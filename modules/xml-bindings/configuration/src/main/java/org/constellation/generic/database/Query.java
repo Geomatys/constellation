@@ -174,13 +174,14 @@ public class Query {
         StringBuilder mainQuery = new StringBuilder("SELECT ");
 
         for (Column col : select.getCol()) {
-            String varName = col.getVar();
-            if (varName != null) {
+            String varName        = col.getVar();
+            final String varValue = col.getSql();
+            if (varName != null && !varValue.equals("*")) {
                 if (varName.equals(":$"))
                     varName = "ID";
-                mainQuery.append(col.getSql()).append(" AS ").append(varName).append(',');
+                mainQuery.append(varValue).append(" AS ").append(varName).append(',');
             } else {
-                mainQuery.append(col.getSql()).append(',');
+                mainQuery.append(varValue).append(',');
             }
         }
         mainQuery = mainQuery.deleteCharAt(mainQuery.length() - 1);

@@ -22,6 +22,7 @@ import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
+import org.constellation.generic.database.Static;
 import org.constellation.ws.CstlServiceException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -177,6 +179,32 @@ public abstract class GenericReader  {
             staticParameters = queries.getParameters();
             if (staticParameters == null) {
                 staticParameters = new HashMap<String, String>();
+            }
+
+            // initialize the static parameters obtained by a static query (no parameters & 1 ouput param)
+            Static statique = queries.getStatique();
+            if (statique != null) {
+                for (Query query : statique.getQuery()) {
+                    String varName = null;
+                    if (query.getSelect() != null && query.getSelect().getCol() != null) {
+                        varName = query.getSelect().getCol().get(0).getVar();
+                    }
+                    String textQuery = query.buildSQLQuery(staticParameters);
+                    logger.finer("new Static query: " + textQuery);
+                    Statement stmt =  connection.createStatement();
+                    ResultSet res  = stmt.executeQuery(textQuery);
+                    String parameterValue = "";
+                    while (res.next()) {
+                        parameterValue += "'" + res.getString(1) + "',";
+                    }
+                    res.close();
+                    stmt.close();
+                    //we remove the last ','
+                    if (parameterValue.length() > 0)
+                        parameterValue = parameterValue.substring(0, parameterValue.length() - 1);
+                    logger.finer("PUT STATIC QUERY :" + varName + "-" + parameterValue);
+                    staticParameters.put(varName, parameterValue);
+                }
             }
             
             // initialize the single statements

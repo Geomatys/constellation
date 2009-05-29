@@ -18,9 +18,7 @@
 
 package org.constellation.generic.database;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import org.geotoolkit.util.Utilities;
@@ -35,6 +33,8 @@ public class Queries {
     private HashMap<String, String> parameters;
 
     private QueryPropertyType main;
+
+    private Static statique;
     
     private Single single;
     
@@ -128,5 +128,19 @@ public class Queries {
         hash = 53 * hash + (this.single != null ? this.single.hashCode() : 0);
         hash = 53 * hash + (this.multiFixed != null ? this.multiFixed.hashCode() : 0);
         return hash;
+    }
+
+    /**
+     * @return the statique
+     */
+    public Static getStatique() {
+        return statique;
+    }
+
+    /**
+     * @param statique the statique to set
+     */
+    public void setStatique(Static statique) {
+        this.statique = statique;
     }
 }

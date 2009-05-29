@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.generic.database.Static;
 
 
 /**
@@ -36,6 +37,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "parameters",
+    "statique",
     "paramsSql",
     "select",
     "nestedSelect",
@@ -57,6 +59,8 @@ public class Query {
     private String option;
 
     private HashMap<String, String> parameters;
+
+    private Static statique;
 
     @XmlElement(name = "params_sql")
     private ParamsSql paramsSql;
@@ -389,5 +393,19 @@ public class Query {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * @return the statique
+     */
+    public Static getStatique() {
+        return statique;
+    }
+
+    /**
+     * @param statique the statique to set
+     */
+    public void setStatique(Static statique) {
+        this.statique = statique;
     }
 }
