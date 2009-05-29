@@ -97,6 +97,7 @@ import org.constellation.sos.io.ObservationResult;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
+import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
 
@@ -1837,26 +1838,9 @@ public class SOSworker {
         } else {
 
             /* Ifremer's server does not contain any .sicade directory, so the
-             * configuration file is put under the WEB-INF directory of constellation.
-             * TODO find a proper way to do this.
+             * configuration files are put under the WEB-INF/classes/configuration directory of constellation.
              */
-            final String catalinaPath = System.getenv().get("CATALINA_HOME");
-            if (catalinaPath != null) {
-                File dirCatalina = new File(catalinaPath);
-                if (dirCatalina != null && dirCatalina.exists()) {
-                    configDir = new File(dirCatalina, "webapps/swe_WS/WEB-INF/sos_configuration");
-                    if (configDir.exists()) {
-                        logger.info("taking ifremer configuration from WEB-INF WAR directory");
-                        return configDir;
-                    }
-                    configDir = new File(dirCatalina, "webapps/swe_WS/WEB-INF/configuration");
-                    if (configDir.exists()) {
-                        logger.info("taking ifremer configuration from WEB-INF WAR directory");
-                        return configDir;
-                    }
-                }
-            }
-            return null;
+            return Util.getDirectoryFromResource("configuration");
         }
     }
 

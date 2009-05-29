@@ -354,16 +354,98 @@ public final class Util {
     }
     
     /**
-     * Searches in the Context ClassLoader for the named packages and returns a 
-     * {@code List<String>} with, for each named package, 
-     *                                  ...TODO, read .scan(.)
-     * <p>
-     * TODO: verify this.
-     * </p>
-     * 
-     * @param packages The names of the packages to scan in Java format, i.e. 
+     * Searches in the Context ClassLoader for the named directory and returns it.
+     *
+     * @param packagee The name of package.
+     *
+     * @return A directory if it exist.
+     */
+    public static File getDirectoryFromResource(final String packagee) {
+        File result = null;
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+
+        try {
+            String fileP = packagee.replace('.', '/');
+            Enumeration<URL> urls = classloader.getResources(fileP);
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                try {
+                    URI uri = url.toURI();
+                    result  = scanDir(uri, fileP);
+                } catch (URISyntaxException e) {
+                    logger.severe("URL, " + url + "cannot be converted to a URI");
+                }
+            }
+        } catch (IOException ex) {
+            logger.severe("The resources for the package" + packagee + ", could not be obtained");
+        }
+
+
+        return result;
+    }
+    /**
+     * Scan a resource file (a JAR or a directory) and return it as a File.
+     *
+     * @param u The URI of the file.
+     * @param filePackageName The package to scan.
+     *
+     * @return a list of package names.
+     * @throws java.io.IOException
+     */
+    public static File scanDir(final URI u, final String filePackageName) throws IOException {
+        String scheme = u.getScheme();
+        if (scheme.equals("file")) {
+            File f = new File(u.getPath());
+            if (f.isDirectory()) {
+                return f;
+            }
+        } else if (scheme.equals("jar") || scheme.equals("zip")) {
+            logger.info("we don't scan jar or zip files");
+        }
+        return null;
+    }
+
+
+    /**
+     * Searches in the Context ClassLoader for the named files and returns a
+     * {@code List<String>} with, for each named package,
+     *
+     * @param packages The names of the packages to scan in Java format, i.e.
      *                   using the "." separator, may be null.
-     * 
+     *
+     * @return A list of package names.
+     */
+    public static List<String> searchSubFiles(final String packagee) {
+        List<String> result = new ArrayList<String>();
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+
+        try {
+            String fileP = packagee.replace('.', '/');
+            Enumeration<URL> urls = classloader.getResources(fileP);
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                try {
+                    URI uri = url.toURI();
+                    result.addAll(scan(uri, fileP, false));
+                } catch (URISyntaxException e) {
+                    logger.severe("URL, " + url + "cannot be converted to a URI");
+                }
+            }
+        } catch (IOException ex) {
+            logger.severe("The resources for the package" + packagee + ", could not be obtained");
+        }
+
+
+        return result;
+    }
+
+    /**
+     * Searches in the Context ClassLoader for the named packages and returns a
+     * {@code List<String>} with, for each named package,
+     *
+     * @param packages The names of the packages to scan in Java format, i.e.
+     *                   using the "." separator, may be null.
+     *
      * @return A list of package names.
      */
     public static List<String> searchSubPackage(final String... packages) {
@@ -377,7 +459,7 @@ public final class Util {
                     URL url = urls.nextElement();
                     try {
                         URI uri = url.toURI();
-                        result.addAll(scan(uri, fileP));
+                        result.addAll(scan(uri, fileP, true));
                     } catch (URISyntaxException e) {
                         logger.severe("URL, " + url + "cannot be converted to a URI");
                     }
@@ -393,50 +475,58 @@ public final class Util {
     /**
      * Scan a resource file (a JAR or a directory) to find the sub-package names of
      * the specified "filePackageName"
-     * 
+     *
      * @param u The URI of the file.
      * @param filePackageName The package to scan.
-     * 
+     *
      * @return a list of package names.
      * @throws java.io.IOException
      */
-    public static List<String> scan(final URI u, final String filePackageName) throws IOException {
+    public static List<String> scan(final URI u, final String filePackageName, boolean directory) throws IOException {
         List<String> result = new ArrayList<String>();
         String scheme = u.getScheme();
         if (scheme.equals("file")) {
             File f = new File(u.getPath());
             if (f.isDirectory()) {
-                result.addAll(scanDirectory(f, filePackageName));
+                result.addAll(scanDirectory(f, filePackageName, directory));
+            } else if (!directory) {
+                System.out.println("added :" + f.getPath());
+                result.add(f.getPath());
             }
         } else if (scheme.equals("jar") || scheme.equals("zip")) {
             try {
                 URI jarUri = URI.create(u.getSchemeSpecificPart());
                 String jarFile = jarUri.getPath();
                 jarFile = jarFile.substring(0, jarFile.indexOf('!'));
-                result.addAll(scanJar(new File(jarFile), filePackageName));
-              
+                result.addAll(scanJar(new File(jarFile), filePackageName, directory));
+
             } catch (IllegalArgumentException ex) {
                 logger.warning("unable to scan jar file: " +u.getSchemeSpecificPart());
             }
         }
-        return result; 
+        return result;
     }
 
     /**
      * Scan a directory to find the sub-package names of
      * the specified "parent" package
-     * 
+     *
      * @param root The root file (directory) of the package to scan.
      * @param parent the package name.
-     * 
+     *
      * @return a list of package names.
      */
-    public static List<String> scanDirectory(final File root, final String parent) {
+    public static List<String> scanDirectory(final File root, final String parent, boolean directory) {
         List<String> result = new ArrayList<String>();
         for (File child : root.listFiles()) {
             if (child.isDirectory()) {
-                result.add(parent.replace('/', '.') + '.' + child.getName());
-                result.addAll(scanDirectory(child, parent));
+                if (directory) {
+                    result.add(parent.replace('/', '.') + '.' + child.getName());
+                }
+                result.addAll(scanDirectory(child, parent, directory));
+            } else if (!directory) {
+                System.out.println("added :" + child.getPath());
+                result.add(child.getPath());
             }
         }
         return result;
@@ -445,20 +535,24 @@ public final class Util {
     /**
      * Scan a jar to find the sub-package names of
      * the specified "parent" package
-     * 
+     *
      * @param file the jar file containing the package to scan
      * @param parent the package name.
-     * 
+     *
      * @return a list of package names.
      * @throws java.io.IOException
      */
-    public static List<String> scanJar(final File file, final String parent) throws IOException {
+    public static List<String> scanJar(final File file, final String parent, boolean directory) throws IOException {
         List<String> result = new ArrayList<String>();
         final JarFile jar = new JarFile(file);
         final Enumeration<JarEntry> entries = jar.entries();
         while (entries.hasMoreElements()) {
             JarEntry e = entries.nextElement();
-            if (e.isDirectory() && e.getName().startsWith(parent)) {
+            if (e.isDirectory() && e.getName().startsWith(parent) && directory) {
+                String s = e.getName().replace('/', '.');
+                s = s.substring(0, s.length() - 1);
+                result.add(s);
+            } else if (!e.isDirectory() && e.getName().startsWith(parent) && !directory) {
                 String s = e.getName().replace('/', '.');
                 s = s.substring(0, s.length() - 1);
                 result.add(s);
