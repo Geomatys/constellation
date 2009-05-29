@@ -48,7 +48,7 @@ import org.constellation.generic.database.Static;
     "orderby",
     "groupby"
 })
-@XmlRootElement(name = "query")
+@XmlRootElement(name = "query", namespace="http://constellation.generic.filter.org")
 public class Query {
 
     @XmlAttribute(required = true)
