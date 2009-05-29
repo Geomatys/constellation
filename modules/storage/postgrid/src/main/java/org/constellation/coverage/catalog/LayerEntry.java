@@ -507,6 +507,10 @@ final class LayerEntry extends Entry implements Layer {
      * {@inheritDoc}
      */
     public boolean isQueryable(ServiceType service) {
+        if (series == null || series.isEmpty()) {
+            // There is no series for this layer, so nothing to request here.
+            return false;
+        }
         for (final Series s : series) {
             if (!s.isQueryable(service)) {
                 return false;

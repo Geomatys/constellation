@@ -101,6 +101,7 @@ import org.geotoolkit.wcs.xml.v111.InterpolationMethodType;
 import org.geotoolkit.wcs.xml.v111.InterpolationMethods;
 import org.geotoolkit.wcs.xml.v111.RangeType;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.ServiceType;
 import org.constellation.ws.rs.WebService;
 
 // Geotools dependencies
@@ -236,6 +237,10 @@ public final class WCSWorker {
 
         //TODO: we should loop over the list
         final LayerDetails layerRef = getLayerReference(request.getCoverage().get(0), ServiceDef.WCS_1_0_0.version.toString());
+        if (!layerRef.isQueryable(ServiceType.WCS)) {
+            throw new CstlServiceException("You are not allowed to request the layer \"" +
+                    layerRef.getName() + "\".", INVALID_PARAMETER_VALUE);
+        }
 
         final List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
         final Set<Series> series = layerRef.getSeries();
@@ -361,6 +366,10 @@ public final class WCSWorker {
         //TODO: we should loop over the list
         final LayerDetails layer = getLayerReference(request.getIdentifier().get(0), ServiceDef.WCS_1_1_1.version.toString());
 
+        if (!layer.isQueryable(ServiceType.WCS)) {
+            throw new CstlServiceException("You are not allowed to request the layer \"" +
+                    layer.getName() + "\".", INVALID_PARAMETER_VALUE);
+        }
         final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory =
                 new org.geotoolkit.ows.xml.v110.ObjectFactory();
         final List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
@@ -574,6 +583,9 @@ public final class WCSWorker {
         final List<LayerDetails> layerRefs = getAllLayerReferences(ServiceDef.WCS_1_0_0.version.toString());
         try {
             for (LayerDetails layer : layerRefs) {
+                if (!layer.isQueryable(ServiceType.WCS)) {
+                    continue;
+                }
                 final CoverageOfferingBriefType co = new CoverageOfferingBriefType();
                 co.addRest(wcs100Factory.createName(layer.getName()));
                 co.addRest(wcs100Factory.createLabel(layer.getName()));
@@ -699,6 +711,9 @@ public final class WCSWorker {
         final List<LayerDetails> layerRefs = getAllLayerReferences(ServiceDef.WCS_1_1_1.version.toString());
         try {
             for (LayerDetails layer : layerRefs) {
+                if (!layer.isQueryable(ServiceType.WCS)) {
+                   continue;
+                }
                 final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
                 title.add(new LanguageStringType(layer.getName()));
                 final List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
@@ -779,7 +794,10 @@ public final class WCSWorker {
 
             //NOTE ADRIAN HACKED HERE
             final LayerDetails layerRef = getLayerReference(abstractRequest.getCoverage(), inputVersion);
-
+            if (!layerRef.isQueryable(ServiceType.WCS)) {
+                throw new CstlServiceException("You are not allowed to request the layer \"" +
+                        layerRef.getName() + "\".", INVALID_PARAMETER_VALUE);
+            }
             final Envelope envelope;
             try {
                 envelope = abstractRequest.getEnvelope();
@@ -822,6 +840,10 @@ public final class WCSWorker {
 
             // SCENE
             final LayerDetails layerRef = getLayerReference(abstractRequest.getCoverage(), inputVersion);
+            if (!layerRef.isQueryable(ServiceType.WCS)) {
+                throw new CstlServiceException("You are not allowed to request the layer \"" +
+                        layerRef.getName() + "\".", INVALID_PARAMETER_VALUE);
+            }
             final Map<String, Object> renderParameters = new HashMap<String, Object>();
             final Envelope envelope;
             try {

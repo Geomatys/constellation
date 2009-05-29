@@ -237,6 +237,9 @@ public class WMSWorker extends AbstractWMSWorker {
         //Build the list of layers
         final List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
         for (LayerDetails layer : layerRefs){
+            if (!layer.isQueryable(ServiceType.WMS)) {
+                continue;
+            }
             /*
              *  TODO
              * code = CRS.lookupEpsgCode(inputLayer.getCoverageReference().getCoordinateReferenceSystem(), false);
@@ -591,6 +594,12 @@ public class WMSWorker extends AbstractWMSWorker {
         final List<LayerDetails> layerRefs;
         layerRefs = getLayerReferences(layerNames, getFI.getVersion().toString());
 
+        for (LayerDetails layer : layerRefs) {
+            if (!layer.isQueryable(ServiceType.GETINFO)) {
+                throw new CstlServiceException("You are not allowed to request the layer \""+
+                        layer.getName() +"\".", INVALID_PARAMETER_VALUE);
+            }
+        }
         //       -- build an equivalent style List
         //TODO: clean up the SLD vs. style logic
         final List<String> styleNames          = getFI.getStyles();
@@ -699,7 +708,10 @@ public class WMSWorker extends AbstractWMSWorker {
     @Override
     public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
         final LayerDetails layer = getLayerReference(getLegend.getLayer(), getLegend.getVersion().toString());
-
+        if (!layer.isQueryable(ServiceType.WMS)) {
+            throw new CstlServiceException("You are not allowed to request the layer \""+
+                    layer.getName() +"\".", INVALID_PARAMETER_VALUE);
+        }
         final Integer width  = getLegend.getWidth();
         final Integer height = getLegend.getHeight();
         final Dimension dims = new Dimension((width == null) ? 140 : width,
@@ -737,6 +749,12 @@ public class WMSWorker extends AbstractWMSWorker {
                 return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize());
             } else {
                 throw new CstlServiceException(ex, LAYER_NOT_DEFINED);
+            }
+        }
+        for (LayerDetails layer : layerRefs) {
+            if (!layer.isQueryable(ServiceType.WMS)) {
+                throw new CstlServiceException("You are not allowed to request the layer \""+
+                        layer.getName() +"\".", INVALID_PARAMETER_VALUE);
             }
         }
         //       -- build an equivalent style List
