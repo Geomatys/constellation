@@ -57,7 +57,11 @@ public enum ServiceDef {
 
     // Security services definitions
 	PEP(Specification.PEP, Organization.OASIS, null, Profile.NONE, null),
-	PDP(Specification.PDP, Organization.OASIS, null, Profile.NONE, null);
+	PDP(Specification.PDP, Organization.OASIS, null, Profile.NONE, null),
+
+    // MDWeb services definitions
+	MDW(Specification.MDW, Organization.NONE, null, Profile.NONE, null);
+	
 
 
     /**
@@ -164,7 +168,8 @@ public enum ServiceDef {
         WMS("Web Map Service"),
         WMTS("Web Map Tile Service"),
 		PEP("Policy Enforcement Point"),
-		PDP("Policy Decision Point");
+		PDP("Policy Decision Point"),
+        MDW("MDWeb");
 
 		public final String fullName;
 
