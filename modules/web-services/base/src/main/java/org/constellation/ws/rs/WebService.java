@@ -317,6 +317,14 @@ public abstract class WebService {
                 Versioned ar = (Versioned) request;
                 if (ar.getVersion() != null)
                     uriContext.getQueryParameters().add("VERSION", ar.getVersion().toString());
+            } if (request != null) {
+                String type = "";
+                if (request instanceof JAXBElement) {
+                    type = ((JAXBElement)request).getDeclaredType().getName();
+                } else {
+                    type = request.getClass().getName();
+                }
+                LOGGER.info("request type:" + type);
             }
             return treatIncomingRequest(request);
         } else {
