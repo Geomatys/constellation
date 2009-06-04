@@ -89,7 +89,7 @@ public class GMLGraphicVisitor extends TextGraphicVisitor{
     public void visit(ProjectedFeature graphic, Shape queryArea) {
         index++;
         final StringBuilder builder = new StringBuilder();
-        final FeatureMapLayer layer = graphic.getSource();
+        final FeatureMapLayer layer = graphic.getFeatureLayer();
         final Feature feature       = graphic.getFeature();
 
         for(final Property prop : feature.getProperties()){
