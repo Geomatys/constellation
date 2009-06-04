@@ -26,7 +26,7 @@ import java.util.Map;
 import javax.measure.unit.Unit;
 
 import org.constellation.query.wms.GetFeatureInfo;
-import org.geotoolkit.display2d.primitive.GraphicCoverageJ2D;
+import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.map.FeatureMapLayer;
 
@@ -104,13 +104,13 @@ public class HTMLGraphicVisitor extends TextGraphicVisitor{
      * {@inheritDoc }
      */
     @Override
-    public void visit(GraphicCoverageJ2D coverage, Shape queryArea) {
+    public void visit(ProjectedCoverage coverage, Shape queryArea) {
         index++;
         final Object[][] results = getCoverageValues(coverage, queryArea);
 
         if(results == null) return;
 
-        final String layerName = coverage.getUserObject().getName();
+        final String layerName = coverage.getCoverageLayer().getName();
         List<String> strs = values.get(layerName);
         if(strs == null){
             strs = new ArrayList<String>();
