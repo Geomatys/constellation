@@ -361,25 +361,9 @@ public class CSWworker {
         } else {
 
             /* Ifremer's server does not contain any .sicade directory, so the
-             * configuration file is put under the WEB-INF directory of constellation.
+             * configuration files are put under the WEB-INF/classes/configuration directory of the WAR file.
              */
-            final String catalinaPath = System.getenv().get("CATALINA_HOME");
-            if (catalinaPath != null) {
-                File dirCatalina = new File(catalinaPath);
-                if (dirCatalina != null && dirCatalina.exists()) {
-                    configDir = new File(dirCatalina, "webapps/sdn-csw_WS/WEB-INF/csw_configuration");
-                    if (configDir.exists()) {
-                        logger.info("taking ifremer configuration from WEB-INF WAR directory");
-                        return configDir;
-                    }
-                    configDir = new File(dirCatalina, "webapps/sdn-csw_WS/WEB-INF/configuration");
-                    if (configDir.exists()) {
-                        logger.info("taking ifremer configuration from WEB-INF WAR directory");
-                        return configDir;
-                    }
-                }
-            }
-            return null;
+            return Util.getDirectoryFromResource("configuration");
         }
     }
 

@@ -1838,7 +1838,7 @@ public class SOSworker {
         } else {
 
             /* Ifremer's server does not contain any .sicade directory, so the
-             * configuration files are put under the WEB-INF/classes/configuration directory of constellation.
+             * configuration files are put under the WEB-INF/classes/configuration directory of the WAR file.
              */
             return Util.getDirectoryFromResource("configuration");
         }

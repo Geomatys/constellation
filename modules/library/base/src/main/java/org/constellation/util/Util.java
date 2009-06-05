@@ -383,6 +383,7 @@ public final class Util {
 
         return result;
     }
+
     /**
      * Scan a resource file (a JAR or a directory) and return it as a File.
      *
@@ -404,7 +405,6 @@ public final class Util {
         }
         return null;
     }
-
 
     /**
      * Searches in the Context ClassLoader for the named files and returns a

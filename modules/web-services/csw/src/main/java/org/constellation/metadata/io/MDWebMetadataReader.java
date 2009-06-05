@@ -41,24 +41,11 @@ import java.util.StringTokenizer;
 import javax.xml.namespace.QName;
 
 // Constellation Dependencies
-import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.ElementSet;
-import org.geotoolkit.csw.xml.Settable;
-import org.geotoolkit.csw.xml.v202.AbstractRecordType;
-import org.geotoolkit.csw.xml.v202.BriefRecordType;
-import org.geotoolkit.csw.xml.v202.DomainValuesType;
-import org.geotoolkit.csw.xml.v202.ElementSetType;
-import org.geotoolkit.csw.xml.v202.ListOfValuesType;
-import org.geotoolkit.csw.xml.v202.SummaryRecordType;
-import org.geotoolkit.csw.xml.v202.RecordType;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
-import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.constellation.util.StringUtilities;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.TypeNames.*;
         
@@ -72,10 +59,23 @@ import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.sql.Reader;
-
-// geotools/GeoAPI dependencies
-import org.geotoolkit.metadata.iso.MetadataEntity;
 import org.mdweb.sql.v20.Reader20;
+
+// geotoolkit/GeoAPI dependencies
+import org.geotoolkit.metadata.iso.MetadataEntity;
+import org.geotoolkit.csw.xml.DomainValues;
+import org.geotoolkit.csw.xml.ElementSet;
+import org.geotoolkit.csw.xml.Settable;
+import org.geotoolkit.csw.xml.v202.AbstractRecordType;
+import org.geotoolkit.csw.xml.v202.BriefRecordType;
+import org.geotoolkit.csw.xml.v202.DomainValuesType;
+import org.geotoolkit.csw.xml.v202.ElementSetType;
+import org.geotoolkit.csw.xml.v202.ListOfValuesType;
+import org.geotoolkit.csw.xml.v202.SummaryRecordType;
+import org.geotoolkit.csw.xml.v202.RecordType;
+import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
+import org.geotoolkit.ows.xml.v100.BoundingBoxType;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.opengis.util.CodeList;
 
 
@@ -252,7 +252,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * We give the possibility to the user to add a configuration file making the mapping.
      * @return
      */
-    public Map<String, Class> initClassBinding(File configDir) {
+    private Map<String, Class> initClassBinding(File configDir) {
         Map<String, Class> result = new HashMap<String, Class>();
         try {
             // we get the configuration file
