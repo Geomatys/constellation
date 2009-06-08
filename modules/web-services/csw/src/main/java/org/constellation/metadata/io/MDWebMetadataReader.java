@@ -1226,12 +1226,21 @@ public class MDWebMetadataReader extends MetadataReader {
 
     @Override
     public List<QName> getAdditionalQueryableQName() {
-        return new ArrayList<QName>();
+        return Arrays.asList(_Degree_QNAME,
+                             _AccessConstraints_QNAME,
+                             _OtherConstraints_QNAME,
+                             _Classification_QNAME,
+                             _ConditionApplyingToAccessAndUse_QNAME,
+                             _MetadataPointOfContact_QNAME,
+                             _Lineage_QNAME,
+                             _SpecificationTitle_QNAME,
+                             _SpecificationDate_QNAME,
+                             _SpecificationDateType_QNAME);
     }
 
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
-        return new HashMap<String, List<String>>();
+        return INSPIRE_QUERYABLE;
     }
 
     /**

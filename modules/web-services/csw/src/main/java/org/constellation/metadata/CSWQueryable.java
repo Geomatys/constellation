@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.xml.namespace.QName;
 
 /**
  * A container for list of queryable elements in different schemas used in CSW.
@@ -27,7 +28,18 @@ import java.util.Map;
  * @author Guilhem Legal
  */
 public class CSWQueryable {
-    
+
+     public final static QName _Degree_QNAME                           = new QName("http://www.inspire.org", "Degree",                          "ins");
+     public final static QName _AccessConstraints_QNAME                = new QName("http://www.inspire.org", "AccessConstraints",               "ins");
+     public final static QName _OtherConstraints_QNAME                 = new QName("http://www.inspire.org", "OtherCOnstraints",                "ins");
+     public final static QName _Classification_QNAME                   = new QName("http://www.inspire.org", "Classification",                  "ins");
+     public final static QName _ConditionApplyingToAccessAndUse_QNAME  = new QName("http://www.inspire.org", "ConditionApplyingToAccessAndUse", "ins");
+     public final static QName _MetadataPointOfContact_QNAME           = new QName("http://www.inspire.org", "MetadataPointOfContact",          "ins");
+     public final static QName _Lineage_QNAME                          = new QName("http://www.inspire.org", "Lineage",                         "ins");
+     public final static QName _SpecificationTitle_QNAME               = new QName("http://www.inspire.org", "SpecificationTitle",              "ins");
+     public final static QName _SpecificationDate_QNAME                = new QName("http://www.inspire.org", "SpecificationDate",               "ins");
+     public final static QName _SpecificationDateType_QNAME            = new QName("http://www.inspire.org", "SpecificationDateType",           "ins");
+     
     /**
      * The queryable element from ISO 19115 and their path id.
      */
@@ -231,7 +243,7 @@ public class CSWQueryable {
         paths.add("Ebrim v3.0:RegistryPackage:name:localizedString:value");
         DUBLIN_CORE_QUERYABLE.put("title", paths);
         
-       paths = new ArrayList<String>();
+        paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:pointOfContact:organisationName#role=originator");
         paths.add("Catalog Web Service:Record:creator:content");
         DUBLIN_CORE_QUERYABLE.put("creator", paths);
@@ -472,5 +484,57 @@ public class CSWQueryable {
         
         paths = new ArrayList<String>();
         EBRIM_QUERYABLE.put("CRS",     paths);
+    }
+
+     /**
+     * The queryable element from DublinCore and their path id.
+     */
+    public static Map<String, List<String>> INSPIRE_QUERYABLE;
+    static {
+        INSPIRE_QUERYABLE = new HashMap<String, List<String>>();
+        List<String> paths;
+
+        /*
+         * The core queryable of DublinCore
+         */
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:dataQualityInfo:report:result:pass");
+        INSPIRE_QUERYABLE.put("Degree", paths);
+
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:accessConstraints");
+        INSPIRE_QUERYABLE.put("AccessConstraints", paths);
+
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:otherConstraints");
+        INSPIRE_QUERYABLE.put("OtherConstraints", paths);
+
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:classification");
+        INSPIRE_QUERYABLE.put("Classification", paths);
+
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:useLimitation");
+        INSPIRE_QUERYABLE.put("ConditionApplyingToAccessAndUse", paths);
+
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:contact:organisationName");
+        INSPIRE_QUERYABLE.put("MetadataPointOfContact", paths);
+
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:dataQualityInfo:lineage:statement");
+        INSPIRE_QUERYABLE.put("Lineage", paths);
+
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:title");
+        INSPIRE_QUERYABLE.put("SpecificationTitle", paths);
+
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:date:date");
+        INSPIRE_QUERYABLE.put("SpecificationDate", paths);
+
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:date:dateType");
+        INSPIRE_QUERYABLE.put("SpecificationDateType", paths);
     }
 }
