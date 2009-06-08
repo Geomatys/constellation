@@ -228,6 +228,12 @@
     <dependency>
       <groupId>org.apache.myfaces.tomahawk</groupId>
       <artifactId>tomahawk</artifactId>
+      <exclusions>
+          <exclusion>
+              <groupId>batik</groupId>
+              <artifactId>batik-awt-util</artifactId>
+          </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.myfaces.tomahawk</groupId>
