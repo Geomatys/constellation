@@ -56,7 +56,7 @@ public class ObjectFactory {
     }
     
     /**
-     * Create an instance of {@link WRSExtrinsicObjectType }
+     * Create an instance of {@link AcknowlegementType }
      * 
      */
     public AcknowlegementType createAcknowlegementType() {
@@ -64,7 +64,7 @@ public class ObjectFactory {
     }
     
     /**
-     * Create an instance of {@link WRSExtrinsicObjectType }
+     * Create an instance of {@link UpdatePropertiesFileType }
      * 
      */
     public UpdatePropertiesFileType createUpdatePropertiesFileType() {
@@ -72,12 +72,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link WRSExtrinsicObjectType }
+     * Create an instance of {@link SOSConfiguration }
      *
      */
     public SOSConfiguration createSOSConfiguration() {
         return new SOSConfiguration();
     }
 
+    /**
+     * Create an instance of {@link HarvestTasks }
+     *
+     */
+    public HarvestTasks createHarvestTasks() {
+        return new HarvestTasks();
+    }
+
+    /**
+     * Create an instance of {@link HarvestTask }
+     *
+     */
+    public HarvestTask createHarvestTask() {
+        return new HarvestTask();
+    }
 
 }

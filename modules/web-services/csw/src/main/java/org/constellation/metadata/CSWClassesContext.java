@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.constellation.configuration.HarvestTasks;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.constellation.util.Util;
 
@@ -61,6 +62,10 @@ public class CSWClassesContext {
      */
     public static Class[] getAllClasses() {
         List<Class> classeList = new ArrayList<Class>();
+
+        // configuration classes
+        classeList.add(HarvestTasks.class);
+
         //ISO 19115 class
         classeList.add(DefaultMetaData.class);
 

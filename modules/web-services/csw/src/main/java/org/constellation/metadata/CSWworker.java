@@ -27,6 +27,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +51,7 @@ import org.w3c.dom.Document;
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.namespace.QName;
@@ -58,6 +60,8 @@ import javax.xml.namespace.QName;
 import org.apache.lucene.search.Sort;
 
 //Constellation dependencies
+import org.constellation.configuration.HarvestTask;
+import org.constellation.configuration.HarvestTasks;
 import org.geotoolkit.csw.xml.AbstractCswRequest;
 import org.geotoolkit.csw.xml.AbstractResultType;
 import org.geotoolkit.csw.xml.CswXmlFactory;
@@ -330,6 +334,7 @@ public class CSWworker {
                 initializeAcceptedResourceType();
                 initializeAnchorsMap();
                 loadCascadedService(configDir);
+                initializeHarvestTask(configDir);
                 logger.info("CSW service (" + configuration.getFormat() + ") running");
             }
         } catch (FactoryNotFoundException ex) {
@@ -457,6 +462,83 @@ public class CSWworker {
             logger.info("no cascaded CSW server found (optionnal) (IO Exception)");
         }
     }
+
+    private void initializeHarvestTask(final File configDirectory) {
+        Unmarshaller unmarshaller = null;
+        try {
+            // we get the saved harvest task file
+            File f = new File(configDirectory, "HarvestTask.xml");
+            if (f.exists()) {
+                unmarshaller = marshallerPool.acquireUnmarshaller();
+                Object obj = unmarshaller.unmarshal(f);
+                Timer t = new Timer();
+                if (obj instanceof HarvestTasks) {
+                    HarvestTasks tasks = (HarvestTasks) obj;
+                    for (HarvestTask task : tasks.getTask()) {
+                        AsynchronousHarvestTask at = new AsynchronousHarvestTask(catalogueHarvester,
+                                                                                 task.getSourceURL(),
+                                                                                 task.getResourceType(),
+                                                                                 task.getMode(),
+                                                                                 task.getEmails());
+                        t.scheduleAtFixedRate(at, 2000, task.getPeriod());
+                    }
+                } else {
+                    logger.severe("Bad data type for file HarvestTask.xml");
+                }
+            } else {
+                logger.info("no Harvest task found (optionnal)");
+            }
+
+        } catch (JAXBException e) {
+            logger.info("JAXB Exception while unmarshalling the file HarvestTask.xml");
+            
+        } finally {
+            if (unmarshaller != null) {
+                marshallerPool.release(unmarshaller);
+            }
+        }
+    }
+
+    private void saveSchreduledHarvestTask(String sourceURL, String resourceType, int mode, List<String> emails, long period) {
+        HarvestTask newTask       = new HarvestTask(sourceURL, resourceType, mode, emails, period);
+        File configDir            = getConfigDirectory();
+        File f                    = new File(configDir, "HarvestTask.xml");
+        Marshaller marshaller     = null;
+        Unmarshaller unmarshaller = null;
+        try {
+            marshaller = marshallerPool.acquireMarshaller();
+            if (f.exists()) {
+                unmarshaller = marshallerPool.acquireUnmarshaller();
+                Object obj   = unmarshaller.unmarshal(f);
+                if (obj instanceof HarvestTasks) {
+                    HarvestTasks tasks = (HarvestTasks) obj;
+                    tasks.addTask(newTask);
+                    marshaller.marshal(tasks, f);
+                } else {
+                    logger.severe("Bad data type for file HarvestTask.xml");
+                }
+            } else {
+                
+                f.createNewFile();
+                HarvestTasks tasks = new HarvestTasks(Arrays.asList(newTask));
+                marshaller.marshal(tasks, f);
+            }
+
+        } catch (IOException ex) {
+            logger.severe("unable to create a file for schreduled harvest task");
+        } catch (JAXBException ex) {
+            logger.severe("A JAXB exception occurs when trying to marshall the shreduled harvest task");
+            ex.printStackTrace();
+        } finally {
+            if (unmarshaller != null) {
+                marshallerPool.release(unmarshaller);
+            }
+            if (marshaller != null) {
+                marshallerPool.release(marshaller);
+            }
+        }
+    }
+            
     
     /**
      * Web service operation describing the service and its capabilities.
@@ -1544,6 +1626,7 @@ public class CSWworker {
                     } else {
                         t.scheduleAtFixedRate(harvestTask, 1000, period);
                         schreduledTask.add(t);
+                        saveSchreduledHarvestTask(sourceURL, resourceType, mode, request.getResponseHandler(), period);
                     }
                     
                 }
