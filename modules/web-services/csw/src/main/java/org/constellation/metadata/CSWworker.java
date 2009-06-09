@@ -21,24 +21,26 @@ package org.constellation.metadata;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
 // W3C DOM dependecies
+import javax.mail.MessagingException;
+import javax.naming.NamingException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -105,6 +107,7 @@ import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
+import org.constellation.metadata.utils.MailSendingUtilities;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v100.DomainType;
 import org.geotoolkit.ows.xml.v100.Operation;
@@ -256,6 +259,11 @@ public class CSWworker {
      * The current version of the service.
      */
     private ServiceVersion actingVersion = new ServiceVersion(ServiceType.CSW, "2.0.2");
+
+    /**
+     * A list of schreduled Task (used in close method).
+     */
+    private List<Timer> schreduledTask = new ArrayList<Timer>();
 
     /**
      * Default constructor for CSW worker.
@@ -1484,55 +1492,60 @@ public class CSWworker {
         }
         String sourceURL = request.getSource();
         if (sourceURL != null) {
-            Unmarshaller unmarshaller = null;
             try {
 
-                unmarshaller = marshallerPool.acquireUnmarshaller();
-                // if the resource is a simple record
+                // TODO find a better to determine if the source is single or catalogue
+                int mode = 1;
                 if (sourceURL.endsWith("xml")) {
-                    
-                    URL source          = new URL(sourceURL);
-                    URLConnection conec = source.openConnection();
-                
-                    // we get the source document
-                    File fileToHarvest = File.createTempFile("harvested", "xml");
-                    fileToHarvest.deleteOnExit();
-                    InputStream in = conec.getInputStream();
-                    FileOutputStream out = new FileOutputStream(fileToHarvest);
-                    byte[] buffer = new byte[1024];
-                    int size;
+                    mode = 0;
+                }
 
-                    while ((size = in.read(buffer, 0, 1024)) > 0) {
-                        out.write(buffer, 0, size);
-                    }
-                
-                    if (resourceType.equals("http://www.isotc211.org/2005/gmd")      || 
-                        resourceType.equals("http://www.opengis.net/cat/csw/2.0.2")  ||
-                        resourceType.equals("http://www.isotc211.org/2005/gfc"))        {
+                //mode synchronous
+                if (request.getResponseHandler().size() == 0) {
 
-                        Object harvested = unmarshaller.unmarshal(fileToHarvest);
-                        if (harvested == null) {
-                            throw new CstlServiceException("The resource can not be parsed.",
-                                                          INVALID_PARAMETER_VALUE, "Source");
-                        }
-                    
-                        logger.info("Object Type of the harvested Resource: " + harvested.getClass().getName());
-                        
-                        // ugly patch TODO handle update in mdweb
-                        try {
-                            if (MDWriter.storeMetadata(harvested))
-                                totalInserted++;
-                        } catch( IllegalArgumentException e) {
-                            totalUpdated++;
-                        }
+                    // if the resource is a simple record
+                    if (mode == 0) {
+                        int[] results = catalogueHarvester.harvestSingle(sourceURL, resourceType);
+                        totalInserted = results[0];
+                        totalUpdated  = results[1];
+                        totalDeleted  = 0;
+
+                    // if the resource is another CSW service we get all the data of this catalogue.
+                    } else {
+                        int[] results = catalogueHarvester.harvestCatalogue(sourceURL);
+                        totalInserted = results[0];
+                        totalUpdated  = results[1];
+                        totalDeleted  = results[2];
                     }
-                
-                // if the resource is another CSW service we get all the data of this catalogue.
+                    TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
+                                                                                totalUpdated,
+                                                                                totalDeleted,
+                                                                                null);
+                    TransactionResponseType transactionResponse = new TransactionResponseType(summary, null, request.getVersion());
+                    response = new HarvestResponseType(transactionResponse);
+
+                //mode asynchronous
                 } else {
-                    int[] results = catalogueHarvester.harvestCatalogue(sourceURL);
-                    totalInserted = results[0];
-                    totalUpdated  = results[1];
-                    totalDeleted  = results[2];
+
+                    AcknowledgementType acknowledgement = new AcknowledgementType(null, new EchoedRequestType(request), System.currentTimeMillis());
+                    response = new HarvestResponseType(acknowledgement);
+                    long period = 0;
+                    if (request.getHarvestInterval() != null) {
+                        period = request.getHarvestInterval().getTimeInMillis(new Date(System.currentTimeMillis()));
+                    }
+
+                    Timer t = new Timer();
+                    TimerTask harvestTask = new AsynchronousHarvestTask(catalogueHarvester, sourceURL, resourceType, mode, request.getResponseHandler());
+                    //we launch only once the harvest
+                    if (period == 0) {
+                        t.schedule(harvestTask, 1000);
+
+                    //we launch the harvest periodically
+                    } else {
+                        t.scheduleAtFixedRate(harvestTask, 1000, period);
+                        schreduledTask.add(t);
+                    }
+                    
                 }
                 
             } catch (SQLException ex) {
@@ -1547,30 +1560,14 @@ public class CSWworker {
             } catch (IOException ex) {
                 throw new CstlServiceException("The service can't open the connection to the source",
                                               INVALID_PARAMETER_VALUE, "Source");
-            } finally {
-                if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
-                }
+            } catch (DatatypeConfigurationException ex) {
+                throw new CstlServiceException("The service has made an error of timestamp",
+                                              INVALID_PARAMETER_VALUE);
             }
             
-        }
-        
-        //mode synchronous
-        if (request.getResponseHandler().size() == 0) {
-           
-            TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
-                                                                        totalUpdated,
-                                                                        totalDeleted,
-                                                                        null);
-            TransactionResponseType transactionResponse = new TransactionResponseType(summary, null, request.getVersion());
-            response = new HarvestResponseType(transactionResponse);
-        
-        //mode asynchronous    
         } else {
-            AcknowledgementType acknowledgement = null;
-            response = new HarvestResponseType(acknowledgement);
-            throw new CstlServiceException("This asynchronous mode for harvest is not yet supported by the service.",
-                                          OPERATION_NOT_SUPPORTED, "ResponseHandler");
+            throw new CstlServiceException("you must specify a source",
+                                              MISSING_PARAMETER_VALUE, "Source");
         }
         
         logger.info("Harvest operation finished");
@@ -1736,8 +1733,104 @@ public class CSWworker {
         if (indexSearcher != null) {
             indexSearcher.destroy();
         }
+        for (Timer t : schreduledTask) {
+            t.cancel();
+        }
         if (catalogueHarvester != null) {
             catalogueHarvester.destroy();
+        }
+    }
+
+     /**
+     * A task launching an harvest periodically.
+     */
+    class AsynchronousHarvestTask extends TimerTask {
+
+        /**
+         * The catalogue harvester.
+         */
+        private CatalogueHarvester harvester;
+
+        /**
+         * The harvest mode SINGLE(0) or CATALOGUE(1)
+         */
+        private int mode;
+
+        /**
+         * The URL of the data source.
+         */
+        private String sourceURL;
+
+        /**
+         * The type of the resource (for single mode).
+         */
+        private String resourceType;
+
+        /**
+         * A list of email addresses.
+         */
+        private String[] emails;
+
+        /**
+         * Build a new Timer which will Harvest the source periodically.
+         *
+         */
+        public AsynchronousHarvestTask(CatalogueHarvester harvester, String sourceURL, String resourceType, int mode, List<String> emails) {
+            this.harvester    = harvester;
+            this.sourceURL    = sourceURL;
+            this.mode         = mode;
+            this.resourceType = resourceType;
+            if (emails != null) {
+                this.emails = emails.toArray(new String[emails.size()]);
+            } else {
+                this.emails = new String[0];
+            }
+        }
+
+        /**
+         * This method is launch when the timer expire.
+         */
+        @Override
+        public void run() {
+            logger.info("launching harvest on:" + sourceURL);
+            try {
+                int[] results;
+                if (mode == 0) {
+                    results = catalogueHarvester.harvestSingle(sourceURL, resourceType);
+                } else {
+                    results = catalogueHarvester.harvestCatalogue(sourceURL);
+                }
+
+                //TODO does we have to send a HarvestResponseType or a custom report to the mails addresses?
+                TransactionSummaryType summary = new TransactionSummaryType(results[0],
+                                                                            results[1],
+                                                                            results[2], null);
+                 TransactionResponseType transactionResponse = new TransactionResponseType(summary, null, "2.0.2");
+                 HarvestResponseType response = new HarvestResponseType(transactionResponse);
+
+                 StringBuilder report = new StringBuilder("Harvest report:\n");
+                 report.append("From: ").append(sourceURL).append('\n');
+                 report.append("Inserted: ").append(results[0]).append('\n');
+                 report.append("Updated: ").append(results[1]).append('\n');
+                 report.append("Deleted: ").append(results[2]).append('\n');
+                 report.append("at ").append(new Date(System.currentTimeMillis()));
+
+                 MailSendingUtilities.mail(emails, "Harvest report", report.toString());
+            } catch (SQLException ex) {
+                logger.severe("The service has throw an SQLException: " + ex.getMessage());
+            } catch (JAXBException ex) {
+                logger.severe("The resource can not be parsed: " + ex.getMessage());
+            } catch (MalformedURLException ex) {
+                logger.severe("The source URL is malformed");
+            } catch (IOException ex) {
+                logger.severe("The service can't open the connection to the source");
+            } catch (CstlServiceException ex) {
+                logger.severe("Constellation exception:" + ex.getMessage());
+            } catch (MessagingException ex) {
+                logger.severe("MessagingException exception:" + ex.getMessage());
+            } catch (NamingException ex) {
+                logger.severe("Naming exception:" + ex.getMessage());
+            }
         }
     }
 }

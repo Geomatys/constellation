@@ -797,7 +797,7 @@ public class CSWService extends OGCWebService {
         if (serviceID != null && !serviceID.equals(""))
             id = '(' + serviceID + ')';
 
-        LOGGER.info("destroying CSW service " + id);
+        LOGGER.info("Shutting down the REST CSW service facade " + id + '.');
         if (worker != null)
             worker.destroy();
     }

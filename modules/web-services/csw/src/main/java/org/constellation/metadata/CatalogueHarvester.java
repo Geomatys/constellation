@@ -17,6 +17,8 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -873,6 +875,62 @@ public class CatalogueHarvester {
         
         return new DistributedResults(matched, additionalResults);
     }
+
+
+    public int[] harvestSingle(String sourceURL, String resourceType) throws MalformedURLException, IOException, CstlServiceException, JAXBException {
+        int[] result = new int[3];
+        result[0] = 0;
+        result[1] = 0;
+        result[2] = 0;
+        Unmarshaller unmarshaller = null;
+        try {
+            unmarshaller = marshallerPool.acquireUnmarshaller();
+            URL source = new URL(sourceURL);
+            URLConnection conec = source.openConnection();
+
+            // we get the source document
+            File fileToHarvest = File.createTempFile("harvested", "xml");
+            fileToHarvest.deleteOnExit();
+            InputStream in = conec.getInputStream();
+            FileOutputStream out = new FileOutputStream(fileToHarvest);
+            byte[] buffer = new byte[1024];
+            int size;
+
+            while ((size = in.read(buffer, 0, 1024)) > 0) {
+                out.write(buffer, 0, size);
+            }
+
+            if (resourceType.equals("http://www.isotc211.org/2005/gmd") ||
+                    resourceType.equals("http://www.opengis.net/cat/csw/2.0.2") ||
+                    resourceType.equals("http://www.isotc211.org/2005/gfc")) {
+
+                Object harvested = unmarshaller.unmarshal(fileToHarvest);
+                if (harvested == null) {
+                    throw new CstlServiceException("The resource can not be parsed.",
+                            INVALID_PARAMETER_VALUE, "Source");
+                }
+
+                logger.info("Object Type of the harvested Resource: " + harvested.getClass().getName());
+
+                // ugly patch TODO handle update in mdweb
+                try {
+                    if (metadataWriter.storeMetadata(harvested)) {
+                        result[0] = 1;
+                    }
+                } catch (IllegalArgumentException e) {
+                    result[1] = 1;
+                }
+            } else {
+                throw new CstlServiceException("unexpected resourceType: " + resourceType, NO_APPLICABLE_CODE);
+            }
+        } finally {
+            if (unmarshaller != null) {
+                marshallerPool.release(unmarshaller);
+            }
+        }
+        return result;
+    }
+
     
     public void destroy() {
         if (metadataWriter != null)

@@ -667,6 +667,6 @@ public final class WCSService extends OGCWebService {
     @PreDestroy
     @Override
     public void destroy() {
-        LOGGER.info("Destroying WCS service");
+        LOGGER.info("Shutting down the REST WCS service facade");
     }
 }

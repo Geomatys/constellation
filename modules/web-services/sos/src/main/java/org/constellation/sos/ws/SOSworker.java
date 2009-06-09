@@ -204,7 +204,7 @@ public class SOSworker {
     private String outputFormat;
     
     /**
-     * A list of schreduled Task (used in clos method).
+     * A list of schreduled Task (used in close method).
      */
     private List<Timer> schreduledTask = new ArrayList<Timer>();
     

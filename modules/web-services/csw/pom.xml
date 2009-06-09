@@ -100,6 +100,12 @@
       <artifactId>cstl-web-ogc</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Mailing API -->
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4.1</version>
+    </dependency>
   </dependencies>
 
 </project>
