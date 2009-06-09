@@ -481,6 +481,7 @@ public class CSWworker {
                                                                                  task.getMode(),
                                                                                  task.getEmails());
                         t.scheduleAtFixedRate(at, 2000, task.getPeriod());
+                        schreduledTask.add(t);
                     }
                 } else {
                     logger.severe("Bad data type for file HarvestTask.xml");
