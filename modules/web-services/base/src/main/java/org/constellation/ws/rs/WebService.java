@@ -50,6 +50,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
 
 // Constellation dependencies
+import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.ws.CstlServiceException;
 
 import org.geotoolkit.util.Versioned;
@@ -229,7 +230,7 @@ public abstract class WebService {
     protected void setXMLContext(final String packagesName, final String rootNamespace) throws JAXBException {
         LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
                     " packages: " + packagesName);
-       marshallerPool = new MarshallerPool(rootNamespace, packagesName);
+       marshallerPool = new AnchoredMarshallerPool(rootNamespace, packagesName);
     }
 
     /**
@@ -242,7 +243,7 @@ public abstract class WebService {
      */
     protected void setXMLContext(final String rootNamespace, final Class<?>... classes) throws JAXBException {
         LOGGER.finer("SETTING XML CONTEXT: classes version");
-        marshallerPool = new MarshallerPool(rootNamespace, classes);
+        marshallerPool = new AnchoredMarshallerPool(rootNamespace, classes);
     }
 
     /**

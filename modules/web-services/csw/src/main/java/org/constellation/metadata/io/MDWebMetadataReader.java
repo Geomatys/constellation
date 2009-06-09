@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.text.DateFormat;
@@ -60,6 +61,8 @@ import org.mdweb.model.storage.Value;
 import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.sql.Reader;
 import org.mdweb.sql.v20.Reader20;
+import org.mdweb.model.thesaurus.Word;
+import org.mdweb.sql.ReaderThesaurus;
 
 // geotoolkit/GeoAPI dependencies
 import org.geotoolkit.metadata.iso.MetadataEntity;
@@ -139,7 +142,12 @@ public class MDWebMetadataReader extends MetadataReader {
      * A List of the already logged Missing MDWeb Classe.
      */
     private List<String> classeNotFound;
-    
+
+    /**
+     *
+     */
+    private Map<String, URI> conceptMap;
+
     /**
      * A map of binding term-path for each standard.
      */
@@ -199,6 +207,32 @@ public class MDWebMetadataReader extends MetadataReader {
             throw new CstlServiceException("SQLException while initializing the MDWeb reader:" +'\n'+
                                            "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
+
+        conceptMap = new HashMap<String, URI>();
+        List<BDD> thesaurusDBs = configuration.getThesaurus();
+        for (BDD thesaurusDB : thesaurusDBs) {
+            try {
+
+                Connection TConnection = thesaurusDB.getConnection();
+                ReaderThesaurus TReader = new ReaderThesaurus(TConnection);
+                List<String> schemas = TReader.getThesaurusSchemas();
+                for (String schema : schemas) {
+                    List<Word> words = TReader.getWords(schema);
+                    for (Word word : words) {
+                        try {
+                            URI uri = new URI(word.getUriConcept());
+                            conceptMap.put(word.getLabel(), uri);
+
+                        } catch (URISyntaxException ex) {
+                            logger.warning("URI syntax exception for:" + word.getUriConcept());
+                        }
+                    }
+                }
+            } catch (SQLException ex) {
+                logger.warning("SQLException while initializing the Thesaurus reader: " + thesaurusDB.getConnectURL());
+            }
+        }
+        
         this.dateFormat         = new SimpleDateFormat("yyyy-MM-dd");
         
         this.geotoolsPackage    = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
@@ -207,7 +241,7 @@ public class MDWebMetadataReader extends MetadataReader {
         this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                         "org.opengis.service", "org.opengis.feature.catalog");
         this.CSWPackage         = Util.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
-                                                       "org.geotoolkit.ogc.xml");
+                                                        "org.geotoolkit.ogc.xml");
         this.ebrimV3Package     = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
         this.ebrimV25Package    = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
         
@@ -237,7 +271,7 @@ public class MDWebMetadataReader extends MetadataReader {
         this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                         "org.opengis.service", "org.opengis.feature.catalog");
         this.CSWPackage         = Util.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
-                                                       "org.geotoolkit.ogc.xml");
+                                                        "org.geotoolkit.ogc.xml");
         this.ebrimV3Package     = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
         this.ebrimV25Package    = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
 
@@ -1086,7 +1120,7 @@ public class MDWebMetadataReader extends MetadataReader {
             
             String name = className;
             int nameType = 0;
-            while (nameType < 6) {
+            while (nameType < 7) {
                 try {
                     logger.finer("searching: " + packageName + '.' + name);
                     result = Class.forName(packageName + '.' + name);
@@ -1132,12 +1166,18 @@ public class MDWebMetadataReader extends MetadataReader {
                             break;
                         }
                         case 4: {
-                            name = "FRA" + name;
+                            name = name.substring(0, name.indexOf("Type"));
+                            name = "Default" + name;
                             nameType = 5;
                             break;
                         }
-                        default:
+                        case 5: {
+                            name = "FRA" + name;
                             nameType = 6;
+                            break;
+                        }
+                        default:
+                            nameType = 7;
                             break;
                     }
 
@@ -1241,6 +1281,11 @@ public class MDWebMetadataReader extends MetadataReader {
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
         return INSPIRE_QUERYABLE;
+    }
+
+    @Override
+    public Map<String, URI> getConceptMap() {
+        return conceptMap;
     }
 
     /**

@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
@@ -95,6 +96,7 @@ import org.constellation.filter.LuceneFilterParser;
 import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
+import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.lucene.filter.SpatialQuery;
 import org.constellation.lucene.SearchingException;
 import org.constellation.lucene.IndexingException;
@@ -318,6 +320,7 @@ public class CSWworker {
                 
                 initializeSupportedTypeNames();
                 initializeAcceptedResourceType();
+                initializeAnchorsMap();
                 loadCascadedService(configDir);
                 logger.info("CSW service (" + configuration.getFormat() + ") running");
             }
@@ -400,6 +403,22 @@ public class CSWworker {
         if (supportedDataTypes.contains(EBRIM)) {
             ACCEPTED_RESOURCE_TYPE.add("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0");
             ACCEPTED_RESOURCE_TYPE.add("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5");
+        }
+    }
+
+    /**
+     * Initialize the Anchors in function of the reader capacity.
+     */
+    private void initializeAnchorsMap() {
+        if (marshallerPool instanceof AnchoredMarshallerPool) {
+            AnchoredMarshallerPool pool = (AnchoredMarshallerPool) marshallerPool;
+            Map<String, URI> concepts = MDReader.getConceptMap();
+            int nbWord = 0;
+            for (String key: concepts.keySet()) {
+                pool.addAnchor(key,concepts.get(key));
+                nbWord ++;
+            }
+            logger.info(nbWord + " words put in pool.");
         }
     }
     

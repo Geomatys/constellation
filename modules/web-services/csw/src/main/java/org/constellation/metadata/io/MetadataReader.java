@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.io;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,6 +109,11 @@ public abstract class MetadataReader {
      * Return the list of Additional queryable element.
      */
     public abstract Map<String, List<String>> getAdditionalQueryablePathMap();
+
+    /**
+     * Return the list of Additional queryable element.
+     */
+    public abstract Map<String, URI> getConceptMap();
 
     /**
      * Destroy all the resource used by this reader.

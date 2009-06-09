@@ -17,6 +17,7 @@
 package org.constellation.metadata.io;
 
 import java.io.File;
+import java.net.URI;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -405,6 +406,11 @@ public class FileMetadataReader extends MetadataReader {
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
         return new HashMap<String, List<String>>();
+    }
+
+    @Override
+    public Map<String, URI> getConceptMap() {
+        return new HashMap<String, URI>();
     }
 }
 

@@ -18,6 +18,8 @@
 package org.constellation.generic.database;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -47,6 +49,8 @@ public class Automatic {
     public static final int FILESYSTEM  = 5;
             
     private BDD bdd;
+
+    private List<BDD> thesaurus;
 
     @XmlTransient
     private File configurationDirectory;
@@ -135,6 +139,23 @@ public class Automatic {
             return FILESYSTEM;
         else
             return DEFAULT;
+    }
+
+    /**
+     * @return the Thesaurus
+     */
+    public List<BDD> getThesaurus() {
+        if (thesaurus == null) {
+            thesaurus = new ArrayList<BDD>();
+        }
+        return thesaurus;
+    }
+
+    /**
+     * @param Thesaurus the Thesaurus to set
+     */
+    public void setThesaurus(List<BDD> Thesaurus) {
+        this.thesaurus = Thesaurus;
     }
     
     @Override
