@@ -39,7 +39,7 @@ import org.geotoolkit.coverage.grid.GeneralGridEnvelope;
 import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.ViewType;
-import org.geotools.coverage.io.CoverageReadParam;
+import org.geotoolkit.coverage.io.CoverageReadParam;
 import org.geotoolkit.coverage.processing.ColorMap;
 import org.geotoolkit.coverage.processing.CoverageProcessingException;
 import org.geotoolkit.coverage.processing.Operations;

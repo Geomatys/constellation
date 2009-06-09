@@ -62,7 +62,7 @@ import org.geotoolkit.gui.swing.tree.MutableTreeNode;
 import org.geotoolkit.gui.swing.tree.DefaultMutableTreeNode;
 import org.geotoolkit.image.io.IIOListeners;
 import org.geotoolkit.image.io.RawBinaryImageReadParam;
-import org.geotools.image.io.netcdf.NetcdfImageReader;
+import org.geotoolkit.image.io.netcdf.NetcdfImageReader;
 import org.geotoolkit.image.io.mosaic.MosaicImageReader;
 import org.geotoolkit.image.io.mosaic.MosaicImageReadParam;
 import org.geotoolkit.util.converter.Classes;

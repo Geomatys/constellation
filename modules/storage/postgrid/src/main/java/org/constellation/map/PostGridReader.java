@@ -31,8 +31,8 @@ import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.io.CoverageReadParam;
-import org.geotools.coverage.io.CoverageReader;
+import org.geotoolkit.coverage.io.CoverageReadParam;
+import org.geotoolkit.coverage.io.CoverageReader;
 import org.geotoolkit.coverage.processing.Operations;
 import org.geotoolkit.display.shape.DoubleDimension2D;
 import org.geotoolkit.geometry.DirectPosition2D;

@@ -53,7 +53,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import org.geotoolkit.image.io.IIOListeners;
-import org.geotools.image.io.netcdf.NetcdfReadParam;
+import org.geotoolkit.image.io.netcdf.NetcdfReadParam;
 import org.geotoolkit.image.io.mosaic.MosaicImageReadParam;
 import org.geotoolkit.image.io.mosaic.TileManager;
 import org.geotoolkit.coverage.GridSampleDimension;

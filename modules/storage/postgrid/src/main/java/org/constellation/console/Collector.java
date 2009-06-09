@@ -33,7 +33,7 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.WritableGridCoverageTable;
 import org.geotoolkit.console.CommandLine;
 import org.geotoolkit.console.Option;
-import org.geotools.image.io.netcdf.NetcdfImageReader;
+import org.geotoolkit.image.io.netcdf.NetcdfImageReader;
 import org.jdom.Element;
 import static org.constellation.catalog.UpdatePolicy.*;
 

@@ -47,7 +47,7 @@ import org.constellation.provider.StyleProviderProxy;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.shape.DoubleDimension2D;
-import org.geotools.coverage.io.CoverageReader;
+import org.geotoolkit.coverage.io.CoverageReader;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotoolkit.map.ElevationModel;

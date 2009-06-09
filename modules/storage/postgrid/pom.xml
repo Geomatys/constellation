@@ -94,12 +94,12 @@
       <artifactId>geoapi</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-coverageio</artifactId>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-coverageio</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-coverageio-netcdf</artifactId>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-coverageio-netcdf</artifactId>
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>

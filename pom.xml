@@ -306,16 +306,6 @@
       <!-- geotools -->
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gtm-coverageio</artifactId>
-        <version>${geotools.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.geotools</groupId>
-        <artifactId>gtm-coverageio-netcdf</artifactId>
-        <version>${geotools.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.geotools</groupId>
         <artifactId>gtm-metadata</artifactId>
         <version>${geotools.version}</version>
       </dependency>
@@ -363,6 +353,16 @@
       </dependency>
 
       <!-- Geotoolkit pending version -->
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-coverageio</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-coverageio-netcdf</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-filter</artifactId>

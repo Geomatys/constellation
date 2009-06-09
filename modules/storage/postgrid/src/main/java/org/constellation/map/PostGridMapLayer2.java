@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.io.CoverageReader;
+import org.geotoolkit.coverage.io.CoverageReader;
 import org.geotoolkit.coverage.processing.ColorMap;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
