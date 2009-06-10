@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import org.geotoolkit.internal.jdbc.JDBC;
 import org.geotoolkit.util.Utilities;
 
 /**
@@ -153,13 +152,20 @@ public class BDD {
      * 
      * @return
      * @throws java.sql.SQLException
+     *
+     * @todo The call to Class.forName(...) is not needed anymore since Java 6 and should be removed.
      */
     public Connection getConnection() throws SQLException {
         // by Default  we use the postgres driver.
         if (className == null) {
             className = "org.postgresql.Driver";
         }
-        JDBC.loadDriver(className);
+        try {
+            Class.forName(className);
+        } catch (Exception e) {
+            // Non-fatal exception, ignore. If there is really a problem, the
+            // following line is expected to throw the appropriate SQLException.
+        }
         return DriverManager.getConnection(connectURL, user, password);
     }
     
