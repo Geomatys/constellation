@@ -29,22 +29,50 @@ import javax.xml.bind.annotation.XmlAccessorType;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class HarvestTask {
 
+    /**
+     * The URl of the resource to harvest
+     */
     private String sourceURL;
+
+    /**
+     * The type of the resource. example: http://www.isotc211.org/2005/gmd
+     */
     private String resourceType;
+
+    /**
+     * The type of the resource: 0 for a single record, 1 for a CSW service
+     */
     private int mode;
+
+    /**
+     * A list of mails addresses to contact for harvest report.
+     */
     private List<String> emails;
+
+    /**
+     * The frequency of harvest task.
+     */
     private long period;
 
+    /**
+     * The last date where the task was launch.
+     */
+    private long lastHarvest;
+
+    /**
+     * Empty constructor used by JAXB
+     */
     public HarvestTask() {
 
     }
 
-    public HarvestTask(String sourceURL, String resourceType, int mode, List<String> emails, long period) {
+    public HarvestTask(String sourceURL, String resourceType, int mode, List<String> emails, long period, long lastHarvest) {
         this.emails       = emails;
         this.mode         = mode;
         this.resourceType = resourceType;
         this.sourceURL    = sourceURL;
         this.period       = period;
+        this.lastHarvest  = lastHarvest;
     }
     
     /**
@@ -115,5 +143,19 @@ public class HarvestTask {
      */
     public void setPeriod(long period) {
         this.period = period;
+    }
+
+    /**
+     * @return the lastHarvest
+     */
+    public long getLastHarvest() {
+        return lastHarvest;
+    }
+
+    /**
+     * @param lastHarvest the lastHarvest to set
+     */
+    public void setLastHarvest(long lastHarvest) {
+        this.lastHarvest = lastHarvest;
     }
 }

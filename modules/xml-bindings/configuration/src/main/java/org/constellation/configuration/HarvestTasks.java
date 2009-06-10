@@ -68,4 +68,19 @@ public class HarvestTasks {
         }
         this.task.add(task);
     }
+
+    /**
+     * Return a task from is sourceURL
+     */
+    public HarvestTask getTaskFromSource(String sourceURL) {
+        if (task == null) {
+            task = new ArrayList<HarvestTask>();
+        }
+        for (HarvestTask t: task) {
+            if (t.getSourceURL() != null && t.getSourceURL().equals(sourceURL)) {
+                return t;
+            }
+        }
+        return null;
+    }
 }

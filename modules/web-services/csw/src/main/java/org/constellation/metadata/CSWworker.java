@@ -463,6 +463,11 @@ public class CSWworker {
         }
     }
 
+    /**
+     * Restore all the periodic Harvest task from the configuration file "HarvestTask.xml".
+     *
+     * @param configDirectory The configuration directory containing the file "HarvestTask.xml"
+     */
     private void initializeHarvestTask(final File configDirectory) {
         Unmarshaller unmarshaller = null;
         try {
@@ -480,7 +485,15 @@ public class CSWworker {
                                                                                  task.getResourceType(),
                                                                                  task.getMode(),
                                                                                  task.getEmails());
-                        t.scheduleAtFixedRate(at, 2000, task.getPeriod());
+                        //we look for the time passed since the last harvest
+                        long time = System.currentTimeMillis() - task.getLastHarvest();
+
+                        long delay = 2000;
+                        if (time < task.getPeriod()) {
+                            delay = task.getPeriod() - time;
+                        }
+
+                        t.scheduleAtFixedRate(at, delay, task.getPeriod());
                         schreduledTask.add(t);
                     }
                 } else {
@@ -500,8 +513,19 @@ public class CSWworker {
         }
     }
 
-    private void saveSchreduledHarvestTask(String sourceURL, String resourceType, int mode, List<String> emails, long period) {
-        HarvestTask newTask       = new HarvestTask(sourceURL, resourceType, mode, emails, period);
+    /**
+     * Save a periodic Harvest task into the specific configuration file "HarvestTask.xml".
+     * This is made in order to restore the task when the server is shutdown and then restart.
+     *
+     * @param sourceURL  The URL of the source to harvest.
+     * @param resourceType The type of the resource.
+     * @param mode The type of the source: 0 for a single record (ex: an xml file) 1 for a CSW service.
+     * @param emails A list of mail addresses to contact when the Harvest is done.
+     * @param period The time between each Harvest.
+     * @param lastHarvest The time of the last task launch.
+     */
+    private void saveSchreduledHarvestTask(String sourceURL, String resourceType, int mode, List<String> emails, long period, long lastHarvest) {
+        HarvestTask newTask       = new HarvestTask(sourceURL, resourceType, mode, emails, period, lastHarvest);
         File configDir            = getConfigDirectory();
         File f                    = new File(configDir, "HarvestTask.xml");
         Marshaller marshaller     = null;
@@ -529,6 +553,50 @@ public class CSWworker {
             logger.severe("unable to create a file for schreduled harvest task");
         } catch (JAXBException ex) {
             logger.severe("A JAXB exception occurs when trying to marshall the shreduled harvest task");
+            ex.printStackTrace();
+        } finally {
+            if (unmarshaller != null) {
+                marshallerPool.release(unmarshaller);
+            }
+            if (marshaller != null) {
+                marshallerPool.release(marshaller);
+            }
+        }
+    }
+
+    /**
+     * Update the Harvest task file by recording the last Harvest date of a task.
+     * This is made in order to avoid the systematic launch of all the task when the CSW start.
+     *
+     * @param sourceURL Used as the task identifier.
+     * @param lastHarvest a long representing the last time where the task was launch
+     */
+     private void updateSchreduledHarvestTask(String sourceURL, long lastHarvest) {
+        File configDir            = getConfigDirectory();
+        File f                    = new File(configDir, "HarvestTask.xml");
+        Marshaller marshaller     = null;
+        Unmarshaller unmarshaller = null;
+        try {
+            marshaller = marshallerPool.acquireMarshaller();
+            if (f.exists()) {
+                unmarshaller = marshallerPool.acquireUnmarshaller();
+                Object obj   = unmarshaller.unmarshal(f);
+                if (obj instanceof HarvestTasks) {
+                    HarvestTasks tasks = (HarvestTasks) obj;
+                    HarvestTask task   = tasks.getTaskFromSource(sourceURL);
+                    if (task != null) {
+                        task.setLastHarvest(lastHarvest);
+                        marshaller.marshal(tasks, f);
+                    }
+                } else {
+                    logger.severe("Bad data type for file HarvestTask.xml");
+                }
+            } else {
+                logger.severe("There is no Harvest task file to update");
+            }
+
+        } catch (JAXBException ex) {
+            logger.severe("A JAXB exception occurs when trying to marshall the shreduled harvest task (update)");
             ex.printStackTrace();
         } finally {
             if (unmarshaller != null) {
@@ -1627,7 +1695,7 @@ public class CSWworker {
                     } else {
                         t.scheduleAtFixedRate(harvestTask, 1000, period);
                         schreduledTask.add(t);
-                        saveSchreduledHarvestTask(sourceURL, resourceType, mode, request.getResponseHandler(), period);
+                        saveSchreduledHarvestTask(sourceURL, resourceType, mode, request.getResponseHandler(), period, System.currentTimeMillis() + 1000);
                     }
                     
                 }
@@ -1885,6 +1953,7 @@ public class CSWworker {
                     results = catalogueHarvester.harvestCatalogue(sourceURL);
                 }
 
+                updateSchreduledHarvestTask(sourceURL, System.currentTimeMillis());
                 //TODO does we have to send a HarvestResponseType or a custom report to the mails addresses?
                 TransactionSummaryType summary = new TransactionSummaryType(results[0],
                                                                             results[1],
