@@ -70,15 +70,25 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4022&bbox=-90,-180,90,180&" +
                                       "layers="+ LAYER_TEST +"&styles=";
-    private static final String WMS_GETMAP_111_WGS84 =
+    private static final String WMS_GETMAP_111_EPSG_4326 =
             "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.1.1&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "srs=EPSG:4326&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";
-    private static final String WMS_GETMAP_130_WGS84 =
+    private static final String WMS_GETMAP_130_EPSG_4326 =
             "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.3.0&" +
                                       "format=image/png&width=1024&height=512&" +
                                       "crs=EPSG:4326&bbox=-90,-180,90,180&" +
+                                      "layers="+ LAYER_TEST +"&styles=";
+    private static final String WMS_GETMAP_111_CRS_84 =
+            "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.1.1&" +
+                                      "format=image/png&width=1024&height=512&" +
+                                      "srs=CRS:84&bbox=-180,-90,180,90&" +
+                                      "layers="+ LAYER_TEST +"&styles=";
+    private static final String WMS_GETMAP_130_CRS_84 =
+            "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.3.0&" +
+                                      "format=image/png&width=1024&height=512&" +
+                                      "crs=CRS:84&bbox=-180,-90,180,90&" +
                                       "layers="+ LAYER_TEST +"&styles=";
 
     /**
@@ -182,7 +192,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      * Verify the axis order for a GetMap in version 1.1.1 for the {@code WGS84} CRS.
      */
     @Test
-    public void testGetMap111Wgs84() {
+    public void testGetMap111Epsg4326() {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -190,7 +200,81 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
-            getMapUrl = new URL(WMS_GETMAP_111_WGS84);
+            getMapUrl = new URL(WMS_GETMAP_111_EPSG_4326);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to get a map from the url. The test is skipped in this method if it fails.
+        final BufferedImage image;
+        try {
+            image = getImageFromURL(getMapUrl, "image/png");
+        } catch (IOException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Test on the returned image.
+        assertEquals(image.getWidth(), 1024);
+        assertEquals(image.getHeight(), 512);
+        assertEquals(Commons.checksum(image), 3640849032L);
+    }
+
+    /**
+     * Verify the axis order for a GetMap in version 1.3.0 for the {@code WGS84} CRS.
+     *
+     * TODO: fix the implementation of the GetMap request concerning the axes order,
+     *       and do this test then.
+     */
+    @Ignore
+    @Test
+    public void testGetMap130Epsg4326() {
+        assertNotNull(layers);
+        assumeTrue(!(layers.isEmpty()));
+        assumeTrue(containsTestLayer());
+
+        // Creates a valid GetMap url.
+        final URL getMapUrl;
+        try {
+            getMapUrl = new URL(WMS_GETMAP_130_EPSG_4326);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to get a map from the url. The test is skipped in this method if it fails.
+        final BufferedImage image;
+        try {
+            image = getImageFromURL(getMapUrl, "image/png");
+        } catch (IOException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Test on the returned image.
+        assertEquals(image.getWidth(), 1024);
+        assertEquals(image.getHeight(), 512);
+        assertTrue  (!(Commons.isImageEmpty(image)));
+        // Here we have to ensure that the axis order should be lat,long in the GetMap request.
+        // So with that axes order, the image should be the same than the one done in GetMap
+        // version 1.1.1 with axes order long,lat.
+        assertTrue  (Commons.checksum(image) != 3640849032L);
+    }
+
+    /**
+     * Verify the axis order for a GetMap in version 1.1.1 for the {@code WGS84} CRS.
+     */
+    @Test
+    public void testGetMap111Crs84() {
+        assertNotNull(layers);
+        assumeTrue(!(layers.isEmpty()));
+        assumeTrue(containsTestLayer());
+
+        // Creates a valid GetMap url.
+        final URL getMapUrl;
+        try {
+            getMapUrl = new URL(WMS_GETMAP_111_CRS_84);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
@@ -218,8 +302,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      *       and do this test then.
      */
     @Test
-    @Ignore
-    public void testGetMap130Wgs84() {
+    public void testGetMap130Crs84() {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -227,7 +310,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         // Creates a valid GetMap url.
         final URL getMapUrl;
         try {
-            getMapUrl = new URL(WMS_GETMAP_130_WGS84);
+            getMapUrl = new URL(WMS_GETMAP_130_CRS_84);
         } catch (MalformedURLException ex) {
             assumeNoException(ex);
             return;
