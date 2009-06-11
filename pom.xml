@@ -164,6 +164,7 @@
     <constellation.coverage>org.constellation.coverage.ws.rs</constellation.coverage>
     <constellation.sensor>org.constellation.sos.ws.rs</constellation.sensor>
     <constellation.services.packages>${constellation.config};${constellation.map};${constellation.metadata};${constellation.provider};${constellation.coverage}</constellation.services.packages>
+    <javadb.scope>test</javadb.scope>
   </properties>
 
   <profiles>
@@ -189,6 +190,12 @@
       <id>csw</id>
       <properties>
         <constellation.services.packages>${constellation.config};${constellation.metadata};${constellation.provider}</constellation.services.packages>
+      </properties>
+    </profile>
+    <profile>
+      <id>tomcat</id>
+      <properties>
+        <javadb.scope>runtime</javadb.scope>
       </properties>
     </profile>
   </profiles>
@@ -465,12 +472,12 @@
       <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derby</artifactId>
-        <version>10.2.2.0</version>
+        <version>10.4.2.0</version>
       </dependency>
       <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derbyLocale_fr</artifactId>
-        <version>10.2.2.0</version>
+        <version>10.4.2.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

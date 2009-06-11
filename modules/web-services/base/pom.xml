@@ -124,6 +124,11 @@
       <artifactId>cstl-engine-server</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <scope>${javadb.scope}</scope>
+    </dependency>
   </dependencies>
 
 </project>

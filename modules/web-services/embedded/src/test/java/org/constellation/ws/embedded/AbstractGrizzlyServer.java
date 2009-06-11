@@ -169,12 +169,12 @@ public abstract class AbstractGrizzlyServer extends PostgridTestCase {
      */
     protected static class GrizzlyThread extends Thread {
         /**
-         * Runs a Grizzly server for a minute.
+         * Runs a Grizzly server for five minutes.
          */
         @Override
         public void run() {
             final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{});
-            cstlServer.duration = 1*60*1000;
+            cstlServer.duration = 5*60*1000;
             cstlServer.runREST();
         }
     }
