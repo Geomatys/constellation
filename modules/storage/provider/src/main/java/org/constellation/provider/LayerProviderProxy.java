@@ -206,8 +206,12 @@ public class LayerProviderProxy implements LayerProvider{
              * HACK for ifremer.
              */
             if (!configFile.exists() && name.equals("postgrid")) {
-                configFile = ConfigDirectory.getWarPackagedConfig();
-            } 
+                File warFile = ConfigDirectory.getWarPackagedConfig();
+                if(warFile != null){
+                    configFile = warFile;
+                }
+            }
+
             
             service.init(configFile);
 

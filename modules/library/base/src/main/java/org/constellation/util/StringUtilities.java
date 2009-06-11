@@ -140,15 +140,9 @@ public class StringUtilities {
         if (epsg == null) {
             return null;
         }
-        final String epsgTrimmed = epsg.trim();
-//        if (epsgTrimmed.endsWith("4326") || epsgTrimmed.endsWith("UNDEFINEDCRS")) {
-//            //TODO fix this
-//            //we should return the good EPSG 32662
-//            return DefaultGeographicCRS.WGS84;
-//        }
-        return CRS.decode(epsg, true);
+        return CRS.decode(epsg);
     }
-
+    
     /**
      * Convert a string containing a date into a {@link Date}, respecting the ISO 8601 standard.
      *

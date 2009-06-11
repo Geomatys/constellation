@@ -148,12 +148,14 @@ public abstract class AbstractGrizzlyServer extends PostgridTestCase {
         iis.close();
         // For debugging, uncomment the JFrame creation and the Thread.sleep further,
         // in order to see the image in a popup.
-//        JFrame frame = new JFrame();
-//        frame.setContentPane(new JLabel(new ImageIcon(image)));
-//        frame.setSize(new Dimension(1024, 512));
+//        javax.swing.JFrame frame = new javax.swing.JFrame();
+//        frame.setContentPane(new javax.swing.JLabel(new javax.swing.ImageIcon(image)));
+//        frame.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
+//        frame.pack();
 //        frame.setVisible(true);
 //        try {
-//            Thread.sleep(3 * 1000);
+//            Thread.sleep(5 * 1000);
+//            frame.dispose();
 //        } catch (InterruptedException ex) {
 //            assumeNoException(ex);
 //        }

@@ -77,7 +77,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
                                       "layers="+ LAYER_TEST +"&styles=";
     private static final String WMS_GETMAP_130_EPSG_4326 =
             "http://localhost:9090/wms?request=GetMap&service=WMS&version=1.3.0&" +
-                                      "format=image/png&width=1024&height=512&" +
+                                      "format=image/png&width=512&height=1024&" +
                                       "crs=EPSG:4326&bbox=-90,-180,90,180&" +
                                       "layers="+ LAYER_TEST +"&styles=";
     private static final String WMS_GETMAP_111_CRS_84 =
@@ -227,7 +227,6 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      * TODO: fix the implementation of the GetMap request concerning the axes order,
      *       and do this test then.
      */
-    @Ignore
     @Test
     public void testGetMap130Epsg4326() {
         assertNotNull(layers);
@@ -253,8 +252,8 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         }
 
         // Test on the returned image.
-        assertEquals(image.getWidth(), 1024);
-        assertEquals(image.getHeight(), 512);
+        assertEquals(image.getWidth(), 512);
+        assertEquals(image.getHeight(), 1024);
         assertTrue  (!(Commons.isImageEmpty(image)));
         // Here we have to ensure that the axis order should be lat,long in the GetMap request.
         // So with that axes order, the image should be the same than the one done in GetMap

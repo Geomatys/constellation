@@ -366,7 +366,7 @@ public class WMSService extends OGCWebService {
         final String version         = getParameter(KEY_VERSION,         true);
         isVersionSupported(version);
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
-        final String strCRS          = getParameter((version.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
+        String strCRS          = getParameter((version.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
                                             KEY_CRS_v111 : KEY_CRS_v130, true);
         final String strBBox         = getParameter(KEY_BBOX,            true);
         final String strLayers       = getParameter(KEY_LAYERS,          true);
@@ -387,6 +387,12 @@ public class WMSService extends OGCWebService {
 
         final CoordinateReferenceSystem crs;
         try {
+            if(version.equals(ServiceDef.WMS_1_1_1.version.toString()) && strCRS.toLowerCase().equals("epsg:4326")){
+                //if we are in 1.1.1 that mean EPSG:4326 define a false EPSG:4326
+                //we must replace it by CRS:84 which is the correct match
+                strCRS = "CRS:84";
+            }
+
             crs = StringUtilities.toCRS(strCRS);
         } catch (FactoryException ex) {
             throw new CstlServiceException(ex, INVALID_CRS);
