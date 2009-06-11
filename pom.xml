@@ -328,6 +328,11 @@
       </dependency>
       <dependency>
         <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-epsg</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit</groupId>
         <artifactId>geotk-metadata-fra</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
