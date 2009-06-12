@@ -54,6 +54,12 @@
         <artifactId>cstl-store-provider</artifactId>
         <version>${project.version}</version>
     </dependency>
+
+    <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-go2-style-extension</artifactId>
+    </dependency>
+
   </dependencies>
 
 </project>
