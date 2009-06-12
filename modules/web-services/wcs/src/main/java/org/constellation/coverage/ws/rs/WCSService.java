@@ -126,7 +126,7 @@ import org.geotoolkit.gml.xml.v311modified.TimePositionType;
  */
 @Path("wcs")
 @Singleton
-public final class WCSService extends OGCWebService {
+public class WCSService extends OGCWebService {
 	
     /**
      * The worker which will perform the core logic for this service.
