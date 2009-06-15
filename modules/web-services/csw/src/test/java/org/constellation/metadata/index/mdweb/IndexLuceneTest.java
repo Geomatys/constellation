@@ -405,7 +405,7 @@ public class IndexLuceneTest {
         
         //The forms
         Date d = new Date(120);
-        Form f1 = new Form(1, cat, "title1", null, null, null, d);
+        Form f1 = new Form(1, cat, "title1", null, null, null, d, false, false, "normalForm");
         Value f1_rootValue    = new Value(recordPath, f1, 1, recordClass, null);
         Value f1_ident        = new Value(identifierPath, f1, 1, sLiteralClass, f1_rootValue);
         TextValue f1_idValue  = new TextValue(idenContentPath, f1, 1, "2345-aa453-ade456", PrimitiveType.STRING, f1_ident);
@@ -419,7 +419,7 @@ public class IndexLuceneTest {
         TextValue f1_ucxValue = new TextValue(upperCornPath, f1, 1, "50", PrimitiveType.STRING, f1_bbox);
         TextValue f1_ucyValue = new TextValue(upperCornPath, f1, 2, "15", PrimitiveType.STRING, f1_bbox);
         
-        Form f2 = new Form(2, cat, "title2", null, null, null, d);
+        Form f2 = new Form(2, cat, "title2", null, null, null, d, false, false, "normalForm");
         Value f2_rootValue    = new Value(recordPath, f2, 1, recordClass, null);
         Value f2_ident        = new Value(identifierPath, f2, 1, sLiteralClass, f2_rootValue);
         TextValue f2_idValue  = new TextValue(idenContentPath, f2, 1, "00180e67-b7cf-40a3-861d-b3a09337b195", PrimitiveType.STRING, f2_ident);
@@ -433,7 +433,7 @@ public class IndexLuceneTest {
         TextValue f2_ucxValue = new TextValue(upperCornPath, f2, 1, "-15", PrimitiveType.STRING, f2_bbox);
         TextValue f2_ucyValue = new TextValue(upperCornPath, f2, 2, "10", PrimitiveType.STRING, f2_bbox);
         
-        Form f3 = new Form(3, cat, "title3", null, null, null, d);
+        Form f3 = new Form(3, cat, "title3", null, null, null, d, false, false, "normalForm");
         Value f3_rootValue    = new Value(recordPath, f3, 1, recordClass, null);
         Value f3_ident        = new Value(identifierPath, f3, 1, sLiteralClass, f3_rootValue);
         TextValue f3_idValue  = new TextValue(idenContentPath, f3, 1, "09844e51-e5cd-52c3-737d-b3a61366d028", PrimitiveType.STRING, f3_ident);
@@ -447,7 +447,7 @@ public class IndexLuceneTest {
         TextValue f3_ucxValue = new TextValue(upperCornPath, f3, 1, "10", PrimitiveType.STRING, f3_bbox);
         TextValue f3_ucyValue = new TextValue(upperCornPath, f3, 2, "15", PrimitiveType.STRING, f3_bbox);
         
-        Form f4 = new Form(4, cat, "title4", null, null, null, d);
+        Form f4 = new Form(4, cat, "title4", null, null, null, d, false, false, "normalForm");
         Value f4_rootValue    = new Value(recordPath, f4, 1, recordClass, null);
         Value f4_ident        = new Value(identifierPath, f4, 1, sLiteralClass, f4_rootValue);
         TextValue f4_idValue  = new TextValue(idenContentPath, f4, 1, "urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f", PrimitiveType.STRING, f4_ident);
