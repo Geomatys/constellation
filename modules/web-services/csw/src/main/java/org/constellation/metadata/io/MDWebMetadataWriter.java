@@ -193,7 +193,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             if  (className.equals("MetaDataImpl")) {
                 defaultProfile = MDReader.getProfile("ISO_19115");
             }
-            Form form = new Form(-1, MDCatalog, title, user, null, defaultProfile, creationDate);
+            Form form = new Form(-1, MDCatalog, title, user, null, defaultProfile, creationDate, false, false, "normalForm");
             
             Classe rootClasse = getClasseFromObject(object);
             if (rootClasse != null) {
@@ -675,7 +675,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         if (f != null) {
             try {
                 long startWrite = System.currentTimeMillis();
-                MDWriter.writeForm(f, false);
+                MDWriter.writeForm(f, false, true);
                 writeTime = System.currentTimeMillis() - startWrite;
             } catch (IllegalArgumentException e) {
                 //TODO restore catching at this point
