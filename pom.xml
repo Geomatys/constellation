@@ -318,11 +318,6 @@
       </dependency>
       <dependency>
         <groupId>org.geotools</groupId>
-        <artifactId>gtm-jdbc-postgis</artifactId>
-        <version>${geotools.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.geotools</groupId>
         <artifactId>gtm-shapefile</artifactId>
         <version>${geotools.version}</version>
       </dependency>
@@ -378,6 +373,11 @@
       <dependency>
         <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-filter</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-jdbc-postgis</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
       <dependency>

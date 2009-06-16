@@ -45,7 +45,7 @@ import org.geotools.data.FeatureSource;
 //import org.geotools.data.postgis.PostgisDataStoreFactory;
 
 import org.geotoolkit.map.ElevationModel;
-import org.geotools.data.postgis.PostgisNGDataStoreFactory;
+import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 

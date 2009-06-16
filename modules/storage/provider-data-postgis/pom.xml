@@ -55,8 +55,8 @@
         <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-jdbc-postgis</artifactId>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-jdbc-postgis</artifactId>
     </dependency>
   </dependencies>
 
