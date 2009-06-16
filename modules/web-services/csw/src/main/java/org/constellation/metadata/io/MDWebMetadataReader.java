@@ -802,7 +802,7 @@ public class MDWebMetadataReader extends MetadataReader {
             if (value instanceof TextValue) {
                 String textValue = ((TextValue) value).getValue();
                 // in some special case (Date, double) we have to format the text value.
-                if (classe.equals(Double.class)) {
+                if (classe.equals(Double.class) && textValue != null) {
                     textValue = textValue.replace(',', '.');
                 }
 

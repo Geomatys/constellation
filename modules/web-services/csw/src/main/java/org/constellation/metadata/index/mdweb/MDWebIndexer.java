@@ -557,7 +557,9 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                             }
                         } else if (tv.getType().getName().equals("Date")) {
                             String value = tv.getValue();
-                            value = value.replaceAll("-", "");
+                            if (value != null) {
+                                value = value.replaceAll("-", "");
+                            }
                             response.append(value).append(',');
                         // else we write the text value.    
                         } else {
