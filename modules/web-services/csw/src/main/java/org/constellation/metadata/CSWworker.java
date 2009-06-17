@@ -62,6 +62,38 @@ import org.apache.lucene.search.Sort;
 //Constellation dependencies
 import org.constellation.configuration.HarvestTask;
 import org.constellation.configuration.HarvestTasks;
+import org.constellation.filter.FilterParser;
+import org.constellation.filter.LuceneFilterParser;
+import org.constellation.filter.SQLFilterParser;
+import org.constellation.filter.SQLQuery;
+import org.constellation.generic.database.Automatic;
+import org.constellation.jaxb.AnchoredMarshallerPool;
+import org.constellation.lucene.filter.SpatialQuery;
+import org.constellation.lucene.SearchingException;
+import org.constellation.lucene.IndexingException;
+import org.constellation.lucene.index.AbstractIndexSearcher;
+import org.constellation.lucene.index.AbstractIndexer;
+import org.constellation.metadata.io.MetadataReader;
+import org.constellation.metadata.io.MetadataWriter;
+import org.constellation.metadata.factory.AbstractCSWFactory;
+import org.constellation.metadata.utils.MailSendingUtilities;
+import org.constellation.util.Util;
+import org.constellation.ws.rs.OGCWebService;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.WebService;
+import org.constellation.ws.ServiceType;
+import org.constellation.ws.ServiceVersion;
+
+import static org.constellation.metadata.io.MetadataReader.*;
+import static org.constellation.metadata.CSWQueryable.*;
+import static org.constellation.metadata.TypeNames.*;
+
+//geotoolkit dependencies
+import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.factory.FactoryRegistry;
+import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
+import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
 import org.geotoolkit.csw.xml.AbstractCswRequest;
 import org.geotoolkit.csw.xml.AbstractResultType;
 import org.geotoolkit.csw.xml.CswXmlFactory;
@@ -97,21 +129,11 @@ import org.geotoolkit.csw.xml.v202.UpdateType;
 import org.geotoolkit.csw.xml.v202.SchemaComponentType;
 import org.geotoolkit.csw.xml.v202.EchoedRequestType;
 import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
-import org.constellation.filter.FilterParser;
-import org.constellation.filter.LuceneFilterParser;
-import org.constellation.filter.SQLFilterParser;
-import org.constellation.filter.SQLQuery;
-import org.constellation.generic.database.Automatic;
-import org.constellation.jaxb.AnchoredMarshallerPool;
-import org.constellation.lucene.filter.SpatialQuery;
-import org.constellation.lucene.SearchingException;
-import org.constellation.lucene.IndexingException;
-import org.constellation.lucene.index.AbstractIndexSearcher;
-import org.constellation.lucene.index.AbstractIndexer;
-import org.constellation.metadata.io.MetadataReader;
-import org.constellation.metadata.io.MetadataWriter;
-import org.constellation.metadata.factory.AbstractCSWFactory;
-import org.constellation.metadata.utils.MailSendingUtilities;
+import org.geotoolkit.ogc.xml.v110modified.FilterCapabilities;
+import org.geotoolkit.ogc.xml.v110modified.SortByType;
+import org.geotoolkit.ogc.xml.v110modified.SortPropertyType;
+import org.geotoolkit.ows.xml.AcceptFormats;
+import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v100.DomainType;
 import org.geotoolkit.ows.xml.v100.Operation;
@@ -119,35 +141,13 @@ import org.geotoolkit.ows.xml.v100.OperationsMetadata;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v100.ServiceIdentification;
 import org.geotoolkit.ows.xml.v100.ServiceProvider;
-import org.constellation.util.Util;
-import org.constellation.ws.rs.OGCWebService;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.WebService;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.metadata.io.MetadataReader.*;
-import static org.constellation.metadata.CSWQueryable.*;
-import static org.constellation.metadata.TypeNames.*;
-
-//geotools dependencies
-import org.geotoolkit.factory.FactoryNotFoundException;
-import org.geotoolkit.factory.FactoryRegistry;
-import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
-import org.geotoolkit.inspire.xml.LanguagesType;
-import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
-import org.geotoolkit.metadata.iso.DefaultMetaData;
-import org.geotoolkit.ogc.xml.v110modified.FilterCapabilities;
-import org.geotoolkit.ogc.xml.v110modified.SortByType;
-import org.geotoolkit.ogc.xml.v110modified.SortPropertyType;
-import org.geotoolkit.ows.xml.AcceptFormats;
-import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.util.logging.MonolineFormatter;
-
-// GeoAPI dependencies
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+
+// GeoAPI dependencies
 import org.opengis.filter.sort.SortOrder;
 
 
@@ -776,9 +776,8 @@ public class CSWworker {
                 }
 
                 //we add the INSPIRE extend capabilties
-                LanguagesType languages = new LanguagesType("FR");
-                InspireCapabilitiesType inspireCapa = new InspireCapabilitiesType(languages, null);
-                MultiLingualCapabilities m = new MultiLingualCapabilities();
+                InspireCapabilitiesType inspireCapa = new InspireCapabilitiesType(Arrays.asList("FRA", "ENG"));
+                MultiLingualCapabilities m          = new MultiLingualCapabilities();
                 m.setMultiLingualCapabilities(inspireCapa);
                 om.setExtendedCapabilities(m);
             }
