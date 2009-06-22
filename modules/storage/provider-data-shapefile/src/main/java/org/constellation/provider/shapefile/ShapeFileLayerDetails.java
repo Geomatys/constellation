@@ -26,6 +26,7 @@ import java.util.Map;
 import org.constellation.provider.AbstractFeatureLayerDetails;
 import org.constellation.provider.StyleProviderProxy;
 
+import org.geotoolkit.map.FeatureMapLayer;
 import org.geotools.data.FeatureSource;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
@@ -54,7 +55,7 @@ class ShapeFileLayerDetails extends AbstractFeatureLayerDetails {
     
     @Override
     protected MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws IOException{
-        MapLayer layer = null;
+        FeatureMapLayer layer = null;
 
         if(style == null && favorites.size() > 0){
             //no style provided, try to get the favorite one
