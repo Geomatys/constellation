@@ -62,7 +62,7 @@ import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.sql.Reader;
 import org.mdweb.sql.v20.Reader20;
 import org.mdweb.model.thesaurus.Word;
-import org.mdweb.sql.ReaderThesaurus;
+import org.mdweb.sql.LocalReaderThesaurus;
 
 // geotoolkit/GeoAPI dependencies
 import org.geotoolkit.metadata.iso.MetadataEntity;
@@ -214,20 +214,19 @@ public class MDWebMetadataReader extends MetadataReader {
             try {
 
                 Connection TConnection = thesaurusDB.getConnection();
-                ReaderThesaurus TReader = new ReaderThesaurus(TConnection);
-                List<String> schemas = TReader.getThesaurusSchemas();
-                for (String schema : schemas) {
-                    List<Word> words = TReader.getWords(schema);
-                    for (Word word : words) {
-                        try {
-                            URI uri = new URI(word.getUriConcept());
-                            conceptMap.put(word.getLabel(), uri);
+                LocalReaderThesaurus TReader = new LocalReaderThesaurus(TConnection);
+               
+                List<Word> words = TReader.getWords();
+                for (Word word : words) {
+                    try {
+                        URI uri = new URI(word.getUriConcept());
+                        conceptMap.put(word.getLabel(), uri);
 
-                        } catch (URISyntaxException ex) {
-                            logger.warning("URI syntax exception for:" + word.getUriConcept());
-                        }
+                    } catch (URISyntaxException ex) {
+                        logger.warning("URI syntax exception for:" + word.getUriConcept());
                     }
                 }
+                
             } catch (SQLException ex) {
                 logger.warning("SQLException while initializing the Thesaurus reader: " + thesaurusDB.getConnectURL());
             }
