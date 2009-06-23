@@ -142,6 +142,7 @@ public class Collector extends CommandLine {
         } catch (SQLException e) {
             throw new CatalogException(e);
         }
+        run();
         database.setUpdateSimulator(pretend ? out : null);
         this.database = database; // Set only after success.
         table = new WritableGridCoverageTable(database.getTable(WritableGridCoverageTable.class));

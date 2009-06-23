@@ -118,6 +118,30 @@ public class PrepareDatabase extends CommandLine {
     }
 
     /**
+     * Verify whether a layer with the specified name is already present into the database.
+     *
+     * @param name The name of a layer to test the existence into the database.
+     * @return {@code True} if the layer is already present into the database. {@code False} otherwise.
+     * @throws SQLException
+     */
+    private boolean isLayerAlreadyPresent(final String name) throws SQLException {
+        final String sql = "SELECT count(name) from \"Layers\" " +
+                           "WHERE name='"+ name +"';";
+        final Statement stmt = connection.createStatement();
+        final ResultSet res  = stmt.executeQuery(sql);
+        int numLayer = 0;
+        while (res.next()) {
+            numLayer = res.getInt(1);
+        }
+        res.close();
+        stmt.close();
+        if (numLayer == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Inserts a dummy record in the {@code GridCoverage} table. It is necessary in order to
      * collect OpenDAP records from an URL. This dummy record will be deleted as soon as the
      * collector is launched.
@@ -159,7 +183,7 @@ public class PrepareDatabase extends CommandLine {
         }
         sql.append(", ");
         sql.append(escapeString(description));
-        sql.append(")");
+        sql.append(");");
         final Statement stmt = connection.createStatement();
         stmt.execute(sql.toString());
         stmt.close();
@@ -182,14 +206,13 @@ public class PrepareDatabase extends CommandLine {
             pathName = pathName.substring(0, indSlash);
         }
         final StringBuilder sql = new StringBuilder(
-                "INSERT INTO \"Series\" (identifier, layer, pathname, extension, format, " +
-                "visible) VALUES (");
+                "INSERT INTO \"Series\" (identifier, layer, pathname, extension, format) " +
+                "VALUES (");
         sql.append(escapeString(identifier)); sql.append(", ");
         sql.append(escapeString(layerName));  sql.append(", ");
         sql.append(escapeString(pathName));   sql.append(", ");
         sql.append(escapeString(extension));  sql.append(", ");
-        sql.append(escapeString(format));     sql.append(", ");
-        sql.append("TRUE)");
+        sql.append(escapeString(format));     sql.append(");");
         final Statement stmt = connection.createStatement();
         stmt.execute(sql.toString());
         stmt.close();
@@ -212,9 +235,14 @@ public class PrepareDatabase extends CommandLine {
         database.setReadOnly(false);
         database.setUpdateSimulator(null);
         connection = database.getConnection();
-        processLayer();
+        run();
+        if (!isLayerAlreadyPresent(layerName)) {
+            processLayer();
+            System.out.println("La couche \""+ layerName +"\" a été insérée.");
+        }
         if (identifier != null) {
             processSerie();
+            System.out.println("La série \""+ identifier +"\" a été insérée.");
         }
         connection.close();
     }
