@@ -36,11 +36,12 @@ import org.geotoolkit.coverage.io.CoverageReader;
 import org.geotoolkit.coverage.processing.Operations;
 import org.geotoolkit.display.shape.DoubleDimension2D;
 import org.geotoolkit.geometry.DirectPosition2D;
-import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.geometry.DirectPosition;
 import org.opengis.geometry.Envelope;
@@ -56,7 +57,7 @@ import org.opengis.referencing.operation.TransformException;
  */
 public class PostGridReader implements CoverageReader{
     
-    private final Logger LOGGER = Logger.getLogger("org/constellation/map/PostGridReader");
+    private final Logger LOGGER = Logging.getLogger(PostGridReader.class);
 
     private final GridCoverageTable table;
     
@@ -91,6 +92,7 @@ public class PostGridReader implements CoverageReader{
     }
 
 
+    @Override
     public synchronized GridCoverage2D read(final CoverageReadParam param) throws FactoryException, TransformException, IOException {
         
         if(param == null){
@@ -121,33 +123,60 @@ public class PostGridReader implements CoverageReader{
             
             return coverage;
         }
-        
+
         Envelope requestEnvelope = param.getEnveloppe();
         final CoordinateReferenceSystem requestCRS = requestEnvelope.getCoordinateReferenceSystem();
         final double[] objResolution = param.getResolution();
+
+        //we would like to quey postgrid in the real asked CRS, but only CRS:84 can be used.
+//        final GeographicBoundingBox bbox = new DefaultGeographicBoundingBox(requestEnvelope);
+//        final Dimension2D resolution = new DoubleDimension2D(objResolution[0],objResolution[1]);
+//
+//        table.setGeographicBoundingBox(bbox);
+//        table.setPreferredResolution(resolution);
+//
+//        GridCoverage2D coverage = null;
+//        try {
+//            coverage = (GridCoverage2D) table.asCoverage();
+//        } catch (CatalogException ex) {
+//            Logger.getLogger(PostGridReader.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (SQLException ex) {
+//            Logger.getLogger(PostGridReader.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+
+
+        //calculate the resolution at the center of the requested envelope
+        //we must use the center since conique or other kind of projection may
+        //have unlinear resolution
         final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
-        
-        DirectPosition dataResolution = new DirectPosition2D(
-                    requestEnvelope.getCoordinateReferenceSystem(), 
-                    objResolution[0], 
-                    objResolution[1]);
-        
+
+        DirectPosition point1 = new DirectPosition2D(
+                    requestEnvelope.getCoordinateReferenceSystem(),
+                    requestEnvelope.getSpan(0),
+                    requestEnvelope.getSpan(1));
+
+        DirectPosition point2 = new DirectPosition2D(
+                    requestEnvelope.getCoordinateReferenceSystem(),
+                    requestEnvelope.getSpan(0) + objResolution[0],
+                    requestEnvelope.getSpan(1) + objResolution[1]);
+
         if(!requestCRS.equals(crs)){
             //reproject requested enveloppe to dataCRS
             final MathTransform objToData = CRS.findMathTransform(
                     requestEnvelope.getCoordinateReferenceSystem(), crs, true);
             requestEnvelope = CRS.transform(objToData, requestEnvelope);
-            dataResolution = objToData.transform(dataResolution, dataResolution);
+            point1 = objToData.transform(point1, point1);
+            point2 = objToData.transform(point2, point2);
         }
-        
+
         final GeographicBoundingBox bbox = new DefaultGeographicBoundingBox(requestEnvelope);
         final Dimension2D resolution = new DoubleDimension2D(
-                Math.abs(dataResolution.getOrdinate(0)),
-                Math.abs(dataResolution.getOrdinate(1)) );
+                Math.abs( Math.abs(point2.getOrdinate(0)) - Math.abs(point1.getOrdinate(0))),
+                Math.abs( Math.abs(point2.getOrdinate(1)) - Math.abs(point1.getOrdinate(1))) );
 
         table.setGeographicBoundingBox(bbox);
         table.setPreferredResolution(resolution);
-                
+
         GridCoverage2D coverage = null;
         try {
             CoverageReference ref = table.getEntry();
@@ -157,7 +186,7 @@ public class PostGridReader implements CoverageReader{
                 table.flush();
                 ref = table.getEntry();
             }
-            
+
             if(ref != null) coverage = ref.getCoverage(null);
             else{
                 throw new CatalogException("No coverage reference found for layer : " + getTable().getLayer().getName());
@@ -169,32 +198,45 @@ public class PostGridReader implements CoverageReader{
 //        Exception in thread "Thread-4" java.lang.ArithmeticException: Le calcul ne converge pas pour les points 89°20,3'W 00°06,6'S et 91°06,2'E 00°06,6'S.
 //        at org.geotoolkit.referencing.datum.DefaultEllipsoid.orthodromicDistance(DefaultEllipsoid.java:507)
 //        at org.constellation.coverage.catalog.CoverageComparator.getArea(CoverageComparator.java:181)
-            
+
             throw new IOException(ex);
         } catch (SQLException ex){
             throw new IOException(ex);
         }
-        
+
         if(coverage != null){
             coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, requestCRS);
         }
+        
         return coverage;
     }
 
-    public ReferencedEnvelope getCoverageBounds() {
+    @Override
+    public Envelope getCoverageBounds() {
         final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
         final GeographicBoundingBox bbox;
         try {
+            table.getLayer().getCoverage().getEnvelope();
             bbox = table.getLayer().getGeographicBoundingBox();
         } catch (CatalogException ex) {
             LOGGER.warning(ex.getLocalizedMessage());
-            return new ReferencedEnvelope(crs);
+            return new GeneralEnvelope(crs);
         }
-        return new ReferencedEnvelope(bbox.getWestBoundLongitude(),
-                bbox.getEastBoundLongitude(),
-                bbox.getSouthBoundLatitude(),
-                bbox.getNorthBoundLatitude(),
-                crs);
+
+        GeneralEnvelope env = new GeneralEnvelope(bbox);
+        env.setCoordinateReferenceSystem(crs);
+        return env;
+
+        //this returns the correct bounds in the original CRS of the data
+        //since we can only query postgrid en CRS:84, we should return the envelope
+        //only in crs:84 to be coherent.
+//        try {
+//            return table.getLayer().getCoverage().getEnvelope();
+//        } catch (CatalogException ex) {
+//            LOGGER.warning(ex.getLocalizedMessage());
+//            return new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
+//        }
+
     }
 
 }

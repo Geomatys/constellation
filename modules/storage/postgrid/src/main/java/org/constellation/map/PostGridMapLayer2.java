@@ -21,25 +21,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.constellation.catalog.CatalogException;
-
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.CoverageReader;
 import org.geotoolkit.coverage.processing.ColorMap;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotools.feature.NameImpl;
 import org.geotoolkit.geometry.GeneralEnvelope;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotoolkit.map.AbstractMapLayer;
 import org.geotoolkit.map.CoverageMapLayer;
-import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.util.logging.Logging;
+
+import org.geotools.feature.NameImpl;
 
 import org.opengis.feature.type.Name;
-import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.style.RasterSymbolizer;
 
@@ -56,7 +54,7 @@ public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLa
     /**
      * Default logger.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgrid");
+    private static final Logger LOGGER = Logging.getLogger(PostGridMapLayer2.class);
 
     /**
      * The requested elevation.
@@ -97,20 +95,22 @@ public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLa
         setName(reader.getTable().getLayer().getName());
     }
 
-    public ReferencedEnvelope getBounds() {
-        final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
-        final GeographicBoundingBox bbox;
-        try {
-            bbox = reader.getTable().getLayer().getGeographicBoundingBox();
-        } catch (CatalogException ex) {
-            LOGGER.warning(ex.getLocalizedMessage());
-            return new ReferencedEnvelope(crs);
-        }
-        return new ReferencedEnvelope(bbox.getWestBoundLongitude(),
-                bbox.getEastBoundLongitude(),
-                bbox.getSouthBoundLatitude(),
-                bbox.getNorthBoundLatitude(),
-                crs);
+    @Override
+    public Envelope getBounds() {
+        return reader.getCoverageBounds();
+//        final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
+//        final GeographicBoundingBox bbox;
+//        try {
+//            bbox = reader.getTable().getLayer().getGeographicBoundingBox();
+//        } catch (CatalogException ex) {
+//            LOGGER.warning(ex.getLocalizedMessage());
+//            return new ReferencedEnvelope(crs);
+//        }
+//        return new ReferencedEnvelope(bbox.getWestBoundLongitude(),
+//                bbox.getEastBoundLongitude(),
+//                bbox.getSouthBoundLatitude(),
+//                bbox.getNorthBoundLatitude(),
+//                crs);
     }
 
     /**
