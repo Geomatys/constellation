@@ -248,6 +248,21 @@ public class PrepareDatabase extends CommandLine {
     }
 
     /**
+     * Redefine this method in order to handle the case if the action parameter is {@code null}.
+     *
+     * @param action The action to execute.
+     *
+     * @see CommandLine#unknownAction(String)
+     */
+    @Override
+    protected void unknownAction(String action) {
+        if (action == null) {
+            return;
+        }
+        super.unknownAction(action);
+    }
+
+    /**
      * @param args The command line arguments.
      * @throws CatalogException
      * @throws SQLException
