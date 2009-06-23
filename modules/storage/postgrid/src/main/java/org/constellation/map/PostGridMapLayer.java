@@ -49,12 +49,12 @@ import org.opengis.style.RasterSymbolizer;
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLayer {
+public class PostGridMapLayer extends AbstractMapLayer implements CoverageMapLayer {
     
     /**
      * Default logger.
      */
-    private static final Logger LOGGER = Logging.getLogger(PostGridMapLayer2.class);
+    private static final Logger LOGGER = Logging.getLogger(PostGridMapLayer.class);
 
     /**
      * The requested elevation.
@@ -88,7 +88,7 @@ public class PostGridMapLayer2 extends AbstractMapLayer implements CoverageMapLa
      * @param db The database connection.
      * @param layer The current layer.
      */
-    public PostGridMapLayer2(final PostGridReader reader) {
+    public PostGridMapLayer(final PostGridReader reader) {
         super(createDefaultRasterStyle());
         this.times = new ArrayList<Date>();
         this.reader = reader;

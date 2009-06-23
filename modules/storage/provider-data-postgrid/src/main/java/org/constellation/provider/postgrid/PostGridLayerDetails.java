@@ -39,7 +39,7 @@ import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.ws.ServiceType;
-import org.constellation.map.PostGridMapLayer2;
+import org.constellation.map.PostGridMapLayer;
 import org.constellation.map.PostGridReader;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
@@ -176,7 +176,7 @@ class PostGridLayerDetails implements LayerDetails {
      */
     @Override
     public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) {
-        final PostGridMapLayer2 mapLayer = new PostGridMapLayer2(reader);
+        final PostGridMapLayer mapLayer = new PostGridMapLayer(reader);
 
         mapLayer.setName(getName());
 
