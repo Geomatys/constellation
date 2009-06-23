@@ -776,6 +776,7 @@
       <id>geomatys</id>
       <name>Repository maven geomatys</name>
       <url>dav:http://maven.geomatys.fr/repository</url>
+      <uniqueVersion>false</uniqueVersion>
     </repository>
   </distributionManagement>
 
