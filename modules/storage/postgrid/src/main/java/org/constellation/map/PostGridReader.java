@@ -19,7 +19,6 @@ package org.constellation.map;
 import java.awt.geom.Dimension2D;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +39,6 @@ import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
-import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.geometry.DirectPosition;
@@ -80,17 +78,6 @@ public class PostGridReader implements CoverageReader{
     public GridCoverageTable getTable(){
         return table;
     }
-
-    public synchronized GridCoverage2D read(final CoverageReadParam param, final double elevation,
-            final Date time, final MeasurementRange dimRange)
-            throws FactoryException, TransformException, IOException{
-
-        table.setTimeRange(time, time);
-        table.setVerticalRange(elevation, elevation);
-
-        return read(param);
-    }
-
 
     @Override
     public synchronized GridCoverage2D read(final CoverageReadParam param) throws FactoryException, TransformException, IOException {
@@ -192,17 +179,17 @@ public class PostGridReader implements CoverageReader{
                 throw new CatalogException("No coverage reference found for layer : " + getTable().getLayer().getName());
             }
 
-        } catch (CatalogException ex) {
+        } catch (SQLException ex){
+            throw new IOException(ex);
+        } catch (Exception ex) {
             //TODO fix in postgrid
-            //catch anything, looks like sometimes, postgrid throw an ArithmeticException
+            //catch anything, looks like sometimes, postgrid throw an ArithmeticException or IllegalArgumentException
 //        Exception in thread "Thread-4" java.lang.ArithmeticException: Le calcul ne converge pas pour les points 89°20,3'W 00°06,6'S et 91°06,2'E 00°06,6'S.
 //        at org.geotoolkit.referencing.datum.DefaultEllipsoid.orthodromicDistance(DefaultEllipsoid.java:507)
 //        at org.constellation.coverage.catalog.CoverageComparator.getArea(CoverageComparator.java:181)
 
             throw new IOException(ex);
-        } catch (SQLException ex){
-            throw new IOException(ex);
-        }
+        } 
 
         if(coverage != null){
             coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, requestCRS);
