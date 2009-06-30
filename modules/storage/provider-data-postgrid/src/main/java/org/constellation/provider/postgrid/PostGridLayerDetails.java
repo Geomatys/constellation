@@ -16,21 +16,17 @@
  */
 package org.constellation.provider.postgrid;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
-import javax.measure.unit.NonSI;
-import javax.measure.unit.Unit;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
@@ -57,24 +53,12 @@ import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.style.StyleConstants;
-import org.geotoolkit.style.function.InterpolationPoint;
-import org.geotoolkit.style.function.Method;
-import org.geotoolkit.style.function.Mode;
 import org.geotoolkit.util.MeasurementRange;
 
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.Function;
-import org.opengis.filter.expression.Literal;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.operation.TransformException;
-import org.opengis.style.ChannelSelection;
-import org.opengis.style.ColorMap;
-import org.opengis.style.ContrastEnhancement;
-import org.opengis.style.Description;
 import org.opengis.style.FeatureTypeStyle;
-import org.opengis.style.OverlapBehavior;
 import org.opengis.style.RasterSymbolizer;
 import org.opengis.style.Rule;
 import org.opengis.style.ShadedRelief;
@@ -329,37 +313,11 @@ class PostGridLayerDetails implements LayerDetails {
         return reader;
     }
 
-    private MutableStyle toStyle(final MeasurementRange dimRange) {
-        final List<InterpolationPoint> values = new ArrayList<InterpolationPoint>();
-        values.add(STYLE_FACTORY.interpolationPoint(
-                        STYLE_FACTORY.literal(Color.WHITE), dimRange.getMinimum()));
-        values.add(STYLE_FACTORY.interpolationPoint(
-                        STYLE_FACTORY.literal(Color.BLUE), dimRange.getMaximum()));
-        final Literal lookup = StyleConstants.DEFAULT_CATEGORIZE_LOOKUP;
-        final Literal fallback = StyleConstants.DEFAULT_FALLBACK;
-        final Function interpolateFunction = STYLE_FACTORY.interpolateFunction(
-                lookup, values, Method.COLOR, Mode.LINEAR, fallback);
-
-        final ChannelSelection selection = STYLE_FACTORY.channelSelection(
-                STYLE_FACTORY.selectedChannelType("0", FILTER_FACTORY.literal(1)));
-
-        final Expression opacity = FILTER_FACTORY.literal(1f);
-        final OverlapBehavior overlap = OverlapBehavior.LATEST_ON_TOP;
-        final ColorMap colorMap = STYLE_FACTORY.colorMap(interpolateFunction);
-        final ContrastEnhancement enhanced = StyleConstants.DEFAULT_CONTRAST_ENHANCEMENT;
-        final ShadedRelief relief = StyleConstants.DEFAULT_SHADED_RELIEF;
-        final Symbolizer outline = null; //createRealWorldLineSymbolizer();
-        final Unit uom = NonSI.FOOT;
-        final String geom = StyleConstants.DEFAULT_GEOM;
-        final String name = "raster symbol name";
-        final Description desc = StyleConstants.DEFAULT_DESCRIPTION;
-
-//        final RasterSymbolizer symbol = STYLE_FACTORY.rasterSymbolizer(
-//                name,geom,desc,uom,opacity, selection,
-//                overlap, colorMap, enhanced, relief, outline);
-
-        final RasterSymbolizer symbol = STYLE_FACTORY.rasterSymbolizer();
-
-        return STYLE_FACTORY.style(symbol);
+    /**
+     * Specifies that the type of this layer is coverage.
+     */
+    @Override
+    public TYPE getType() {
+        return TYPE.COVERAGE;
     }
 }

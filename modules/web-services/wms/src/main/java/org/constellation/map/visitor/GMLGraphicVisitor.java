@@ -56,6 +56,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
+ * Visit results of a GetFeatureInfo request, and format the output into GML.
  *
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)

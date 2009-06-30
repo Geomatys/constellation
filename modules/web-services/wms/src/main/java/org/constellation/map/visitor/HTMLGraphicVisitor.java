@@ -16,38 +16,64 @@
  */
 package org.constellation.map.visitor;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.measure.unit.Unit;
 
+import org.constellation.map.ws.WMSWorker;
+import org.constellation.provider.LayerDetails;
+import org.constellation.provider.LayerDetails.TYPE;
 import org.constellation.query.wms.GetFeatureInfo;
+import org.constellation.ws.CstlServiceException;
+
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.map.FeatureMapLayer;
 
 import org.opengis.feature.Feature;
 import org.opengis.feature.Property;
-import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
+
 
 /**
+ * Visit results of a GetFeatureInfo request, and format the output into HTML.
  *
  * @author Johann Sorel (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
 public final class HTMLGraphicVisitor extends TextGraphicVisitor {
+    /**
+     * Contains the values for all coverage layers requested.
+     */
+    private final Map<String, List<String>> coverages = new HashMap<String, List<String>>();
 
-    private final Map<String, List<String>> values = new HashMap<String, List<String>>();
+    /**
+     * Contains all features that cover the point requested, for feature layers.
+     */
+    private final Map<String, List<Feature>> features = new HashMap<String, List<Feature>>();
+
     private int index = 0;
 
     public HTMLGraphicVisitor(final GetFeatureInfo gfi) {
         super(gfi);
 
         for (String key : gfi.getQueryLayers()) {
-            values.put(key, new ArrayList<String>());
+            final LayerDetails layerDetails;
+            try {
+                layerDetails = WMSWorker.getLayerReference(key, gfi.getVersion().toString());
+            } catch (CstlServiceException ex) {
+                // Should not occur since it has already been gotten previously.
+                throw new AssertionError(ex);
+            }
+            if (layerDetails.getType().equals(TYPE.COVERAGE)) {
+                coverages.put(key, new ArrayList<String>());
+            } else {
+                features.put(key, new ArrayList<Feature>());
+            }
         }
     }
 
@@ -70,38 +96,15 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
     @Override
     public void visit(ProjectedFeature graphic, Shape queryArea) {
         index++;
-        final StringBuilder builder = new StringBuilder();
         final FeatureMapLayer layer = graphic.getFeatureLayer();
         final Feature feature = graphic.getFeature();
-
-        for (final Property prop : feature.getProperties()) {
-            if (prop == null) {
-                continue;
-            }
-            final Name propName = prop.getName();
-            if (propName == null) {
-                continue;
-            }
-
-            if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
-                builder.append(propName.toString()).append(':').append(prop.getType().getBinding().getSimpleName()).append(';');
-            } else {
-                Object value = prop.getValue();
-                builder.append(propName.toString()).append(':').append(value).append(';');
-            }
+        final String layerName = layer.getName();
+        List<Feature> feat = features.get(layerName);
+        if (feat == null) {
+            feat = new ArrayList<Feature>();
+            features.put(layerName, feat);
         }
-
-        final String result = builder.toString();
-        if (builder.length() > 0 && result.endsWith(";")) {
-            final String layerName = layer.getName();
-            List<String> strs = values.get(layerName);
-            if (strs == null) {
-                strs = new ArrayList<String>();
-                values.put(layerName, strs);
-            }
-            strs.add(result.substring(0, result.length() - 2));
-        }
-
+        feat.add(feature);
     }
 
     /**
@@ -117,10 +120,10 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
         }
 
         final String layerName = coverage.getCoverageLayer().getName();
-        List<String> strs = values.get(layerName);
+        List<String> strs = coverages.get(layerName);
         if (strs == null) {
             strs = new ArrayList<String>();
-            values.put(layerName, strs);
+            coverages.put(layerName, strs);
         }
 
         StringBuilder builder = new StringBuilder();
@@ -152,35 +155,69 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
                 .append("    <head>\n")
                 .append("        <title>GetFeatureInfo output</title>\n")
                 .append("    </head>\n")
-                .append("    <body>\n")
-                .append("    <table>\n");
-        for (String layer : values.keySet()) {
-            response.append("       <tr>")
-                    .append("           <th>").append(layer).append("</th>")
-                    .append("       </tr>");
-            final List<String> record = values.get(layer);
+                .append("    <body>\n");
 
-            if(record.isEmpty()){
-                response.append("       <tr>")
-                        .append("           <th>")
-                        .append("               No values.")
-                        .append("           </th>")
-                        .append("       </tr>");
-            }else{
+        for (String layer : coverages.keySet()) {
+            response.append("    <table>\n")
+                    .append("       <tr>\n")
+                    .append("           <th><u>").append(layer).append("</u></th>\n")
+                    .append("       </tr>\n");
+            final List<String> record = coverages.get(layer);
+
+            if (record.isEmpty()) {
+                response.append("       <tr>\n")
+                        .append("           <td>")
+                        .append("               No data for this point.")
+                        .append("           </td>\n")
+                        .append("       </tr>\n");
+            } else {
                 for (String value : record) {
-                    response.append("       <tr>")
-                            .append("           <th>")
+                    response.append("       <tr>\n")
+                            .append("           <td>")
                             .append(value)
-                            .append("           </th>")
-                            .append("       </tr>");
+                            .append("           </td>\n")
+                            .append("       </tr>\n");
                 }
             }
+            response.append("    </table>\n");
         }
-        response.append("    </table>\n")
-                .append("    </body>\n")
+        for (String featureId : features.keySet()) {
+            response.append("    <table>\n")
+                    .append("       <tr>\n")
+                    .append("           <th><u>").append(featureId).append("</u></th>\n")
+                    .append("       </tr>\n");
+            final List<Feature> record = features.get(featureId);
+
+            if (record.isEmpty()) {
+                response.append("       <tr>\n")
+                        .append("           <td>")
+                        .append("               No feature covers the requested point.")
+                        .append("           </td>\n")
+                        .append("       </tr>\n");
+            } else {
+                for (Feature feature : record) {
+                    response.append("       <tr>\n");
+                    for (Iterator it = feature.getType().getDescriptors().iterator(); it.hasNext();) {
+                        response.append("           <th>")
+                            .append(((PropertyDescriptor)it.next()).getName().getLocalPart())
+                            .append("           </th>\n");
+                    }
+                    response.append("       </tr>\n")
+                            .append("       <tr>\n");
+                    for (Iterator it = feature.getProperties().iterator(); it.hasNext();) {
+                        response.append("           <td>")
+                            .append(((Property)it.next()).getValue().toString())
+                            .append("           </td>\n");
+                    }
+                    response.append("       </tr>\n");
+                }
+            }
+            response.append("    </table>\n");
+        }
+        response.append("    </body>\n")
                 .append("</html>");
 
-        values.clear();
+        coverages.clear();
         return response.toString();
     }
 

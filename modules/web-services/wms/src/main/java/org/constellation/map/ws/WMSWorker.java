@@ -827,7 +827,7 @@ public class WMSWorker extends AbstractWMSWorker {
 
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
-    private List<LayerDetails> getAllLayerReferences(final String version) throws CstlServiceException {
+    private static List<LayerDetails> getAllLayerReferences(final String version) throws CstlServiceException {
 
     	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
     	try { // WE catch the exception from either service version
@@ -847,7 +847,7 @@ public class WMSWorker extends AbstractWMSWorker {
 
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
-    private List<LayerDetails> getLayerReferences(final List<String> layerNames, final String version)
+    private static List<LayerDetails> getLayerReferences(final List<String> layerNames, final String version)
                                                                            throws CstlServiceException
     {
 
@@ -869,7 +869,7 @@ public class WMSWorker extends AbstractWMSWorker {
 
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
-    private LayerDetails getLayerReference(final String layerName, final String version)
+    public static LayerDetails getLayerReference(final String layerName, final String version)
                                                              throws CstlServiceException
     {
 

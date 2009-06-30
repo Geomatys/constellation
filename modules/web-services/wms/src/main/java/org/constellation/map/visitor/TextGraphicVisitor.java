@@ -22,19 +22,35 @@ import org.geotoolkit.display2d.canvas.AbstractGraphicVisitor;
 
 
 /**
+ * Abstract graphic visitor designed to handle text output format.
  *
  * @author Johann Sorel (Geomatys)
+ * @author Cédric Briançon (Geomatys)
+ *
+ * @see AbstractGraphicVisitor
  */
 public abstract class TextGraphicVisitor extends AbstractGraphicVisitor {
-
+    /**
+     * The GetFeatureInfo WMS request.
+     */
     protected final GetFeatureInfo gfi;
 
-    protected TextGraphicVisitor(GetFeatureInfo gfi) {
+    /**
+     * Instanciates this abstract graphic visitor with the GetFeatureInfo request specified.
+     *
+     * @param gfi A GetFeatureInfo request.
+     */
+    protected TextGraphicVisitor(final GetFeatureInfo gfi) {
         if (gfi == null) {
             throw new NullPointerException("GetFeatureInfo Object can not be null");
         }
         this.gfi = gfi;
     }
 
+    /**
+     * Method that have to be called in order to get the output result of the GetFeatureInfo request.
+     *
+     * @return A text representing the result, depending on the output format chosen.
+     */
     public abstract String getResult();
 }

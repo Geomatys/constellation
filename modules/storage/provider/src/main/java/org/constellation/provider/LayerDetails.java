@@ -51,6 +51,13 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * @author Cédric Briançon
  */
 public interface LayerDetails {
+    /**
+     * Defines the type of provider for a {@linkplain Layer layer}.
+     */
+    public static enum TYPE {
+        COVERAGE,
+        FEATURE;
+    };
 
     public static final String KEY_DIM_RANGE = "DIM_RANGE";
     public static final String KEY_ELEVATION = "ELEVATION";
@@ -146,4 +153,9 @@ public interface LayerDetails {
      * @see Layer#isQueryable 
      */
     public boolean isQueryable(ServiceType service);
+
+    /**
+     * Returns the type of provider for a {@linkplain Layer layer}.
+     */
+    public abstract TYPE getType();
 }

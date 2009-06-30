@@ -322,6 +322,11 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
         return DefaultGlyphService.create(style, dimension);
     }
 
+    /**
+     * Returns {@code null}. This method should not be used in this context.
+     *
+     * @todo the super class should probably not define this method as abstract.
+     */
     @Override
     public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
             final Double elevation, final Date time) throws CatalogException, IOException
@@ -330,7 +335,17 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     }
 
     /**
+     * Specifies that the type of this layer is feature.
+     */
+    @Override
+    public TYPE getType() {
+        return TYPE.FEATURE;
+    }
+
+    /**
      * Should not have been called in this implementation.
+     *
+     * @todo the super class should probably not define this method as abstract.
      */
     @Override
     public Set<Series> getSeries() {
@@ -373,5 +388,4 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     }
     
     protected abstract MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws IOException;
-    
 }

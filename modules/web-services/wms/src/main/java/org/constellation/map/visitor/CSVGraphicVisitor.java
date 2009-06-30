@@ -37,6 +37,7 @@ import org.opengis.feature.type.Name;
 
 
 /**
+ * Visit results of a GetFeatureInfo request, and format the output into CSV.
  *
  * @author Johann Sorel (Geomatys)
  */
