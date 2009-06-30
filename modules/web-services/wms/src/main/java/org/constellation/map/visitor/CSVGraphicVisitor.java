@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.map.ws.rs;
+package org.constellation.map.visitor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -35,20 +35,20 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.Property;
 import org.opengis.feature.type.Name;
 
+
 /**
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CSVGraphicVisitor extends TextGraphicVisitor{
+public final class CSVGraphicVisitor extends TextGraphicVisitor {
 
-    private final Map<String,List<String>> values = new HashMap<String,List<String>>();
-
+    private final Map<String, List<String>> values = new HashMap<String, List<String>>();
     private int index = 0;
 
     public CSVGraphicVisitor(final GetFeatureInfo gfi) {
         super(gfi);
 
-        for(String key : gfi.getQueryLayers()){
+        for (String key : gfi.getQueryLayers()) {
             values.put(key, new ArrayList<String>());
         }
     }
@@ -59,9 +59,9 @@ public class CSVGraphicVisitor extends TextGraphicVisitor{
     @Override
     public boolean isStopRequested() {
         Integer count = gfi.getFeatureCount();
-        if(count != null){
+        if (count != null) {
             return (index == count);
-        }else{
+        } else {
             return false;
         }
     }
@@ -74,30 +74,34 @@ public class CSVGraphicVisitor extends TextGraphicVisitor{
         index++;
         final StringBuilder builder = new StringBuilder();
         final FeatureMapLayer layer = graphic.getFeatureLayer();
-        final Feature feature       = graphic.getFeature();
+        final Feature feature = graphic.getFeature();
 
-        for(final Property prop : feature.getProperties()){
-            if(prop == null) continue;
+        for (final Property prop : feature.getProperties()) {
+            if (prop == null) {
+                continue;
+            }
             final Name propName = prop.getName();
-            if(propName == null) continue;
+            if (propName == null) {
+                continue;
+            }
 
-            if( Geometry.class.isAssignableFrom( prop.getType().getBinding() )){
+            if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
                 builder.append(propName.toString()).append(':').append(prop.getType().getBinding().getSimpleName()).append(';');
-            }else{
+            } else {
                 Object value = prop.getValue();
                 builder.append(propName.toString()).append(':').append(value).append(';');
             }
         }
 
         final String result = builder.toString();
-        if(builder.length() > 0 && result.endsWith(";")){
+        if (builder.length() > 0 && result.endsWith(";")) {
             final String layerName = layer.getName();
             List<String> strs = values.get(layerName);
-            if(strs == null){
+            if (strs == null) {
                 strs = new ArrayList<String>();
                 values.put(layerName, strs);
             }
-            strs.add(result.substring(0, result.length()-2));
+            strs.add(result.substring(0, result.length() - 2));
         }
 
     }
@@ -110,19 +114,21 @@ public class CSVGraphicVisitor extends TextGraphicVisitor{
         index++;
         final Object[][] results = getCoverageValues(coverage, queryArea);
 
-        if(results == null) return;
+        if (results == null) {
+            return;
+        }
 
         final String layerName = coverage.getCoverageLayer().getName();
         List<String> strs = values.get(layerName);
-        if(strs == null){
+        if (strs == null) {
             strs = new ArrayList<String>();
             values.put(layerName, strs);
         }
 
         StringBuilder builder = new StringBuilder();
-        for(int i=0;i<results.length;i++){
+        for (int i = 0; i < results.length; i++) {
             final Object value = results[i][0];
-            final Unit unit    = (Unit)results[i][1];
+            final Unit unit = (Unit) results[i][1];
             if (value == null) {
                 continue;
             }
@@ -134,7 +140,7 @@ public class CSVGraphicVisitor extends TextGraphicVisitor{
         }
 
         final String result = builder.toString();
-        strs.add(result.substring(0, result.length()-2));
+        strs.add(result.substring(0, result.length() - 2));
 
     }
 
@@ -142,17 +148,17 @@ public class CSVGraphicVisitor extends TextGraphicVisitor{
      * {@inheritDoc }
      */
     @Override
-    public String getResult(){
+    public String getResult() {
         final StringBuilder builder = new StringBuilder();
 
-        for(final String layerName : values.keySet()){
+        for (final String layerName : values.keySet()) {
             builder.append(layerName).append("\n");
             final List<String> features = values.get(layerName);
 
-            if(features.isEmpty()){
+            if (features.isEmpty()) {
                 builder.append("No values.").append("\n");
-            }else{
-                for(final String record : values.get(layerName)){
+            } else {
+                for (final String record : values.get(layerName)) {
                     builder.append(record).append("\n");
                 }
             }
@@ -161,5 +167,4 @@ public class CSVGraphicVisitor extends TextGraphicVisitor{
         values.clear();
         return builder.toString();
     }
-
 }

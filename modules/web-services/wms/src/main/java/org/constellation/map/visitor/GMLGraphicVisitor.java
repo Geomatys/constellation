@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.map.ws.rs;
+package org.constellation.map.visitor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -54,18 +54,19 @@ import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+
 /**
  *
  * @author Johann Sorel (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  */
-public class GMLGraphicVisitor extends TextGraphicVisitor{
+public final class GMLGraphicVisitor extends TextGraphicVisitor {
 
     private final LayerProviderProxy dp = LayerProviderProxy.getInstance();
-    private final Map<String,List<String>> values = new HashMap<String,List<String>>();
-
+    private final Map<String, List<String>> values = new HashMap<String, List<String>>();
     private int index = 0;
 
-    public GMLGraphicVisitor(GetFeatureInfo gfi){
+    public GMLGraphicVisitor(GetFeatureInfo gfi) {
         super(gfi);
     }
 
@@ -75,13 +76,13 @@ public class GMLGraphicVisitor extends TextGraphicVisitor{
     @Override
     public boolean isStopRequested() {
         Integer count = gfi.getFeatureCount();
-        if(count != null){
+        if (count != null) {
             return (index == count);
-        }else{
+        } else {
             return false;
         }
     }
-    
+
     /**
      * {@inheritDoc }
      */
@@ -90,30 +91,34 @@ public class GMLGraphicVisitor extends TextGraphicVisitor{
         index++;
         final StringBuilder builder = new StringBuilder();
         final FeatureMapLayer layer = graphic.getFeatureLayer();
-        final Feature feature       = graphic.getFeature();
+        final Feature feature = graphic.getFeature();
 
-        for(final Property prop : feature.getProperties()){
-            if(prop == null) continue;
+        for (final Property prop : feature.getProperties()) {
+            if (prop == null) {
+                continue;
+            }
             final Name propName = prop.getName();
-            if(propName == null) continue;
+            if (propName == null) {
+                continue;
+            }
 
-            if( Geometry.class.isAssignableFrom( prop.getType().getBinding() )){
+            if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
                 builder.append(propName.toString()).append(':').append(prop.getType().getBinding().getSimpleName()).append(';');
-            }else{
+            } else {
                 Object value = prop.getValue();
                 builder.append(propName.toString()).append(':').append(value).append(';');
             }
         }
 
         final String result = builder.toString();
-        if(builder.length() > 0 && result.endsWith(";")){
+        if (builder.length() > 0 && result.endsWith(";")) {
             final String layerName = layer.getName();
             List<String> strs = values.get(layerName);
-            if(strs == null){
+            if (strs == null) {
                 strs = new ArrayList<String>();
                 values.put(layerName, strs);
             }
-            strs.add(result.substring(0, result.length()-2));
+            strs.add(result.substring(0, result.length() - 2));
         }
 
         //TODO handle features as real GML features here
@@ -128,19 +133,21 @@ public class GMLGraphicVisitor extends TextGraphicVisitor{
         index++;
         final Object[][] results = getCoverageValues(coverage, queryArea);
 
-        if(results == null) return;
+        if (results == null) {
+            return;
+        }
 
         final String layerName = coverage.getCoverageLayer().getName();
         List<String> strs = values.get(layerName);
-        if(strs == null){
+        if (strs == null) {
             strs = new ArrayList<String>();
             values.put(layerName, strs);
         }
 
         StringBuilder builder = new StringBuilder();
-        for(int i=0;i<results.length;i++){
+        for (int i = 0; i < results.length; i++) {
             final Object value = results[i][0];
-            final Unit unit    = (Unit)results[i][1];
+            final Unit unit = (Unit) results[i][1];
             if (value == null) {
                 continue;
             }
@@ -257,7 +264,7 @@ public class GMLGraphicVisitor extends TextGraphicVisitor{
                .append("\n");
 
         for (String layerName : values.keySet()) {
-            for(final String record : values.get(layerName)){
+            for (final String record : values.get(layerName)) {
                 builder.append(record).append("\n");
             }
         }
@@ -267,7 +274,6 @@ public class GMLGraphicVisitor extends TextGraphicVisitor{
         values.clear();
         return builder.toString();
     }
-
 
     /**
      * Returns the coordinates of the requested pixel in the image, expressed in the
@@ -279,15 +285,14 @@ public class GMLGraphicVisitor extends TextGraphicVisitor{
         final int height = gfi.getSize().height;
         final int pixelX = gfi.getX();
         final int pixelY = gfi.getY();
-        final double widthEnv     = objEnv.getSpan(0);
-        final double heightEnv    = objEnv.getSpan(1);
-        final double resX         =      widthEnv  / width;
-        final double resY         = -1 * heightEnv / height;
+        final double widthEnv = objEnv.getSpan(0);
+        final double heightEnv = objEnv.getSpan(1);
+        final double resX = widthEnv / width;
+        final double resY = -1 * heightEnv / height;
         final double geoX = (pixelX + 0.5) * resX + objEnv.getMinimum(0);
         final double geoY = (pixelY + 0.5) * resY + objEnv.getMaximum(1);
         final GeneralDirectPosition position = new GeneralDirectPosition(geoX, geoY);
         position.setCoordinateReferenceSystem(objEnv.getCoordinateReferenceSystem());
         return position;
     }
-
 }

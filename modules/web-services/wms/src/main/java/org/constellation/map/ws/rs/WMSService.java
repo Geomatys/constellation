@@ -104,7 +104,7 @@ public class WMSService extends OGCWebService {
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
         setXMLContext("org.constellation.ws:" +
-        		      "org.geotoolkit.wms.xml.v111:" +
+                      "org.geotoolkit.wms.xml.v111:" +
                       "org.geotoolkit.wms.xml.v130:" +
                       "org.geotoolkit.sld.xml.v110",
                       "");

@@ -15,27 +15,26 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
-package org.constellation.map.ws.rs;
+package org.constellation.map.visitor;
 
 import org.constellation.query.wms.GetFeatureInfo;
 import org.geotoolkit.display2d.canvas.AbstractGraphicVisitor;
+
 
 /**
  *
  * @author Johann Sorel (Geomatys)
  */
-public abstract class TextGraphicVisitor extends AbstractGraphicVisitor{
+public abstract class TextGraphicVisitor extends AbstractGraphicVisitor {
 
     protected final GetFeatureInfo gfi;
 
-    protected TextGraphicVisitor(GetFeatureInfo gfi){
-        if(gfi == null){
+    protected TextGraphicVisitor(GetFeatureInfo gfi) {
+        if (gfi == null) {
             throw new NullPointerException("GetFeatureInfo Object can not be null");
         }
         this.gfi = gfi;
     }
 
     public abstract String getResult();
-
 }
