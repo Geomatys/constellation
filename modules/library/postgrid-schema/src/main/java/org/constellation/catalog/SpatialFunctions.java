@@ -65,7 +65,7 @@ public final class SpatialFunctions {
     private static int getDimension(final Envelope envelope) {
         int dimension = envelope.getDimension();
         while (dimension != 0) {
-            final double length = envelope.getLength(dimension - 1);
+            final double length = envelope.getSpan(dimension - 1);
             if (!Double.isNaN(length) && !Double.isInfinite(length)) {
                 break;
             }
@@ -112,7 +112,7 @@ public final class SpatialFunctions {
                 switch (i) {
                     case  0: // Fall through
                     case  1: value = CORNERS[corner+i] ? envelope.getMaximum(i) : envelope.getMinimum(i); break;
-                    default: value = envelope.getCenter(i); break;
+                    default: value = envelope.getMedian(i); break;
                 }
                 buffer.append(separator).append(value);
                 separator = ' ';

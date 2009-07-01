@@ -348,7 +348,7 @@ final class CoverageComparator implements Comparator<CoverageReference> {
             if (tDim<0 || tDim>=source.getDimension()) {
                 return Double.NaN;
             }
-            return Math.abs(source.getCenter(tDim) - target.getCenter(tDim));
+            return Math.abs(source.getMedian(tDim) - target.getMedian(tDim));
         }
 
         /**
