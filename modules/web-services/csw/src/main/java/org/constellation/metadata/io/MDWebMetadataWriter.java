@@ -746,7 +746,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             Catalog catalog = MDReader.getCatalog(catalogCode);
             Form f = MDReader.getForm(catalog, id);
 
-            MDWriter.deleteForm(f);
+            MDWriter.deleteForm(f.getId());
         } catch (SQLException ex) {
             throw new CstlServiceException("The service has throw an SQLException while deleting the metadata: " + ex.getMessage(),
                         NO_APPLICABLE_CODE);
