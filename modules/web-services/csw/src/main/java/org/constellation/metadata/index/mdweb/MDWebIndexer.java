@@ -195,11 +195,11 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             logger.info("all form read in " + (System.currentTimeMillis() - time) + " ms.");
             nbForms = results.size();
             for (Form form : results) {
-                //if (form.isFullyValidated()) {
+                if (form.getType() == null || !form.getType().equals("templateForm")) {
                     indexDocument(writer, form);
-                //} else {
-                //     logger.info("The form " + form.getId() + "is not validated we don't index it");
-            //    }
+                } else {
+                     logger.info("The form " + form.getId() + "is a context so we don't index it");
+                }
             }
             writer.optimize();
             writer.close();
