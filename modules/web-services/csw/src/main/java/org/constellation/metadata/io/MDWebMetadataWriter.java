@@ -190,7 +190,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             }
             
             Profile defaultProfile = null;
-            if  (className.equals("MetaDataImpl")) {
+            if  (className.equals("DefaultMetaData")) {
                 defaultProfile = MDReader.getProfile("ISO_19115");
             }
             Form form = new Form(-1, MDCatalog, title, user, null, defaultProfile, creationDate, false, false, "normalForm");
@@ -431,13 +431,13 @@ public class MDWebMetadataWriter extends MetadataWriter {
         }
 
         //special case TODO delete when geotools/api will be updated.
-        if (className.equals("MetaDataImpl")) {
+        if (className.equals("DefaultMetaData")) {
             className = "Metadata";
-        } else if (className.equals("OnLineResourceImpl")) {
+        } else if (className.equals("DefaultOnLineResource")) {
             className = "OnlineResource";
-        } else if (className.equals("CitationDate") || className.equals("CitationDateImpl")) {
+        } else if (className.equals("CitationDate") || className.equals("DefaultCitationDate")) {
             className = "CI_Date";
-        } else if (className.equals("ScopeImpl")) {
+        } else if (className.equals("DefaultScope")) {
             className = "DQ_Scope";
         } 
         
@@ -446,10 +446,11 @@ public class MDWebMetadataWriter extends MetadataWriter {
         if (i != -1) {
             className = className.substring(0, i);
         }
-        
-        //We replace The FRA prefix by FRA_
-        if (className.startsWith("FRA"))
-            className = "FRA_" + className.substring(3);
+
+        //we remove the Default prefix
+        if (className.startsWith("Default")) {
+            className = className.substring(7, className.length());
+        }
         
         //we remove the Type suffix
         if (className.endsWith("Type") && !className.equals("CouplingType") 

@@ -654,9 +654,9 @@ public class CatalogueHarvester {
     private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, CstlServiceException, IOException {
         
         
-        URL source         = new URL(sourceURL);
+        URL source          = new URL(sourceURL);
         URLConnection conec = source.openConnection();
-        Object harvested = null;
+        Object harvested    = null;
         
         try {
         
@@ -738,6 +738,9 @@ public class CatalogueHarvester {
                     harvested = ((JAXBElement) harvested).getValue();
                 }
             } catch (JAXBException ex) {
+                logger.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
+                        "cause: " + ex.getMessage());
+            }  catch (IllegalAccessError ex) {
                 logger.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
                         "cause: " + ex.getMessage());
             } finally {
