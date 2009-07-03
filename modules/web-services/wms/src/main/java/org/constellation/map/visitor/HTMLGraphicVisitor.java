@@ -153,14 +153,19 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
         final StringBuilder response = new StringBuilder();
         response.append("<html>\n")
                 .append("    <head>\n")
-                .append("        <title>GetFeatureInfo output</title>\n")
+                .append("        <title>GetFeatureInfo HTML output</title>\n")
                 .append("    </head>\n")
+                .append("    <style>\n")
+                .append("       .trLayerName th {\n")
+                .append("           text-decoration:underline;\n")
+                .append("       }\n")
+                .append("    </style>\n")
                 .append("    <body>\n");
 
         for (String layer : coverages.keySet()) {
-            response.append("    <table>\n")
-                    .append("       <tr>\n")
-                    .append("           <th><u>").append(layer).append("</u></th>\n")
+            response.append("    <table class=\"tableCoverageGFI\">\n")
+                    .append("       <tr class=\"trLayerName\">\n")
+                    .append("           <th>").append(layer).append("</th>\n")
                     .append("       </tr>\n");
             final List<String> record = coverages.get(layer);
 
@@ -172,19 +177,21 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
                         .append("       </tr>\n");
             } else {
                 for (String value : record) {
-                    response.append("       <tr>\n")
+                    response.append("       <tr class=\"trValue\">\n")
+                            .append("           <td>Value: </td>")
                             .append("           <td>")
                             .append(value)
                             .append("           </td>\n")
                             .append("       </tr>\n");
                 }
             }
-            response.append("    </table>\n");
+            response.append("    </table>\n")
+                    .append("<br/>\n");
         }
         for (String featureId : features.keySet()) {
-            response.append("    <table>\n")
-                    .append("       <tr>\n")
-                    .append("           <th><u>").append(featureId).append("</u></th>\n")
+            response.append("    <table class=\"tableFeatureGFI\">\n")
+                    .append("       <tr class=\"trLayerName\">\n")
+                    .append("           <th>").append(featureId).append("</th>\n")
                     .append("       </tr>\n");
             final List<Feature> record = features.get(featureId);
 
@@ -195,24 +202,26 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
                         .append("           </td>\n")
                         .append("       </tr>\n");
             } else {
+                final Feature firstFeature = record.get(0);
+                response.append("       <tr class=\"trColumnName\">\n");
+                for (Iterator it = firstFeature.getType().getDescriptors().iterator(); it.hasNext();) {
+                    response.append("           <th>")
+                        .append(((PropertyDescriptor)it.next()).getName().getLocalPart())
+                        .append("           </th>\n");
+                }
+                response.append("       </tr>\n");
                 for (Feature feature : record) {
-                    response.append("       <tr>\n");
-                    for (Iterator it = feature.getType().getDescriptors().iterator(); it.hasNext();) {
-                        response.append("           <th>")
-                            .append(((PropertyDescriptor)it.next()).getName().getLocalPart())
-                            .append("           </th>\n");
-                    }
-                    response.append("       </tr>\n")
-                            .append("       <tr>\n");
+                    response.append("       <tr class=\"trValue\">\n");
                     for (Iterator it = feature.getProperties().iterator(); it.hasNext();) {
                         response.append("           <td>")
-                            .append(((Property)it.next()).getValue().toString())
-                            .append("           </td>\n");
+                                .append(((Property)it.next()).getValue().toString())
+                                .append("           </td>\n");
                     }
                     response.append("       </tr>\n");
                 }
             }
-            response.append("    </table>\n");
+            response.append("    </table>\n")
+                    .append("<br/>\n");
         }
         response.append("    </body>\n")
                 .append("</html>");
