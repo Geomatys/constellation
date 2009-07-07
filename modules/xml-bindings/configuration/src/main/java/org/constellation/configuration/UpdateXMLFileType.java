@@ -16,7 +16,6 @@
  */
 package org.constellation.configuration;
 
-import java.util.HashMap;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -24,59 +23,57 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * An XML binding for a request used to update server property File.
- * 
+ *
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "UpdatePropertiesFile")
-public class UpdatePropertiesFileType {
-    
+@XmlRootElement(name = "UpdateXMLFile")
+public class UpdateXMLFileType {
+
     /**
      * The name of the properties file.
      */
     private String fileName;
-    
+
     /**
      * The name of the service using this configuration file (used for verication)
      */
     private String service;
-    
+
     /**
      * A list of key-value properties.
      */
-    private HashMap<String, String> properties;
-    
+    private Object xmlContent;
+
     /**
      * Build an empty UpdatePropertiesFile request
      */
-    public UpdatePropertiesFileType() {
-        properties = new HashMap<String, String>();
+    public UpdateXMLFileType() {
     }
-    
+
     /**
      * Build an UpdatePropertiesFile request with the specified file name and service.
-     * 
+     *
      * @param fileName The name of the properties file. example: config.properties
      * @param service  The name of the Service using this file.
      */
-    public UpdatePropertiesFileType(String fileName, String service) {
+    public UpdateXMLFileType(String fileName, String service) {
         this.fileName = fileName;
         this.service  = service;
-        properties    = new HashMap<String, String>();
     }
-    
+
     /**
      * Build an UpdatePropertiesFile request with the specified file name and service.
-     * 
+     *
      * @param fileName The name of the properties file. example: config.properties
      * @param service  The name of the Service using this file.
      * @param properties A map of key-value properties.
      */
-    public UpdatePropertiesFileType(String path, String service, HashMap<String, String> properties) {
-        this.fileName       = path;
+    public UpdateXMLFileType(String path, String service, Object xmlContent) {
+        this.fileName   = path;
         this.service    = service;
-        this.properties = properties;
+        this.xmlContent = xmlContent;
     }
 
     public String getFileName() {
@@ -95,15 +92,18 @@ public class UpdatePropertiesFileType {
         this.service = service;
     }
 
-    public HashMap<String, String> getProperties() {
-        if (properties == null) {
-            properties = new HashMap<String, String>();
-        }
-        return properties;
+    /**
+     * @return the xmlContent
+     */
+    public Object getXmlContent() {
+        return xmlContent;
     }
 
-    public void setProperties(HashMap<String, String> properties) {
-        this.properties = properties;
+    /**
+     * @param xmlContent the xmlContent to set
+     */
+    public void setXmlContent(Object xmlContent) {
+        this.xmlContent = xmlContent;
     }
 
 }

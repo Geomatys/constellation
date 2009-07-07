@@ -124,15 +124,14 @@ public class MDWebMetadataWriter extends MetadataWriter {
         try {
 
             Connection MDConnection = db.getConnection();
-            MDReader = new Reader20(Standard.ISO_19115, MDConnection);
-            MDCatalog = MDReader.getCatalog("CSWCat");
+            MDReader      = new Reader20(Standard.ISO_19115, MDConnection);
+            MDCatalog     = MDReader.getCatalog("CSWCat");
+            this.MDWriter = new Writer20(MDConnection);
             if (MDCatalog == null) {
                 MDCatalog = new Catalog("CSWCat", "CSW Data Catalog");
                 MDWriter.writeCatalog(MDCatalog);
             }
             this.user     = MDReader.getUser("admin");
-            this.MDReader = new Reader20(Standard.ISO_19115, MDConnection);
-            this.MDWriter = new Writer20(MDConnection);
 
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLException while initializing the MDWeb writer:" +'\n'+

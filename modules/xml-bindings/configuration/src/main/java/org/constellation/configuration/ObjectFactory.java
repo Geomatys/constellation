@@ -95,4 +95,12 @@ public class ObjectFactory {
         return new HarvestTask();
     }
 
+    /**
+     * Create an instance of {@link UpdateXMLFileType }
+     *
+     */
+    public UpdateXMLFileType createUpdateXMLFileType() {
+        return new UpdateXMLFileType();
+    }
+
 }

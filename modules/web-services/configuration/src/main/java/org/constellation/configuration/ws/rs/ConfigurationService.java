@@ -46,6 +46,7 @@ import org.constellation.ServiceDef;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.UpdatePropertiesFileType;
+import org.constellation.configuration.UpdateXMLFileType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.util.Util;
@@ -148,6 +149,12 @@ public class ConfigurationService extends WebService  {
             if ("UpdatePropertiesFile".equalsIgnoreCase(request) || objectRequest instanceof UpdatePropertiesFileType) {
                 UpdatePropertiesFileType updateProp = (UpdatePropertiesFileType) objectRequest;
                 marshaller.marshal(updatePropertiesFile(updateProp), sw);
+                return Response.ok(sw.toString(), "text/xml").build();
+            }
+
+            if ("UpdateXMLFile".equalsIgnoreCase(request) || objectRequest instanceof UpdateXMLFileType) {
+                UpdateXMLFileType updateProp = (UpdateXMLFileType) objectRequest;
+                marshaller.marshal(updateXmlFile(updateProp), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
             }
             
@@ -340,7 +347,62 @@ public class ConfigurationService extends WebService  {
         
         return new AcknowlegementType("success", "properties file sucessfully updated");
     }
-    
+
+    /**
+     * Update a properties file on the server file system.
+     *
+     * @param request
+     * @return
+     * @throws org.constellation.coverage.web.CstlServiceException
+     */
+    private AcknowlegementType updateXmlFile(UpdateXMLFileType request) throws CstlServiceException {
+        LOGGER.info("update properties file requested");
+
+        String service    = request.getService();
+        String fileName   = request.getFileName();
+        Object newContent = request.getXmlContent();
+
+        if ( service == null) {
+            throw new CstlServiceException("You must specify the service parameter.",
+                                              MISSING_PARAMETER_VALUE, "service");
+        } else if (!serviceDirectory.keySet().contains(service)) {
+            String msg = "Invalid value for the service parameter: " + service + '\n' +
+                         "accepted values are:";
+            for (String s: serviceDirectory.keySet()) {
+                msg = msg + s + ',';
+            }
+            throw new CstlServiceException(msg, MISSING_PARAMETER_VALUE, "service");
+
+        }
+
+        if (fileName == null) {
+             throw new CstlServiceException("You must specify the fileName parameter.", MISSING_PARAMETER_VALUE, "fileName");
+        }
+
+        if (newContent == null) {
+             throw new CstlServiceException("You must specify a non empty xml content parameter.", MISSING_PARAMETER_VALUE,
+                     "xmlContent");
+        }
+
+        File configDir  = serviceDirectory.get(service);
+        File configFile = new File(configDir, fileName);
+
+        Marshaller marshaller = null;
+        try {
+            marshaller = marshallerPool.acquireMarshaller();
+            marshaller.marshal(newContent, configFile);
+        } catch (JAXBException ex) {
+            throw new CstlServiceException("JAXBException while trying to store the properties files.",
+                                          NO_APPLICABLE_CODE);
+        } finally {
+            if (marshaller != null) {
+                marshallerPool.release(marshaller);
+            }
+        }
+
+        return new AcknowlegementType("success", "xml file sucessfully updated");
+    }
+
     /**
      * Receive a file and write it into the static file path.
      * 
