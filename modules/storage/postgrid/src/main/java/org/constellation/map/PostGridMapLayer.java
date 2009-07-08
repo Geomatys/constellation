@@ -33,8 +33,7 @@ import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.style.MutableStyleFactory;
 import org.geotoolkit.util.logging.Logging;
-
-import org.geotools.feature.NameImpl;
+import org.geotoolkit.feature.DefaultName;
 
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
@@ -166,10 +165,12 @@ public class PostGridMapLayer extends AbstractMapLayer implements CoverageMapLay
         return times;
     }
 
+    @Override
     public Name getCoverageName() {
-        return new NameImpl(reader.getTable().getLayer().getName());
+        return new DefaultName(reader.getTable().getLayer().getName());
     }
 
+    @Override
     public CoverageReader getCoverageReader() {
         reader.getTable().setTimeRange(getTime(), getTime());
         reader.getTable().setVerticalRange(elevation, elevation);
