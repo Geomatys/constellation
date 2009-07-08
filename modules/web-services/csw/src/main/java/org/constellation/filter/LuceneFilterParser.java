@@ -51,7 +51,7 @@ import org.apache.lucene.search.Filter;
 
 // geotools dependencies
 import org.geotoolkit.csw.xml.QueryConstraint;
-import org.geotools.filter.text.cql2.CQLException;
+import org.geotoolkit.filter.text.cql2.CQLException;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.gml.xml.v311modified.AbstractGeometryType;
 import org.geotoolkit.gml.xml.v311modified.EnvelopeEntry;

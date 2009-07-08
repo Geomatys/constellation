@@ -40,8 +40,8 @@ import org.geotoolkit.filter.FilterFactoryImpl;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotools dependencies
-import org.geotools.filter.text.cql2.CQL;
-import org.geotools.filter.text.cql2.CQLException;
+import org.geotoolkit.filter.text.cql2.CQL;
+import org.geotoolkit.filter.text.cql2.CQLException;
 import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.gml.xml.v311modified.CoordinatesType;

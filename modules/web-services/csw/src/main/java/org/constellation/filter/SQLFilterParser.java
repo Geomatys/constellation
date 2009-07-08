@@ -51,7 +51,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotools dependencies
 import org.geotoolkit.referencing.CRS;
-import org.geotools.filter.text.cql2.CQLException;
+import org.geotoolkit.filter.text.cql2.CQLException;
 import org.geotoolkit.geometry.GeneralEnvelope;
 
 // MDWeb dependencies
