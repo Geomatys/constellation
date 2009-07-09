@@ -22,9 +22,9 @@ import java.awt.image.RenderedImage;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import org.geotoolkit.util.collection.CanonicalSet;
 import org.geotoolkit.coverage.CoverageFactoryFinder;
 import org.geotoolkit.coverage.grid.GridCoverageFactory;
+import org.geotoolkit.util.collection.WeakHashSet;
 
 
 /**
@@ -50,7 +50,7 @@ final class GridCoveragePool {
      * Entries added by {@link GridCoverageEntry#unique} and not yet garbage collected.
      * {@link GridCoverageTable} will try to reuse existing entries as much as possible.
      */
-    private final CanonicalSet<GridCoverageEntry> pool = CanonicalSet.newInstance(GridCoverageEntry.class);
+    private final WeakHashSet<GridCoverageEntry> pool = WeakHashSet.newInstance(GridCoverageEntry.class);
 
     /**
      * Last entries on which {@link GridCoverageEntry#getCoverage} has been invoked. When a new

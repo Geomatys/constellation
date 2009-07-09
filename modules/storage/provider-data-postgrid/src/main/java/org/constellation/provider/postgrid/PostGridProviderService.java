@@ -23,11 +23,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
+
+import org.geotoolkit.util.logging.Logging;
 
 import static org.constellation.provider.postgrid.PostGridProvider.*;
 
@@ -42,7 +45,7 @@ public class PostGridProviderService extends AbstractProviderService<String,Laye
     /**
      * Default logger.
      */
-    private static final Logger LOGGER = Logger.getLogger(PostGridProviderService.class.getName());
+    private static final Logger LOGGER = Logging.getLogger(PostGridProviderService.class);
     private static final String NAME = "postgrid";
 
     private static final Collection<PostGridProvider> PROVIDERS = new ArrayList<PostGridProvider>();

@@ -254,6 +254,8 @@
     </dependency>
   </dependencies>
   <properties>
-        <netbeans.hint.deploy.server>J2EE</netbeans.hint.deploy.server>
-    </properties>    
+        <netbeans.hint.deploy.server>gfv3</netbeans.hint.deploy.server>
+    </properties>
 </project>
+
+

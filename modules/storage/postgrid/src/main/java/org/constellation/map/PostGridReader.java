@@ -81,7 +81,7 @@ public class PostGridReader implements CoverageReader{
 
     @Override
     public synchronized GridCoverage2D read(final CoverageReadParam param) throws FactoryException, TransformException, IOException {
-        
+
         if(param == null){
             
             //no parameters, return the complete image

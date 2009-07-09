@@ -46,7 +46,6 @@ import org.geotoolkit.display.shape.DoubleDimension2D;
 import org.geotoolkit.coverage.io.CoverageReader;
 import org.geotoolkit.display2d.ext.dimrange.DimRangeSymbolizer;
 import org.geotoolkit.geometry.GeneralEnvelope;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
@@ -104,14 +103,13 @@ class PostGridLayerDetails implements LayerDetails {
      */
     @Override
     public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
-            final Double elevation, final Date time) throws CatalogException, IOException
-    {
-        final ReferencedEnvelope objEnv = new ReferencedEnvelope(envelope);
+            final Double elevation, final Date time) throws CatalogException, IOException{
+
         final int width = dimension.width;
         final int height = dimension.height;
         final Envelope genv;
         try {
-            genv = CRS.transform(objEnv, DefaultGeographicCRS.WGS84);
+            genv = CRS.transform(envelope, DefaultGeographicCRS.WGS84);
         } catch (TransformException ex) {
             throw new CatalogException(ex);
         }

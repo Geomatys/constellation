@@ -36,12 +36,12 @@ import org.constellation.coverage.catalog.LayerTable;
 import org.constellation.map.PostGridReader;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProvider;
-
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
+
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
-import org.geotoolkit.util.collection.SoftValueHashMap;
+import org.geotoolkit.util.logging.Logging;
 
 
 /**
@@ -59,14 +59,15 @@ public class PostGridProvider implements LayerProvider{
     public static final String KEY_ROOT_DIRECTORY = "RootDirectory";
 
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgrid");
+    private static final Logger LOGGER = Logging.getLogger(PostGridProvider.class);
 
     private final Map<String,Layer> index = new HashMap<String,Layer>();
     private final Map<String,List<String>> favorites = new  HashMap<String, List<String>>();
-    private final Map<String,PostGridReader> cache = new SoftValueHashMap<String, PostGridReader>(6);
+    private final Map<String,PostGridLayerDetails> cache = new HashMap<String, PostGridLayerDetails>();
 
     private final ProviderSource source;
     private final Database database;
+    private final GridCoverageTable coverageTable;
 
     protected PostGridProvider(ProviderSource source) throws IOException, SQLException {
         this.source = source;
@@ -77,6 +78,14 @@ public class PostGridProvider implements LayerProvider{
         }
 
         database = new Database(null,properties);
+
+        GridCoverageTable gridTable = null;
+        try {
+            gridTable = database.getTable(GridCoverageTable.class);
+        } catch (NoSuchTableException ex) {
+            LOGGER.log(Level.SEVERE, "No GridCoverageTable", ex);
+        }
+        coverageTable = gridTable;
         
         visit();
     }
@@ -88,6 +97,7 @@ public class PostGridProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public Class<String> getKeyClass() {
         return String.class;
     }
@@ -95,6 +105,7 @@ public class PostGridProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public Class<LayerDetails> getValueClass() {
         return LayerDetails.class;
     }
@@ -102,6 +113,7 @@ public class PostGridProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public Set<String> getKeys() {
         return index.keySet();
     }
@@ -109,6 +121,7 @@ public class PostGridProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public boolean contains(String key) {
         return index.containsKey(key);
     }
@@ -116,48 +129,46 @@ public class PostGridProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
-    public PostGridLayerDetails get(final String key) {
-        PostGridReader reader = null;
-        synchronized(cache){
-            reader = cache.get(key);
+    @Override
+    public LayerDetails get(final String key) {
 
-            if(reader == null) {
-                //coverage reader is not in the cache, try to load it
-                final Layer layer = index.get(key);
+        PostGridLayerDetails detail = cache.get(key);
 
-                if(layer == null) return null;
+        if(detail == null){
+            //coverage reader is not in the cache, try to load it
+            final Layer layer = index.get(key);
 
-                GridCoverageTable gridTable = null;
-                try {
-                    gridTable = database.getTable(GridCoverageTable.class);
-                } catch (NoSuchTableException ex) {
-                    LOGGER.log(Level.SEVERE, "No GridCoverageTable", ex);
-                }
-                //create a mutable copy
-                gridTable = new GridCoverageTable(gridTable);
-                gridTable.setLayer(layer);
-                reader = new PostGridReader(gridTable);
-                cache.put(key, reader);
+            if(layer == null) return null;
+
+            //create a mutable copy
+            GridCoverageTable gridTable = new GridCoverageTable(coverageTable);
+            gridTable.setLayer(layer);
+            PostGridReader reader = new PostGridReader(gridTable);
+
+            //reader is null, this layer is not registered in this provider.
+            if(reader == null) return null;
+
+            final ProviderLayer layerDef = source.getLayer(key);
+            final List<String> styles = new ArrayList<String>();
+            final String elevationModel;
+            if(layerDef != null){
+                styles.addAll(layerDef.styles);
+                elevationModel = layerDef.elevationModel;
+            }else{
+                elevationModel = null;
             }
 
+            detail = new PostGridLayerDetails(reader, styles, elevationModel);
+            cache.put(key, detail);
         }
 
-        final ProviderLayer layer = source.getLayer(key);
-        final List<String> styles = new ArrayList<String>();
-        final String elevationModel;
-        if(layer != null){
-            styles.addAll(layer.styles);
-            elevationModel = layer.elevationModel;
-        }else{
-            elevationModel = null;
-        }
-
-        return (reader != null) ? new PostGridLayerDetails(reader, styles, elevationModel) : null;
+        return detail;
     }
 
     /**
      * {@inheritDoc }
      */
+    @Override
     public void reload() {
         synchronized(this){
             favorites.clear();
@@ -170,6 +181,7 @@ public class PostGridProvider implements LayerProvider{
     /**
      * {@inheritDoc }
      */
+    @Override
     public void dispose() {
         synchronized(this){
             favorites.clear();
@@ -214,7 +226,7 @@ public class PostGridProvider implements LayerProvider{
 
         ProviderLayer layer = source.getLayer(name);
         if(layer != null && layer.isElevationModel){
-            PostGridLayerDetails pgld = get(name);
+            PostGridLayerDetails pgld = (PostGridLayerDetails) get(name);
             if(pgld != null){
                 return MapBuilder.createElevationModel(pgld.getReader());
             }
