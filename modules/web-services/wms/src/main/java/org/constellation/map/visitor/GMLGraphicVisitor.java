@@ -119,7 +119,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
                 strs = new ArrayList<String>();
                 values.put(layerName, strs);
             }
-            strs.add(result.substring(0, result.length() - 2));
+            strs.add(result.substring(0, result.length() - 1));
         }
 
         //TODO handle features as real GML features here

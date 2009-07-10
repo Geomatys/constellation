@@ -102,7 +102,7 @@ public final class CSVGraphicVisitor extends TextGraphicVisitor {
                 strs = new ArrayList<String>();
                 values.put(layerName, strs);
             }
-            strs.add(result.substring(0, result.length() - 2));
+            strs.add(result.substring(0, result.length() - 1));
         }
 
     }
