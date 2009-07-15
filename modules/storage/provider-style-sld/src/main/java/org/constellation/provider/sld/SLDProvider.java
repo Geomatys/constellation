@@ -40,7 +40,7 @@ import org.geotoolkit.sld.xml.Specification.SymbologyEncoding;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.collection.SoftValueHashMap;
+import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.style.MutableStyleFactory;
 
 /**
@@ -67,7 +67,7 @@ public class SLDProvider implements StyleProvider{
     private final XMLUtilities sldParser = new XMLUtilities();
     private final File folder;
     private final Map<String,File> index = new HashMap<String,File>();
-    private final Map<String,MutableStyle> cache = new SoftValueHashMap<String, MutableStyle>(20);
+    private final Map<String,MutableStyle> cache = new Cache<String, MutableStyle>(20, 20, true);
     private final ProviderSource source;
     
     
@@ -117,6 +117,8 @@ public class SLDProvider implements StyleProvider{
 
     /**
      * {@inheritDoc }
+     *
+     * @todo Should use {@code cache.getOrCreate(...)} for concurrent access.
      */
     public MutableStyle get(String key) {
         

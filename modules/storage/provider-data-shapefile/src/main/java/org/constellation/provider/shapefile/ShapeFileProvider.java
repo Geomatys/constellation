@@ -34,7 +34,7 @@ import org.constellation.provider.configuration.ProviderSource;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotoolkit.map.ElevationModel;
-import org.geotoolkit.util.collection.SoftValueHashMap;
+import org.geotoolkit.util.collection.Cache;
 
 
 
@@ -70,7 +70,7 @@ public class ShapeFileProvider implements LayerProvider {
      * Keeps a link between the file name and the file.
      */
     private final Map<String,File> index = new HashMap<String,File>();
-    private final Map<String,DataStore> cache = new SoftValueHashMap<String, DataStore>(10);
+    private final Map<String,DataStore> cache = new Cache<String, DataStore>(10, 10, true);
 
 
     protected ShapeFileProvider(final ProviderSource source) throws IllegalArgumentException {
@@ -128,6 +128,8 @@ public class ShapeFileProvider implements LayerProvider {
 
     /**
      * {@inheritDoc }
+     *
+     * @todo Should use {@code cache.getOrCreate(...)} for concurrent access.
      */
     @Override
     public LayerDetails get(final String key) {

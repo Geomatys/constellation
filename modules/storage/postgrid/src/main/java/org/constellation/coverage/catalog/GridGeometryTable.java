@@ -33,7 +33,7 @@ import static java.lang.reflect.Array.getDouble;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import org.geotoolkit.util.collection.CanonicalSet;
+import org.geotoolkit.util.collection.WeakHashSet;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.operation.transform.AffineTransform2D;
 import org.geotoolkit.referencing.factory.IdentifiedObjectFinder;
@@ -72,7 +72,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * A set of CRS created up to date. Cached because we will typically have many grid
      * geometries using the same set of CRS.
      */
-    private transient CanonicalSet<SpatialRefSysEntry> gridCRS;
+    private transient WeakHashSet<SpatialRefSysEntry> gridCRS;
 
     /**
      * Constructs a new {@code GridGeometryTable}.
@@ -195,7 +195,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         assert Thread.holdsLock(this);
         Column column = query.identifier;
         if (gridCRS == null) {
-            gridCRS = CanonicalSet.newInstance(SpatialRefSysEntry.class);
+            gridCRS = WeakHashSet.newInstance(SpatialRefSysEntry.class);
         }
         final SpatialRefSysEntry candidate = gridCRS.unique(srsEntry);
         if (candidate != srsEntry) {

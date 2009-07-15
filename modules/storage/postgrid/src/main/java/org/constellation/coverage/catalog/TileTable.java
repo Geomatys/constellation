@@ -38,7 +38,7 @@ import org.geotoolkit.image.io.mosaic.Tile;
 import org.geotoolkit.image.io.mosaic.TileManager;
 import org.geotoolkit.image.io.mosaic.TileManagerFactory;
 import org.geotoolkit.util.Utilities;
-import org.geotoolkit.util.collection.SoftValueHashMap;
+import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.util.XArrays;
 import org.geotoolkit.resources.Errors;
 
@@ -72,7 +72,7 @@ final class TileTable extends Table {
      */
     public TileTable(final Database database) {
         super(new TileQuery(database));
-        cache = new SoftValueHashMap<Request,TileManager[]>();
+        cache = new Cache<Request,TileManager[]>();
     }
 
     /**
@@ -87,6 +87,8 @@ final class TileTable extends Table {
      * @return The tile managers for the given series and date range.
      * @throws CatalogException if an inconsistent record is found in the database.
      * @throws SQLException if an error occured while reading the database.
+     *
+     * @todo We should use {@code cache.getOrCreate(...)} and allow concurrent access.
      */
     public synchronized TileManager[] getTiles(final Layer layer,
             final Timestamp startTime, final Timestamp endTime, final int srid)

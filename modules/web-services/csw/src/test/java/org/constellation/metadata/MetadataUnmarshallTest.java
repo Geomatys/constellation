@@ -472,7 +472,7 @@ public class MetadataUnmarshallTest {
         //static part
         set = new HashSet();
         set.add(Locale.ENGLISH);
-        dataIdentification.setLanguage(set);
+        dataIdentification.setLanguages(set);
         set = new HashSet();
         set.add(TopicCategory.OCEANS);
         dataIdentification.setTopicCategories(set);
@@ -556,7 +556,7 @@ public class MetadataUnmarshallTest {
 
         set = new HashSet();
         set.add(extent);
-        dataIdentification.setExtent(set);
+        dataIdentification.setExtents(set);
 
         set = new HashSet();
         set.add(dataIdentification);
@@ -1189,7 +1189,7 @@ public class MetadataUnmarshallTest {
         //static part
         set = new HashSet();
         set.add(Locale.ENGLISH);
-        dataIdentification.setLanguage(set);
+        dataIdentification.setLanguages(set);
         set = new HashSet();
         set.add(TopicCategory.OCEANS);
         dataIdentification.setTopicCategories(set);
@@ -1260,7 +1260,7 @@ public class MetadataUnmarshallTest {
 
         set = new HashSet();
         set.add(extent);
-        dataIdentification.setExtent(set);
+        dataIdentification.setExtents(set);
 
         set = new HashSet();
         set.add(dataIdentification);

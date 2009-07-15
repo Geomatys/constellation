@@ -38,6 +38,7 @@ import org.geotoolkit.geometry.Envelope2D;
 import org.geotoolkit.image.io.mosaic.Tile;
 import org.geotoolkit.image.io.mosaic.TileManager;
 import org.geotoolkit.image.io.mosaic.MosaicBuilder;
+import org.geotoolkit.image.io.mosaic.MosaicImageWriteParam;
 import org.geotoolkit.image.io.mosaic.TileWritingPolicy;
 import org.geotoolkit.image.io.mosaic.TileManagerFactory;
 import org.geotoolkit.util.collection.FrequencySortedSet;
@@ -356,8 +357,9 @@ public class TileBuilder extends ExternalyConfiguredCommandLine implements Runna
                         }
                     }
                 }
-                // ---- TODO: Remove the "0" after the switch to Geotidy ----
-                manager = builder.createTileManager(tiles, 0, policy);
+                final MosaicImageWriteParam param = new MosaicImageWriteParam();
+                param.setTileWritingPolicy(policy);
+                manager = builder.writeFromInput(tiles, param);
             }
         } catch (IOException e) {
             err.println(e);
