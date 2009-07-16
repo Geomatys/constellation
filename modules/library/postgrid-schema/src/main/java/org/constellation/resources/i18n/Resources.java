@@ -48,13 +48,7 @@ public class Resources extends IndexedResourceBundle {
      * @throws MissingResourceException if resources can't be found.
      */
     public static Resources getResources(Locale locale) throws MissingResourceException {
-        if (locale == null) {
-            locale = Locale.getDefault();
-        }
-        return (Resources) getBundle(Resources.class.getName(), locale);
-        /*
-         * We rely on cache capability of {@link java.util.ResourceBundle}.
-         */
+        return getBundle(Resources.class, locale);
     }
 
     /**
