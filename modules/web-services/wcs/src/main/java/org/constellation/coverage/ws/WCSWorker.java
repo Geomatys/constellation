@@ -107,10 +107,10 @@ import org.constellation.ws.rs.WebService;
 // Geotools dependencies
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.xml.v311modified.CodeListType;
 import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
 import org.geotoolkit.gml.xml.v311modified.TimePositionType;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.xml.MarshallerPool;
 
@@ -857,15 +857,15 @@ public final class WCSWorker {
             final Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRef, null, renderParameters);
 
             // VIEW
-            final ReferencedEnvelope refEnvel;
+            final JTSEnvelope2D refEnvel;
             try {
                 if (envelope.getDimension() > 2) {
-                    refEnvel = new ReferencedEnvelope(
+                    refEnvel = new JTSEnvelope2D(
                             envelope.getMinimum(0), envelope.getMaximum(0),
                             envelope.getMinimum(1), envelope.getMaximum(1),
                             CRS.getHorizontalCRS(abstractRequest.getCRS()));
                 } else {
-                    refEnvel = new ReferencedEnvelope(envelope);
+                    refEnvel = new JTSEnvelope2D(envelope);
                 }
             } catch (FactoryException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);

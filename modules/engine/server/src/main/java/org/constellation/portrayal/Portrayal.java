@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.constellation.provider.LayerDetails;
-import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.style.MutableStyle;
 
 
@@ -60,12 +60,12 @@ public final class Portrayal {
 	public final static class ViewDef{
 		
 		/** The extent of interest. */
-		public final ReferencedEnvelope envelope;
+		public final JTSEnvelope2D envelope;
 		/** The azimuth. TODO: what is this really?*/
 		public final double azimuth;
 		
 		
-		public ViewDef(ReferencedEnvelope env,
+		public ViewDef(JTSEnvelope2D env,
 				       double azimuth){
 			
 			assert( null != env);

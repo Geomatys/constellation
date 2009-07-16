@@ -38,15 +38,15 @@ import org.constellation.ws.ServiceType;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.data.DefaultQuery;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.Query;
+import org.geotoolkit.data.FeatureSource;
+import org.geotoolkit.data.Query;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.DefaultGlyphService;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
+import org.geotoolkit.feature.collection.FeatureCollection;
+import org.geotoolkit.feature.collection.FeatureIterator;
 import org.geotoolkit.filter.text.cql2.CQL;
 import org.geotoolkit.filter.text.cql2.CQLException;
-import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.CRS;
@@ -171,7 +171,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
         //TODO handle this correctly
         try{
-            final ReferencedEnvelope env = fs.getBounds();
+            final JTSEnvelope2D env = fs.getBounds();
 
             Envelope renv = null;
             if(env.getCoordinateReferenceSystem().equals(DefaultGeographicCRS.WGS84)){

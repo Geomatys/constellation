@@ -27,7 +27,7 @@ import org.constellation.provider.AbstractFeatureLayerDetails;
 import org.constellation.provider.StyleProviderProxy;
 
 import org.geotoolkit.map.FeatureMapLayer;
-import org.geotools.data.FeatureSource;
+import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableStyle;
@@ -49,7 +49,8 @@ class ShapeFileLayerDetails extends AbstractFeatureLayerDetails {
     }
     
     ShapeFileLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites,
-        String dateStart, String dateEnd, String elevationStart, String elevationEnd){
+        String dateStart, String dateEnd, String elevationStart, String elevationEnd)
+    {
         super(name,fs,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
     }
     

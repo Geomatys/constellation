@@ -81,8 +81,8 @@ import org.constellation.ws.rs.WebService;
 
 //Geotools dependencies
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
 import org.geotoolkit.sld.MutableNamedLayer;
@@ -635,7 +635,7 @@ public class WMSWorker extends AbstractWMSWorker {
 
 
         // 2. VIEW
-        final ReferencedEnvelope refEnv        = new ReferencedEnvelope(getFI.getEnvelope());
+        final JTSEnvelope2D refEnv             = new JTSEnvelope2D(getFI.getEnvelope());
         final double azimuth                   = getFI.getAzimuth();
         Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnv,azimuth);
 
@@ -792,7 +792,7 @@ public class WMSWorker extends AbstractWMSWorker {
 
 
         // 2. VIEW
-        final ReferencedEnvelope refEnv        = new ReferencedEnvelope(getMap.getEnvelope());
+        final JTSEnvelope2D refEnv             = new JTSEnvelope2D(getMap.getEnvelope());
         final double azimuth                   = getMap.getAzimuth();
         Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnv,azimuth);
 

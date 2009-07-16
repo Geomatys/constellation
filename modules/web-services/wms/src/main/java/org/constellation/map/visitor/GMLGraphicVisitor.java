@@ -41,7 +41,7 @@ import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.geometry.GeneralDirectPosition;
-import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.metadata.iso.citation.Citations;
 import org.geotoolkit.referencing.CRS;
@@ -281,7 +281,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
      * {@linkplain CoordinateReferenceSystem crs} defined in the request.
      */
     public GeneralDirectPosition getPixelCoordinates(final GetFeatureInfo gfi) {
-        final ReferencedEnvelope objEnv = new ReferencedEnvelope(gfi.getEnvelope());
+        final JTSEnvelope2D objEnv = new JTSEnvelope2D(gfi.getEnvelope());
         final int width = gfi.getSize().width;
         final int height = gfi.getSize().height;
         final int pixelX = gfi.getX();

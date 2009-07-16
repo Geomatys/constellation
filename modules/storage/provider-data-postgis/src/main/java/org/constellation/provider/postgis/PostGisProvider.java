@@ -39,9 +39,9 @@ import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.resources.ArraySet;
 
-import org.geotools.data.DataStore;
+import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
+import org.geotoolkit.data.FeatureSource;
 
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
