@@ -26,12 +26,9 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.io.Writer;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.FileInputStream;
 
 import org.geotoolkit.io.TableWriter;
 import org.geotoolkit.util.Utilities;
-import org.geotools.resources.Arguments;
 
 import org.constellation.catalog.Database;
 import org.constellation.catalog.Element;
@@ -62,6 +59,8 @@ import org.constellation.catalog.LoggingLevel;
  * @version $Id$
  * @author Martin Desruisseaux
  * @author Cédric Briançon
+ *
+ * @todo extends {@link org.geotoolkit.console.CommandLine}
  */
 public class Synchronizer {
     /**
@@ -650,35 +649,35 @@ nextTable: for (final String table : tables.keySet()) {
      * @throws IOException  If an error occured while writing to the output stream.
      * @throws SQLException If an error occured while reading or writing the database.
      */
-    public static void main(String[] args) throws IOException, SQLException {
-        final Arguments arguments = new Arguments(args);
-        final String config = arguments.getRequiredString("-config");
-        final boolean deleteBeforeInsert = arguments.getFlag("-delete-before-insert");
-        final boolean pretend = arguments.getFlag("-pretend");
-        final Policy onExisting = deleteBeforeInsert ? Policy.DELETE_BEFORE_INSERT : Policy.INSERT_ONLY;
-        args = arguments.getRemainingArguments(0);
-        final Properties properties = new Properties();
-        final InputStream in = new FileInputStream(config);
-        properties.load(in);
-        in.close();
-
-        final Synchronizer synchronizer = new Synchronizer(properties, arguments.out);
-        synchronizer.pretend = pretend;
-        final Connection source = synchronizer.source.getConnection();
-        final Connection target = synchronizer.target.getConnection();
-        source.setReadOnly(true);
-        target.setAutoCommit(false);
-        boolean success = false;
-        try {
-            synchronizer.copy(asMap(properties), onExisting);
-            success = true;
-        } finally {
-            if (success) {
-                target.commit();
-            } else {
-                target.rollback();
-            }
-            synchronizer.close();
-        }
-    }
+//    public static void main(String[] args) throws IOException, SQLException {
+//        final Arguments arguments = new Arguments(args);
+//        final String config = arguments.getRequiredString("-config");
+//        final boolean deleteBeforeInsert = arguments.getFlag("-delete-before-insert");
+//        final boolean pretend = arguments.getFlag("-pretend");
+//        final Policy onExisting = deleteBeforeInsert ? Policy.DELETE_BEFORE_INSERT : Policy.INSERT_ONLY;
+//        args = arguments.getRemainingArguments(0);
+//        final Properties properties = new Properties();
+//        final InputStream in = new FileInputStream(config);
+//        properties.load(in);
+//        in.close();
+//
+//        final Synchronizer synchronizer = new Synchronizer(properties, arguments.out);
+//        synchronizer.pretend = pretend;
+//        final Connection source = synchronizer.source.getConnection();
+//        final Connection target = synchronizer.target.getConnection();
+//        source.setReadOnly(true);
+//        target.setAutoCommit(false);
+//        boolean success = false;
+//        try {
+//            synchronizer.copy(asMap(properties), onExisting);
+//            success = true;
+//        } finally {
+//            if (success) {
+//                target.commit();
+//            } else {
+//                target.rollback();
+//            }
+//            synchronizer.close();
+//        }
+//    }
 }

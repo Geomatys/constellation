@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.BufferedOutputStream;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.Remote;
@@ -54,7 +55,6 @@ import java.lang.reflect.Constructor;
 import org.geotoolkit.io.TableWriter;
 import org.geotoolkit.internal.jdbc.JDBC;
 import org.geotoolkit.util.converter.Classes;
-import org.geotools.resources.Arguments;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -925,11 +925,10 @@ public class Database {
      * @throws IOException If an error occured while reading the configuration file.
      */
     public static void main(String[] args) throws SQLException, IOException {
-        final Arguments arguments = new Arguments(args);
-        args = arguments.getRemainingArguments(0);
         final Database database = new Database();
         final DatabaseMetaData metadata = database.getConnection().getMetaData();
-        final TableWriter table = new TableWriter(arguments.out, 1);
+        final OutputStreamWriter writer = new OutputStreamWriter(System.out);
+        final TableWriter table = new TableWriter(writer, 1);
         table.write("Database:\t");
         table.write(metadata.getDatabaseProductName());
         table.write(' ');
@@ -948,6 +947,7 @@ public class Database {
         }
         table.write(version);
         table.flush();
+        writer.close();
         database.close();
     }
 }

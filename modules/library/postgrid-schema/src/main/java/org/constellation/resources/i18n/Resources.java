@@ -19,7 +19,7 @@ package org.constellation.resources.i18n;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
-import org.geotools.resources.IndexedResourceBundle;
+import org.geotoolkit.resources.IndexedResourceBundle;
 
 
 /**
@@ -31,6 +31,15 @@ import org.geotools.resources.IndexedResourceBundle;
  * @author Martin Desruisseaux
  */
 public class Resources extends IndexedResourceBundle {
+    /**
+     * Default constructor dynamically called.
+     *
+     * @param filename The name of a resource file.
+     */
+    public Resources(final String filename) {
+        super(filename);
+    }
+
     /**
      * Returns resources in the given locale.
      *

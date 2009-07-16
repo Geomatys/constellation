@@ -32,7 +32,6 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.UIManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellRenderer;
@@ -41,7 +40,6 @@ import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.gui.swing.ExceptionMonitor;
 import org.geotoolkit.gui.swing.image.OperationTreeBrowser;
-import org.geotools.resources.Arguments;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
@@ -55,6 +53,8 @@ import org.constellation.coverage.catalog.LayerTable;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo extends {@link org.geotoolkit.console.CommandLine}
  */
 public final class CoverageBrowser {
     /**
@@ -185,23 +185,23 @@ public final class CoverageBrowser {
     /**
      * Shows this component using the default database.
      */
-    public static void main(String[] args) {
-        final Arguments arguments = new Arguments(args);
-        args = arguments.getRemainingArguments(0);
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            // Ignore. We will use the default L&F.
-        }
-        final CoverageBrowser browser;
-        try {
-            final Database database = new Database();
-            browser = new CoverageBrowser(database);
-            // Do not close the database; we will rely on shutdown hook.
-        } catch (Exception e) {
-            e.printStackTrace(arguments.err);
-            return;
-        }
-        browser.show();
-    }
+//    public static void main(String[] args) {
+//        final Arguments arguments = new Arguments(args);
+//        args = arguments.getRemainingArguments(0);
+//        try {
+//            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+//        } catch (Exception e) {
+//            // Ignore. We will use the default L&F.
+//        }
+//        final CoverageBrowser browser;
+//        try {
+//            final Database database = new Database();
+//            browser = new CoverageBrowser(database);
+//            // Do not close the database; we will rely on shutdown hook.
+//        } catch (Exception e) {
+//            e.printStackTrace(arguments.err);
+//            return;
+//        }
+//        browser.show();
+//    }
 }

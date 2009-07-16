@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-import org.geotools.resources.Arguments;
 
 
 /**
@@ -34,6 +33,8 @@ import org.geotools.resources.Arguments;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo extends {@link org.geotoolkit.console.CommandLine}
  */
 public class DumpComparator {
     /**
@@ -149,28 +150,28 @@ public class DumpComparator {
     /**
      * Runs from the command line.
      */
-    public static void main(String[] args) {
-        final Arguments arguments = new Arguments(args);
-        final String oldDir  = arguments.getRequiredString("-old");
-        final String newFile = arguments.getRequiredString("-new");
-        args = arguments.getRemainingArguments(0);
-        final DumpComparator oldSchema = new DumpComparator();
-        final DumpComparator newSchema = new DumpComparator();
-        try {
-            oldSchema.load(new File(oldDir, "postgrid.sql"));
-            oldSchema.load(new File(oldDir, "postgrid-model.sql"));
-            oldSchema.load(new File(oldDir, "postgrid-comments.sql"));
-            newSchema.load(new File(newFile));
-        } catch (IOException e) {
-            arguments.err.println(e);
-            return;
-        }
-        final PrintWriter out = arguments.out;
-        out.print(oldSchema.makeDisjoint(newSchema, false));            out.println(" identical lines");
-        out.print(oldSchema.removeLineStartingWith("SET "));            out.println(" ignored SET");
-        out.print(newSchema.removeLineStartingWith("REVOKE ALL ON "));  out.println(" ignored REVOKE ALL");
-        out.print(oldSchema.makeDisjoint(newSchema, true));             out.println(" identical lines ignoring schema");
-        oldSchema.printLines("Unmached lines in old schema", out);
-        newSchema.printLines("Unmached lines in new schema", out);
-    }
+//    public static void main(String[] args) {
+//        final Arguments arguments = new Arguments(args);
+//        final String oldDir  = arguments.getRequiredString("-old");
+//        final String newFile = arguments.getRequiredString("-new");
+//        args = arguments.getRemainingArguments(0);
+//        final DumpComparator oldSchema = new DumpComparator();
+//        final DumpComparator newSchema = new DumpComparator();
+//        try {
+//            oldSchema.load(new File(oldDir, "postgrid.sql"));
+//            oldSchema.load(new File(oldDir, "postgrid-model.sql"));
+//            oldSchema.load(new File(oldDir, "postgrid-comments.sql"));
+//            newSchema.load(new File(newFile));
+//        } catch (IOException e) {
+//            arguments.err.println(e);
+//            return;
+//        }
+//        final PrintWriter out = arguments.out;
+//        out.print(oldSchema.makeDisjoint(newSchema, false));            out.println(" identical lines");
+//        out.print(oldSchema.removeLineStartingWith("SET "));            out.println(" ignored SET");
+//        out.print(newSchema.removeLineStartingWith("REVOKE ALL ON "));  out.println(" ignored REVOKE ALL");
+//        out.print(oldSchema.makeDisjoint(newSchema, true));             out.println(" identical lines ignoring schema");
+//        oldSchema.printLines("Unmached lines in old schema", out);
+//        newSchema.printLines("Unmached lines in new schema", out);
+//    }
 }

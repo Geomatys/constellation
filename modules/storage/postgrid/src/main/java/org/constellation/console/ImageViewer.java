@@ -41,13 +41,6 @@ import javax.imageio.spi.ImageWriterSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 
-import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotools.resources.Arguments;
-
-import org.constellation.catalog.Database;
-import org.constellation.coverage.catalog.CoverageReference;
-import org.constellation.coverage.catalog.GridCoverageTable;
-import org.geotoolkit.coverage.grid.ViewType;
 import org.geotoolkit.image.io.metadata.GeographicMetadata;
 
 
@@ -58,6 +51,8 @@ import org.geotoolkit.image.io.metadata.GeographicMetadata;
  * @source $URL$
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @todo extends {@link org.geotoolkit.console.CommandLine}
  */
 public final class ImageViewer {
     /**
@@ -283,48 +278,48 @@ public final class ImageViewer {
      *       (otherwise the image is get from an ordinary file).</li>
      * </ul>
      */
-    public static void main(String[] args) throws IOException {
-        final Arguments arguments = new Arguments(args);
-        final boolean formats = arguments.getFlag("-formats");
-        final boolean mimes   = arguments.getFlag("-mimes");
-        final boolean show    = arguments.getFlag("-show");
-        final String  layer   = arguments.getOptionalString("-layer");
-        final PrintWriter out = arguments.out;
-        args = arguments.getRemainingArguments(Integer.MAX_VALUE);
-        if (formats) {
-            out.println("Images formats:");
-            list(out, ImageIO.getReaderFormatNames(), ImageIO.getWriterFormatNames());
-        }
-        if (mimes) {
-            out.println("MIMES types:");
-            list(out, ImageIO.getReaderMIMETypes(), ImageIO.getWriterMIMETypes());
-        }
-        if (layer == null) {
-            for (int i=0; i<args.length; i++) {
-                final String filename = args[i];
-                out.print("Filename: "); out.println(filename);
-                final RenderedImage image = read(new File(filename), 0, out);
-                printProperties(image, out);
-                if (show) {
-                    show(image, filename);
-                }
-            }
-        } else try {
-            final Database database = new Database();
-            final GridCoverageTable coverages = new GridCoverageTable(database.getTable(GridCoverageTable.class));
-            coverages.setLayer(layer);
-            for (final String file : args) {
-                final CoverageReference ref = coverages.getEntry(file);
-                final GridCoverage2D coverage = ref.getCoverage(null);
-                final RenderedImage image = coverage.view(ViewType.RENDERED).getRenderedImage();
-                printProperties(image, out);
-                if (show) {
-                    show(image, file);
-                }
-            }
-            database.close();
-        } catch (Exception e) {
-            e.printStackTrace(arguments.err);
-        }
-    }
+//    public static void main(String[] args) throws IOException {
+//        final Arguments arguments = new Arguments(args);
+//        final boolean formats = arguments.getFlag("-formats");
+//        final boolean mimes   = arguments.getFlag("-mimes");
+//        final boolean show    = arguments.getFlag("-show");
+//        final String  layer   = arguments.getOptionalString("-layer");
+//        final PrintWriter out = arguments.out;
+//        args = arguments.getRemainingArguments(Integer.MAX_VALUE);
+//        if (formats) {
+//            out.println("Images formats:");
+//            list(out, ImageIO.getReaderFormatNames(), ImageIO.getWriterFormatNames());
+//        }
+//        if (mimes) {
+//            out.println("MIMES types:");
+//            list(out, ImageIO.getReaderMIMETypes(), ImageIO.getWriterMIMETypes());
+//        }
+//        if (layer == null) {
+//            for (int i=0; i<args.length; i++) {
+//                final String filename = args[i];
+//                out.print("Filename: "); out.println(filename);
+//                final RenderedImage image = read(new File(filename), 0, out);
+//                printProperties(image, out);
+//                if (show) {
+//                    show(image, filename);
+//                }
+//            }
+//        } else try {
+//            final Database database = new Database();
+//            final GridCoverageTable coverages = new GridCoverageTable(database.getTable(GridCoverageTable.class));
+//            coverages.setLayer(layer);
+//            for (final String file : args) {
+//                final CoverageReference ref = coverages.getEntry(file);
+//                final GridCoverage2D coverage = ref.getCoverage(null);
+//                final RenderedImage image = coverage.view(ViewType.RENDERED).getRenderedImage();
+//                printProperties(image, out);
+//                if (show) {
+//                    show(image, file);
+//                }
+//            }
+//            database.close();
+//        } catch (Exception e) {
+//            e.printStackTrace(arguments.err);
+//        }
+//    }
 }
