@@ -215,7 +215,7 @@ public class FileMetadataReader extends MetadataReader {
             for (Identification identification: metadata.getIdentificationInfo()) {
                 if (identification instanceof DataIdentification) {
                     DataIdentification dataIdentification = (DataIdentification) identification;
-                    for (Extent extent : dataIdentification.getExtent()) {
+                    for (Extent extent : dataIdentification.getExtents()) {
                         for (GeographicExtent geoExtent :extent.getGeographicElements()) {
                             if (geoExtent instanceof GeographicBoundingBox) {
                                 GeographicBoundingBox bbox = (GeographicBoundingBox) geoExtent;
