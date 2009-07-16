@@ -34,7 +34,7 @@ public class PostGridStorageSuite extends TestSuite {
     public PostGridStorageSuite() {
         addTestSuite(org.constellation.catalog.DatabaseTest.Open.class); // Must be first
 
-        addTestSuite(org.geotools.referencing.factory.wkt.PostgisAuthorityFactoryTest.class);
+        addTestSuite(org.geotoolkit.referencing.factory.wkt.PostgisAuthorityFactoryTest.class);
 
 //        addTestSuite(org.constellation.catalog.         SpatialFunctionsTest         .class);
 //        addTestSuite(org.constellation.catalog.         TimeStampTest                .class);

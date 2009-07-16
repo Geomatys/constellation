@@ -14,8 +14,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.factory.wkt;
+package org.geotoolkit.referencing.factory.wkt;
 
+import org.geotoolkit.referencing.factory.wkt.*;
 import java.util.Set;
 import java.util.Collections;
 import org.opengis.referencing.IdentifiedObject;

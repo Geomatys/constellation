@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.console;
+package org.geotoolkit.console;
 
 import java.awt.Point;
 import java.awt.Dimension;
@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-import org.geotoolkit.console.CommandLine;
 import org.geotoolkit.geometry.Envelope2D;
 
 

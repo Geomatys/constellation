@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.geotools.referencing.factory.wkt;
+package org.geotoolkit.referencing.factory.wkt;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

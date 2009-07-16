@@ -37,7 +37,7 @@ import org.geotoolkit.util.collection.WeakHashSet;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.operation.transform.AffineTransform2D;
 import org.geotoolkit.referencing.factory.IdentifiedObjectFinder;
-import org.geotools.referencing.factory.wkt.PostgisAuthorityFactory;
+import org.geotoolkit.referencing.factory.wkt.PostgisAuthorityFactory;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.IllegalRecordException;

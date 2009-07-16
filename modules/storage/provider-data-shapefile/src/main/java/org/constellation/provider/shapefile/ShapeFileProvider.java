@@ -31,8 +31,8 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
+import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.util.collection.Cache;
 

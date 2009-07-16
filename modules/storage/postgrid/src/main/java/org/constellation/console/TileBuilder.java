@@ -44,7 +44,7 @@ import org.geotoolkit.image.io.mosaic.TileManagerFactory;
 import org.geotoolkit.util.collection.FrequencySortedSet;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.console.Option;
-import org.geotools.console.ExternalyConfiguredCommandLine;
+import org.geotoolkit.console.ExternalyConfiguredCommandLine;
 
 import org.constellation.catalog.Database;
 import org.constellation.catalog.CatalogException;
