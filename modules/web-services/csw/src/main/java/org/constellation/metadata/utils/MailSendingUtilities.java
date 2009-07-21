@@ -24,7 +24,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.security.cert.CertificateException;
 import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -57,11 +61,13 @@ public class MailSendingUtilities {
     private static final int PORT;
     private static final Session SESSION;
 
+    private MailSendingUtilities() {}
+    
     static{
         final Properties configProps = new Properties();
 
         try {
-            File f = new File(WebService.getConfigDirectory(), "mailing.properties");
+            final File f = new File(WebService.getConfigDirectory(), "mailing.properties");
             configProps.load(new FileInputStream(f));
         } catch (IOException ex) {
             Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);
@@ -96,15 +102,23 @@ public class MailSendingUtilities {
             final KeyGenerator keygen = KeyGenerator.getInstance("DES");
             keygen.init(random);
             final javax.crypto.SecretKey mySecretKey = keygen.generateKey();
-            KeyStore.SecretKeyEntry skEntry = new KeyStore.SecretKeyEntry(mySecretKey);
+            final KeyStore.SecretKeyEntry skEntry = new KeyStore.SecretKeyEntry(mySecretKey);
             store.setEntry(keyAlias, skEntry, new KeyStore.PasswordProtection(keyStorePassword));
 
             mailingProps.put("javax.net.ssl.keyStore",store);
             mailingProps.put("javax.net.ssl.keyStorePassword", keyStorePassword);
             mailingProps.put("javax.net.ssl.trustStorePassword", store);
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (NoSuchProviderException ex) {
+            Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CertificateException ex) {
+            Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (KeyStoreException ex) {
+            Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         SESSION = Session.getInstance(mailingProps, null);
@@ -125,8 +139,8 @@ public class MailSendingUtilities {
             final String content, final File ... files)
             throws MessagingException, IOException, NamingException {
 
-        if(title == null || content == null) throw new NullPointerException("Title and content can not be null.");
-        if(emails == null || emails.length == 0) throw new IllegalArgumentException("Mails adresses can not be null or empty");
+        if (title == null || content == null)     throw new IllegalArgumentException("Title and content can not be null.");
+        if (emails == null || emails.length == 0) throw new IllegalArgumentException("Mails adresses can not be null or empty");
 
         //make the message content
         final MimeMultipart mp = new MimeMultipart();
@@ -141,7 +155,7 @@ public class MailSendingUtilities {
             mp.addBodyPart(mbp);
         }
 
-        InternetAddress[] adresses = new InternetAddress[emails.length];
+        final InternetAddress[] adresses = new InternetAddress[emails.length];
         for(int i=0;i<emails.length;i++){
             adresses[i] = InternetAddress.parse(emails[i], false)[0];
         }

@@ -75,7 +75,7 @@ public class CSWService {
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("org.costellation.metadata");
+    private static final Logger LOGGER = Logger.getLogger("org.costellation.metadata");
     
     /**
      * A map containing the Capabilities Object already load from file.
@@ -124,7 +124,7 @@ public class CSWService {
            //TODO find real url
            worker.setServiceURL("http://localhost:8080/CSWServer/CSWService");
        } catch (JAXBException ex){
-           logger.severe("The CSW service is not running."       + '\n' +
+           LOGGER.severe("The CSW service is not running."       + '\n' +
                          " cause  : Error creating XML context." + '\n' +
                          " error  : " + ex.getMessage()          + '\n' +
                          " details: " + ex.toString());
@@ -141,7 +141,7 @@ public class CSWService {
     @WebMethod(action="getCapabilities")
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilitiesType requestCapabilities) throws SOAPServiceException  {
         try {
-            logger.info("received SOAP getCapabilities request");
+            LOGGER.info("received SOAP getCapabilities request");
             worker.setSkeletonCapabilities((Capabilities)getCapabilitiesObject());
              
             return worker.getCapabilities(requestCapabilities);
@@ -159,7 +159,7 @@ public class CSWService {
     @WebMethod(action="getDomain")
     public GetDomainResponseType getDomain(@WebParam(name = "GetDomain") GetDomainType requestGetDomain) throws SOAPServiceException  {
         try {
-            logger.info("received SOAP GetDomain request");
+            LOGGER.info("received SOAP GetDomain request");
             return (GetDomainResponseType) worker.getDomain(requestGetDomain);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -174,7 +174,7 @@ public class CSWService {
     @WebMethod(action="getRecordById")
     public GetRecordByIdResponseType getRecordById(@WebParam(name = "GetRecordById") GetRecordByIdType requestRecordById) throws SOAPServiceException {
         try {
-            logger.info("received SOAP getRecordById request");
+            LOGGER.info("received SOAP getRecordById request");
             return (GetRecordByIdResponseType) worker.getRecordById(requestRecordById);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -188,7 +188,7 @@ public class CSWService {
     @WebMethod(action="getRecords")
     public Object getRecords(@WebParam(name = "GetRecords") GetRecordsType requestRecords) throws SOAPServiceException {
         try {
-            logger.info("received SOAP getRecords request");
+            LOGGER.info("received SOAP getRecords request");
             return worker.getRecords(requestRecords);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -202,7 +202,7 @@ public class CSWService {
     @WebMethod(action="describeRecord")
     public DescribeRecordResponseType describeRecord(@WebParam(name = "DescribeRecord") DescribeRecordType requestDescribeRecord) throws SOAPServiceException {
         try {
-            logger.info("received SOAP describeRecord request");
+            LOGGER.info("received SOAP describeRecord request");
             return worker.describeRecord(requestDescribeRecord);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -216,7 +216,7 @@ public class CSWService {
     @WebMethod(action="harvest")
     public HarvestResponseType harvest(@WebParam(name = "Harvest") HarvestType requestHarvest) throws SOAPServiceException {
         try {
-            logger.info("received SOAP harvest request");
+            LOGGER.info("received SOAP harvest request");
             return worker.harvest(requestHarvest);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -230,7 +230,7 @@ public class CSWService {
     @WebMethod(action="transaction")
     public TransactionResponseType transaction(@WebParam(name = "Transaction") TransactionType requestTransaction) throws SOAPServiceException {
         try {
-            logger.info("received SOAP transaction request");
+            LOGGER.info("received SOAP transaction request");
             return worker.transaction(requestTransaction);
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -246,45 +246,40 @@ public class CSWService {
      * @return The capabilities Object, or {@code null} if none.
      */
     public Object getCapabilitiesObject() throws JAXBException {
-       String fileName = "CSWCapabilities2.0.2.xml";
+       final String fileName = "CSWCapabilities2.0.2.xml";
        
-       if (fileName == null) {
-           return null;
-       } else {
-           Object response = capabilities.get(fileName);
-           if (response == null) {
-           
-               String home;
-                    
-               String env = "/home/tomcat/.sicade"; //System.getenv("CATALINA_HOME");
-                // we get the configuration file
-               File path = new File(env + "/csw_configuration/");     
-               //we delete the /WS
-               if (!path.isDirectory()) {
-                    home = System.getProperty("user.home");
-                    if (System.getProperty("os.name", "").startsWith("Windows")) {
-                        path = new File(home, WINDOWS_DIRECTORY);
-                    } else {
-                        path = new File(home, UNIX_DIRECTORY);
-                    }
-                } 
-            
-               File f = new File(path, fileName);
-               logger.info(f.toString());
-               Unmarshaller unmarshaller = null;
-               try {
-                   unmarshaller = marshallerPool.acquireUnmarshaller();
-                   response = unmarshaller.unmarshal(f);
-                   capabilities.put(fileName, response);
-               } finally {
-                   if (unmarshaller != null) {
-                       marshallerPool.release(unmarshaller);
-                   }
+       Object response = capabilities.get(fileName);
+       if (response == null) {
+
+           String home;
+
+           final String env = "/home/tomcat/.sicade"; //System.getenv("CATALINA_HOME");
+            // we get the configuration file
+           File path = new File(env + "/csw_configuration/");
+           //we delete the /WS
+           if (!path.isDirectory()) {
+                home = System.getProperty("user.home");
+                if (System.getProperty("os.name", "").startsWith("Windows")) {
+                    path = new File(home, WINDOWS_DIRECTORY);
+                } else {
+                    path = new File(home, UNIX_DIRECTORY);
+                }
+            }
+
+           final File f = new File(path, fileName);
+           LOGGER.info(f.toString());
+           Unmarshaller unmarshaller = null;
+           try {
+               unmarshaller = marshallerPool.acquireUnmarshaller();
+               response = unmarshaller.unmarshal(f);
+               capabilities.put(fileName, response);
+           } finally {
+               if (unmarshaller != null) {
+                   marshallerPool.release(unmarshaller);
                }
            }
-           
-           return response;
-        }
+       }
+       return response;
     }
 }
 

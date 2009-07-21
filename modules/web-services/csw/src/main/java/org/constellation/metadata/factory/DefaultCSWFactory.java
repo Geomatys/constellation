@@ -47,9 +47,10 @@ import org.constellation.ws.CstlServiceException;
  */
 public class DefaultCSWFactory extends AbstractCSWFactory {
 
-    public DefaultCSWFactory() {
+    /*public DefaultCSWFactory() {
         super();
-    }
+    }*/
+    
     /**
      * Return a Metadata reader for the specified database type.
      * 

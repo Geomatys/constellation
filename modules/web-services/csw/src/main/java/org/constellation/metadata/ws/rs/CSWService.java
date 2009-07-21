@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
+import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -163,7 +164,7 @@ public class CSWService extends OGCWebService {
                     serviceDef = getVersionFromNumber(gc.getVersion().toString());
                     worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
                 
-                    StringWriter sw = new StringWriter();
+                    final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getCapabilities(gc), sw);
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
@@ -182,7 +183,7 @@ public class CSWService extends OGCWebService {
                         gr = createNewGetRecordsRequest();
                     }
                     serviceDef = getVersionFromNumber(gr.getVersion());
-                    StringWriter sw = new StringWriter();
+                    final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getRecords(gr), sw);
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
@@ -201,7 +202,7 @@ public class CSWService extends OGCWebService {
                         grbi = createNewGetRecordByIdRequest();
                     }
                     serviceDef = getVersionFromNumber(grbi.getVersion());
-                    StringWriter sw = new StringWriter();
+                    final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getRecordById(grbi), sw);
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
@@ -220,7 +221,7 @@ public class CSWService extends OGCWebService {
                         dr = createNewDescribeRecordRequest();
                     }
                     serviceDef = getVersionFromNumber(dr.getVersion());
-                    StringWriter sw = new StringWriter();
+                    final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.describeRecord(dr), sw);
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
@@ -241,7 +242,7 @@ public class CSWService extends OGCWebService {
                     serviceDef = getVersionFromNumber(gd.getVersion());
                     worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
                     
-                    StringWriter sw = new StringWriter();
+                    final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getDomain(gd), sw);
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
@@ -257,7 +258,7 @@ public class CSWService extends OGCWebService {
                                                        OPERATION_NOT_SUPPORTED, "transaction");
                     }
                     serviceDef = getVersionFromNumber(t.getVersion());
-                    StringWriter sw = new StringWriter();
+                    final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.transaction(t), sw);
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
@@ -276,7 +277,7 @@ public class CSWService extends OGCWebService {
                         h = createNewHarvestRequest();
                     }
                     serviceDef = getVersionFromNumber(h.getVersion());
-                    StringWriter sw = new StringWriter();
+                    final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.harvest(h), sw);
         
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
@@ -322,7 +323,7 @@ public class CSWService extends OGCWebService {
                 !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                 !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
@@ -331,8 +332,8 @@ public class CSWService extends OGCWebService {
                 serviceDef = getBestVersion(null);
             }
             final String version = serviceDef.exceptionVersion.toString();
-            ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
-            StringWriter sw = new StringWriter();
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
+            final StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
         } else {
@@ -356,11 +357,11 @@ public class CSWService extends OGCWebService {
              versions = new AcceptVersionsType("2.0.2");
         }
                     
-        AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
+        final AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
                         
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid. 
-        String section = getParameter("Sections", false);
+        final String section = getParameter("Sections", false);
         List<String> requestedSections = new ArrayList<String>();
         if (section != null && !section.equalsIgnoreCase("All")) {
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
@@ -377,7 +378,7 @@ public class CSWService extends OGCWebService {
             //if there is no requested Sections we add all the sections
             requestedSections = SectionsType.getExistingSections();
         }
-        SectionsType sections     = new SectionsType(requestedSections);
+        final SectionsType sections     = new SectionsType(requestedSections);
         return new GetCapabilitiesType(versions,
                                        sections,
                                        formats,
@@ -421,10 +422,10 @@ public class CSWService extends OGCWebService {
         
         //we get the value of start position, if not set we put default value "1"
         String startPos = getParameter("STARTPOSITION", false);
-        Integer startPosition = new Integer("1");
+        Integer startPosition = Integer.valueOf("1");
         if (startPos != null) {
             try {
-                startPosition = new Integer(startPos);
+                startPosition = Integer.valueOf(startPos);
             } catch (NumberFormatException e){
                throw new CstlServiceException("The positif integer " + startPos + " is malformed",
                                              INVALID_PARAMETER_VALUE, "startPosition");
@@ -433,10 +434,10 @@ public class CSWService extends OGCWebService {
         
         //we get the value of max record, if not set we put default value "10"
         String maxRec = getParameter("MAXRECORDS", false);
-        Integer maxRecords= new Integer("10");
+        Integer maxRecords= Integer.valueOf("10");
         if (maxRec != null) {
             try {
-                maxRecords = new Integer(maxRec);
+                maxRecords = Integer.valueOf(maxRec);
             } catch (NumberFormatException e){
                throw new CstlServiceException("The positif integer " + maxRec + " is malformed",
                                              INVALID_PARAMETER_VALUE, "maxRecords");
