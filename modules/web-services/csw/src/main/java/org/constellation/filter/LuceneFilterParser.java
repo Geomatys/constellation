@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 // JAXB dependencies
+import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -86,7 +87,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Guilhem Legal
  */
 public class LuceneFilterParser extends FilterParser {
-    
+
+    private String defaultField = "metafile:doc";
+
     /**
      * Build a lucene request from the specified constraint
      * 
@@ -97,8 +100,8 @@ public class LuceneFilterParser extends FilterParser {
         FilterType filter = null;
         //if the constraint is null we make a null filter
         if (constraint == null)  {
-            Filter nullFilter = null;
-            return new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
+            final Filter nullFilter = null;
+            return new SpatialQuery(defaultField, nullFilter, SerialChainFilter.AND);
             
         } else if (constraint.getCqlText() != null && constraint.getFilter() != null) {
             throw new CstlServiceException("The query constraint must be in Filter or CQL but not both.",
@@ -110,10 +113,10 @@ public class LuceneFilterParser extends FilterParser {
         
         if (constraint.getCqlText() != null) {
             try {
-                filter = CQLtoFilter(constraint.getCqlText());
+                filter = cqlToFilter(constraint.getCqlText());
                  
             } catch (JAXBException ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 throw new CstlServiceException("JAXBException while parsing CQL query: " + ex.getMessage(),
                                              NO_APPLICABLE_CODE, "QueryConstraint");
             } catch (CQLException ex) {
@@ -137,9 +140,9 @@ public class LuceneFilterParser extends FilterParser {
      */
     public SpatialQuery getLuceneQuery(final FilterType filter) throws CstlServiceException {
         
-        SpatialQuery response = null;
+        SpatialQuery response   = null;
         //for ambigous purpose
-        Filter nullFilter     = null;
+        final Filter nullFilter = null;
         
         if (filter != null) { 
             // we treat logical Operators like AND, OR, ...
@@ -169,17 +172,15 @@ public class LuceneFilterParser extends FilterParser {
      * @throws org.constellation.coverage.web.CstlServiceException
      */
     @Override
-    protected SpatialQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws CstlServiceException {
-        List<SpatialQuery> subQueries = new ArrayList<SpatialQuery>();
-        StringBuilder queryBuilder    = new StringBuilder();
-        LogicOpsType logicOps         = JBlogicOps.getValue();
-        String operator               = JBlogicOps.getName().getLocalPart();
-        List<Filter> filters          = new ArrayList<Filter>();
-        //for ambigous purpose
-        Filter nullFilter             = null;
+    protected SpatialQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws CstlServiceException {
+        final List<SpatialQuery> subQueries = new ArrayList<SpatialQuery>();
+        final StringBuilder queryBuilder    = new StringBuilder();
+        final LogicOpsType logicOps         = jbLogicOps.getValue();
+        final String operator               = jbLogicOps.getName().getLocalPart();
+        final List<Filter> filters          = new ArrayList<Filter>();
         
         if (logicOps instanceof BinaryLogicOpType) {
-            BinaryLogicOpType binary = (BinaryLogicOpType) logicOps;
+            final BinaryLogicOpType binary = (BinaryLogicOpType) logicOps;
             queryBuilder.append('(');
             
             // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...   
@@ -194,12 +195,12 @@ public class LuceneFilterParser extends FilterParser {
             
                 boolean writeOperator = true;
                 
-                SpatialQuery sq  = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
-                String subQuery  = sq.getQuery();
-                Filter subFilter = sq.getSpatialFilter();
+                final SpatialQuery sq  = treatLogicalOperator((JAXBElement<? extends LogicOpsType>)jb);
+                final String subQuery  = sq.getQuery();
+                final Filter subFilter = sq.getSpatialFilter();
                     
                 //if the sub spatial query contains both term search and spatial search we create a subQuery 
-                if ((subFilter != null && !subQuery.equals("metafile:doc")) 
+                if ((subFilter != null && !subQuery.equals(defaultField))
                     || sq.getSubQueries().size() != 0 
                     || (sq.getLogicalOperator() == SerialChainFilter.NOT && sq.getSpatialFilter() == null)) {
                     subQueries.add(sq);
@@ -230,14 +231,14 @@ public class LuceneFilterParser extends FilterParser {
             }
                 
           // we remove the last Operator and add a ') '
-          int pos = queryBuilder.length()- (operator.length() + 2);
+          final int pos = queryBuilder.length()- (operator.length() + 2);
           if (pos > 0)
             queryBuilder.delete(queryBuilder.length()- (operator.length() + 2), queryBuilder.length());
           
           queryBuilder.append(')');
                 
         } else if (logicOps instanceof UnaryLogicOpType) {
-            UnaryLogicOpType unary = (UnaryLogicOpType) logicOps;
+            final UnaryLogicOpType unary = (UnaryLogicOpType) logicOps;
                        
                         
             // we treat comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
@@ -252,11 +253,11 @@ public class LuceneFilterParser extends FilterParser {
                 
              // we treat logical Operators like AND, OR, ...
             } else if (unary.getLogicOps() != null) {
-                SpatialQuery sq  = treatLogicalOperator(unary.getLogicOps());
-                String subQuery  = sq.getQuery();
-                Filter subFilter = sq.getSpatialFilter();
+                final SpatialQuery sq  = treatLogicalOperator(unary.getLogicOps());
+                final String subQuery  = sq.getQuery();
+                final Filter subFilter = sq.getSpatialFilter();
                     
-                if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.equals("metafile:doc")) ||
+                if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.equals(defaultField)) ||
                     (sq.getLogicalOperator() == SerialChainFilter.NOT)) {
                     subQueries.add(sq);
                    
@@ -281,7 +282,7 @@ public class LuceneFilterParser extends FilterParser {
         if (filters.size() == 1) {
             
             if (logicalOperand == SerialChainFilter.NOT) {
-                int filterType[] = {SerialChainFilter.NOT};
+                final int[] filterType = {SerialChainFilter.NOT};
                 spatialFilter = new SerialChainFilter(filters, filterType);
                 if (query.equals("")) {
                     logicalOperand = SerialChainFilter.AND;
@@ -292,7 +293,7 @@ public class LuceneFilterParser extends FilterParser {
         
         } else if (filters.size() > 1) {
             
-            int filterType[] = new int[filters.size() - 1];
+            final int[] filterType = new int[filters.size() - 1];
             for (int i = 0; i < filterType.length; i++) {
                 filterType[i] = logicalOperand;
             }
@@ -300,7 +301,7 @@ public class LuceneFilterParser extends FilterParser {
         }
         
             
-        SpatialQuery response = new SpatialQuery(query, spatialFilter, logicalOperand);
+        final SpatialQuery response = new SpatialQuery(query, spatialFilter, logicalOperand);
         response.setSubQueries(subQueries);
         return response;
     }
@@ -314,12 +315,12 @@ public class LuceneFilterParser extends FilterParser {
      */
     @Override
     protected String treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> JBComparisonOps) throws CstlServiceException {
-        StringBuilder response = new StringBuilder();
+        final StringBuilder response = new StringBuilder();
         
-        ComparisonOpsType comparisonOps = JBComparisonOps.getValue();
+        final ComparisonOpsType comparisonOps = JBComparisonOps.getValue();
         
         if (comparisonOps instanceof PropertyIsLikeType ) {
-            PropertyIsLikeType pil = (PropertyIsLikeType) comparisonOps;
+            final PropertyIsLikeType pil = (PropertyIsLikeType) comparisonOps;
             String propertyName    = "";
             //we get the field
             if (pil.getPropertyName() != null) {
@@ -353,7 +354,7 @@ public class LuceneFilterParser extends FilterParser {
                                               INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
         } else if (comparisonOps instanceof PropertyIsNullType) {
-             PropertyIsNullType pin = (PropertyIsNullType) comparisonOps;
+             final PropertyIsNullType pin = (PropertyIsNullType) comparisonOps;
 
             //we get the field
             if (pin.getPropertyName() != null) {
@@ -369,10 +370,10 @@ public class LuceneFilterParser extends FilterParser {
         
         } else if (comparisonOps instanceof BinaryComparisonOpType) {
             
-            BinaryComparisonOpType bc = (BinaryComparisonOpType) comparisonOps;
-            String propertyName       = bc.getPropertyName();
-            LiteralType literal       = bc.getLiteral();
-            String operator           = JBComparisonOps.getName().getLocalPart(); 
+            final BinaryComparisonOpType bc = (BinaryComparisonOpType) comparisonOps;
+            final String propertyName       = bc.getPropertyName();
+            final LiteralType literal       = bc.getLiteral();
+            final String operator           = JBComparisonOps.getName().getLocalPart();
             
             if (propertyName == null || literal == null) {
                 throw new CstlServiceException("A binary comparison operator must be constitued of a literal and a property name.",
@@ -479,15 +480,15 @@ public class LuceneFilterParser extends FilterParser {
      * @throws org.constellation.coverage.web.CstlServiceException
      */
     @Override
-    protected Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> JBSpatialOps) throws CstlServiceException {
+    protected Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> jbSpatialOps) throws CstlServiceException {
         SpatialFilter spatialfilter = null;
         
-        SpatialOpsType spatialOps = JBSpatialOps.getValue();
+        final SpatialOpsType spatialOps = jbSpatialOps.getValue();
         
         if (spatialOps instanceof BBOXType) {
-            BBOXType bbox       = (BBOXType) spatialOps;
-            String propertyName = bbox.getPropertyName();
-            String CRSName      = bbox.getSRS();
+            final BBOXType bbox       = (BBOXType) spatialOps;
+            final String propertyName = bbox.getPropertyName();
+            final String crsName      = bbox.getSRS();
             
             //we verify that all the parameters are specified
             if (propertyName == null) {
@@ -501,22 +502,22 @@ public class LuceneFilterParser extends FilterParser {
                 throw new CstlServiceException("An operator BBOX must specified an envelope.",
                                               INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
-            if (CRSName == null) {
+            if (crsName == null) {
                 throw new CstlServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
                                              INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
             //we transform the EnvelopeEntry in GeneralEnvelope
-            double min[] = {bbox.getMinX(), bbox.getMinY()};
-            double max[] = {bbox.getMaxX(), bbox.getMaxY()};
+            final double[] min = {bbox.getMinX(), bbox.getMinY()};
+            final double[] max = {bbox.getMaxX(), bbox.getMaxY()};
             try {
-                GeneralEnvelope envelope      = new GeneralEnvelope(min, max);
-                CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
+                final GeneralEnvelope envelope      = new GeneralEnvelope(min, max);
+                final CoordinateReferenceSystem crs = CRS.decode(crsName, true);
                 envelope.setCoordinateReferenceSystem(crs);
-                spatialfilter = new BBOXFilter(envelope, CRSName);
+                spatialfilter = new BBOXFilter(envelope, crsName);
                 
             } catch (NoSuchAuthorityCodeException e) {
-                throw new CstlServiceException("Unknow Coordinate Reference System: " + CRSName,
+                throw new CstlServiceException("Unknow Coordinate Reference System: " + crsName,
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (FactoryException e) {
                 throw new CstlServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
@@ -528,11 +529,11 @@ public class LuceneFilterParser extends FilterParser {
             
         } else if (spatialOps instanceof DistanceBufferType) {
             
-            DistanceBufferType dist = (DistanceBufferType) spatialOps;
-            double distance         = dist.getDistance();
-            String units            = dist.getDistanceUnits();
-            JAXBElement JBgeom      = dist.getAbstractGeometry();
-            String operator         = JBSpatialOps.getName().getLocalPart();
+            final DistanceBufferType dist = (DistanceBufferType) spatialOps;
+            final double distance         = dist.getDistance();
+            final String units            = dist.getDistanceUnits();
+            final JAXBElement jbGeom      = dist.getAbstractGeometry();
+            final String operator         = jbSpatialOps.getName().getLocalPart();
            
             //we verify that all the parameters are specified
             if (dist.getPropertyName() == null) {
@@ -543,44 +544,44 @@ public class LuceneFilterParser extends FilterParser {
                  throw new CstlServiceException("An distanceBuffer operator must specified the ditance units.",
                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
-            if (JBgeom == null || JBgeom.getValue() == null) {
+            if (jbGeom == null || jbGeom.getValue() == null) {
                  throw new CstlServiceException("An distanceBuffer operator must specified a geometric object.",
                                                   INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
            
-            Object geometry  = JBgeom.getValue(); 
-            String propName  = dist.getPropertyName().getPropertyName();
-            String CRSName   = null;
+            Object geometry  = jbGeom.getValue();
+            //String propName  = dist.getPropertyName().getPropertyName();
+            String crsName   = null;
            
             // we transform the gml geometry in treatable geometry
             try {
                 if (geometry instanceof PointType) {
-                    PointType GMLpoint = (PointType) geometry;
-                    CRSName  = GMLpoint.getSrsName();
-                    geometry = GMLpointToGeneralDirectPosition(GMLpoint);
+                    final PointType gmlPoint = (PointType) geometry;
+                    crsName  = gmlPoint.getSrsName();
+                    geometry = gmlPointToGeneralDirectPosition(gmlPoint);
                     
                 } else if (geometry instanceof LineStringType) {
-                    LineStringType GMLline =  (LineStringType) geometry;
-                    CRSName  = GMLline.getSrsName();
-                    geometry = GMLlineToline2d(GMLline);
+                    final LineStringType gmlLine =  (LineStringType) geometry;
+                    crsName  = gmlLine.getSrsName();
+                    geometry = gmlLineToline2d(gmlLine);
                     
                 } else if (geometry instanceof EnvelopeEntry) {
-                    EnvelopeEntry GMLenvelope = (EnvelopeEntry) geometry;
-                    CRSName  = GMLenvelope.getSrsName();
-                    geometry = GMLenvelopeToGeneralEnvelope(GMLenvelope);
+                    final EnvelopeEntry gmlEnvelope = (EnvelopeEntry) geometry;
+                    crsName  = gmlEnvelope.getSrsName();
+                    geometry = gmlEnvelopeToGeneralEnvelope(gmlEnvelope);
                 }
 
                 if (operator.equals("DWithin")) {
-                    spatialfilter = new DWithinFilter(geometry, CRSName, distance, units);
+                    spatialfilter = new DWithinFilter(geometry, crsName, distance, units);
                 } else if (operator.equals("Beyond")) {
-                    spatialfilter = new BeyondFilter(geometry, CRSName, distance, units);
+                    spatialfilter = new BeyondFilter(geometry, crsName, distance, units);
                 } else {
                     throw new CstlServiceException("Unknow DistanceBuffer operator.",
                             INVALID_PARAMETER_VALUE, "QueryConstraint");
                 }
                 
             } catch (NoSuchAuthorityCodeException e) {
-                    throw new CstlServiceException("Unknow Coordinate Reference System: " + CRSName,
+                    throw new CstlServiceException("Unknow Coordinate Reference System: " + crsName,
                                                      INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (FactoryException e) {
                     throw new CstlServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
@@ -592,16 +593,16 @@ public class LuceneFilterParser extends FilterParser {
            
         } else if (spatialOps instanceof BinarySpatialOpType) {
             
-            BinarySpatialOpType binSpatial = (BinarySpatialOpType) spatialOps;
+            final BinarySpatialOpType binSpatial = (BinarySpatialOpType) spatialOps;
                         
             String propertyName = null;
-            String operator     = JBSpatialOps.getName().getLocalPart();
+            String operator     = jbSpatialOps.getName().getLocalPart();
             operator            = operator.toUpperCase();
             Object geometry     = null;
             
             // the propertyName
             if (binSpatial.getPropertyName() != null && binSpatial.getPropertyName().getValue() != null) {
-                PropertyNameType p = binSpatial.getPropertyName().getValue();
+                final PropertyNameType p = binSpatial.getPropertyName().getValue();
                 propertyName = p.getContent();
             }
                 
@@ -612,7 +613,7 @@ public class LuceneFilterParser extends FilterParser {
                 
             
             if (binSpatial.getAbstractGeometry() != null && binSpatial.getAbstractGeometry().getValue() != null) {
-                AbstractGeometryType ab =  binSpatial.getAbstractGeometry().getValue();
+                final AbstractGeometryType ab =  binSpatial.getAbstractGeometry().getValue();
                 
                 // geometric object: point
                 if (ab instanceof PointType) {
@@ -639,47 +640,49 @@ public class LuceneFilterParser extends FilterParser {
             try {
                 filterType = SpatialFilterType.valueOf(operator);
             } catch (IllegalArgumentException ex) {
-                logger.severe("unknow spatial filter Type");
+                LOGGER.severe("unknow spatial filter Type");
             }
             if (filterType == null) {
                 throw new CstlServiceException("Unknow FilterType: " + operator,
                                               INVALID_PARAMETER_VALUE, "QueryConstraint");
             }
             
-            String CRSName = "undefined CRS";
+            String crsName = "undefined CRS";
             try {
                 Object filterGeometry = null;
                 if (geometry instanceof EnvelopeEntry) {
                     
                     //we transform the EnvelopeEntry in GeneralEnvelope
-                    EnvelopeEntry GMLenvelope = (EnvelopeEntry)geometry;
-                    CRSName                   = GMLenvelope.getSrsName();
-                    filterGeometry            = GMLenvelopeToGeneralEnvelope(GMLenvelope);
+                    final EnvelopeEntry gmlEnvelope = (EnvelopeEntry)geometry;
+                    crsName                         = gmlEnvelope.getSrsName();
+                    filterGeometry                  = gmlEnvelopeToGeneralEnvelope(gmlEnvelope);
                 
                 } else if (geometry instanceof PointType) {
-                    PointType GMLpoint        = (PointType) geometry;
-                    CRSName                   = GMLpoint.getSrsName();
-                    filterGeometry            = GMLpointToGeneralDirectPosition(GMLpoint);
+                    final PointType gmlPoint  = (PointType) geometry;
+                    crsName                   = gmlPoint.getSrsName();
+                    filterGeometry            = gmlPointToGeneralDirectPosition(gmlPoint);
                 
                 } else if (geometry instanceof LineStringType) {
-                    LineStringType GMLline =  (LineStringType) geometry;
-                    CRSName                = GMLline.getSrsName();
-                    filterGeometry         = GMLlineToline2d(GMLline);
+                    final LineStringType gmlLine = (LineStringType) geometry;
+                    crsName                      = gmlLine.getSrsName();
+                    filterGeometry               = gmlLineToline2d(gmlLine);
                 }
 
                 switch (filterType) {
-                    case CONTAINS  : spatialfilter = new ContainsFilter(filterGeometry, CRSName);  break;
-                    case CROSSES   : spatialfilter = new CrossesFilter(filterGeometry, CRSName);   break;
-                    case DISJOINT  : spatialfilter = new DisjointFilter(filterGeometry, CRSName);  break;
-                    case EQUALS    : spatialfilter = new EqualsFilter(filterGeometry, CRSName);    break;
-                    case INTERSECTS : spatialfilter = new IntersectFilter(filterGeometry, CRSName); break;
-                    case OVERLAPS  : spatialfilter = new OverlapsFilter(filterGeometry, CRSName);  break;
-                    case TOUCHES   : spatialfilter = new TouchesFilter(filterGeometry, CRSName);   break;
-                    case WITHIN    : spatialfilter = new WithinFilter(filterGeometry, CRSName);    break;
+                    case CONTAINS   : spatialfilter = new ContainsFilter(filterGeometry, crsName);  break;
+                    case CROSSES    : spatialfilter = new CrossesFilter(filterGeometry, crsName);   break;
+                    case DISJOINT   : spatialfilter = new DisjointFilter(filterGeometry, crsName);  break;
+                    case EQUALS     : spatialfilter = new EqualsFilter(filterGeometry, crsName);    break;
+                    case INTERSECTS : spatialfilter = new IntersectFilter(filterGeometry, crsName); break;
+                    case OVERLAPS   : spatialfilter = new OverlapsFilter(filterGeometry, crsName);  break;
+                    case TOUCHES    : spatialfilter = new TouchesFilter(filterGeometry, crsName);   break;
+                    case WITHIN     : spatialfilter = new WithinFilter(filterGeometry, crsName);    break;
+                    default         : LOGGER.info("default filter within");
+                                      spatialfilter = new WithinFilter(filterGeometry, crsName);    break;
                 }
                 
             } catch (NoSuchAuthorityCodeException e) {
-                throw new CstlServiceException("Unknow Coordinate Reference System: " + CRSName,
+                throw new CstlServiceException("Unknow Coordinate Reference System: " + crsName,
                                               INVALID_PARAMETER_VALUE, "QueryConstraint");
             } catch (FactoryException e) {
                 throw new CstlServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
@@ -694,8 +697,8 @@ public class LuceneFilterParser extends FilterParser {
         return spatialfilter;
     }
     
-    private String treatIDOperator(final List<JAXBElement<? extends AbstractIdType>> JBIdsOps) {
-        StringBuilder response = new StringBuilder();
+    private String treatIDOperator(final List<JAXBElement<? extends AbstractIdType>> jbIdsOps) {
+        final StringBuilder response = new StringBuilder();
         
         //TODO
         if (true)
@@ -708,7 +711,7 @@ public class LuceneFilterParser extends FilterParser {
      * Remove the prefix on propertyName.
      */
     private String removePrefix(String s) {
-        int i = s.indexOf(':');
+        final int i = s.indexOf(':');
         if ( i != -1) {
             s = s.substring(i + 1, s.length());
         }

@@ -68,16 +68,16 @@ public abstract class FilterParser {
      /**
      * use for debugging purpose
      */
-    protected Logger logger = Logger.getLogger("org.constellation.metadata");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
     
    /**
      * Build a Filter with the specified CQL query
      * 
      * @param cqlQuery A well-formed CQL query .
      */
-    public FilterType CQLtoFilter(String cqlQuery) throws CQLException, JAXBException {
+    public static FilterType cqlToFilter(String cqlQuery) throws CQLException, JAXBException {
         FilterType result;
-        Object newFilter = CQL.toFilter(cqlQuery, new FilterFactoryImpl());
+        final Object newFilter = CQL.toFilter(cqlQuery, new FilterFactoryImpl());
         /*
          * here we put a temporary patch consisting in using the geotools filterFactory implementation
          * instead of our own implementation.
@@ -110,32 +110,32 @@ public abstract class FilterParser {
      * @throws org.opengis.referencing.NoSuchAuthorityCodeException
      * @throws org.opengis.referencing.FactoryException
      */
-    public Line2D GMLlineToline2d(LineStringType GMLline) throws NoSuchAuthorityCodeException, FactoryException, CstlServiceException {
-        String CRSName = GMLline.getSrsName();
-        if (CRSName == null) {
+    public static Line2D gmlLineToline2d(LineStringType gmlLine) throws NoSuchAuthorityCodeException, FactoryException, CstlServiceException {
+        final String crsName = gmlLine.getSrsName();
+        if (crsName == null) {
             throw new CstlServiceException("A CRS (coordinate Reference system) must be specified for the line.",
                                           INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
        
-        CoordinatesType coord = GMLline.getCoordinates();
+        final CoordinatesType coord = gmlLine.getCoordinates();
         String s = coord.getValue();
-        double X1, X2, Y1, Y2;
+        double x1, x2, y1, y2;
         
-        X1 = Double.parseDouble(s.substring(0, s.indexOf(coord.getCs())));
+        x1 = Double.parseDouble(s.substring(0, s.indexOf(coord.getCs())));
         
         s = s.substring(s.indexOf(coord.getCs()) + 1);
         
-        Y1 = Double.parseDouble(s.substring(0, s.indexOf(coord.getTs())));
+        y1 = Double.parseDouble(s.substring(0, s.indexOf(coord.getTs())));
         
         s = s.substring(s.indexOf(coord.getTs()) + 1);
         
-        X2 = Double.parseDouble(s.substring(0, s.indexOf(coord.getCs())));
+        x2 = Double.parseDouble(s.substring(0, s.indexOf(coord.getCs())));
         
         s = s.substring(s.indexOf(coord.getCs()) + 1);
         
-        Y2 = Double.parseDouble(s);
+        y2 = Double.parseDouble(s);
 
-        Line2D line = new Line2D.Double(X1, Y1, X2, Y2);
+        final Line2D line = new Line2D.Double(x1, y1, x2, y2);
         
         // TODO CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
         
@@ -151,27 +151,27 @@ public abstract class FilterParser {
      * @throws org.opengis.referencing.NoSuchAuthorityCodeException
      * @throws org.opengis.referencing.FactoryException
      */
-    public GeneralEnvelope GMLenvelopeToGeneralEnvelope(EnvelopeEntry GMLenvelope) throws NoSuchAuthorityCodeException, FactoryException, CstlServiceException {
-        String CRSName = GMLenvelope.getSrsName();
-        if (CRSName == null) {
+    public static GeneralEnvelope gmlEnvelopeToGeneralEnvelope(EnvelopeEntry gmlEnvelope) throws NoSuchAuthorityCodeException, FactoryException, CstlServiceException {
+        final String crsName = gmlEnvelope.getSrsName();
+        if (crsName == null) {
             throw new CstlServiceException("An operator BBOX must specified a CRS (coordinate Reference system) for the envelope.",
                                           INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
        
-        List<Double> lmin = GMLenvelope.getLowerCorner().getValue();
-        double min[] = new double[lmin.size()];
+        final List<Double> lmin = gmlEnvelope.getLowerCorner().getValue();
+        final double[] min      = new double[lmin.size()];
         for (int i = 0; i < min.length; i++) {
             min[i] = lmin.get(i);
         }
 
-        List<Double> lmax = GMLenvelope.getUpperCorner().getValue();
-        double max[] = new double[lmax.size()];
+        final List<Double> lmax = gmlEnvelope.getUpperCorner().getValue();
+        final double[] max = new double[lmax.size()];
         for (int i = 0; i < min.length; i++) {
             max[i] = lmax.get(i);
         }
 
-        GeneralEnvelope envelopeF = new GeneralEnvelope(min, max);
-        CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
+        final GeneralEnvelope envelopeF     = new GeneralEnvelope(min, max);
+        final CoordinateReferenceSystem crs = CRS.decode(crsName, true);
         envelopeF.setCoordinateReferenceSystem(crs);
         return envelopeF;
     }
@@ -187,24 +187,24 @@ public abstract class FilterParser {
      * @throws org.opengis.referencing.NoSuchAuthorityCodeException
      * @throws org.opengis.referencing.FactoryException
      */
-    protected GeneralDirectPosition GMLpointToGeneralDirectPosition(PointType GMLpoint) throws CstlServiceException, NoSuchAuthorityCodeException, FactoryException {
+    protected GeneralDirectPosition gmlPointToGeneralDirectPosition(PointType gmlPoint) throws CstlServiceException, NoSuchAuthorityCodeException, FactoryException {
         
-        String CRSName = GMLpoint.getSrsName();
+        final String crsName = gmlPoint.getSrsName();
 
-        if (CRSName == null) {
+        if (crsName == null) {
             throw new CstlServiceException("A GML point must specify Coordinate Reference System.",
                     INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
 
         //we get the coordinate of the point (if they are present)
-        if (GMLpoint.getCoordinates() == null && GMLpoint.getPos() == null) {
+        if (gmlPoint.getCoordinates() == null && gmlPoint.getPos() == null) {
             throw new CstlServiceException("A GML point must specify coordinates or direct position.",
                     INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
 
         final double[] coordinates = new double[2];
-        if (GMLpoint.getCoordinates() != null) {
-            String coord = GMLpoint.getCoordinates().getValue();
+        if (gmlPoint.getCoordinates() != null) {
+            final String coord = gmlPoint.getCoordinates().getValue();
        
             final StringTokenizer tokens = new StringTokenizer(coord, " ");
             int index = 0;
@@ -216,15 +216,15 @@ public abstract class FilterParser {
                 }
                 coordinates[index++] = value;
             }
-        } else if (GMLpoint.getPos().getValue() != null && GMLpoint.getPos().getValue().size() == 2){
-            coordinates[0] = GMLpoint.getPos().getValue().get(0);
-            coordinates[0] = GMLpoint.getPos().getValue().get(1);
+        } else if (gmlPoint.getPos().getValue() != null && gmlPoint.getPos().getValue().size() == 2){
+            coordinates[0] = gmlPoint.getPos().getValue().get(0);
+            coordinates[0] = gmlPoint.getPos().getValue().get(1);
         } else {
-            throw new CstlServiceException("The GML pointis malformed.",
+            throw new CstlServiceException("The GML point is malformed.",
                     INVALID_PARAMETER_VALUE, "QueryConstraint");
         }
-        GeneralDirectPosition point = new GeneralDirectPosition(coordinates);
-        CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
+        final GeneralDirectPosition point   = new GeneralDirectPosition(coordinates);
+        final CoordinateReferenceSystem crs = CRS.decode(crsName, true);
         point.setCoordinateReferenceSystem(crs);
         return point;    
     }
@@ -253,7 +253,7 @@ public abstract class FilterParser {
      */
     protected String createDate(String date) throws ParseException {
         
-        Map<String, String> monthPOOL = new HashMap<String, String>();
+        final Map<String, String> monthPOOL = new HashMap<String, String>();
         //french lowerCase
         monthPOOL.put("janvier",   "01");
         monthPOOL.put("février",   "02");
@@ -303,52 +303,52 @@ public abstract class FilterParser {
         if (date != null){
             if(date.contains("/")){
                 
-                day   = date.substring(0, date.indexOf("/"));
-                date  = date.substring(date.indexOf("/")+1);
-                month = date.substring(0, date.indexOf("/"));
-                year  = date.substring(date.indexOf("/")+1);
+                day   = date.substring(0, date.indexOf('/'));
+                date  = date.substring(date.indexOf('/') + 1);
+                month = date.substring(0, date.indexOf('/'));
+                year  = date.substring(date.indexOf('/') + 1);
                                 
                 tmp   = year + "-" + month + "-" + day;
             } else if ( getOccurence(date, " ") == 2 ) {
                 if (! date.contains("?")){
                                
-                    day    = date.substring(0, date.indexOf(" "));
-                    date   = date.substring(date.indexOf(" ")+1);
-                    month  = monthPOOL.get(date.substring(0, date.indexOf(" ")));
-                    year   = date.substring(date.indexOf(" ")+1);
+                    day    = date.substring(0, date.indexOf(' '));
+                    date   = date.substring(date.indexOf(' ') + 1);
+                    month  = monthPOOL.get(date.substring(0, date.indexOf(' ')));
+                    year   = date.substring(date.indexOf(' ')+1);
 
-                    tmp    = day+"-"+month+"-"+year;
+                    tmp    = day + "-" + month + "-" + year;
                 } else tmp = "2000-01-01";
                 
             } else if ( getOccurence(date, " ") == 1 ) {
                 
-                month = monthPOOL.get(date.substring(0, date.indexOf(" ")));
-                year  = date.substring(date.indexOf(" ") + 1);   
+                month = monthPOOL.get(date.substring(0, date.indexOf(' ')));
+                year  = date.substring(date.indexOf(' ') + 1);
                tmp   = year + "-" + month + "-01";
                 
             } else if ( getOccurence(date, "-") == 1 ) {
                 
-                month = date.substring(0, date.indexOf("-"));
-                year  = date.substring(date.indexOf("-")+1);
+                month = date.substring(0, date.indexOf('-'));
+                year  = date.substring(date.indexOf('-') + 1);
                                 
                 tmp   = year + "-" + month + "-01";
                 
             } else if ( getOccurence(date, "-") == 2 ) {
                 
                 //if date is in format yyyy-mm-dd
-                if (date.substring(0, date.indexOf("-")).length()==4){
-                    year  = date.substring(0, date.indexOf("-"));
-                    date  = date.substring(date.indexOf("-")+1);
-                    month = date.substring(0, date.indexOf("-"));
-                    day   = date.substring(date.indexOf("-")+1);
+                if (date.substring(0, date.indexOf('-')).length()==4){
+                    year  = date.substring(0, date.indexOf('-'));
+                    date  = date.substring(date.indexOf('-') + 1);
+                    month = date.substring(0, date.indexOf('-'));
+                    day   = date.substring(date.indexOf('-') + 1);
                     
                     tmp   = year + "-" + month + "-" + day;
                 }
                 else{
-                    day   = date.substring(0, date.indexOf("-"));
-                    date  = date.substring(date.indexOf("-")+1);
-                    month = date.substring(0, date.indexOf("-"));
-                    year  = date.substring(date.indexOf("-")+1);
+                    day   = date.substring(0, date.indexOf('-'));
+                    date  = date.substring(date.indexOf('-') + 1);
+                    month = date.substring(0, date.indexOf('-'));
+                    year  = date.substring(date.indexOf('-') + 1);
                     
                     tmp   = year + "-" + month + "-" + day;
                 }
@@ -394,11 +394,11 @@ public abstract class FilterParser {
     
     public abstract Object getQuery(final QueryConstraint constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException;
     
-    protected abstract Object treatLogicalOperator(final JAXBElement<? extends LogicOpsType> JBlogicOps) throws CstlServiceException;
+    protected abstract Object treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws CstlServiceException;
     
-    protected abstract Object treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> JBComparisonOps) throws CstlServiceException;
+    protected abstract Object treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> jbComparisonOps) throws CstlServiceException;
     
-    protected abstract Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> JBSpatialOps) throws CstlServiceException;
+    protected abstract Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> jbSpatialOps) throws CstlServiceException;
     
 
 }
