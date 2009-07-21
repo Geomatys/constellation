@@ -29,21 +29,21 @@ import javax.xml.namespace.QName;
  */
 public class CSWQueryable {
 
-     public final static QName _Degree_QNAME                           = new QName("http://www.inspire.org", "Degree",                          "ins");
-     public final static QName _AccessConstraints_QNAME                = new QName("http://www.inspire.org", "AccessConstraints",               "ins");
-     public final static QName _OtherConstraints_QNAME                 = new QName("http://www.inspire.org", "OtherCOnstraints",                "ins");
-     public final static QName _Classification_QNAME                   = new QName("http://www.inspire.org", "Classification",                  "ins");
-     public final static QName _ConditionApplyingToAccessAndUse_QNAME  = new QName("http://www.inspire.org", "ConditionApplyingToAccessAndUse", "ins");
-     public final static QName _MetadataPointOfContact_QNAME           = new QName("http://www.inspire.org", "MetadataPointOfContact",          "ins");
-     public final static QName _Lineage_QNAME                          = new QName("http://www.inspire.org", "Lineage",                         "ins");
-     public final static QName _SpecificationTitle_QNAME               = new QName("http://www.inspire.org", "SpecificationTitle",              "ins");
-     public final static QName _SpecificationDate_QNAME                = new QName("http://www.inspire.org", "SpecificationDate",               "ins");
-     public final static QName _SpecificationDateType_QNAME            = new QName("http://www.inspire.org", "SpecificationDateType",           "ins");
+     public static final QName _Degree_QNAME                           = new QName("http://www.inspire.org", "Degree",                          "ins");
+     public static final QName _AccessConstraints_QNAME                = new QName("http://www.inspire.org", "AccessConstraints",               "ins");
+     public static final QName _OtherConstraints_QNAME                 = new QName("http://www.inspire.org", "OtherCOnstraints",                "ins");
+     public static final QName _Classification_QNAME                   = new QName("http://www.inspire.org", "Classification",                  "ins");
+     public static final QName _ConditionApplyingToAccessAndUse_QNAME  = new QName("http://www.inspire.org", "ConditionApplyingToAccessAndUse", "ins");
+     public static final QName _MetadataPointOfContact_QNAME           = new QName("http://www.inspire.org", "MetadataPointOfContact",          "ins");
+     public static final QName _Lineage_QNAME                          = new QName("http://www.inspire.org", "Lineage",                         "ins");
+     public static final QName _SpecificationTitle_QNAME               = new QName("http://www.inspire.org", "SpecificationTitle",              "ins");
+     public static final QName _SpecificationDate_QNAME                = new QName("http://www.inspire.org", "SpecificationDate",               "ins");
+     public static final QName _SpecificationDateType_QNAME            = new QName("http://www.inspire.org", "SpecificationDateType",           "ins");
      
     /**
      * The queryable element from ISO 19115 and their path id.
      */
-    public static Map<String, List<String>> ISO_QUERYABLE;
+    public static final Map<String, List<String>> ISO_QUERYABLE;
     static {
         ISO_QUERYABLE      = new HashMap<String, List<String>>();
         List<String> paths;
@@ -228,7 +228,7 @@ public class CSWQueryable {
     /**
      * The queryable element from DublinCore and their path id.
      */
-    public static Map<String, List<String>> DUBLIN_CORE_QUERYABLE;
+    public static final Map<String, List<String>> DUBLIN_CORE_QUERYABLE;
     static {
         DUBLIN_CORE_QUERYABLE = new HashMap<String, List<String>>();
         List<String> paths;
@@ -401,7 +401,7 @@ public class CSWQueryable {
      * The queryable element from ebrim and their path id.
      */
     @Deprecated
-    public static Map<String, List<String>> EBRIM_QUERYABLE;
+    public static final Map<String, List<String>> EBRIM_QUERYABLE;
     static {
         EBRIM_QUERYABLE = new HashMap<String, List<String>>();
         List<String> paths;
@@ -489,7 +489,7 @@ public class CSWQueryable {
      /**
      * The queryable element from DublinCore and their path id.
      */
-    public static Map<String, List<String>> INSPIRE_QUERYABLE;
+    public static final Map<String, List<String>> INSPIRE_QUERYABLE;
     static {
         INSPIRE_QUERYABLE = new HashMap<String, List<String>>();
         List<String> paths;

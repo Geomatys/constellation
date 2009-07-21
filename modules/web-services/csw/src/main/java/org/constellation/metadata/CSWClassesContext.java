@@ -38,15 +38,17 @@ import org.geotoolkit.wrs.xml.v100.ExtrinsicObjectType;
  */
 public class CSWClassesContext {
 
-    private static Logger LOGGER = Logger.getLogger("org.constellation.metadata");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
 
+    private CSWClassesContext() {}
+    
     /**
      * List of classes for the french profile of metadata.
      */
-    public static final List<Class> fraClasses = new ArrayList<Class>();
+    public static final List<Class> FRA_CLASSES = new ArrayList<Class>();
 
     static {
-        fraClasses.addAll(Arrays.asList(
+        FRA_CLASSES.addAll(Arrays.asList(
                 org.geotoolkit.metadata.fra.FRA_Constraints.class,
                 org.geotoolkit.metadata.fra.FRA_DataIdentification.class,
                 org.geotoolkit.metadata.fra.FRA_DirectReferenceSystem.class,
@@ -61,7 +63,7 @@ public class CSWClassesContext {
      * @return
      */
     public static Class[] getAllClasses() {
-        List<Class> classeList = new ArrayList<Class>();
+        final List<Class> classeList = new ArrayList<Class>();
 
         // configuration classes
         classeList.add(HarvestTasks.class);
@@ -70,7 +72,7 @@ public class CSWClassesContext {
         classeList.add(DefaultMetaData.class);
 
         //ISO 19115 French profile class
-        classeList.addAll(fraClasses);
+        classeList.addAll(FRA_CLASSES);
 
         // Inspire classes
         classeList.add(org.geotoolkit.inspire.xml.ObjectFactory.class);
@@ -107,7 +109,7 @@ public class CSWClassesContext {
      * Return a list of classes to add in the context of JAXB.
      */
     public static List<Class> loadExtensionsClasses() {
-        List<Class> ExtClasses = new ArrayList<Class>();
+        final List<Class> extClasses = new ArrayList<Class>();
 
         // if they are present in the classPath we add the ISO 19119 classes
         Class c = null;
@@ -117,7 +119,7 @@ public class CSWClassesContext {
             LOGGER.info("ISO 19119 classes not found (optional)") ;
         }
         if (c != null) {
-            ExtClasses.add(c);
+            extClasses.add(c);
             LOGGER.info("extension ISO 19119 loaded");
         }
 
@@ -126,84 +128,84 @@ public class CSWClassesContext {
         try {
             c = Class.forName("org.geotools.feature.catalog.AssociationRoleImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.BindingImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.BoundFeatureAttributeImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.ConstraintImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.DefinitionReferenceImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.DefinitionSourceImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.FeatureAssociationImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.FeatureAttributeImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.FeatureCatalogueImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.FeatureOperationImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.FeatureTypeImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.InheritanceRelationImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.ListedValueImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.feature.catalog.PropertyTypeImpl");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             c = Class.forName("org.geotools.util.Multiplicity");
             if (c != null) {
-                ExtClasses.add(c);
+                extClasses.add(c);
             }
 
             LOGGER.info("extension ISO 19110 loaded");
         } catch (ClassNotFoundException e) {
             LOGGER.info("ISO 19110 classes not found (optional).");
         }
-        return ExtClasses;
+        return extClasses;
     }
 
 

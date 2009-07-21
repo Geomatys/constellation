@@ -82,7 +82,7 @@ public class CatalogueHarvester {
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("org.constellation.metadata");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
     
     /**
      * A getRecords request used to request another csw (2.0.2).
@@ -97,7 +97,7 @@ public class CatalogueHarvester {
     /**
      * A special getRecords request used to request another unstandardized csw (2.0.0).
      */
-    private org.geotoolkit.csw.xml.v200.GetRecordsType fullGetRecordsRequestv200_Special1;
+    private org.geotoolkit.csw.xml.v200.GetRecordsType fullGetRecordsRequestv200Special1;
     
     /**
      * A getCapabilities request used request another csw(2.0.2)
@@ -118,12 +118,12 @@ public class CatalogueHarvester {
     /**
      * a QName for csw:Record type
      */
-    private final static QName _Record_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Record");
+    private static final QName RECORD_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Record");
     
     /**
      * a QName for gmd:Dataset type
      */
-    private final static QName _Dataset_QNAME = new QName("http://www.isotc211.org/2005/gmd", "Dataset");
+    private static final QName DATASET_QNAME = new QName("http://www.isotc211.org/2005/gmd", "Dataset");
     
     /**
      * A Marshaller / unMarshaller pool to send request to another CSW services / to get object from harvested resource.
@@ -162,33 +162,32 @@ public class CatalogueHarvester {
         /*
          * we build the first filter : < dublinCore:Title IS LIKE '*' >
          */ 
-        List<QName> typeNames  = new ArrayList<QName>();
-        PropertyNameType pname = new PropertyNameType("dc:Title");
-        PropertyIsLikeType pil = new PropertyIsLikeType(pname, "something?", "*", "?", "\\");
-        NotType n              = new NotType(pil);
-        FilterType filter1     = new FilterType(n);
+        List<QName> typeNames    = new ArrayList<QName>();
+        PropertyNameType pname   = new PropertyNameType("dc:Title");
+        PropertyIsLikeType pil   = new PropertyIsLikeType(pname, "something?", "*", "?", "\\");
+        NotType n                = new NotType(pil);
+        final FilterType filter1 = new FilterType(n);
         
         /*
          * Second filter a special case for some unstandardized CSW : < title IS NOT LIKE 'something' >
          */
-        typeNames          = new ArrayList<QName>();
-        pname              = new PropertyNameType("title");
-        pil                = new PropertyIsLikeType(pname, "something", null, null, null);
-        n                  = new NotType(pil);
-        FilterType filter2 = new FilterType(n);
+        pname                    = new PropertyNameType("title");
+        pil                      = new PropertyIsLikeType(pname, "something", null, null, null);
+        n                        = new NotType(pil);
+        final FilterType filter2 = new FilterType(n);
         
         
         //we build the base request to harvest another CSW service (2.0.2)
-        QueryConstraintType constraint = new QueryConstraintType(filter1, "1.1.0");
-        typeNames.add(_Record_QNAME);
-        QueryType query = new QueryType(typeNames, new ElementSetNameType(ElementSetType.FULL), null, constraint); 
+        final QueryConstraintType constraint = new QueryConstraintType(filter1, "1.1.0");
+        typeNames.add(RECORD_QNAME);
+        final QueryType query = new QueryType(typeNames, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         fullGetRecordsRequestv202 = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, query, null);
                  
         
         //we build the base request to harvest another CSW service (2.0.0)
         org.geotoolkit.csw.xml.v200.QueryConstraintType constraint2 = new org.geotoolkit.csw.xml.v200.QueryConstraintType(filter1, "1.1.0");
         List<QName> typeNames2 = new ArrayList<QName>();
-        typeNames2.add(_Dataset_QNAME);
+        typeNames2.add(DATASET_QNAME);
         org.geotoolkit.csw.xml.v200.QueryType query2 = new org.geotoolkit.csw.xml.v200.QueryType(typeNames2,
                                                                                          new org.geotoolkit.csw.xml.v200.ElementSetNameType(org.geotoolkit.csw.xml.v200.ElementSetType.FULL),
                                                                                          constraint2); 
@@ -198,18 +197,18 @@ public class CatalogueHarvester {
         //we build the special request to harvest unstandardized CSW service (2.0.0)
         constraint2        = new org.geotoolkit.csw.xml.v200.QueryConstraintType(filter2, "1.0.20");
         typeNames2         = new ArrayList<QName>();
-        typeNames2.add(_Dataset_QNAME);
+        typeNames2.add(DATASET_QNAME);
         query2             = new org.geotoolkit.csw.xml.v200.QueryType(typeNames2,
                                                                    new org.geotoolkit.csw.xml.v200.ElementSetNameType(org.geotoolkit.csw.xml.v200.ElementSetType.FULL),
                                                                    constraint2); 
-        fullGetRecordsRequestv200_Special1 = new org.geotoolkit.csw.xml.v200.GetRecordsType("CSW", "2.0.0", org.geotoolkit.csw.xml.v200.ResultType.RESULTS, null, "application/xml", null, 1, 20, query2, null);
+        fullGetRecordsRequestv200Special1 = new org.geotoolkit.csw.xml.v200.GetRecordsType("CSW", "2.0.0", org.geotoolkit.csw.xml.v200.ResultType.RESULTS, null, "application/xml", null, 1, 20, query2, null);
         
         
         //we build the base request to get the capabilities of anoter CSW service (2.0.2)
-        AcceptVersionsType versions = new AcceptVersionsType("2.0.2", "2.0.0");
-        SectionsType sections       = new SectionsType("All");
-        AcceptFormatsType formats   = new AcceptFormatsType("text/xml", "application/xml");
-        getCapabilitiesRequestv202  = new GetCapabilitiesType(versions, sections, formats, null, "CSW");
+        final AcceptVersionsType versions = new AcceptVersionsType("2.0.2", "2.0.0");
+        final SectionsType sections       = new SectionsType("All");
+        final AcceptFormatsType formats   = new AcceptFormatsType("text/xml", "application/xml");
+        getCapabilitiesRequestv202        = new GetCapabilitiesType(versions, sections, formats, null, "CSW");
         
         //we build the base request to get the capabilities of anoter CSW service (2.0.0)
         getCapabilitiesRequestv200  = new org.geotoolkit.csw.xml.v200.GetCapabilitiesType(versions, sections, formats, null, "CSW");
@@ -265,11 +264,11 @@ public class CatalogueHarvester {
         boolean secondTry    = false;
         
         //we prepare to store the distant serviceException and send it later if this is necessary
-        List<CstlServiceException> distantException = new ArrayList<CstlServiceException>();
+        final List<CstlServiceException> distantException = new ArrayList<CstlServiceException>();
         
         //we request all the records for the best outputSchema supported
         
-            logger.info("harvesting with outputSchema: " + bestDistantOuputSchema);
+            LOGGER.info("harvesting with outputSchema: " + bestDistantOuputSchema);
             startPosition    = 1;
             
             if (!specialCase1)
@@ -279,26 +278,26 @@ public class CatalogueHarvester {
             //we make multiple request by pack of 20 record 
             while (moreResults) {
         
-                Object harvested = sendRequest(sourceURL, getRecordRequest);
+                final Object harvested = sendRequest(sourceURL, getRecordRequest);
         
                 // if the service respond with non xml or unstandardized response
                 if (harvested == null) {
-                    CstlServiceException exe = new CstlServiceException("The distant service does not respond correctly.",
+                    final CstlServiceException exe = new CstlServiceException("The distant service does not respond correctly.",
                                                      NO_APPLICABLE_CODE);
-                    logger.severe("The distant service does not respond correctly");
+                    LOGGER.severe("The distant service does not respond correctly");
                     distantException.add(exe);
                     moreResults = false;
             
                 // if the service respond correctly    
                 } else if (harvested instanceof GetRecordsResponseType) {
                     succeed = true;
-                    logger.info("Response of distant service:" + '\n' + harvested.toString());
-                    GetRecordsResponseType serviceResponse = (GetRecordsResponseType) harvested;
-                    SearchResultsType results = serviceResponse.getSearchResults();
+                    LOGGER.info("Response of distant service:" + '\n' + harvested.toString());
+                    final GetRecordsResponseType serviceResponse = (GetRecordsResponseType) harvested;
+                    final SearchResultsType results              = serviceResponse.getSearchResults();
             
                     //we looking for CSW record
-                    for (JAXBElement<? extends AbstractRecordType> JBrecord: results.getAbstractRecord()) {
-                        AbstractRecordType record = JBrecord.getValue();
+                    for (JAXBElement<? extends AbstractRecordType> jbRecord: results.getAbstractRecord()) {
+                        final AbstractRecordType record = jbRecord.getValue();
                         
                         //Temporary ugly patch TODO handle update in CSW
                         try {
@@ -314,7 +313,7 @@ public class CatalogueHarvester {
                         if (otherRecord instanceof JAXBElement)
                             otherRecord = ((JAXBElement)otherRecord).getValue();
                         
-                        logger.info("other Record Type: " + otherRecord.getClass().getSimpleName());
+                        LOGGER.info("other Record Type: " + otherRecord.getClass().getSimpleName());
                         
                         //Temporary ugly patch TODO handle update in CSW
                         try {
@@ -329,20 +328,20 @@ public class CatalogueHarvester {
                     moreResults = results.getNumberOfRecordsReturned() != 0;
                     if (moreResults) {
                         startPosition = startPosition + results.getAbstractRecord().size() + results.getAny().size();
-                        logger.info("startPosition=" + startPosition);
+                        LOGGER.info("startPosition=" + startPosition);
                         getRecordRequest.setStartPosition(startPosition);
                     } 
                     
                 // a correct response v2.0.0
                 } else if (harvested instanceof org.geotoolkit.csw.xml.v200.GetRecordsResponseType) {
                     succeed = true;
-                    logger.info("Response of distant service:" + '\n' + harvested.toString());
-                    org.geotoolkit.csw.xml.v200.GetRecordsResponseType serviceResponse = (org.geotoolkit.csw.xml.v200.GetRecordsResponseType) harvested;
-                    org.geotoolkit.csw.xml.v200.SearchResultsType results = serviceResponse.getSearchResults();
+                    LOGGER.info("Response of distant service:" + '\n' + harvested.toString());
+                    final org.geotoolkit.csw.xml.v200.GetRecordsResponseType serviceResponse = (org.geotoolkit.csw.xml.v200.GetRecordsResponseType) harvested;
+                    final org.geotoolkit.csw.xml.v200.SearchResultsType results              = serviceResponse.getSearchResults();
             
                     //we looking for CSW record
-                    for (JAXBElement<? extends org.geotoolkit.csw.xml.v200.AbstractRecordType> JBrecord: results.getAbstractRecord()) {
-                        org.geotoolkit.csw.xml.v200.AbstractRecordType record = JBrecord.getValue();
+                    for (JAXBElement<? extends org.geotoolkit.csw.xml.v200.AbstractRecordType> jbRecord: results.getAbstractRecord()) {
+                        final org.geotoolkit.csw.xml.v200.AbstractRecordType record = jbRecord.getValue();
                         
                         //Temporary ugly patch TODO handle update in CSW
                         try {
@@ -371,23 +370,24 @@ public class CatalogueHarvester {
                     moreResults = (results.getAbstractRecord().size() + results.getAny().size()) != 0;
                     if (moreResults) {
                         startPosition = startPosition +  results.getAbstractRecord().size() + results.getAny().size();
-                        logger.info("startPosition=" + startPosition);
+                        LOGGER.info("startPosition=" + startPosition);
                         getRecordRequest.setStartPosition(startPosition);
                     }
                      
                 // if the distant service has launch a standardized exception    
                 } else if (harvested instanceof ExceptionReport) {
-                    ExceptionReport ex = (ExceptionReport) harvested;
-                    String msg = "";
+                    final ExceptionReport ex = (ExceptionReport) harvested;
+                    StringBuilder msg = new StringBuilder();
                     if (ex.getException() != null && ex.getException().size() > 0) {
                         for (ExceptionType e:ex.getException()) {
-                            for (String s: e.getExceptionText())
-                                msg = msg + s + '\n';
+                            for (String s: e.getExceptionText()) {
+                                msg.append(s).append('\n');
+                            }
                         }
                     }
-                    CstlServiceException exe = new CstlServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
+                    final CstlServiceException exe = new CstlServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
                                                                       NO_APPLICABLE_CODE);
-                    logger.severe("The distant service has throw a webService exception: " + '\n' + exe.toString());
+                    LOGGER.severe("The distant service has throw a webService exception: " + '\n' + exe.toString());
                     distantException.add(exe);
                     moreResults = false;
                 
@@ -403,14 +403,14 @@ public class CatalogueHarvester {
                     getRecordRequest.removeConstraint();
                     firstTry    = false;
                     secondTry   = true;
-                    logger.info("trying with no constraint request");
+                    LOGGER.info("trying with no constraint request");
                 
                 //if we don't succeed agin we try with CQL constraint    
                 } else if (secondTry && ! succeed) {
                     secondTry   = false;
                     moreResults = true;
                     getRecordRequest.setCQLConstraint("title NOT LIKE 'something'");
-                    logger.info("trying with CQL constraint request");
+                    LOGGER.info("trying with CQL constraint request");
                 }
             }
         
@@ -419,7 +419,7 @@ public class CatalogueHarvester {
             throw distantException.get(0);
         }
         
-        int result[] = new int[3];
+        final int result[] = new int [3];
         result[0]    = nbRecordInserted;
         result[1]    = nbRecordUpdated;
         result[2]    = 0;
@@ -435,7 +435,7 @@ public class CatalogueHarvester {
      */
     private GetRecordsRequest analyseCapabilitiesDocument(CapabilitiesBaseType capa, GetRecordsRequest request) {
         String distantVersion = "2.0.2";
-        StringBuilder report = new StringBuilder();
+        final StringBuilder report = new StringBuilder();
 
         //we get the service version (could be 2.0.0 or 2.0.1 or 2.0.2)
         if (capa.getVersion() != null) {
@@ -453,7 +453,7 @@ public class CatalogueHarvester {
         // Special case 1
         if (serviceName.equals("IAAA CSW")) {
             specialCase1 = true;
-            request      = fullGetRecordsRequestv200_Special1;
+            request      = fullGetRecordsRequestv200Special1;
             special      = "Special case 1";
             
         // Special case 2    
@@ -465,17 +465,17 @@ public class CatalogueHarvester {
         report.append("CSW ").append(distantVersion).append(" service identified: " + serviceName).append(" ").append(special).append('\n');
         
         //we get the Operations metadata if they are present
-        OperationsMetadata om = capa.getOperationsMetadata();
+        final OperationsMetadata om = capa.getOperationsMetadata();
 
         //we look for the GetRecords operation.
-        Operation getRecordOp = om.getOperation("GetRecords");
+        final Operation getRecordOp = om.getOperation("GetRecords");
         if (getRecordOp != null) {
             report .append("GetRecords operation supported:").append('\n');
             
             // if there is only one DCP (most case)
             if (getRecordOp.getDCP().size() == 1) {
-                DCP dcp = getRecordOp.getDCP().get(0);
-                List<JAXBElement<RequestMethodType>> protocols = dcp.getHTTP().getRealGetOrPost();
+                final DCP dcp = getRecordOp.getDCP().get(0);
+                final List<JAXBElement<RequestMethodType>> protocols = dcp.getHTTP().getRealGetOrPost();
                 report.append("available protocols:").append('\n');
                 for (JAXBElement<RequestMethodType> jb : protocols) {
                     report .append(jb.getName().getLocalPart()).append('\n');
@@ -487,7 +487,7 @@ public class CatalogueHarvester {
                 int i = 0;
                 for (DCP dcp: getRecordOp.getDCP()) {
                     report.append("DCP ").append(i).append(':').append('\n');
-                    List<JAXBElement<RequestMethodType>> protocols = dcp.getHTTP().getRealGetOrPost();
+                    final List<JAXBElement<RequestMethodType>> protocols = dcp.getHTTP().getRealGetOrPost();
                     report .append("available protocols:").append('\n');
                     for (JAXBElement<RequestMethodType> jb : protocols) {
                         report.append(jb.getName().getLocalPart()).append('\n');
@@ -510,9 +510,8 @@ public class CatalogueHarvester {
             }
             
             if (outputDomain != null) {
-                List<String> availableOutputSchema = new ArrayList<String>();
-                availableOutputSchema              = Util.cleanStrings(outputDomain.getValue());
-                String defaultValue                = outputDomain.getDefaultValue(); 
+                List<String> availableOutputSchema = Util.cleanStrings(outputDomain.getValue());
+                final String defaultValue          = outputDomain.getDefaultValue();
                 
                 if (defaultValue != null && !defaultValue.equals("") && !availableOutputSchema.contains(defaultValue))
                     availableOutputSchema.add(defaultValue);
@@ -554,11 +553,11 @@ public class CatalogueHarvester {
                 }
             }
             
-            List<QName>  typeNamesQname = new ArrayList<QName>();
+            final List<QName>  typeNamesQname = new ArrayList<QName>();
             if (typeNameDomain != null) {
-                List<String> typeNames      = typeNameDomain.getValue();
+                final List<String> typeNames  = typeNameDomain.getValue();
                 
-                String defaultValue = typeNameDomain.getDefaultValue(); 
+                final String defaultValue = typeNameDomain.getDefaultValue();
                 if (defaultValue != null && !defaultValue.equals(""))
                     typeNames.add(defaultValue);
                 
@@ -576,10 +575,10 @@ public class CatalogueHarvester {
                     if (osc.indexOf(':') != -1) {
                         prefix    = osc.substring(0, osc.indexOf(':'));
                         localPart = osc.substring(osc.indexOf(':') + 1, osc.length());
-                        String namespaceURI = getNamespaceURIFromprefix(prefix, distantVersion);
+                        final String namespaceURI = getNamespaceURIFromprefix(prefix, distantVersion);
                         typeNamesQname.add(new QName(namespaceURI, localPart, prefix));
                     } else {
-                        logger.severe("NO ':' in Typenames => unexpected!!!");
+                        LOGGER.severe("NO ':' in Typenames => unexpected!!!");
                     }
                 }
             } else {
@@ -587,7 +586,7 @@ public class CatalogueHarvester {
                               '\t' + "csw:Record"                           + '\n');
                 
                 //we add the default typeNames used
-                typeNamesQname.add(_Record_QNAME);
+                typeNamesQname.add(RECORD_QNAME);
             }
             //we update the request
             request.setTypeNames(typeNamesQname);
@@ -596,7 +595,7 @@ public class CatalogueHarvester {
             report.append("No GetRecords operation find").append('\n');
         }
 
-        logger.info(report.toString());
+        LOGGER.info(report.toString());
         return request;
     }
     
@@ -634,7 +633,7 @@ public class CatalogueHarvester {
         } else if (availableOutputSchema.contains("DublinCore")) {
             return "DublinCore";
         } else {
-            logger.severe("unable to found a outputSchema!!!");
+            LOGGER.severe("unable to found a outputSchema!!!");
             return "http://www.opengis.net/cat/csw/2.0.2";
         }
     }
@@ -654,8 +653,8 @@ public class CatalogueHarvester {
     private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, CstlServiceException, IOException {
         
         
-        URL source          = new URL(sourceURL);
-        URLConnection conec = source.openConnection();
+        final URL source          = new URL(sourceURL);
+        final URLConnection conec = source.openConnection();
         Object harvested    = null;
         
         try {
@@ -665,8 +664,8 @@ public class CatalogueHarvester {
         
                 conec.setDoOutput(true);
                 conec.setRequestProperty("Content-Type","text/xml");
-                OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
-                StringWriter sw = new StringWriter();
+                final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+                final StringWriter sw = new StringWriter();
                 Marshaller marshaller = null;
                 try {
                     marshaller = marshallerPool.acquireMarshaller();
@@ -679,30 +678,30 @@ public class CatalogueHarvester {
                         marshallerPool.release(marshaller);
                     }
                 }
-                String XMLRequest = sw.toString();
+                String xmlRequest = sw.toString();
             
                 // in the special case 1 we need to remove ogc prefix inside  the >Filter
                 if (specialCase1) {
-                    XMLRequest = XMLRequest.replace("<ogc:", "<");
-                    XMLRequest = XMLRequest.replace("</ogc:", "</");
-                    XMLRequest = XMLRequest.replace("<Filter", "<ogc:Filter");
-                    XMLRequest = XMLRequest.replace("</Filter", "</ogc:Filter");
-                    XMLRequest = XMLRequest.replace("xmlns:gco=\"http://www.isotc211.org/2005/gco\""    , "");
-                    XMLRequest = XMLRequest.replace("xmlns:gmd=\"http://www.isotc211.org/2005/gmd\""    , "");
-                    XMLRequest = XMLRequest.replace("xmlns:dc=\"http://purl.org/dc/elements/1.1/\""     , ""); 
-                    XMLRequest = XMLRequest.replace("xmlns:dc2=\"http://www.purl.org/dc/elements/1.1/\"", "");
-                    XMLRequest = XMLRequest.replace("xmlns:dct2=\"http://www.purl.org/dc/terms/\""      , "");
-                    logger.info("special obtained request: " + '\n' + XMLRequest);
+                    xmlRequest = xmlRequest.replace("<ogc:", "<");
+                    xmlRequest = xmlRequest.replace("</ogc:", "</");
+                    xmlRequest = xmlRequest.replace("<Filter", "<ogc:Filter");
+                    xmlRequest = xmlRequest.replace("</Filter", "</ogc:Filter");
+                    xmlRequest = xmlRequest.replace("xmlns:gco=\"http://www.isotc211.org/2005/gco\""    , "");
+                    xmlRequest = xmlRequest.replace("xmlns:gmd=\"http://www.isotc211.org/2005/gmd\""    , "");
+                    xmlRequest = xmlRequest.replace("xmlns:dc=\"http://purl.org/dc/elements/1.1/\""     , "");
+                    xmlRequest = xmlRequest.replace("xmlns:dc2=\"http://www.purl.org/dc/elements/1.1/\"", "");
+                    xmlRequest = xmlRequest.replace("xmlns:dct2=\"http://www.purl.org/dc/terms/\""      , "");
+                    LOGGER.info("special obtained request: " + '\n' + xmlRequest);
                 }
-                logger.info("sended:" + XMLRequest);
-                wr.write(XMLRequest);
+                LOGGER.info("sended:" + xmlRequest);
+                wr.write(xmlRequest);
                 wr.flush();
             }
         
             // we get the response document
-            InputStream in = conec.getInputStream();
-            StringWriter out = new StringWriter();
-            byte[] buffer = new byte[1024];
+            final InputStream in   = conec.getInputStream();
+            final StringWriter out = new StringWriter();
+            final byte[] buffer    = new byte[1024];
             int size;
 
             while ((size = in.read(buffer, 0, 1024)) > 0) {
@@ -734,14 +733,14 @@ public class CatalogueHarvester {
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
                 harvested = unmarshaller.unmarshal(new StringReader(decodedString));
-                if (harvested != null && harvested instanceof JAXBElement) {
+                if (harvested instanceof JAXBElement) {
                     harvested = ((JAXBElement) harvested).getValue();
                 }
             } catch (JAXBException ex) {
-                logger.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
+                LOGGER.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
                         "cause: " + ex.getMessage());
             }  catch (IllegalAccessError ex) {
-                logger.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
+                LOGGER.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
                         "cause: " + ex.getMessage());
             } finally {
                 if (unmarshaller != null) {
@@ -749,7 +748,7 @@ public class CatalogueHarvester {
                 }
             }
         } catch (IOException ex) {
-            logger.severe("The Distant service have made an error");
+            LOGGER.severe("The Distant service have made an error");
             return null;
         }
         return harvested;
@@ -825,7 +824,7 @@ public class CatalogueHarvester {
      */
     public DistributedResults transferGetRecordsRequest(GetRecordsRequest request, List<String> distributedServers,
             int startPosition, int maxRecords) {
-        List<Object> additionalResults = new ArrayList<Object>();
+        final List<Object> additionalResults = new ArrayList<Object>();
         int matched = 0;
         for (String serverURL : distributedServers) {
             request.setStartPosition(startPosition);
@@ -833,17 +832,17 @@ public class CatalogueHarvester {
         
             try {
 
-                Object response = sendRequest(serverURL, request);
+                final Object response = sendRequest(serverURL, request);
 
                 if (response instanceof GetRecordsResponseType) {
                     
-                    logger.info("Response of distant service:" + '\n' + response.toString());
-                    GetRecordsResponseType serviceResponse = (GetRecordsResponseType) response;
-                    SearchResultsType results = serviceResponse.getSearchResults();
+                    LOGGER.info("Response of distant service:" + '\n' + response.toString());
+                    final GetRecordsResponseType serviceResponse = (GetRecordsResponseType) response;
+                    final SearchResultsType results = serviceResponse.getSearchResults();
 
                     //we looking for CSW record
-                    for (JAXBElement<? extends AbstractRecordType> JBrecord : results.getAbstractRecord()) {
-                        AbstractRecordType record = JBrecord.getValue();
+                    for (JAXBElement<? extends AbstractRecordType> jbRecord : results.getAbstractRecord()) {
+                        final AbstractRecordType record = jbRecord.getValue();
                         additionalResults.add(record);
                     }
 
@@ -863,16 +862,14 @@ public class CatalogueHarvester {
                         maxRecords    = maxRecords - additionalResults.size();
                         
                     }
-                    
-                    
                 }
 
             } catch (MalformedURLException ex) {
-                logger.severe(serverURL + " is a malformed URL. unable to request that service");
+                LOGGER.severe(serverURL + " is a malformed URL. unable to request that service");
             } catch (CstlServiceException ex) {
-                logger.severe(ex.getMessage());
+                LOGGER.severe(ex.getMessage());
             } catch (IOException ex) {
-                logger.info("IO exeception while distibuting the request: " + ex.getMessage());
+                LOGGER.info("IO exeception while distibuting the request: " + ex.getMessage());
             }
         }
         
@@ -881,22 +878,22 @@ public class CatalogueHarvester {
 
 
     public int[] harvestSingle(String sourceURL, String resourceType) throws MalformedURLException, IOException, CstlServiceException, JAXBException {
-        int[] result = new int[3];
+        final int[] result = new int[3];
         result[0] = 0;
         result[1] = 0;
         result[2] = 0;
         Unmarshaller unmarshaller = null;
         try {
             unmarshaller = marshallerPool.acquireUnmarshaller();
-            URL source = new URL(sourceURL);
-            URLConnection conec = source.openConnection();
+            final URL source = new URL(sourceURL);
+            final URLConnection conec = source.openConnection();
 
             // we get the source document
-            File fileToHarvest = File.createTempFile("harvested", "xml");
+            final File fileToHarvest = File.createTempFile("harvested", "xml");
             fileToHarvest.deleteOnExit();
-            InputStream in = conec.getInputStream();
-            FileOutputStream out = new FileOutputStream(fileToHarvest);
-            byte[] buffer = new byte[1024];
+            final InputStream in = conec.getInputStream();
+            final FileOutputStream out = new FileOutputStream(fileToHarvest);
+            final byte[] buffer = new byte[1024];
             int size;
 
             while ((size = in.read(buffer, 0, 1024)) > 0) {
@@ -907,13 +904,13 @@ public class CatalogueHarvester {
                     resourceType.equals("http://www.opengis.net/cat/csw/2.0.2") ||
                     resourceType.equals("http://www.isotc211.org/2005/gfc")) {
 
-                Object harvested = unmarshaller.unmarshal(fileToHarvest);
+                final Object harvested = unmarshaller.unmarshal(fileToHarvest);
                 if (harvested == null) {
                     throw new CstlServiceException("The resource can not be parsed.",
                             INVALID_PARAMETER_VALUE, "Source");
                 }
 
-                logger.info("Object Type of the harvested Resource: " + harvested.getClass().getName());
+                LOGGER.info("Object Type of the harvested Resource: " + harvested.getClass().getName());
 
                 // ugly patch TODO handle update in mdweb
                 try {

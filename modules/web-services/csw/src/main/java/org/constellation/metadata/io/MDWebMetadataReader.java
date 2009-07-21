@@ -1202,7 +1202,7 @@ public class MDWebMetadataReader extends MetadataReader {
                     try {
                         List<String> values = MDReader.getDomainOfValuesFromPaths(paths);
                         ListOfValuesType ListValues = new ListOfValuesType(values);
-                        DomainValuesType value = new DomainValuesType(null, token, ListValues, _Metadata_QNAME);
+                        DomainValuesType value = new DomainValuesType(null, token, ListValues, METADATA_QNAME);
                         responseList.add(value);
                         if (false) throw new SQLException();
 
