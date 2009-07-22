@@ -42,12 +42,12 @@ final class PermissionQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, user, WMS, WCS, getInfo, description;
+    final Column name, user, WMS, WCS, getInfo, description;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byName, byUser;
+    final Parameter byName, byUser;
 
     /**
      * Creates a new query for the specified database.

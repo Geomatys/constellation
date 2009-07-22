@@ -35,12 +35,12 @@ final class OperationParameterQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column parameter, value;
+    final Column parameter, value;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byOperation;
+    final Parameter byOperation;
 
     /**
      * Creates a new query for the specified database.

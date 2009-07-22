@@ -35,12 +35,12 @@ final class TileQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column series, filename, index, spatialExtent, dx, dy;
+    final Column series, filename, index, spatialExtent, dx, dy;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byLayer, byStartTime, byEndTime, byHorizontalSRID;
+    final Parameter byLayer, byStartTime, byEndTime, byHorizontalSRID;
 
     /**
      * Creates a new query for the specified database.

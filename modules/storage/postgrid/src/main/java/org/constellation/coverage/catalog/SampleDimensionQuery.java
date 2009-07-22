@@ -35,12 +35,12 @@ final class SampleDimensionQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column identifier, band, units;
+    final Column identifier, band, units;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byFormat;
+    final Parameter byFormat;
 
     /**
      * Creates a new query for the specified database.

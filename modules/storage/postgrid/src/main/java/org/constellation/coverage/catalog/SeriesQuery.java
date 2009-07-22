@@ -35,12 +35,12 @@ final class SeriesQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, layer, pathname, extension, format, permission, remarks;
+    final Column name, layer, pathname, extension, format, permission, remarks;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byName, byLayer;
+    final Parameter byName, byLayer;
 
     /**
      * Creates a new query for the specified database.

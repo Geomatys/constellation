@@ -34,14 +34,14 @@ final class LayerMetadataQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column layerMetaName, layerName, abbrTitle, shortTitle, 
+    final Column layerMetaName, layerName, abbrTitle, shortTitle, 
             longTitle, parameterName, parameterType, description, longDescription,
             dataSource, purpose, supplementalInfo, updateFrequency, useConstraint;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byName;
+    final Parameter byName;
 
     /**
      * Creates a new query for the specified database.

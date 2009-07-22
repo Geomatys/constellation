@@ -56,7 +56,7 @@ final class SpatialRefSysEntry {
     /**
      * The horizontal and vertical SRID declared in the database.
      */
-    protected final int horizontalSRID, verticalSRID;
+    final int horizontalSRID, verticalSRID;
 
     /**
      * The horizontal CRS.

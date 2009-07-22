@@ -34,14 +34,14 @@ final class PointOfContactQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column pocId, lastName, firstName, address1, address2, city, state, country, 
+    final Column pocId, lastName, firstName, address1, address2, city, state, country, 
             zip, phone, email, org, org_address1, org_address2, org_city, org_state, org_zip, 
             org_country, org_contact;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byName;
+    final Parameter byName;
 
     /**
      * Creates a new query for the specified database.

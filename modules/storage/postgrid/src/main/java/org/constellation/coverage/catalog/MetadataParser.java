@@ -77,14 +77,14 @@ final class MetadataParser {
      * {@code null} if the later method has not been invoked or didn't
      * completed successfully.
      */
-    protected Date timeOrigin;
+    Date timeOrigin;
 
     /**
      * Time units found during the last invocation of {@link #getDateRanges}.
      * {@code null} if the later method has not been invoked or didn't
      * completed successfully.
      */
-    protected Unit<Duration> timeUnit;
+    Unit<Duration> timeUnit;
 
     /**
      * Gets the geographic metadata from the specified reader.

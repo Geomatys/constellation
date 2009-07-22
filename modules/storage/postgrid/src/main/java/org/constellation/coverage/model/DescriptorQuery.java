@@ -35,12 +35,12 @@ final class DescriptorQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column identifier, symbol, layer, operation, region, band, distribution;
+    final Column identifier, symbol, layer, operation, region, band, distribution;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter bySymbol, byIdentifier;
+    final Parameter bySymbol, byIdentifier;
 
     /**
      * Creates a new query for the specified database.

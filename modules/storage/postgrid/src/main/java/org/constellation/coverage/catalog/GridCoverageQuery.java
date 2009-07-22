@@ -36,18 +36,18 @@ final class GridCoverageQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column series, filename, index, startTime, endTime, spatialExtent;
+    final Column series, filename, index, startTime, endTime, spatialExtent;
 
     /**
      * For insertion of new entries in the {@code Tiles} table only.
      * Null otherwise.
      */
-    protected final Column dx, dy;
+    final Column dx, dy;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byFilename, byLayer, bySeries,
+    final Parameter byFilename, byLayer, bySeries,
             byStartTime, byEndTime, byHorizontalExtent;
 
     /**

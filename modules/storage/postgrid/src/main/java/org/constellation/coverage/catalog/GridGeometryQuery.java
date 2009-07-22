@@ -35,13 +35,13 @@ final class GridGeometryQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column identifier, width, height, scaleX, scaleY, translateX, translateY,
+    final Column identifier, width, height, scaleX, scaleY, translateX, translateY,
             shearX, shearY, horizontalSRID, verticalSRID, verticalOrdinates;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byIdentifier, byWidth, byHeight, byScaleX, byScaleY,
+    final Parameter byIdentifier, byWidth, byHeight, byScaleX, byScaleY,
             byTranslateX, byTranslateY, byShearX, byShearY, byHorizontalSRID;
 
     /**

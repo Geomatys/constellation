@@ -74,14 +74,14 @@ final class GridGeometryEntry extends Entry {
      * presents as well but may be invalid (the exact value will be set on an coverage-by-coverage
      * basis).
      */
-    protected final GeneralGridGeometry geometry;
+    final GeneralGridGeometry geometry;
 
     /**
      * The "grid to CRS" affine transform for the horizontal part. The vertical
      * transform is not included because the {@link #verticalOrdinates} may not
      * be regular.
      */
-    protected final AffineTransform2D gridToCRS;
+    final AffineTransform2D gridToCRS;
 
     /**
      * A shape describing the coverage outline in WGS 84 geographic coordinates. This is the

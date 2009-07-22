@@ -35,12 +35,12 @@ final class LinearModelQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column source1, source2, coefficient;
+    final Column source1, source2, coefficient;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byTarget;
+    final Parameter byTarget;
 
     /**
      * Creates a new query for the specified database.

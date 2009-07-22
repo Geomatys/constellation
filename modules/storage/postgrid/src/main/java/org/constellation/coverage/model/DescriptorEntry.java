@@ -48,7 +48,7 @@ final class DescriptorEntry extends Entry implements Descriptor {
     /**
      * Identifiant de l'observable.
      */
-    protected final int identifier;
+    private final int identifier;
 
     /**
      * Référence vers le {@linkplain Phenomenon phénomène} observé.

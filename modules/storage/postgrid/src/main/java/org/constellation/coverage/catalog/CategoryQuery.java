@@ -35,12 +35,12 @@ final class CategoryQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, lower, upper, c0, c1, function, colors;
+    final Column name, lower, upper, c0, c1, function, colors;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byBand;
+    final Parameter byBand;
 
     /**
      * Creates a new query for the specified database.

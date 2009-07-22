@@ -35,12 +35,12 @@ final class DescriptorSubstitutionQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column symbol1, symbol2;
+    final Column symbol1, symbol2;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter bySymbol;
+    final Parameter bySymbol;
 
     /**
      * Creates a new query for the specified database.

@@ -34,12 +34,12 @@ final class DomainOfLayerQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column layer, startTime, endTime, west, east, south, north, xResolution, yResolution;
+    final Column layer, startTime, endTime, west, east, south, north, xResolution, yResolution;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byLayer;
+    final Parameter byLayer;
 
     /**
      * Creates a new query for the specified database.

@@ -34,13 +34,13 @@ final class SeriesMetadataQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column id, seriesName, legendURI, pubDate, pocId, version, forecast,
+    final Column id, seriesName, legendURI, pubDate, pocId, version, forecast,
         themekey1, themekey2, themekey3, themekey4, themekey5, themekey6, themekey7, themekey8;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byName;
+    final Parameter byName;
 
     /**
      * Creates a new query for the specified database.
