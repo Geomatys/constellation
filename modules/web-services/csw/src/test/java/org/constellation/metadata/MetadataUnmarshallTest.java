@@ -116,7 +116,7 @@ public class MetadataUnmarshallTest {
 
     @BeforeClass
     public static void setUp() throws JAXBException, URISyntaxException {
-        final List<Class> classes = CSWClassesContext.fraClasses;
+        final List<Class> classes = CSWClassesContext.FRA_CLASSES;
         classes.add(DefaultMetaData.class);
         testPool = new AnchorPool(classes);
     }

@@ -524,7 +524,7 @@ public class CSWworkerTest {
          *  TEST 1 : getRecords with HITS - DC mode (FULL) - CQL text: Title LIKE *0008411.ctd
          */
         
-        List<QName> typeNames             = Arrays.asList(TypeNames._Record_QNAME);
+        List<QName> typeNames             = Arrays.asList(TypeNames.RECORD_QNAME);
         ElementSetNameType elementSetName = new ElementSetNameType(ElementSetType.FULL);
         SortByType sortBy                 = null;
         QueryConstraintType constraint    = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
@@ -546,7 +546,7 @@ public class CSWworkerTest {
          *  TEST 2 : getRecords with RESULTS - DC mode (FULL) - CQL text: Title LIKE *0008411.ctd
          */
 
-        typeNames      = Arrays.asList(TypeNames._Record_QNAME);
+        typeNames      = Arrays.asList(TypeNames.RECORD_QNAME);
         elementSetName = new ElementSetNameType(ElementSetType.FULL);
         sortBy         = null;
         constraint     = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
@@ -595,7 +595,7 @@ public class CSWworkerTest {
          *  TEST 3 : getRecords with VALIDATE - DC mode (FULL) - CQL text: Title LIKE *0008411.ctd
          */
 
-        typeNames      = Arrays.asList(TypeNames._Record_QNAME);
+        typeNames      = Arrays.asList(TypeNames.RECORD_QNAME);
         elementSetName = new ElementSetNameType(ElementSetType.FULL);
         sortBy         = null;
         constraint     = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
@@ -608,7 +608,7 @@ public class CSWworkerTest {
          *  TEST 4 : getRecords with RESULTS - DC mode (BRIEF) - CQL text: Title LIKE *0008411.ctd
          */
 
-        typeNames      = Arrays.asList(TypeNames._Record_QNAME);
+        typeNames      = Arrays.asList(TypeNames.RECORD_QNAME);
         elementSetName = new ElementSetNameType(ElementSetType.BRIEF);
         sortBy         = null;
         constraint     = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
@@ -658,7 +658,7 @@ public class CSWworkerTest {
          *  TEST 5 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE *0008411.ctd
          */
 
-        typeNames        = Arrays.asList(TypeNames._Record_QNAME);
+        typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
         List<QName> cust = new ArrayList<QName>();
         cust.add(_Identifier_QNAME);
         cust.add(_Subject_QNAME);
@@ -711,7 +711,7 @@ public class CSWworkerTest {
          *  TEST 5 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE *0008411.ctd
          */
 
-        typeNames        = Arrays.asList(TypeNames._Record_QNAME);
+        typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
         cust             = new ArrayList<QName>();
         cust.add(_BoundingBox_QNAME);
         cust.add(_Modified_QNAME);
@@ -786,7 +786,7 @@ public class CSWworkerTest {
 
         List<DomainValues> domainValues = new ArrayList<DomainValues>();
         ListOfValuesType values = new  ListOfValuesType(Arrays.asList("All", "ServiceIdentification", "ServiceProvider", "OperationsMetadata", "Filter_Capabilities"));
-        DomainValuesType value  = new DomainValuesType("GetCapabilities.sections", null, values, _Capabilities_QNAME);
+        DomainValuesType value  = new DomainValuesType("GetCapabilities.sections", null, values, CAPABILITIES_QNAME);
         domainValues.add(value);
         GetDomainResponse expResult = new GetDomainResponseType(domainValues);
 
@@ -810,7 +810,7 @@ public class CSWworkerTest {
         list.add("OperationsMetadata");
         list.add("Filter_Capabilities");
         org.geotoolkit.csw.xml.v200.ListOfValuesType values200 = new org.geotoolkit.csw.xml.v200.ListOfValuesType(list);
-        org.geotoolkit.csw.xml.v200.DomainValuesType value200  = new org.geotoolkit.csw.xml.v200.DomainValuesType("GetCapabilities.sections", null, values200, _Capabilities_QNAME);
+        org.geotoolkit.csw.xml.v200.DomainValuesType value200  = new org.geotoolkit.csw.xml.v200.DomainValuesType("GetCapabilities.sections", null, values200, CAPABILITIES_QNAME);
         domainValues200.add(value200);
         GetDomainResponse expResult200 = new org.geotoolkit.csw.xml.v200.GetDomainResponseType(domainValues200);
 

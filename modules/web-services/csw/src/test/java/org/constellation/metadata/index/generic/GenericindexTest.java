@@ -573,7 +573,7 @@ public class GenericindexTest {
 
     public static List<DefaultMetaData> fillTestData() throws JAXBException {
         List<DefaultMetaData> result = new ArrayList<DefaultMetaData>();
-        final List<Class> classes = CSWClassesContext.fraClasses;
+        final List<Class> classes = CSWClassesContext.FRA_CLASSES;
         classes.add(DefaultMetaData.class);
         MarshallerPool pool          = new MarshallerPool(classes.toArray(new Class[1]));
         Unmarshaller unmarshaller    = pool.acquireUnmarshaller();

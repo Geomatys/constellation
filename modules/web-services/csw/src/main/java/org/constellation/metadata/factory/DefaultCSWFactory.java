@@ -99,7 +99,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      */
     public int getProfile(int dbType) {
         switch (dbType) {
-            case MDWEB:
+            case MDWEB :
                 return CSWworker.TRANSACTIONAL;
             case FILESYSTEM:
                 return CSWworker.TRANSACTIONAL;
