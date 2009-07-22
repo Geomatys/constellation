@@ -28,7 +28,6 @@ import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
 import org.geotoolkit.gml.xml.v311modified.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311modified.TimePositionType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
-import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sml.xml.AbstractClassification;
 import org.geotoolkit.sml.xml.AbstractClassifier;
 import org.geotoolkit.sml.xml.AbstractDerivableComponent;
@@ -48,8 +47,10 @@ public class Utils {
     /**
      * use for debugging purpose
      */
-    private static Logger logger = Logger.getLogger("org.constellation.sos");
+    private static final Logger logger = Logger.getLogger("org.constellation.sos");
 
+    private Utils() {}
+    
     /**
      * Return the physical ID of a sensor.
      * This ID is found into a "Identifier" mark with the name 'supervisorCode'
@@ -59,8 +60,8 @@ public class Utils {
      */
     public static String getPhysicalID(final AbstractSensorML sensor) {
         if (sensor != null && sensor.getMember().size() > 0) {
-            AbstractProcess process = sensor.getMember().get(0).getRealProcess();
-            List<? extends AbstractIdentification> idents = process.getIdentification();
+            final AbstractProcess process = sensor.getMember().get(0).getRealProcess();
+            final List<? extends AbstractIdentification> idents = process.getIdentification();
 
             for(AbstractIdentification ident : idents) {
                 if (ident.getIdentifierList() != null) {
@@ -83,10 +84,10 @@ public class Utils {
      * @return
      */
     public static List<String> getNetworkNames(final AbstractSensorML sensor) {
-        List<String> results = new ArrayList<String>();
+        final List<String> results = new ArrayList<String>();
         if (sensor.getMember().size() == 1) {
             if (sensor.getMember().get(0) instanceof AbstractProcess) {
-                AbstractProcess component = (AbstractProcess) sensor.getMember().get(0);
+                final AbstractProcess component = (AbstractProcess) sensor.getMember().get(0);
                 for (AbstractClassification cl : component.getClassification()) {
                     if (cl.getClassifierList() != null) {
                         for (AbstractClassifier classifier : cl.getClassifierList().getClassifier()) {
@@ -110,7 +111,7 @@ public class Utils {
     public static DirectPositionType getSensorPosition(final AbstractSensorML sensor) {
         if (sensor.getMember().size() == 1) {
             if (sensor.getMember().get(0) instanceof AbstractDerivableComponent) {
-                AbstractDerivableComponent component = (AbstractDerivableComponent) sensor.getMember().get(0);
+                final AbstractDerivableComponent component = (AbstractDerivableComponent) sensor.getMember().get(0);
                 if (component.getSMLLocation() != null && component.getSMLLocation().getPoint() != null &&
                     component.getSMLLocation().getPoint() != null && component.getSMLLocation().getPoint().getPos() != null)
                 return component.getSMLLocation().getPoint().getPos();
@@ -136,7 +137,7 @@ public class Utils {
             }
              try {
                  //here t is not used but it allow to verify the syntax of the timestamp
-                 Timestamp t = Timestamp.valueOf(value);
+                 final Timestamp t = Timestamp.valueOf(value);
                  return t.toString();
 
              } catch(IllegalArgumentException e) {
@@ -164,19 +165,19 @@ public class Utils {
     public static EnvelopeEntry getCollectionBound(final ObservationCollectionEntry collection) {
         double minx = Double.MAX_VALUE;
         double miny = Double.MAX_VALUE;
-        double maxx = (-Double.MAX_VALUE);
-        double maxy = (-Double.MAX_VALUE);
+        double maxx = -Double.MAX_VALUE;
+        double maxy = -Double.MAX_VALUE;
 
         for (Observation observation: collection.getMember()) {
             if (observation.getFeatureOfInterest() instanceof AbstractFeatureEntry) {
-                AbstractFeatureEntry feature = (AbstractFeatureEntry) observation.getFeatureOfInterest();
+                final AbstractFeatureEntry feature = (AbstractFeatureEntry) observation.getFeatureOfInterest();
                 if (feature.getBoundedBy() != null) {
-                    BoundingShapeEntry bound = feature.getBoundedBy();
+                    final BoundingShapeEntry bound = feature.getBoundedBy();
                     if (bound.getEnvelope() != null) {
                         if (bound.getEnvelope().getLowerCorner() != null
                             && bound.getEnvelope().getLowerCorner().getValue() != null
                             && bound.getEnvelope().getLowerCorner().getValue().size() == 2 ) {
-                            List<Double> lower = bound.getEnvelope().getLowerCorner().getValue();
+                            final List<Double> lower = bound.getEnvelope().getLowerCorner().getValue();
                             if (lower.get(0) < minx) {
                                 minx = lower.get(0);
                             }
@@ -187,12 +188,12 @@ public class Utils {
                         if (bound.getEnvelope().getUpperCorner() != null
                             && bound.getEnvelope().getUpperCorner().getValue() != null
                             && bound.getEnvelope().getUpperCorner().getValue().size() == 2 ) {
-                            List<Double> Upper = bound.getEnvelope().getUpperCorner().getValue();
-                            if (Upper.get(0) > maxx) {
-                                maxx = Upper.get(0);
+                            final List<Double> upper = bound.getEnvelope().getUpperCorner().getValue();
+                            if (upper.get(0) > maxx) {
+                                maxx = upper.get(0);
                             }
-                            if (Upper.get(1) > maxy) {
-                                maxy = Upper.get(1);
+                            if (upper.get(1) > maxy) {
+                                maxy = upper.get(1);
                             }
                         }
                     }

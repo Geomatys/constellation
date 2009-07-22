@@ -135,6 +135,8 @@ public class FileMetadataWriter extends MetadataWriter {
            boolean suceed =  metadataFile.delete();
            if (suceed) {
                indexer.removeDocument(metadataID);
+           } else {
+               LOGGER.severe("unable to delete the matadata file");
            }
            return suceed;
         } else {
