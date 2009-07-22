@@ -33,15 +33,15 @@ public interface SensorReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public AbstractSensorML getSensor(String sensorID) throws CstlServiceException;
+    AbstractSensorML getSensor(String sensorID) throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.
      */
-    public String getInfos();
+    String getInfos();
 
     /**
      * Destroy and free the resource used by the reader.
      */
-    public abstract void destroy();
+    abstract void destroy();
 }

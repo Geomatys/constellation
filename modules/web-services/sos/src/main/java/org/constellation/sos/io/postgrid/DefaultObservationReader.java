@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 // Constellation dependencies
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
@@ -69,7 +70,7 @@ public class DefaultObservationReader implements ObservationReader {
     /**
      * use for debugging purpose
      */
-    protected Logger logger = Logger.getLogger("org.constellation.sos");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
 
     /**
      * The base for observation id.
@@ -79,7 +80,7 @@ public class DefaultObservationReader implements ObservationReader {
     /**
      * A Database object for the O&M dataBase.
      */
-    private final Database OMDatabase;
+    private final Database omDatabase;
 
     /**
      * A database table for insert and get observation
@@ -122,27 +123,27 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
         // we get the database informations
-        BDD db = configuration.getBdd();
+        final BDD db = configuration.getBdd();
         if (db == null) {
             throw new CstlServiceException("The configuration file does not contains a BDD object (DefaultObservationReader)", NO_APPLICABLE_CODE);
         }
         try {
-            PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
+            final PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
             dataSourceOM.setServerName(db.getHostName());
             dataSourceOM.setPortNumber(db.getPortNumber());
             dataSourceOM.setDatabaseName(db.getDatabaseName());
             dataSourceOM.setUser(db.getUser());
             dataSourceOM.setPassword(db.getPassword());
 
-            OMDatabase = new Database(dataSourceOM);
+            omDatabase = new Database(dataSourceOM);
             //we build the database table frequently used.
-            obsTable = OMDatabase.getTable(ObservationTable.class);
-            offTable = OMDatabase.getTable(ObservationOfferingTable.class);
-            refTable = OMDatabase.getTable(ReferenceTable.class);
+            obsTable = omDatabase.getTable(ObservationTable.class);
+            offTable = omDatabase.getTable(ObservationOfferingTable.class);
+            refTable = omDatabase.getTable(ReferenceTable.class);
             //we build the prepared Statement
-            newObservationIDStmt = OMDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observations\" WHERE name LIKE '%" + observationIdBase + "%' ");
-            observationExistStmt = OMDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=?");
-            getMinEventTimeOffering = OMDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
+            newObservationIDStmt = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observations\" WHERE name LIKE '%" + observationIdBase + "%' ");
+            observationExistStmt = omDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=?");
+            getMinEventTimeOffering = omDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
         } catch (SQLException ex) {
             throw new CstlServiceException("SQL Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (NoSuchTableException ex) {
@@ -158,12 +159,12 @@ public class DefaultObservationReader implements ObservationReader {
         try {
             return offTable.getIdentifiers();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
@@ -178,7 +179,7 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
@@ -186,23 +187,21 @@ public class DefaultObservationReader implements ObservationReader {
 
     public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
         try {
-            List<ObservationOfferingEntry> loo = new ArrayList<ObservationOfferingEntry>();
-            Set<ObservationOfferingEntry> set = offTable.getEntries();
+            final List<ObservationOfferingEntry> loo = new ArrayList<ObservationOfferingEntry>();
+            final Set<ObservationOfferingEntry> set  = offTable.getEntries();
             loo.addAll(set);
             return loo;
         } catch (SQLException ex) {
-            System.out.println("trowing SQL");
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
-            System.out.println("trowing cat");
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a Runtime Exception:" + e.getMessage(),
                     NO_APPLICABLE_CODE);
         }
@@ -210,15 +209,15 @@ public class DefaultObservationReader implements ObservationReader {
 
     public Set<String> getProcedureNames() throws CstlServiceException {
         try {
-            ProcessTable procTable = OMDatabase.getTable(ProcessTable.class);
+            final ProcessTable procTable = omDatabase.getTable(ProcessTable.class);
             return procTable.getIdentifiers();
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
@@ -226,20 +225,20 @@ public class DefaultObservationReader implements ObservationReader {
 
     public Set<String> getPhenomenonNames() throws CstlServiceException {
         try {
-            PhenomenonTable phenoTable = OMDatabase.getTable(PhenomenonTable.class);
-            Set<String> phenoNames = phenoTable.getIdentifiers();
-            CompositePhenomenonTable compoPhenoTable = OMDatabase.getTable(CompositePhenomenonTable.class);
-            Set<String> compoPhenoNames = compoPhenoTable.getIdentifiers();
+            final PhenomenonTable phenoTable               = omDatabase.getTable(PhenomenonTable.class);
+            final Set<String> phenoNames                   = phenoTable.getIdentifiers();
+            final CompositePhenomenonTable compoPhenoTable = omDatabase.getTable(CompositePhenomenonTable.class);
+            final Set<String> compoPhenoNames              = compoPhenoTable.getIdentifiers();
             phenoNames.addAll(compoPhenoNames);
             phenoNames.remove("");
             return phenoNames;
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
@@ -247,26 +246,26 @@ public class DefaultObservationReader implements ObservationReader {
 
     public PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException {
         try {
-            CompositePhenomenonTable compositePhenomenonTable = OMDatabase.getTable(CompositePhenomenonTable.class);
+            final CompositePhenomenonTable compositePhenomenonTable = omDatabase.getTable(CompositePhenomenonTable.class);
             CompositePhenomenonEntry cphen = null;
             try {
                 cphen = compositePhenomenonTable.getEntry(phenomenonName);
             } catch (NoSuchRecordException ex) {
             //we let continue to look if it is a phenomenon (simple)
             }
-            PhenomenonTable phenomenonTable = OMDatabase.getTable(PhenomenonTable.class);
+            PhenomenonTable phenomenonTable = omDatabase.getTable(PhenomenonTable.class);
             return (PhenomenonEntry) phenomenonTable.getEntry(phenomenonName);
 
         } catch (NoSuchRecordException ex) {
             return null;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
@@ -274,19 +273,19 @@ public class DefaultObservationReader implements ObservationReader {
 
     public Set<String> getFeatureOfInterestNames() throws CstlServiceException {
         try {
-            SamplingFeatureTable featureTable = OMDatabase.getTable(SamplingFeatureTable.class);
-            Set<String> featureNames = featureTable.getIdentifiers();
-            SamplingPointTable pointTable = OMDatabase.getTable(SamplingPointTable.class);
-            Set<String> pointNames = pointTable.getIdentifiers();
+            final SamplingFeatureTable featureTable = omDatabase.getTable(SamplingFeatureTable.class);
+            final Set<String> featureNames          = featureTable.getIdentifiers();
+            final SamplingPointTable pointTable     = omDatabase.getTable(SamplingPointTable.class);
+            final Set<String> pointNames            = pointTable.getIdentifiers();
             featureNames.addAll(pointNames);
             return featureNames;
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
@@ -294,7 +293,7 @@ public class DefaultObservationReader implements ObservationReader {
 
     public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException {
         try {
-            SamplingPointTable foiTable = OMDatabase.getTable(SamplingPointTable.class);
+            SamplingPointTable foiTable = omDatabase.getTable(SamplingPointTable.class);
             return foiTable.getEntry(samplingFeatureName);
         } catch (NoSuchRecordException ex) {
             return null;
@@ -302,7 +301,7 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException("Catalog exception while getting the feature of interest",
                     NO_APPLICABLE_CODE, "featureOfInterest");
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
@@ -315,7 +314,7 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException("Catalog exception while getting the observations: " + ex.getMessage(),
                     NO_APPLICABLE_CODE, "getObservation");
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
@@ -323,8 +322,8 @@ public class DefaultObservationReader implements ObservationReader {
 
     public AnyResultEntry getResult(String identifier) throws CstlServiceException {
         try {
-            AnyResultTable resTable = OMDatabase.getTable(AnyResultTable.class);
-            Integer id = Integer.parseInt(identifier);
+            final AnyResultTable resTable = omDatabase.getTable(AnyResultTable.class);
+            final Integer id = Integer.parseInt(identifier);
             return resTable.getEntry(id);
         } catch (CatalogException ex) {
             throw new CstlServiceException("Catalog exception while getting the results: " + ex.getMessage(),
@@ -333,7 +332,7 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException("Number format exception while getting the results: " + ex.getMessage(),
                     NO_APPLICABLE_CODE, "getResult");
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
@@ -341,11 +340,11 @@ public class DefaultObservationReader implements ObservationReader {
 
     public ReferenceEntry getReference(String href) throws CstlServiceException {
         try {
-            Set<ReferenceEntry> references = refTable.getEntries();
+            final Set<ReferenceEntry> references = refTable.getEntries();
             if (references != null) {
-                Iterator<ReferenceEntry> it = references.iterator();
+                final Iterator<ReferenceEntry> it = references.iterator();
                 while (it.hasNext()) {
-                    ReferenceEntry ref = it.next();
+                    final ReferenceEntry ref = it.next();
                     if (ref != null && ref.getHref() != null && ref.getHref().equals(href)) {
                         return ref;
                     }
@@ -354,16 +353,16 @@ public class DefaultObservationReader implements ObservationReader {
             return null;
 
         } catch (NoSuchRecordException ex) {
-            logger.info("NoSuchRecordException in getReferences");
+            LOGGER.info("NoSuchRecordException in getReferences");
             return null;
 
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                 NO_APPLICABLE_CODE);
 
         } catch (CatalogException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
@@ -377,11 +376,11 @@ public class DefaultObservationReader implements ObservationReader {
             obsTable.clear();
             offTable.clear();
             refTable.clear();
-            OMDatabase.close();
+            omDatabase.close();
         } catch (CatalogException ex) {
-            logger.severe("Catalog Exception while destroy observation reader");
+            LOGGER.severe("Catalog Exception while destroy observation reader");
         } catch (SQLException ex) {
-            logger.severe("SQL Exception while destroy observation reader");
+            LOGGER.severe("SQL Exception while destroy observation reader");
         }
     }
 
@@ -406,7 +405,7 @@ public class DefaultObservationReader implements ObservationReader {
             res.close();
             return observationIdBase + id;
         } catch( SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("The service has throw a SQLException:" + e.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
@@ -418,7 +417,7 @@ public class DefaultObservationReader implements ObservationReader {
     public List<String> getEventTime() throws CstlServiceException {
         String ret = null;
         try {
-            ResultSet res = getMinEventTimeOffering.executeQuery();
+            final ResultSet res = getMinEventTimeOffering.executeQuery();
             Timestamp t = null;
             while (res.next()) {
                 t = res.getTimestamp(1);
@@ -430,7 +429,7 @@ public class DefaultObservationReader implements ObservationReader {
             res.close();
 
         } catch (SQLException ex) {
-           ex.printStackTrace();
+           LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                          NO_APPLICABLE_CODE);
         }

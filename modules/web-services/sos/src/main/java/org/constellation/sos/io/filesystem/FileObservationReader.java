@@ -47,7 +47,7 @@ public class FileObservationReader implements ObservationReader {
      /**
      * use for debugging purpose
      */
-    protected Logger logger = Logger.getLogger("org.constellation.sos");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
 
     /**
      * The base for observation id.
@@ -68,9 +68,11 @@ public class FileObservationReader implements ObservationReader {
 
     private MarshallerPool marshallerPool;
 
+    private static final String FILE_EXTENSION = ".xml";
+
     public FileObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException {
         this.observationIdBase = observationIdBase;
-        File dataDirectory = configuration.getdataDirectory();
+        final File dataDirectory = configuration.getdataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
             offeringDirectory    = new File(dataDirectory, "offerings");
             phenomenonDirectory  = new File(dataDirectory, "phenomenons");
@@ -89,10 +91,10 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public Collection<String> getOfferingNames() throws CstlServiceException {
-        List<String> offeringNames = new ArrayList<String>();
+        final List<String> offeringNames = new ArrayList<String>();
         for (File offeringFile: offeringDirectory.listFiles()) {
             String offeringName = offeringFile.getName();
-            offeringName.substring(0, offeringName.indexOf(".xml"));
+            offeringName = offeringName.substring(0, offeringName.indexOf(FILE_EXTENSION));
             offeringNames.add(offeringName);
         }
         return offeringNames;
@@ -100,12 +102,12 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException {
-        File offeringFile = new File(observationDirectory, offeringName + ".xml");
+        final File offeringFile = new File(observationDirectory, offeringName + FILE_EXTENSION);
         if (offeringFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(offeringFile);
+                final Object obj = unmarshaller.unmarshal(offeringFile);
                 if (obj instanceof ObservationOfferingEntry) {
                     return (ObservationOfferingEntry) obj;
                 }
@@ -123,18 +125,18 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
-        List<ObservationOfferingEntry> offerings = new ArrayList<ObservationOfferingEntry>();
+        final List<ObservationOfferingEntry> offerings = new ArrayList<ObservationOfferingEntry>();
         for (File offeringFile: offeringDirectory.listFiles()) {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(offeringFile);
+                final Object obj = unmarshaller.unmarshal(offeringFile);
                 if (obj instanceof ObservationOfferingEntry) {
                     offerings.add((ObservationOfferingEntry) obj);
                 }
                 throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
-                logger.severe("Unable to unmarshall The file " + offeringFile);
+                LOGGER.severe("Unable to unmarshall The file " + offeringFile);
             } finally {
                 if (unmarshaller != null) {
                     marshallerPool.release(unmarshaller);
@@ -146,10 +148,10 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public Collection<String> getProcedureNames() throws CstlServiceException {
-        List<String> sensorNames = new ArrayList<String>();
+        final List<String> sensorNames = new ArrayList<String>();
         for (File sensorFile: sensorDirectory.listFiles()) {
             String sensorName = sensorFile.getName();
-            sensorName.substring(0, sensorName.indexOf(".xml"));
+            sensorName = sensorName.substring(0, sensorName.indexOf(FILE_EXTENSION));
             sensorNames.add(sensorName);
         }
         return sensorNames;
@@ -157,10 +159,10 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public Collection<String> getPhenomenonNames() throws CstlServiceException {
-        List<String> phenomenonNames = new ArrayList<String>();
+        final List<String> phenomenonNames = new ArrayList<String>();
         for (File phenomenonFile: phenomenonDirectory.listFiles()) {
             String phenomenonName = phenomenonFile.getName();
-            phenomenonName.substring(0, phenomenonName.indexOf(".xml"));
+            phenomenonName = phenomenonName.substring(0, phenomenonName.indexOf(FILE_EXTENSION));
             phenomenonNames.add(phenomenonName);
         }
         return phenomenonNames;
@@ -168,12 +170,12 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException {
-        File phenomenonFile = new File(phenomenonDirectory, phenomenonName + ".xml");
+        final File phenomenonFile = new File(phenomenonDirectory, phenomenonName + FILE_EXTENSION);
         if (phenomenonFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(phenomenonFile);
+                final Object obj = unmarshaller.unmarshal(phenomenonFile);
                 if (obj instanceof PhenomenonEntry) {
                     return (PhenomenonEntry) obj;
                 }
@@ -191,10 +193,10 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public Collection<String> getFeatureOfInterestNames() throws CstlServiceException {
-        List<String> foiNames = new ArrayList<String>();
+        final List<String> foiNames = new ArrayList<String>();
         for (File foiFile: foiDirectory.listFiles()) {
             String foiName = foiFile.getName();
-            foiName.substring(0, foiName.indexOf(".xml"));
+            foiName = foiName.substring(0, foiName.indexOf(FILE_EXTENSION));
             foiNames.add(foiName);
         }
         return foiNames;
@@ -202,12 +204,12 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException {
-        File samplingFeatureFile = new File(foiDirectory, samplingFeatureName + ".xml");
+        final File samplingFeatureFile = new File(foiDirectory, samplingFeatureName + FILE_EXTENSION);
         if (samplingFeatureFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(samplingFeatureFile);
+                final Object obj = unmarshaller.unmarshal(samplingFeatureFile);
                 if (obj instanceof SamplingFeatureEntry) {
                     return (SamplingFeatureEntry) obj;
                 }
@@ -225,12 +227,12 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public ObservationEntry getObservation(String identifier) throws CstlServiceException {
-        File observationFile = new File(observationDirectory, identifier + ".xml");
+        final File observationFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (observationFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(observationFile);
+                final Object obj = unmarshaller.unmarshal(observationFile);
                 if (obj instanceof ObservationEntry) {
                     return (ObservationEntry) obj;
                 }
@@ -248,25 +250,25 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public AnyResult getResult(String identifier) throws CstlServiceException {
-        File AnyResultFile = new File(resultDirectory, identifier + ".xml");
-        if (AnyResultFile.exists()) {
+        final File anyResultFile = new File(resultDirectory, identifier + FILE_EXTENSION);
+        if (anyResultFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(AnyResultFile);
+                final Object obj = unmarshaller.unmarshal(anyResultFile);
                 if (obj instanceof AnyResult) {
                     return (AnyResult) obj;
                 }
-                throw new CstlServiceException("The file " + AnyResultFile + " does not contains an foi Object.", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("The file " + anyResultFile + " does not contains an foi Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
-                throw new CstlServiceException("Unable to unmarshall The file " + AnyResultFile, ex, NO_APPLICABLE_CODE);
+                throw new CstlServiceException("Unable to unmarshall The file " + anyResultFile, ex, NO_APPLICABLE_CODE);
             } finally {
                 if (unmarshaller != null) {
                     marshallerPool.release(unmarshaller);
                 }
             }
         }
-        throw new CstlServiceException("The file " + AnyResultFile + " does not exist", NO_APPLICABLE_CODE);
+        throw new CstlServiceException("The file " + anyResultFile + " does not exist", NO_APPLICABLE_CODE);
     }
 
     @Override

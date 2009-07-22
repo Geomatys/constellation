@@ -61,9 +61,11 @@ public class FileObservationWriter implements ObservationWriter {
 
     private MarshallerPool marshallerPool;
 
+    private static final String FILE_EXTENSION = ".xml";
+
     public FileObservationWriter(Automatic configuration) throws CstlServiceException {
         super();
-        File dataDirectory = configuration.getdataDirectory();
+        final File dataDirectory = configuration.getdataDirectory();
         if (dataDirectory.exists()) {
             offeringDirectory    = new File(dataDirectory, "offerings");
             phenomenonDirectory  = new File(dataDirectory, "phenomenons");
@@ -86,8 +88,11 @@ public class FileObservationWriter implements ObservationWriter {
         Marshaller marshaller = null;
         try {
             marshaller = marshallerPool.acquireMarshaller();
-            File observationFile = new File(observationDirectory, observation.getName() + ".xml");
-            observationFile.createNewFile();
+            final File observationFile = new File(observationDirectory, observation.getName() + FILE_EXTENSION);
+            boolean created = observationFile.createNewFile();
+            if (!created) {
+                throw new CstlServiceException("unable to create an observation file.", NO_APPLICABLE_CODE);
+            }
             marshaller.marshal(observation, observationFile);
             return observation.getName();
         } catch (JAXBException ex) {
@@ -106,8 +111,11 @@ public class FileObservationWriter implements ObservationWriter {
         Marshaller marshaller = null;
         try {
             marshaller = marshallerPool.acquireMarshaller();
-            File observationFile = new File(observationDirectory, measurement.getName() + ".xml");
-            observationFile.createNewFile();
+            final File observationFile = new File(observationDirectory, measurement.getName() + FILE_EXTENSION);
+            boolean created = observationFile.createNewFile();
+            if (!created) {
+                throw new CstlServiceException("unable to create an observation file.", NO_APPLICABLE_CODE);
+            }
             marshaller.marshal(measurement, observationFile);
             return measurement.getName();
         } catch (JAXBException ex) {
@@ -126,8 +134,11 @@ public class FileObservationWriter implements ObservationWriter {
         Marshaller marshaller = null;
         try {
             marshaller = marshallerPool.acquireMarshaller();
-            File offeringFile = new File(offeringDirectory, offering.getName() + ".xml");
-            offeringFile.createNewFile();
+            File offeringFile = new File(offeringDirectory, offering.getName() + FILE_EXTENSION);
+            boolean created = offeringFile.createNewFile();
+            if (!created) {
+                throw new CstlServiceException("unable to create an offering file.", NO_APPLICABLE_CODE);
+            }
             marshaller.marshal(offering, offeringFile);
             return offering.getName();
         } catch (JAXBException ex) {

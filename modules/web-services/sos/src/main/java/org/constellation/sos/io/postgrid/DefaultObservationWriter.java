@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 // constellation dependencies
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
@@ -59,12 +60,12 @@ public class DefaultObservationWriter implements ObservationWriter {
     /**
      * use for debugging purpose
      */
-    protected Logger logger = Logger.getLogger("org.constellation.sos");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
 
     /**
      * A Database object for the O&M dataBase.
      */
-    private final Database OMDatabase;
+    private final Database omDatabase;
 
     /**
      * A database table for insert and get observation
@@ -94,24 +95,24 @@ public class DefaultObservationWriter implements ObservationWriter {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
         // we get the database informations
-        BDD db = configuration.getBdd();
+        final BDD db = configuration.getBdd();
         if (db == null) {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
         try {
-            PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
+            final PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
             dataSourceOM.setServerName(db.getHostName());
             dataSourceOM.setPortNumber(db.getPortNumber());
             dataSourceOM.setDatabaseName(db.getDatabaseName());
             dataSourceOM.setUser(db.getUser());
             dataSourceOM.setPassword(db.getPassword());
 
-            OMDatabase   = new Database(dataSourceOM);
+            omDatabase   = new Database(dataSourceOM);
             
             //we build the database table frequently used.
-            obsTable = OMDatabase.getTable(ObservationTable.class);
-            offTable = OMDatabase.getTable(ObservationOfferingTable.class);
-            refTable = OMDatabase.getTable(ReferenceTable.class);
+            obsTable = omDatabase.getTable(ObservationTable.class);
+            offTable = omDatabase.getTable(ObservationOfferingTable.class);
+            refTable = omDatabase.getTable(ReferenceTable.class);
 
         } catch (NoSuchTableException ex) {
             throw new CstlServiceException("NoSuchTable Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -131,7 +132,7 @@ public class DefaultObservationWriter implements ObservationWriter {
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
@@ -139,13 +140,13 @@ public class DefaultObservationWriter implements ObservationWriter {
 
     public String writeMeasurement(Measurement measurement) throws CstlServiceException {
         try {
-            MeasurementTable measTable = OMDatabase.getTable(MeasurementTable.class);
+            final MeasurementTable measTable = omDatabase.getTable(MeasurementTable.class);
             return measTable.getIdentifier(measurement);
         } catch (CatalogException ex) {
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
@@ -159,7 +160,7 @@ public class DefaultObservationWriter implements ObservationWriter {
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
@@ -178,7 +179,7 @@ public class DefaultObservationWriter implements ObservationWriter {
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
@@ -192,43 +193,43 @@ public class DefaultObservationWriter implements ObservationWriter {
         if (position == null || position.getValue().size() < 2)
             return;
         try {
-            Statement stmt2    = OMDatabase.getConnection().createStatement();
+            final Statement stmt2    = omDatabase.getConnection().createStatement();
             final ResultSet result2;
             String request = "SELECT * FROM ";
             boolean insert = true;
-            String SRSName = "4326";
+            String srsName = "4326";
             if (position.getSrsName() != null)
-                SRSName = position.getSrsName();
+                srsName = position.getSrsName();
 
-            if (SRSName.equals("27582")) {
+            if (srsName.equals("27582")) {
                 request = request + " projected_localisations WHERE id='" + physicalID + "'";
                 result2 = stmt2.executeQuery(request);
                 if (!result2.next()) {
                     request = "INSERT INTO projected_localisations VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + position.getSrsName() + "))";
                 } else {
                     insert = false;
-                    logger.severe("Projected sensor location already registred for " + physicalID + " keeping old location");
+                    LOGGER.severe("Projected sensor location already registred for " + physicalID + " keeping old location");
                 }
-            } else if (SRSName.equals("4326")) {
+            } else if (srsName.equals("4326")) {
                 request = request + " geographic_localisations WHERE id='" + physicalID + "'";
                 result2 = stmt2.executeQuery(request);
                 if (!result2.next()) {
                     request = "INSERT INTO geographic_localisations VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + position.getSrsName() + "))";
                 } else {
                     insert = false;
-                    logger.severe("Geographic sensor location already registred for " + physicalID + " keeping old location");
+                    LOGGER.severe("Geographic sensor location already registred for " + physicalID + " keeping old location");
                 }
             } else {
-                throw new CstlServiceException("This CRS " + SRSName + " is not supported", INVALID_PARAMETER_VALUE);
+                throw new CstlServiceException("This CRS " + srsName + " is not supported", INVALID_PARAMETER_VALUE);
             }
-            logger.info(request);
+            LOGGER.info(request);
             if (insert) {
                 stmt2.executeUpdate(request);
             }
             result2.close();
             stmt2.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
@@ -243,11 +244,11 @@ public class DefaultObservationWriter implements ObservationWriter {
             obsTable.clear();
             offTable.clear();
             refTable.clear();
-            OMDatabase.close();
+            omDatabase.close();
         } catch (CatalogException ex) {
-            logger.severe("Catalog exception while destroying observation writer");
+            LOGGER.severe("Catalog exception while destroying observation writer");
         } catch (SQLException ex) {
-            logger.severe("SQL exception while destroying observation writer");
+            LOGGER.severe("SQL exception while destroying observation writer");
         }
     }
 

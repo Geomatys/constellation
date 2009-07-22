@@ -64,7 +64,7 @@ public class SOService {
     /**
      * use for debugging purpose
      */
-    Logger logger = Logger.getLogger("org.constellation.sos");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
     
     /**
      * A map containing the Capabilities Object already load from file.
@@ -95,9 +95,10 @@ public class SOService {
      * Initialize the database connection.
      */
     public SOService() throws JAXBException, CstlServiceException {
-       worker = new SOSworker(null);
-       JAXBContext jbcontext = JAXBContext.newInstance("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml");
-       unmarshaller = jbcontext.createUnmarshaller();
+       worker                      = new SOSworker(null);
+       final JAXBContext jbcontext = JAXBContext.newInstance("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml");
+       unmarshaller                = jbcontext.createUnmarshaller();
+
        //TODO find real url
        worker.setServiceURL("http://localhost:8080/SOServer/SOService");
     }
@@ -112,7 +113,7 @@ public class SOService {
     @WebMethod(action="getCapabilities")
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilities requestCapabilities) throws SOServiceException  {
         try {
-            logger.info("received SOAP getCapabilities request");
+            LOGGER.info("received SOAP getCapabilities request");
             worker.setSkeletonCapabilities((Capabilities)getCapabilitiesObject());
              
             return worker.getCapabilities(requestCapabilities);
@@ -133,7 +134,7 @@ public class SOService {
     @WebMethod(action="describeSensor")
     public AbstractSensorML describeSensor(@WebParam(name = "DescribeSensor") DescribeSensor requestDescSensor) throws SOServiceException  {
         try {
-            logger.info("received SOAP DescribeSensor request");
+            LOGGER.info("received SOAP DescribeSensor request");
             return worker.describeSensor(requestDescSensor);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -152,7 +153,7 @@ public class SOService {
     @WebMethod(action="getObservation")
     public ObservationCollectionEntry getObservation(@WebParam(name = "GetObservation") GetObservation requestObservation) throws SOServiceException {
         try {
-            logger.info("received SOAP getObservation request");
+            LOGGER.info("received SOAP getObservation request");
             return (ObservationCollectionEntry) worker.getObservation(requestObservation);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -168,7 +169,7 @@ public class SOService {
     @WebMethod(action="getResult")
     public GetResultResponse getResult(@WebParam(name = "GetResult") GetResult requestResult) throws SOServiceException {
         try {
-            logger.info("received SOAP getResult request");
+            LOGGER.info("received SOAP getResult request");
             return worker.getResult(requestResult);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -187,7 +188,7 @@ public class SOService {
     @WebMethod(action="registerSensor")
     public RegisterSensorResponse registerSensor(@WebParam(name = "RegisterSensor") RegisterSensor requestRegSensor) throws SOServiceException {
         try {
-            logger.info("received SOAP registerSensor request");
+            LOGGER.info("received SOAP registerSensor request");
             return worker.registerSensor(requestRegSensor);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -205,7 +206,7 @@ public class SOService {
     @WebMethod(action="InsertObservation")
     public InsertObservationResponse insertObservation(@WebParam(name = "InsertObservation") InsertObservation requestInsObs) throws SOServiceException {
         try {
-            logger.info("received SOAP insertObservation request");
+            LOGGER.info("received SOAP insertObservation request");
             return worker.insertObservation(requestInsObs);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -222,37 +223,31 @@ public class SOService {
      * @throws JAXBException
      */
     public Object getCapabilitiesObject() throws JAXBException {
-       String fileName = "SOSCapabilities1.0.0.xml";
+       final String fileName = "SOSCapabilities1.0.0.xml";
        
-       if (fileName == null) {
-           return null;
-       } else {
-           Object response = capabilities.get(fileName);
-           if (response == null) {
-           
-               String home;
-                    
-               String env = System.getenv("CATALINA_HOME");
-                // we get the configuration file
-               File path = new File(env + "/sos_configuration/");     
-               //we delete the /WS
-               if (!path.isDirectory()) {
-                    home = System.getProperty("user.home");
-                    if (System.getProperty("os.name", "").startsWith("Windows")) {
-                        path = new File(home, WINDOWS_DIRECTORY);
-                    } else {
-                        path = new File(home, UNIX_DIRECTORY);
-                    }
-                } 
-            
-               File f = new File(path, fileName);
-               logger.info(f.toString());
-               response = unmarshaller.unmarshal(f);
-               capabilities.put(fileName, response);
-           }
-           
-           return response;
-        }
+       Object response = capabilities.get(fileName);
+       if (response == null) {
+
+           String home;
+           final String env = System.getenv("CATALINA_HOME");
+            // we get the configuration file
+           File path = new File(env + "/sos_configuration/");
+           //we delete the /WS
+           if (!path.isDirectory()) {
+                home = System.getProperty("user.home");
+                if (System.getProperty("os.name", "").startsWith("Windows")) {
+                    path = new File(home, WINDOWS_DIRECTORY);
+                } else {
+                    path = new File(home, UNIX_DIRECTORY);
+                }
+            }
+
+           final File f = new File(path, fileName);
+           LOGGER.info(f.toString());
+           response = unmarshaller.unmarshal(f);
+           capabilities.put(fileName, response);
+       }
+       return response;
     }
 }
 

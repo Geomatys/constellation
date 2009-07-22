@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 
 // JAXB dependencies
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -61,7 +62,7 @@ public class MDWebSensorWriter implements SensorWriter {
     /**
      * use for debugging purpose
      */
-    protected Logger logger = Logger.getLogger("org.constellation.sos");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
 
     /**
      * A Writer to the SensorML database.
@@ -71,7 +72,7 @@ public class MDWebSensorWriter implements SensorWriter {
     /**
      * the data catalog for SensorML database.
      */
-    private final Catalog SMLCatalog;
+    private final Catalog sensorMLCatalog;
 
     /**
      * The user who owe the form.
@@ -99,12 +100,12 @@ public class MDWebSensorWriter implements SensorWriter {
      */
     private MarshallerPool marshallerPool;
 
-    public MDWebSensorWriter(Automatic configuration, String sensorIdBase) throws CstlServiceException {
+    public MDWebSensorWriter(final Automatic configuration, final String sensorIdBase) throws CstlServiceException {
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
         // we get the database informations
-        BDD db = configuration.getBdd();
+        final BDD db = configuration.getBdd();
         if (db == null) {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
@@ -112,7 +113,7 @@ public class MDWebSensorWriter implements SensorWriter {
             smlConnection  = db.getConnection();
             sensorMLWriter = new Writer20(smlConnection);
             sensorMLReader = new Reader20(Standard.SENSORML, smlConnection);
-            SMLCatalog     = sensorMLReader.getCatalog("SMLC");
+            sensorMLCatalog     = sensorMLReader.getCatalog("SMLC");
             mainUser       = sensorMLReader.getUser("admin");
 
              //we build the prepared Statement
@@ -122,7 +123,7 @@ public class MDWebSensorWriter implements SensorWriter {
             marshallerPool = new MarshallerPool("http://www.opengis.net/sensorML/1.0", "org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
 
         } catch (JAXBException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("JAXBException while starting the MDweb Senor reader", NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLBException while starting the MDweb Senor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -135,44 +136,44 @@ public class MDWebSensorWriter implements SensorWriter {
             marshaller = marshallerPool.acquireMarshaller();
 
             //we create a new Tempory File SensorML
-            File sensorFile = File.createTempFile("sml", "xml");
+            final File sensorFile = File.createTempFile("sml", "xml");
             marshaller.marshal(process, sensorFile);
 
             //we parse the temporay xmlFile
-            Reader XMLReader = new Reader(sensorMLReader, sensorFile, sensorMLWriter);
+            final Reader xmlReader = new Reader(sensorMLReader, sensorFile, sensorMLWriter);
 
             //and we write it in the sensorML Database
 
-            Form f = XMLReader.readForm(SMLCatalog, mainUser, "source", id, Standard.SENSORML);
+            final Form f = xmlReader.readForm(sensorMLCatalog, mainUser, "source", id, Standard.SENSORML);
             sensorMLWriter.writeForm(f, false, true);
 
         } catch (ParserConfigurationException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("The service has throw a ParserException:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         } catch (SAXException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("The service has throw a SAXException:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         } catch (MalFormedDocumentException ex) {
-            ex.printStackTrace();
-            logger.severe("MalFormedDocumentException:" + ex.getMessage());
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            LOGGER.severe("MalFormedDocumentException:" + ex.getMessage());
             throw new CstlServiceException("The SensorML Document is Malformed:" + ex.getMessage(),
                                           INVALID_PARAMETER_VALUE, "sensorDescription");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("The service cannot build the temporary file",
                                           NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw an IOException:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw an JAXBException:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         } finally {
@@ -187,7 +188,7 @@ public class MDWebSensorWriter implements SensorWriter {
             smlConnection.setAutoCommit(false);
             currentSavePoint = smlConnection.setSavepoint("registerSensorTransaction");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
@@ -200,7 +201,7 @@ public class MDWebSensorWriter implements SensorWriter {
             smlConnection.commit();
             smlConnection.setAutoCommit(true);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
@@ -213,7 +214,7 @@ public class MDWebSensorWriter implements SensorWriter {
             smlConnection.commit();
             smlConnection.setAutoCommit(true);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
@@ -225,15 +226,15 @@ public class MDWebSensorWriter implements SensorWriter {
     @Override
     public int getNewSensorId() throws CstlServiceException {
         try {
-            ResultSet res = newSensorIdStmt.executeQuery();
+            final ResultSet res = newSensorIdStmt.executeQuery();
             int id = -1;
             while (res.next()) {
                 id = res.getInt(1);
             }
             res.close();
-            return (id + 1);
+            return id + 1;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
@@ -244,7 +245,7 @@ public class MDWebSensorWriter implements SensorWriter {
             newSensorIdStmt.close();
             sensorMLWriter.dispose();
         } catch (SQLException ex) {
-            logger.severe("SQLException while closing SOSWorker");
+            LOGGER.severe("SQLException while closing SOSWorker");
         }
     }
 

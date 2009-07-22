@@ -59,7 +59,7 @@ public abstract class GenericReader  {
     /**
      * use for debugging purpose
      */
-    protected Logger logger = Logger.getLogger("org.constellation.sos");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
 
     /**
      * A list of precompiled SQL request returning single value.
@@ -75,7 +75,7 @@ public abstract class GenericReader  {
      * A map binding the statements and the string query used for debug purpose.
      * (because of the implementation of the SQL driver which don't implements the toString method (Oracle))
      */
-    private Map<PreparedStatement, String> StringQueryMap;
+    private Map<PreparedStatement, String> stringQueryMap;
 
     /**
      * A precompiled Statement requesting all The identifiers
@@ -133,7 +133,7 @@ public abstract class GenericReader  {
         this.configuration = configuration;
         advancedJdbcDriver = true;
         try {
-            BDD bdd = configuration.getBdd();
+            final BDD bdd = configuration.getBdd();
             if (bdd != null) {
                 this.connection = bdd.getConnection();
                 initStatement();
@@ -155,7 +155,7 @@ public abstract class GenericReader  {
         this.debugValues   = debugValues;
         singleStatements   = new HashMap<PreparedStatement, List<String>>();
         multipleStatements = new HashMap<PreparedStatement, List<String>>();
-        StringQueryMap     = new HashMap<PreparedStatement, String>();
+        stringQueryMap     = new HashMap<PreparedStatement, String>();
         if (staticParameters != null) {
             this.staticParameters = staticParameters;
         } else {
@@ -168,12 +168,12 @@ public abstract class GenericReader  {
      *
      * @throws java.sql.SQLException
      */
-    private final void initStatement() throws SQLException {
+    private void initStatement() throws SQLException {
         // no main query in sos
-        singleStatements   = new HashMap<PreparedStatement, List<String>>();
-        multipleStatements = new HashMap<PreparedStatement, List<String>>();
-        StringQueryMap     = new HashMap<PreparedStatement, String>();
-        Queries queries = configuration.getQueries();
+        singleStatements      = new HashMap<PreparedStatement, List<String>>();
+        multipleStatements    = new HashMap<PreparedStatement, List<String>>();
+        stringQueryMap        = new HashMap<PreparedStatement, String>();
+        final Queries queries = configuration.getQueries();
         if (queries != null) {
 
             staticParameters = queries.getParameters();
@@ -182,72 +182,73 @@ public abstract class GenericReader  {
             }
 
             // initialize the static parameters obtained by a static query (no parameters & 1 ouput param)
-            Static statique = queries.getStatique();
+            final Static statique = queries.getStatique();
             if (statique != null) {
                 for (Query query : statique.getQuery()) {
                     String varName = null;
                     if (query.getSelect() != null && query.getSelect().getCol() != null) {
                         varName = query.getSelect().getCol().get(0).getVar();
                     }
-                    String textQuery = query.buildSQLQuery(staticParameters);
-                    logger.finer("new Static query: " + textQuery);
-                    Statement stmt =  connection.createStatement();
-                    ResultSet res  = stmt.executeQuery(textQuery);
-                    String parameterValue = "";
+                    final String textQuery = query.buildSQLQuery(staticParameters);
+                    LOGGER.finer("new Static query: " + textQuery);
+                    final Statement stmt =  connection.createStatement();
+                    final ResultSet res  = stmt.executeQuery(textQuery);
+                    final StringBuilder parameterValue = new StringBuilder();
                     while (res.next()) {
-                        parameterValue += "'" + res.getString(1) + "',";
+                        parameterValue.append("'").append(res.getString(1)).append("',");
                     }
                     res.close();
                     stmt.close();
                     //we remove the last ','
+                    String pValue = parameterValue.toString();
                     if (parameterValue.length() > 0)
-                        parameterValue = parameterValue.substring(0, parameterValue.length() - 1);
-                    logger.finer("PUT STATIC QUERY :" + varName + "-" + parameterValue);
-                    staticParameters.put(varName, parameterValue);
+                        pValue = parameterValue.substring(0, parameterValue.length() - 1);
+                    LOGGER.finer("PUT STATIC QUERY :" + varName + "-" + pValue);
+                    staticParameters.put(varName, pValue);
                 }
             }
             
             // initialize the single statements
-            Single single = queries.getSingle();
+            final Single single = queries.getSingle();
             if (single != null) {
                 for (Query query : single.getQuery()) {
-                    List<String> varNames = new ArrayList<String>();
+                    final List<String> varNames = new ArrayList<String>();
                     if (query.getSelect() != null) {
                         for (Column col : query.getSelect().getCol()) {
                             varNames.add(col.getVar());
                         }
                     }
-                    String textQuery = query.buildSQLQuery(staticParameters);
-                    logger.finer("new Single query: " + textQuery);
-                    PreparedStatement stmt =  connection.prepareStatement(textQuery);
+                    final String textQuery = query.buildSQLQuery(staticParameters);
+                    LOGGER.finer("new Single query: " + textQuery);
+                    final PreparedStatement stmt =  connection.prepareStatement(textQuery);
                     singleStatements.put(stmt, varNames);
-                    StringQueryMap.put(stmt, textQuery);
+                    stringQueryMap.put(stmt, textQuery);
                 }
             } else {
-                logger.severe("The configuration file is probably malformed, there is no single query.");
+                LOGGER.severe("The configuration file is probably malformed, there is no single query.");
             }
 
             // initialize the multiple statements
-            MultiFixed multi = queries.getMultiFixed();
+            final MultiFixed multi = queries.getMultiFixed();
             if (multi != null) {
                 for (Query query : multi.getQuery()) {
-                    List<String> varNames = new ArrayList<String>();
+                    final List<String> varNames = new ArrayList<String>();
                     if (query.getSelect() != null) {
                         for (Column col : query.getSelect().getCol()) {
                             varNames.add(col.getVar());
                         }
                     }
-                    String textQuery = query.buildSQLQuery(staticParameters);
-                    logger.finer("new Multiple query: " + textQuery);
-                    PreparedStatement stmt =  connection.prepareStatement(textQuery);
+                    final String textQuery = query.buildSQLQuery(staticParameters);
+                    LOGGER.finer("new Multiple query: " + textQuery);
+                    final PreparedStatement stmt =  connection.prepareStatement(textQuery);
                     multipleStatements.put(stmt, varNames);
-                    StringQueryMap.put(stmt, textQuery);
+                    stringQueryMap.put(stmt, textQuery);
                 }
             } else {
-                logger.severe("The configuration file is probably malformed, there is no single query.");
+                LOGGER.severe("The configuration file is probably malformed, there is no single query.");
             }
         } else {
-            logger.severe("The configuration file is probably malformed, there is no queries part.");
+            LOGGER.severe("The configuration file is probably malformed, there is no queries part.");
         }
     }
 
@@ -297,8 +298,8 @@ public abstract class GenericReader  {
      */
     protected Values loadData(List<String> variables, List<String> parameters) throws CstlServiceException {
 
-        Set<PreparedStatement> subSingleStmts = new HashSet<PreparedStatement>();
-        Set<PreparedStatement> subMultiStmts = new HashSet<PreparedStatement>();
+        final Set<PreparedStatement> subSingleStmts = new HashSet<PreparedStatement>();
+        final Set<PreparedStatement> subMultiStmts  = new HashSet<PreparedStatement>();
         Values values = null;
         for (String var : variables) {
             PreparedStatement stmt = getStatementFromSingleVar(var);
@@ -318,7 +319,7 @@ public abstract class GenericReader  {
                         values.singleValue.put(var, staticParameters.get(var));
                     }
                     if (!debugMode)
-                        logger.severe("no statement found for variable: " + var);
+                        LOGGER.severe("no statement found for variable: " + var);
                 }
             }
         }
@@ -327,7 +328,7 @@ public abstract class GenericReader  {
         }
         
         if (debugMode) {
-            values = debugLoading(variables, parameters);
+            values = debugLoading(parameters);
         } else if (isThreadEnabled) {
             values = paraleleLoading(parameters, subSingleStmts, subMultiStmts);
         } else {
@@ -341,7 +342,7 @@ public abstract class GenericReader  {
      * Load the data in debug mode without queying the database .
      *
      */
-    private Values debugLoading(List<String> variables, List<String> parameters) {
+    private Values debugLoading(List<String> parameters) {
         if (debugValues != null) {
             return debugValues.get(parameters);
         }
@@ -356,7 +357,7 @@ public abstract class GenericReader  {
      * @param subMultiStmts
      */
     private Values sequentialLoading(List<String> parameters, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) throws CstlServiceException {
-        Values values = new Values();
+        final Values values = new Values();
         
         //we extract the single values
         for (PreparedStatement stmt : subSingleStmts) {
@@ -427,12 +428,12 @@ public abstract class GenericReader  {
             try {
                 cs.take().get();
             } catch (InterruptedException ex) {
-               logger.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
+               LOGGER.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-                if (ex.getCause() != null && ex.getCause() instanceof CstlServiceException) {
+                if (ex.getCause() instanceof CstlServiceException) {
                     throw (CstlServiceException) ex.getCause();
                 } else {
-                    logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
+                    LOGGER.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
                 }
             } 
         }
@@ -463,12 +464,12 @@ public abstract class GenericReader  {
             try {
                 cs.take().get();
             } catch (InterruptedException ex) {
-               logger.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
+               LOGGER.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-                if (ex.getCause() != null && ex.getCause() instanceof CstlServiceException) {
+                if (ex.getCause() instanceof CstlServiceException) {
                     throw (CstlServiceException) ex.getCause();
                 } else {
-                    logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
+                    LOGGER.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
                 }
             }
         }
@@ -484,14 +485,14 @@ public abstract class GenericReader  {
     private void fillStatement(PreparedStatement stmt, List<String> parameters) throws SQLException {
         if (parameters == null)
             parameters = new ArrayList<String>();
-        ParameterMetaData meta = stmt.getParameterMetaData();
-        int nbParam = meta.getParameterCount();
+        final ParameterMetaData meta = stmt.getParameterMetaData();
+        final int nbParam = meta.getParameterCount();
         if (nbParam != parameters.size())
             throw new IllegalArgumentException("There is not the good number of parameters specified for this statement: stmt:" + nbParam + " parameters:" + parameters.size());
         
         int i = 1;
         while (i < nbParam + 1) {
-            String parameter = parameters.get(i - 1);
+            final String parameter = parameters.get(i - 1);
 
             // in some jdbc driver (oracle for example) the following instruction is not supported.
             int type = -1;
@@ -499,16 +500,16 @@ public abstract class GenericReader  {
                 try {
                     type = meta.getParameterType(i);
                 } catch (Exception ex) {
-                    logger.warning("unsupported jdbc operation in fillstatement");
+                    LOGGER.warning("unsupported jdbc operation in fillstatement");
                     advancedJdbcDriver = false;
                 }
             }
             if (type == java.sql.Types.INTEGER) {
                 try {
-                    int id = Integer.parseInt(parameter);
+                    final int id = Integer.parseInt(parameter);
                     stmt.setInt(i, id);
                 } catch(NumberFormatException ex) {
-                    logger.severe("unable to parse the int parameter:" + parameter);
+                    LOGGER.severe("unable to parse the int parameter:" + parameter);
                 }
             } else  {
                 stmt.setString(i, parameter);
@@ -518,7 +519,7 @@ public abstract class GenericReader  {
     }
 
     private void fillSingleValues(PreparedStatement stmt, Values values) throws SQLException {
-        ResultSet result = stmt.executeQuery();
+        final ResultSet result = stmt.executeQuery();
         if (result.next()) {
             for (String varName : singleStatements.get(stmt)) {
                 values.addSingleValue(varName, result.getString(varName));
@@ -528,8 +529,8 @@ public abstract class GenericReader  {
     }
 
     private void fillMultipleValues(PreparedStatement stmt, Values values) throws SQLException {
-        ResultSet result = stmt.executeQuery();
-        logger.finer("QUERY:" + stmt.toString());
+        final ResultSet result = stmt.executeQuery();
+        LOGGER.finer("QUERY:" + stmt.toString());
         for (String varName : multipleStatements.get(stmt)) {
             values.createNewMultipleValue(varName);
         }
@@ -549,7 +550,7 @@ public abstract class GenericReader  {
      */
     private PreparedStatement getStatementFromSingleVar(String varName) {
         for (PreparedStatement stmt : singleStatements.keySet()) {
-            List<String> vars = singleStatements.get(stmt);
+            final List<String> vars = singleStatements.get(stmt);
             if (vars.contains(varName))
                 return stmt;
         }
@@ -564,7 +565,7 @@ public abstract class GenericReader  {
      */
     private PreparedStatement getStatementFromMultipleVar(String varName) {
         for (PreparedStatement stmt : multipleStatements.keySet()) {
-            List<String> vars = multipleStatements.get(stmt);
+            final List<String> vars = multipleStatements.get(stmt);
             if (vars.contains(varName))
                 return stmt;
         }
@@ -579,21 +580,23 @@ public abstract class GenericReader  {
      * @param ex
      */
     private void logError(List<String> varList, Exception ex, PreparedStatement stmt) {
-        String varlist = "";
+        final StringBuilder varlist = new StringBuilder();
+        String value;
         if (varList != null) {
             for (String s : varList) {
-                varlist += s + ',';
+                varlist.append(s).append(',');
             }
-            if (varlist.length() > 1);
-                varlist = varlist.substring(0, varlist.length() - 1);
+            value = varlist.toString();
+            if (varlist.length() > 1)
+                value = varlist.substring(0, varlist.length() - 1);
         } else {
-            varlist = "no variables";
+            value = "no variables";
         }
-        logger.severe( ex.getClass().getSimpleName() +
+        LOGGER.severe( ex.getClass().getSimpleName() +
                       " occurs while executing query: "          + '\n' +
-                      "query: " + StringQueryMap.get(stmt)       + '\n' +
+                      "query: " + stringQueryMap.get(stmt)       + '\n' +
                       "cause: " + ex.getMessage()                + '\n' +
-                      "for variable: " + varlist                 + '\n');
+                      "for variable: " + value                   + '\n');
     }
 
     /**
@@ -604,14 +607,14 @@ public abstract class GenericReader  {
     public void reloadConnection() throws CstlServiceException {
         if (!isReconnecting) {
             try {
-               logger.info("refreshing the connection");
-               BDD db          = configuration.getBdd();
+               LOGGER.info("refreshing the connection");
+               final BDD db    = configuration.getBdd();
                this.connection = db.getConnection();
                initStatement();
-               isReconnecting = false;
+               isReconnecting  = false;
 
             } catch(SQLException ex) {
-                logger.severe("SQLException while restarting the connection:" + ex);
+                LOGGER.severe("SQLException while restarting the connection:" + ex);
                 isReconnecting = false;
             }
         }
@@ -619,7 +622,7 @@ public abstract class GenericReader  {
     }
     
     public void destroy() {
-        logger.info("destroying generic reader");
+        LOGGER.info("destroying generic reader");
         try {
             for (PreparedStatement stmt : singleStatements.keySet()) {
                 stmt.close();
@@ -633,12 +636,11 @@ public abstract class GenericReader  {
 
             if (mainStatement != null) {
                 mainStatement.close();
-                mainStatement = null;
             }
 
             pool.shutdown();
         } catch (SQLException ex) {
-            logger.severe("SQLException while destroying Generic metadata reader");
+            LOGGER.severe("SQLException while destroying Generic metadata reader");
         }
     }
 }

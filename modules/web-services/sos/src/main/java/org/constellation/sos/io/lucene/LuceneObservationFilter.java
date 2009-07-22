@@ -28,67 +28,79 @@ import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 
 /**
- *
+ * TODO
+ * 
  * @author Guilhem Legal (Geomatys)
  */
 public class LuceneObservationFilter implements ObservationFilter {
 
+    private static final String NOT_SUPPORTED_YET = "Not supported yet.";
+
+    private String observationIdBase;
+    private String observationTemplateIdBase;
+    private Properties map;
+    private Automatic configuration;
+
     public LuceneObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
-        
+        this.configuration             = configuration;
+        this.map                       = map;
+        this.observationIdBase         = observationIdBase;
+        this.observationTemplateIdBase = observationTemplateIdBase;
     }
+    
     @Override
     public void initFilterObservation(ResponseModeType requestMode) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void initFilterGetResult(String procedure) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void setProcedure(List<String> procedures, ObservationOfferingEntry off) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void setFeatureOfInterest(List<String> fois) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void setTimeEquals(Object time) throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void setTimeBefore(Object time) throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void setTimeAfter(Object time) throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public void setTimeDuring(Object time) throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public List<ObservationResult> filterResult() throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
     public List<String> filterObservation() throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     public String getInfos() {

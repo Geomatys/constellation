@@ -34,24 +34,49 @@ import org.opengis.observation.Observation;
  * @author Guilhem Legal (Geomatys)
  */
 public interface ObservationWriter {
+
+    /**
+     * Write a new Observation into the database
+     *
+     * @param observation An O&M observation
+     *
+     * @return The new identifiers of the observation
+     *
+     * @throws CstlServiceException
+     */
+    String writeObservation(Observation observation) throws CstlServiceException;
+
+    /**
+     * Write a new Measurement into the database
+     *
+     * @param measurement An O&M measurement
+     *
+     * @return The new identifiers of the observation
+     *
+     * @throws CstlServiceException
+     */
+    String writeMeasurement(Measurement measurement) throws CstlServiceException;
+
+    /**
+     * Write a new Observation offering into the database
+     *
+     * @param offering
+     * @return
+     * @throws CstlServiceException
+     */
+    String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException;
     
-    public String writeObservation(Observation observation) throws CstlServiceException;
-    
-    public String writeMeasurement(Measurement measurement) throws CstlServiceException;
-    
-    public String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException;
-    
-    public void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno,
+    void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno,
             OfferingSamplingFeatureEntry offSF) throws CstlServiceException;
     
-    public void updateOfferings();
+    void updateOfferings();
     
-    public void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException;
+    void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.
      */
-    public String getInfos();
+    String getInfos();
     
-    public void destroy();
+    void destroy();
 }

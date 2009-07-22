@@ -21,6 +21,8 @@ package org.constellation.sos.io.filesystem;
 import java.io.File;
 
 // JAXB dependencies
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -53,14 +55,14 @@ public class FileSensorReader implements SensorReader {
 
             this.dataDirectory  = configuration.getdataDirectory();
         } catch (JAXBException ex) {
-            ex.printStackTrace();
+            Logger.getAnonymousLogger().log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("JAXBException while starting the file system Sensor reader", NO_APPLICABLE_CODE);
         } 
     }
 
     @Override
     public AbstractSensorML getSensor(String sensorId) throws CstlServiceException {
-        File sensorFile = new File(dataDirectory, sensorId + ".xml");
+        final File sensorFile = new File(dataDirectory, sensorId + ".xml");
         if (sensorFile.exists()){
             Unmarshaller unmarshaller = null;
             try {

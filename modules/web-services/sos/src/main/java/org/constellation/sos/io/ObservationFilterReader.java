@@ -27,12 +27,12 @@ import org.opengis.observation.Observation;
  */
 public interface ObservationFilterReader extends ObservationFilter {
 
-    public List<Observation> getObservationTemplates() throws CstlServiceException;
+    List<Observation> getObservationTemplates() throws CstlServiceException;
 
-    public List<Observation> getObservations() throws CstlServiceException;
+    List<Observation> getObservations() throws CstlServiceException;
 
-    public String getResults() throws CstlServiceException;
+    String getResults() throws CstlServiceException;
 
-    public String getOutOfBandResults() throws CstlServiceException;
+    String getOutOfBandResults() throws CstlServiceException;
 
 }

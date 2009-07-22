@@ -53,7 +53,7 @@ public interface ObservationReader {
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    public Collection<String> getOfferingNames() throws CstlServiceException;
+    Collection<String> getOfferingNames() throws CstlServiceException;
 
     /**
      * Return The offering with the specified name.
@@ -62,28 +62,28 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException;
+    ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException;
 
     /**
      * Return a list of all the offerings.
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException;
+    List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException;
 
     /**
      * Return a list of the sensor identifiers.
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public Collection<String> getProcedureNames() throws CstlServiceException;
+    Collection<String> getProcedureNames() throws CstlServiceException;
 
     /**
      * Return a list of the phenomenon identifiers.
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public Collection<String> getPhenomenonNames() throws CstlServiceException;
+    Collection<String> getPhenomenonNames() throws CstlServiceException;
 
     /**
      * Return a phenomenon with the specified identifier
@@ -91,7 +91,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public Phenomenon getPhenomenon(String phenomenonName) throws CstlServiceException;
+    Phenomenon getPhenomenon(String phenomenonName) throws CstlServiceException;
 
     /**
      * Return a list of sampling feature identifiers.
@@ -99,7 +99,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public Collection<String> getFeatureOfInterestNames() throws CstlServiceException;
+    Collection<String> getFeatureOfInterestNames() throws CstlServiceException;
 
     /**
      * Return a sampling feature for the specified sampling feature.
@@ -108,7 +108,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public SamplingFeature getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException;
+    SamplingFeature getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException;
 
     /**
      * Return an observation for the specified identifier.
@@ -117,7 +117,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public Observation getObservation(String identifier) throws CstlServiceException;
+    Observation getObservation(String identifier) throws CstlServiceException;
 
     /**
      * Return a result for the specified identifier.
@@ -126,7 +126,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public AnyResult getResult(String identifier) throws CstlServiceException;
+    AnyResult getResult(String identifier) throws CstlServiceException;
 
     /**
      * Return a reference from the specified identifier
@@ -134,35 +134,35 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public ReferenceEntry getReference(String href) throws CstlServiceException;
+    ReferenceEntry getReference(String href) throws CstlServiceException;
     
     /**
      * Create a new identifier for an observation.
      */
-    public String getNewObservationId() throws CstlServiceException;
+    String getNewObservationId() throws CstlServiceException;
     
     /**
      * Return the minimal/maximal value for the offering event Time
      */
-    public List<String> getEventTime() throws CstlServiceException;
+    List<String> getEventTime() throws CstlServiceException;
 
     /**
      * Return the list of supported response Mode
      */
-    public List<ResponseModeType> getResponseModes() throws CstlServiceException;
+    List<ResponseModeType> getResponseModes() throws CstlServiceException;
 
     /**
      * Return the list of supported response Mode
      */
-    public List<String> getResponseFormats() throws CstlServiceException;
+    List<String> getResponseFormats() throws CstlServiceException;
     
     /**
      * Return informations about the implementation class.
      */
-    public String getInfos();
+    String getInfos();
     
     /**
      * free the resources and close the database connection if there is one.
      */
-    public void destroy();
+    void destroy();
 }

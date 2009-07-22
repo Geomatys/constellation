@@ -35,14 +35,14 @@ public interface SensorWriter {
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    public void writeSensor(String id, AbstractSensorML sensor) throws CstlServiceException;
+    void writeSensor(String id, AbstractSensorML sensor) throws CstlServiceException;
 
     /**
      * Start a transaction on the datasource.
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    public void startTransaction() throws CstlServiceException;
+    void startTransaction() throws CstlServiceException;
 
     /**
      * Abort if there is a transaction running.
@@ -50,7 +50,7 @@ public interface SensorWriter {
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    public void abortTransaction() throws CstlServiceException;
+    void abortTransaction() throws CstlServiceException;
 
     /**
      * End a transaction (if there is one running)
@@ -58,20 +58,20 @@ public interface SensorWriter {
      * 
      * @throws org.constellation.ws.CstlServiceException
      */
-    public void endTransaction() throws CstlServiceException;
+    void endTransaction() throws CstlServiceException;
 
     /**
      * Create a new identifier for a sensor.
      */
-    public int getNewSensorId() throws CstlServiceException;
+    int getNewSensorId() throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.
      */
-    public String getInfos();
+    String getInfos();
 
     /**
      * Free the resources and close the connections to datasource.
      */
-    public void destroy();
+    void destroy();
 }

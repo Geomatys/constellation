@@ -28,6 +28,7 @@ import com.sun.jersey.spi.resource.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -62,6 +63,8 @@ public class SOService extends OGCWebService {
 
     private SOSworker worker;
 
+    private static final String TEXT_XML = "text/xml";
+
     /**
      * Build a new Restfull SOS service.
      */
@@ -85,22 +88,22 @@ public class SOService extends OGCWebService {
                 request = (String) getParameter("REQUEST", true);
 
              if (request.equalsIgnoreCase("GetObservation") || (objectRequest instanceof GetObservation)) {
-                GetObservation go = (GetObservation)objectRequest;
+                final GetObservation go = (GetObservation) objectRequest;
                 if (go == null){
                     throw new CstlServiceException("The operation GetObservation is only requestable in XML",
                                                      OPERATION_NOT_SUPPORTED, "GetObservation");
                 }
                 serviceDef = getVersionFromNumber(go.getVersion());
-                Object response = worker.getObservation(go);
+                final Object response = worker.getObservation(go);
 
                 String outputFormat = go.getResponseFormat();
-                if (outputFormat != null  && outputFormat.startsWith("text/xml")) {
-                    outputFormat = "text/xml";
+                if (outputFormat != null  && outputFormat.startsWith(TEXT_XML)) {
+                    outputFormat = TEXT_XML;
                 }
 
                 String marshalled;
                 if (response instanceof ObservationCollectionEntry) {
-                     StringWriter sw = new StringWriter();
+                     final StringWriter sw = new StringWriter();
                      marshaller.marshal(response, sw);
                      marshalled = sw.toString();
                 } else if (response instanceof String) {
@@ -119,52 +122,52 @@ public class SOService extends OGCWebService {
                     ds = createDescribeSensor();
                 }
                 serviceDef = getVersionFromNumber(ds.getVersion());
-                StringWriter sw = new StringWriter();
+                final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.describeSensor(ds), sw);
 
-                return Response.ok(sw.toString(), "text/xml").build();
+                return Response.ok(sw.toString(), TEXT_XML).build();
 
              }
 
              if (request.equalsIgnoreCase("InsertObservation") || (objectRequest instanceof InsertObservation)) {
-                InsertObservation is = (InsertObservation)objectRequest;
+                final InsertObservation is = (InsertObservation)objectRequest;
                 if (is == null){
                     throw new CstlServiceException("The operation InsertObservation is only requestable in XML",
                                                      OPERATION_NOT_SUPPORTED, "InsertObservation");
                 }
                 serviceDef = getVersionFromNumber(is.getVersion());
-                StringWriter sw = new StringWriter();
+                final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.insertObservation(is), sw);
 
-                return Response.ok(sw.toString(), "text/xml").build();
+                return Response.ok(sw.toString(), TEXT_XML).build();
 
              }
 
              if (request.equalsIgnoreCase("GetResult") || (objectRequest instanceof GetResult)) {
-                GetResult gr = (GetResult)objectRequest;
+                final GetResult gr = (GetResult)objectRequest;
                 if (gr == null){
                     throw new CstlServiceException("The operation GetResult is only requestable in XML",
                                                      OPERATION_NOT_SUPPORTED, "GetResult");
                 }
                 serviceDef = getVersionFromNumber(gr.getVersion());
-                StringWriter sw = new StringWriter();
+                final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getResult(gr), sw);
 
-                return Response.ok(sw.toString(), "text/xml").build();
+                return Response.ok(sw.toString(), TEXT_XML).build();
 
              }
 
              if (request.equalsIgnoreCase("RegisterSensor") || (objectRequest instanceof RegisterSensor)) {
-                RegisterSensor rs = (RegisterSensor)objectRequest;
+                final RegisterSensor rs = (RegisterSensor)objectRequest;
                 if (rs == null){
                     throw new CstlServiceException("The operation RegisterSensor is only requestable in XML",
                                                   OPERATION_NOT_SUPPORTED, "RegisterSensor");
                 }
                 serviceDef = getVersionFromNumber(rs.getVersion());
-                StringWriter sw = new StringWriter();
+                final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.registerSensor(rs), sw);
 
-                return Response.ok(sw.toString(), "text/xml").build();
+                return Response.ok(sw.toString(), TEXT_XML).build();
 
              }
 
@@ -181,7 +184,7 @@ public class SOService extends OGCWebService {
                 }
                 if (gc.getVersion() != null)
                     serviceDef = getVersionFromNumber(gc.getVersion().toString());
-                StringWriter sw = new StringWriter();
+                final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(gc), sw);
 
                 return Response.ok(sw.toString(), worker.getOutputFormat()).build();
@@ -216,7 +219,7 @@ public class SOService extends OGCWebService {
                 !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                 !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
@@ -225,11 +228,11 @@ public class SOService extends OGCWebService {
             if (serviceDef == null) {
                 serviceDef = getBestVersion(null);
             }
-            StringWriter sw = new StringWriter();
-            ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(),
+            final StringWriter sw = new StringWriter();
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(),
                                                          serviceDef.exceptionVersion.toString());
             marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
         } else {
             return Response.ok("The SOS server is not running cause: unable to create JAXB context!", "text/plain").build();
         }
@@ -251,11 +254,11 @@ public class SOService extends OGCWebService {
             versions = new AcceptVersionsType("1.0.0");
         }
 
-        AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
+        final AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
 
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid.
-        String section = getParameter("Sections", false);
+        final String section = getParameter("Sections", false);
         List<String> requestedSections = new ArrayList<String>();
         if (section != null && !section.equalsIgnoreCase("All")) {
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
@@ -272,7 +275,7 @@ public class SOService extends OGCWebService {
             //if there is no requested Sections we add all the sections
             requestedSections = SectionsType.getExistingSections("1.1.1");
         }
-        SectionsType sections     = new SectionsType(requestedSections);
+        final SectionsType sections     = new SectionsType(requestedSections);
         return new GetCapabilities(versions,
                                    sections,
                                    formats,

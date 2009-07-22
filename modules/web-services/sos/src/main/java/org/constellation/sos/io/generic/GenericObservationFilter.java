@@ -58,9 +58,9 @@ import static org.constellation.sos.ws.Utils.*;
  */
 public class GenericObservationFilter implements ObservationFilter {
 
-    public final Query configurationQuery;
+    private final Query configurationQuery;
 
-    public Query currentQuery;
+    private Query currentQuery;
 
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
@@ -70,7 +70,7 @@ public class GenericObservationFilter implements ObservationFilter {
     /**
      * use for debugging purpose
      */
-    protected Logger logger = Logger.getLogger("org.constellation.sos");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
 
     /**
      * The base for observation id.
@@ -96,16 +96,16 @@ public class GenericObservationFilter implements ObservationFilter {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
         // we get the database informations
-        BDD db = configuration.getBdd();
+        final BDD db = configuration.getBdd();
         if (db == null) {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
         try {
-            JAXBContext context = JAXBContext.newInstance("org.constellation.generic.filter");
-            Unmarshaller unmarshaller = context.createUnmarshaller();
-            File affinage = new File(configuration.getConfigurationDirectory(), "affinage.xml");
+            final JAXBContext context = JAXBContext.newInstance("org.constellation.generic.filter");
+            final Unmarshaller unmarshaller = context.createUnmarshaller();
+            final File affinage = new File(configuration.getConfigurationDirectory(), "affinage.xml");
             if (affinage.exists()) {
-                Object object = unmarshaller.unmarshal(affinage);
+                final Object object = unmarshaller.unmarshal(affinage);
                 if (object instanceof Query)
                     this.configurationQuery = (Query) object;
                 else
@@ -127,10 +127,10 @@ public class GenericObservationFilter implements ObservationFilter {
      */
     @Override
     public void initFilterObservation(ResponseModeType requestMode) {
-        currentQuery  = new Query();
-        Select select = configurationQuery.getSelect("filterObservation");
-        From from     = configurationQuery.getFrom("observations");
-        Where where   = configurationQuery.getWhere("observationType");
+        currentQuery        = new Query();
+        final Select select = configurationQuery.getSelect("filterObservation");
+        final From from     = configurationQuery.getFrom("observations");
+        final Where where   = configurationQuery.getWhere("observationType");
 
         if (requestMode == INLINE) {
             where.replaceVariable("observationIdBase", observationIdBase, false);
@@ -147,10 +147,10 @@ public class GenericObservationFilter implements ObservationFilter {
      */
     @Override
     public void initFilterGetResult(String procedure) {
-        currentQuery  = new Query();
-        Select select = configurationQuery.getSelect("filterResult");
-        From from     = configurationQuery.getFrom("observations");
-        Where where   = configurationQuery.getWhere("procedure");
+        currentQuery        = new Query();
+        final Select select = configurationQuery.getSelect("filterResult");
+        final From from     = configurationQuery.getFrom("observations");
+        final Where where   = configurationQuery.getWhere("procedure");
         where.replaceVariable("procedure", procedure, true);
         currentQuery.addSelect(select);
         currentQuery.addFrom(from);
@@ -173,7 +173,7 @@ public class GenericObservationFilter implements ObservationFilter {
                     if (dbId == null) {
                         dbId = s;
                     }
-                    Where where = configurationQuery.getWhere("procedure");
+                    final Where where = configurationQuery.getWhere("procedure");
                     where.replaceVariable("procedure", dbId, true);
                     currentQuery.addWhere(where);
                 }
@@ -181,7 +181,7 @@ public class GenericObservationFilter implements ObservationFilter {
         } else {
             //if is not specified we use all the process of the offering
             for (ReferenceEntry proc : off.getProcedure()) {
-                 Where where = configurationQuery.getWhere("procedure");
+                 final Where where = configurationQuery.getWhere("procedure");
                  where.replaceVariable("procedure", proc.getHref(), true);
                  currentQuery.addWhere(where);
             }
@@ -197,12 +197,12 @@ public class GenericObservationFilter implements ObservationFilter {
     @Override
     public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon) {
         for (String p : phenomenon) {
-            Where where = configurationQuery.getWhere("simplePhenomenon");
+            final Where where = configurationQuery.getWhere("simplePhenomenon");
             where.replaceVariable("phenomenon", p, true);
             currentQuery.addWhere(where);
         }
         for (String p : compositePhenomenon) {
-            Where where = configurationQuery.getWhere("compositePhenomenon");
+            final Where where = configurationQuery.getWhere("compositePhenomenon");
             where.replaceVariable("phenomenon", p, true);
             currentQuery.addWhere(where);
         }
@@ -217,7 +217,7 @@ public class GenericObservationFilter implements ObservationFilter {
     @Override
     public void setFeatureOfInterest(List<String> fois) {
         for (String foi : fois) {
-            Where where = configurationQuery.getWhere("foi");
+            final Where where = configurationQuery.getWhere("foi");
             where.replaceVariable("foi", foi, true);
             currentQuery.addWhere(where);
         }
@@ -232,21 +232,21 @@ public class GenericObservationFilter implements ObservationFilter {
     @Override
     public void setTimeEquals(Object time) throws CstlServiceException {
         if (time instanceof TimePeriodType) {
-            TimePeriodType tp = (TimePeriodType) time;
-            String begin = getTimeValue(tp.getBeginPosition());
-            String end = getTimeValue(tp.getEndPosition());
+            final TimePeriodType tp = (TimePeriodType) time;
+            final String begin      = getTimeValue(tp.getBeginPosition());
+            final String end        = getTimeValue(tp.getEndPosition());
 
-            Where where = configurationQuery.getWhere("tequalsTP");
+            final Where where       = configurationQuery.getWhere("tequalsTP");
             where.replaceVariable("begin", begin, true);
             where.replaceVariable("end", end, true);
             currentQuery.addWhere(where);
 
         // if the temporal object is a timeInstant
         } else if (time instanceof TimeInstantType) {
-            TimeInstantType ti = (TimeInstantType) time;
-            String position = getTimeValue(ti.getTimePosition());
+            final TimeInstantType ti = (TimeInstantType) time;
+            final String position = getTimeValue(ti.getTimePosition());
 
-            Where where = configurationQuery.getWhere("tequalsTI");
+            final Where where = configurationQuery.getWhere("tequalsTI");
             where.replaceVariable("position", position, true);
             currentQuery.addWhere(where);
 
@@ -266,10 +266,10 @@ public class GenericObservationFilter implements ObservationFilter {
     public void setTimeBefore(Object time) throws CstlServiceException  {
         // for the operation before the temporal object must be an timeInstant
         if (time instanceof TimeInstantType) {
-            TimeInstantType ti = (TimeInstantType) time;
-            String position = getTimeValue(ti.getTimePosition());
+            final TimeInstantType ti = (TimeInstantType) time;
+            final String position = getTimeValue(ti.getTimePosition());
             
-            Where where = configurationQuery.getWhere("tbefore");
+            final Where where = configurationQuery.getWhere("tbefore");
             where.replaceVariable("time", position, true);
             currentQuery.addWhere(where);
 
@@ -289,10 +289,10 @@ public class GenericObservationFilter implements ObservationFilter {
     public void setTimeAfter(Object time) throws CstlServiceException {
         // for the operation after the temporal object must be an timeInstant
         if (time instanceof TimeInstantType) {
-            TimeInstantType ti = (TimeInstantType) time;
-            String position = getTimeValue(ti.getTimePosition());
+            final TimeInstantType ti = (TimeInstantType) time;
+            final String position    = getTimeValue(ti.getTimePosition());
             
-            Where where = configurationQuery.getWhere("tafter");
+            final Where where        = configurationQuery.getWhere("tafter");
             where.replaceVariable("time", position, true);
             currentQuery.addWhere(where);
 
@@ -311,11 +311,11 @@ public class GenericObservationFilter implements ObservationFilter {
     @Override
     public void setTimeDuring(Object time) throws CstlServiceException {
         if (time instanceof TimePeriodType) {
-            TimePeriodType tp = (TimePeriodType) time;
-            String begin = getTimeValue(tp.getBeginPosition());
-            String end = getTimeValue(tp.getEndPosition());
+            final TimePeriodType tp = (TimePeriodType) time;
+            final String begin      = getTimeValue(tp.getBeginPosition());
+            final String end        = getTimeValue(tp.getEndPosition());
 
-            Where where = configurationQuery.getWhere("tduring");
+            final Where where = configurationQuery.getWhere("tduring");
             where.replaceVariable("begin", begin, true);
             where.replaceVariable("end", end, true);
             currentQuery.addWhere(where);
@@ -328,12 +328,12 @@ public class GenericObservationFilter implements ObservationFilter {
 
     @Override
     public List<ObservationResult> filterResult() throws CstlServiceException {
-        String request = currentQuery.buildSQLQuery();
-        logger.info("request:" + request);
+        final String request = currentQuery.buildSQLQuery();
+        LOGGER.info("request:" + request);
         try {
-            List<ObservationResult> results = new ArrayList<ObservationResult>();
-            Statement currentStatement = connection.createStatement();
-            ResultSet result = currentStatement.executeQuery(request);
+            final List<ObservationResult> results = new ArrayList<ObservationResult>();
+            final Statement currentStatement      = connection.createStatement();
+            final ResultSet result                = currentStatement.executeQuery(request);
             while (result.next()) {
                 results.add(new ObservationResult(result.getString(1),
                                                   result.getTimestamp(2),
@@ -344,7 +344,7 @@ public class GenericObservationFilter implements ObservationFilter {
             return results;
 
         } catch (SQLException ex) {
-            logger.severe("SQLExcpetion while executing the query: " + request);
+            LOGGER.severe("SQLExcpetion while executing the query: " + request);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
@@ -353,12 +353,12 @@ public class GenericObservationFilter implements ObservationFilter {
 
     @Override
     public List<String> filterObservation() throws CstlServiceException {
-        String request = currentQuery.buildSQLQuery();
-        logger.info("request:" + request);
+        final String request = currentQuery.buildSQLQuery();
+        LOGGER.info("request:" + request);
         try {
-            List<String> results = new ArrayList<String>();
-            Statement currentStatement = connection.createStatement();
-            ResultSet result = currentStatement.executeQuery(request);
+            final List<String> results       = new ArrayList<String>();
+            final Statement currentStatement = connection.createStatement();
+            final ResultSet result           = currentStatement.executeQuery(request);
             while (result.next()) {
                 results.add(result.getString(1));
             }
@@ -366,7 +366,7 @@ public class GenericObservationFilter implements ObservationFilter {
             currentStatement.close();
             return results;
         } catch (SQLException ex) {
-            logger.severe("SQLException while executing the query: " + request);
+            LOGGER.severe("SQLException while executing the query: " + request);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }

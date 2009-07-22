@@ -33,12 +33,12 @@ public interface ObservationFilter {
     /**
      * Initialize the query.
      */
-    public void initFilterObservation(ResponseModeType requestMode);
+    void initFilterObservation(ResponseModeType requestMode);
 
     /**
      * Initialize the query.
      */
-    public void initFilterGetResult(String procedure);
+    void initFilterGetResult(String procedure);
 
     /**
      * Add some procedure filter to the request.
@@ -47,7 +47,7 @@ public interface ObservationFilter {
      * @param procedures
      * @param off
      */
-    public void setProcedure(List<String> procedures, ObservationOfferingEntry off);
+    void setProcedure(List<String> procedures, ObservationOfferingEntry off);
 
     /**
      * Add some phenomenon filter to the request.
@@ -55,7 +55,7 @@ public interface ObservationFilter {
      * @param phenomenon
      * @param compositePhenomenon
      */
-    public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon);
+    void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon);
 
     /**
      * Add some sampling point filter to the request.
@@ -63,7 +63,7 @@ public interface ObservationFilter {
      * @param phenomenon
      * @param compositePhenomenon
      */
-    public void setFeatureOfInterest(List<String> fois);
+    void setFeatureOfInterest(List<String> fois);
 
     /**
      * Add a TM_Equals filter to the current request.
@@ -71,7 +71,7 @@ public interface ObservationFilter {
      * @param time
      * @throws org.constellation.ws.CstlServiceException
      */
-    public void setTimeEquals(Object time) throws CstlServiceException;
+     void setTimeEquals(Object time) throws CstlServiceException;
 
     /**
      * Add a TM_Before filter to the current request.
@@ -79,7 +79,7 @@ public interface ObservationFilter {
      * @param time
      * @throws org.constellation.ws.CstlServiceException
      */
-    public void setTimeBefore(Object time) throws CstlServiceException;
+    void setTimeBefore(Object time) throws CstlServiceException;
 
     /**
      * Add a TM_After filter to the current request.
@@ -87,7 +87,7 @@ public interface ObservationFilter {
      * @param time
      * @throws org.constellation.ws.CstlServiceException
      */
-    public void setTimeAfter(Object time) throws CstlServiceException;
+    void setTimeAfter(Object time) throws CstlServiceException;
 
     /**
      * Add a TM_During filter to the current request.
@@ -95,7 +95,7 @@ public interface ObservationFilter {
      * @param time
      * @throws org.constellation.ws.CstlServiceException
      */
-    public void setTimeDuring(Object time) throws CstlServiceException;
+    void setTimeDuring(Object time) throws CstlServiceException;
 
     /**
      * Add a BBOX filter to the current request.
@@ -104,7 +104,7 @@ public interface ObservationFilter {
      * @param e
      * @throws org.constellation.ws.CstlServiceException
      */
-    public void setBoundingBox(EnvelopeEntry e) throws CstlServiceException;
+    void setBoundingBox(EnvelopeEntry e) throws CstlServiceException;
 
     /**
      * Execute the current query and return a list of observation result.
@@ -112,22 +112,22 @@ public interface ObservationFilter {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public List<ObservationResult> filterResult() throws CstlServiceException;
+    List<ObservationResult> filterResult() throws CstlServiceException;
 
     /**
      * Execute the current query and return a list of observation ID.
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    public List<String> filterObservation() throws CstlServiceException;
+    List<String> filterObservation() throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.
      */
-    public String getInfos();
+    String getInfos();
 
     /**
      * Return true if each observation has a position
      */
-    public boolean isBoundedObservation();
+    boolean isBoundedObservation();
 }

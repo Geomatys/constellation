@@ -40,8 +40,10 @@ import org.opengis.observation.Observation;
  */
 public class Normalizer {
 
-    private static Logger logger = Logger.getLogger("org.constellation.sos");
+    private static final Logger logger = Logger.getLogger("org.constellation.sos");
 
+    private Normalizer() {}
+    
     /**
      * Normalize the capabilities document by replacing the double by reference
      *
@@ -50,7 +52,7 @@ public class Normalizer {
      * @return a normalized document
      */
     public static Capabilities normalizeDocument(Capabilities capa){
-        List<PhenomenonPropertyType> alreadySee = new ArrayList<PhenomenonPropertyType>();
+        final List<PhenomenonPropertyType> alreadySee = new ArrayList<PhenomenonPropertyType>();
         if (capa.getContents() != null) {
             for (ObservationOfferingEntry off: capa.getContents().getObservationOfferingList().getObservationOffering()) {
                 for (PhenomenonPropertyType pheno: off.getRealObservedProperty()) {
@@ -58,7 +60,7 @@ public class Normalizer {
                         pheno.setToHref();
                     } else {
                         if (pheno.getPhenomenon() instanceof CompositePhenomenonEntry) {
-                            CompositePhenomenonEntry compo = (CompositePhenomenonEntry) pheno.getPhenomenon();
+                            final CompositePhenomenonEntry compo = (CompositePhenomenonEntry) pheno.getPhenomenon();
                             for (PhenomenonPropertyType pheno2: compo.getRealComponent()) {
                                 if (alreadySee.contains(pheno2)) {
                                     pheno2.setToHref();
@@ -88,26 +90,25 @@ public class Normalizer {
             return new ObservationCollectionEntry("urn:ogc:def:nil:OGC:inapplicable");
         }
 
-        List<FeaturePropertyType>          foiAlreadySee   = new ArrayList<FeaturePropertyType> ();
-        List<PhenomenonPropertyType>       phenoAlreadySee = new ArrayList<PhenomenonPropertyType>();
-        List<AbstractEncodingProperty>     encAlreadySee   = new ArrayList<AbstractEncodingProperty>();
-        List<DataComponentProperty>        dataAlreadySee  = new ArrayList<DataComponentProperty>();
-        int index = 0;
+        final List<FeaturePropertyType>      foiAlreadySee   = new ArrayList<FeaturePropertyType> ();
+        final List<PhenomenonPropertyType>   phenoAlreadySee = new ArrayList<PhenomenonPropertyType>();
+        final List<AbstractEncodingProperty> encAlreadySee   = new ArrayList<AbstractEncodingProperty>();
+        final List<DataComponentProperty>    dataAlreadySee  = new ArrayList<DataComponentProperty>();
         for (Observation observation: collection.getMember()) {
             //we do this for the feature of interest
-            FeaturePropertyType foi = ((ObservationEntry)observation).getPropertyFeatureOfInterest();
+            final FeaturePropertyType foi = ((ObservationEntry)observation).getPropertyFeatureOfInterest();
             if (foiAlreadySee.contains(foi)){
                 foi.setToHref();
             } else {
                 foiAlreadySee.add(foi);
             }
             //for the phenomenon
-            PhenomenonPropertyType phenomenon = ((ObservationEntry)observation).getPropertyObservedProperty();
+            final PhenomenonPropertyType phenomenon = ((ObservationEntry)observation).getPropertyObservedProperty();
             if (phenoAlreadySee.contains(phenomenon)){
                 phenomenon.setToHref();
             } else {
                 if (phenomenon.getPhenomenon() instanceof CompositePhenomenonEntry) {
-                    CompositePhenomenonEntry compo = (CompositePhenomenonEntry) phenomenon.getPhenomenon();
+                    final CompositePhenomenonEntry compo = (CompositePhenomenonEntry) phenomenon.getPhenomenon();
                     for (PhenomenonPropertyType pheno2: compo.getRealComponent()) {
                         if (phenoAlreadySee.contains(pheno2)) {
                                     pheno2.setToHref();
@@ -120,10 +121,10 @@ public class Normalizer {
             }
             //for the result : textBlock encoding and element type
             if (observation.getResult() instanceof DataArrayProperty) {
-                DataArray array = ((DataArrayProperty)observation.getResult()).getDataArray();
+                final DataArray array = ((DataArrayProperty)observation.getResult()).getDataArray();
 
                 //element type
-                DataComponentProperty elementType = array.getPropertyElementType();
+                final DataComponentProperty elementType = array.getPropertyElementType();
                 if (dataAlreadySee.contains(elementType)){
                     elementType.setToHref();
                 } else {
@@ -131,7 +132,7 @@ public class Normalizer {
                 }
 
                 //encoding
-                AbstractEncodingProperty encoding = array.getPropertyEncoding();
+                final AbstractEncodingProperty encoding = array.getPropertyEncoding();
                 if (encAlreadySee.contains(encoding)){
                     encoding.setToHref();
 
@@ -144,7 +145,6 @@ public class Normalizer {
                 else
                     logger.severe("NormalizeDocument: The result is null");
             }
-            index++;
         }
         return collection;
     }

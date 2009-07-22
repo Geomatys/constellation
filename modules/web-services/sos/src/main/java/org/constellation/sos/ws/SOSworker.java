@@ -39,6 +39,7 @@ import java.util.StringTokenizer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.FileHandler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -140,13 +141,13 @@ import org.geotoolkit.util.logging.MonolineFormatter;
  */
 public class SOSworker {
 
-    public final static int DISCOVERY     = 0;
-    public final static int TRANSACTIONAL = 1;
+    public static final int DISCOVERY     = 0;
+    public static final int TRANSACTIONAL = 1;
     
     /**
      * use for debugging purpose
      */
-    protected Logger logger = Logger.getLogger("org.constellation.sos");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
     
     /**
      * A list of temporary ObservationTemplate
@@ -171,7 +172,7 @@ public class SOSworker {
     /**
      * The base for offering id.
      */ 
-    private final String offeringIdBase = "offering-";
+    private final static String OFFERING_ID_BASE = "offering-";
     
     /**
      * The base for phenomenon id.
@@ -211,7 +212,7 @@ public class SOSworker {
     /**
      * A list of supported MIME type 
      */
-    private final static List<String> ACCEPTED_OUTPUT_FORMATS;
+    private static final List<String> ACCEPTED_OUTPUT_FORMATS;
     static {
         ACCEPTED_OUTPUT_FORMATS = Arrays.asList("text/xml", "application/xml", "text/plain");
     }
@@ -229,32 +230,32 @@ public class SOSworker {
     /**
      * The Observation database reader
      */
-    private ObservationReader OMReader;
+    private ObservationReader omReader;
     
     /**
      * The Observation database writer
      */
-    private ObservationWriter OMWriter;
+    private ObservationWriter omWriter;
 
     /**
      * The observation filter
      */
-    private ObservationFilter OMFilter;
+    private ObservationFilter omFilter;
     
     /**
      * The sensorML database reader
      */
-    private SensorReader SMLReader;
+    private SensorReader smlReader;
     
     /**
      * The sensorML database writer
      */
-    private SensorWriter SMLWriter;
+    private SensorWriter smlWriter;
 
     /**
      * The base Qname for complex observation.
      */
-    public static final QName observation_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
+    public static final QName OBSERVATION_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
 
     /**
      * A registry factory allowing to load carious SOS factory in function of the build implementation.
@@ -285,8 +286,8 @@ public class SOSworker {
             configurationDirectory = getConfigDirectory();
         }
 
-        logger.info("path to config file=" + configurationDirectory);
-
+        LOGGER.info("path to config file=" + configurationDirectory);
+        String notWorkingMsg = "The SOS service is not running!";
         
         isStarted = true;
         SOSConfiguration configuration = null;
@@ -294,20 +295,20 @@ public class SOSworker {
         // Database configuration
         try {
 
-            Unmarshaller configUM = JAXBContext.newInstance(SOSConfiguration.class).createUnmarshaller();
-            File configFile = new File(configurationDirectory, "config.xml");
+            final Unmarshaller configUM = JAXBContext.newInstance(SOSConfiguration.class).createUnmarshaller();
+            final File configFile = new File(configurationDirectory, "config.xml");
             if (configFile.exists()) {
-                Object object = configUM.unmarshal(configFile);
+                final Object object = configUM.unmarshal(configFile);
                 if (object instanceof SOSConfiguration) {
                     configuration = (SOSConfiguration) object;
                 } else {
-                    logger.severe("The SOS service is not running!"              + '\n' +
+                    LOGGER.severe(notWorkingMsg                                  + '\n' +
                             "cause: The generic configuration file is malformed" + '\n');
                     isStarted = false;
                     return;
                 }
             } else {
-                logger.severe("The SOS service is not running!" + '\n' +
+                LOGGER.severe(notWorkingMsg                            + '\n' +
                         "cause: The configuration file can't be found" + '\n');
                 isStarted = false;
                 return;
@@ -315,59 +316,59 @@ public class SOSworker {
 
             if (configuration.getLogFolder() != null) {
                 initLogger("", configuration.getLogFolder());
-                logger.info("Redirecting the log to: " + configuration.getLogFolder());
+                LOGGER.info("Redirecting the log to: " + configuration.getLogFolder());
             }
             this.profile = configuration.getProfile();
             if (this.profile == DISCOVERY) {
-                logger.info("Discovery profile loaded." + '\n');
+                LOGGER.info("Discovery profile loaded." + '\n');
             } else {
-                logger.info("Transactional profile loaded." + '\n');
+                LOGGER.info("Transactional profile loaded." + '\n');
             }
 
             // the file who record the map between phisycal ID and DB ID.
             loadMapping(configurationDirectory);
 
             //we get the O&M filter Type
-            ObservationFilterType OMFilterType = configuration.getObservationFilterType();
+            final ObservationFilterType omFilterType = configuration.getObservationFilterType();
 
             //we get the O&M reader Type
-            ObservationReaderType OMReaderType = configuration.getObservationReaderType();
+            final ObservationReaderType omReaderType = configuration.getObservationReaderType();
 
             //we get the O&M writer Type
-            ObservationWriterType OMWriterType = configuration.getObservationWriterType();
+            final ObservationWriterType omWriterType = configuration.getObservationWriterType();
 
             //we get the Sensor reader type
-            DataSourceType SMLType = configuration.getSMLType();
+            final DataSourceType smlType = configuration.getSMLType();
 
-            Automatic SMLConfiguration = configuration.getSMLConfiguration();
-            if (SMLConfiguration == null) {
-                logger.severe("The SOS service is not running!" + '\n' +
+            final Automatic smlConfiguration = configuration.getSMLConfiguration();
+            if (smlConfiguration == null) {
+                LOGGER.severe(notWorkingMsg + '\n' +
                         "cause: The configuration file does not contains a SML configuration");
                 isStarted = false;
                 return;
             }
-            SMLConfiguration.setConfigurationDirectory(configurationDirectory);
+            smlConfiguration.setConfigurationDirectory(configurationDirectory);
 
-            Automatic OMConfiguration = configuration.getOMConfiguration();
-            if (OMConfiguration == null) {
-                logger.severe("The SOS service is not running!" + '\n' +
+            final Automatic omConfiguration = configuration.getOMConfiguration();
+            if (omConfiguration == null) {
+                LOGGER.severe(notWorkingMsg + '\n' +
                         "cause: The configuration file does not contains a O&M configuration");
                 isStarted = false;
                 return;
             }
-            OMConfiguration.setConfigurationDirectory(configurationDirectory);
+            omConfiguration.setConfigurationDirectory(configurationDirectory);
 
             // we load the factory from the available classes
-            AbstractSOSFactory SOSfactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
+            final AbstractSOSFactory sosFactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
         
             //we initialize the properties attribute
-            String observationIdBase  = configuration.getObservationIdBase() != null ?
+            final String observationIdBase  = configuration.getObservationIdBase() != null ?
             configuration.getObservationIdBase() : "urn:ogc:object:observation:unknow:";
 
             sensorIdBase              = configuration.getSensorIdBase() != null ?
             configuration.getSensorIdBase() : "urn:ogc:object:sensor:unknow:";
 
-            phenomenonIdBase              = configuration.getPhenomenonIdBase() != null ?
+            phenomenonIdBase          = configuration.getPhenomenonIdBase() != null ?
             configuration.getPhenomenonIdBase() : "urn:ogc:def:phenomenon:OGC:1.0.30:";
 
             observationTemplateIdBase = configuration.getObservationTemplateIdBase() != null ?
@@ -381,36 +382,36 @@ public class SOSworker {
                 String validTime = configuration.getTemplateValidTime();
                 if (validTime == null || validTime.equals("") || validTime.indexOf(':') == -1) {
                     validTime = "1:00";
-                    logger.info("using default template valid time: one hour.\n");
+                    LOGGER.info("using default template valid time: one hour.\n");
                 }
                 h = Integer.parseInt(validTime.substring(0, validTime.indexOf(':')));
                 m = Integer.parseInt(validTime.substring(validTime.indexOf(':') + 1));
             } catch (NumberFormatException ex) {
-                logger.info("using default template valid time: one hour.\n");
+                LOGGER.info("using default template valid time: one hour.\n");
                 h = 1;
                 m = 0;
             }
             templateValidTime = (h * 3600000) + (m * 60000);
 
             // we initialize the reader/writer/filter
-            SMLReader = SOSfactory.getSensorReader(SMLType, SMLConfiguration, sensorIdBase, map);
-            SMLWriter = SOSfactory.getSensorWriter(SMLType, SMLConfiguration, sensorIdBase);
-            OMReader  = SOSfactory.getObservationReader(OMReaderType, OMConfiguration, observationIdBase);
-            OMWriter  = SOSfactory.getObservationWriter(OMWriterType, OMConfiguration);
-            OMFilter  = SOSfactory.getObservationFilter(OMFilterType, observationIdBase, observationTemplateIdBase, map, OMConfiguration);
+            smlReader = sosFactory.getSensorReader(smlType, smlConfiguration, sensorIdBase, map);
+            smlWriter = sosFactory.getSensorWriter(smlType, smlConfiguration, sensorIdBase);
+            omReader  = sosFactory.getObservationReader(omReaderType, omConfiguration, observationIdBase);
+            omWriter  = sosFactory.getObservationWriter(omWriterType, omConfiguration);
+            omFilter  = sosFactory.getObservationFilter(omFilterType, observationIdBase, observationTemplateIdBase, map, omConfiguration);
 
             //we initialize the variables depending on the Reader capabilities
-            this.acceptedResponseMode   = OMReader.getResponseModes();
-            this.acceptedResponseFormat = OMReader.getResponseFormats();
+            this.acceptedResponseMode   = omReader.getResponseModes();
+            this.acceptedResponseFormat = omReader.getResponseFormats();
             
             // we log some implementation informations
             logInfos();
 
-            logger.info("SOS service running" + '\n');
+            LOGGER.info("SOS service running" + '\n');
             
 
         } catch (JAXBException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             String msg;
             if (ex.getMessage() != null) {
                 msg = ex.getMessage();
@@ -421,13 +422,13 @@ public class SOSworker {
                     msg = "no message";
                 }
             }
-            logger.severe("The SOS service is not running!" + '\n' + "cause: JAXBException:" + ex.getMessage());
+            LOGGER.severe(notWorkingMsg + '\n' + "cause: JAXBException:" + msg);
             isStarted = false;
         } catch (FactoryNotFoundException ex) {
-            logger.severe("The SOS service is not working!" + '\n' + "cause: Unable to find a SOS Factory");
+            LOGGER.severe(notWorkingMsg + '\n' + "cause: Unable to find a SOS Factory");
             isStarted = false;
         } catch (CstlServiceException ex) {
-            logger.severe("The SOS service is not working!" + '\n' + "cause:" + ex.getMessage());
+            LOGGER.severe(notWorkingMsg + '\n' + "cause:" + ex.getMessage());
             isStarted = false;
         }
     }
@@ -436,33 +437,34 @@ public class SOSworker {
      * Log some informations about the implementations classes for reader / writer / filter object.
      */
     public void logInfos() {
-        if (SMLReader != null) {
-            logger.info(SMLReader.getInfos() + " loaded.\n");
+        String loaded =  " loaded.\n";
+        if (smlReader != null) {
+            LOGGER.info(smlReader.getInfos() + loaded);
         } else {
-            logger.warning("No SensorML reader loaded.\n");
+            LOGGER.warning("No SensorML reader loaded.\n");
         }
         if ( profile == TRANSACTIONAL) {
-            if (SMLWriter != null) {
-                logger.info(SMLWriter.getInfos() + " loaded.\n");
+            if (smlWriter != null) {
+                LOGGER.info(smlWriter.getInfos() + loaded);
             } else {
-                logger.warning("No SensorML writer loaded.\n");
+                LOGGER.warning("No SensorML writer loaded.\n");
             }
         }
-        if (OMReader != null) {
-            logger.info(OMReader.getInfos() + " loaded.\n");
+        if (omReader != null) {
+            LOGGER.info(omReader.getInfos() + loaded);
         } else {
-            logger.warning("No O&M reader loaded.\n");
+            LOGGER.warning("No O&M reader loaded.\n");
         }
-        if (OMFilter != null) {
-            logger.info(OMFilter.getInfos() + " loaded.\n");
+        if (omFilter != null) {
+            LOGGER.info(omFilter.getInfos() + loaded);
         } else {
-            logger.warning("No O&M filter loaded.\n");
+            LOGGER.warning("No O&M filter loaded.\n");
         }
         if ( profile == TRANSACTIONAL) {
-            if (OMWriter != null) {
-                logger.info(OMWriter.getInfos() + " loaded.\n");
+            if (omWriter != null) {
+                LOGGER.info(omWriter.getInfos() + loaded);
             } else {
-                logger.warning("No O&M writer loaded.\n");
+                LOGGER.warning("No O&M writer loaded.\n");
             }
         }
     }
@@ -476,20 +478,23 @@ public class SOSworker {
     private void loadMapping(File configDir) {
         // the file who record the map between phisycal ID and DB ID.
         try {
-            File f = new File(configDir, "mapping.properties");
+            final File f = new File(configDir, "mapping.properties");
             if (f.exists()) {
-                FileInputStream in = new FileInputStream(f);
+                final FileInputStream in = new FileInputStream(f);
                 map.load(in);
                 in.close();
             } else {
-                logger.info("No mapping file found creating one.");
-                f.createNewFile();
+                LOGGER.info("No mapping file found creating one.");
+                boolean created = f.createNewFile();
+                if (!created) {
+                    LOGGER.warning("unable to create a new empty mapping file.");
+                }
             }
         } catch (FileNotFoundException e) {
             // this tecnically can't happen
-            logger.warning("File Not Found Exception while loading the mapping file");
+            LOGGER.warning("File Not Found Exception while loading the mapping file");
         }  catch (IOException e) {
-            logger.severe("IO Exception while loading the mapping file:" + e.getMessage());
+            LOGGER.severe("IO Exception while loading the mapping file:" + e.getMessage());
         }
     }
     /**
@@ -500,8 +505,8 @@ public class SOSworker {
      */
     public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws CstlServiceException {
         isWorking();
-        logger.info("getCapabilities request processing" + '\n');
-        long start = System.currentTimeMillis();
+        LOGGER.info("getCapabilities request processing" + '\n');
+        final long start = System.currentTimeMillis();
         
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
@@ -513,14 +518,14 @@ public class SOSworker {
             throw new CstlServiceException("Service must be specified!",
                                              MISSING_PARAMETER_VALUE, "service");
         }
-        AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
+        final AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
         if (versions != null) {
             if (!versions.getVersion().contains("1.0.0")){
                  throw new CstlServiceException("version available : 1.0.0",
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
         }
-        AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
+        final AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
         if (formats != null && formats.getOutputFormat().size() > 0 ) {
             boolean found = false;
             for (String form: formats.getOutputFormat()) {
@@ -584,33 +589,33 @@ public class SOSworker {
 
 
            //we update the parameter in operation metadata.
-           Operation go = om.getOperation("GetObservation");
+           final Operation go = om.getOperation("GetObservation");
 
            // the list of offering names
-           go.updateParameter("offering", OMReader.getOfferingNames());
+           go.updateParameter("offering", omReader.getOfferingNames());
 
            // the event time range
-           List<String> eventTime = OMReader.getEventTime();
+           final List<String> eventTime = omReader.getEventTime();
            if (eventTime != null && eventTime.size() == 1) {
-               RangeType range = new RangeType(eventTime.get(0), "now");
+               final RangeType range = new RangeType(eventTime.get(0), "now");
                go.updateParameter("eventTime", range);
            } else if (eventTime != null && eventTime.size() == 2) {
-               RangeType range = new RangeType(eventTime.get(0), eventTime.get(1));
+               final RangeType range = new RangeType(eventTime.get(0), eventTime.get(1));
                go.updateParameter("eventTime", range);
            }
 
            //the process list
-           Collection<String> procNames  = OMReader.getProcedureNames();
+           final Collection<String> procNames  = omReader.getProcedureNames();
            go.updateParameter("procedure", procNames);
 
            //the phenomenon list
-           go.updateParameter("observedProperty", OMReader.getPhenomenonNames());
+           go.updateParameter("observedProperty", omReader.getPhenomenonNames());
 
            //the feature of interest list
-           go.updateParameter("featureOfInterest", OMReader.getFeatureOfInterestNames());
+           go.updateParameter("featureOfInterest", omReader.getFeatureOfInterestNames());
 
            // the different responseMode available
-           List<String> arm = new ArrayList<String>();
+           final List<String> arm = new ArrayList<String>();
            for (ResponseModeType rm: acceptedResponseMode) {
                arm.add(rm.value());
            }
@@ -619,7 +624,7 @@ public class SOSworker {
            // the different responseFormat available
            go.updateParameter("responseFormat", acceptedResponseFormat);
 
-           Operation ds = om.getOperation("DescribeSensor");
+           final Operation ds = om.getOperation("DescribeSensor");
            ds.updateParameter("procedure", procNames);
 
         }
@@ -632,7 +637,7 @@ public class SOSworker {
 
         if (sections.getSection().contains("Contents") || sections.getSection().contains("All")) {
             // we add the list of observation ofeerings 
-            ObservationOfferingList ool = new ObservationOfferingList(OMReader.getObservationOfferings());
+            final ObservationOfferingList ool = new ObservationOfferingList(omReader.getObservationOfferings());
             cont = new Contents(ool);
         }
         c = new Capabilities(si, sp, om, "1.0.0", null, fc, cont);
@@ -640,7 +645,7 @@ public class SOSworker {
         // we normalize the document
         c = normalizeDocument(c);
 
-        logger.info("getCapabilities processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        LOGGER.info("getCapabilities processed in " + (System.currentTimeMillis() - start) + "ms.\n");
         return c;
     }
     
@@ -650,8 +655,8 @@ public class SOSworker {
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
      */
     public AbstractSensorML describeSensor(DescribeSensor requestDescSensor) throws CstlServiceException  {
-        logger.info("DescribeSensor request processing"  + '\n');
-        long start = System.currentTimeMillis();
+        LOGGER.info("DescribeSensor request processing"  + '\n');
+        final long start = System.currentTimeMillis();
 
         // we get the form
         verifyBaseRequest(requestDescSensor);
@@ -671,10 +676,10 @@ public class SOSworker {
             throw new CstlServiceException("You must specify the sensor ID!",
                                          MISSING_PARAMETER_VALUE, "procedure");
         }
-        String sensorId = requestDescSensor.getProcedure();
+        final String sensorId = requestDescSensor.getProcedure();
 
-        AbstractSensorML result = SMLReader.getSensor(sensorId);
-        logger.info("describeSensor processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        final AbstractSensorML result = smlReader.getSensor(sensorId);
+        LOGGER.info("describeSensor processed in " + (System.currentTimeMillis() - start) + "ms.\n");
         return result;
     }
     
@@ -685,8 +690,8 @@ public class SOSworker {
      * @param requestObservation a document specifying the parameter of the request.
      */
     public Object getObservation(GetObservation requestObservation) throws CstlServiceException {
-        logger.info("getObservation request processing"  + '\n');
-        long start = System.currentTimeMillis();
+        LOGGER.info("getObservation request processing"  + '\n');
+        final long start = System.currentTimeMillis();
         
         //we verify the base request attribute
         verifyBaseRequest(requestObservation);
@@ -694,12 +699,12 @@ public class SOSworker {
         //we verify that the output format is good.     
         if (requestObservation.getResponseFormat() != null) {
             if (!acceptedResponseFormat.contains(requestObservation.getResponseFormat())) {
-                String arf = "";
+                StringBuilder arf = new StringBuilder();
                 for (String s : acceptedResponseFormat) {
-                    arf = arf + s + '\n';
+                    arf.append(s).append('\n');
                 }
                 throw new CstlServiceException(requestObservation.getResponseFormat() + " is not accepted for responseFormat.\n" +
-                                               "Accepted values are:\n" + arf,
+                                               "Accepted values are:\n" + arf.toString(),
                                                INVALID_PARAMETER_VALUE, "responseFormat");
             }
         } else {
@@ -732,7 +737,7 @@ public class SOSworker {
             }
         }
         try {
-            OMFilter.initFilterObservation(mode);
+            omFilter.initFilterObservation(mode);
         } catch (IllegalArgumentException ex) {
             throw new CstlServiceException(ex);
         }
@@ -757,7 +762,7 @@ public class SOSworker {
             throw new CstlServiceException("Offering must be specify!",
                                              MISSING_PARAMETER_VALUE, "offering");
         } else {
-            off = OMReader.getObservationOffering(requestObservation.getOffering());
+            off = omReader.getObservationOffering(requestObservation.getOffering());
             if (off == null) {
                 throw new CstlServiceException("This offering is not registered in the service",
                                               INVALID_PARAMETER_VALUE, "offering");
@@ -786,15 +791,15 @@ public class SOSworker {
         }
 
         //we get the list of process
-        List<String> procedures = requestObservation.getProcedure();
+        final List<String> procedures = requestObservation.getProcedure();
         for (String s : procedures) {
             if (s != null) {
                 String dbId = map.getProperty(s);
                 if (dbId == null) {
                     dbId = s;
                 }
-                logger.info("process ID: " + dbId);
-                ReferenceEntry proc = OMReader.getReference(dbId);
+                LOGGER.info("process ID: " + dbId);
+                final ReferenceEntry proc = omReader.getReference(dbId);
                 if (proc == null) {
                     throw new CstlServiceException(" this process is not registred in the table",
                             INVALID_PARAMETER_VALUE, "procedure");
@@ -811,21 +816,21 @@ public class SOSworker {
                 }
             }
         }
-        OMFilter.setProcedure(procedures, off);
+        omFilter.setProcedure(procedures, off);
 
         //we get the list of phenomenon
         //TODO verifier que les pheno appartiennent a l'offering
-        List<String> observedProperties = requestObservation.getObservedProperty();
+        final List<String> observedProperties = requestObservation.getObservedProperty();
         if (observedProperties.size() != 0 ) {
-            List<String> singlePhenomenons    = new ArrayList<String>();
-            List<String> compositePhenomenons = new ArrayList<String>();
+            final List<String> singlePhenomenons    = new ArrayList<String>();
+            final List<String> compositePhenomenons = new ArrayList<String>();
             for (String phenomenonName : observedProperties) {
-                logger.info("phenomenon:" + phenomenonName + " phenomenonIdBase:" + phenomenonIdBase);
+                LOGGER.info("phenomenon:" + phenomenonName + " phenomenonIdBase:" + phenomenonIdBase);
                 if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
                     phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
                 }
-                logger.info("phenomenon:" + phenomenonName);
-                Phenomenon phen = OMReader.getPhenomenon(phenomenonName);
+                LOGGER.info("phenomenon:" + phenomenonName);
+                final Phenomenon phen = omReader.getPhenomenon(phenomenonName);
                 if (phen == null) {
                     throw new CstlServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",
                             INVALID_PARAMETER_VALUE, "observedProperty");
@@ -837,29 +842,29 @@ public class SOSworker {
                     singlePhenomenons.add(phenomenonName);
                 }
             }
-            OMFilter.setObservedProperties(singlePhenomenons, compositePhenomenons);
+            omFilter.setObservedProperties(singlePhenomenons, compositePhenomenons);
         }
 
 
         //we treat the time restriction
-        List<EventTime> times = requestObservation.getEventTime();
-        AbstractTimeGeometricPrimitiveType templateTime = treatEventTimeRequest(times, template);
+        final List<EventTime> times = requestObservation.getEventTime();
+        final AbstractTimeGeometricPrimitiveType templateTime = treatEventTimeRequest(times, template);
 
         //we treat the restriction on the feature of interest
         if (requestObservation.getFeatureOfInterest() != null) {
-            GetObservation.FeatureOfInterest foiRequest = requestObservation.getFeatureOfInterest();
+            final GetObservation.FeatureOfInterest foiRequest = requestObservation.getFeatureOfInterest();
 
             // if the request is a list of station
             if (!foiRequest.getObjectID().isEmpty()) {
 
                 //verify that the station is registred in the DB.
-                Collection<String> fois = OMReader.getFeatureOfInterestNames();
+                final Collection<String> fois = omReader.getFeatureOfInterestNames();
                 for (final String samplingFeatureName : foiRequest.getObjectID()) {
                     if (!fois.contains(samplingFeatureName))
                         throw new CstlServiceException("the feature of interest "+ samplingFeatureName + " is not registered",
                                                          INVALID_PARAMETER_VALUE, "featureOfInterest");
                 }
-                OMFilter.setFeatureOfInterest(foiRequest.getObjectID());
+                omFilter.setFeatureOfInterest(foiRequest.getObjectID());
 
             // if the request is a spatial operator
             } else {
@@ -870,19 +875,19 @@ public class SOSworker {
                         foiRequest.getBBOX().getEnvelope().getLowerCorner().getValue().size() == 2 &&
                         foiRequest.getBBOX().getEnvelope().getUpperCorner().getValue().size() == 2) {
                         
-                        EnvelopeEntry e = foiRequest.getBBOX().getEnvelope();
+                        final EnvelopeEntry e = foiRequest.getBBOX().getEnvelope();
                         boolean add     = false;
-                        List<String> matchingFeatureOfInterest = new ArrayList<String>();
-                        if (OMFilter.isBoundedObservation()) {
-                            OMFilter.setBoundingBox(e);
+                        final List<String> matchingFeatureOfInterest = new ArrayList<String>();
+                        if (omFilter.isBoundedObservation()) {
+                            omFilter.setBoundingBox(e);
                         } else {
                             for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
-                                SamplingPoint station = (SamplingPointEntry) OMReader.getFeatureOfInterest(refStation.getHref());
+                                final SamplingPoint station = (SamplingPoint) omReader.getFeatureOfInterest(refStation.getHref());
                                 if (station == null)
                                     throw new CstlServiceException("the feature of interest is not registered",
                                             INVALID_PARAMETER_VALUE);
                                 if (station instanceof SamplingPointEntry) {
-                                    SamplingPointEntry sp = (SamplingPointEntry) station;
+                                    final SamplingPointEntry sp = (SamplingPointEntry) station;
                                     if (sp.getPosition() != null && sp.getPosition().getPos() != null && sp.getPosition().getPos().getValue().size() >= 2) {
                                         if (sp.getPosition().getPos().getValue().get(0) > e.getUpperCorner().getValue().get(0) &&
                                             sp.getPosition().getPos().getValue().get(0) < e.getLowerCorner().getValue().get(0) &&
@@ -892,15 +897,17 @@ public class SOSworker {
                                             matchingFeatureOfInterest.add(sp.getId());
                                             add = true;
                                         } else {
-                                            logger.info(" the feature of interest " + sp.getId() + " is not in the BBOX");
+                                            LOGGER.info(" the feature of interest " + sp.getId() + " is not in the BBOX");
                                         }
                                     } else {
-                                        logger.severe(" the feature of interest " + sp.getId() + " does not have proper position");
+                                        LOGGER.severe(" the feature of interest " + sp.getId() + " does not have proper position");
                                     }
+                                } else {
+                                    LOGGER.severe("unknow implementation:" + station.getClass().getName());
                                 }
                             }
                             if (add) {
-                                OMFilter.setFeatureOfInterest(matchingFeatureOfInterest);
+                                omFilter.setFeatureOfInterest(matchingFeatureOfInterest);
                             }
                         }
                         
@@ -918,13 +925,13 @@ public class SOSworker {
 
         //TODO we treat the restriction on the result
         if (requestObservation.getResult() != null) {
-            GetObservation.Result result = requestObservation.getResult();
+            final GetObservation.Result result = requestObservation.getResult();
 
             //we treat the different operation
             if (result.getPropertyIsLessThan() != null) {
 
-                String propertyName  = result.getPropertyIsLessThan().getPropertyName();
-                LiteralType literal  = result.getPropertyIsLessThan().getLiteral() ;
+                final String propertyName  = result.getPropertyIsLessThan().getPropertyName();
+                final LiteralType literal  = result.getPropertyIsLessThan().getLiteral() ;
                 if (literal == null || propertyName == null || propertyName.equals("")) {
                     throw new CstlServiceException(" to use the operation Less Than you must specify the propertyName and the litteral",
                                                   MISSING_PARAMETER_VALUE, "lessThan");
@@ -933,8 +940,8 @@ public class SOSworker {
 
             } else if (result.getPropertyIsGreaterThan() != null) {
 
-                String propertyName  = result.getPropertyIsGreaterThan().getPropertyName();
-                LiteralType literal  = result.getPropertyIsGreaterThan().getLiteral();
+                final String propertyName  = result.getPropertyIsGreaterThan().getPropertyName();
+                final LiteralType literal  = result.getPropertyIsGreaterThan().getLiteral();
                 if (propertyName == null || propertyName.equals("") || literal == null) {
                     throw new CstlServiceException(" to use the operation Greater Than you must specify the propertyName and the litteral",
                                                  MISSING_PARAMETER_VALUE, "greaterThan");
@@ -942,8 +949,8 @@ public class SOSworker {
 
             } else if (result.getPropertyIsEqualTo() != null) {
 
-                String propertyName  = result.getPropertyIsEqualTo().getPropertyName();
-                LiteralType literal  = result.getPropertyIsEqualTo().getLiteral();
+                final String propertyName  = result.getPropertyIsEqualTo().getPropertyName();
+                final LiteralType literal  = result.getPropertyIsEqualTo().getLiteral();
                 if (propertyName == null || propertyName.equals("") || literal == null) {
                      throw new CstlServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
                                                    MISSING_PARAMETER_VALUE, "propertyIsEqualTo");
@@ -956,20 +963,19 @@ public class SOSworker {
 
             } else if (result.getPropertyIsBetween() != null) {
 
-                logger.info("PROP IS BETWEEN");
+                LOGGER.info("PROP IS BETWEEN");
                 if (result.getPropertyIsBetween().getPropertyName() == null) {
                     throw new CstlServiceException("To use the operation Between you must specify the propertyName and the litteral",
                                                   MISSING_PARAMETER_VALUE, "propertyIsBetween");
                 }
-                String propertyName  = result.getPropertyIsBetween().getPropertyName();
+                
+                final String propertyName       = result.getPropertyIsBetween().getPropertyName();
+                final LiteralType lowerLiteral  = result.getPropertyIsBetween().getLowerBoundary().getLiteral();
+                final LiteralType upperLiteral  = result.getPropertyIsBetween().getUpperBoundary().getLiteral();
 
-                LiteralType LowerLiteral  = result.getPropertyIsBetween().getLowerBoundary().getLiteral();
-                LiteralType UpperLiteral  = result.getPropertyIsBetween().getUpperBoundary().getLiteral();
-
-                if (propertyName == null || propertyName.equals("") || LowerLiteral == null || UpperLiteral == null) {
+                if (propertyName == null || propertyName.equals("") || lowerLiteral == null || upperLiteral == null) {
                         throw new CstlServiceException("This property name, lower and upper literal must be specify",
                                                       INVALID_PARAMETER_VALUE, "result");
-
                 }
 
             } else {
@@ -981,7 +987,7 @@ public class SOSworker {
         Object response;
         if (!outOfBand) {
 
-            ObservationCollectionEntry OCresponse = new ObservationCollectionEntry();
+            ObservationCollectionEntry ocResponse = new ObservationCollectionEntry();
             
             /*
              * here we can have 2 different behaviour :
@@ -997,61 +1003,61 @@ public class SOSworker {
             List<Observation> matchingResult = new ArrayList<Observation>();
 
             // case (1)
-            if (!(OMFilter instanceof ObservationFilterReader)) {
-                List<String> observationIDs = OMFilter.filterObservation();
+            if (!(omFilter instanceof ObservationFilterReader)) {
+                final List<String> observationIDs = omFilter.filterObservation();
                 for (String observationID : observationIDs) {
-                    matchingResult.add(OMReader.getObservation(observationID));
+                    matchingResult.add(omReader.getObservation(observationID));
                 }
 
             // case (2)
             } else {
-                ObservationFilterReader OMFR = (ObservationFilterReader) OMFilter;
+                final ObservationFilterReader omFR = (ObservationFilterReader) omFilter;
                 if (template) {
-                    matchingResult = OMFR.getObservationTemplates();
+                    matchingResult = omFR.getObservationTemplates();
                 } else {
-                    matchingResult = OMFR.getObservations();
+                    matchingResult = omFR.getObservations();
                 }
             }
 
             for (Observation o : matchingResult) {
                 if (template) {
 
-                    String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
-                    ObservationEntry temporaryTemplate = ((ObservationEntry) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
+                    final String temporaryTemplateId = o.getName() + '-' + getTemplateSuffix(o.getName());
+                    final ObservationEntry temporaryTemplate = ((ObservationEntry) o).getTemporaryTemplate(temporaryTemplateId, templateTime);
                     templates.put(temporaryTemplateId, temporaryTemplate);
 
                     // we launch a timer which will destroy the template in one hours
-                    Timer t = new Timer();
+                    final Timer t = new Timer();
                     //we get the date and time for now
-                    Date d = new Date(System.currentTimeMillis() + templateValidTime);
-                    logger.info("this template will be destroyed at:" + d.toString());
+                    final Date d = new Date(System.currentTimeMillis() + templateValidTime);
+                    LOGGER.info("this template will be destroyed at:" + d.toString());
                     t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
                     schreduledTask.add(t);
 
-                    OCresponse.add(temporaryTemplate);
+                    ocResponse.add(temporaryTemplate);
                 } else {
-                    OCresponse.add((ObservationEntry) o);
+                    ocResponse.add((ObservationEntry) o);
 
                     //we stop the request if its too big
-                    if (OCresponse.getMember().size() > maxObservationByRequest) {
+                    if (ocResponse.getMember().size() > maxObservationByRequest) {
                         throw new CstlServiceException("Your request is to voluminous please add filter and try again",
                                 NO_APPLICABLE_CODE);
                     }
                 }
             }
-            OCresponse.setBoundedBy(getCollectionBound(OCresponse));
-            OCresponse = normalizeDocument(OCresponse);
-            response = OCresponse;
+            ocResponse.setBoundedBy(getCollectionBound(ocResponse));
+            ocResponse = normalizeDocument(ocResponse);
+            response = ocResponse;
         } else {
-            String Sreponse = "";
-            if ((OMFilter instanceof ObservationFilterReader)) {
-                Sreponse = ((ObservationFilterReader)OMFilter).getOutOfBandResults();
+            String sReponse = "";
+            if (omFilter instanceof ObservationFilterReader) {
+                sReponse = ((ObservationFilterReader)omFilter).getOutOfBandResults();
             } else {
                 throw new IllegalArgumentException("Out of band response mode has been implemented only for ObservationFilterReader for now");
             }
-            response = Sreponse;
+            response = sReponse;
         }
-        logger.info("getObservation processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        LOGGER.info("getObservation processed in " + (System.currentTimeMillis() - start) + "ms.\n");
         return response;
     }
 
@@ -1060,15 +1066,15 @@ public class SOSworker {
      * Web service operation
      */
     public GetResultResponse getResult(GetResult requestResult) throws CstlServiceException {
-        logger.info("getResult request processing"  + '\n');
-        long start = System.currentTimeMillis();
+        LOGGER.info("getResult request processing"  + '\n');
+        final long start = System.currentTimeMillis();
         
         //we verify the base request attribute
         verifyBaseRequest(requestResult);
         
         ObservationEntry template = null;
         if (requestResult.getObservationTemplateId() != null) {
-            String id = requestResult.getObservationTemplateId();
+            final String id = requestResult.getObservationTemplateId();
             template = templates.get(id);
             if (template == null) {
                 throw new CstlServiceException("this template does not exist or is no longer usable",
@@ -1080,10 +1086,10 @@ public class SOSworker {
         }
         
         //we begin to create the sql request
-        OMFilter.initFilterGetResult(((ProcessEntry)template.getProcedure()).getHref());
+        omFilter.initFilterGetResult(((ProcessEntry)template.getProcedure()).getHref());
         
         //we treat the time constraint
-        List<EventTime> times = requestResult.getEventTime();
+        final List<EventTime> times = requestResult.getEventTime();
         
         /**
          * The template time :
@@ -1091,30 +1097,30 @@ public class SOSworker {
         
         // case TEquals with time instant
         if (template.getSamplingTime() instanceof TimeInstantType) {
-           TimeInstantType ti = (TimeInstantType) template.getSamplingTime();
-           BinaryTemporalOpType equals  = new BinaryTemporalOpType(ti);
-           EventTime e                  = new EventTime(equals);
+           final TimeInstantType ti           = (TimeInstantType) template.getSamplingTime();
+           final BinaryTemporalOpType equals  = new BinaryTemporalOpType(ti);
+           final EventTime e                  = new EventTime(equals);
            times.add(e);
         
         } else if (template.getSamplingTime() instanceof TimePeriodType) {
-            TimePeriodType tp = (TimePeriodType) template.getSamplingTime();
+            final TimePeriodType tp = (TimePeriodType) template.getSamplingTime();
             
             //case TBefore
             if (tp.getBeginPosition().equals(new TimePositionType(TimeIndeterminateValueType.BEFORE))) {
-                BinaryTemporalOpType before  = new BinaryTemporalOpType(new TimeInstantType(tp.getEndPosition()));
-                EventTime e                  = new EventTime(null, before, null);
+                final BinaryTemporalOpType before  = new BinaryTemporalOpType(new TimeInstantType(tp.getEndPosition()));
+                final EventTime e                  = new EventTime(null, before, null);
                 times.add(e);
             
             //case TAfter    
             } else if (tp.getEndPosition().equals(new TimePositionType(TimeIndeterminateValueType.NOW))) {
-                BinaryTemporalOpType after  = new BinaryTemporalOpType(new TimeInstantType(tp.getBeginPosition()));
-                EventTime e                  = new EventTime(after, null, null);
+                final BinaryTemporalOpType after  = new BinaryTemporalOpType(new TimeInstantType(tp.getBeginPosition()));
+                final EventTime e                  = new EventTime(after, null, null);
                 times.add(e);
             
             //case TDuring/TEquals  (here the sense of T_Equals with timePeriod is lost but not very usefull) 
             } else {
-                BinaryTemporalOpType during  = new BinaryTemporalOpType(tp);
-                EventTime e                  = new EventTime(null, null, during);
+                final BinaryTemporalOpType during  = new BinaryTemporalOpType(tp);
+                final EventTime e                  = new EventTime(null, null, during);
                 times.add(e);
             }
         }
@@ -1125,16 +1131,17 @@ public class SOSworker {
         //we prepare the response document
         
         String values;
-        if (OMFilter instanceof ObservationFilterReader) {
-            values = ((ObservationFilterReader)OMFilter).getResults();
+        if (omFilter instanceof ObservationFilterReader) {
+            values = ((ObservationFilterReader)omFilter).getResults();
             
         } else {
-            List<ObservationResult> results = OMFilter.filterResult();
-            StringBuilder datablock = new StringBuilder();
+            final List<ObservationResult> results = omFilter.filterResult();
+            final StringBuilder datablock         = new StringBuilder();
+            
             for (ObservationResult result: results) {
-                Timestamp tBegin = result.beginTime;
-                Timestamp tEnd   = result.endTime;
-                AnyResult a = OMReader.getResult(result.resultID);
+                final Timestamp tBegin = result.beginTime;
+                final Timestamp tEnd   = result.endTime;
+                final AnyResult a      = omReader.getResult(result.resultID);
                 if (a != null) {
                     DataArray array = a.getArray();
                     if (array != null) {
@@ -1147,9 +1154,9 @@ public class SOSworker {
             }
             values = datablock.toString();
         }
-        GetResultResponse.Result r = new GetResultResponse.Result(values, serviceURL + '/' + requestResult.getObservationTemplateId());
-        GetResultResponse response = new GetResultResponse(r);
-        logger.info("GetResult processed in " + (System.currentTimeMillis() - start) + "ms");
+        final GetResultResponse.Result r = new GetResultResponse.Result(values, serviceURL + '/' + requestResult.getObservationTemplateId());
+        final GetResultResponse response = new GetResultResponse(r);
+        LOGGER.info("GetResult processed in " + (System.currentTimeMillis() - start) + "ms");
         return response;
     }
     
@@ -1162,59 +1169,59 @@ public class SOSworker {
             values = array.getValues();
             
             for (EventTime bound: eventTimes) {
-                logger.finer(" Values: " + values);
+                LOGGER.finer(" Values: " + values);
                 if (bound.getTEquals() != null) {
                     if (bound.getTEquals().getRest().get(0) instanceof TimeInstantType) {
-                        TimeInstantType ti = (TimeInstantType) bound.getTEquals().getRest().get(0);
-                        Timestamp boundEquals = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
+                        final TimeInstantType ti    = (TimeInstantType) bound.getTEquals().getRest().get(0);
+                        final Timestamp boundEquals = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
                         
-                        logger.finer("TE case 1");
+                        LOGGER.finer("TE case 1");
                         //case 1 the periods contains a matching values
                         values = parseDataBlock(values, array.getEncoding(), null, null, boundEquals);
                         
                     }
                     
                 } else if (bound.getTAfter()  != null) {
-                    TimeInstantType ti = (TimeInstantType) bound.getTAfter().getRest().get(0);
-                    Timestamp boundBegin = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
+                    final TimeInstantType ti   = (TimeInstantType) bound.getTAfter().getRest().get(0);
+                    final Timestamp boundBegin = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
                     
                     // case 1 the period overlaps the bound 
                     if (tBegin.before(boundBegin) && tEnd.after(boundBegin)) {
-                        logger.finer("TA case 1");
+                        LOGGER.finer("TA case 1");
                         values = parseDataBlock(values, array.getEncoding(), boundBegin, null, null);
                     
                     }
                         
                 } else if (bound.getTBefore() != null) {
-                    TimeInstantType ti = (TimeInstantType) bound.getTBefore().getRest().get(0);
-                    Timestamp boundEnd = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
+                    final TimeInstantType ti = (TimeInstantType) bound.getTBefore().getRest().get(0);
+                    final Timestamp boundEnd = Timestamp.valueOf(getTimeValue(ti.getTimePosition()));
                     
                     // case 1 the period overlaps the bound 
                     if (tBegin.before(boundEnd) && tEnd.after(boundEnd)) {
-                        logger.finer("TB case 1");
+                        LOGGER.finer("TB case 1");
                         values = parseDataBlock(values, array.getEncoding(), null, boundEnd, null);
                     
                     }
                     
                 } else if (bound.getTDuring() != null) {
                     
-                    TimePeriodType tp = (TimePeriodType) bound.getTDuring().getRest().get(0);
-                    Timestamp boundBegin = Timestamp.valueOf(getTimeValue(tp.getBeginPosition()));
-                    Timestamp boundEnd   = Timestamp.valueOf(getTimeValue(tp.getEndPosition()));
+                    final TimePeriodType tp = (TimePeriodType) bound.getTDuring().getRest().get(0);
+                    final Timestamp boundBegin = Timestamp.valueOf(getTimeValue(tp.getBeginPosition()));
+                    final Timestamp boundEnd   = Timestamp.valueOf(getTimeValue(tp.getEndPosition()));
                     
                     // case 1 the period overlaps the first bound 
                     if (tBegin.before(boundBegin) && tEnd.before(boundEnd) && tEnd.after(boundBegin)) {
-                        logger.finer("TD case 1");
+                        LOGGER.finer("TD case 1");
                         values = parseDataBlock(values, array.getEncoding(), boundBegin, boundEnd, null);
 
                     // case 2 the period overlaps the second bound    
                     } else if (tBegin.after(boundBegin) && tEnd.after(boundEnd) && tBegin.before(boundEnd)) {
-                        logger.finer("TD case 2");
+                        LOGGER.finer("TD case 2");
                         values = parseDataBlock(values, array.getEncoding(), boundBegin, boundEnd, null);
 
                     // case 3 the period totaly overlaps the bounds
                     } else if (tBegin.before(boundBegin) && tEnd.after(boundEnd)) {
-                        logger.finer("TD case 3");
+                        LOGGER.finer("TD case 3");
                         values = parseDataBlock(values, array.getEncoding(), boundBegin, boundEnd, null);
                     } 
                     
@@ -1243,12 +1250,12 @@ public class SOSworker {
     private String parseDataBlock(String brutValues, AbstractEncoding abstractEncoding, Timestamp boundBegin, Timestamp boundEnd, Timestamp boundEquals) {
         String values = "";
         if (abstractEncoding instanceof TextBlock) {
-                TextBlock encoding = (TextBlock) abstractEncoding;
-                StringTokenizer tokenizer = new StringTokenizer(brutValues, encoding.getBlockSeparator());
+                final TextBlock encoding        = (TextBlock) abstractEncoding;
+                final StringTokenizer tokenizer = new StringTokenizer(brutValues, encoding.getBlockSeparator());
                 int i = 1;
                 while (tokenizer.hasMoreTokens()) {
-                    String block = tokenizer.nextToken();
-                    logger.finer(i + " eme block =" + block);
+                    final String block = tokenizer.nextToken();
+                    LOGGER.finer(i + " eme block =" + block);
                     i++;
                     String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
                     samplingTimeValue = samplingTimeValue.replace('T', ' ');
@@ -1258,42 +1265,42 @@ public class SOSworker {
                             d = dateformat.parse(samplingTimeValue);
                         }
                     } catch (ParseException ex) {
-                        logger.severe("unable to parse the value: " + samplingTimeValue);
+                        LOGGER.severe("unable to parse the value: " + samplingTimeValue);
                         continue;
                     }
-                    Timestamp t = new Timestamp(d.getTime());
+                    final Timestamp t = new Timestamp(d.getTime());
                     
                     // time during case
                     if (boundBegin != null && boundEnd != null) {
                         if (t.after(boundBegin) && t.before(boundEnd)) {
                             values += block + encoding.getBlockSeparator();
-                            logger.finer("TD matching");
+                            LOGGER.finer("TD matching");
                         }
                         
                     //time after case    
                     } else if (boundBegin != null && boundEnd == null) {
                         if (t.after(boundBegin)) {
                             values += block + encoding.getBlockSeparator();
-                            logger.finer("TA matching");
+                            LOGGER.finer("TA matching");
                         }
                     
                     //time before case    
                     } else if (boundBegin == null && boundEnd != null) {
                         if (t.before(boundEnd)) {
                             values += block + encoding.getBlockSeparator();
-                            logger.finer("TB matching");
+                            LOGGER.finer("TB matching");
                         }
                         
                     //time equals case    
                     } else if (boundEquals != null) {
                         if (t.equals(boundEquals)) {
                             values += block + encoding.getBlockSeparator();
-                            logger.finer("TE matching");
+                            LOGGER.finer("TE matching");
                         }
                     }
                 }
             } else {
-                logger.severe("unable to parse datablock unknown encoding");
+                LOGGER.severe("unable to parse datablock unknown encoding");
                 values = brutValues;
             }
         return values;
@@ -1307,8 +1314,8 @@ public class SOSworker {
      *                         and an observation template for this sensor.
      */
     public RegisterSensorResponse registerSensor(RegisterSensor requestRegSensor) throws CstlServiceException {
-        logger.info("registerSensor request processing"  + '\n');
-        long start = System.currentTimeMillis();
+        LOGGER.info("registerSensor request processing"  + '\n');
+        final long start = System.currentTimeMillis();
         
         //we verify the base request attribute
         verifyBaseRequest(requestRegSensor);
@@ -1317,10 +1324,10 @@ public class SOSworker {
         String id = "";
         try {
             //we begin a transaction
-            SMLWriter.startTransaction();
+            smlWriter.startTransaction();
             
             //we get the SensorML file who describe the Sensor to insert.
-            RegisterSensor.SensorDescription d = requestRegSensor.getSensorDescription();
+            final RegisterSensor.SensorDescription d = requestRegSensor.getSensorDescription();
             AbstractSensorML process;
             if (d != null && d.getAny() instanceof AbstractSensorML) {
                 process = (AbstractSensorML) d.getAny();
@@ -1332,8 +1339,8 @@ public class SOSworker {
             }
             
             //we get the observation template provided with the sensor description.
-            ObservationTemplate temp = requestRegSensor.getObservationTemplate();
-            ObservationEntry obs     = null;
+            final ObservationTemplate temp = requestRegSensor.getObservationTemplate();
+            ObservationEntry obs           = null;
             if (temp != null)
                 obs = temp.getObservation();
             if(temp == null && obs == null) {
@@ -1347,28 +1354,28 @@ public class SOSworker {
             }
             
             //we create a new Identifier from the SensorML database
-            int num = SMLWriter.getNewSensorId();
+            final int num = smlWriter.getNewSensorId();
             id = sensorIdBase + num;
             
             //and we write it in the sensorML Database
-            SMLWriter.writeSensor(id, process);
+            smlWriter.writeSensor(id, process);
 
-            String phyId = getPhysicalID(process);
+            final String phyId = getPhysicalID(process);
 
             // we record the mapping between physical id and database id
             recordMapping(id, phyId);
             
             // and we record the position of the piezometer
-            DirectPositionType position = getSensorPosition(process);
-            OMWriter.recordProcedureLocation(phyId, position);
+            final DirectPositionType position = getSensorPosition(process);
+            omWriter.recordProcedureLocation(phyId, position);
                                     
             //we assign the new capteur id to the observation template
-            ProcessEntry p = new ProcessEntry(id);
+            final ProcessEntry p = new ProcessEntry(id);
             obs.setProcedure(p);
             obs.setName(observationTemplateIdBase + num);
-            logger.finer(obs.toString());
+            LOGGER.finer(obs.toString());
             //we write the observation template in the O&M database
-            OMWriter.writeObservation(obs);
+            omWriter.writeObservation(obs);
                    
             addSensorToOffering(process, obs);
             
@@ -1376,14 +1383,14 @@ public class SOSworker {
 
         } finally {
             if (!success) {
-               SMLWriter.abortTransaction();
-               logger.severe("Transaction failed");
+               smlWriter.abortTransaction();
+               LOGGER.severe("Transaction failed");
             } else {
-                SMLWriter.endTransaction();
+                smlWriter.endTransaction();
             }
         }
         
-        logger.info("registerSensor processed in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.info("registerSensor processed in " + (System.currentTimeMillis() - start) + "ms");
         return new RegisterSensorResponse(id);
     }
     
@@ -1394,8 +1401,8 @@ public class SOSworker {
      * @param requestInsObs an InsertObservation request containing an O&M object and a Sensor id.
      */
     public InsertObservationResponse insertObservation(InsertObservation requestInsObs) throws CstlServiceException {
-        logger.info("InsertObservation request processing"  + '\n');
-        long start = System.currentTimeMillis();
+        LOGGER.info("InsertObservation request processing"  + '\n');
+        final long start = System.currentTimeMillis();
 
         //we verify the base request attribute
         verifyBaseRequest(requestInsObs);
@@ -1410,15 +1417,15 @@ public class SOSworker {
             throw new CstlServiceException("The sensor identifier is not valid",
                                          INVALID_PARAMETER_VALUE, "assignedSensorId");
         }
-        ProcessEntry proc = new ProcessEntry(sensorId);
+        final ProcessEntry proc = new ProcessEntry(sensorId);
 
         //we get the observation and we assign to it the sensor
-        ObservationEntry obs = requestInsObs.getObservation();
+        final ObservationEntry obs = requestInsObs.getObservation();
         if (obs != null) {
             obs.setProcedure(proc);
-            obs.setName(OMReader.getNewObservationId());
-            logger.finer("samplingTime received: " + obs.getSamplingTime()); 
-            logger.finer("template received:" + '\n' + obs.toString());
+            obs.setName(omReader.getNewObservationId());
+            LOGGER.finer("samplingTime received: " + obs.getSamplingTime());
+            LOGGER.finer("template received:" + '\n' + obs.toString());
         } else {
             throw new CstlServiceException("The observation template must be specified",
                                              MISSING_PARAMETER_VALUE, "observationTemplate");
@@ -1426,16 +1433,16 @@ public class SOSworker {
 
         //we record the observation in the O&M database
        if (obs instanceof MeasurementEntry) {
-           OMWriter.writeMeasurement((MeasurementEntry)obs);
-        } else if (obs instanceof ObservationEntry) {
+           omWriter.writeMeasurement((MeasurementEntry)obs);
+        } else {
 
             //in first we verify that the observation is conform to the template
-            ObservationEntry template = (ObservationEntry) OMReader.getObservation(observationTemplateIdBase + num);
+            final ObservationEntry template = (ObservationEntry) omReader.getObservation(observationTemplateIdBase + num);
             //if the observation to insert match the template we can insert it in the OM db
             if (obs.matchTemplate(template)) {
                 if (obs.getSamplingTime() != null && obs.getResult() != null) {
-                    id = OMWriter.writeObservation(obs);
-                    logger.info("new observation inserted:"+ "id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
+                    id = omWriter.writeObservation(obs);
+                    LOGGER.info("new observation inserted:"+ "id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
                 } else {
                     throw new CstlServiceException("The observation sampling time and the result must be specify",
                                                   MISSING_PARAMETER_VALUE, "samplingTime");
@@ -1446,7 +1453,7 @@ public class SOSworker {
             }
         }
 
-        logger.info("insertObservation processed in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.info("insertObservation processed in " + (System.currentTimeMillis() - start) + "ms");
         return new InsertObservationResponse(id);
     }
     
@@ -1471,11 +1478,11 @@ public class SOSworker {
                 if (time.getTEquals() != null && time.getTEquals().getRest().size() != 0) {
                     
                     // we get the property name (not used for now)
-                    String propertyName = time.getTEquals().getPropertyName();
-                    Object timeFilter   = time.getTEquals().getRest().get(0);
+                    //String propertyName = time.getTEquals().getPropertyName();
+                    final Object timeFilter   = time.getTEquals().getRest().get(0);
                     
                     if (!template) {
-                        OMFilter.setTimeEquals(timeFilter);
+                        omFilter.setTimeEquals(timeFilter);
                         
                     } else if (timeFilter instanceof TimePeriodType || timeFilter instanceof TimeInstantType) {
                         templateTime = (AbstractTimeGeometricPrimitiveType) timeFilter;
@@ -1489,13 +1496,13 @@ public class SOSworker {
                 } else if (time.getTBefore() != null && time.getTBefore().getRest().size() != 0) {
 
                     // we get the property name (not used for now)
-                    String propertyName = time.getTBefore().getPropertyName();
-                    Object timeFilter   = time.getTBefore().getRest().get(0);
+                    // String propertyName = time.getTBefore().getPropertyName();
+                    final Object timeFilter   = time.getTBefore().getRest().get(0);
 
                     if (!template) {
-                        OMFilter.setTimeBefore(timeFilter);
+                        omFilter.setTimeBefore(timeFilter);
                     } else if (timeFilter instanceof TimeInstantType) {
-                        TimeInstantType ti = (TimeInstantType)timeFilter;
+                        final TimeInstantType ti = (TimeInstantType)timeFilter;
                         templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getTimePosition());
                     } else {
                         throw new CstlServiceException("TM_Before operation require timeInstant!",
@@ -1506,13 +1513,13 @@ public class SOSworker {
                 } else if (time.getTAfter() != null && time.getTAfter().getRest().size() != 0) {
                     
                     // we get the property name (not used for now)
-                    String propertyName = time.getTAfter().getPropertyName();
-                    Object timeFilter   = time.getTAfter().getRest().get(0);
+                    //String propertyName = time.getTAfter().getPropertyName();
+                    final Object timeFilter   = time.getTAfter().getRest().get(0);
 
                     if (!template) {
-                        OMFilter.setTimeAfter(timeFilter);
+                        omFilter.setTimeAfter(timeFilter);
                     } else if (timeFilter instanceof TimeInstantType) {
-                        TimeInstantType ti = (TimeInstantType)timeFilter;
+                        final TimeInstantType ti = (TimeInstantType)timeFilter;
                         templateTime = new TimePeriodType(ti.getTimePosition());
                         
                     } else {
@@ -1524,11 +1531,11 @@ public class SOSworker {
                 } else if (time.getTDuring() != null && time.getTDuring().getRest().size() != 0) {
                     
                     // we get the property name (not used for now)
-                    String propertyName = time.getTDuring().getPropertyName();
-                    Object timeFilter   = time.getTDuring().getRest().get(0);
+                    //String propertyName = time.getTDuring().getPropertyName();
+                    final Object timeFilter   = time.getTDuring().getRest().get(0);
 
                     if (!template) {
-                        OMFilter.setTimeDuring(timeFilter);
+                        omFilter.setTimeDuring(timeFilter);
                     }
                     if (timeFilter instanceof TimePeriodType) {
                         templateTime = (TimePeriodType)timeFilter;
@@ -1605,29 +1612,29 @@ public class SOSworker {
     private void addSensorToOffering(AbstractSensorML sensor, Observation template) throws CstlServiceException {
      
         //we search which are the networks binded to this sensor
-        List<String> networkNames = getNetworkNames(sensor);
+        final List<String> networkNames = getNetworkNames(sensor);
 
-        int size = networkNames.size();
+        final int size = networkNames.size();
         if (size == 0) {
-            logger.severe("There is no network in that SensorML file");
+            LOGGER.severe("There is no network in that SensorML file");
         }
 
         // for each network we create (or update) an offering
         for (String networkName : networkNames) {
 
-            String offeringName = "offering-" + networkName;
-            logger.info("networks:" + offeringName);
+            final String offeringName = "offering-" + networkName;
+            LOGGER.info("networks:" + offeringName);
             ObservationOfferingEntry offering = null;
 
             //we get the offering from the O&M database
-            offering = OMReader.getObservationOffering(offeringName);
+            offering = omReader.getObservationOffering(offeringName);
 
             //if the offering is already in the database
             if (offering != null) {
 
                 //we add the new sensor to the offering
                 OfferingProcedureEntry offProc = null;
-                ReferenceEntry ref = OMReader.getReference(((ProcessEntry) template.getProcedure()).getHref());
+                ReferenceEntry ref = omReader.getReference(((ProcessEntry) template.getProcedure()).getHref());
                 if (!offering.getProcedure().contains(ref)) {
                     if (ref == null) {
                         ref = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
@@ -1643,41 +1650,41 @@ public class SOSworker {
 
                 // we add the feature of interest (station) to the offering
                 OfferingSamplingFeatureEntry offSF = null;
-                ref = OMReader.getReference(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                ref = omReader.getReference(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
                 if (!offering.getFeatureOfInterest().contains(ref)) {
                     if (ref == null) {
                         ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
                     }
                     offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
                 }
-                OMWriter.updateOffering(offProc, offPheno, offSF);
+                omWriter.updateOffering(offProc, offPheno, offSF);
             // we build a new offering
             // TODO bounded by??? station?
             } else {
-                logger.info("offering " + offeringName + " not present, first build");
+                LOGGER.info("offering " + offeringName + " not present, first build");
 
                 // for the eventime of the offering we take the time of now.
-                Timestamp t = new Timestamp(System.currentTimeMillis());
-                TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
+                final Timestamp t         = new Timestamp(System.currentTimeMillis());
+                final TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
 
                 //we add the template process
-                ReferenceEntry process = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
+                final ReferenceEntry process = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
 
                 //we add the template phenomenon
-                PhenomenonEntry phenomenon = (PhenomenonEntry) template.getObservedProperty();
+                final PhenomenonEntry phenomenon = (PhenomenonEntry) template.getObservedProperty();
 
                 //we add the template feature of interest
-                ReferenceEntry station = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                final ReferenceEntry station = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
 
                 //we create a list of accepted responseMode (fixed)
-                List<ResponseModeType> responses  = Arrays.asList(INLINE, RESULT_TEMPLATE);
-                List<QName> resultModel           = Arrays.asList(observation_QNAME);
-                List<String> offerinfOutputFormat = Arrays.asList("text/xml");
-                List<String> srsName              = Arrays.asList("EPSG:4326");
+                final List<ResponseModeType> responses  = Arrays.asList(INLINE, RESULT_TEMPLATE);
+                final List<QName> resultModel           = Arrays.asList(OBSERVATION_QNAME);
+                final List<String> offerinfOutputFormat = Arrays.asList("text/xml");
+                final List<String> srsName              = Arrays.asList("EPSG:4326");
 
                 // we create a the new Offering
                 offering = new ObservationOfferingEntry(offeringName,
-                        offeringIdBase + offeringName,
+                        OFFERING_ID_BASE + offeringName,
                         "",
                         srsName,
                         time,
@@ -1687,20 +1694,20 @@ public class SOSworker {
                         offerinfOutputFormat,
                         resultModel,
                         responses);
-                OMWriter.writeOffering(offering);
+                omWriter.writeOffering(offering);
             }
 
         }
         //then  we add the sensor to the global offering containing all the sensor
 
         //we get the offering from the O&M database
-        ObservationOfferingEntry offering = OMReader.getObservationOffering("offering-allSensor");
+        ObservationOfferingEntry offering = omReader.getObservationOffering("offering-allSensor");
 
         if (offering != null) {
 
             //we add the new sensor to the offering
             OfferingProcedureEntry offProc = null;
-            ReferenceEntry ref = OMReader.getReference(((ProcessEntry) template.getProcedure()).getHref());
+            ReferenceEntry ref = omReader.getReference(((ProcessEntry) template.getProcedure()).getHref());
             if (!offering.getProcedure().contains(ref)) {
                 if (ref == null) {
                     ref = new ReferenceEntry(null, ((ProcessEntry) template.getProcedure()).getHref());
@@ -1716,39 +1723,39 @@ public class SOSworker {
 
             // we add the feature of interest (station) to the offering
             OfferingSamplingFeatureEntry offSF = null;
-            ref = OMReader.getReference(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+            ref = omReader.getReference(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
             if (!offering.getFeatureOfInterest().contains(ref)) {
                 if (ref == null) {
                     ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
                 }
                 offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
             }
-            OMWriter.updateOffering(offProc, offPheno, offSF);
+            omWriter.updateOffering(offProc, offPheno, offSF);
         } else {
-            logger.info("offering allSensor not present, first build");
+            LOGGER.info("offering allSensor not present, first build");
 
             // for the eventime of the offering we take the time of now.
-            Timestamp t = new Timestamp(System.currentTimeMillis());
-            TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
+            final Timestamp t = new Timestamp(System.currentTimeMillis());
+            final TimePeriodType time = new TimePeriodType(new TimePositionType(t.toString()));
 
             //we add the template process
-            ReferenceEntry process = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
+            final ReferenceEntry process = new ReferenceEntry(null, ((ProcessEntry)template.getProcedure()).getHref());
 
             //we add the template phenomenon
-            PhenomenonEntry phenomenon = (PhenomenonEntry)template.getObservedProperty();
+            final PhenomenonEntry phenomenon = (PhenomenonEntry)template.getObservedProperty();
 
             //we add the template feature of interest
-            ReferenceEntry station = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
+            final ReferenceEntry station = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
 
             //we create a list of accepted responseMode (fixed)
-            List<ResponseModeType> responses  = Arrays.asList(RESULT_TEMPLATE, INLINE);
-            List<QName> resultModel           = Arrays.asList(observation_QNAME);
-            List<String> offeringOutputFormat = Arrays.asList("text/xml");
-            List<String> srsName              = Arrays.asList("EPSG:4326");
+            final List<ResponseModeType> responses  = Arrays.asList(RESULT_TEMPLATE, INLINE);
+            final List<QName> resultModel           = Arrays.asList(OBSERVATION_QNAME);
+            final List<String> offeringOutputFormat = Arrays.asList("text/xml");
+            final List<String> srsName              = Arrays.asList("EPSG:4326");
 
             // we create a the new Offering
-            offering = new ObservationOfferingEntry(offeringIdBase + "allSensor",
-                                                    offeringIdBase + "allSensor",
+            offering = new ObservationOfferingEntry(OFFERING_ID_BASE + "allSensor",
+                                                    OFFERING_ID_BASE + "allSensor",
                                                     "Base offering containing all the sensors.",
                                                     srsName,
                                                     time,
@@ -1758,7 +1765,7 @@ public class SOSworker {
                                                     offeringOutputFormat,
                                                     resultModel,
                                                     responses);
-            OMWriter.writeOffering(offering);
+            omWriter.writeOffering(offering);
         }
     }
 
@@ -1797,17 +1804,17 @@ public class SOSworker {
     private void recordMapping(String dbId, String physicalID) throws CstlServiceException {
         try {
             map.setProperty(physicalID, dbId);
-            File mappingFile = new File(WebService.getSicadeDirectory(), "/sos_configuration/mapping.properties");
-            FileOutputStream out = new FileOutputStream(mappingFile);
+            final File mappingFile     = new File(WebService.getSicadeDirectory(), "/sos_configuration/mapping.properties");
+            final FileOutputStream out = new FileOutputStream(mappingFile);
             map.store(out, "");
             out.close();
 
         } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("The service cannot build the temporary file",
                     NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw an IOException:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
@@ -1831,9 +1838,9 @@ public class SOSworker {
      * we search the CATALINA_HOME/webapps/ifremer-sos/WEB-INF/sos_configuration
      */
     private File getConfigDirectory() {
-        File configDir = new File(WebService.getConfigDirectory(), "sos_configuration/");
+        final File configDir = new File(WebService.getConfigDirectory(), "sos_configuration/");
         if (configDir.exists()) {
-            logger.info("taking configuration from constellation directory: " + configDir.getPath());
+            LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
             return configDir;
         } else {
 
@@ -1852,18 +1859,18 @@ public class SOSworker {
      * @param ID The ID of the service in a case of multiple sos server.
      * @param filePath The path to the log folder.
      */
-    private void initLogger(String ID, String filePath) {
+    private void initLogger(String id, String filePath) {
         try {
-            if (ID != null && !ID.equals("")) {
-                ID = ID + '-';
+            if (id != null && !id.equals("")) {
+                id = id + '-';
             }
-            FileHandler handler  = new FileHandler(filePath + '/'+ ID + "cstl-sos.log");
+            final FileHandler handler  = new FileHandler(filePath + '/'+ id + "cstl-sos.log");
             handler.setFormatter(new MonolineFormatter(handler));
-            logger.addHandler(handler);
+            LOGGER.addHandler(handler);
         } catch (IOException ex) {
-            logger.severe("IO exception while trying to separate CSW Logs:" + ex.getMessage());
+            LOGGER.severe("IO exception while trying to separate CSW Logs:" + ex.getMessage());
         } catch (SecurityException ex) {
-            logger.severe("Security exception while trying to separate CSW Logs" + ex.getMessage());
+            LOGGER.severe("Security exception while trying to separate CSW Logs" + ex.getMessage());
         }
     }
 
@@ -1871,14 +1878,14 @@ public class SOSworker {
      * Destroy and free the resource used by the worker.
      */
     public void destroy() {
-        if (SMLReader != null)
-            SMLReader.destroy();
-        if (SMLWriter != null)
-            SMLWriter.destroy();
-        if (OMReader != null)
-            OMReader.destroy();
-        if (OMWriter != null)
-            OMWriter.destroy();
+        if (smlReader != null)
+            smlReader.destroy();
+        if (smlWriter != null)
+            smlWriter.destroy();
+        if (omReader != null)
+            omReader.destroy();
+        if (omWriter != null)
+            omWriter.destroy();
         for (Timer t : schreduledTask) {
             t.cancel();
         }
@@ -1909,7 +1916,7 @@ public class SOSworker {
         @Override
         public void run() {
             templates.remove(templateId);
-            logger.info("template:" + templateId + " destroyed");
+            LOGGER.info("template:" + templateId + " destroyed");
         }
     }
 }

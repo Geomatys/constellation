@@ -42,12 +42,12 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class Utils {
+public final class Utils {
 
     /**
      * use for debugging purpose
      */
-    private static final Logger logger = Logger.getLogger("org.constellation.sos");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
 
     private Utils() {}
     
@@ -117,7 +117,7 @@ public class Utils {
                 return component.getSMLLocation().getPoint().getPos();
             }
         }
-        logger.severe("there is no piezo location");
+        LOGGER.severe("there is no piezo location");
         return null;
     }
 
