@@ -46,38 +46,38 @@ public class CSWConfigurationBean extends ConfigurationBean {
      public void generateIndex() {
         logger.info("GUI refresh index");
         refreshServletRequest();
-        String URL = getConfigurationURL() + "/WS/configuration?request=refreshIndex&asynchrone=";
+        String url = getConfigurationURL() + "/WS/configuration?request=refreshIndex&asynchrone=";
         if (currentSynchroneMode.equals("synchrone"))
-            URL = URL + "false";
+            url = url + "false";
         else
-            URL = URL + "true";
+            url = url + "true";
 
-        logger.info(URL);
-        String response = performRequest(URL);
+        logger.info(url);
+        performRequest(url);
     }
 
     public void addToIndex() {
         logger.info("GUI add to index");
         refreshServletRequest();
-        String URL = getConfigurationURL() + "/WS/configuration?request=addToIndex&identifiers=" + getRecordIdentifiers();
-        logger.info(URL);
-        String response = performRequest(URL);
+        String url = getConfigurationURL() + "/WS/configuration?request=addToIndex&identifiers=" + getRecordIdentifiers();
+        logger.info(url);
+        performRequest(url);
     }
 
     public void resfreshContact() {
         logger.info("GUI refresh contact index");
         refreshServletRequest();
-        String URL = getConfigurationURL() + "/WS/configuration?request=resfreshContact";
-        logger.info(URL);
-        String response = performRequest(URL);
+        String url = getConfigurationURL() + "/WS/configuration?request=resfreshContact";
+        logger.info(url);
+        performRequest(url);
     }
 
     public void resfreshVocabulary() {
         logger.info("GUI refresh vocabulary index");
         refreshServletRequest();
-        String URL = getConfigurationURL() + "/WS/configuration?request=resfreshVocabulary";
-        logger.info(URL);
-        String response = performRequest(URL);
+        String url = getConfigurationURL() + "/WS/configuration?request=resfreshVocabulary";
+        logger.info(url);
+        performRequest(url);
     }
     
     /**

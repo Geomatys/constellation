@@ -42,53 +42,49 @@ public class UserData {
         @XmlElementRef(name = "WMSCapabilities", namespace = "http://www.opengis.net/wms", type = WMSCapabilities.class),
         @XmlElementRef(name = "WMT_MS_Capabilities", namespace = "http://www.opengis.net/wms", type = WMT_MS_Capabilities.class)
     })
-    private Object[] WMSCapabilities;
+    private Object[] wmsCapabilities;
     
     @XmlElementRefs ({
         @XmlElementRef(name = "WCS_Capabilities", namespace = "http://www.opengis.net/wcs", type = WCSCapabilitiesType.class),
         @XmlElementRef(name = "Capabilities", namespace = "http://www.opengis.net/wcs/1.1.1", type = Capabilities.class)
     })
-    private Object[] WCSCapabilities;
+    private Object[] wcsCapabilities;
     
     @XmlElementRef(name= "Capabilities", namespace="http://www.opengis.net/cat/csw/2.0.2", type = org.geotoolkit.csw.xml.v202.Capabilities.class)
-    private Object[] CSWCapabilities;
+    private Object[] cswCapabilities;
     
-    private Object[] SOSCapabilities;
+    private Object[] sosCapabilities;
     
-    public UserData() {
-        
-    }
-
     public Object[] getWMSCapabilities() {
-        return WMSCapabilities;
+        return wmsCapabilities;
     }
 
-    public void setWMSCapabilities(Object[] WMSCapabilities) {
-        this.WMSCapabilities = WMSCapabilities;
+    public void setWMSCapabilities(Object[] wmsCapabilities) {
+        this.wmsCapabilities = wmsCapabilities;
     }
 
     public Object[] getWCSCapabilities() {
-        return WCSCapabilities;
+        return wcsCapabilities;
     }
 
-    public void setWCSCapabilities(Object[] WCSCapabilities) {
-        this.WCSCapabilities = WCSCapabilities;
+    public void setWCSCapabilities(Object[] wcsCapabilities) {
+        this.wcsCapabilities = wcsCapabilities;
     }
 
     public Object[] getCSWCapabilities() {
-        return CSWCapabilities;
+        return cswCapabilities;
     }
 
-    public void setCSWCapabilities(Object[] CSWCapabilities) {
-        this.CSWCapabilities = CSWCapabilities;
+    public void setCSWCapabilities(Object[] cswCapabilities) {
+        this.cswCapabilities = cswCapabilities;
     }
 
     public Object[] getSOSCapabilities() {
-        return SOSCapabilities;
+        return sosCapabilities;
     }
 
-    public void setSOSCapabilities(Object[] SOSCapabilities) {
-        this.SOSCapabilities = SOSCapabilities;
+    public void setSOSCapabilities(Object[] sosCapabilities) {
+        this.sosCapabilities = sosCapabilities;
     }
     
     

@@ -118,6 +118,7 @@ public final class TimeParser {
                 case ':': if (numTimeFields != 0) numTimeFields++;  break;
                 case '.': if (numTimeFields >= 3) numTimeFields++;  break;
                 case 'Z': if (numTimeFields != 0) hasTimeZone=true; break;
+                default : break;
             }
         }
         this.numDateFields = numDateFields;
@@ -207,7 +208,7 @@ public final class TimeParser {
         synchronized (format) {
             time = format.parse(value, position);
         }
-        int index = position.getIndex();
+        final int index = position.getIndex();
         final int length = value.length();
         if (index != length) {
             final int errorIndex = Math.max(index, position.getErrorIndex());
@@ -257,7 +258,7 @@ public final class TimeParser {
             try {
                 value = Double.parseDouble(number);
             } catch (NumberFormatException exception) {
-                ParseException e = new ParseException(Errors.format(
+                final ParseException e = new ParseException(Errors.format(
                         Errors.Keys.UNPARSABLE_NUMBER_$1, number), lower);
                 e.initCause(exception);
                 throw e;

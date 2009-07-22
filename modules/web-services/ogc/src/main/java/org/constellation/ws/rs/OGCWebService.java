@@ -176,11 +176,11 @@ public abstract class OGCWebService extends WebService {
      */
     protected void isVersionSupported(String versionNumber) throws CstlServiceException {
         if (getVersionFromNumber(versionNumber) == null) {
-            String message = "The parameter ";
+            StringBuilder messageb = new StringBuilder("The parameter ");
             for (ServiceDef vers : supportedVersions) {
-                message += "VERSION=" + vers.version.toString() + " OR ";
+                messageb.append("VERSION=").append(vers.version.toString()).append(" OR ");
             }
-            message = message.substring(0, message.length()-3);
+            String message = messageb.substring(0, messageb.length()-3);
             message += " must be specified";
             throw new CstlServiceException(message, VERSION_NEGOTIATION_FAILED);
         }
@@ -244,7 +244,7 @@ public abstract class OGCWebService extends WebService {
             marshaller = marshallerPool.acquireMarshaller();
 
             final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
-            CstlServiceException ex = new CstlServiceException(message, code, locator);
+            final CstlServiceException ex = new CstlServiceException(message, code, locator);
             return processExceptionResponse(ex, marshaller, supportedVersions.get(0));
         } finally {
             if (marshaller != null) {
@@ -270,14 +270,14 @@ public abstract class OGCWebService extends WebService {
      * @return The capabilities Object, or {@code null} if none.
      */
     public Object getStaticCapabilitiesObject(final Version version) throws JAXBException {
-        String fileName = this.serviceType + "Capabilities" + version.toString() + ".xml";
-        File changeFile = getFile("change.properties");
-        Properties p    = new Properties();
+        final String fileName = this.serviceType + "Capabilities" + version.toString() + ".xml";
+        final File changeFile = getFile("change.properties");
+        final Properties p    = new Properties();
 
         // if the flag file is present we load the properties
         if (changeFile != null && changeFile.exists()) {
             try {
-                FileInputStream in = new FileInputStream(changeFile);
+                final FileInputStream in = new FileInputStream(changeFile);
                 p.load(in);
                 in.close();
             } catch (IOException ex) {
@@ -288,49 +288,45 @@ public abstract class OGCWebService extends WebService {
         }
 
        //we recup the capabilities file and unmarshall it
-       if (fileName == null) {
-           return null;
+       
+       //we look if we have already put it in cache
+       Object response = capabilities.get(fileName);
+       final boolean update  = p.getProperty("update").equals("true");
 
-       } else {
+       if (response == null || update) {
+           if (update) {
+               LOGGER.info("updating metadata");
+           }
 
-           //we look if we have already put it in cache
-           Object response = capabilities.get(fileName);
-           boolean update  = p.getProperty("update").equals("true");
-
-           if (response == null || update) {
-               if (update) {
-                   LOGGER.info("updating metadata");
-               }
-
-               File f = getFile(fileName);
-               Unmarshaller unmarshaller = null;
-               try {
-                   unmarshaller = marshallerPool.acquireUnmarshaller();
-                   response = unmarshaller.unmarshal(f);
-               } finally {
-                   if (unmarshaller != null) {
-                       marshallerPool.release(unmarshaller);
-                   }
-               }
-               if (response != null) {
-                   capabilities.put(fileName, response);
-                   this.setLastUpdateTIme(System.currentTimeMillis());
-                   p.put("update", "false");
-               }
-
-               // if the flag file is present we store the properties
-               if (changeFile != null && changeFile.exists()) {
-                   try {
-                       FileOutputStream out = new FileOutputStream(changeFile);
-                       p.store(out, "updated from WebService");
-                       out.close();
-                   } catch (IOException ex) {
-                       LOGGER.warning("Unable to write the change.properties file");
-                   }
+           final File f = getFile(fileName);
+           Unmarshaller unmarshaller = null;
+           try {
+               unmarshaller = marshallerPool.acquireUnmarshaller();
+               response = unmarshaller.unmarshal(f);
+           } finally {
+               if (unmarshaller != null) {
+                   marshallerPool.release(unmarshaller);
                }
            }
-           return response;
-        }
+           if (response != null) {
+               capabilities.put(fileName, response);
+               this.setLastUpdateTIme(System.currentTimeMillis());
+               p.put("update", "false");
+           }
+
+           // if the flag file is present we store the properties
+           if (changeFile != null && changeFile.exists()) {
+               try {
+                   final FileOutputStream out = new FileOutputStream(changeFile);
+                   p.store(out, "updated from WebService");
+                   out.close();
+               } catch (IOException ex) {
+                   LOGGER.warning("Unable to write the change.properties file");
+               }
+           }
+       }
+       return response;
+        
     }
 
     /**
@@ -385,12 +381,12 @@ public abstract class OGCWebService extends WebService {
      */
     protected boolean isOWS(final ServiceDef def) {
         if (def == null) {
-            throw new NullPointerException("Unable to know if the service is OWS because it is not defined.");
+            throw new IllegalArgumentException("Unable to know if the service is OWS because it is not defined.");
         }
-        return (def.equals(ServiceDef.CSW_2_0_2) || def.equals(ServiceDef.PDP)       ||
+        return  def.equals(ServiceDef.CSW_2_0_2) || def.equals(ServiceDef.PDP)       ||
                 def.equals(ServiceDef.PEP)       || def.equals(ServiceDef.SOS_1_0_0) ||
                 def.equals(ServiceDef.WCS_1_1_1) || def.equals(ServiceDef.WCS_1_1_0) ||
-                def.equals(ServiceDef.WCS_1_1_2) || def.equals(ServiceDef.WMTS_1_0_0));
+                def.equals(ServiceDef.WCS_1_1_2) || def.equals(ServiceDef.WMTS_1_0_0);
     }
 
     /**
@@ -403,8 +399,9 @@ public abstract class OGCWebService extends WebService {
     public static void updateOWSURL(List<? extends AbstractOperation> operations, String url, String service) {
         for (AbstractOperation op:operations) {
             for (AbstractDCP dcp: op.getDCP()) {
-                for (AbstractOnlineResourceType method:dcp.getHTTP().getGetOrPost())
+                for (AbstractOnlineResourceType method:dcp.getHTTP().getGetOrPost()) {
                     method.setHref(url + service.toLowerCase() + "?");
+                }
             }
        }
     }

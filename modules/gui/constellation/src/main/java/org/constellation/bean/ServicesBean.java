@@ -218,14 +218,14 @@ public class ServicesBean {
     /**
      * Debugging purpose
      */
-    private Logger logger = Logger.getLogger("org.constellation.bean");
+    private static final Logger logger = Logger.getLogger("org.constellation.bean");
 
     public ServicesBean() throws JAXBException, FileNotFoundException {
         
         userData = new UserData();
 
         // we get the sevlet context to read the capabilities files in the deployed war
-        FacesContext context = FacesContext.getCurrentInstance();
+        final FacesContext context = FacesContext.getCurrentInstance();
         servletContext = (ServletContext) context.getExternalContext().getContext();
 
         //adding items into the webServices list.
@@ -248,55 +248,55 @@ public class ServicesBean {
     private void fillFormFromOWS110(CapabilitiesBaseType cap) {
 
         //we fill the default value of Service Identification
-        ServiceIdentification SI = cap.getServiceIdentification();
-        if (SI.getTitle().size() > 0) {
-            this.title = SI.getTitle().get(0).getValue();
+        final ServiceIdentification si = cap.getServiceIdentification();
+        if (si.getTitle().size() > 0) {
+            this.title = si.getTitle().get(0).getValue();
         }
-        if (SI.getAbstract().size() > 0) {
-            this._abstract = SI.getAbstract().get(0).getValue();
+        if (si.getAbstract().size() > 0) {
+            this._abstract = si.getAbstract().get(0).getValue();
         }
-        if (SI.getKeywords().size() > 0) {
-            this.keywords = keywordsToSelectItem(SI.getKeywords().get(0));
+        if (si.getKeywords().size() > 0) {
+            this.keywords = keywordsToSelectItem(si.getKeywords().get(0));
         }
-        this.serviceType = SI.getServiceType().getValue();
-        this.versions = stringToSelectItem(SI.getServiceTypeVersion());
-        this.fees = SI.getFees();
-        if (SI.getAccessConstraints().size() > 0) {
-            this.accessConstraints = SI.getAccessConstraints().get(0);
+        this.serviceType = si.getServiceType().getValue();
+        this.versions = stringToSelectItem(si.getServiceTypeVersion());
+        this.fees = si.getFees();
+        if (si.getAccessConstraints().size() > 0) {
+            this.accessConstraints = si.getAccessConstraints().get(0);
         }
 
         //we fill the value of ServiceProvider
-        ServiceProvider SP = cap.getServiceProvider();
-        ResponsiblePartySubsetType SC = SP.getServiceContact();
-        ContactType CI = SC.getContactInfo();
-        TelephoneType T = CI.getPhone();
-        AddressType A = CI.getAddress();
-        this.providerName = SP.getProviderName();
-        this.providerSite = SP.getProviderSite().getHref();
-        this.individualName = SC.getIndividualName();
-        this.positionName = SC.getPositionName();
+        final ServiceProvider sp            = cap.getServiceProvider();
+        final ResponsiblePartySubsetType sc = sp.getServiceContact();
+        final ContactType ci                = sc.getContactInfo();
+        final TelephoneType t               = ci.getPhone();
+        final AddressType a                 = ci.getAddress();
+        this.providerName                   = sp.getProviderName();
+        this.providerSite                   = sp.getProviderSite().getHref();
+        this.individualName                 = sc.getIndividualName();
+        this.positionName                   = sc.getPositionName();
 
         // Phone party
-        if (T.getVoice().size() > 0) {
-            this.phoneVoice = T.getVoice().get(0);
+        if (t.getVoice().size() > 0) {
+            this.phoneVoice = t.getVoice().get(0);
         }
-        if (T.getFacsimile().size() > 0) {
-            this.phoneFacsimile = T.getFacsimile().get(0);
+        if (t.getFacsimile().size() > 0) {
+            this.phoneFacsimile = t.getFacsimile().get(0);
         }
 
         //address party
-        if (A.getDeliveryPoint().size() > 0) {
-            this.deliveryPoint = A.getDeliveryPoint().get(0);
+        if (a.getDeliveryPoint().size() > 0) {
+            this.deliveryPoint = a.getDeliveryPoint().get(0);
         }
-        this.city = A.getCity();
-        this.administrativeArea = A.getAdministrativeArea();
-        this.postalCode = A.getPostalCode();
-        this.country = A.getCountry();
-        if (A.getElectronicMailAddress().size() > 0) {
-            this.electronicAddress = A.getElectronicMailAddress().get(0);
+        this.city = a.getCity();
+        this.administrativeArea = a.getAdministrativeArea();
+        this.postalCode = a.getPostalCode();
+        this.country = a.getCountry();
+        if (a.getElectronicMailAddress().size() > 0) {
+            this.electronicAddress = a.getElectronicMailAddress().get(0);
         }
-        if (SC.getRole() != null) {
-            this.role = SC.getRole().getValue();
+        if (sc.getRole() != null) {
+            this.role = sc.getRole().getValue();
         }
     }
 
@@ -306,52 +306,52 @@ public class ServicesBean {
     private void fillFormFromOWS100(org.geotoolkit.ows.xml.v100.CapabilitiesBaseType cap) {
 
         //we fill the default value of Service Identification
-        org.geotoolkit.ows.xml.v100.ServiceIdentification SI = cap.getServiceIdentification();
-        this.title = SI.getTitle();
-        this._abstract = SI.getAbstract();
-        if (SI.getKeywords().size() > 0) {
-            this.keywords = keywordsToSelectItem(SI.getKeywords().get(0));
+        final org.geotoolkit.ows.xml.v100.ServiceIdentification si = cap.getServiceIdentification();
+        this.title     = si.getTitle();
+        this._abstract = si.getAbstract();
+        if (si.getKeywords().size() > 0) {
+            this.keywords = keywordsToSelectItem(si.getKeywords().get(0));
         }
 
-        this.serviceType = SI.getServiceType().getValue();
-        this.versions = stringToSelectItem(SI.getServiceTypeVersion());
-        this.fees = SI.getFees();
-        if (SI.getAccessConstraints().size() > 0) {
-            this.accessConstraints = SI.getAccessConstraints().get(0);
+        this.serviceType = si.getServiceType().getValue();
+        this.versions    = stringToSelectItem(si.getServiceTypeVersion());
+        this.fees        = si.getFees();
+        if (si.getAccessConstraints().size() > 0) {
+            this.accessConstraints = si.getAccessConstraints().get(0);
         }
 
         //we fill the value of ServiceProvider
-        org.geotoolkit.ows.xml.v100.ServiceProvider SP = cap.getServiceProvider();
-        org.geotoolkit.ows.xml.v100.ResponsiblePartySubsetType SC = SP.getServiceContact();
-        org.geotoolkit.ows.xml.v100.ContactType CI = SC.getContactInfo();
-        org.geotoolkit.ows.xml.v100.TelephoneType T = CI.getPhone();
-        org.geotoolkit.ows.xml.v100.AddressType A = CI.getAddress();
-        this.providerName = SP.getProviderName();
-        this.providerSite = SP.getProviderSite().getHref();
-        this.individualName = SC.getIndividualName();
-        this.positionName = SC.getPositionName();
+        final org.geotoolkit.ows.xml.v100.ServiceProvider sp            = cap.getServiceProvider();
+        final org.geotoolkit.ows.xml.v100.ResponsiblePartySubsetType sc = sp.getServiceContact();
+        final org.geotoolkit.ows.xml.v100.ContactType ci                = sc.getContactInfo();
+        final org.geotoolkit.ows.xml.v100.TelephoneType t               = ci.getPhone();
+        final org.geotoolkit.ows.xml.v100.AddressType a                 = ci.getAddress();
+        this.providerName   = sp.getProviderName();
+        this.providerSite   = sp.getProviderSite().getHref();
+        this.individualName = sc.getIndividualName();
+        this.positionName   = sc.getPositionName();
 
         // Phone party
-        if (T.getVoice().size() > 0) {
-            this.phoneVoice = T.getVoice().get(0);
+        if (t.getVoice().size() > 0) {
+            this.phoneVoice = t.getVoice().get(0);
         }
-        if (T.getFacsimile().size() > 0) {
-            this.phoneFacsimile = T.getFacsimile().get(0);
+        if (t.getFacsimile().size() > 0) {
+            this.phoneFacsimile = t.getFacsimile().get(0);
         }
 
         //address party
-        if (A.getDeliveryPoint().size() > 0) {
-            this.deliveryPoint = A.getDeliveryPoint().get(0);
+        if (a.getDeliveryPoint().size() > 0) {
+            this.deliveryPoint = a.getDeliveryPoint().get(0);
         }
-        this.city = A.getCity();
-        this.administrativeArea = A.getAdministrativeArea();
-        this.postalCode = A.getPostalCode();
-        this.country = A.getCountry();
-        if (A.getElectronicMailAddress().size() > 0) {
-            this.electronicAddress = A.getElectronicMailAddress().get(0);
+        this.city = a.getCity();
+        this.administrativeArea = a.getAdministrativeArea();
+        this.postalCode = a.getPostalCode();
+        this.country = a.getCountry();
+        if (a.getElectronicMailAddress().size() > 0) {
+            this.electronicAddress = a.getElectronicMailAddress().get(0);
         }
-        if (SC.getRole() != null) {
-            this.role = SC.getRole().getValue();
+        if (sc.getRole() != null) {
+            this.role = sc.getRole().getValue();
         }
     }
 
@@ -361,10 +361,10 @@ public class ServicesBean {
     private void fillFormFromWMS(WMSCapabilities cap) {
 
         //we fill the default value of Service Identification
-        Service S = cap.getService();
-        this.title = S.getTitle();
-        this._abstract = S.getAbstract();
-        KeywordList klist = S.getKeywordList();
+        final Service s         = cap.getService();
+        this.title              = s.getTitle();
+        this._abstract          = s.getAbstract();
+        final KeywordList klist = s.getKeywordList();
         if (klist != null) {
             this.keywords = keywordsToSelectItem(klist);
         }
@@ -373,37 +373,37 @@ public class ServicesBean {
         this.versions.add(new SelectItem("1.3.0"));
         this.versions.add(new SelectItem("1.1.1"));
 
-        this.fees = S.getFees();
-        this.accessConstraints = S.getAccessConstraints();
+        this.fees = s.getFees();
+        this.accessConstraints = s.getAccessConstraints();
 
         //we fill the value of ServiceProvider
-        ContactInformation CI = S.getContactInformation();
-        ContactAddress A = CI.getContactAddress();
-        ContactPersonPrimary CPP = CI.getContactPersonPrimary();
-        this.providerName = CPP.getContactOrganization();
-        this.providerSite = S.getOnlineResource().getHref();
-        this.individualName = CPP.getContactPerson();
-        this.positionName = CI.getContactPosition();
+        ContactInformation ci    = s.getContactInformation();
+        ContactAddress a         = ci.getContactAddress();
+        ContactPersonPrimary cpp = ci.getContactPersonPrimary();
+        this.providerName        = cpp.getContactOrganization();
+        this.providerSite        = s.getOnlineResource().getHref();
+        this.individualName      = cpp.getContactPerson();
+        this.positionName        = ci.getContactPosition();
 
         // Phone party
-        this.phoneVoice = CI.getContactVoiceTelephone();
-        this.phoneFacsimile = CI.getContactFacsimileTelephone();
+        this.phoneVoice     = ci.getContactVoiceTelephone();
+        this.phoneFacsimile = ci.getContactFacsimileTelephone();
 
         //address party
-        this.deliveryPoint = A.getAddress();
-        this.city = A.getCity();
-        this.administrativeArea = A.getStateOrProvince();
-        this.postalCode = A.getPostCode();
-        this.country = A.getCountry();
-        this.electronicAddress = CI.getContactElectronicMailAddress();
+        this.deliveryPoint      = a.getAddress();
+        this.city               = a.getCity();
+        this.administrativeArea = a.getStateOrProvince();
+        this.postalCode         = a.getPostCode();
+        this.country            = a.getCountry();
+        this.electronicAddress  = ci.getContactElectronicMailAddress();
 
         /*
          * The extras attribute for WMS 
          */
-        this.addressType = A.getAddressType();
-        this.layerLimit = S.getLayerLimit();
-        this.maxHeight = S.getMaxHeight();
-        this.maxWidth = S.getMaxWidth();
+        this.addressType = a.getAddressType();
+        this.layerLimit  = s.getLayerLimit();
+        this.maxHeight   = s.getMaxHeight();
+        this.maxWidth    = s.getMaxWidth();
     }
 
     /**
@@ -429,7 +429,7 @@ public class ServicesBean {
      * @return
      */
     private List<SelectItem> keywordsToSelectItem(org.geotoolkit.ows.xml.v100.KeywordsType keywords) {
-        List<SelectItem> results = new ArrayList<SelectItem>();
+        final List<SelectItem> results = new ArrayList<SelectItem>();
 
         for (String keyword : keywords.getKeyword()) {
             results.add(new SelectItem(keyword));
@@ -445,7 +445,7 @@ public class ServicesBean {
      * @return
      */
     private List<SelectItem> keywordsToSelectItem(KeywordList keywords) {
-        List<SelectItem> results = new ArrayList<SelectItem>();
+        final List<SelectItem> results = new ArrayList<SelectItem>();
 
         for (Keyword keyword : keywords.getKeyword()) {
             results.add(new SelectItem(keyword.getValue()));
@@ -460,7 +460,7 @@ public class ServicesBean {
      * @return
      */
     private List<SelectItem> stringToSelectItem(List<String> list) {
-        List<SelectItem> results = new ArrayList<SelectItem>();
+        final List<SelectItem> results = new ArrayList<SelectItem>();
 
         for (String item : list) {
             results.add(new SelectItem(item));
@@ -475,13 +475,13 @@ public class ServicesBean {
     public String storeForm() throws JAXBException, IOException, FileNotFoundException {
 
         //we signal to the webService to update is capabilities
-        File f = new File(servletContext.getRealPath("WEB-INF/change.properties"));
-        Properties p = new Properties();
+        final File f = new File(servletContext.getRealPath("WEB-INF/change.properties"));
+        final Properties p = new Properties();
         FileInputStream in = new FileInputStream(f);
         p.load(in);
         in.close();
         p.put("update", "true");
-        FileOutputStream out = new FileOutputStream(f);
+        final FileOutputStream out = new FileOutputStream(f);
         p.store(out, "updated from JSF interface");
         out.close();
         int i = 0;
@@ -489,36 +489,36 @@ public class ServicesBean {
 
             //for OWS 1.1.0
             if (capa instanceof org.geotoolkit.ows.xml.v110.CapabilitiesBaseType) {
-                ServiceIdentification SI = getServiceIdentification110();
-                ServiceProvider SP = getServiceProvider110();
-                ((CapabilitiesBaseType) capa).setServiceProvider(SP);
-                ((CapabilitiesBaseType) capa).setServiceIdentification(SI);
+                final ServiceIdentification si = getServiceIdentification110();
+                final ServiceProvider sp       = getServiceProvider110();
+                ((CapabilitiesBaseType) capa).setServiceProvider(sp);
+                ((CapabilitiesBaseType) capa).setServiceIdentification(si);
 
             // for OWS 1.0.0
             } else if (capa instanceof org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) {
-                org.geotoolkit.ows.xml.v100.ServiceIdentification SI = getServiceIdentification100();
-                org.geotoolkit.ows.xml.v100.ServiceProvider SP = getServiceProvider100();
-                ((org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) capa).setServiceProvider(SP);
-                ((org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) capa).setServiceIdentification(SI);
+                final org.geotoolkit.ows.xml.v100.ServiceIdentification si = getServiceIdentification100();
+                final org.geotoolkit.ows.xml.v100.ServiceProvider sp       = getServiceProvider100();
+                ((org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) capa).setServiceProvider(sp);
+                ((org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) capa).setServiceIdentification(si);
 
 
             // for WCS 1.0.0
             } else if (capa instanceof WCSCapabilitiesType) {
-                ServiceType S = getWCSService();
-                ((WCSCapabilitiesType) capa).setService(S);
+                final ServiceType s = getWCSService();
+                ((WCSCapabilitiesType) capa).setService(s);
 
             // for WMS 1.3.0/1.1.1
             } else if (capa instanceof WMSCapabilities || capa instanceof WMT_MS_Capabilities) {
-                List<AbstractService> S = getWMSService();
+                final List<AbstractService> s = getWMSService();
                 
                 // 1.3.0
                 if (capa instanceof  WMSCapabilities) {
-                    ((WMSCapabilities) capa).setService(S.get(0));
+                    ((WMSCapabilities) capa).setService(s.get(0));
                     logger.info("update WMS version 1.3.0");
                 
                 // 1.1.1
                 } else {
-                    ((WMT_MS_Capabilities) capa).setService(S.get(1));
+                    ((WMT_MS_Capabilities) capa).setService(s.get(1));
                     logger.info("update WMS version 1.1.1");
                 }
             }
@@ -533,24 +533,23 @@ public class ServicesBean {
      */
     public ServiceIdentification getServiceIdentification110() {
 
-        List<LanguageStringType> listKey = new ArrayList<LanguageStringType>();
+        final List<LanguageStringType> listKey = new ArrayList<LanguageStringType>();
         for (SelectItem k : keywords) {
             listKey.add(new LanguageStringType((String) k.getValue()));
         }
 
-        List<String> listVers = new ArrayList<String>();
+        final List<String> listVers = new ArrayList<String>();
         for (SelectItem v : versions) {
             listVers.add((String) v.getValue());
         }
 
-        ServiceIdentification SI = new ServiceIdentification(new LanguageStringType(title),
+        return new ServiceIdentification(new LanguageStringType(title),
                 new LanguageStringType(_abstract),
                 new KeywordsType(listKey, null),
                 new CodeType(serviceType),
                 listVers,
                 fees,
                 accessConstraints);
-        return SI;
     }
 
     /**
@@ -558,24 +557,23 @@ public class ServicesBean {
      */
     public org.geotoolkit.ows.xml.v100.ServiceIdentification getServiceIdentification100() {
 
-        List<String> listKey = new ArrayList<String>();
+        final List<String> listKey = new ArrayList<String>();
         for (SelectItem k : keywords) {
             listKey.add((String) k.getValue());
         }
 
-        List<String> listVers = new ArrayList<String>();
+        final List<String> listVers = new ArrayList<String>();
         for (SelectItem v : versions) {
             listVers.add((String) v.getValue());
         }
 
-        org.geotoolkit.ows.xml.v100.ServiceIdentification SI = new org.geotoolkit.ows.xml.v100.ServiceIdentification(title,
+        return new org.geotoolkit.ows.xml.v100.ServiceIdentification(title,
                 _abstract,
                 new org.geotoolkit.ows.xml.v100.KeywordsType(listKey, null),
                 new org.geotoolkit.ows.xml.v100.CodeType(serviceType),
                 listVers,
                 fees,
                 accessConstraints);
-        return SI;
     }
 
     /**
@@ -583,31 +581,30 @@ public class ServicesBean {
      */
     private ServiceType getWCSService() {
 
-        List<MetadataLinkType> links = new ArrayList<MetadataLinkType>();
+        final List<MetadataLinkType> links = new ArrayList<MetadataLinkType>();
         links.add(new MetadataLinkType(providerSite));
 
-        List<String> listKey = new ArrayList<String>();
+        final List<String> listKey = new ArrayList<String>();
         for (SelectItem k : keywords) {
             listKey.add((String) k.getValue());
         }
 
-        org.geotoolkit.wcs.xml.v100.TelephoneType tel = new org.geotoolkit.wcs.xml.v100.TelephoneType(phoneVoice, phoneFacsimile);
-
-        org.geotoolkit.wcs.xml.v100.AddressType adr = new org.geotoolkit.wcs.xml.v100.AddressType(deliveryPoint,
+        final org.geotoolkit.wcs.xml.v100.TelephoneType tel = new org.geotoolkit.wcs.xml.v100.TelephoneType(phoneVoice, phoneFacsimile);
+        final org.geotoolkit.wcs.xml.v100.AddressType adr   = new org.geotoolkit.wcs.xml.v100.AddressType(deliveryPoint,
                 city,
                 administrativeArea,
                 postalCode,
                 country,
                 electronicAddress);
 
-        org.geotoolkit.wcs.xml.v100.ContactType CI = new org.geotoolkit.wcs.xml.v100.ContactType(tel, adr, null);
+        final org.geotoolkit.wcs.xml.v100.ContactType ci = new org.geotoolkit.wcs.xml.v100.ContactType(tel, adr, null);
 
-        ResponsiblePartyType resp = new ResponsiblePartyType(individualName,
+        final ResponsiblePartyType resp = new ResponsiblePartyType(individualName,
                 positionName,
                 providerName,
-                CI);
+                ci);
 
-        ServiceType service = new ServiceType(links,
+        return new ServiceType(links,
                 title,
                 title,
                 _abstract,
@@ -616,7 +613,6 @@ public class ServicesBean {
                 new CodeListType(fees),
                 new CodeListType(accessConstraints),
                 null);
-        return service;
     }
 
     /**
@@ -624,46 +620,46 @@ public class ServicesBean {
      */
     private List<AbstractService> getWMSService() {
 
-        List<AbstractService> result = new ArrayList<AbstractService>();
+        final List<AbstractService> result = new ArrayList<AbstractService>();
         
         // v1.3.0
-        List<Keyword> listKey = new ArrayList<Keyword>();
+        final List<Keyword> listKey = new ArrayList<Keyword>();
         for (SelectItem k : keywords) {
             listKey.add(new Keyword((String) k.getValue()));
         }
-        KeywordList keywordList = new KeywordList(listKey);
-        ContactPersonPrimary CPP = new ContactPersonPrimary(individualName, providerName);
-        ContactAddress CA = new ContactAddress(getAddressType(), deliveryPoint, city, administrativeArea,
+        final KeywordList keywordList   = new KeywordList(listKey);
+        final ContactPersonPrimary cpp  = new ContactPersonPrimary(individualName, providerName);
+        final ContactAddress ca         = new ContactAddress(getAddressType(), deliveryPoint, city, administrativeArea,
                 postalCode, country);
 
-        ContactInformation CI = new ContactInformation(CPP, positionName,
-                CA, phoneVoice, phoneFacsimile, electronicAddress);
+        final ContactInformation ci = new ContactInformation(cpp, positionName,
+                ca, phoneVoice, phoneFacsimile, electronicAddress);
 
-        Service service130 = new Service(title, title, _abstract,
+        final Service service130 = new Service(title, title, _abstract,
                 keywordList,
                 new OnlineResource(providerSite),
-                CI, fees, accessConstraints, getLayerLimit(),
+                ci, fees, accessConstraints, getLayerLimit(),
                 getMaxWidth(), getMaxHeight());
         result.add(service130);
         
         // v1.1.1
-        List<org.geotoolkit.wms.xml.v111.Keyword> listKey111 = new ArrayList<org.geotoolkit.wms.xml.v111.Keyword>();
+        final List<org.geotoolkit.wms.xml.v111.Keyword> listKey111 = new ArrayList<org.geotoolkit.wms.xml.v111.Keyword>();
         for (SelectItem k : keywords) {
             listKey111.add(new org.geotoolkit.wms.xml.v111.Keyword((String) k.getValue()));
         }
-        org.geotoolkit.wms.xml.v111.KeywordList keywordList111 = new org.geotoolkit.wms.xml.v111.KeywordList(listKey111);
-        org.geotoolkit.wms.xml.v111.ContactPersonPrimary CPP111 = new org.geotoolkit.wms.xml.v111.ContactPersonPrimary(individualName, providerName);
-        org.geotoolkit.wms.xml.v111.ContactAddress CA111 = new org.geotoolkit.wms.xml.v111.ContactAddress(
+        final org.geotoolkit.wms.xml.v111.KeywordList keywordList111 = new org.geotoolkit.wms.xml.v111.KeywordList(listKey111);
+        final org.geotoolkit.wms.xml.v111.ContactPersonPrimary cpp111 = new org.geotoolkit.wms.xml.v111.ContactPersonPrimary(individualName, providerName);
+        final org.geotoolkit.wms.xml.v111.ContactAddress ca111 = new org.geotoolkit.wms.xml.v111.ContactAddress(
                 getAddressType(), deliveryPoint, city, administrativeArea, postalCode, country);
 
-        org.geotoolkit.wms.xml.v111.ContactInformation CI111 = new org.geotoolkit.wms.xml.v111.ContactInformation(CPP111, positionName,
-                CA111, phoneVoice, phoneFacsimile, electronicAddress);
+        org.geotoolkit.wms.xml.v111.ContactInformation ci111 = new org.geotoolkit.wms.xml.v111.ContactInformation(cpp111, positionName,
+                ca111, phoneVoice, phoneFacsimile, electronicAddress);
 
         org.geotoolkit.wms.xml.v111.Service service111 = new org.geotoolkit.wms.xml.v111.Service(
                 title, title, _abstract,
                 keywordList111,
                 new org.geotoolkit.wms.xml.v111.OnlineResource(providerSite),
-                CI111, fees, accessConstraints);
+                ci111, fees, accessConstraints);
         result.add(service111);
         
         return result;
@@ -674,26 +670,26 @@ public class ServicesBean {
      */
     public ServiceProvider getServiceProvider110() {
 
-        AddressType adr = new AddressType(deliveryPoint,
+        final AddressType adr = new AddressType(deliveryPoint,
                 city,
                 administrativeArea,
                 postalCode,
                 country,
                 electronicAddress);
 
-        ContactType CI = new ContactType(new TelephoneType(phoneVoice, phoneFacsimile),
+        final ContactType ci = new ContactType(new TelephoneType(phoneVoice, phoneFacsimile),
                 adr,
                 null, null, null);
 
-        ResponsiblePartySubsetType SC = new ResponsiblePartySubsetType(individualName,
+        final ResponsiblePartySubsetType sc = new ResponsiblePartySubsetType(individualName,
                 positionName,
-                CI,
+                ci,
                 new CodeType(role));
 
-        ServiceProvider SP = new ServiceProvider(providerName,
+        final ServiceProvider sp = new ServiceProvider(providerName,
                 new OnlineResourceType(providerSite),
-                SC);
-        return SP;
+                sc);
+        return sp;
     }
 
     /**
@@ -701,28 +697,27 @@ public class ServicesBean {
      */
     public org.geotoolkit.ows.xml.v100.ServiceProvider getServiceProvider100() {
 
-        org.geotoolkit.ows.xml.v100.AddressType adr = new org.geotoolkit.ows.xml.v100.AddressType(deliveryPoint,
+        final org.geotoolkit.ows.xml.v100.AddressType adr = new org.geotoolkit.ows.xml.v100.AddressType(deliveryPoint,
                 city,
                 administrativeArea,
                 postalCode,
                 country,
                 electronicAddress);
 
-        org.geotoolkit.ows.xml.v100.ContactType CI = new org.geotoolkit.ows.xml.v100.ContactType(new org.geotoolkit.ows.xml.v100.TelephoneType(phoneVoice, phoneFacsimile),
+        final org.geotoolkit.ows.xml.v100.ContactType ci = new org.geotoolkit.ows.xml.v100.ContactType(new org.geotoolkit.ows.xml.v100.TelephoneType(phoneVoice, phoneFacsimile),
                 adr,
                 null, null, null);
 
-        org.geotoolkit.ows.xml.v100.ResponsiblePartySubsetType SC = new org.geotoolkit.ows.xml.v100.ResponsiblePartySubsetType(
+        final org.geotoolkit.ows.xml.v100.ResponsiblePartySubsetType sc = new org.geotoolkit.ows.xml.v100.ResponsiblePartySubsetType(
                 individualName,
                 positionName,
-                CI,
+                ci,
                 new org.geotoolkit.ows.xml.v100.CodeType(role));
 
-        org.geotoolkit.ows.xml.v100.ServiceProvider SP = new org.geotoolkit.ows.xml.v100.ServiceProvider(
+        return new org.geotoolkit.ows.xml.v100.ServiceProvider(
                 providerName,
                 new org.geotoolkit.ows.xml.v100.OnlineResourceType(providerSite),
-                SC);
-        return SP;
+                sc);
     }
 
     /**
@@ -732,10 +727,10 @@ public class ServicesBean {
      */
     private void storeCapabilitiesFile() throws JAXBException {
         try {
-            Marshaller marshaller = marshallerPool.acquireMarshaller();
+            final Marshaller marshaller = marshallerPool.acquireMarshaller();
             int i = 0;
             for (File f : capabilitiesFile) {
-                OutputStream out = new FileOutputStream(f);
+                final OutputStream out = new FileOutputStream(f);
                 marshaller.marshal(capabilities[i],out);
                 out.close();
                 logger.info("store " + f.getAbsolutePath());
@@ -769,7 +764,7 @@ public class ServicesBean {
     private void loadUserData(File f) throws FileNotFoundException, IOException {
         try {
             if (f != null) {
-                Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             	userData = (UserData) unmarshaller.unmarshal(f);
                 marshallerPool.release(unmarshaller);
             } else {
@@ -777,7 +772,7 @@ public class ServicesBean {
                 return;
             }
 
-            Marshaller marshaller = marshallerPool.acquireMarshaller();
+            final Marshaller marshaller = marshallerPool.acquireMarshaller();
             // we extract and update WMS user data
             if (userData.getWMSCapabilities() != null) {
                 
@@ -887,13 +882,13 @@ public class ServicesBean {
             }
             
             //we signal to the webService to update is capabilities
-            File change        = new File(servletContext.getRealPath("WEB-INF/change.properties"));
-            Properties p       = new Properties();
-            FileInputStream in = new FileInputStream(change);
+            final File change        = new File(servletContext.getRealPath("WEB-INF/change.properties"));
+            final Properties p       = new Properties();
+            final FileInputStream in = new FileInputStream(change);
             p.load(in);
             in.close();
             p.put("update", "true");
-            FileOutputStream out = new FileOutputStream(change);
+            final FileOutputStream out = new FileOutputStream(change);
             p.store(out, "updated from JSF interface");
             out.close();
 
@@ -906,9 +901,9 @@ public class ServicesBean {
     }
     
     public void storeData() throws JAXBException {
-        String url = servletContext.getRealPath("preference.sml");
+        final String url = servletContext.getRealPath("preference.sml");
         setUrlPreference("preference.sml");
-        File f = new File(url);
+        final File f = new File(url);
         //f.setWritable(true);
         setExistPrefrence(true);
         Marshaller marshaller = marshallerPool.acquireMarshaller();
@@ -922,7 +917,7 @@ public class ServicesBean {
         webServiceMode    = "WMS";
         capabilities     = new Object[2];
         capabilitiesFile = new File[2];
-        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
         //we begin to read the high lvl document
         String path = servletContext.getRealPath("WEB-INF/WMSCapabilities1.3.0.xml");
@@ -957,7 +952,7 @@ public class ServicesBean {
         webServiceMode = "WCS";
         capabilities = new Object[2];
         capabilitiesFile = new File[2];
-        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
         //we begin to read the high lvl document
         String path = servletContext.getRealPath("WEB-INF/WCSCapabilities1.1.1.xml");
@@ -1084,8 +1079,8 @@ public class ServicesBean {
 
     public boolean existsCapabilities(String ws) {
         boolean exist = false;
-        File file;
-        String path;
+        final File file;
+        final String path;
         if (ws.equals("CSW")) {
             path = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
             file = new File(path);
@@ -1113,13 +1108,13 @@ public class ServicesBean {
      */
     public File processSubmitedFile() throws IOException {
         upload();
-        File f = File.createTempFile("userData", "geomatys");
+        final File f = File.createTempFile("userData", "geomatys");
         try {
            
-            InputStream inputStream = uploadedFile.getInputStream();
-            InputStreamReader infile = new InputStreamReader(inputStream);
-            BufferedReader inbuf = new BufferedReader(infile);
-            FileWriter writer = new FileWriter(f);
+            final InputStream inputStream  = uploadedFile.getInputStream();
+            final InputStreamReader infile = new InputStreamReader(inputStream);
+            final BufferedReader inbuf     = new BufferedReader(infile);
+            final FileWriter writer        = new FileWriter(f);
 
             String line;
             while ((line = inbuf.readLine()) != null) {
@@ -1131,22 +1126,18 @@ public class ServicesBean {
             writer.close();
             
         } catch (Exception x) {
-            FacesMessage message = new FacesMessage(
+            final FacesMessage message = new FacesMessage(
                     FacesMessage.SEVERITY_FATAL,
                     x.getClass().getName(), x.getMessage());
-            FacesContext.getCurrentInstance().addMessage(
-                    null, message);
+            FacesContext.getCurrentInstance().addMessage(null, message);
             logger.severe("Exception in proccesSubmitFile " + x.getMessage());
             return null;
-        }
-        if (f == null) {
-            logger.severe("process uploaded file null");
         }
         return f;
     }
     
     public String doUpload() throws IOException{
-        File f = processSubmitedFile();
+        final File f = processSubmitedFile();
         if (f == null) {
             logger.severe("[doUpload]process uploaded file null");
         }
@@ -1159,7 +1150,7 @@ public class ServicesBean {
      * @throws java.io.IOException
      */
     public void upload() throws IOException {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
+        final FacesContext facesContext = FacesContext.getCurrentInstance();
         facesContext.getExternalContext().getApplicationMap().put("fileupload_bytes", uploadedFile.getBytes());
         facesContext.getExternalContext().getApplicationMap().put("fileupload_type", uploadedFile.getContentType());
         facesContext.getExternalContext().getApplicationMap().put("fileupload_name", uploadedFile.getName());
@@ -1171,7 +1162,7 @@ public class ServicesBean {
      * @return boolean
      */
     public boolean isUploaded() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
+        final FacesContext facesContext = FacesContext.getCurrentInstance();
         return facesContext.getExternalContext().getApplicationMap().get("fileupload_bytes") != null;
     }
 
@@ -1183,16 +1174,16 @@ public class ServicesBean {
         return title;
     }
 
-    public void setTitle(String Title) {
-        this.title = Title;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getAbstract() {
         return _abstract;
     }
 
-    public void setAbstract(String _abstract) {
-        this._abstract = _abstract;
+    public void setAbstract(String abstractt) {
+        this._abstract = abstractt;
     }
 
     public List<SelectItem> getKeywords() {

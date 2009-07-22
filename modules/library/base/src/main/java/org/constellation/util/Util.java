@@ -89,8 +89,9 @@ import javax.xml.bind.Unmarshaller;
  */
 public final class Util {
 	
-    private static Logger logger = Logger.getLogger("org.constellation.util");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.util");
     
+    private Util() {}
     
     /**
      * Returns true if one of the {@code String} elements in a {@code List} 
@@ -103,15 +104,15 @@ public final class Util {
      *           parameter, {@code false} otherwise.
      */
     public static boolean matchesStringfromList(final List<String> list,final String str) {
-        boolean str_available = false;
+        boolean strAvailable = false;
         for (String s : list) {
-            Pattern pattern = Pattern.compile(str,Pattern.CASE_INSENSITIVE | Pattern.CANON_EQ);
-            Matcher matcher = pattern.matcher(s);
+            final Pattern pattern = Pattern.compile(str,Pattern.CASE_INSENSITIVE | Pattern.CANON_EQ);
+            final Matcher matcher = pattern.matcher(s);
             if (matcher.find()) {
-                str_available = true;
+                strAvailable = true;
             }
         }
-        return str_available;
+        return strAvailable;
     }
     
     /**
@@ -128,20 +129,20 @@ public final class Util {
      * @see TimeParser
      */
     public static Date getDateFromString(String dateString) throws ParseException {
-        final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
-        final String DATE_FORMAT2 = "yyyy-MM-dd";
-        final String DATE_FORMAT3 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-        final SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT);
-        final SimpleDateFormat sdf2 = new java.text.SimpleDateFormat(DATE_FORMAT2);
-        final SimpleDateFormat sdf3 = new java.text.SimpleDateFormat(DATE_FORMAT3);
+        final String dateFormat     = "yyyy-MM-dd'T'HH:mm:ssZ";
+        final String dateFormat2    = "yyyy-MM-dd";
+        final String dateFormat3    = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+        final SimpleDateFormat sdf  = new java.text.SimpleDateFormat(dateFormat);
+        final SimpleDateFormat sdf2 = new java.text.SimpleDateFormat(dateFormat2);
+        final SimpleDateFormat sdf3 = new java.text.SimpleDateFormat(dateFormat3);
 
         if (dateString.contains("T")) {
             String timezoneStr;
-            int index = dateString.lastIndexOf("+");
+            int index = dateString.lastIndexOf('+');
             if (index == -1) {
-                index = dateString.lastIndexOf("-");
+                index = dateString.lastIndexOf('-');
             }
-            if (index > dateString.indexOf("T")) {
+            if (index > dateString.indexOf('T')) {
                 timezoneStr = dateString.substring(index + 1);
 
                 if (timezoneStr.contains(":")) {
@@ -187,11 +188,11 @@ public final class Util {
         if (dateString.endsWith("Z")) {
             return "GMT+" + 0;
         }
-        int index = dateString.lastIndexOf("+");
+        int index = dateString.lastIndexOf('+');
         if (index == -1) {
-            index = dateString.lastIndexOf("-");
+            index = dateString.lastIndexOf('-');
         }
-        if (index > dateString.indexOf("T")) {
+        if (index > dateString.indexOf('T')) {
             return "GMT" + dateString.substring(index);
         }
         return TimeZone.getDefault().getID();
@@ -215,33 +216,33 @@ public final class Util {
      */
     public static Date createDate(String date, final DateFormat dateFormat) throws ParseException {
         
-        Map<String, String> POOL = new HashMap<String, String>();
-        POOL.put("janvier",   "01");
-        POOL.put("février",   "02");
-        POOL.put("mars",      "03");
-        POOL.put("avril",     "04");
-        POOL.put("mai",       "05");
-        POOL.put("juin",      "06");
-        POOL.put("juillet",   "07");
-        POOL.put("août",      "08");
-        POOL.put("septembre", "09");
-        POOL.put("octobre",   "10");
-        POOL.put("novembre",  "11");
-        POOL.put("décembre",  "12");
+        final Map<String, String> pool = new HashMap<String, String>();
+        pool.put("janvier",   "01");
+        pool.put("février",   "02");
+        pool.put("mars",      "03");
+        pool.put("avril",     "04");
+        pool.put("mai",       "05");
+        pool.put("juin",      "06");
+        pool.put("juillet",   "07");
+        pool.put("août",      "08");
+        pool.put("septembre", "09");
+        pool.put("octobre",   "10");
+        pool.put("novembre",  "11");
+        pool.put("décembre",  "12");
 
-        Map<String, String> POOLcase = new HashMap<String, String>();
-        POOLcase.put("Janvier",   "01");
-        POOLcase.put("Février",   "02");
-        POOLcase.put("Mars",      "03");
-        POOLcase.put("Avril",     "04");
-        POOLcase.put("Mai",       "05");
-        POOLcase.put("Juin",      "06");
-        POOLcase.put("Juillet",   "07");
-        POOLcase.put("Août",      "08");
-        POOLcase.put("Septembre", "09");
-        POOLcase.put("Octobre",   "10");
-        POOLcase.put("Novembre",  "11");
-        POOLcase.put("Décembre",  "12");
+        final Map<String, String> poolCase = new HashMap<String, String>();
+        poolCase.put("Janvier",   "01");
+        poolCase.put("Février",   "02");
+        poolCase.put("Mars",      "03");
+        poolCase.put("Avril",     "04");
+        poolCase.put("Mai",       "05");
+        poolCase.put("Juin",      "06");
+        poolCase.put("Juillet",   "07");
+        poolCase.put("Août",      "08");
+        poolCase.put("Septembre", "09");
+        poolCase.put("Octobre",   "10");
+        poolCase.put("Novembre",  "11");
+        poolCase.put("Décembre",  "12");
 
         String year;
         String month;
@@ -250,26 +251,26 @@ public final class Util {
         if (date != null) {
             if (date.contains("/")) {
                 if (getOccurenceFrequency(date, "/") == 2) {
-                    day = date.substring(0, date.indexOf("/"));
-                    date = date.substring(date.indexOf("/") + 1);
-                    month = date.substring(0, date.indexOf("/"));
-                    year = date.substring(date.indexOf("/") + 1);
+                    day = date.substring(0, date.indexOf('/'));
+                    date = date.substring(date.indexOf('/') + 1);
+                    month = date.substring(0, date.indexOf('/'));
+                    year = date.substring(date.indexOf('/') + 1);
 
                     tmp = getDateFromString(year + "-" + month + "-" + day);
                 } else {
                     if (getOccurenceFrequency(date, "/") == 1) {
-                        month = date.substring(0, date.indexOf("/"));
-                        year = date.substring(date.indexOf("/") + 1);
+                        month = date.substring(0, date.indexOf('/'));
+                        year = date.substring(date.indexOf('/') + 1);
                         tmp = getDateFromString(year + "-" + month + "-" + "01");
                     }
                 }
             } else if (getOccurenceFrequency(date, " ") == 2) {
                 if (!date.contains("?")) {
 
-                    day = date.substring(0, date.indexOf(" "));
-                    date = date.substring(date.indexOf(" ") + 1);
-                    month = POOL.get(date.substring(0, date.indexOf(" ")));
-                    year = date.substring(date.indexOf(" ") + 1);
+                    day = date.substring(0, date.indexOf(' '));
+                    date = date.substring(date.indexOf(' ') + 1);
+                    month = pool.get(date.substring(0, date.indexOf(' ')));
+                    year = date.substring(date.indexOf(' ') + 1);
 
                     tmp = getDateFromString(year + "-" + month + "-" + day);
                 } else {
@@ -283,38 +284,39 @@ public final class Util {
                     }
                     return new Date(d.getTime());
                 } catch (ParseException ex) {
+                    LOGGER.info("parse exception for input:" + date);
                 }
-                month = POOLcase.get(date.substring(0, date.indexOf(" ")));
-                year = date.substring(date.indexOf(" ") + 1);
+                month = poolCase.get(date.substring(0, date.indexOf(' ')));
+                year = date.substring(date.indexOf(' ') + 1);
                 tmp = getDateFromString(year + "-" + month + "-" + "01");
 
 
             } else if (getOccurenceFrequency(date, "-") == 1) {
 
-                month = date.substring(0, date.indexOf("-"));
-                year = date.substring(date.indexOf("-") + 1);
+                month = date.substring(0, date.indexOf('-'));
+                year = date.substring(date.indexOf('-') + 1);
 
                 tmp = getDateFromString(year + "-" + month + "-" + "01");
 
             } else if (getOccurenceFrequency(date, "-") == 2) {
 
                 //if date is in format yyyy-mm-dd
-                if (date.substring(0, date.indexOf("-")).length() == 4) {
-                    year = date.substring(0, date.indexOf("-"));
-                    date = date.substring(date.indexOf("-") + 1); //mm-ddZ
-                    month = date.substring(0, date.indexOf("-"));
-                    date = date.substring(date.indexOf("-") + 1); // ddZ
+                if (date.substring(0, date.indexOf('-')).length() == 4) {
+                    year = date.substring(0, date.indexOf('-'));
+                    date = date.substring(date.indexOf('-') + 1); //mm-ddZ
+                    month = date.substring(0, date.indexOf('-'));
+                    date = date.substring(date.indexOf('-') + 1); // ddZ
                     if (date.contains("Z")) {
-                        date = date.substring(0, date.indexOf("Z"));
+                        date = date.substring(0, date.indexOf('Z'));
                     }
                     day = date;
 
                     tmp = getDateFromString(year + "-" + month + "-" + day);
                 } else {
-                    day = date.substring(0, date.indexOf("-"));
-                    date = date.substring(date.indexOf("-") + 1);
-                    month = date.substring(0, date.indexOf("-"));
-                    year = date.substring(date.indexOf("-") + 1);
+                    day = date.substring(0, date.indexOf('-'));
+                    date = date.substring(date.indexOf('-') + 1);
+                    month = date.substring(0, date.indexOf('-'));
+                    year = date.substring(date.indexOf('-') + 1);
 
                     tmp = getDateFromString(year + "-" + month + "-" + day);
                 }
@@ -362,22 +364,22 @@ public final class Util {
      */
     public static File getDirectoryFromResource(final String packagee) {
         File result = null;
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
 
         try {
-            String fileP = packagee.replace('.', '/');
-            Enumeration<URL> urls = classloader.getResources(fileP);
+            final String fileP = packagee.replace('.', '/');
+            final Enumeration<URL> urls = classloader.getResources(fileP);
             while (urls.hasMoreElements()) {
-                URL url = urls.nextElement();
+                final URL url = urls.nextElement();
                 try {
-                    URI uri = url.toURI();
+                    final URI uri = url.toURI();
                     result  = scanDir(uri, fileP);
                 } catch (URISyntaxException e) {
-                    logger.severe("URL, " + url + "cannot be converted to a URI");
+                    LOGGER.severe("URL, " + url + "cannot be converted to a URI");
                 }
             }
         } catch (IOException ex) {
-            logger.severe("The resources for the package" + packagee + ", could not be obtained");
+            LOGGER.severe("The resources for the package" + packagee + ", could not be obtained");
         }
 
 
@@ -394,14 +396,14 @@ public final class Util {
      * @throws java.io.IOException
      */
     public static File scanDir(final URI u, final String filePackageName) throws IOException {
-        String scheme = u.getScheme();
+        final String scheme = u.getScheme();
         if (scheme.equals("file")) {
-            File f = new File(u.getPath());
+            final File f = new File(u.getPath());
             if (f.isDirectory()) {
                 return f;
             }
         } else if (scheme.equals("jar") || scheme.equals("zip")) {
-            logger.info("we don't scan jar or zip files");
+            LOGGER.info("we don't scan jar or zip files");
         }
         return null;
     }
@@ -416,26 +418,24 @@ public final class Util {
      * @return A list of package names.
      */
     public static List<String> searchSubFiles(final String packagee) {
-        List<String> result = new ArrayList<String>();
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        final List<String> result     = new ArrayList<String>();
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
 
         try {
-            String fileP = packagee.replace('.', '/');
-            Enumeration<URL> urls = classloader.getResources(fileP);
+            final String fileP          = packagee.replace('.', '/');
+            final Enumeration<URL> urls = classloader.getResources(fileP);
             while (urls.hasMoreElements()) {
-                URL url = urls.nextElement();
+                final URL url = urls.nextElement();
                 try {
-                    URI uri = url.toURI();
+                    final URI uri = url.toURI();
                     result.addAll(scan(uri, fileP, false));
                 } catch (URISyntaxException e) {
-                    logger.severe("URL, " + url + "cannot be converted to a URI");
+                    LOGGER.severe("URL, " + url + "cannot be converted to a URI");
                 }
             }
         } catch (IOException ex) {
-            logger.severe("The resources for the package" + packagee + ", could not be obtained");
+            LOGGER.severe("The resources for the package" + packagee + ", could not be obtained");
         }
-
-
         return result;
     }
 
@@ -449,26 +449,25 @@ public final class Util {
      * @return A list of package names.
      */
     public static List<String> searchSubPackage(final String... packages) {
-        List<String> result = new ArrayList<String>();
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        final List<String> result     = new ArrayList<String>();
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         for (String p : packages) {
             try {
-                String fileP = p.replace('.', '/');
-                Enumeration<URL> urls = classloader.getResources(fileP);
+                final String fileP          = p.replace('.', '/');
+                final Enumeration<URL> urls = classloader.getResources(fileP);
                 while (urls.hasMoreElements()) {
-                    URL url = urls.nextElement();
+                    final URL url = urls.nextElement();
                     try {
-                        URI uri = url.toURI();
+                        final URI uri = url.toURI();
                         result.addAll(scan(uri, fileP, true));
                     } catch (URISyntaxException e) {
-                        logger.severe("URL, " + url + "cannot be converted to a URI");
+                        LOGGER.severe("URL, " + url + "cannot be converted to a URI");
                     }
                 }
             } catch (IOException ex) {
-                logger.severe("The resources for the package" + p + ", could not be obtained");
+                LOGGER.severe("The resources for the package" + p + ", could not be obtained");
             }
         }
-
         return result;
     }
 
@@ -483,25 +482,25 @@ public final class Util {
      * @throws java.io.IOException
      */
     public static List<String> scan(final URI u, final String filePackageName, boolean directory) throws IOException {
-        List<String> result = new ArrayList<String>();
-        String scheme = u.getScheme();
+        final List<String> result = new ArrayList<String>();
+        final String scheme = u.getScheme();
         if (scheme.equals("file")) {
-            File f = new File(u.getPath());
+            final File f = new File(u.getPath());
             if (f.isDirectory()) {
                 result.addAll(scanDirectory(f, filePackageName, directory));
             } else if (!directory) {
-                System.out.println("added :" + f.getPath());
+                LOGGER.info("added :" + f.getPath());
                 result.add(f.getPath());
             }
         } else if (scheme.equals("jar") || scheme.equals("zip")) {
             try {
-                URI jarUri = URI.create(u.getSchemeSpecificPart());
-                String jarFile = jarUri.getPath();
-                jarFile = jarFile.substring(0, jarFile.indexOf('!'));
+                final URI jarUri = URI.create(u.getSchemeSpecificPart());
+                String jarFile   = jarUri.getPath();
+                jarFile          = jarFile.substring(0, jarFile.indexOf('!'));
                 result.addAll(scanJar(new File(jarFile), filePackageName, directory));
 
             } catch (IllegalArgumentException ex) {
-                logger.warning("unable to scan jar file: " +u.getSchemeSpecificPart());
+                LOGGER.warning("unable to scan jar file: " +u.getSchemeSpecificPart());
             }
         }
         return result;
@@ -517,7 +516,7 @@ public final class Util {
      * @return a list of package names.
      */
     public static List<String> scanDirectory(final File root, final String parent, boolean directory) {
-        List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<String>();
         for (File child : root.listFiles()) {
             if (child.isDirectory()) {
                 if (directory) {
@@ -525,7 +524,7 @@ public final class Util {
                 }
                 result.addAll(scanDirectory(child, parent, directory));
             } else if (!directory) {
-                System.out.println("added :" + child.getPath());
+                LOGGER.info("added :" + child.getPath());
                 result.add(child.getPath());
             }
         }
@@ -543,11 +542,11 @@ public final class Util {
      * @throws java.io.IOException
      */
     public static List<String> scanJar(final File file, final String parent, boolean directory) throws IOException {
-        List<String> result = new ArrayList<String>();
-        final JarFile jar = new JarFile(file);
+        final List<String> result = new ArrayList<String>();
+        final JarFile jar         = new JarFile(file);
         final Enumeration<JarEntry> entries = jar.entries();
         while (entries.hasMoreElements()) {
-            JarEntry e = entries.nextElement();
+            final JarEntry e = entries.nextElement();
             if (e.isDirectory() && e.getName().startsWith(parent) && directory) {
                 String s = e.getName().replace('/', '.');
                 s = s.substring(0, s.length() - 1);
@@ -567,9 +566,9 @@ public final class Util {
      * @param key :  the string to encode.
      * @return the value (string) hexadecimal on 32 bits
      */
-    public static String MD5encode(final String key) {
+    public static String md5encode(final String key) {
 
-        byte[] uniqueKey = key.getBytes();
+        final byte[] uniqueKey = key.getBytes();
         byte[] hash = null;
         try {
             // we get an object allowing to crypt the string
@@ -578,7 +577,7 @@ public final class Util {
         } catch (NoSuchAlgorithmException e) {
             throw new Error("no MD5 support in this VM");
         }
-        StringBuffer hashString = new StringBuffer();
+        final StringBuffer hashString = new StringBuffer();
         for (int i = 0; i < hash.length; ++i) {
             String hex = Integer.toHexString(hash[i]);
             if (hex.length() == 1) {
@@ -602,7 +601,7 @@ public final class Util {
      * @return An array of {@code Class<?>}.
      */
     public static Class<?>[] toArray(final List<Class> classeList) {
-        Class<?>[] result = new Class<?>[classeList.size()];
+        final Class<?>[] result = new Class<?>[classeList.size()];
         int i = 0;
         for (Class<?> classe : classeList) {
             result[i] = classe;
@@ -634,7 +633,10 @@ public final class Util {
                 if (f.isDirectory()) {
                     deleteDirectory(directory);
                 } else {
-                    f.delete();
+                    boolean deleted = f.delete();
+                    if (!deleted) {
+                        LOGGER.warning("unable to delete the file:" + f.getName());
+                    }
                 }
             }
         } 
@@ -649,7 +651,7 @@ public final class Util {
      * @return
      */
     public static List<String> cleanStrings(final List<String> list) {
-        List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<String>();
         for (String s : list) {
             //we remove the bad character before the real value
            s = s.replace(" ", "");
@@ -675,17 +677,17 @@ public final class Util {
     /**
      * Return an marshallable Object from an url
      */
-    public static Object getUrlContent(final String URL, final Unmarshaller unmarshaller) throws MalformedURLException, IOException {
-        URL source         = new URL(URL);
-        URLConnection conec = source.openConnection();
+    public static Object getUrlContent(final String url, final Unmarshaller unmarshaller) throws MalformedURLException, IOException {
+        final URL source         = new URL(url);
+        final URLConnection conec = source.openConnection();
         Object response = null;
         
         try {
         
             // we get the response document
-            InputStream in = conec.getInputStream();
-            StringWriter out = new StringWriter();
-            byte[] buffer = new byte[1024];
+            final InputStream in   = conec.getInputStream();
+            final StringWriter out = new StringWriter();
+            final byte[] buffer    = new byte[1024];
             int size;
 
             while ((size = in.read(buffer, 0, 1024)) > 0) {
@@ -697,21 +699,19 @@ public final class Util {
 
             //we need to replace % character by "percent because they are reserved char for url encoding
             brutString = brutString.replaceAll("%", "percent");
-            String decodedString = java.net.URLDecoder.decode(brutString, "UTF-8");
-
-            
+            final String decodedString = java.net.URLDecoder.decode(brutString, "UTF-8");
             
             try {
                 response = unmarshaller.unmarshal(new StringReader(decodedString));
-                if (response != null && response instanceof JAXBElement) {
+                if (response instanceof JAXBElement) {
                     response = ((JAXBElement<?>) response).getValue();
                 }
             } catch (JAXBException ex) {
-                logger.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
+                LOGGER.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
                         "cause: " + ex.getMessage());
             }
         } catch (IOException ex) {
-            logger.severe("The Distant service have made an error");
+            LOGGER.severe("The Distant service have made an error");
             return null;
         }
         return response;
@@ -731,24 +731,23 @@ public final class Util {
             if (classe == null)
                 return null;
             
-            Constructor<?> constructor = classe.getConstructor();
+            final Constructor<?> constructor = classe.getConstructor();
 
             //we execute the constructor
-            Object result = constructor.newInstance();
-            return result;
+            return constructor.newInstance();
             
         } catch (InstantiationException ex) {
-            logger.severe("The service can not instantiate the class: " + classe.getName() + "()");
+            LOGGER.severe("The service can not instantiate the class: " + classe.getName() + "()");
         } catch (IllegalAccessException ex) {
-            logger.severe("The service can not access the constructor in class: " + classe.getName());
+            LOGGER.severe("The service can not access the constructor in class: " + classe.getName());
         } catch (IllegalArgumentException ex) {//TODO: this cannot possibly happen.
-            logger.severe("Illegal Argument in empty constructor for class: " + classe.getName());
+            LOGGER.severe("Illegal Argument in empty constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            logger.severe("Invocation Target Exception in empty constructor for class: " + classe.getName());
+            LOGGER.severe("Invocation Target Exception in empty constructor for class: " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            logger.severe("There is no empty constructor for class: " + classe.getName());
+            LOGGER.severe("There is no empty constructor for class: " + classe.getName());
         } catch (SecurityException ex) {
-            logger.severe("Security exception while instantiating class: " + classe.getName());
+            LOGGER.severe("Security exception while instantiating class: " + classe.getName());
         }
         return null;
     }
@@ -768,24 +767,23 @@ public final class Util {
         try {
             if (classe == null)
                 return null;
-            Constructor<?> constructor = classe.getConstructor(String.class);
+            final Constructor<?> constructor = classe.getConstructor(String.class);
             
             //we execute the constructor
-            Object result = constructor.newInstance(parameter);
-            return result;
+            return constructor.newInstance(parameter);
             
         } catch (InstantiationException ex) {
-            logger.severe("The service can not instantiate the class: " + classe.getName() + "(string)");
+            LOGGER.severe("The service can not instantiate the class: " + classe.getName() + "(string)");
         } catch (IllegalAccessException ex) {
-            logger.severe("The service can not access the constructor in class: " + classe.getName());
+            LOGGER.severe("The service can not access the constructor in class: " + classe.getName());
         } catch (IllegalArgumentException ex) {
-            logger.severe("Illegal Argument in string constructor for class: " + classe.getName());
+            LOGGER.severe("Illegal Argument in string constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            logger.severe("Invocation target exception in string constructor for class: " + classe.getName());
+            LOGGER.severe("Invocation target exception in string constructor for class: " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            logger.severe("No single string constructor in class: " + classe.getName());
+            LOGGER.severe("No single string constructor in class: " + classe.getName());
         } catch (SecurityException ex) {
-            logger.severe("Security exception while instantiating class: " + classe.getName());
+            LOGGER.severe("Security exception while instantiating class: " + classe.getName());
         }
         return null;
     }
@@ -807,24 +805,23 @@ public final class Util {
         try {
             if (classe == null)
                 return null;
-            Constructor<?> constructor = classe.getConstructor(String.class, String.class);
+            final Constructor<?> constructor = classe.getConstructor(String.class, String.class);
             
             //we execute the constructor
-            Object result = constructor.newInstance(parameter1, parameter2);
-            return result;
+            return constructor.newInstance(parameter1, parameter2);
             
         } catch (InstantiationException ex) {
-            logger.severe("The service can't instantiate the class: " + classe.getName() + "(string, string)");
+            LOGGER.severe("The service can't instantiate the class: " + classe.getName() + "(string, string)");
         } catch (IllegalAccessException ex) {
-            logger.severe("The service can not access the constructor in class: " + classe.getName());
+            LOGGER.severe("The service can not access the constructor in class: " + classe.getName());
         } catch (IllegalArgumentException ex) {
-            logger.severe("Illegal Argument in double string constructor for class: " + classe.getName());
+            LOGGER.severe("Illegal Argument in double string constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            logger.severe("Invocation target exception in double string constructor for class: " + classe.getName());
+            LOGGER.severe("Invocation target exception in double string constructor for class: " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            logger.severe("No double string constructor in class: " + classe.getName());
+            LOGGER.severe("No double string constructor in class: " + classe.getName());
         } catch (SecurityException ex) {
-            logger.severe("Security exception while instantiating class: " + classe.getName());
+            LOGGER.severe("Security exception while instantiating class: " + classe.getName());
         }
         return null;
     }
@@ -844,24 +841,23 @@ public final class Util {
         try {
             if (classe == null)
                 return null;
-            Constructor<?> constructor = classe.getConstructor(CharSequence.class);
+            final Constructor<?> constructor = classe.getConstructor(CharSequence.class);
             
             //we execute the constructor
-            Object result = constructor.newInstance(parameter);
-            return result;
+            return constructor.newInstance(parameter);
             
         } catch (InstantiationException ex) {
-            logger.severe("The service can't instantiate the class: " + classe.getName() + "(CharSequence)");
+            LOGGER.severe("The service can't instantiate the class: " + classe.getName() + "(CharSequence)");
         } catch (IllegalAccessException ex) {
-            logger.severe("The service can not access the constructor in class: " + classe.getName());
+            LOGGER.severe("The service can not access the constructor in class: " + classe.getName());
         } catch (IllegalArgumentException ex) {
-            logger.severe("Illegal Argument in CharSequence constructor for class: " + classe.getName());
+            LOGGER.severe("Illegal Argument in CharSequence constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            logger.severe("Invocation target exception in CharSequence constructor for class: " + classe.getName());
+            LOGGER.severe("Invocation target exception in CharSequence constructor for class: " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            logger.severe("No such CharSequence constructor in class: " + classe.getName());
+            LOGGER.severe("No such CharSequence constructor in class: " + classe.getName());
         } catch (SecurityException ex) {
-            logger.severe("Security exception while instantiating class: " + classe.getName());
+            LOGGER.severe("Security exception while instantiating class: " + classe.getName());
         }
         return null;
     }
@@ -887,17 +883,17 @@ public final class Util {
             if (method != null) {
                 result = method.invoke(object);
             } else {
-                logger.severe(baseMessage + "the method reference is null.");
+                LOGGER.severe(baseMessage + "the method reference is null.");
             }
 
         } catch (IllegalAccessException ex) {
-            logger.severe(baseMessage + "the class is not accessible.");
+            LOGGER.severe(baseMessage + "the class is not accessible.");
 
         } catch (IllegalArgumentException ex) {//TODO: this cannot happen
-            logger.severe(baseMessage + "the argument does not match with the method.");
+            LOGGER.severe(baseMessage + "the argument does not match with the method.");
 
         } catch (InvocationTargetException ex) {
-            logger.severe(baseMessage + "an Exception was thrown by the invoked method.");
+            LOGGER.severe(baseMessage + "an Exception was thrown by the invoked method.");
         }
         return result;
     }
@@ -925,16 +921,16 @@ public final class Util {
             if (method != null) {
                 result = method.invoke(object, parameter);
             } else {
-                logger.severe(baseMessage + "the method reference is null.");
+                LOGGER.severe(baseMessage + "the method reference is null.");
             }
         } catch (IllegalAccessException ex) {
-            logger.severe(baseMessage + "the class is not accessible.");
+            LOGGER.severe(baseMessage + "the class is not accessible.");
 
         } catch (IllegalArgumentException ex) {
             String param = "null";
             if (parameter != null)
                 param = parameter.getClass().getSimpleName();
-            logger.severe(baseMessage + "the given argument does not match that required by the method.( argument type was " + param + ")");
+            LOGGER.severe(baseMessage + "the given argument does not match that required by the method.( argument type was " + param + ")");
 
         } catch (InvocationTargetException ex) {
             String errorMsg = ex.getMessage();
@@ -944,7 +940,7 @@ public final class Util {
             if (errorMsg == null && ex.getTargetException() != null) {
                 errorMsg = ex.getTargetException().getMessage();
             }
-            logger.severe(baseMessage + "an Exception was thrown in the invoked method:" + errorMsg);
+            LOGGER.severe(baseMessage + "an Exception was thrown in the invoked method:" + errorMsg);
         }
         return result;
     }
@@ -966,7 +962,7 @@ public final class Util {
         if (method != null) {
             result = method.invoke(object, parameter);
         } else {
-            logger.severe("Unable to invoke the method reference is null.");
+            LOGGER.severe("Unable to invoke the method reference is null.");
         }
         return result;
     }
@@ -989,11 +985,11 @@ public final class Util {
             method = classe.getMethod(propertyName);
 
         } catch (IllegalArgumentException ex) {
-            logger.severe("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
+            LOGGER.severe("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            logger.severe("The method " + propertyName + " does not exists in the classe " + classe.getName());
+            LOGGER.severe("The method " + propertyName + " does not exists in the classe " + classe.getName());
         } catch (SecurityException ex) {
-            logger.severe("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
+            LOGGER.severe("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
         }
         return method;
     }
@@ -1014,11 +1010,11 @@ public final class Util {
             method = classe.getMethod(propertyName, parameterClass);
 
         } catch (IllegalArgumentException ex) {
-            logger.severe("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
+            LOGGER.severe("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
         } catch (NoSuchMethodException ex) {
-            logger.severe("The method " + propertyName + " does not exists in the classe " + classe.getName());
+            LOGGER.severe("The method " + propertyName + " does not exists in the classe " + classe.getName());
         } catch (SecurityException ex) {
-            logger.severe("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
+            LOGGER.severe("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
         }
         return method;
     }
@@ -1094,6 +1090,7 @@ public final class Util {
                         getter = rootClass.getMethod(methodName + "es");
                         break;
                     }
+                    default: break;
                    
                 }
                 return getter;
@@ -1102,7 +1099,7 @@ public final class Util {
                 occurenceType++;
             }
         }
-        logger.severe("No getter have been found for attribute " + propertyName + " in the class " + rootClass.getName());
+        LOGGER.severe("No getter have been found for attribute " + propertyName + " in the class " + rootClass.getName());
         return null;
     }
     
@@ -1117,7 +1114,7 @@ public final class Util {
      * @return a setter to this attribute.
      */
     public static Method getSetterFromName(String propertyName, final Class<?> classe, final Class<?> rootClass) {
-        logger.finer("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
+        LOGGER.finer("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
         
         //special case
         if (propertyName.equals("beginPosition")) {
@@ -1126,7 +1123,7 @@ public final class Util {
             propertyName = "ending";
         } 
         
-        String methodName = "set" + StringUtilities.firstToUpper(propertyName);
+        final String methodName = "set" + StringUtilities.firstToUpper(propertyName);
         int occurenceType = 0;
         
         //TODO look all interfaces
@@ -1180,6 +1177,7 @@ public final class Util {
                         setter = rootClass.getMethod(methodName , argumentSuperInterface);
                         break;
                     }
+                    default: break;
                 }
                 return setter;
 
@@ -1191,35 +1189,35 @@ public final class Util {
                 switch (occurenceType) {
 
                     case 0: {
-                        logger.finer("The setter " + methodName + "(" + classe.getName() + ") does not exist");
+                        LOGGER.finer("The setter " + methodName + "(" + classe.getName() + ") does not exist");
                         occurenceType = 1;
                         break;
                     }
                     case 1: {
-                        logger.finer("The setter " + methodName + "(long) does not exist");
+                        LOGGER.finer("The setter " + methodName + "(long) does not exist");
                         occurenceType = 2;
                         break;
                     }
                     case 2: {
                         if (interfacee != null) {
-                            logger.finer("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
+                            LOGGER.finer("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
                         }
                         occurenceType = 3;
                         break;
                     }
                     case 3: {
-                        logger.finer("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
+                        LOGGER.finer("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
                         occurenceType = 4;
                         break;
                     }
                     case 4: {
-                        logger.finer("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
+                        LOGGER.finer("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
                         occurenceType = 5;
                         break;
                     }
                     case 5: {
                         if (argumentSuperClass != null) {
-                            logger.finer("The setter " + methodName + "(" + argumentSuperClass.getName() + ") does not exist");
+                            LOGGER.finer("The setter " + methodName + "(" + argumentSuperClass.getName() + ") does not exist");
                             argumentSuperClass     = argumentSuperClass.getSuperclass();
                             occurenceType = 5;
                             
@@ -1230,7 +1228,7 @@ public final class Util {
                     }
                     case 6: {
                         if (argumentSuperInterface != null) {
-                            logger.finer("The setter " + methodName + "(" + argumentSuperInterface.getName() + ") does not exist");
+                            LOGGER.finer("The setter " + methodName + "(" + argumentSuperInterface.getName() + ") does not exist");
                         }
                         occurenceType = 7;
                         break;
@@ -1240,7 +1238,7 @@ public final class Util {
                 }
             }
         }
-        logger.severe("No setter have been found for attribute " + propertyName +
+        LOGGER.severe("No setter have been found for attribute " + propertyName +
                       " of type " + classe.getName() + " in the class " + rootClass.getName());
         return null;
     }
@@ -1253,19 +1251,19 @@ public final class Util {
     public static String getElementNameFromEnum(final Object enumeration) {
         String value = "";
         try {
-            Method getValue = enumeration.getClass().getDeclaredMethod("value");
+            final Method getValue = enumeration.getClass().getDeclaredMethod("value");
             value = (String) getValue.invoke(enumeration);
         } catch (IllegalAccessException ex) {
-            logger.severe("The class is not accessible");
+            LOGGER.severe("The class is not accessible");
         } catch (IllegalArgumentException ex) {
-            logger.severe("IllegalArguement exeption in value()");
+            LOGGER.severe("IllegalArguement exeption in value()");
         } catch (InvocationTargetException ex) {
-            logger.severe("Exception throw in the invokated getter value() " + '\n' +
+            LOGGER.severe("Exception throw in the invokated getter value() " + '\n' +
                        "Cause: " + ex.getMessage());
         } catch (NoSuchMethodException ex) {
-           logger.severe("no such method value() in " + enumeration.getClass().getSimpleName());
+           LOGGER.severe("no such method value() in " + enumeration.getClass().getSimpleName());
         } catch (SecurityException ex) {
-           logger.severe("security Exception while getting the codelistElement in value() method");
+           LOGGER.severe("security Exception while getting the codelistElement in value() method");
         }
         return value;
     }
@@ -1357,7 +1355,7 @@ public final class Util {
     public static synchronized void writeImage(final RenderedImage image,
             final String mime, Object output) throws IOException
     {
-        if(image == null) throw new NullPointerException("Image can not be null");
+        if(image == null) throw new IllegalArgumentException("Image can not be null");
         final Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mime);
         while (writers.hasNext()) {
             final ImageWriter writer = writers.next();
@@ -1496,15 +1494,15 @@ public final class Util {
      * @return
      */
     public static String transformCodeName(String code) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         while (code.indexOf('_') != -1) {
             final String tmp = code.substring(0, code.indexOf('_')).toLowerCase();
-            result += StringUtilities.firstToUpper(tmp);
+            result.append(StringUtilities.firstToUpper(tmp));
             code = code.substring(code.indexOf('_') + 1, code.length());
         }
         code = code.toLowerCase();
-        result += StringUtilities.firstToUpper(code);
-        return result;
+        result.append(StringUtilities.firstToUpper(code));
+        return result.toString();
     }
     
     /**

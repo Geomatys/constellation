@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import java.util.logging.Logger;
 
 /**
  * 
@@ -34,41 +33,40 @@ import java.util.logging.Logger;
  */
 public class PeriodUtilities {
     
-    Logger logger = Logger.getLogger("org.constellation.util");
     /**
      * The number of millisecond in one year.
      */
-    private final long yearMS = 31536000000L;
+    private static final long YEAR_MS = 31536000000L;
     
     /**
      * The number of millisecond in one month.
      */
-    private final long monthMS = 2628000000L;
+    private static final long MONTH_MS = 2628000000L;
     
     /**
      * The number of millisecond in one week.
      */
-    private final long weekMS = 604800000L;
+    private static final long WEEK_MS = 604800000L;
     
     /**
      * The number of millisecond in one day.
      */
-    private final long dayMS = 86400000L;
+    private static final long DAY_MS = 86400000L;
     
     /**
      * The number of millisecond in one hour.
      */
-    private final long hourMS = 3600000L;
+    private static final long HOUR_MS = 3600000L;
     
     /**
      * The number of millisecond in one minute.
      */
-    private final long minMS = 60000;
+    private static final long MIN_MS = 60000;
     
     /**
      * The number of millisecond in one second.
      */
-    private final long secondMS = 1000;
+    private static final long SECOND_MS = 1000;
         
     /**
      * The format of the dates. 
@@ -93,7 +91,7 @@ public class PeriodUtilities {
             throw new IllegalArgumentException();
         }
         
-        StringBuffer response = new StringBuffer();
+        final StringBuffer response = new StringBuffer();
        /* Iterator<Date> it = dates.iterator();
         if (!it.hasNext()) {
             return "";
@@ -139,9 +137,9 @@ public class PeriodUtilities {
 
             if (previousGap != gap) {
                 if (nbDataInGap >= 2) {
-                    String firstDate = dateFormat.format(first) + "";
+                    final String firstDate = dateFormat.format(first) + "";
                     if (response.indexOf(firstDate + ',') != -1) {
-                        int pos = response.indexOf(firstDate);
+                        final int pos = response.indexOf(firstDate);
                         response.delete(pos, pos + firstDate.length() + 1);
                     } 
                     response.append(getPeriodDescription(dates.subSet(first, d), previousGap)).append(',');
@@ -163,9 +161,9 @@ public class PeriodUtilities {
 
         if (nbDataInGap > 0) {
             if (nbDataInGap >= 2) {
-                String firstDate = dateFormat.format(first) + "";
+                final String firstDate = dateFormat.format(first) + "";
                 if (response.indexOf(firstDate + ',') != -1) {
-                    int pos = response.indexOf(firstDate);
+                    final int pos = response.indexOf(firstDate);
                     response.delete(pos, pos + firstDate.length() + 1);
                 } 
                 response.append(getPeriodDescription(dates.tailSet(first), gap));
@@ -190,7 +188,7 @@ public class PeriodUtilities {
      * @return
      */
     public String getPeriodDescription(SortedSet<Date> dates, long gap) {
-        StringBuffer response = new StringBuffer();
+        final StringBuffer response = new StringBuffer();
         dateFormat.format(dates.first(), response, new FieldPosition(0));
         response.append('/');
         
@@ -198,30 +196,30 @@ public class PeriodUtilities {
         response.append("/P");
 
         //we look if the gap is more than one year (31536000000 ms)
-        long temp = gap / yearMS;
+        long temp = gap / YEAR_MS;
         if (temp > 1) {
             response.append(temp).append("Y");
-            gap -= temp * yearMS;
+            gap -= temp * YEAR_MS;
         }
 
         //we look if the gap is more than one month (2628000000 ms)
-        temp = gap / monthMS;
+        temp = gap / MONTH_MS;
         if (temp >= 1) {
             response.append(temp).append("M");
-            gap -= temp * monthMS;
+            gap -= temp * MONTH_MS;
         }
         //we look if the gap is more than one week (604800000 ms)
-        temp = gap / weekMS;
+        temp = gap / WEEK_MS;
         if (temp >= 1) {
             response.append(temp).append("W");
-            gap -= temp * weekMS;
+            gap -= temp * WEEK_MS;
         }
 
         //we look if the gap is more than one day (86400000 ms)
-        temp = gap / dayMS;
+        temp = gap / DAY_MS;
         if (temp >= 1) {
             response.append(temp).append("D");
-            gap -= temp * dayMS;
+            gap -= temp * DAY_MS;
         }
 
         //if the gap is not over we pass to the hours by adding 'T'
@@ -230,24 +228,24 @@ public class PeriodUtilities {
         }
 
         //we look if the gap is more than one hour (3600000 ms)
-        temp = gap / hourMS;
+        temp = gap / HOUR_MS;
         if (temp >= 1) {
             response.append(temp).append("H");
-            gap -= temp * hourMS;
+            gap -= temp * HOUR_MS;
         }
 
         //we look if the gap is more than one min (60000 ms)
-        temp = gap / minMS;
+        temp = gap / MIN_MS;
         if (temp >= 1) {
             response.append(temp).append("M");
-            gap -= temp * minMS;
+            gap -= temp * MIN_MS;
         }
 
         //we look if the gap is more than one week (1000 ms)
-        temp = gap / secondMS;
+        temp = gap / SECOND_MS;
         if (temp >= 1) {
             response.append(temp).append("S");
-            gap -= temp * secondMS;
+            gap -= temp * SECOND_MS;
         }
         if (gap != 0) {
             throw new IllegalArgumentException("TimePeriod can't be found a the Millisecond precision");
@@ -264,29 +262,28 @@ public class PeriodUtilities {
      * @throws java.text.ParseException
      */
     public SortedSet<Date> getDatesFromPeriodDescription(String periods) throws ParseException {
-        SortedSet<Date> response = new TreeSet<Date>();
+        final SortedSet<Date> response = new TreeSet<Date>();
         final StringTokenizer tokens = new StringTokenizer(periods, ",");
         while (tokens.hasMoreTokens()) {
             String dates = tokens.nextToken().trim();
 
             if (dates.indexOf('/') == -1) {
-
                 response.add(dateFormat.parse(dates));
 
             } else {
 
                 //we get the begin position
-                String begin = dates.substring(0, dates.indexOf('/'));
-                Date first = dateFormat.parse(begin);
+                final String begin = dates.substring(0, dates.indexOf('/'));
+                final Date first = dateFormat.parse(begin);
                 dates = dates.substring(dates.indexOf('/') + 1);
 
                 //we get the end position
-                String end = dates.substring(0, dates.indexOf('/'));
-                Date last = dateFormat.parse(end);
+                final String end = dates.substring(0, dates.indexOf('/'));
+                final Date last = dateFormat.parse(end);
                 dates = dates.substring(dates.indexOf('/') + 1);
 
                 //then we get the period Description
-                long gap = getTimeFromPeriodDescription(dates);
+                final long gap = getTimeFromPeriodDescription(dates);
 
                 Date currentDate = first;
                 while (!currentDate.equals(last)) {
@@ -294,7 +291,6 @@ public class PeriodUtilities {
                     currentDate = new Date(currentDate.getTime() + gap);
                 }
                 response.add(last);
-
             }
         }
         return response;
@@ -314,30 +310,30 @@ public class PeriodUtilities {
 
         //we look if the period contains years (31536000000 ms)
         if (periodDescription.indexOf('Y') != -1) {
-            int nbYear = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('Y')));
-            time += nbYear * yearMS;
+            final int nbYear = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('Y')));
+            time += nbYear * YEAR_MS;
             periodDescription = periodDescription.substring(periodDescription.indexOf('Y') + 1);
         }
 
         //we look if the period contains months (2628000000 ms)
         if (    periodDescription.indexOf('M') != -1 && 
-                (periodDescription.indexOf("T") == -1 || periodDescription.indexOf("T") > periodDescription.indexOf('M')) ) {
-            int nbMonth = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('M')));
-            time += nbMonth * monthMS;
+                (periodDescription.indexOf('T') == -1 || periodDescription.indexOf('T') > periodDescription.indexOf('M')) ) {
+            final int nbMonth = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('M')));
+            time += nbMonth * MONTH_MS;
             periodDescription = periodDescription.substring(periodDescription.indexOf('M') + 1);
         }
         
         //we look if the period contains weeks (604800000 ms)
         if (periodDescription.indexOf('W') != -1) {
-            int nbWeek = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('W')));
-            time += nbWeek * weekMS;
+            final int nbWeek = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('W')));
+            time += nbWeek * WEEK_MS;
             periodDescription = periodDescription.substring(periodDescription.indexOf('W') + 1);
         }
 
         //we look if the period contains days (86400000 ms)
         if (periodDescription.indexOf('D') != -1) {
-            int nbDay = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('D')));
-            time += nbDay * dayMS;
+            final int nbDay = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('D')));
+            time += nbDay * DAY_MS;
             periodDescription = periodDescription.substring(periodDescription.indexOf('D') + 1);
         }
 
@@ -348,22 +344,22 @@ public class PeriodUtilities {
 
         //we look if the period contains hours (3600000 ms)
         if (periodDescription.indexOf('H') != -1) {
-            int nbHour = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('H')));
-            time += nbHour * hourMS;
+            final int nbHour = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('H')));
+            time += nbHour * HOUR_MS;
             periodDescription = periodDescription.substring(periodDescription.indexOf('H') + 1);
         }
 
         //we look if the period contains minutes (60000 ms)
         if (periodDescription.indexOf('M') != -1) {
-            int nbMin = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('M')));
-            time += nbMin * minMS;
+            final int nbMin = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('M')));
+            time += nbMin * MIN_MS;
             periodDescription = periodDescription.substring(periodDescription.indexOf('M') + 1);
         }
 
         //we look if the period contains seconds (1000 ms)
         if (periodDescription.indexOf('S') != -1) {
-            int nbSec = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('S')));
-            time += nbSec * secondMS;
+            final int nbSec = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('S')));
+            time += nbSec * SECOND_MS;
             periodDescription = periodDescription.substring(periodDescription.indexOf('S') + 1);
         }
 

@@ -31,7 +31,7 @@ public class AuthentificationBean {
     /**
      * Debugging purpose
      */
-    private Logger logger = Logger.getLogger("org.constellation.bean");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.bean");
     
     private String login;
     
@@ -44,8 +44,8 @@ public class AuthentificationBean {
     public AuthentificationBean() {
         
         // we get the sevlet context to read the capabilities files in the deployed war
-        FacesContext context = FacesContext.getCurrentInstance();
-        response = (HttpServletResponse) context.getExternalContext().getResponse();
+        final FacesContext context = FacesContext.getCurrentInstance();
+        response    = (HttpServletResponse) context.getExternalContext().getResponse();
         contextPath = ((ServletContext)context.getExternalContext().getContext()).getContextPath();
         
     }
@@ -54,10 +54,10 @@ public class AuthentificationBean {
         
         //TODO remove this ugly thing
         if (login != null && login.equals("admin") && password != null && password.equals("admin")) {
-            Cookie cookie = new Cookie("authent", login + ':' + password);
+            final Cookie cookie = new Cookie("authent", login + ':' + password);
             cookie.setPath(contextPath);
             response.addCookie(cookie);
-            logger.info("cookie added with value:" + login + ':' + password);
+            LOGGER.info("cookie added with value:" + login + ':' + password);
             return "authentified";
         } else {
             return "notAllowed";

@@ -74,7 +74,11 @@ public final class JDBC {
                         log = Loggings.format(Level.CONFIG, Loggings.Keys.JDBC_DRIVER_VERSION_$3,
                                 driver, d.getMajorVersion(), d.getMinorVersion());
                         DRIVERS.add(driver);
-                    } catch (Exception exception) {
+                    } catch (ClassNotFoundException exception) {
+                        log = new LogRecord(Level.WARNING, exception.toString());
+                    } catch (InstantiationException exception) {
+                        log = new LogRecord(Level.WARNING, exception.toString());
+                    } catch (IllegalAccessException exception) {
                         log = new LogRecord(Level.WARNING, exception.toString());
                     }
                 }

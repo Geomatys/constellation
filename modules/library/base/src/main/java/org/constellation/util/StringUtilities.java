@@ -55,6 +55,8 @@ import org.opengis.referencing.crs.VerticalCRS;
  */
 public class StringUtilities {
 
+    private StringUtilities() {}
+    
     /**
      * Returns a string representation of the {@code Bounding Box}. It is a comma-separated
      * list matching with this pattern: minx,miny,maxx,maxy.
@@ -179,9 +181,9 @@ public class StringUtilities {
      */
     public static String firstToUpper(final String s) {
         if (s != null && !s.equals("")) {
-            String first = s.substring(0, 1);
-            String result = s.substring(1);
-            result = first.toUpperCase() + result;
+            final String first = s.substring(0, 1);
+            String result      = s.substring(1);
+            result             = first.toUpperCase() + result;
             return result;
         }
         return s;
@@ -204,17 +206,15 @@ public class StringUtilities {
         envelope.setCoordinateReferenceSystem(crs);
         envelope.setToInfinite();
         if (bbox == null) {
-            if (envelope != null) {
-                envelope.setToInfinite();
-            }
             return envelope;
         }
-            final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
-        if (envelope == null) {
+
+        final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
+        /*if (envelope == null) {
             envelope = new GeneralEnvelope((tokens.countTokens() + 1) >> 1);
             envelope.setCoordinateReferenceSystem(crs);
             envelope.setToInfinite();
-        }
+        }*/
         final double[] coordinates = new double[envelope.getDimension() * 2];
             int index = 0;
             while (tokens.hasMoreTokens()) {
@@ -234,7 +234,7 @@ public class StringUtilities {
                     final double maximum = coordinates[--index];
                     final double minimum = coordinates[--index];
                     envelope.setRange(index >> 1, minimum, maximum);
-        }
+                }
             }
             case 4: envelope.setRange(1, coordinates[1], coordinates[3]);
             case 3:
@@ -395,8 +395,8 @@ public class StringUtilities {
             return Collections.emptyList();
         }
         strLayers = strLayers.trim();
-        List<String> styles = new ArrayList<String>();
-        StringTokenizer token = new StringTokenizer(strLayers,",");
+        final List<String> styles   = new ArrayList<String>();
+        final StringTokenizer token = new StringTokenizer(strLayers,",");
         while(token.hasMoreTokens()){
             styles.add(token.nextToken());
         }
@@ -412,18 +412,18 @@ public class StringUtilities {
      * @return true if the list got an element which contains the specified string (could be a regex).
      */
     public static boolean containsMatch(List<String> list, String str) {
-        boolean str_available = false;
-        Pattern pattern = Pattern.compile(str, Pattern.CASE_INSENSITIVE | Pattern.CANON_EQ);
+        boolean strAvailable = false;
+        final Pattern pattern = Pattern.compile(str, Pattern.CASE_INSENSITIVE | Pattern.CANON_EQ);
         if (list != null)  {
             for (String s : list) {
-                Matcher matcher = pattern.matcher(s);
+                final Matcher matcher = pattern.matcher(s);
                 if (matcher.find()) {
-                    str_available = true;
+                    strAvailable = true;
                     break;
                 }
             }
         }
-        return str_available;
+        return strAvailable;
     }
 
     /**

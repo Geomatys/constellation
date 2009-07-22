@@ -34,14 +34,14 @@ public class UploadListener implements ValueChangeListener {
 
     public void processValueChange(ValueChangeEvent event) throws AbortProcessingException {
         try {
-            UploadedFile uploadedFile = (UploadedFile) event.getNewValue();
+            final UploadedFile uploadedFile = (UploadedFile) event.getNewValue();
 
             //used when the <t:inputFileUpload> tag doesn't have a storage attribute or when the value of this attribute is memory.
-            UploadedFileDefaultMemoryImpl _memory = (UploadedFileDefaultMemoryImpl) uploadedFile;
+            final UploadedFileDefaultMemoryImpl memory = (UploadedFileDefaultMemoryImpl) uploadedFile;
 
             //if the value of the attribute storage is file.
             //UploadedFileDefaultFileImpl _file = (UploadedFileDefaultFileImpl) uploadedFile;
-            InputStream inputStream = _memory.getInputStream();
+            final InputStream inputStream = memory.getInputStream();
             
             // do something with uploadedFile
         } catch (IOException ex) {

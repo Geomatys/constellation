@@ -37,7 +37,7 @@ public class ConfigurationBean {
     /**
      * Debugging purpose
      */
-    protected Logger logger = Logger.getLogger("org.constellation.bean");
+    protected static final Logger logger = Logger.getLogger("org.constellation.bean");
 
     /**
      * A servlet context allowing to find the path to deployed file.
@@ -48,7 +48,7 @@ public class ConfigurationBean {
 
     public ConfigurationBean() {
         // we get the sevlet context to read the capabilities files in the deployed war
-        FacesContext context = FacesContext.getCurrentInstance();
+        final FacesContext context = FacesContext.getCurrentInstance();
         servletContext = (ServletContext) context.getExternalContext().getContext();
         servletRequest = (HttpServletRequest) context.getExternalContext().getRequest();
     }
@@ -58,28 +58,28 @@ public class ConfigurationBean {
     }
 
     protected void refreshServletRequest() {
-        FacesContext context = FacesContext.getCurrentInstance();
+        final FacesContext context = FacesContext.getCurrentInstance();
         servletRequest = (HttpServletRequest) context.getExternalContext().getRequest();
     }
     
     public void restartServices() {
         logger.info("GUI restart services");
         refreshServletRequest();
-        String URL = getConfigurationURL() + "/WS/configuration?request=restart";
-        logger.info(URL);
-        String response = performRequest(URL);
+        String url = getConfigurationURL() + "/WS/configuration?request=restart";
+        logger.info(url);
+        performRequest(url);
     }
 
     protected String performRequest(String url) {
         try {
 
-            URL source = new URL(url);
-            URLConnection conec = source.openConnection();
+            final URL source          = new URL(url);
+            final URLConnection conec = source.openConnection();
 
             // we get the response document
-            InputStream in = conec.getInputStream();
-            StringWriter out = new StringWriter();
-            byte[] buffer = new byte[1024];
+            final InputStream in   = conec.getInputStream();
+            final StringWriter out = new StringWriter();
+            final byte[] buffer    = new byte[1024];
             int size;
 
             while ((size = in.read(buffer, 0, 1024)) > 0) {

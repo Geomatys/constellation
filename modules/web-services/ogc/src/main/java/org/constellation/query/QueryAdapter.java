@@ -43,6 +43,8 @@ public class QueryAdapter {
      */
     public static final Logger LOGGER = Logger.getLogger("org.constellation.query");
 
+    private QueryAdapter() {}
+    
     /**
      * Verify that all layers are queryable for a {@code GetFeatureInfo}.
      *
