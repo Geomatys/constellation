@@ -101,7 +101,7 @@ public class Where {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[Where]");
+        final StringBuilder s = new StringBuilder("[Where]");
         if (operator != null)
             s.append("operator: ").append(operator).append('\n');
         if (group != null)

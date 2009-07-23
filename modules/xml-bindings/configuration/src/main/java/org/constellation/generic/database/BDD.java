@@ -94,16 +94,15 @@ public class BDD {
     }
 
     public String getDatabaseName() {
-        if (connectURL != null && connectURL.lastIndexOf("/") != -1) {
-            String databaseName = connectURL.substring(connectURL.lastIndexOf("/") + 1);
-            return databaseName;
+        if (connectURL != null && connectURL.lastIndexOf('/') != -1) {
+            return connectURL.substring(connectURL.lastIndexOf('/') + 1);
         }
         return null;
     }
 
     public int getPortNumber() {
-        if (connectURL != null && connectURL.lastIndexOf(":") != -1) {
-            String portName = connectURL.substring(connectURL.lastIndexOf(":") + 1);
+        if (connectURL != null && connectURL.lastIndexOf(':') != -1) {
+            String portName = connectURL.substring(connectURL.lastIndexOf(':') + 1);
             if (portName.indexOf('/') != -1) {
                 portName        = portName.substring(0, portName.indexOf('/'));
                 try {
@@ -162,7 +161,7 @@ public class BDD {
         }
         try {
             Class.forName(className);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             // Non-fatal exception, ignore. If there is really a problem, the
             // following line is expected to throw the appropriate SQLException.
         }
@@ -171,7 +170,7 @@ public class BDD {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[BDD]");
+        final StringBuilder s = new StringBuilder("[BDD]");
         s.append("className: ").append(className).append('\n');
         s.append("connectURL: ").append(connectURL).append('\n');
         s.append("user: ").append(user).append('\n');

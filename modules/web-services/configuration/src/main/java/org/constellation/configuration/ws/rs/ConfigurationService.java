@@ -38,6 +38,8 @@ import javax.ws.rs.core.Response;
 import com.sun.jersey.spi.resource.Singleton;
 
 // JAXB dependencies
+import java.util.Map.Entry;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
@@ -88,13 +90,13 @@ public class ConfigurationService extends WebService  {
     
     private static FactoryRegistry factory = new FactoryRegistry(AbstractConfigurerFactory.class);
     
-    private boolean CSWFunctionEnabled;
+    private boolean cswFunctionEnabled;
     
-    public final static Map<String, File> serviceDirectory = new HashMap<String, File>();
+    public static final Map<String, File> SERVCE_DIRECTORY = new HashMap<String, File>();
     static {
-        serviceDirectory.put("CSW",      new File(getSicadeDirectory(), "csw_configuration"));
-        serviceDirectory.put("SOS",      new File(getSicadeDirectory(), "sos_configuration"));
-        serviceDirectory.put("MDSEARCH", new File(getSicadeDirectory(), "mdweb/search"));
+        SERVCE_DIRECTORY.put("CSW",      new File(getSicadeDirectory(), "csw_configuration"));
+        SERVCE_DIRECTORY.put("SOS",      new File(getSicadeDirectory(), "sos_configuration"));
+        SERVCE_DIRECTORY.put("MDSEARCH", new File(getSicadeDirectory(), "mdweb/search"));
     }
     
     /**
@@ -104,20 +106,20 @@ public class ConfigurationService extends WebService  {
         super();
         try {
             setXMLContext("org.geotoolkit.ows.xml.v110:org.constellation.configuration:org.geotoolkit.skos.xml", "");
-            AbstractConfigurerFactory configurerfactory = factory.getServiceProvider(AbstractConfigurerFactory.class, null, null, null);
+            final AbstractConfigurerFactory configurerfactory = factory.getServiceProvider(AbstractConfigurerFactory.class, null, null, null);
             cswConfigurer      = configurerfactory.getCSWConfigurer(cn);
-            CSWFunctionEnabled = true;
+            cswFunctionEnabled = true;
         } catch (JAXBException ex) {
             workingContext = false;
             LOGGER.severe("JAXBException while setting the JAXB context for configuration service:" + ex.getMessage());
-            ex.printStackTrace();
-            CSWFunctionEnabled = false;
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            cswFunctionEnabled = false;
         } catch (ConfigurationException ex) {
             LOGGER.warning("Specific CSW operation will not be available." + '\n' + ex);
-            CSWFunctionEnabled = false;
+            cswFunctionEnabled = false;
         } catch (FactoryNotFoundException ex) {
             LOGGER.warning("Factory not found for CSWConfigurer, specific CSW operation will not be available.");
-            CSWFunctionEnabled = false;
+            cswFunctionEnabled = false;
         }
         LOGGER.info("Configuration service runing");
     }
@@ -131,7 +133,7 @@ public class ConfigurationService extends WebService  {
         try {
             marshaller = marshallerPool.acquireMarshaller();
             String request  = "";
-            StringWriter sw = new StringWriter();
+            final StringWriter sw = new StringWriter();
 
             if (cswConfigurer != null) {
                 cswConfigurer.setContainerNotifier(cn);
@@ -147,19 +149,19 @@ public class ConfigurationService extends WebService  {
             }
             
             if ("UpdatePropertiesFile".equalsIgnoreCase(request) || objectRequest instanceof UpdatePropertiesFileType) {
-                UpdatePropertiesFileType updateProp = (UpdatePropertiesFileType) objectRequest;
+                final UpdatePropertiesFileType updateProp = (UpdatePropertiesFileType) objectRequest;
                 marshaller.marshal(updatePropertiesFile(updateProp), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
             }
 
             if ("UpdateXMLFile".equalsIgnoreCase(request) || objectRequest instanceof UpdateXMLFileType) {
-                UpdateXMLFileType updateProp = (UpdateXMLFileType) objectRequest;
+                final UpdateXMLFileType updateProp = (UpdateXMLFileType) objectRequest;
                 marshaller.marshal(updateXmlFile(updateProp), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
             }
             
             if ("Download".equalsIgnoreCase(request)) {    
-                File f = downloadFile();
+                final File f = downloadFile();
                 return Response.ok(f, MediaType.MULTIPART_FORM_DATA_TYPE).build(); 
             }
             
@@ -167,10 +169,10 @@ public class ConfigurationService extends WebService  {
             /* CSW specific operations */
             
             if ("RefreshIndex".equalsIgnoreCase(request)) {
-                if (CSWFunctionEnabled) {
-                    boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
-                    String service     = getParameter("SERVICE", false);
-                    String id          = getParameter("ID", false);
+                if (cswFunctionEnabled) {
+                    final boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
+                    final String service     = getParameter("SERVICE", false);
+                    final String id          = getParameter("ID", false);
                 
                     marshaller.marshal(cswConfigurer.refreshIndex(asynchrone, service, id), sw);
                     return Response.ok(sw.toString(), "text/xml").build();
@@ -181,12 +183,12 @@ public class ConfigurationService extends WebService  {
             }
 
             if ("AddToIndex".equalsIgnoreCase(request)) {
-                if (CSWFunctionEnabled) {
-                    String service           = getParameter("SERVICE", false);
-                    String id                = getParameter("ID", false);
-                    List<String> identifiers = new ArrayList<String>();
-                    String identifierList    = getParameter("IDENTIFIERS", true);
-                    StringTokenizer tokens   = new StringTokenizer(identifierList, ",;");
+                if (cswFunctionEnabled) {
+                    final String service           = getParameter("SERVICE", false);
+                    final String id                = getParameter("ID", false);
+                    final List<String> identifiers = new ArrayList<String>();
+                    final String identifierList    = getParameter("IDENTIFIERS", true);
+                    final StringTokenizer tokens   = new StringTokenizer(identifierList, ",;");
                     while (tokens.hasMoreTokens()) {
                         final String token = tokens.nextToken().trim();
                         identifiers.add(token);
@@ -201,13 +203,13 @@ public class ConfigurationService extends WebService  {
             }
             
             if ("RefreshCascadedServers".equalsIgnoreCase(request) || objectRequest instanceof CSWCascadingType) {
-                CSWCascadingType refreshCS = (CSWCascadingType) objectRequest;
+                final CSWCascadingType refreshCS = (CSWCascadingType) objectRequest;
                 marshaller.marshal(cswConfigurer.refreshCascadedServers(refreshCS), sw);
                 return Response.ok(sw.toString(), "text/xml").build();
             }
             
             if ("UpdateVocabularies".equalsIgnoreCase(request)) {    
-                if (CSWFunctionEnabled) {
+                if (cswFunctionEnabled) {
                     return Response.ok(cswConfigurer.updateVocabularies(),"text/xml").build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
@@ -216,7 +218,7 @@ public class ConfigurationService extends WebService  {
             }
             
             if ("UpdateContacts".equalsIgnoreCase(request)) {    
-                if (CSWFunctionEnabled) {
+                if (cswFunctionEnabled) {
                     return Response.ok(cswConfigurer.updateContacts(),"text/xml").build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
@@ -236,11 +238,11 @@ public class ConfigurationService extends WebService  {
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
                     !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                     !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             } else {
                 LOGGER.info(ex.getMessage());
             }
-            StringWriter sw = new StringWriter();
+            final StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
             
@@ -268,7 +270,7 @@ public class ConfigurationService extends WebService  {
             final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
             final ExceptionReport report = new ExceptionReport(message, code.name(), locator,
                                                            ServiceDef.CONFIG.exceptionVersion.toString());
-            StringWriter sw = new StringWriter();
+            final StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(sw.toString(), "text/xml").build();
             
@@ -300,20 +302,20 @@ public class ConfigurationService extends WebService  {
     private AcknowlegementType updatePropertiesFile(UpdatePropertiesFileType request) throws CstlServiceException {
         LOGGER.info("update properties file requested");
         
-        String service  = request.getService();
-        String fileName = request.getFileName();
-        Map<String, String> newProperties = request.getProperties();
+        final String service  = request.getService();
+        final String fileName = request.getFileName();
+        final Map<String, String> newProperties = request.getProperties();
         
         if ( service == null) {
             throw new CstlServiceException("You must specify the service parameter.",
                                               MISSING_PARAMETER_VALUE, "service");
-        } else if (!serviceDirectory.keySet().contains(service)) {
-            String msg = "Invalid value for the service parameter: " + service + '\n' +
-                         "accepted values are:";
-            for (String s: serviceDirectory.keySet()) {
-                msg = msg + s + ',';
+        } else if (!SERVCE_DIRECTORY.keySet().contains(service)) {
+            StringBuilder msg = new StringBuilder("Invalid value for the service parameter: ").append(service).append('\n');
+            msg.append("accepted values are:");
+            for (String s: SERVCE_DIRECTORY.keySet()) {
+                msg .append(s).append(',');
             }
-            throw new CstlServiceException(msg, MISSING_PARAMETER_VALUE, "service");
+            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, "service");
             
         }
         
@@ -326,13 +328,13 @@ public class ConfigurationService extends WebService  {
                      "properties");
         }
         
-        File configDir   = serviceDirectory.get(service);
-        File propertiesFile = new File(configDir, fileName);
+        final File configDir   = SERVCE_DIRECTORY.get(service);
+        final File propertiesFile = new File(configDir, fileName);
         
-        Properties prop     = new Properties();
+        final Properties prop     = new Properties();
         if (propertiesFile.exists()) {
-            for (String key : newProperties.keySet()) {
-                prop.put(key, newProperties.get(key));
+            for (Entry<String, String> entry : newProperties.entrySet()) {
+                prop.put(entry.getKey(), entry.getValue());
             }
         } else {
             throw new CstlServiceException("The file does not exist: " + propertiesFile.getPath(),
@@ -358,20 +360,20 @@ public class ConfigurationService extends WebService  {
     private AcknowlegementType updateXmlFile(UpdateXMLFileType request) throws CstlServiceException {
         LOGGER.info("update properties file requested");
 
-        String service    = request.getService();
-        String fileName   = request.getFileName();
-        Object newContent = request.getXmlContent();
+        final String service    = request.getService();
+        final String fileName   = request.getFileName();
+        final Object newContent = request.getXmlContent();
 
         if ( service == null) {
             throw new CstlServiceException("You must specify the service parameter.",
                                               MISSING_PARAMETER_VALUE, "service");
-        } else if (!serviceDirectory.keySet().contains(service)) {
-            String msg = "Invalid value for the service parameter: " + service + '\n' +
-                         "accepted values are:";
-            for (String s: serviceDirectory.keySet()) {
-                msg = msg + s + ',';
+        } else if (!SERVCE_DIRECTORY.keySet().contains(service)) {
+            StringBuilder msg = new StringBuilder("Invalid value for the service parameter: ").append(service).append('\n');
+            msg.append("accepted values are:");
+            for (String s: SERVCE_DIRECTORY.keySet()) {
+                msg.append(s).append(',');
             }
-            throw new CstlServiceException(msg, MISSING_PARAMETER_VALUE, "service");
+            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, "service");
 
         }
 
@@ -384,8 +386,8 @@ public class ConfigurationService extends WebService  {
                      "xmlContent");
         }
 
-        File configDir  = serviceDirectory.get(service);
-        File configFile = new File(configDir, fileName);
+        final File configDir  = SERVCE_DIRECTORY.get(service);
+        final File configFile = new File(configDir, fileName);
 
         Marshaller marshaller = null;
         try {
@@ -416,8 +418,8 @@ public class ConfigurationService extends WebService  {
     public AcknowlegementType uploadFile(InputStream in) {
         LOGGER.info("uploading");
         try  {
-            String layer = getParameter("layer", false);
-            System.out.println("LAYER= " + layer);
+            final String layer = getParameter("layer", false);
+            LOGGER.info("LAYER= " + layer);
             // TODO: implement upload action here.
             in.close();
         } catch (CstlServiceException ex) {
@@ -426,7 +428,7 @@ public class ConfigurationService extends WebService  {
             return new AcknowlegementType("failed", "Webservice exception while get the layer parameter");
         } catch (IOException ex) {
             LOGGER.severe("IO exception while uploading file");
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return new AcknowlegementType("failed", "IO exception while performing upload");
         }
         return new AcknowlegementType("success", "the file has been successfully uploaded");

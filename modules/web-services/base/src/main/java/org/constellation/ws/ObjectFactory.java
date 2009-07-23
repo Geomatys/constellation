@@ -16,10 +16,7 @@
  */
 package org.constellation.ws;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
-import javax.xml.namespace.QName;
 
 
 /**
@@ -36,16 +33,9 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public final class ObjectFactory {
     
-    private final static QName _Expression_QNAME = new QName("http://www.opengis.net/ogc", "expression");
+    //private final static QName _Expression_QNAME = new QName("http://www.opengis.net/ogc", "expression");
     
     
-    /**
-     * Creates a new ObjectFactory that can be used to create new instances of schema derived
-     * classes for package {@code net.opengis.ogc}.
-     */
-    public ObjectFactory() {
-    }
-
     /**
      * Creates an instance of {@link ServiceExceptionType }
      */

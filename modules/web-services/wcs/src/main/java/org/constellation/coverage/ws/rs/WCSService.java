@@ -304,7 +304,7 @@ public class WCSService extends OGCWebService {
                          (locator == null) ? new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()) :
                                              new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode(), locator));
         }
-        StringWriter sw = new StringWriter();
+        final StringWriter sw = new StringWriter();
         marshaller.marshal(report, sw);
 
         return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
@@ -340,11 +340,11 @@ public class WCSService extends OGCWebService {
         if (finalVersion.equals(ServiceDef.WCS_1_0_0)) {
             return new org.geotoolkit.wcs.xml.v100.GetCapabilitiesType(getParameter(KEY_SECTION, false), null);
         } else if (finalVersion.equals(ServiceDef.WCS_1_1_1)) {
-            AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
+            final AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
 
             //We transform the String of sections in a list.
             //In the same time we verify that the requested sections are valid.
-            String section = getParameter("Sections", false);
+            final String section = getParameter("Sections", false);
             List<String> requestedSections = new ArrayList<String>();
             if (section != null) {
                 final StringTokenizer tokens = new StringTokenizer(section, ",;");
@@ -361,8 +361,8 @@ public class WCSService extends OGCWebService {
                 //if there is no requested Sections we add all the sections
                 requestedSections = SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString());
             }
-            SectionsType sections = new SectionsType(requestedSections);
-            AcceptVersionsType versions = new AcceptVersionsType(ServiceDef.WCS_1_1_1.version.toString());
+            final SectionsType sections = new SectionsType(requestedSections);
+            final AcceptVersionsType versions = new AcceptVersionsType(ServiceDef.WCS_1_1_1.version.toString());
             return (GetCapabilities) new org.geotoolkit.wcs.xml.v111.GetCapabilitiesType(versions, sections, formats, null);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
@@ -425,14 +425,14 @@ public class WCSService extends OGCWebService {
     private org.geotoolkit.wcs.xml.v100.GetCoverageType adaptKvpGetCoverageRequest100()
                                                     throws CstlServiceException
     {
-        String width  = getParameter(KEY_WIDTH,  false);
-        String height = getParameter(KEY_HEIGHT, false);
-        String depth  = getParameter(KEY_DEPTH,  false);
+        final String width  = getParameter(KEY_WIDTH,  false);
+        final String height = getParameter(KEY_HEIGHT, false);
+        final String depth  = getParameter(KEY_DEPTH,  false);
 
-        String resx   = getParameter(KEY_RESX,   false);
-        String resy   = getParameter(KEY_RESY,   false);
+        final String resx   = getParameter(KEY_RESX,   false);
+        final String resy   = getParameter(KEY_RESY,   false);
         @SuppressWarnings("unused")
-        String resz   = getParameter(KEY_RESZ,   false);
+        final String resz   = getParameter(KEY_RESZ,   false);
 
         // temporal subset
         org.geotoolkit.wcs.xml.v100.TimeSequenceType temporal = null;
@@ -470,14 +470,14 @@ public class WCSService extends OGCWebService {
         axis.add("width");
         axis.add("height");
         final List<BigInteger> low = new ArrayList<BigInteger>();
-        low.add(new BigInteger("0"));
-        low.add(new BigInteger("0"));
+        low.add(BigInteger.ZERO);
+        low.add(BigInteger.ZERO);
         final List<BigInteger> high = new ArrayList<BigInteger>();
         high.add(new BigInteger(width));
         high.add(new BigInteger(height));
         if (depth != null) {
             axis.add("depth");
-            low.add(new BigInteger("0"));
+            low.add(BigInteger.ZERO);
             high.add(new BigInteger(depth));
         }
         final GridLimitsType limits = new GridLimitsType(low, high);

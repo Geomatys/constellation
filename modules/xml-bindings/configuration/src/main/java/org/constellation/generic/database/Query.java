@@ -194,15 +194,15 @@ public class Query {
 
         if (where != null && where.size() > 0 && where.get(0) != null && !where.get(0).getvalue().equals("")) {
             String sql = where.get(0).getvalue();
-            while (sql.indexOf(":${") != -1 && sql.indexOf("}") != -1) {
-                String paramName = sql.substring(sql.indexOf(":${") + 3, sql.indexOf("}"));
+            while (sql.indexOf(":${") != -1 && sql.indexOf('}') != -1) {
+                String paramName = sql.substring(sql.indexOf(":${") + 3, sql.indexOf('}'));
                 String paramValues = staticParameters.get(paramName);
                 if (paramValues != null) {
-                    String s = sql.substring(sql.indexOf(":${"), sql.indexOf("}") + 1);
+                    String s = sql.substring(sql.indexOf(":${"), sql.indexOf('}') + 1);
                     sql = sql.replace(s, paramValues);
                     
                 } else {
-                    String s = sql.substring(sql.indexOf(":${"), sql.indexOf("}") + 1);
+                    String s = sql.substring(sql.indexOf(":${"), sql.indexOf('}') + 1);
                     sql = sql.replace(s, "?");
                 }
             }
@@ -224,7 +224,7 @@ public class Query {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[Query]");
+        final StringBuilder s = new StringBuilder("[Query]");
         if (name != null)
             s.append("name: ").append(name).append('\n');
         if (select != null)

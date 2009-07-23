@@ -122,7 +122,7 @@ public abstract class WebService {
     /**
      * Specifies if the process is running on a Glassfish application server.
      */
-    protected static Boolean runningOnGlassfish = null;
+    private static Boolean runningOnGlassfish = null;
 
     /**
      * The user directory where configuration files are stored on Unix platforms.
@@ -268,15 +268,15 @@ public abstract class WebService {
     @Consumes("application/x-www-form-urlencoded")
     public Response doPOSTKvp(String request) throws JAXBException  {
         final StringTokenizer tokens = new StringTokenizer(request, "&");
-        String log = "";
+        final StringBuilder log = new StringBuilder();
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
-            String paramName  = token.substring(0, token.indexOf('='));
-            String paramValue = token.substring(token.indexOf('=')+ 1);
-            log += "put: " + paramName + "=" + paramValue + '\n';
+            final String paramName  = token.substring(0, token.indexOf('='));
+            final String paramValue = token.substring(token.indexOf('=')+ 1);
+            log.append("put: ").append(paramName).append("=").append(paramValue).append('\n');
             uriContext.getQueryParameters().add(paramName, paramValue);
         }
-        LOGGER.info("request POST kvp: " + request + '\n' + log);
+        LOGGER.info("request POST kvp: " + request + '\n' + log.toString());
         return treatIncomingRequest(null);
     }
 
@@ -314,8 +314,8 @@ public abstract class WebService {
                 }
             }
 
-            if (request != null && request instanceof Versioned) {
-                Versioned ar = (Versioned) request;
+            if (request instanceof Versioned) {
+                final Versioned ar = (Versioned) request;
                 if (ar.getVersion() != null)
                     uriContext.getQueryParameters().add("VERSION", ar.getVersion().toString());
             } if (request != null) {
@@ -343,7 +343,7 @@ public abstract class WebService {
     @Consumes("text/plain")
     public Response doPOSTPlain(InputStream is) throws JAXBException  {
         LOGGER.severe("request POST plain sending Exception");
-        Object obj = launchException("The plain text content type is not allowed. Send " + 
+        final Object obj = launchException("The plain text content type is not allowed. Send " +
         		                     "a message body with key=value pairs in the " +
         		                     "application/x-www-form-urlencoded MIME type, or " +
         		                     "an XML file using an application/xml or text/xml " +
@@ -422,7 +422,7 @@ public abstract class WebService {
             if (!parameters.isEmpty())
                 LOGGER.info(parameters.toString());
         } else {
-            if (uriContext != null && uriContext.getRequestUri() != null) {
+            if (uriContext.getRequestUri() != null) {
                 LOGGER.info(uriContext.getRequestUri().toString());
             }
         }
@@ -446,7 +446,7 @@ public abstract class WebService {
         Unmarshaller unmarshaller = null;
         try {
             unmarshaller = marshallerPool.acquireUnmarshaller();
-            MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
+            final MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
             LinkedList<String> list = (LinkedList<String>) parameters.get(parameterName);
             if (list == null) {
                 list = (LinkedList<String>) parameters.get(parameterName.toLowerCase());
@@ -460,7 +460,7 @@ public abstract class WebService {
                     }
                 }
             }
-            StringReader sr = new StringReader(list.get(0));
+            final StringReader sr = new StringReader(list.get(0));
             Object result = unmarshaller.unmarshal(sr);
             if (result instanceof JAXBElement) {
                 result = ((JAXBElement)result).getValue();
@@ -486,7 +486,7 @@ public abstract class WebService {
          File path;
 
          //we try to get the deployed "WEB-INF" directory
-         String home = servletContext.getRealPath("WEB-INF");
+         final String home = servletContext.getRealPath("WEB-INF");
 
          if (home == null || !(path = new File(home)).isDirectory()) {
             path = getSicadeDirectory();
@@ -510,9 +510,9 @@ public abstract class WebService {
 
     public static File getConfigDirectory() {
         try {
-            String path = getPropertyValue("Constellation", "config_dir");
+            final String path = getPropertyValue("Constellation", "config_dir");
             if(path != null){
-                File folder = new File(path);
+                final File folder = new File(path);
                 if(folder.exists() && folder.canRead() && folder.canWrite()){
                     return folder;
                 }else{
@@ -540,8 +540,8 @@ public abstract class WebService {
      * @return The ".sicade" directory containing.
      */
     public static File getSicadeDirectory() {
-        File sicadeDirectory;
-        String home = System.getProperty("user.home");
+        final File sicadeDirectory;
+        final String home = System.getProperty("user.home");
 
         if (System.getProperty("os.name", "").startsWith("Windows")) {
              sicadeDirectory = new File(home, WINDOWS_DIRECTORY);

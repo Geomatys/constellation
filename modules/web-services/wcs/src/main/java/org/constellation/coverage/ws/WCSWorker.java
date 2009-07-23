@@ -156,7 +156,7 @@ public final class WCSWorker {
     /*
      * Set to true for CITE tests.
      */
-    private final static boolean CITE_TESTING = false;
+    private static final boolean CITE_TESTING = false;
 
     /**
      * The web service marshaller, which will use the web service name space.
@@ -406,8 +406,8 @@ public final class WCSWorker {
         //general metadata
         final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
         title.add(new LanguageStringType(layer.getName()));
-        final List<LanguageStringType> _abstract = new ArrayList<LanguageStringType>();
-        _abstract.add(new LanguageStringType(Util.cleanSpecialCharacter(layer.getRemarks())));
+        final List<LanguageStringType> abstractt = new ArrayList<LanguageStringType>();
+        abstractt.add(new LanguageStringType(Util.cleanSpecialCharacter(layer.getRemarks())));
         final List<KeywordsType> keywords = new ArrayList<KeywordsType>();
         keywords.add(new KeywordsType(new LanguageStringType("WCS"),
                 new LanguageStringType(layer.getName())));
@@ -459,7 +459,7 @@ public final class WCSWorker {
         supportedFormat.add("image/bmp");
         supportedFormat.add("image/gif");
 
-        final CoverageDescriptionType coverage = new CoverageDescriptionType(title, _abstract,
+        final CoverageDescriptionType coverage = new CoverageDescriptionType(title, abstractt,
                 keywords, layer.getName(), domain, range, supportedCRS, supportedFormat);
         coverages.add(coverage);
         return new CoverageDescriptions(coverages);
@@ -703,9 +703,9 @@ public final class WCSWorker {
 
         // Generate the Contents part of the GetCapabilities.
         final Contents contents;
-        List<CoverageSummaryType>        summary = new ArrayList<CoverageSummaryType>();
-        org.geotoolkit.wcs.xml.v111.ObjectFactory wcs111Factory = new org.geotoolkit.wcs.xml.v111.ObjectFactory();
-        org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory = new org.geotoolkit.ows.xml.v110.ObjectFactory();
+        final List<CoverageSummaryType>        summary                = new ArrayList<CoverageSummaryType>();
+        final org.geotoolkit.wcs.xml.v111.ObjectFactory wcs111Factory = new org.geotoolkit.wcs.xml.v111.ObjectFactory();
+        final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory    = new org.geotoolkit.ows.xml.v110.ObjectFactory();
 
         //NOTE: ADRIAN HACKED HERE
         final List<LayerDetails> layerRefs = getAllLayerReferences(ServiceDef.WCS_1_1_1.version.toString());
@@ -1037,8 +1037,9 @@ public final class WCSWorker {
     private void updateOWSURL(List<? extends AbstractOperation> operations, String url, String service) {
         for (AbstractOperation op:operations) {
             for (AbstractDCP dcp: op.getDCP()) {
-                for (AbstractOnlineResourceType method:dcp.getHTTP().getGetOrPost())
+                for (AbstractOnlineResourceType method:dcp.getHTTP().getGetOrPost()) {
                     method.setHref(url + service.toLowerCase() + "?");
+                }
             }
        }
     }

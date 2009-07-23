@@ -40,11 +40,11 @@ import org.constellation.provider.LayerDetails;
  */
 public interface PrimitiveRegisterIF {
 
-	public List<LayerDetails> getAllLayerReferences(ServiceDef serviceDef) throws RegisterException ;
+	List<LayerDetails> getAllLayerReferences(ServiceDef serviceDef) throws RegisterException ;
 	
-	public List<LayerDetails> getLayerReferences(ServiceDef serviceDef, List<String> layerNames) throws RegisterException ;
+	List<LayerDetails> getLayerReferences(ServiceDef serviceDef, List<String> layerNames) throws RegisterException ;
 	
-	public LayerDetails getLayerReference(ServiceDef serviceDef, String layerName) throws RegisterException ;
+	LayerDetails getLayerReference(ServiceDef serviceDef, String layerName) throws RegisterException ;
 	
 
 }

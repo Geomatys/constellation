@@ -55,6 +55,6 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
     
     @Override
     protected File getConfigurationDirectory() {
-        return serviceDirectory.get("CSW");
+        return SERVCE_DIRECTORY.get("CSW");
     }
 }

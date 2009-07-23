@@ -49,7 +49,7 @@ public interface PortrayalServiceIF {
 	 *           given canvas.
 	 * @throws PortrayalException For errors during portrayal, TODO: common examples?
 	 */
-	public BufferedImage portray( final Portrayal.SceneDef  sdef,
+	BufferedImage portray( final Portrayal.SceneDef  sdef,
 								  final Portrayal.ViewDef   vdef,
 								  final Portrayal.CanvasDef cdef) 
 			throws PortrayalException;
@@ -67,7 +67,7 @@ public interface PortrayalServiceIF {
 	 * 
 	 * @see AbstractGraphicVisitor
 	 */
-	public void visit( final Portrayal.SceneDef  sdef,
+	void visit( final Portrayal.SceneDef  sdef,
 					   final Portrayal.ViewDef   vdef,
 					   final Portrayal.CanvasDef cdef,
 					   Shape selectedArea, 
@@ -85,8 +85,6 @@ public interface PortrayalServiceIF {
 	 * @param dim    The dimension in pixels of the generated image.
 	 * @return       An image of the exception message text. TODO: verify this.
 	 */
-	public BufferedImage writeInImage(Exception e, Dimension dim);
-
-
+	BufferedImage writeInImage(Exception e, Dimension dim);
 
 }

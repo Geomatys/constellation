@@ -20,7 +20,6 @@ import java.awt.Dimension;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.constellation.portrayal.Portrayal;
 import org.constellation.portrayal.PortrayalServiceIF;
@@ -50,16 +49,14 @@ import org.geotoolkit.style.MutableStyle;
  * @see Cst.Portrayal
  * @see Portrayal
  */
-public class CstlPortrayalService implements PortrayalServiceIF {
+public final class CstlPortrayalService implements PortrayalServiceIF {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.portrayal");
-    
     /**
      * This generates a new instance for each thread (i.e. each service request) 
      * but still allows us to have a statically accessible reference with the 
      * {@link #getInstance()} method.
      */
-    private static final ThreadLocal<CstlPortrayalService> instances = new ThreadLocal<CstlPortrayalService>() {
+    private static final ThreadLocal<CstlPortrayalService> INSTANCES = new ThreadLocal<CstlPortrayalService>() {
         @Override
         protected CstlPortrayalService initialValue() {
             return new CstlPortrayalService();
@@ -74,8 +71,8 @@ public class CstlPortrayalService implements PortrayalServiceIF {
      * </p>
      * @return
      */
-    public static CstlPortrayalService internal_getInstance(){
-        return instances.get();
+    public static CstlPortrayalService internalGetInstance(){
+        return INSTANCES.get();
     }
         
     private CstlPortrayalService(){}
@@ -100,8 +97,8 @@ public class CstlPortrayalService implements PortrayalServiceIF {
     	final MapContext context = createContext(sdef);
         final ReportMonitor monitor = new ReportMonitor();
 
-        try{
-            BufferedImage buffer = DefaultPortrayalService.portray(
+        try {
+            final BufferedImage buffer = DefaultPortrayalService.portray(
                     context,
                     vdef.envelope,
                     cdef.dimension,
@@ -110,20 +107,20 @@ public class CstlPortrayalService implements PortrayalServiceIF {
                     monitor,
                     cdef.background);
 
-            Exception exp = monitor.getLastException();
+            final Exception exp = monitor.getLastException();
             if(exp != null){
                 throw exp;
             }
 
             return buffer;
 
-        }catch(Exception ex){
+        } catch(Exception ex) {
             if (ex instanceof PortrayalException) {
                 throw (PortrayalException)ex;
             } else {
                 throw new PortrayalException(ex);
             }
-        }finally{
+        } finally {
             context.layers().clear();
         }
 

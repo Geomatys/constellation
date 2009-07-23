@@ -58,7 +58,7 @@ public final class Cstl {
 	 *           Service Interface}.
 	 */
 	public static PortrayalServiceIF getPortrayalService() {
-		return CstlPortrayalService.internal_getInstance();
+		return CstlPortrayalService.internalGetInstance();
 	}
 	
 }

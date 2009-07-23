@@ -154,13 +154,13 @@ public class Automatic {
     /**
      * @param Thesaurus the Thesaurus to set
      */
-    public void setThesaurus(List<BDD> Thesaurus) {
-        this.thesaurus = Thesaurus;
+    public void setThesaurus(List<BDD> thesaurus) {
+        this.thesaurus = thesaurus;
     }
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[Automatic]");
+        final StringBuilder s = new StringBuilder("[Automatic]");
         s.append("format: ").append(format).append('\n');
         s.append("BDD:").append(bdd).append('\n');
         s.append("dataDirectory:").append(bdd).append('\n');
