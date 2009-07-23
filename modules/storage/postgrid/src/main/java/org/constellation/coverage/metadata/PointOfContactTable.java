@@ -79,16 +79,16 @@ public class PointOfContactTable extends BoundedSingletonTable<PointOfContact> {
         final String phone =            results.getString(indexOf(query.phone));
         final String email =            results.getString(indexOf(query.email));
         final String org =              results.getString(indexOf(query.org));
-        final String org_address1 =     results.getString(indexOf(query.org_address1));
-        final String org_address2 =     results.getString(indexOf(query.org_address2));
-        final String org_city =         results.getString(indexOf(query.org_city));
-        final String org_state =        results.getString(indexOf(query.org_state));
-        final String org_zip =          results.getString(indexOf(query.org_zip));
-        final String org_country =      results.getString(indexOf(query.org_country));
-        final String org_contact =      results.getString(indexOf(query.org_contact));
+        final String orgAddress1 =      results.getString(indexOf(query.org_address1));
+        final String orgAddress2 =      results.getString(indexOf(query.org_address2));
+        final String orgCity =          results.getString(indexOf(query.org_city));
+        final String orgState =         results.getString(indexOf(query.org_state));
+        final String orgZip =           results.getString(indexOf(query.org_zip));
+        final String orgCountry =       results.getString(indexOf(query.org_country));
+        final String orgContact =       results.getString(indexOf(query.org_contact));
         final PointOfContactEntry entry = new PointOfContactEntry(pocId, lastName, firstName, 
-                address1, address2, city, state, country, zip, phone, email, org, org_address1,
-                org_address2, org_city, org_state, org_zip, org_country, org_contact);
+                address1, address2, city, state, country, zip, phone, email, org, orgAddress1,
+                orgAddress2, orgCity, orgState, orgZip, orgCountry, orgContact);
         return entry;
     }
 

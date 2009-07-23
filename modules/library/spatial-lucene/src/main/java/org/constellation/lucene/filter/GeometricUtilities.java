@@ -43,8 +43,9 @@ public class GeometricUtilities {
     /**
      *  WGS 1984 ellipsoid with axis in {@linkplain SI#METER metres}.
      */
-    private static final DefaultEllipsoid de = DefaultEllipsoid.WGS84;
-    
+    private static final DefaultEllipsoid DE = DefaultEllipsoid.WGS84;
+
+    private GeometricUtilities() {}
     /**
      * Return the shortest orthodromic distance between a boundingBox and a point.
      * if the boundingBox contains the point it return 0.
@@ -55,16 +56,16 @@ public class GeometricUtilities {
      * 
      * @return the shortest distance between the bounding box and the point.
      */
-    public static double BBoxToPointDistance(final GeneralEnvelope boundingBox, final GeneralDirectPosition point, final String units) {
+    public static double bboxToPointDistance(final GeneralEnvelope boundingBox, final GeneralDirectPosition point, final String units) {
         if (boundingBox.contains(point))
             return 0;
         
-        List<Line2D> border = getBorder(boundingBox);
+        final List<Line2D> border = getBorder(boundingBox);
         double distance     = Double.MAX_VALUE;
         
         for (Line2D l: border) {
             
-             double tempDistance = lineToPointDistance(l, point, units);
+             final double tempDistance = lineToPointDistance(l, point, units);
              if (tempDistance < distance)
                  distance = tempDistance;
         }
@@ -82,7 +83,7 @@ public class GeometricUtilities {
      */
     public static double lineToPointDistance(final Line2D line, final GeneralDirectPosition point, final String units) {
 
-        Point2D pt = ShapeUtilities.nearestColinearPoint(line, new Point2D.Double(point.getOrdinate(0), point.getOrdinate(1)));
+        final Point2D pt = ShapeUtilities.nearestColinearPoint(line, new Point2D.Double(point.getOrdinate(0), point.getOrdinate(1)));
                 
         return getOrthodromicDistance(point.getOrdinate(0), point.getOrdinate(1),
                                       pt.getX(), pt.getY(), units);
@@ -136,16 +137,16 @@ public class GeometricUtilities {
      */
     public static double lineToBBoxDistance(final Line2D line, final GeneralEnvelope boundingBox, final String units) {
         
-        CoordinateReferenceSystem crs = boundingBox.getCoordinateReferenceSystem();
-        GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
+        final CoordinateReferenceSystem crs = boundingBox.getCoordinateReferenceSystem();
+        final GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
         tempPoint1.setCoordinateReferenceSystem(crs);
-        GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
+        final GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
         tempPoint2.setCoordinateReferenceSystem(crs);
         
         if (boundingBox.contains(tempPoint1) || boundingBox.contains(tempPoint2))
             return 0;
         
-        List<Line2D> border = getBorder(boundingBox);
+        final List<Line2D> border = getBorder(boundingBox);
         double distance     = Double.MAX_VALUE;
         
         for (Line2D l: border) {
@@ -168,7 +169,7 @@ public class GeometricUtilities {
      * 
      * @return The shortest distance between the bounding box and the line.
      */
-     public static double BBoxToBBoxDistance(final GeneralEnvelope boundingBox1, final GeneralEnvelope boundingBox2, final String units) {
+     public static double bboxToBBoxDistance(final GeneralEnvelope boundingBox1, final GeneralEnvelope boundingBox2, final String units) {
         if (boundingBox1.intersects(boundingBox2, false))
             return 0;
         List<Line2D> border = getBorder(boundingBox1);
@@ -195,7 +196,7 @@ public class GeometricUtilities {
      * @return The distance between 2 points on earth expressed in the specified units
      */
     public static double getOrthodromicDistance(final double x1, final double y1, final double x2, final double y2, final String units) {
-        double result = de.orthodromicDistance(y1, x1, y2, x2);
+        final double result = DE.orthodromicDistance(y1, x1, y2, x2);
         if (units.equals("meters") || units.equals("m"))
             return result;
         
@@ -222,16 +223,16 @@ public class GeometricUtilities {
      * @return a list ordered like following: height-left border, width-top border, height-right border, width-bottom border.
      */
     public static List<Line2D> getBorder(final Object geometry) {
-        List<Line2D> result = new ArrayList<Line2D>();
+        final List<Line2D> result = new ArrayList<Line2D>();
         if (geometry instanceof GeneralEnvelope) {
-            GeneralEnvelope env = (GeneralEnvelope) geometry;
-            Line2D heightLeft  = new Line2D.Double(env.getMinimum(0), env.getMaximum(1), env.getMinimum(0), env.getMinimum(1));
+            final GeneralEnvelope env = (GeneralEnvelope) geometry;
+            final Line2D heightLeft  = new Line2D.Double(env.getMinimum(0), env.getMaximum(1), env.getMinimum(0), env.getMinimum(1));
             result.add(heightLeft);
-            Line2D widthTop    = new Line2D.Double(env.getMinimum(0), env.getMaximum(1), env.getMaximum(0), env.getMaximum(1));
+            final Line2D widthTop    = new Line2D.Double(env.getMinimum(0), env.getMaximum(1), env.getMaximum(0), env.getMaximum(1));
             result.add(widthTop);
-            Line2D heightRight = new Line2D.Double(env.getMaximum(0), env.getMaximum(1), env.getMaximum(0), env.getMinimum(1));
+            final Line2D heightRight = new Line2D.Double(env.getMaximum(0), env.getMaximum(1), env.getMaximum(0), env.getMinimum(1));
             result.add(heightRight);
-            Line2D widthBottom = new Line2D.Double(env.getMinimum(0), env.getMinimum(1), env.getMaximum(0), env.getMinimum(1));
+            final Line2D widthBottom = new Line2D.Double(env.getMinimum(0), env.getMinimum(1), env.getMaximum(0), env.getMinimum(1));
             result.add(widthBottom);
         }
         
@@ -246,16 +247,16 @@ public class GeometricUtilities {
      * @return a list ordered like following: upper-left corner, upper-right corner, bottom-right corner, bottom-left corner.
      */
     public static List<Point2D> getCorner(final Object geometry) {
-        List<Point2D> result = new ArrayList<Point2D>();
+        final List<Point2D> result = new ArrayList<Point2D>();
         if (geometry instanceof GeneralEnvelope) {
-            GeneralEnvelope env = (GeneralEnvelope) geometry;
-            Point2D upperLeft   = new Point2D.Double(env.getMinimum(0), env.getMaximum(1));
+            final GeneralEnvelope env = (GeneralEnvelope) geometry;
+            final Point2D upperLeft   = new Point2D.Double(env.getMinimum(0), env.getMaximum(1));
             result.add(upperLeft);
-            Point2D upperRight  = new Point2D.Double(env.getMaximum(0), env.getMaximum(1));
+            final Point2D upperRight  = new Point2D.Double(env.getMaximum(0), env.getMaximum(1));
             result.add(upperRight);
-            Point2D bottomRight = new Point2D.Double(env.getMaximum(0), env.getMinimum(1));
+            final Point2D bottomRight = new Point2D.Double(env.getMaximum(0), env.getMinimum(1));
             result.add(bottomRight);
-            Point2D bottomLeft  = new Point2D.Double(env.getMinimum(0), env.getMinimum(1));
+            final Point2D bottomLeft  = new Point2D.Double(env.getMinimum(0), env.getMinimum(1));
             result.add(bottomLeft);
         }
         
@@ -275,9 +276,9 @@ public class GeometricUtilities {
         if (point == null || boundingBox == null)
             return false;
         
-        Line2D pointLine = new Line2D.Double(point.getOrdinate(0), point.getOrdinate(1), 
+        final Line2D pointLine = new Line2D.Double(point.getOrdinate(0), point.getOrdinate(1),
                                              point.getOrdinate(0), point.getOrdinate(1));
-        List<Line2D> border = getBorder(boundingBox);
+        final List<Line2D> border = getBorder(boundingBox);
         for (Line2D l: border) {
             if (l.intersectsLine(pointLine))
                 return true;
@@ -324,7 +325,7 @@ public class GeometricUtilities {
         if (line == null || boundingBox == null)
             return false;
         
-        List<Line2D> border = getBorder(boundingBox);
+        final List<Line2D> border = getBorder(boundingBox);
         for (Line2D l: border) {
             if (l.intersectsLine(line.getX1(), line.getY1(), line.getX1(), line.getY1()) ||
                 l.intersectsLine(line.getX2(), line.getY2(), line.getX2(), line.getY2()))
@@ -352,8 +353,8 @@ public class GeometricUtilities {
         boolean touches = false;
 
         // we look if one of the corner of the second bounding Box touch a border of the first box
-        List<Line2D> BBoxBorder1 = getBorder(boundingBox1);
-        for (Line2D l : BBoxBorder1) {
+        final List<Line2D> bboxBorder1 = getBorder(boundingBox1);
+        for (Line2D l : bboxBorder1) {
             for (Point2D p : getCorner(boundingBox2)) {
                 if (l.intersectsLine(p.getX(), p.getY(), p.getX(), p.getY())) {
                     touches = true;
@@ -362,7 +363,7 @@ public class GeometricUtilities {
         }
 
         // then we look if one of the corner of the first bounding box touch one border of the second box
-        List<Point2D> filterBoxCorner = GeometricUtilities.getCorner(boundingBox1);
+        final List<Point2D> filterBoxCorner = GeometricUtilities.getCorner(boundingBox1);
         for (Line2D l : getBorder(boundingBox2)) {
             for (Point2D p : filterBoxCorner) {
                 if (l.intersectsLine(p.getX(), p.getY(), p.getX(), p.getY())) {
@@ -382,11 +383,11 @@ public class GeometricUtilities {
      * @return True f the intersection between the envelope and the point is empty.
      */
     public static boolean disjoint(final GeneralEnvelope boundingBox, final Line2D line) {
-        GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
-        GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
+        final GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
+        final GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
             
         if (!boundingBox.contains(tempPoint1) && !boundingBox.contains(tempPoint2)) {
-            List<Line2D> border = getBorder(boundingBox);
+            final List<Line2D> border = getBorder(boundingBox);
             for (Line2D l : border) {
                 if (l.intersectsLine(line)) {
                     return false;
@@ -406,8 +407,8 @@ public class GeometricUtilities {
      * @return True f the intersection between the envelope and the point is empty.
      */
     public static boolean intersect(final GeneralEnvelope boundingBox, final Line2D line) {
-        GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
-        GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
+        final GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
+        final GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
         if (boundingBox.contains(tempPoint1) || boundingBox.contains(tempPoint2))
             return true;
         
@@ -428,10 +429,10 @@ public class GeometricUtilities {
      * @return True if the line crosses the envelope.
      */
     public static boolean crosses(GeneralEnvelope boundingBox, Line2D line) {
-        CoordinateReferenceSystem crs = boundingBox.getCoordinateReferenceSystem();
-        GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
+        final CoordinateReferenceSystem crs = boundingBox.getCoordinateReferenceSystem();
+        final GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
         tempPoint1.setCoordinateReferenceSystem(crs);
-        GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
+        final GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
         tempPoint2.setCoordinateReferenceSystem(crs);
         
         // for this case we look if the line have a point inside and a point outside
@@ -469,10 +470,10 @@ public class GeometricUtilities {
      * @return True if the envelope contain the line.
      */
     public static boolean contains(GeneralEnvelope boundingBox, Line2D line) {
-        CoordinateReferenceSystem crs = boundingBox.getCoordinateReferenceSystem();
-        GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
+        final CoordinateReferenceSystem crs = boundingBox.getCoordinateReferenceSystem();
+        final GeneralDirectPosition tempPoint1 = new GeneralDirectPosition(line.getX1(), line.getY1());
         tempPoint1.setCoordinateReferenceSystem(crs);
-        GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
+        final GeneralDirectPosition tempPoint2 = new GeneralDirectPosition(line.getX2(), line.getY2());
         tempPoint2.setCoordinateReferenceSystem(crs);
         if ((boundingBox.contains(tempPoint1) && boundingBox.contains(tempPoint2)))
             return true;
@@ -547,11 +548,11 @@ public class GeometricUtilities {
      * @throws org.opengis.referencing.operation.TransformException
      */
     public static Object reprojectGeometry(final String targetCRSName, final String sourceCRSName, Object geometry) throws NoSuchAuthorityCodeException, FactoryException, TransformException {
-        CoordinateReferenceSystem targetCRS = CRS.decode(targetCRSName,true);
-        CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCRSName,true);
+        final CoordinateReferenceSystem targetCRS = CRS.decode(targetCRSName,true);
+        final CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCRSName,true);
         
         if (geometry instanceof GeneralEnvelope) {
-            GeneralEnvelope env = (GeneralEnvelope) geometry;
+            final GeneralEnvelope env = (GeneralEnvelope) geometry;
             if (env.getCoordinateReferenceSystem() == null) {
                 env.setCoordinateReferenceSystem(sourceCRS);
             }
@@ -566,14 +567,14 @@ public class GeometricUtilities {
                 throw new TransformException("transform exception: " + exception.getMessage());
             }
 
-            MathTransform mt = operation.getMathTransform();
+            final MathTransform mt = operation.getMathTransform();
             mt.transform((GeneralDirectPosition) geometry, (GeneralDirectPosition) geometry);
             return geometry;
 
         } else if (geometry instanceof Line2D) {
-            Line2D line = (Line2D) geometry;
-            GeneralDirectPosition pt1 = new GeneralDirectPosition(line.getX1(), line.getY1());
-            GeneralDirectPosition pt2 = new GeneralDirectPosition(line.getX2(), line.getY2());
+            final Line2D line = (Line2D) geometry;
+            final GeneralDirectPosition pt1 = new GeneralDirectPosition(line.getX1(), line.getY1());
+            final GeneralDirectPosition pt2 = new GeneralDirectPosition(line.getX2(), line.getY2());
 
             final CoordinateOperationFactory factory = CRS.getCoordinateOperationFactory(true);
             final CoordinateOperation operation;
@@ -583,7 +584,7 @@ public class GeometricUtilities {
                 throw new TransformException("transform exception: " + exception.getMessage());
             }
 
-            MathTransform mt = operation.getMathTransform();
+            final MathTransform mt = operation.getMathTransform();
             mt.transform(pt1, pt1);
             mt.transform(pt2, pt2);
             return new Line2D.Double(pt1.getOrdinate(0), pt1.getOrdinate(1), pt2.getOrdinate(0), pt2.getOrdinate(1));
@@ -606,7 +607,7 @@ public class GeometricUtilities {
      */
     public static Object reprojectBbox2DString(final String sourceCRSName, final String targetCRSName,  String boundingBox) throws NoSuchAuthorityCodeException, FactoryException, TransformException {
       
-      String[] bbox = boundingBox.split(",");
+      final String[] bbox = boundingBox.split(",");
       double[] lowerCorner ={Double.parseDouble(bbox[1]),Double.parseDouble(bbox[0])};
       double[] upperCorner ={Double.parseDouble(bbox[3]),Double.parseDouble(bbox[2])};  
       GeneralEnvelope env = new GeneralEnvelope(lowerCorner,upperCorner);
@@ -614,7 +615,6 @@ public class GeometricUtilities {
       env = (GeneralEnvelope) reprojectGeometry(targetCRSName, sourceCRSName, env);
       lowerCorner = env.getLowerCorner().getCoordinate();
       upperCorner = env.getUpperCorner().getCoordinate();
-      System.out.println(lowerCorner[0]+","+lowerCorner[1]+","+upperCorner[0]+","+upperCorner[1]);
       return lowerCorner[0]+","+lowerCorner[1]+","+upperCorner[0]+","+upperCorner[1];
     }
 

@@ -47,18 +47,18 @@ public class ObservationOfferingQuery extends Query {
      */
     public ObservationOfferingQuery(final Database database) {
         super (database, "observation_offerings");
-        final QueryType[] SIL  = {SELECT, INSERT, LIST};
-        final QueryType[] SIEL = {SELECT,INSERT, EXISTS, LIST};
-        id                   = addColumn("id",                     SIEL);
-        name                 = addColumn("name",                   SIL);
-        description          = addColumn("description",            SIL);
-        srsName              = addColumn("srs_name",               SIL);
-        eventTimeBegin       = addColumn("event_time_begin",       SIL);
-        eventTimeEnd         = addColumn("event_time_end",         SIL);
-        boundedBy            = addColumn("bounded_by",             SIL);
-        resultModelNamespace = addColumn("result_model_namespace", SIL);
-        resultModelLocalPart = addColumn("result_model_localpart", SIL);
-        responseFormat       = addColumn("response_format",        SIL);
+        final QueryType[] sil  = {SELECT, INSERT, LIST};
+        final QueryType[] siel = {SELECT,INSERT, EXISTS, LIST};
+        id                   = addColumn("id",                     siel);
+        name                 = addColumn("name",                   sil);
+        description          = addColumn("description",            sil);
+        srsName              = addColumn("srs_name",               sil);
+        eventTimeBegin       = addColumn("event_time_begin",       sil);
+        eventTimeEnd         = addColumn("event_time_end",         sil);
+        boundedBy            = addColumn("bounded_by",             sil);
+        resultModelNamespace = addColumn("result_model_namespace", sil);
+        resultModelLocalPart = addColumn("result_model_localpart", sil);
+        responseFormat       = addColumn("response_format",        sil);
         
         byId                 = addParameter(id, SELECT, EXISTS);
     }

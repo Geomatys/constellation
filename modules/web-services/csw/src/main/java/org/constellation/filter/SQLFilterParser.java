@@ -389,7 +389,7 @@ public class SQLFilterParser extends FilterParser {
                 brutValue = brutValue.replace(pil.getEscapeChar(),  "\\");// SAME
                 
                 //for a date we remove the '-'
-                if (propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")) {
+                if (isDateField(propertyName)) {
                         brutValue = brutValue.replaceAll("-", "");
                         brutValue = brutValue.replace("Z", "");
                 }
@@ -441,7 +441,7 @@ public class SQLFilterParser extends FilterParser {
                    response.append(" AND v").append(nbField).append(".form=identifier ");
                 
                 } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
-                    if (propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")) {
+                    if (isDateField(propertyName)) {
                         String dateValue = literal.getStringValue();
                         try {
                             if (dateValue.indexOf("CEST") != -1)
@@ -460,7 +460,7 @@ public class SQLFilterParser extends FilterParser {
                     }
                 
                 } else if (operator.equals("PropertyIsGreaterThan")) {
-                    if (propertyName.contains("Date") || propertyName.contains("Modified") || propertyName.contains("date")) {
+                    if (isDateField(propertyName)) {
                         String dateValue = literal.getStringValue();
                         try {
                             if (dateValue.indexOf("CEST") != -1)
@@ -479,7 +479,7 @@ public class SQLFilterParser extends FilterParser {
                     }
                 
                 } else if (operator.equals("PropertyIsLessThan") ) {
-                    if (propertyName.contains("Date") || propertyName.contains("Modified") || propertyName.contains("date")) {
+                    if (isDateField(propertyName)) {
                         //if we are passed by CQL we must format the date
                         String dateValue = literal.getStringValue();
                         try {
@@ -499,7 +499,7 @@ public class SQLFilterParser extends FilterParser {
                     }
                     
                 } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
-                    if (propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")) {
+                    if (isDateField(propertyName)) {
                         String dateValue = literal.getStringValue();
                         try {
                             if (dateValue.indexOf("CEST") != -1)

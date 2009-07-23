@@ -57,10 +57,10 @@ public class IntersectFilter extends SpatialFilter {
         // we prepare the result
         BitSet bits = new BitSet(reader.maxDoc());
 
-        TermDocs termDocs = reader.termDocs(new Term("geometry"));
+        TermDocs termDocs = reader.termDocs(new Term(GEOMETRY_FIELD));
 
         // we are searching for matching points
-        termDocs.seek(new Term("geometry", "point"));
+        termDocs.seek(new Term(GEOMETRY_FIELD, "point"));
         while (termDocs.next()) {
             int docNum = termDocs.doc();
             GeneralDirectPosition tempPoint = readPoint(reader, docNum);
@@ -78,7 +78,7 @@ public class IntersectFilter extends SpatialFilter {
         }
 
         //then we search for matching box
-        termDocs.seek(new Term("geometry", "boundingbox"));
+        termDocs.seek(new Term(GEOMETRY_FIELD, "boundingbox"));
         while (termDocs.next()) {
             int docNum = termDocs.doc();
             GeneralEnvelope tempBox = readBoundingBox(reader, docNum);
@@ -96,7 +96,7 @@ public class IntersectFilter extends SpatialFilter {
         }
 
         //then we search for matching line
-        termDocs.seek(new Term("geometry", "line"));
+        termDocs.seek(new Term(GEOMETRY_FIELD, "line"));
         while (termDocs.next()) {
             int docNum = termDocs.doc();
             Line2D tempLine = readLine(reader, docNum);

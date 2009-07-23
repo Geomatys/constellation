@@ -204,7 +204,7 @@ public class SpatialQuery {
         }
             
         if (spatialFilter != null && !query.toString().equals("")) {
-            s.append(SerialChainFilter.ValueOf(logicalOperator)).append('\n');
+            s.append(SerialChainFilter.valueOf(logicalOperator)).append('\n');
         }
         
         if (spatialFilter != null) {

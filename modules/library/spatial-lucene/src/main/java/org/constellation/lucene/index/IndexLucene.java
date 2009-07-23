@@ -43,12 +43,12 @@ public abstract class IndexLucene {
     /**
      * This is the RAM Directory if you would like to store the index in the RAM memory.
      */
-    private RAMDirectory RAMdirectory = new RAMDirectory();
+    private RAMDirectory ramDirectory = new RAMDirectory();
 
     /**
      * This the File Directory if you would like to store the index in a File directory.
      */
-    private File FileDirectory;
+    private File fileDirectory;
     
    /**
      * Creates a new Lucene Index.
@@ -75,7 +75,7 @@ public abstract class IndexLucene {
      * Returns a RAMdirectory of this Index Object.
      */
     public RAMDirectory getRAMdirectory() {
-        return RAMdirectory;
+        return ramDirectory;
     }
 
     /**
@@ -83,15 +83,15 @@ public abstract class IndexLucene {
      *
      * @param RAMDirectory a RAMDirectory object.
      */
-    public void setRAMdirectory(final RAMDirectory RAMdirectory) {
-        this.RAMdirectory = RAMdirectory;
+    public void setRAMdirectory(final RAMDirectory ramDirectory) {
+        this.ramDirectory = ramDirectory;
     }
 
     /**
      * Returns a file directory of this index.
      */
     public File getFileDirectory() {
-        return FileDirectory;
+        return fileDirectory;
     }
 
     /**
@@ -100,7 +100,7 @@ public abstract class IndexLucene {
      * @param aFileDirectory a FileDirectory object.
      */
     public void setFileDirectory(final File aFileDirectory) {
-        FileDirectory = aFileDirectory;
+        fileDirectory = aFileDirectory;
     }
 
 }

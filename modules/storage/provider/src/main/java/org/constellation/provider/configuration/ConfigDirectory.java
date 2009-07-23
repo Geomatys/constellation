@@ -41,6 +41,8 @@ import org.constellation.util.Util;
  */
 public final class ConfigDirectory {
 
+    private ConfigDirectory() {}
+    
     /**
      * The default debugging logger for all web services.
      */

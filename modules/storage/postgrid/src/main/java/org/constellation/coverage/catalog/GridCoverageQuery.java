@@ -77,25 +77,25 @@ final class GridCoverageQuery extends Query {
     GridCoverageQuery(final Database database, final boolean tiles) {
         super(database, tiles ? "Tiles" : "GridCoverages", tiles);
         final Column layer, horizontalExtent;
-        final QueryType[] ________ = {                                                                        };
-        final QueryType[] SE____D_ = {SELECT, EXISTS,                                            DELETE       };
-        final QueryType[] _E____DC = {        EXISTS,                                            DELETE, CLEAR};
-        final QueryType[] S_L_____ = {SELECT,         LIST                                                    };
-        final QueryType[] S_L__I__ = {SELECT,         LIST,                               INSERT              };
-        final QueryType[] SEL__I__ = {SELECT, EXISTS, LIST,                               INSERT              };
-        final QueryType[] S_LA_I__ = {SELECT,         LIST, AVAILABLE_DATA,               INSERT              };
-        final QueryType[] S_LABI__ = {SELECT,         LIST, AVAILABLE_DATA, BOUNDING_BOX, INSERT              };
-        final QueryType[] S_LAB___ = {SELECT,         LIST, AVAILABLE_DATA, BOUNDING_BOX                      };
-        final QueryType[] SELAB_DC = {SELECT, EXISTS, LIST, AVAILABLE_DATA, BOUNDING_BOX,        DELETE, CLEAR};
-        final QueryType[] ____B___ = {                                      BOUNDING_BOX                      };
-        layer            = addForeignerColumn("Series",         "layer",            ________);
-        series           = addColumn         (                  "series",           S_L__I__);
-        filename         = addColumn         (                  "filename",         SEL__I__);
-        index            = addColumn         (                  "index", 1,         S_L__I__);
-        startTime        = addColumn         (                  "startTime",        S_LABI__);
-        endTime          = addColumn         (                  "endTime",          S_LABI__);
-        spatialExtent    = addColumn         (                  "extent",           S_LA_I__);
-        horizontalExtent = addForeignerColumn("GridGeometries", "horizontalExtent", ____B___);
+        final QueryType[] empty   = {                                                                        };
+        final QueryType[] sed     = {SELECT, EXISTS,                                            DELETE       };
+        final QueryType[] edc     = {        EXISTS,                                            DELETE, CLEAR};
+        final QueryType[] sl      = {SELECT,         LIST                                                    };
+        final QueryType[] sli     = {SELECT,         LIST,                               INSERT              };
+        final QueryType[] seli    = {SELECT, EXISTS, LIST,                               INSERT              };
+        final QueryType[] slai    = {SELECT,         LIST, AVAILABLE_DATA,               INSERT              };
+        final QueryType[] slabi   = {SELECT,         LIST, AVAILABLE_DATA, BOUNDING_BOX, INSERT              };
+        final QueryType[] slab    = {SELECT,         LIST, AVAILABLE_DATA, BOUNDING_BOX                      };
+        final QueryType[] selabdc = {SELECT, EXISTS, LIST, AVAILABLE_DATA, BOUNDING_BOX,        DELETE, CLEAR};
+        final QueryType[] b       = {                                      BOUNDING_BOX                      };
+        layer            = addForeignerColumn("Series",         "layer",            empty);
+        series           = addColumn         (                  "series",           sli);
+        filename         = addColumn         (                  "filename",         seli);
+        index            = addColumn         (                  "index", 1,         sli);
+        startTime        = addColumn         (                  "startTime",        slabi);
+        endTime          = addColumn         (                  "endTime",          slabi);
+        spatialExtent    = addColumn         (                  "extent",           slai);
+        horizontalExtent = addForeignerColumn("GridGeometries", "horizontalExtent", b);
         if (tiles) {
             dx = addColumn("dx", INSERT);
             dy = addColumn("dy", INSERT);
@@ -103,20 +103,20 @@ final class GridCoverageQuery extends Query {
             dx = null;
             dy = null;
         }
-        startTime.setFunction("MIN",  ____B___);
-        endTime  .setFunction("MAX",  ____B___);
-        endTime  .setOrdering("DESC", S_L_____); // Sort by date is mandatory.
-        series   .setOrdering("ASC",  S_L_____);
+        startTime.setFunction("MIN",  b);
+        endTime  .setFunction("MAX",  b);
+        endTime  .setOrdering("DESC", sl); // Sort by date is mandatory.
+        series   .setOrdering("ASC",  sl);
 
-        byFilename         = addParameter(filename,           SE____D_);
-        byLayer            = addParameter(layer,              S_LAB___);
-        bySeries           = addParameter(series,             _E____DC);
-        byStartTime        = addParameter(startTime,          SELAB_DC);
-        byEndTime          = addParameter(endTime,            SELAB_DC);
-        byHorizontalExtent = addParameter(horizontalExtent,   S_LAB___);
+        byFilename         = addParameter(filename,           sed);
+        byLayer            = addParameter(layer,              slab);
+        bySeries           = addParameter(series,             edc);
+        byStartTime        = addParameter(startTime,          selabdc);
+        byEndTime          = addParameter(endTime,            selabdc);
+        byHorizontalExtent = addParameter(horizontalExtent,   slab);
         byHorizontalExtent.setComparator("&&");
-        byHorizontalExtent.setFunction("GeometryFromText(?,4326)", S_LAB___);
-        horizontalExtent  .setFunction("EXTENT",                   ____B___);
+        byHorizontalExtent.setFunction("GeometryFromText(?,4326)", slab);
+        horizontalExtent  .setFunction("EXTENT",                   b);
         byStartTime.setComparator("IS NULL OR <=");
         byEndTime  .setComparator("IS NULL OR >=");
     }

@@ -402,4 +402,8 @@ public abstract class FilterParser {
     protected abstract Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> jbSpatialOps) throws CstlServiceException;
     
 
+    protected boolean isDateField(String propertyName) {
+        return (propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")
+                 || propertyName.equalsIgnoreCase("TempExtent_begin") || propertyName.equalsIgnoreCase("TempExtent_end"));
+    }
 }

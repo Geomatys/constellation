@@ -48,12 +48,12 @@ public class TextBlockQuery extends Query{
      */
     public TextBlockQuery(final Database database) {
         super(database, "text_block_encodings");
-        final QueryType[] SI  = {SELECT, INSERT};
-        final QueryType[] SIEF = {SELECT, INSERT, EXISTS,  FILTERED_LIST};
-        id               = addColumn("id_encoding",       SIEF);
-        tokenSeparator   = addColumn("token_separator",   SI);
-        blockSeparator   = addColumn("block_separator",   SI);
-        decimalSeparator = addColumn("decimal_separator", SI);
+        final QueryType[] si   = {SELECT, INSERT};
+        final QueryType[] sief = {SELECT, INSERT, EXISTS,  FILTERED_LIST};
+        id               = addColumn("id_encoding",       sief);
+        tokenSeparator   = addColumn("token_separator",   si);
+        blockSeparator   = addColumn("block_separator",   si);
+        decimalSeparator = addColumn("decimal_separator", si);
 
         byId               = addParameter(id, SELECT, EXISTS);
         byBlockSeparator   = addParameter(blockSeparator,   FILTERED_LIST);

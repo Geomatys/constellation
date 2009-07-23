@@ -72,7 +72,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
     /**
      * The maximum size of the map of queries.
      */
-    private final static int MaxCachedQueriesSize = 50;
+    private final static int maxCachedQueriesSize = 50;
 
     /**
      * A flag indicating if the cache system for query is enabled.
@@ -81,8 +81,8 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
 
     /**
      * A flag indicating if the multiLingual system for query is enabled.
-     */
-    private boolean isMultiLingualEnabled;
+    
+    private boolean isMultiLingualEnabled; */
 
     /**
      * A list of metadata ID ordered by DocID.
@@ -101,7 +101,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
         try {
             setFileDirectory(new File(configDir, serviceID + "index"));
             isCacheEnabled        = true;
-            isMultiLingualEnabled = false;
+            //isMultiLingualEnabled = false;
             initSearcher();
             initIdentifiersList();
 
@@ -125,8 +125,8 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      * Returns the IndexSearcher of this index.
      */
     private void initSearcher() throws CorruptIndexException, IOException {
-        File indexDirectory = getFileDirectory();
-        IndexReader ireader = IndexReader.open(indexDirectory);
+        final File indexDirectory = getFileDirectory();
+        final IndexReader ireader = IndexReader.open(indexDirectory);
         searcher   = new IndexSearcher(ireader);
         LOGGER.info("Creating new Index Searcher with index directory:" + indexDirectory.getPath());
        
@@ -138,7 +138,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
     private final void initIdentifiersList() throws IOException, CorruptIndexException, ParseException, SearchingException {
         identifiers = new ArrayList<String>();
         for (int i = 0; i < searcher.maxDoc(); i++) {
-            String metadataID = getMatchingID(searcher.doc(i));
+            final String metadataID = getMatchingID(searcher.doc(i));
             identifiers.add(i, metadataID);
         }
         LOGGER.info(identifiers.size() + " records founded.");
@@ -194,7 +194,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
      */
     public List<String> doSearch(SpatialQuery spatialQuery) throws SearchingException {
         try {
-            long start = System.currentTimeMillis();
+            final long start = System.currentTimeMillis();
             List<String> results = new ArrayList<String>();
 
             //we look for a cached Query
@@ -210,8 +210,8 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
                 maxRecords = 1;
             }
 
-            String field = "Title";
-            QueryParser parser = new QueryParser(field, analyzer);
+            final String field       = "Title";
+            final QueryParser parser = new QueryParser(field, analyzer);
             parser.setDefaultOperator(Operator.AND);
 
             // we enable the leading wildcard mode if the first character of the query is a '*'
@@ -220,10 +220,10 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
                 parser.setAllowLeadingWildcard(true);
                 BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
             }
-            Query query = parser.parse(spatialQuery.getQuery());
-            Filter filter = spatialQuery.getSpatialFilter();
-            int operator = spatialQuery.getLogicalOperator();
-            Sort sort = spatialQuery.getSort();
+            final Query query = parser.parse(spatialQuery.getQuery());
+            final Filter filter = spatialQuery.getSpatialFilter();
+            final int operator = spatialQuery.getLogicalOperator();
+            final Sort sort = spatialQuery.getSort();
             String sorted = "no Sorted";
             if (sort != null) {
                 sorted = "order by: " + sort.toString();
@@ -232,11 +232,11 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             if (filter != null) {
                 f = filter.toString();
             }
-            LOGGER.info("Searching for: " + query.toString(field) + '\n' + SerialChainFilter.ValueOf(operator) + '\n' + f + '\n' + sorted + '\n' + "max records: " + maxRecords);
+            LOGGER.info("Searching for: " + query.toString(field) + '\n' + SerialChainFilter.valueOf(operator) + '\n' + f + '\n' + sorted + '\n' + "max records: " + maxRecords);
 
             // simple query with an AND
             if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && filter == null)) {
-                TopDocs docs;
+                final TopDocs docs;
                 if (sort != null) {
                     docs = searcher.search(query, filter, maxRecords, sort);
                 } else {
@@ -248,8 +248,8 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
 
             // for a OR we need to perform many request
             } else if (operator == SerialChainFilter.OR) {
-                TopDocs hits1;
-                TopDocs hits2;
+                final TopDocs hits1;
+                final TopDocs hits2;
                 if (sort != null) {
                     hits1 = searcher.search(query, null, maxRecords, sort);
                     hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), maxRecords, sort);
@@ -269,18 +269,18 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
 
             // for a NOT we need to perform many request
             } else if (operator == SerialChainFilter.NOT) {
-                TopDocs hits1;
+                final TopDocs hits1;
                 if (sort != null) {
                     hits1 = searcher.search(query, filter, maxRecords, sort);
                 } else {
                     hits1 = searcher.search(query, filter, maxRecords);
                 }
-                List<String> unWanteds = new ArrayList<String>();
+                final List<String> unWanteds = new ArrayList<String>();
                 for (ScoreDoc doc : hits1.scoreDocs) {
                     unWanteds.add(identifiers.get(doc.doc));
                 }
 
-                TopDocs hits2;
+                final TopDocs hits2;
                 if (sort != null) {
                     hits2 = searcher.search(simpleQuery, null, maxRecords, sort);
                 } else {
@@ -299,8 +299,8 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
 
             // if we have some subQueries we execute it separely and merge the result
             if (spatialQuery.getSubQueries().size() > 0) {
-                SpatialQuery sub = spatialQuery.getSubQueries().get(0);
-                List<String> subResults = doSearch(sub);
+                final SpatialQuery sub        = spatialQuery.getSubQueries().get(0);
+                final List<String> subResults = doSearch(sub);
                 for (String r : results) {
                     if (!subResults.contains(r)) {
                         results.remove(r);
@@ -330,7 +330,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
     private void putInCache(SpatialQuery query, List<String> results) {
         if (isCacheEnabled) {
             // if we had reach the maximum cache size we remove the first request
-            if (cachedQueries.size() >= MaxCachedQueriesSize) {
+            if (cachedQueries.size() >= maxCachedQueriesSize) {
                 cachedQueries.remove(cachedQueries.keySet().iterator().next());
             }
             cachedQueries.put(query, results);
@@ -348,12 +348,4 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             LOGGER.info("IOException while closing the indexer");
         }
     }
-
-    /**
-     * @param isMultiLingualEnabled the isMultiLingualEnabled to set
-     */
-    public void setIsMultiLingualEnabled(boolean isMultiLingualEnabled) {
-        this.isMultiLingualEnabled = isMultiLingualEnabled;
-    }
-
 }

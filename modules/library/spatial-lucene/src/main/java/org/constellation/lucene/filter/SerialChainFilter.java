@@ -55,16 +55,16 @@ public class SerialChainFilter extends Filter {
     public static final int XOR     = 4;
     public static final int DEFAULT = OR;
 	
-    private int actionType[];
+    private int[] actionType;
 
     public SerialChainFilter(List<Filter> chain) {
         this.chain      = chain;
         this.actionType = new int[]{DEFAULT};
     }
 
-    public SerialChainFilter(List<Filter> chain, int actionType[]) {
+    public SerialChainFilter(List<Filter> chain, int[] actionType) {
         this.chain      = chain;
-        this.actionType = actionType;
+        this.actionType = actionType.clone();
     }
 	
 	   /* (non-Javadoc)
@@ -73,10 +73,10 @@ public class SerialChainFilter extends Filter {
     @Override
     public BitSet bits(IndexReader reader) throws CorruptIndexException, IOException {
 
-        int chainSize  = chain.size();
-        int actionSize = actionType.length;
+        final int chainSize  = chain.size();
+        final int actionSize = actionType.length;
 
-        BitSet bits    = chain.get(0).bits(reader);
+        final BitSet bits    = chain.get(0).bits(reader);
 
         //if there is only an operand not we don't enter the loop
         int j = 0;
@@ -95,7 +95,7 @@ public class SerialChainFilter extends Filter {
                 action = DEFAULT;
             }
 
-            BitSet nextFilterResponse = chain.get(i).bits(reader);
+            final BitSet nextFilterResponse = chain.get(i).bits(reader);
 
             //if the next operator is NOT we have to process the action before the current operand
             if (j < actionSize && actionType[j] == NOT) {
@@ -105,13 +105,13 @@ public class SerialChainFilter extends Filter {
 
             switch (action) {
 
-                case (AND):
+                case AND:
                     bits.and(nextFilterResponse);
                     break;
-                case (OR):
+                case OR:
                     bits.or(nextFilterResponse);
                     break;
-                case (XOR):
+                case XOR:
                     bits.xor(nextFilterResponse);
                     break;
                 default:
@@ -135,7 +135,7 @@ public class SerialChainFilter extends Filter {
      * @return the actionType
      */
     public int[] getActionType() {
-        return actionType;
+        return actionType.clone();
     }
 
     /**
@@ -167,15 +167,15 @@ public class SerialChainFilter extends Filter {
      * 
      * @return A filter name : And, Or, Xor or Not. 
      */
-    public static String ValueOf(final int flag) {
+    public static String valueOf(final int flag) {
         switch (flag) {
-            case (AND):
+            case AND:
                 return "AND";
-            case (OR):
+            case OR:
                 return "OR";
-            case (NOT):
+            case NOT:
                 return "NOT";
-            case (XOR):
+            case XOR:
                 return "XOR";
             default:
                return "unknow";
@@ -214,10 +214,10 @@ public class SerialChainFilter extends Filter {
       if (chain.size() == 0)
     	  return 0;
 
-      int h = chain.get(0).hashCode() ^ new Integer(actionType[0]).hashCode(); 
+      int h = chain.get(0).hashCode() ^ Integer.valueOf(actionType[0]).hashCode();
       for (int i = 1; i < this.chain.size(); i++) {
     	  h ^= chain.get(i).hashCode();
-    	  h ^= new Integer(actionType[i]).hashCode();
+    	  h ^= Integer.valueOf(actionType[i]).hashCode();
       }
 
       return h;
@@ -236,16 +236,16 @@ public class SerialChainFilter extends Filter {
             
             for (int i = 0; i < actionType.length; i++) {
                 switch(actionType[i]) {
-                    case (AND):
+                    case AND:
                         buf.append("AND");
                         break;
-                    case (OR):
+                    case OR:
                         buf.append("OR");
                         break;
-                    case (NOT):
+                    case NOT:
                         buf.append("NOT");
                         break;
-                    case (XOR):
+                    case XOR:
                         buf.append("XOR");
                         break;
                     default:

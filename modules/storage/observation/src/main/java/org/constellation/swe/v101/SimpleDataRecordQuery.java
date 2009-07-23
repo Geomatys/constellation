@@ -49,12 +49,12 @@ public class SimpleDataRecordQuery extends Query{
      */
     public SimpleDataRecordQuery(final Database database) {
         super(database, "simple_data_records");
-        final QueryType[] SLI  = {SELECT, LIST, INSERT};
-        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
-        idBlock       = addColumn("id_datablock",  SLIE);
-        idDataRecord  = addColumn("id_datarecord", SLIE);
-        definition    = addColumn("definition",    SLI);
-        fixed         = addColumn("fixed",         SLI);
+        final QueryType[] sli  = {SELECT, LIST, INSERT};
+        final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
+        idBlock       = addColumn("id_datablock",  slie);
+        idDataRecord  = addColumn("id_datarecord", slie);
+        definition    = addColumn("definition",    sli);
+        fixed         = addColumn("fixed",         sli);
         
         byIdBlock       = addParameter(idBlock, SELECT, LIST, EXISTS);
         byIdDataRecord  = addParameter(idDataRecord, SELECT, EXISTS);

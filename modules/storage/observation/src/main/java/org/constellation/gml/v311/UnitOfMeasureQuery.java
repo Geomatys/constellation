@@ -47,13 +47,13 @@ public class UnitOfMeasureQuery extends Query{
      */
     public UnitOfMeasureQuery(final Database database) {
         super(database, "unit_of_measures");
-        final QueryType[] SLI = {SELECT, LIST, INSERT};
-        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
+        final QueryType[] sli  = {SELECT, LIST, INSERT};
+        final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         
-        id           = addColumn("id",            SLIE);
-        name         = addColumn("name",          SLI);
-        quantityType = addColumn("quantity_type", SLI);
-        unitSystem   = addColumn("unit_system",   SLI);
+        id           = addColumn("id",            slie);
+        name         = addColumn("name",          sli);
+        quantityType = addColumn("quantity_type", sli);
+        unitSystem   = addColumn("unit_system",   sli);
         
         byId         = addParameter(id, SELECT, EXISTS);
     }

@@ -39,6 +39,8 @@ public class CSWQueryable {
      public static final QName SPECIFICATION_TITLE_QNAME                  = new QName("http://www.inspire.org", "SpecificationTitle",              "ins");
      public static final QName SPECIFICATION_DATE_QNAME                   = new QName("http://www.inspire.org", "SpecificationDate",               "ins");
      public static final QName SPECIFICATION_DATETYPE_QNAME               = new QName("http://www.inspire.org", "SpecificationDateType",           "ins");
+
+     private CSWQueryable() {}
      
     /**
      * The queryable element from ISO 19115 and their path id.

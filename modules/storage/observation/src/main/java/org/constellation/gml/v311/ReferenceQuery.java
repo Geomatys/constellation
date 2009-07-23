@@ -47,17 +47,17 @@ public class ReferenceQuery extends Query {
      */
     public ReferenceQuery(final Database database) {
         super(database, "references");
-        final QueryType[] SLI  = {SELECT, LIST, INSERT};
-        final QueryType[] SLIEF = {SELECT, INSERT, LIST, EXISTS, FILTERED_LIST};
-        idReference = addColumn("id_reference", SLIEF);
-        actuate     = addColumn("actuate"     , SLI);
-        arcrole     = addColumn("arcrole"     , SLI);
-        href        = addColumn("href"        , SLI);
-        role        = addColumn("role"        , SLI);
-        show        = addColumn("show"        , SLI);
-        title       = addColumn("title"       , SLI);
-        type        = addColumn("type"        , SLI);
-        owns        = addColumn("owns"        , SLI);
+        final QueryType[] sli   = {SELECT, LIST, INSERT};
+        final QueryType[] slief = {SELECT, INSERT, LIST, EXISTS, FILTERED_LIST};
+        idReference = addColumn("id_reference", slief);
+        actuate     = addColumn("actuate"     , sli);
+        arcrole     = addColumn("arcrole"     , sli);
+        href        = addColumn("href"        , sli);
+        role        = addColumn("role"        , sli);
+        show        = addColumn("show"        , sli);
+        title       = addColumn("title"       , sli);
+        type        = addColumn("type"        , sli);
+        owns        = addColumn("owns"        , sli);
         
         byIdReference = addParameter(idReference, SELECT, EXISTS);
         byActuate     = addParameter(actuate,     FILTERED_LIST);

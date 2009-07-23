@@ -19,6 +19,7 @@ package org.constellation.lucene.filter;
 
 import java.awt.geom.Line2D;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Apache Lucene dependencies
@@ -55,7 +56,8 @@ public abstract class SpatialFilter extends Filter {
     private static final long serialVersionUID = -1337271653030261124L;
 
     private static final Logger LOGGER = Logger.getLogger("org.constellation.lucene.filter");
-    
+
+    public static final String GEOMETRY_FIELD = "geometry";
     /**
      * The envelope were we search results.
      */
@@ -84,7 +86,7 @@ public abstract class SpatialFilter extends Filter {
     /**
      * an approximation to apply to the different filter in order to balance the lost of precision by the reprojection.
      */
-    private final double precision = 0.01;
+    private static final double PRECISION = 0.01;
     
     /**
      * initialize the filter with the specified geometry and filterType.
@@ -123,25 +125,25 @@ public abstract class SpatialFilter extends Filter {
      * @return a GeneralEnvelope.
      */
     protected GeneralEnvelope readBoundingBox(IndexReader reader, int docNum) throws CorruptIndexException, IOException {
-        FieldSelector fs = new BboxFieldSelector();
-        Document doc = reader.document(docNum, fs);
+        final FieldSelector fs = new BboxFieldSelector();
+        final Document doc = reader.document(docNum, fs);
 
         String fullBBOX = doc.get("fullBBOX");
         if (fullBBOX == null)
             return null;
 
-        double minx = Double.parseDouble(fullBBOX.substring(0, fullBBOX.indexOf(',')));
+        final double minx = Double.parseDouble(fullBBOX.substring(0, fullBBOX.indexOf(',')));
         fullBBOX = fullBBOX.substring(fullBBOX.indexOf(',') + 1);
-        double maxx = Double.parseDouble(fullBBOX.substring(0, fullBBOX.indexOf(',')));
+        final double maxx = Double.parseDouble(fullBBOX.substring(0, fullBBOX.indexOf(',')));
         fullBBOX = fullBBOX.substring(fullBBOX.indexOf(',') + 1);
-        double miny = Double.parseDouble(fullBBOX.substring(0, fullBBOX.indexOf(',')));
+        final double miny = Double.parseDouble(fullBBOX.substring(0, fullBBOX.indexOf(',')));
         fullBBOX = fullBBOX.substring(fullBBOX.indexOf(',') + 1);
-        double maxy = Double.parseDouble(fullBBOX.substring(0, fullBBOX.indexOf(',')));
+        final double maxy = Double.parseDouble(fullBBOX.substring(0, fullBBOX.indexOf(',')));
         fullBBOX = fullBBOX.substring(fullBBOX.indexOf(',') + 1);
-        String sourceCRSName = fullBBOX;
+        final String sourceCRSName = fullBBOX;
 
-        double[] min = {minx, miny};
-        double[] max = {maxx, maxy};
+        final double[] min = {minx, miny};
+        final double[] max = {maxx, maxy};
         GeneralEnvelope result = null;
         
         try {
@@ -149,24 +151,22 @@ public abstract class SpatialFilter extends Filter {
         
         } catch (IllegalArgumentException e) {
             String s = "unknow";
-            Field f = doc.getField("Title");
+            final Field f = doc.getField("Title");
             if (f != null)
                 s = f.stringValue();
         
             LOGGER.severe("Unable to read the bouding box(minx="+ minx +" miny=" + miny + " maxx=" + maxx + " maxy=" + maxy + ")for the Document:" + s + '\n' +
                           "cause: " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
         try {
             if (result != null) {
                 if (sourceCRSName.equals(geometryCRSName)) {
                     result.setCoordinateReferenceSystem(geometryCRS);
-                
                 } else {
-                
-                    CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCRSName, true);
+                    final CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCRSName, true);
                     result.setCoordinateReferenceSystem(sourceCRS);
-                    String boxbefore = result.toString(); 
+                    final String boxbefore = result.toString();
                     if (!CRS.equalsIgnoreMetadata(sourceCRS, geometryCRS)) {
                         LOGGER.finer("sourceCRS:" + sourceCRS + '\n' +
                                     "geometryCRS:" + geometryCRS + '\n' +
@@ -197,24 +197,24 @@ public abstract class SpatialFilter extends Filter {
      * @return a Line2D.
      */
     protected Line2D readLine(IndexReader reader, int docNum) throws CorruptIndexException, IOException {
-        FieldSelector fs = new LineFieldSelector();
-        Document doc= reader.document(docNum, fs);
+        final FieldSelector fs = new LineFieldSelector();
+        final Document doc     = reader.document(docNum, fs);
 
         String fullLine = doc.get("fullLine");
-        double x1 = Double.parseDouble(fullLine.substring(0, fullLine.indexOf(',')));
+        final double x1 = Double.parseDouble(fullLine.substring(0, fullLine.indexOf(',')));
         fullLine = fullLine.substring(fullLine.indexOf(',') + 1);
-        double y1 = Double.parseDouble(fullLine.substring(0, fullLine.indexOf(',')));
+        final double y1 = Double.parseDouble(fullLine.substring(0, fullLine.indexOf(',')));
         fullLine = fullLine.substring(fullLine.indexOf(',') + 1);
-        double x2 = Double.parseDouble(fullLine.substring(0, fullLine.indexOf(',')));
+        final double x2 = Double.parseDouble(fullLine.substring(0, fullLine.indexOf(',')));
         fullLine = fullLine.substring(fullLine.indexOf(',') + 1);
-        double y2 = Double.parseDouble(fullLine.substring(0, fullLine.indexOf(',')));
+        final double y2 = Double.parseDouble(fullLine.substring(0, fullLine.indexOf(',')));
         fullLine = fullLine.substring(fullLine.indexOf(',') + 1);
-        String sourceCRSName = fullLine;
+        final String sourceCRSName = fullLine;
         
         Line2D result = new Line2D.Double(x1, y1, x2, y2);
         try {
             if (!sourceCRSName.equals(geometryCRSName)) {
-                CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCRSName, true);
+                final CoordinateReferenceSystem sourceCRS = CRS.decode(sourceCRSName, true);
                 if (!CRS.equalsIgnoreMetadata(sourceCRS, geometryCRS))
                     result =  (Line2D) GeometricUtilities.reprojectGeometry(geometryCRSName, sourceCRSName, result);
             }
@@ -237,15 +237,15 @@ public abstract class SpatialFilter extends Filter {
      * @return a GeneralDirectPosition.
      */
     protected GeneralDirectPosition readPoint(IndexReader reader, int docNum) throws CorruptIndexException, IOException {
-        FieldSelector fs = new PointFieldSelector();
-        Document doc= reader.document(docNum, fs);
+        final FieldSelector fs = new PointFieldSelector();
+        final Document doc     = reader.document(docNum, fs);
 
         String fullPoint = doc.get("fullPoint");
-        double x = Double.parseDouble(fullPoint.substring(0, fullPoint.indexOf(',')));
+        final double x = Double.parseDouble(fullPoint.substring(0, fullPoint.indexOf(',')));
         fullPoint = fullPoint.substring(fullPoint.indexOf(',') + 1);
-        double y = Double.parseDouble(fullPoint.substring(0, fullPoint.indexOf(',')));
+        final double y = Double.parseDouble(fullPoint.substring(0, fullPoint.indexOf(',')));
         fullPoint = fullPoint.substring(fullPoint.indexOf(',') + 1);
-        String sourceCRSName = fullPoint;
+        final String sourceCRSName = fullPoint;
         GeneralDirectPosition result = new GeneralDirectPosition(y, x);
         
         try {
@@ -293,7 +293,7 @@ public abstract class SpatialFilter extends Filter {
      */
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[").append(this.getClass().getSimpleName()).append("]: ").append('\n');
+        final StringBuilder s = new StringBuilder("[").append(this.getClass().getSimpleName()).append("]: ").append('\n');
         if (boundingBox != null) {
             s.append("geometry types: GeneralEnvelope.").append('\n').append(boundingBox);
         } else if (line != null) {
@@ -302,7 +302,7 @@ public abstract class SpatialFilter extends Filter {
             s.append("geometry types: GeneralDirectPosition.").append('\n').append(point);
         }
         s.append("geometry CRS: ").append(geometryCRSName).append('\n');
-        s.append("precision: ").append(precision).append('\n');
+        s.append("precision: ").append(PRECISION).append('\n');
         return s.toString();
     }
 
@@ -321,8 +321,7 @@ public abstract class SpatialFilter extends Filter {
                    Utilities.equals(this.geometryCRS,     that.geometryCRS)     &&
                    Utilities.equals(this.geometryCRSName, that.geometryCRSName) &&
                    Utilities.equals(this.line,            that.line)            &&
-                   Utilities.equals(this.point,           that.point)           &&
-                   Utilities.equals(this.precision,       that.precision);
+                   Utilities.equals(this.point,           that.point);
         }
         return false;
     }
@@ -335,7 +334,6 @@ public abstract class SpatialFilter extends Filter {
         hash = 29 * hash + (this.line != null ? this.line.hashCode() : 0);
         hash = 29 * hash + (this.geometryCRS != null ? this.geometryCRS.hashCode() : 0);
         hash = 29 * hash + (this.geometryCRSName != null ? this.geometryCRSName.hashCode() : 0);
-        hash = 29 * hash + (int) (Double.doubleToLongBits(this.precision) ^ (Double.doubleToLongBits(this.precision) >>> 32));
         return hash;
     }
 

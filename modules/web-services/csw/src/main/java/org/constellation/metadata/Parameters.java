@@ -23,6 +23,8 @@ package org.constellation.metadata;
  */
 public class Parameters {
 
+    private Parameters() {}
+    
     public static final String CSW_202_VERSION = "2.0.2";
     
     public static final String SERVICE = "service";

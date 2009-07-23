@@ -46,14 +46,14 @@ public class EnvelopeQuery extends Query {
      */
     public EnvelopeQuery(final Database database) {
         super (database, "envelopes");
-        final QueryType[] SLI  = {SELECT, LIST, INSERT};
-        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
-        id           = addColumn("id",             SLIE);
-        srsName      = addColumn("srs_name",       SLI);
-        lowerCornerX = addColumn("corner_x", SLI);
-        lowerCornerY = addColumn("lower_corner_y", SLI);
-        upperCornerX = addColumn("upper_corner_x", SLI);
-        upperCornerY = addColumn("upper_corner_y", SLI);
+        final QueryType[] sli  = {SELECT, LIST, INSERT};
+        final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
+        id           = addColumn("id",             slie);
+        srsName      = addColumn("srs_name",       sli);
+        lowerCornerX = addColumn("corner_x", sli);
+        lowerCornerY = addColumn("lower_corner_y", sli);
+        upperCornerX = addColumn("upper_corner_x", sli);
+        upperCornerY = addColumn("upper_corner_y", sli);
         
         byId         = addParameter(id, SELECT, EXISTS);
     }

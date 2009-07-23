@@ -161,7 +161,7 @@ public final class ImageViewer {
         if (dot >= 0) {
             extension = filename.substring(dot + 1);
         } else {
-            dot       = filename.length();
+            //dot       = filename.length();
             extension = "png";
             filename += ".png";
             file      = new File(file.getParentFile(), filename);
@@ -214,15 +214,15 @@ public final class ImageViewer {
      * List all available image readers and writers.
      */
     private static void list(final PrintWriter out, final String[] readers, final String[] writers) {
-        final String READ       = "R  ";
-        final String WRITE      = "  W";
-        final String READ_WRITE = "R/W";
+        final String read       = "R  ";
+        final String write      = "  W";
+        final String readWrite  = "R/W";
         final Map<String,String> formats = new TreeMap<String,String>();
         final Map<String,String> names   = new HashMap<String,String>();
         int length = 0;
         boolean secondPass = false;
         do {
-            final String label = secondPass ? WRITE : READ;
+            final String label = secondPass ? write : read;
             final String[] codecs = secondPass ? writers : readers;
             for (int i=0; i<codecs.length; i++) {
                 final String name = codecs[i];
@@ -232,8 +232,8 @@ public final class ImageViewer {
                     names.put(identifier, old);
                 }
                 old = formats.put(identifier, label);
-                if (old!=null && old!=label) {
-                    formats.put(identifier, READ_WRITE);
+                if (old != null && !old.equals(label)) {
+                    formats.put(identifier, readWrite);
                 }
                 final int lg = name.length();
                 if (lg > length) {

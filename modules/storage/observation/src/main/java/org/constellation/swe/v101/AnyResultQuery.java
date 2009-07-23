@@ -49,14 +49,14 @@ public class AnyResultQuery extends Query {
      */
     public AnyResultQuery(final Database database) {
         super(database, "any_results");
-        final QueryType[] SSI  = {SELECT, SELECT_BY_NUMBER, INSERT, FILTERED_LIST};
-        final QueryType[] SSIE = {SELECT, SELECT_BY_NUMBER, INSERT, EXISTS};
-        final QueryType[] SSE   = {SELECT,SELECT_BY_NUMBER,  EXISTS};
+        final QueryType[] ssi  = {SELECT, SELECT_BY_NUMBER, INSERT, FILTERED_LIST};
+        //final QueryType[] SSIE = {SELECT, SELECT_BY_NUMBER, INSERT, EXISTS};
+        final QueryType[] sse   = {SELECT,SELECT_BY_NUMBER,  EXISTS};
 
-        idResult     = addColumn("id_result",  SSE);
-        reference    = addColumn("reference",  SSI);
-        values       = addColumn("values",     SSI);
-        definition   = addColumn("definition", SSI);
+        idResult     = addColumn("id_result",  sse);
+        reference    = addColumn("reference",  ssi);
+        values       = addColumn("values",     ssi);
+        definition   = addColumn("definition", ssi);
 
         byIdResult   = addParameter(idResult,  SELECT, EXISTS, SELECT_BY_NUMBER);
         byValues     = addParameter(values, FILTERED_LIST);

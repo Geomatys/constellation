@@ -53,20 +53,20 @@ public class SamplingPointQuery extends Query {
     */
     public SamplingPointQuery(final Database database) {
         super(database, "sampling_points");
-        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
-        final QueryType[] SLI  = {SELECT, LIST, INSERT};
-        final QueryType[] SLIF = {SELECT, LIST, INSERT, FILTERED_LIST};
-        final QueryType[] SLIEF = {SELECT, LIST, INSERT, EXISTS, FILTERED_LIST};
+        //final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
+        final QueryType[] sli   = {SELECT, LIST, INSERT};
+        final QueryType[] slif  = {SELECT, LIST, INSERT, FILTERED_LIST};
+        final QueryType[] slief = {SELECT, LIST, INSERT, EXISTS, FILTERED_LIST};
         
-        identifier             = addColumn   ("id",                 SLIEF);
-        name                   = addColumn   ("name",               SLIF);
-        description            = addColumn   ("description",        SLI);
-        sampledFeature         = addColumn   ("sampled_feature",    SLI);
-        pointIdentifier        = addColumn   ("point_id",           SLI);
-        srsName                = addColumn   ("point_srsname",      SLI);
-        srsDimension           = addColumn   ("point_srsdimension", SLI);
-        positionValueX         = addColumn   ("x_value",            SLI);
-        positionValueY         = addColumn   ("y_value",            SLI);
+        identifier             = addColumn   ("id",                 slief);
+        name                   = addColumn   ("name",               slif);
+        description            = addColumn   ("description",        sli);
+        sampledFeature         = addColumn   ("sampled_feature",    sli);
+        pointIdentifier        = addColumn   ("point_id",           sli);
+        srsName                = addColumn   ("point_srsname",      sli);
+        srsDimension           = addColumn   ("point_srsdimension", sli);
+        positionValueX         = addColumn   ("x_value",            sli);
+        positionValueY         = addColumn   ("y_value",            sli);
         
         byIdentifier  = addParameter(identifier, SELECT, EXISTS);
         byName        = addParameter(name, FILTERED_LIST);

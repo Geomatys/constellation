@@ -55,10 +55,10 @@ public class OverlapsFilter extends SpatialFilter {
         // we prepare the result
         BitSet bits = new BitSet(reader.maxDoc());
 
-        TermDocs termDocs = reader.termDocs(new Term("geometry"));
+        TermDocs termDocs = reader.termDocs(new Term(GEOMETRY_FIELD));
 
         // we search for matching box
-        termDocs.seek(new Term("geometry", "boundingbox"));
+        termDocs.seek(new Term(GEOMETRY_FIELD, "boundingbox"));
         while (termDocs.next()) {
             int docNum = termDocs.doc();
             GeneralEnvelope tempBox = readBoundingBox(reader, docNum);

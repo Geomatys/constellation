@@ -49,12 +49,12 @@ public class PhenomenonQuery extends Query{
      */
     public PhenomenonQuery(final Database database) {
         super(database, "phenomenons");
-        final QueryType[] SIL = {SELECT, INSERT, LIST};
-        final QueryType[] SIEL = {SELECT, INSERT, EXISTS, LIST};
+        final QueryType[] sil = {SELECT, INSERT, LIST};
+        final QueryType[] siel = {SELECT, INSERT, EXISTS, LIST};
         
-        identifier = addColumn ("id",          SIEL);
-        name       = addColumn ("name",        SIL);
-        remarks    = addColumn ("description", SIL);
+        identifier = addColumn ("id",          siel);
+        name       = addColumn ("name",        sil);
+        remarks    = addColumn ("description", sil);
         
         byName     = addParameter(identifier, SELECT, EXISTS);
     }

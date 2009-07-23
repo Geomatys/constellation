@@ -43,6 +43,8 @@ import org.geotoolkit.xacml.xml.policy.SubjectAttributeDesignatorType;
  */
 public class PolicyAttributeFactory {
 
+    private PolicyAttributeFactory() {}
+
     public static AttributeValueType createAnyURIAttributeType(final URI value) {
         return getBareAttributeValueType("" + value, XMLSchemaConstants.DATATYPE_ANYURI);
     }

@@ -114,7 +114,7 @@ public abstract class DistanceFilter extends SpatialFilter {
                                                                      point.getOrdinate(0),     point.getOrdinate(1), distanceUnit);
 
             } else if (boundingBox != null) {
-                return GeometricUtilities.BBoxToPointDistance(boundingBox, tempPoint, distanceUnit);
+                return GeometricUtilities.bboxToPointDistance(boundingBox, tempPoint, distanceUnit);
 
             } else if (line != null) {
                 return GeometricUtilities.lineToPointDistance(line, tempPoint, distanceUnit);
@@ -126,13 +126,13 @@ public abstract class DistanceFilter extends SpatialFilter {
 
             GeneralEnvelope tempBox = (GeneralEnvelope) geometry;
             if (point != null) {
-                return GeometricUtilities.BBoxToPointDistance(tempBox, point, distanceUnit);
+                return GeometricUtilities.bboxToPointDistance(tempBox, point, distanceUnit);
 
             } else if (line != null) {
                 return GeometricUtilities.lineToBBoxDistance(line, tempBox, distanceUnit);
 
             } else if (boundingBox != null) {
-                return GeometricUtilities.BBoxToBBoxDistance(tempBox, boundingBox, distanceUnit);
+                return GeometricUtilities.bboxToBBoxDistance(tempBox, boundingBox, distanceUnit);
 
             } else {
                 return 0;

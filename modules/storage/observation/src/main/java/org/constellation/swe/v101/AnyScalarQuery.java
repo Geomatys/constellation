@@ -49,16 +49,16 @@ public class AnyScalarQuery extends Query{
      */
     public AnyScalarQuery(final Database database) {
         super (database, "any_scalars");
-        final QueryType[] SLI  = {SELECT, LIST, INSERT};
-        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
-        idDataRecord  = addColumn("id_datarecord", SLIE);
-        idDataBlock   = addColumn("id_datablock",  SLIE);
-        name          = addColumn("name",          SLIE);
-        definition    = addColumn("definition",    SLI);
-        type          = addColumn("type",          SLI);
-        uomCode       = addColumn("uom_code",      SLI);
-        uomHref       = addColumn("uom_href",      SLI);
-        value         = addColumn("value",         SLI);
+        final QueryType[] sli  = {SELECT, LIST, INSERT};
+        final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
+        idDataRecord  = addColumn("id_datarecord", slie);
+        idDataBlock   = addColumn("id_datablock",  slie);
+        name          = addColumn("name",          slie);
+        definition    = addColumn("definition",    sli);
+        type          = addColumn("type",          sli);
+        uomCode       = addColumn("uom_code",      sli);
+        uomHref       = addColumn("uom_href",      sli);
+        value         = addColumn("value",         sli);
         
         byName         = addParameter(name, SELECT, EXISTS);
         byIdDataRecord = addParameter(idDataRecord, SELECT, LIST, EXISTS);

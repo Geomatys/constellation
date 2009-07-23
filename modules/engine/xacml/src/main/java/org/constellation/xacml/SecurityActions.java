@@ -30,6 +30,8 @@ import java.security.PrivilegedAction;
  *  @version $Revision$
  */
 public class SecurityActions {
+
+    private SecurityActions() {}
     
     /**
      * Obtain the Thread Context ClassLoader.
@@ -48,7 +50,7 @@ public class SecurityActions {
      * Return the URL of the specified resource 
      */
     public static URL getResource(String url) {
-        ClassLoader cl = getContextClassLoader();
+        final ClassLoader cl = getContextClassLoader();
         return cl.getResource(url);
     }
     
@@ -56,7 +58,7 @@ public class SecurityActions {
      * Return an input stream of the specified resource. 
      */
     public static InputStream getResourceAsStream(String url) {
-        ClassLoader cl = getContextClassLoader();
+        final ClassLoader cl = getContextClassLoader();
         return cl.getResourceAsStream(url);
     }
     
@@ -64,7 +66,7 @@ public class SecurityActions {
      * Return an input stream of the specified resource. 
      */
     public static Class<?> loadClass(String name) throws ClassNotFoundException {
-        ClassLoader cl = getContextClassLoader();
+        final ClassLoader cl = getContextClassLoader();
         return cl.loadClass(name);
     }
 }

@@ -42,6 +42,8 @@ import org.geotoolkit.xacml.xml.context.AttributeValueType;
  */
 public class RequestAttributeFactory {
 
+    private RequestAttributeFactory() {}
+    
     public static AttributeType createAnyURIAttributeType(final String attrID,
             final String issuer, final URI value)
     {

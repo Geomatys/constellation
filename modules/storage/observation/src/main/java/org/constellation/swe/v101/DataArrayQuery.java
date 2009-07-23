@@ -49,12 +49,12 @@ public class DataArrayQuery extends Query{
      */
     public DataArrayQuery(final Database database) {
         super(database, "data_array_definition");
-        final QueryType[] SI = {SELECT, INSERT};
-        final QueryType[] SIEF = {SELECT, INSERT, EXISTS, FILTERED_LIST};
-        idArray        = addColumn ("id_array_definition", SIEF);
-        encoding       = addColumn ("encoding"           , SI);
-        elementCount   = addColumn ("element_count"      , SI);
-        elementType    = addColumn ("elementType"        , SI);
+        final QueryType[] si   = {SELECT, INSERT};
+        final QueryType[] sief = {SELECT, INSERT, EXISTS, FILTERED_LIST};
+        idArray        = addColumn ("id_array_definition", sief);
+        encoding       = addColumn ("encoding"           , si);
+        elementCount   = addColumn ("element_count"      , si);
+        elementType    = addColumn ("elementType"        , si);
 
         byIdArray      = addParameter(idArray,      SELECT, EXISTS);
         byElementCount = addParameter(elementCount, FILTERED_LIST);

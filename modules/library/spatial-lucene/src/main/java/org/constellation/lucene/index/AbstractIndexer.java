@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 // Apache Lucene dependencies
+import java.util.logging.Level;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -60,10 +61,10 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
     public AbstractIndexer(String serviceID, File configDirectory, Analyzer analyzer) {
         super(analyzer);
         //we look if an index has been pre-generated. if yes, we delete the precedent index and replace it.
-        File preGeneratedIndexDirectory = new File(configDirectory, serviceID + "nextIndex");
+        final File preGeneratedIndexDirectory = new File(configDirectory, serviceID + "nextIndex");
 
         // we get the current index directory
-        File currentIndexDirectory = new File(configDirectory, serviceID + "index");
+        final File currentIndexDirectory = new File(configDirectory, serviceID + "index");
         setFileDirectory(currentIndexDirectory);
 
         if (preGeneratedIndexDirectory.exists()) {
@@ -140,10 +141,10 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
      */
     public void removeDocument(String identifier) {
         try {
-            IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false, MaxFieldLength.UNLIMITED);
+            final IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false, MaxFieldLength.UNLIMITED);
 
-            Term t          = new Term("id", identifier);
-            TermQuery query = new TermQuery(t);
+            final Term t          = new Term("id", identifier);
+            final TermQuery query = new TermQuery(t);
             LOGGER.info("Term query:" + query);
 
 
@@ -156,10 +157,10 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
 
         } catch (CorruptIndexException ex) {
             LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
             LOGGER.severe("IOException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 

@@ -51,13 +51,13 @@ public class CompositePhenomenonQuery extends Query{
      */
     public CompositePhenomenonQuery(final Database database) {
         super(database, "composite_phenomenons");
-        final QueryType[] SIL = {SELECT, INSERT, LIST};
-        final QueryType[] SIEL = {SELECT, INSERT, EXISTS, LIST};
+        final QueryType[] sil  = {SELECT, INSERT, LIST};
+        final QueryType[] siel = {SELECT, INSERT, EXISTS, LIST};
         
-        identifier = addColumn ("id",          SIEL);
-        name       = addColumn ("name",        SIL);
-        remarks    = addColumn ("description", SIL);
-        dimension  = addColumn ("dimension",   SIL);
+        identifier = addColumn ("id",          siel);
+        name       = addColumn ("name",        sil);
+        remarks    = addColumn ("description", sil);
+        dimension  = addColumn ("dimension",   sil);
         
         byName     = addParameter(identifier, SELECT, EXISTS);
     }

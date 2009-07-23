@@ -49,16 +49,16 @@ final class SeriesQuery extends Query {
      */
     public SeriesQuery(final Database database) {
         super(database, "Series");
-        final QueryType[] SLF   = {SELECT, LIST, FILTERED_LIST};
-        final QueryType[] SLFI  = {SELECT, LIST, FILTERED_LIST, INSERT};
-        final QueryType[] SLFIE = {SELECT, LIST, FILTERED_LIST, INSERT, EXISTS};
-        name       = addColumn("identifier",           SLFIE);
-        layer      = addColumn("layer",                SLFI );
-        pathname   = addColumn("pathname",             SLFI );
-        extension  = addColumn("extension",            SLFI );
-        format     = addColumn("format",               SLFI );
-        permission = addColumn("permission", "Public", SLF  );
-        remarks    = addColumn("remarks",    null,     SLF  );
+        final QueryType[] slf   = {SELECT, LIST, FILTERED_LIST};
+        final QueryType[] slfi  = {SELECT, LIST, FILTERED_LIST, INSERT};
+        final QueryType[] slfie = {SELECT, LIST, FILTERED_LIST, INSERT, EXISTS};
+        name       = addColumn("identifier",           slfie);
+        layer      = addColumn("layer",                slfi );
+        pathname   = addColumn("pathname",             slfi );
+        extension  = addColumn("extension",            slfi );
+        format     = addColumn("format",               slfi );
+        permission = addColumn("permission", "Public", slf  );
+        remarks    = addColumn("remarks",    null,     slf  );
         byName     = addParameter(name,  SELECT, EXISTS);
         byLayer    = addParameter(layer, FILTERED_LIST);
         name.setOrdering("ASC", LIST, FILTERED_LIST);

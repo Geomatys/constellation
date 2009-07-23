@@ -46,11 +46,11 @@ public class OfferingSamplingFeatureQuery extends Query {
      */
     public OfferingSamplingFeatureQuery(final Database database) {
         super (database, "offering_sampling_features");
-        final QueryType[] SLI  = {SELECT, LIST, INSERT};
-        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
+        //final QueryType[] SLI  = {SELECT, LIST, INSERT};
+        final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         
-        idOffering      = addColumn("id_offering", SLIE);
-        samplingFeature = addColumn("sampling_feature",  SLIE);
+        idOffering      = addColumn("id_offering", slie);
+        samplingFeature = addColumn("sampling_feature",  slie);
         
         byOffering        = addParameter(idOffering, SELECT, LIST, EXISTS);
         bySamplingFeature = addParameter(samplingFeature,  SELECT, EXISTS);

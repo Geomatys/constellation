@@ -46,11 +46,11 @@ public class OfferingProcedureQuery extends Query {
      */
     public OfferingProcedureQuery(final Database database) {
         super (database, "offering_procedures");
-        final QueryType[] SLI  = {SELECT, LIST, INSERT};
-        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
+        //final QueryType[] SLI  = {SELECT, LIST, INSERT};
+        final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         
-        idOffering  = addColumn("id_offering", SLIE);
-        procedure   = addColumn("procedure",  SLIE);
+        idOffering  = addColumn("id_offering", slie);
+        procedure   = addColumn("procedure",  slie);
         
         byOffering  = addParameter(idOffering, SELECT, LIST, EXISTS);
         byProcedure = addParameter(procedure,  SELECT, EXISTS);
