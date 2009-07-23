@@ -23,40 +23,43 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+// JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
+//geotoolkit dependencies
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.csw.xml.v202.RecordType;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.util.SimpleInternationalString;
+import org.geotoolkit.xml.MarshallerPool;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+// Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.CSWClassesContext;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.metadata.iso.DefaultMetaData;
-import org.geotoolkit.util.SimpleInternationalString;
-import org.geotoolkit.xml.MarshallerPool;
+
+// GeoApi dependencies
 import org.opengis.util.InternationalString;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 public class FileMetadataWriter extends MetadataWriter {
-
-    /**
-     * The maximum number of elements in a queue of marshallers and unmarshallers.
-     */
-    private static final int MAX_QUEUE_SIZE = 4;
 
     /**
      * A marshaller to store object from harvested resource.
@@ -435,7 +438,6 @@ public class FileMetadataWriter extends MetadataWriter {
         Object result = null;
         if (method != null) {
             int i = 0;
-            CstlServiceException exe = null;
             while (i < 2) {
                 try {
                     Collection c = new ArrayList(1);

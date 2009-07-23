@@ -34,6 +34,7 @@ import javax.xml.namespace.QName;
 import org.apache.lucene.search.Filter;
 
 // constellation dependencies
+import org.constellation.metadata.Parameters;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.csw.xml.QueryConstraint;
 import org.geotoolkit.filter.FilterFactoryImpl;
@@ -114,7 +115,7 @@ public abstract class FilterParser {
         final String crsName = gmlLine.getSrsName();
         if (crsName == null) {
             throw new CstlServiceException("A CRS (coordinate Reference system) must be specified for the line.",
-                                          INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                          INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
         }
        
         final CoordinatesType coord = gmlLine.getCoordinates();
@@ -155,7 +156,7 @@ public abstract class FilterParser {
         final String crsName = gmlEnvelope.getSrsName();
         if (crsName == null) {
             throw new CstlServiceException("An operator BBOX must specified a CRS (coordinate Reference system) for the envelope.",
-                                          INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                          INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
         }
        
         final List<Double> lmin = gmlEnvelope.getLowerCorner().getValue();
@@ -193,13 +194,13 @@ public abstract class FilterParser {
 
         if (crsName == null) {
             throw new CstlServiceException("A GML point must specify Coordinate Reference System.",
-                    INVALID_PARAMETER_VALUE, "QueryConstraint");
+                    INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
         }
 
         //we get the coordinate of the point (if they are present)
         if (gmlPoint.getCoordinates() == null && gmlPoint.getPos() == null) {
             throw new CstlServiceException("A GML point must specify coordinates or direct position.",
-                    INVALID_PARAMETER_VALUE, "QueryConstraint");
+                    INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
         }
 
         final double[] coordinates = new double[2];
@@ -212,7 +213,7 @@ public abstract class FilterParser {
                 final double value = parseDouble(tokens.nextToken());
                 if (index >= coordinates.length) {
                     throw new CstlServiceException("This service support only 2D point.",
-                            INVALID_PARAMETER_VALUE, "QueryConstraint");
+                            INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
                 }
                 coordinates[index++] = value;
             }
@@ -221,7 +222,7 @@ public abstract class FilterParser {
             coordinates[0] = gmlPoint.getPos().getValue().get(1);
         } else {
             throw new CstlServiceException("The GML point is malformed.",
-                    INVALID_PARAMETER_VALUE, "QueryConstraint");
+                    INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
         }
         final GeneralDirectPosition point   = new GeneralDirectPosition(coordinates);
         final CoordinateReferenceSystem crs = CRS.decode(crsName, true);

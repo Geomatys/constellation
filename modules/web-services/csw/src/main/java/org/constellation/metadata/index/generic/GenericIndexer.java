@@ -38,6 +38,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 // apache Lucene dependencies
+import java.util.logging.Level;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -134,8 +135,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @throws java.sql.SQLException
      */
     public void createIndex() throws IndexingException {
-        logger.info("Creating lucene index for Generic database please wait...");
-        long time = System.currentTimeMillis();
+        LOGGER.info("Creating lucene index for Generic database please wait...");
+        final long time = System.currentTimeMillis();
         IndexWriter writer;
         int nbEntries = 0;
         try {
@@ -143,7 +144,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
             // TODO getting the objects list and index avery item in the IndexWriter.
             List<? extends Object> ids = reader.getAllEntries();
-            logger.info("all entries read in " + (System.currentTimeMillis() - time) + " ms.");
+            LOGGER.info("all entries read in " + (System.currentTimeMillis() - time) + " ms.");
             nbEntries = ids.size();
             for (Object entry : ids) {
                 indexDocument(writer, entry);
@@ -152,19 +153,19 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             writer.close();
 
         } catch (CorruptIndexException ex) {
-            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
             throw new IndexingException("CorruptIndexException while indexing documents.", ex);
         } catch (LockObtainFailedException ex) {
-            logger.severe("LockObtainException while indexing document: " + ex.getMessage());
+            LOGGER.severe("LockObtainException while indexing document: " + ex.getMessage());
             throw new IndexingException("LockObtainException while indexing documents.", ex);
         } catch (IOException ex) {
-            logger.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
             throw new IndexingException("IOException while indexing documents.", ex);
         } catch (CstlServiceException ex) {
-            logger.severe("CstlServiceException while indexing document: " + ex.getMessage());
+            LOGGER.severe("CstlServiceException while indexing document: " + ex.getMessage());
             throw new IndexingException("CstlServiceException while indexing documents.", ex);
         }
-        logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 " documents indexed: " + nbEntries);
     }
 
@@ -174,7 +175,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @throws java.sql.SQLException
      */
     public void createIndex(List<? extends Object> toIndex) throws IndexingException {
-        logger.info("Creating lucene index for Generic database please wait...");
+        LOGGER.info("Creating lucene index for Generic database please wait...");
         long time = System.currentTimeMillis();
         IndexWriter writer;
         int nbEntries = 0;
@@ -188,16 +189,16 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             writer.close();
 
         } catch (CorruptIndexException ex) {
-            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (LockObtainFailedException ex) {
-            logger.severe("LockObtainException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.severe("LockObtainException while indexing document: " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
-            logger.severe("IOException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
-        logger.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 " documents indexed: " + nbEntries);
     }
 
@@ -212,17 +213,17 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         try {
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            logger.finer("Metadata: " + ((DefaultMetaData)meta).getFileIdentifier() + " indexed");
+            LOGGER.finer("Metadata: " + ((DefaultMetaData)meta).getFileIdentifier() + " indexed");
 
         } catch (SQLException ex) {
-            logger.severe("SQLException " + ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.severe("SQLException " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (CorruptIndexException ex) {
-            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
-            logger.severe("IOException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -234,24 +235,24 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      */
     public void indexDocument(Object meta) {
         try {
-            IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false);
+            final IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false);
 
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            logger.finer("Metadata: " + ((DefaultMetaData)meta).getFileIdentifier() + " indexed");
+            LOGGER.finer("Metadata: " + ((DefaultMetaData)meta).getFileIdentifier() + " indexed");
 
             writer.optimize();
             writer.close();
 
         } catch (SQLException ex) {
-            logger.severe("SQLException " + ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.severe("SQLException " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (CorruptIndexException ex) {
-            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
-            logger.severe("IOException while indexing document: " + ex.getMessage());
-            ex.printStackTrace();
+            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -272,7 +273,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
         final StringBuilder anyText = new StringBuilder();
         
-        logger.finer("indexing ISO 19119 MD_Metadata");
+        LOGGER.finer("indexing ISO 19119 MD_Metadata");
         for (final String term : ISO_QUERYABLE.keySet()) {
              cs.submit(new Callable<TermValue>() {
                 public TermValue call() {
@@ -283,7 +284,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
         for (int i = 0; i < ISO_QUERYABLE.size(); i++) {
             try {
-                TermValue values = cs.take().get();
+                final TermValue values = cs.take().get();
                 if (values.term != null && !values.term.equals("AnyText")) {
                     doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
                     doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
@@ -292,10 +293,10 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     }
                 }
             } catch (InterruptedException ex) {
-               logger.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
+               LOGGER.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-               logger.severe("ExecutionException in parralele create document:" + '\n' + ex.getCause());
-               ex.getCause().printStackTrace();
+               LOGGER.severe("ExecutionException in parralele create document:" + '\n' + ex.getCause());
+               LOGGER.log(Level.SEVERE, ex.getCause().getMessage(), ex.getCause());
             }
         }
         
@@ -343,13 +344,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], "EPSG:4326");
                 }
             } else {
-                logger.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
                         "cause: missing coordinates.: " + coord);
             }
 
         } catch (NumberFormatException e) {
             if (!coord.equals("null")) {
-                logger.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
                         "cause:  unable to parse double: " + coord);
             }
         }
@@ -367,7 +368,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
         for (int i = 0; i < DUBLIN_CORE_QUERYABLE.size(); i++) {
             try {
-                TermValue values = cs.take().get();
+                final TermValue values = cs.take().get();
                 doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
                 doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
                 if (values.value != null && !values.value.equals("null") && anyText.indexOf(values.value) == -1) {
@@ -375,9 +376,9 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 }
                 
             } catch (InterruptedException ex) {
-               logger.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
+               LOGGER.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-               logger.severe("ExecutionException in parralele create document:" + '\n' + ex.getMessage());
+               LOGGER.severe("ExecutionException in parralele create document:" + '\n' + ex.getMessage());
             }
         }
             
@@ -420,20 +421,20 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 i++;
             }
                 
-            String crs = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("CRS"));
+            // String crs = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("CRS"));
                 
             if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
                 for (int j = 0; j < minx.length; j++)  {
                     addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], "EPSG:4326");
                 }
             } else {
-                logger.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
                         "cause: missing coordinates.: " + coord);
             }
             
         } catch (NumberFormatException e) {
             if (!coord.equals("null"))
-                logger.severe("unable to spatially index metadata: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                LOGGER.severe("unable to spatially index metadata: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
                               "cause:  unable to parse double: " + coord);
         }
 
@@ -443,7 +444,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
                 String values = getValues(metadata, additionalQueryable.get(term));
                 if (!values.equals("null")) {
-                    logger.finer("put " + term + " values: " + values);
+                    LOGGER.finer("put " + term + " values: " + values);
                     anyText.append(values).append(" ");
                 }
                 if (term.equals("date") || term.equals("modified")) {
@@ -472,7 +473,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @return A string concataining the differents values correspounding to the specified term, coma separated.
      */
     private String getValues(Object metadata, List<String> paths) {
-        StringBuilder response  = new StringBuilder("");
+        final StringBuilder response  = new StringBuilder("");
         
         if (paths != null) {
             for (String fullPathID: paths) {
@@ -481,12 +482,12 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 String conditionalValue     = null;
                 
                 // if the path ID contains a # we have a conditional value (codeList element) next to the searched value.
-                int separator = fullPathID.indexOf('#'); 
+                final int separator = fullPathID.indexOf('#');
                 if (separator != -1) {
                     pathID               = fullPathID.substring(0, separator);
                     conditionalAttribute = fullPathID.substring(separator + 1, fullPathID.indexOf('='));
                     conditionalValue     = fullPathID.substring(fullPathID.indexOf('=') + 1);
-                    logger.finer("pathID              : " + pathID               + '\n' +
+                    LOGGER.finer("pathID              : " + pathID               + '\n' +
                                  "conditionalAttribute: " + conditionalAttribute + '\n' +
                                  "conditionalValue    : " + conditionalValue); 
                 } else {
@@ -494,7 +495,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 }
                 
                 if (conditionalAttribute == null) {
-                    String value = getValuesFromPath(pathID, metadata);
+                    final String value = getValuesFromPath(pathID, metadata);
                     if (value != null && !value.equals("") && !value.equals("null"))
                         response.append(value).append(',');
                 } else {
@@ -545,9 +546,9 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 }
                 
                 if (metadata instanceof Collection) {
-                    List<Object> tmp = new ArrayList<Object>();
+                    final List<Object> tmp = new ArrayList<Object>();
                     for (Object subMeta: (Collection) metadata) {
-                        Object obj = getAttributeValue(subMeta, attributeName);
+                        final Object obj = getAttributeValue(subMeta, attributeName);
                         if (obj instanceof Collection) {
                             for (Object o : (Collection)obj) {
                                 if (o != null) tmp.add(o);
@@ -580,14 +581,14 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         } else if (obj instanceof String) {
             result = (String) obj;
         } else if (obj instanceof InternationalString) {
-            InternationalString is = (InternationalString) obj;
+            final InternationalString is = (InternationalString) obj;
             result = is.toString();
         } else if (obj instanceof Double) {
             result = obj + "";
         } else if (obj instanceof java.util.Locale) {
             result = ((java.util.Locale)obj).getISO3Language();
         } else if (obj instanceof Collection) {
-            StringBuilder sb = new StringBuilder();
+            final StringBuilder sb = new StringBuilder();
             for (Object o : (Collection) obj) {
                 sb.append(getStringValue(o)).append(',');
             }
@@ -600,11 +601,11 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             result = ((org.opengis.util.CodeList)obj).name();
         
         } else if (obj instanceof DefaultPosition) {
-            DefaultPosition pos = (DefaultPosition) obj;
+            final DefaultPosition pos = (DefaultPosition) obj;
             result = dateFormat.format(pos.getDate());
             
         } else if (obj instanceof DefaultInstant) {
-            DefaultInstant inst = (DefaultInstant)obj;
+            final DefaultInstant inst = (DefaultInstant)obj;
             if (inst.getPosition() != null && inst.getPosition().getDate() != null) {
                 result = dateFormat.format(inst.getPosition().getDate());
             } else {
@@ -649,7 +650,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 }
                 
                 if (metadata instanceof Collection) {
-                    List<Object> tmp = new ArrayList<Object>();
+                    final List<Object> tmp = new ArrayList<Object>();
                     if (pathID.equals("")) {
                         for (Object subMeta: (Collection)metadata) {
                             if (matchCondition(subMeta, conditionalAttribute, conditionalValue)) {
@@ -658,7 +659,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                         }
                     } else {
                         for (Object subMeta: (Collection)metadata) {
-                            Object obj = getAttributeValue(subMeta, attributeName);
+                            final Object obj = getAttributeValue(subMeta, attributeName);
                             if (obj instanceof Collection) {
                                 for (Object o : (Collection)obj) {
                                     if (o != null) tmp.add(o);
@@ -696,8 +697,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @return
      */
     private boolean matchCondition(Object metadata, String conditionalAttribute, String conditionalValue) {
-        Object conditionalObj = getAttributeValue(metadata, conditionalAttribute);
-        logger.finer("contionalObj: "     + getStringValue(conditionalObj) + '\n' +
+        final Object conditionalObj = getAttributeValue(metadata, conditionalAttribute);
+        LOGGER.finer("contionalObj: "     + getStringValue(conditionalObj) + '\n' +
                      "conditionalValue: " + conditionalValue               + '\n' +
                      "match? " +conditionalValue.equals(getStringValue(conditionalObj)));
         return conditionalValue.equalsIgnoreCase(getStringValue(conditionalObj));
@@ -713,8 +714,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     private Object getAttributeValue(Object object, String attributeName) {
         Object result = null;
         if (object != null) {
-            String getterId = object.getClass().getName() + ':' + attributeName;
-            Method getter = getters.get(getterId);
+            final String getterId = object.getClass().getName() + ':' + attributeName;
+            Method getter         = getters.get(getterId);
             if (getter != null) {
                 result = Util.invokeMethod(object, getter);
             } else {

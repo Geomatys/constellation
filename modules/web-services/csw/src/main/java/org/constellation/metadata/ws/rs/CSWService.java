@@ -251,7 +251,7 @@ public class CSWService extends OGCWebService {
 
                 if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof Transaction)) {
                 
-                    Transaction t = (Transaction)objectRequest;
+                    final Transaction t = (Transaction)objectRequest;
                 
                     if (t == null) {
                          throw new CstlServiceException("The Operation transaction is not available in KVP",
@@ -555,7 +555,7 @@ public class CSWService extends OGCWebService {
             } else if (constLanguage.equalsIgnoreCase("FILTER")) {
                 Object constraintObject = getComplexParameter("CONSTRAINT", false);
                 if (constraintObject == null) {
-                    PropertyIsLikeType filter = new PropertyIsLikeType(new PropertyNameType("AnyText"), "%%", "%", "?", "\\");
+                    final PropertyIsLikeType filter = new PropertyIsLikeType(new PropertyNameType("AnyText"), "%%", "%", "?", "\\");
                     constraintObject = new FilterType(filter);
                 } else if (constraintObject instanceof FilterType){
                     constraint = new QueryConstraintType((FilterType)constraintObject, languageVersion);

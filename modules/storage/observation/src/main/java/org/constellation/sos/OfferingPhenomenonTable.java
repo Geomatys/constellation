@@ -19,7 +19,6 @@ package org.constellation.sos;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
@@ -37,10 +36,6 @@ import org.geotoolkit.util.Utilities;
  */
 public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEntry>{
 
-    /**
-     * A logger debugging purpose
-     */    
-    private Logger logger = Logger.getLogger("OfferingPhenomenonTable");
     /**
      * identifier secondary of the table.
      */

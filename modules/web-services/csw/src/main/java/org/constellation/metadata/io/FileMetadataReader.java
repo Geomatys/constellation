@@ -18,7 +18,6 @@ package org.constellation.metadata.io;
 
 import java.io.File;
 import java.net.URI;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -82,11 +81,6 @@ import org.geotoolkit.xml.MarshallerPool;
 public class FileMetadataReader extends MetadataReader {
 
     /**
-     * The maximum number of elements in a queue of marshallers and unmarshallers.
-     */
-    private static final int MAX_QUEUE_SIZE = 4;
-    
-    /**
      * The directory containing the data XML files.
      */
     private final File dataDirectory;
@@ -133,7 +127,6 @@ public class FileMetadataReader extends MetadataReader {
      * @param elementName A list of QName describing the requested fields. (implies type == null)
      * 
      * @return A marshallable metadata object.
-     * @throws java.sql.SQLException
      */
     @Override
     public Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
@@ -153,7 +146,7 @@ public class FileMetadataReader extends MetadataReader {
      * @throws org.constellation.ws.CstlServiceException
      */
     private Object getObjectFromFile(String identifier) throws CstlServiceException {
-        File metadataFile = new File (dataDirectory,  identifier + ".xml");
+        final File metadataFile = new File (dataDirectory,  identifier + ".xml");
         if (metadataFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
@@ -240,17 +233,17 @@ public class FileMetadataReader extends MetadataReader {
             /*
              *  SUMMARY part
              */
-            List<SimpleLiteral> _abstract = new ArrayList<SimpleLiteral>();
+            final List<SimpleLiteral> abstractt = new ArrayList<SimpleLiteral>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 if (identification.getAbstract() != null) {
-                    _abstract.add(new SimpleLiteral(identification.getAbstract().toString()));
+                    abstractt.add(new SimpleLiteral(identification.getAbstract().toString()));
                 }
             }
             if (elementName != null && elementName.contains(_Abstract_QNAME)) {
-                customRecord.setAbstract(_abstract);
+                customRecord.setAbstract(abstractt);
             }
 
-            List<SimpleLiteral> subjects = new ArrayList<SimpleLiteral>();
+            final List<SimpleLiteral> subjects = new ArrayList<SimpleLiteral>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 if (identification instanceof DataIdentification) {
                     DataIdentification dataIdentification = (DataIdentification) identification;
@@ -269,7 +262,7 @@ public class FileMetadataReader extends MetadataReader {
             }
 
 
-            List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
+            final List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
             Distribution distribution   = metadata.getDistributionInfo();
             if (distribution != null) {
                 for (Format f: distribution.getDistributionFormats()) {
@@ -284,16 +277,16 @@ public class FileMetadataReader extends MetadataReader {
             }
 
 
-            SimpleLiteral modified = new SimpleLiteral(formatter.format(metadata.getDateStamp()));
+            final SimpleLiteral modified = new SimpleLiteral(formatter.format(metadata.getDateStamp()));
             if (elementName != null && elementName.contains(_Modified_QNAME)) {
                 customRecord.setModified(modified);
             }
 
 
             if (type != null && type.equals(ElementSetType.SUMMARY))
-                return new SummaryRecordType(identifier, title, dataType, bboxes, subjects, formats, modified, _abstract);
+                return new SummaryRecordType(identifier, title, dataType, bboxes, subjects, formats, modified, abstractt);
 
-            SimpleLiteral date    = modified;
+            final SimpleLiteral date    = modified;
             if (elementName != null && elementName.contains(_Date_QNAME)) {
                 customRecord.setDate(date);
             }
@@ -338,7 +331,7 @@ public class FileMetadataReader extends MetadataReader {
             SimpleLiteral spatial = null;
             SimpleLiteral references = null;
             if (type != null && type.equals(ElementSetType.FULL))
-                return new RecordType(identifier, title, dataType, subjects, formats, modified, date, _abstract, bboxes, creator, distributor, language, spatial, references);
+                return new RecordType(identifier, title, dataType, subjects, formats, modified, date, abstractt, bboxes, creator, distributor, language, spatial, references);
 
             return customRecord;
         }
@@ -356,7 +349,7 @@ public class FileMetadataReader extends MetadataReader {
     }
 
     @Override
-    public List<String> executeEbrimSQLQuery(String SQLQuery) throws CstlServiceException {
+    public List<String> executeEbrimSQLQuery(String sqlQuery) throws CstlServiceException {
         throw new CstlServiceException("Ebrim query are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
     }
 

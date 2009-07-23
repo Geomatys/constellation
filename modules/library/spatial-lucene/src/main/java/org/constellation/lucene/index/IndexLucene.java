@@ -33,7 +33,7 @@ import org.apache.lucene.store.RAMDirectory;
  */
 public abstract class IndexLucene {
 
-    protected static final Logger logger = Logger.getLogger("org.constellation.metadata.index");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.index");
 
     /**
      * A lucene analyser.

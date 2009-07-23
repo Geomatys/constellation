@@ -47,6 +47,7 @@ import org.constellation.lucene.filter.SpatialFilter;
 import org.constellation.lucene.filter.SpatialFilterType;
 import org.constellation.lucene.filter.TouchesFilter;
 import org.constellation.lucene.filter.WithinFilter;
+import org.constellation.metadata.Parameters;
 import org.geotoolkit.csw.xml.QueryConstraint;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -120,10 +121,10 @@ public class SQLFilterParser extends FilterParser {
             
         } else if (constraint.getCqlText() != null && constraint.getFilter() != null) {
             throw new CstlServiceException("The query constraint must be in Filter or CQL but not both.",
-                                             INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                             INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
         } else if (constraint.getCqlText() == null && constraint.getFilter() == null) {
             throw new CstlServiceException("The query constraint must contain a Filter or a CQL query.",
-                                             INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                             INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
         }
         
         if (constraint.getCqlText() != null) {
@@ -133,11 +134,11 @@ public class SQLFilterParser extends FilterParser {
             } catch (JAXBException ex) {
                 LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 throw new CstlServiceException("JAXBException while parsing CQL query: " + ex.getMessage(),
-                                                 NO_APPLICABLE_CODE, "QueryConstraint");
+                                                 NO_APPLICABLE_CODE, Parameters.QUERY_CONSTRAINT);
             } catch (CQLException ex) {
                 throw new CstlServiceException("The CQL query is malformed: " + ex.getMessage() + '\n' 
                                                  + "syntax Error: " + ex.getSyntaxError(),
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             
         } else if (constraint.getFilter() != null) {
@@ -375,7 +376,7 @@ public class SQLFilterParser extends FilterParser {
                 response.append('v').append(nbField).append("value LIKE '");
             } else {
                 throw new CstlServiceException("An operator propertyIsLike must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             
             //we get the value of the field
@@ -398,7 +399,7 @@ public class SQLFilterParser extends FilterParser {
                 
             } else {
                 throw new CstlServiceException("An operator propertyIsLike must specified the literal value.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
         } else if (comparisonOps instanceof PropertyIsNullType) {
              final PropertyIsNullType pin = (PropertyIsNullType) comparisonOps;
@@ -410,7 +411,7 @@ public class SQLFilterParser extends FilterParser {
                 response.append(" AND v").append(nbField).append(".form=identifier ");
             } else {
                 throw new CstlServiceException("An operator propertyIsNull must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
         } else if (comparisonOps instanceof PropertyIsBetweenType) {
             
@@ -426,7 +427,7 @@ public class SQLFilterParser extends FilterParser {
             
             if (propertyName == null || literal == null) {
                 throw new CstlServiceException("A binary comparison operator must be constitued of a literal and a property name.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } else {
                 if (operator.equals("PropertyIsEqualTo")) {                
                     response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
@@ -447,7 +448,7 @@ public class SQLFilterParser extends FilterParser {
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
                             throw new CstlServiceException("The service was unable to parse the Date: " + dateValue,
-                                                             INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                             INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
@@ -455,7 +456,7 @@ public class SQLFilterParser extends FilterParser {
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                         throw new CstlServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, "QueryConstraint");
+                                                          OPERATION_NOT_SUPPORTED, Parameters.QUERY_CONSTRAINT);
                     }
                 
                 } else if (operator.equals("PropertyIsGreaterThan")) {
@@ -466,7 +467,7 @@ public class SQLFilterParser extends FilterParser {
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
                             throw new CstlServiceException("The service was unable to parse the Date: " + dateValue,
-                                                             INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                             INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
@@ -474,7 +475,7 @@ public class SQLFilterParser extends FilterParser {
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                         throw new CstlServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, "QueryConstraint");
+                                                          OPERATION_NOT_SUPPORTED, Parameters.QUERY_CONSTRAINT);
                     }
                 
                 } else if (operator.equals("PropertyIsLessThan") ) {
@@ -486,7 +487,7 @@ public class SQLFilterParser extends FilterParser {
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
                             throw new CstlServiceException("The service was unable to parse the Date: " + dateValue,
-                                                             INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                             INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
@@ -494,7 +495,7 @@ public class SQLFilterParser extends FilterParser {
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                         throw new CstlServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, "QueryConstraint");
+                                                          OPERATION_NOT_SUPPORTED, Parameters.QUERY_CONSTRAINT);
                     }
                     
                 } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
@@ -505,7 +506,7 @@ public class SQLFilterParser extends FilterParser {
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
                             throw new CstlServiceException("The service was unable to parse the Date: " + dateValue,
-                                                             INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                             INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
@@ -513,11 +514,11 @@ public class SQLFilterParser extends FilterParser {
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                          throw new CstlServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, "QueryConstraint");
+                                                          OPERATION_NOT_SUPPORTED, Parameters.QUERY_CONSTRAINT);
                     }
                 } else {
                     throw new CstlServiceException("Unkwnow comparison operator: " + operator,
-                                                     INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                     INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
                 }
             }
         }
@@ -545,18 +546,18 @@ public class SQLFilterParser extends FilterParser {
             //we verify that all the parameters are specified
             if (propertyName == null) {
                 throw new CstlServiceException("An operator BBOX must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } else if (!propertyName.contains("BoundingBox")) {
                 throw new CstlServiceException("An operator the propertyName BBOX must be geometry valued. The property :" + propertyName + " is not.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             if (bbox.getEnvelope() == null && bbox.getEnvelopeWithTimePeriod() == null) {
                 throw new CstlServiceException("An operator BBOX must specified an envelope.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             if (crsName == null) {
                 throw new CstlServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             
             //we transform the EnvelopeEntry in GeneralEnvelope
@@ -570,13 +571,13 @@ public class SQLFilterParser extends FilterParser {
                 
             } catch (NoSuchAuthorityCodeException e) {
                 throw new CstlServiceException("Unknow Coordinate Reference System: " + crsName,
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } catch (FactoryException e) {
                 throw new CstlServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } catch (IllegalArgumentException e) {
                 throw new CstlServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             
         } else if (spatialOps instanceof DistanceBufferType) {
@@ -590,15 +591,15 @@ public class SQLFilterParser extends FilterParser {
             //we verify that all the parameters are specified
             if (dist.getPropertyName() == null) {
                  throw new CstlServiceException("An distanceBuffer operator must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             if (units == null) {
                  throw new CstlServiceException("An distanceBuffer operator must specified the ditance units.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             if (jbGeom == null || jbGeom.getValue() == null) {
                  throw new CstlServiceException("An distanceBuffer operator must specified a geometric object.",
-                                                  INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                  INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
            
             Object geometry  = jbGeom.getValue();
@@ -628,18 +629,18 @@ public class SQLFilterParser extends FilterParser {
                     spatialfilter = new BeyondFilter(geometry, crsName, distance, units);
                 } else {
                     throw new CstlServiceException("Unknow DistanceBuffer operator.",
-                            INVALID_PARAMETER_VALUE, "QueryConstraint");
+                            INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
                 }
                
             } catch (NoSuchAuthorityCodeException e) {
                     throw new CstlServiceException("Unknow Coordinate Reference System: " + crsName,
-                                                     INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                     INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } catch (FactoryException e) {
                     throw new CstlServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
-                                                     INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                     INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } catch (IllegalArgumentException e) {
                     throw new CstlServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
-                                                      INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                      INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
            
         } else if (spatialOps instanceof BinarySpatialOpType) {
@@ -684,7 +685,7 @@ public class SQLFilterParser extends FilterParser {
             
             if (propertyName == null && geometry == null) {
                 throw new CstlServiceException("An Binarary spatial operator must specified a propertyName and a geometry.",
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             SpatialFilterType filterType = null;
             try {
@@ -694,7 +695,7 @@ public class SQLFilterParser extends FilterParser {
             }
             if (filterType == null) {
                 throw new CstlServiceException("Unknow FilterType: " + operator,
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             
             String crsName = "undefined CRS";
@@ -708,9 +709,9 @@ public class SQLFilterParser extends FilterParser {
                     filterGeometry            = gmlEnvelopeToGeneralEnvelope(gmlEnvelope);
 
                 } else if (geometry instanceof PointType) {
-                    final PointType GMLpoint  = (PointType) geometry;
-                    crsName                   = GMLpoint.getSrsName();
-                    filterGeometry            = gmlPointToGeneralDirectPosition(GMLpoint);
+                    final PointType gmlPoint  = (PointType) geometry;
+                    crsName                   = gmlPoint.getSrsName();
+                    filterGeometry            = gmlPointToGeneralDirectPosition(gmlPoint);
 
                 } else if (geometry instanceof LineStringType) {
                     final LineStringType gmlLine =  (LineStringType) geometry;
@@ -733,13 +734,13 @@ public class SQLFilterParser extends FilterParser {
 
             } catch (NoSuchAuthorityCodeException e) {
                 throw new CstlServiceException("Unknow Coordinate Reference System: " + crsName,
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } catch (FactoryException e) {
                 throw new CstlServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } catch (IllegalArgumentException e) {
                 throw new CstlServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, "QueryConstraint");
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             
         }
@@ -767,7 +768,7 @@ public class SQLFilterParser extends FilterParser {
         }
         // we replace the variableName
         for (String varName : variables.keySet()) {
-            QName var =  variables.get(varName);
+            final QName var       =  variables.get(varName);
             final String mdwebVar = getStandardFromNamespace(var.getNamespaceURI()) + ':' + var.getLocalPart();
             s = s.replace("$" + varName,  mdwebVar);
         }

@@ -45,7 +45,7 @@ public class PolicySetFinderModule extends PolicyFinderModule {
     private final List<AbstractPolicy> policies = new ArrayList<AbstractPolicy>();
     protected PolicyFinder policyFinder         = null;
     
-    private Logger logger = Logger.getLogger("org.constellation.xacml.bridge");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.xacml.bridge");
 
     public PolicySetFinderModule() {
         this(null);
@@ -76,30 +76,30 @@ public class PolicySetFinderModule extends PolicyFinderModule {
      */
     @Override
     public PolicyFinderResult findPolicy(final EvaluationCtx context) {
-        logger.finer(context.getResourceId().encode());
+        LOGGER.finer(context.getResourceId().encode());
         
         AbstractPolicy selectedPolicy = null;
         final MatchResult match = policySet.match(context);
-        int result = match.getResult();
+        final int result = match.getResult();
         if (result == MatchResult.MATCH) {
             selectedPolicy = policySet;
         }
         
         // if target matching was indeterminate, then return the error
         if (result == MatchResult.INDETERMINATE) {
-            logger.finer("undeterminate matching");
+            LOGGER.finer("undeterminate matching");
             return new PolicyFinderResult(match.getStatus());        // see if the target matched
         }
         if (result == MatchResult.MATCH) {
-            logger.finer("succefull matching");
+            LOGGER.finer("succefull matching");
             return new PolicyFinderResult(selectedPolicy);
         }
         if (result == MatchResult.NO_MATCH) {
-            logger.finer("no match: ");
+            LOGGER.finer("no match: ");
             return new PolicyFinderResult(match.getStatus());  
         }
 
-        logger.finer("returning null");
+        LOGGER.finer("returning null");
         return new PolicyFinderResult(selectedPolicy);
     }
 

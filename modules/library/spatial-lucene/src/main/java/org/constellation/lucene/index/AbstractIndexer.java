@@ -68,14 +68,14 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
 
         if (preGeneratedIndexDirectory.exists()) {
             switchIndexDir(preGeneratedIndexDirectory, currentIndexDirectory);
-            logger.info("using pre-created index.");
+            LOGGER.info("using pre-created index.");
 
         } else {
             //if the index File exists we don't need to index the documents again.
             if(!currentIndexDirectory.exists()) {
                 create = true;
             } else {
-                logger.info("Index already created.");
+                LOGGER.info("Index already created.");
                 create = false;
             }
         }
@@ -144,21 +144,21 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
 
             Term t          = new Term("id", identifier);
             TermQuery query = new TermQuery(t);
-            logger.info("Term query:" + query);
+            LOGGER.info("Term query:" + query);
 
 
             writer.deleteDocuments(query);
-            logger.info("Metadata: " + identifier + " removed from the index");
+            LOGGER.info("Metadata: " + identifier + " removed from the index");
 
             writer.commit();
             writer.optimize();
             writer.close();
 
         } catch (CorruptIndexException ex) {
-            logger.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
             ex.printStackTrace();
         } catch (IOException ex) {
-            logger.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -186,7 +186,7 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
         // convert the corner of the box to lucene fields
         doc.add(new Field("geometry" , "boundingbox", Field.Store.YES, Field.Index.NOT_ANALYZED));
         doc.add(new Field("fullBBOX", minx + "," + maxx + "," + miny + "," + maxy + "," + crsName, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        logger.finer("added boundingBox: minx=" + minx + " miny=" + miny + " maxx=" + maxx +  " maxy=" + maxy);
+        LOGGER.finer("added boundingBox: minx=" + minx + " miny=" + miny + " maxx=" + maxx +  " maxy=" + maxy);
         
     }
 

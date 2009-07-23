@@ -53,9 +53,9 @@ import org.opengis.referencing.operation.TransformException;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class PostGridReader implements CoverageReader{
+public class PostGridReader implements CoverageReader {
     
-    private final Logger LOGGER = Logging.getLogger(PostGridReader.class);
+    private static final Logger LOGGER = Logging.getLogger(PostGridReader.class);
 
     private final GridCoverageTable table;
     

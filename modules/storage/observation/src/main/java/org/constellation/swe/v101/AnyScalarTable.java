@@ -20,7 +20,6 @@ package org.constellation.swe.v101;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
@@ -40,11 +39,6 @@ import org.geotoolkit.util.Utilities;
  * @version $Id:
  */
 public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
-    
-    /**
-     * A logger (debugging purpose)
-     */
-    private Logger logger = Logger.getLogger("anyScalarTable");
     
     /**
      * identifiant secondaire de la table

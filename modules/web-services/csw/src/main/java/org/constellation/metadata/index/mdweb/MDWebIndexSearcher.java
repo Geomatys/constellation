@@ -56,17 +56,17 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
      */
     public String identifierQuery(String id) throws SearchingException {
         try {
-            TermQuery query = new TermQuery(new Term("identifier_sort", id));
-            List<String> results = new ArrayList<String>();
-            int maxRecords = searcher.maxDoc();
-            logger.info("TermQuery: " + query.toString());
-            TopDocs hits = searcher.search(query, maxRecords);
+            final TermQuery query = new TermQuery(new Term("identifier_sort", id));
+            final List<String> results = new ArrayList<String>();
+            final int maxRecords = searcher.maxDoc();
+            LOGGER.info("TermQuery: " + query.toString());
+            final TopDocs hits = searcher.search(query, maxRecords);
             for (ScoreDoc doc : hits.scoreDocs) {
-                Document document = searcher.doc(doc.doc, new IDFieldSelector());
+                final Document document = searcher.doc(doc.doc, new IDFieldSelector());
                 results.add(document.get("id") + ':' + document.get("catalog"));
             }
             if (results.size() > 1) {
-                logger.warning("multiple record in lucene index for identifier: " + id);
+                LOGGER.warning("multiple record in lucene index for identifier: " + id);
             }
             if (results.size() > 0) {
                 return results.get(0);

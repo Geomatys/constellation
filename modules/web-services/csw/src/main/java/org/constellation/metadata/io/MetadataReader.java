@@ -34,14 +34,14 @@ import org.constellation.ws.CstlServiceException;
  */
 public abstract class MetadataReader {
     
-    public final static int DUBLINCORE = 0;
-    public final static int ISO_19115  = 1;
-    public final static int EBRIM      = 2;
+    public static final int DUBLINCORE = 0;
+    public static final int ISO_19115  = 1;
+    public static final int EBRIM      = 2;
     
     /**
      * A debugging logger
      */
-    protected Logger logger = Logger.getLogger("org.constellation.metadata");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
     
     /**
      * A flag indicating if the cache mecanism is enabled or not.
@@ -88,7 +88,7 @@ public abstract class MetadataReader {
      * @return
      * @throws CstlServiceException
      */
-    public abstract List<String> executeEbrimSQLQuery(String SQLQuery) throws CstlServiceException;
+    public abstract List<String> executeEbrimSQLQuery(String sqlQuery) throws CstlServiceException;
     
     /**
      * Return all the entries from the database

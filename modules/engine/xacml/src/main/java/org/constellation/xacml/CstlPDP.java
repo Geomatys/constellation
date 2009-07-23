@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.constellation.xacml.factory.FactoryException;
 import org.constellation.xacml.factory.PolicyFactory;
@@ -60,8 +59,6 @@ public class CstlPDP implements PolicyDecisionPoint {
     
     private final PolicyFinder policyFinder = new PolicyFinder();
 
-    private Logger logger = Logger.getLogger("org.constellation.xacml");
-    
     /**
      * Build a new empty PDP.
      */

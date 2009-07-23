@@ -62,20 +62,20 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
     @Override
     public String identifierQuery(String id) throws SearchingException {
         try {
-            TermQuery query = new TermQuery(new Term("id", id));
-            List<String> results = new ArrayList<String>();
+            final TermQuery query = new TermQuery(new Term("id", id));
+            final List<String> results = new ArrayList<String>();
             int maxRecords = searcher.maxDoc();
             if (maxRecords == 0) {
-                logger.severe("There is no document in the index");
+                LOGGER.severe("There is no document in the index");
                 maxRecords = 1;
             }
-            logger.info("TermQuery: " + query.toString());
-            TopDocs hits = searcher.search(query, maxRecords);
+            LOGGER.info("TermQuery: " + query.toString());
+            final TopDocs hits = searcher.search(query, maxRecords);
             for (ScoreDoc doc : hits.scoreDocs) {
                 results.add(searcher.doc(doc.doc, new IDFieldSelector()).get("id"));
             }
             if (results.size() > 1) {
-                logger.warning("multiple record in lucene index for identifier: " + id);
+                LOGGER.warning("multiple record in lucene index for identifier: " + id);
             }
             if (results.size() > 0) {
                 return results.get(0);

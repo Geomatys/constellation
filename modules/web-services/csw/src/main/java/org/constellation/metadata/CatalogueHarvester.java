@@ -71,6 +71,7 @@ import org.geotoolkit.ogc.xml.v110modified.NotType;
 import org.geotoolkit.ogc.xml.v110modified.PropertyIsLikeType;
 import org.geotoolkit.ogc.xml.v110modified.PropertyNameType;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.xml.Namespaces;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -118,12 +119,12 @@ public class CatalogueHarvester {
     /**
      * a QName for csw:Record type
      */
-    private static final QName RECORD_QNAME = new QName("http://www.opengis.net/cat/csw/2.0.2", "Record");
+    private static final QName RECORD_QNAME = new QName(Namespaces.CSW_202, "Record");
     
     /**
      * a QName for gmd:Dataset type
      */
-    private static final QName DATASET_QNAME = new QName("http://www.isotc211.org/2005/gmd", "Dataset");
+    private static final QName DATASET_QNAME = new QName(Namespaces.GMD, "Dataset");
     
     /**
      * A Marshaller / unMarshaller pool to send request to another CSW services / to get object from harvested resource.
@@ -162,11 +163,11 @@ public class CatalogueHarvester {
         /*
          * we build the first filter : < dublinCore:Title IS LIKE '*' >
          */ 
-        List<QName> typeNames    = new ArrayList<QName>();
-        PropertyNameType pname   = new PropertyNameType("dc:Title");
-        PropertyIsLikeType pil   = new PropertyIsLikeType(pname, "something?", "*", "?", "\\");
-        NotType n                = new NotType(pil);
-        final FilterType filter1 = new FilterType(n);
+        final List<QName> typeNames = new ArrayList<QName>();
+        PropertyNameType pname      = new PropertyNameType("dc:Title");
+        PropertyIsLikeType pil      = new PropertyIsLikeType(pname, "something?", "*", "?", "\\");
+        NotType n                   = new NotType(pil);
+        final FilterType filter1    = new FilterType(n);
         
         /*
          * Second filter a special case for some unstandardized CSW : < title IS NOT LIKE 'something' >
@@ -181,7 +182,7 @@ public class CatalogueHarvester {
         final QueryConstraintType constraint = new QueryConstraintType(filter1, "1.1.0");
         typeNames.add(RECORD_QNAME);
         final QueryType query = new QueryType(typeNames, new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        fullGetRecordsRequestv202 = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 20, query, null);
+        fullGetRecordsRequestv202 = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", Namespaces.CSW_202, 1, 20, query, null);
                  
         
         //we build the base request to harvest another CSW service (2.0.0)
@@ -419,7 +420,7 @@ public class CatalogueHarvester {
             throw distantException.get(0);
         }
         
-        final int result[] = new int [3];
+        final int[] result = new int [3];
         result[0]    = nbRecordInserted;
         result[1]    = nbRecordUpdated;
         result[2]    = 0;
@@ -510,8 +511,8 @@ public class CatalogueHarvester {
             }
             
             if (outputDomain != null) {
-                List<String> availableOutputSchema = Util.cleanStrings(outputDomain.getValue());
-                final String defaultValue          = outputDomain.getDefaultValue();
+                final List<String> availableOutputSchema = Util.cleanStrings(outputDomain.getValue());
+                final String defaultValue                = outputDomain.getDefaultValue();
                 
                 if (defaultValue != null && !defaultValue.equals("") && !availableOutputSchema.contains(defaultValue))
                     availableOutputSchema.add(defaultValue);
@@ -532,7 +533,7 @@ public class CatalogueHarvester {
                 report.append("No outputSchema specified using default: http://www.opengis.net/cat/csw/2.0.2");
                 
                 //we add the default outputSchema used
-                bestDistantOuputSchema = "http://www.opengis.net/cat/csw/2.0.2";
+                bestDistantOuputSchema = Namespaces.CSW_202;
             }
             
             // we look for the different Type names
@@ -602,21 +603,21 @@ public class CatalogueHarvester {
     private String getBestOutputSchema(List<String> availableOutputSchema) {
         if (availableOutputSchema.size() == 0) {
             //default case
-            return "http://www.opengis.net/cat/csw/2.0.2";
+            return Namespaces.CSW_202;
         
         } else if (availableOutputSchema.size() == 1) {
             return availableOutputSchema.get(0);
         
         // Priority to the ISO schema
-        } else if (availableOutputSchema.contains("http://www.isotc211.org/2005/gmd")) {
-            return "http://www.isotc211.org/2005/gmd";
+        } else if (availableOutputSchema.contains(Namespaces.GMD)) {
+            return Namespaces.GMD;
         
         } else if (availableOutputSchema.contains("csw:profile")) {
             return "csw:profile";
             
         // else to Dublincore schema    
-        } else if (availableOutputSchema.contains("http://www.opengis.net/cat/csw/2.0.2")) {
-            return "http://www.opengis.net/cat/csw/2.0.2";
+        } else if (availableOutputSchema.contains(Namespaces.CSW_202)) {
+            return Namespaces.CSW_202;
         
         } else if (availableOutputSchema.contains("csw:record")) {
             return "csw:record";
@@ -634,7 +635,7 @@ public class CatalogueHarvester {
             return "DublinCore";
         } else {
             LOGGER.severe("unable to found a outputSchema!!!");
-            return "http://www.opengis.net/cat/csw/2.0.2";
+            return Namespaces.CSW_202;
         }
     }
     
@@ -763,8 +764,8 @@ public class CatalogueHarvester {
      */
     private String restoreGoodNamespace(String s) {
        s = s.replace("MD_Metadata ", "MD_Metadata xmlns:gco=\"http://www.isotc211.org/2005/gco\" ");
-       s = s.replace("http://schemas.opengis.net/iso19115full", "http://www.isotc211.org/2005/gmd");
-       s = s.replace("http://metadata.dgiwg.org/smXML", "http://www.isotc211.org/2005/gmd");
+       s = s.replace("http://schemas.opengis.net/iso19115full", Namespaces.GMD);
+       s = s.replace("http://metadata.dgiwg.org/smXML", Namespaces.GMD);
        s = Util.replacePrefix(s, "CharacterString", "gco");
        return s;
    } 
@@ -780,7 +781,7 @@ public class CatalogueHarvester {
     private String getNamespaceURIFromprefix(String prefix, String distantVersion) {
         if (distantVersion.equals("2.0.2")) {
             if (prefix.equals("csw"))
-                return "http://www.opengis.net/cat/csw/2.0.2";
+                return Namespaces.CSW_202;
             
             else if (prefix.equals("ebrim") || prefix.equals("rim"))
                 return "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";
@@ -789,7 +790,7 @@ public class CatalogueHarvester {
                 return "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
             
             else if (prefix.equals("gmd"))
-                return "http://www.isotc211.org/2005/gmd";
+                return Namespaces.GMD;
             
             else if (prefix.equals("wrs"))
                 return "http://www.opengis.net/cat/wrs/1.0";
@@ -807,7 +808,7 @@ public class CatalogueHarvester {
                 return "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
             
             else if (prefix.equals("gmd"))
-                return "http://www.isotc211.org/2005/gmd";
+                return Namespaces.GMD;
             
             else if (prefix.equals("wrs") || prefix.equals("wrs09"))
                 return "http://www.opengis.net/cat/wrs";
@@ -900,8 +901,8 @@ public class CatalogueHarvester {
                 out.write(buffer, 0, size);
             }
 
-            if (resourceType.equals("http://www.isotc211.org/2005/gmd") ||
-                    resourceType.equals("http://www.opengis.net/cat/csw/2.0.2") ||
+            if (resourceType.equals(Namespaces.GMD) ||
+                    resourceType.equals(Namespaces.CSW_202) ||
                     resourceType.equals("http://www.isotc211.org/2005/gfc")) {
 
                 final Object harvested = unmarshaller.unmarshal(fileToHarvest);

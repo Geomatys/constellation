@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBElement;
@@ -44,12 +45,14 @@ import org.geotoolkit.xacml.xml.policy.PolicyType;
  */
 public class PolicyFactory {
 
-    private static Logger logger = Logger.getLogger("org.constellation.xacml");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.xacml");
     
     public static Class<?> constructingClass = CstlXACMLPolicy.class;
 
+    private PolicyFactory() {}
+    
     public static void setConstructingClass(final Class<?> clazz) {
-        if (XACMLPolicy.class.isAssignableFrom(clazz) == false) {
+        if (!XACMLPolicy.class.isAssignableFrom(clazz)) {
             throw new IllegalArgumentException("Specified class is not of type XACMLPolicy");
         }
         constructingClass = clazz;
@@ -120,8 +123,8 @@ public class PolicyFactory {
         } catch (IllegalArgumentException ex) {
             throw new FactoryException(ex);
         } catch (InvocationTargetException ex) {
-            logger.severe("invocation target exception: " + ex.toString());
-            ex.printStackTrace();
+            LOGGER.severe("invocation target exception: " + ex.toString());
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new FactoryException(ex);
         }
     }

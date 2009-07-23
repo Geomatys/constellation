@@ -228,7 +228,7 @@ public class CSWworker {
     /**
      * A list of supported MIME type. 
      */
-    private final static List<String> ACCEPTED_OUTPUT_FORMATS;
+    private static final List<String> ACCEPTED_OUTPUT_FORMATS;
     static {
         ACCEPTED_OUTPUT_FORMATS = new ArrayList<String>();
         ACCEPTED_OUTPUT_FORMATS.add("text/xml");
@@ -264,7 +264,7 @@ public class CSWworker {
     /**
      * The current version of the service.
      */
-    private ServiceVersion actingVersion = new ServiceVersion(ServiceType.CSW, "2.0.2");
+    private ServiceVersion actingVersion = new ServiceVersion(ServiceType.CSW, Parameters.CSW_202_VERSION);
 
     /**
      * A list of schreduled Task (used in close method).
@@ -297,7 +297,7 @@ public class CSWworker {
      */
     protected CSWworker(final String serviceID, final MarshallerPool marshallerPool, File configDir) {
 
-        String notWorkingMsg = "The CSW service is not working!";
+        final String notWorkingMsg = "The CSW service is not working!";
         this.marshallerPool  = marshallerPool;
         if (configDir == null) {
             configDir    = getConfigDirectory();
@@ -412,13 +412,13 @@ public class CSWworker {
      */
     private void initializeAcceptedResourceType() {
         acceptedResourceType = new ArrayList<String>();
-        List<Integer> supportedDataTypes = mdReader.getSupportedDataTypes();
+        final List<Integer> supportedDataTypes = mdReader.getSupportedDataTypes();
         if (supportedDataTypes.contains(ISO_19115)) {
-            acceptedResourceType.add("http://www.isotc211.org/2005/gmd");
-            acceptedResourceType.add("http://www.isotc211.org/2005/gfc");
+            acceptedResourceType.add(Namespaces.GMD);
+            acceptedResourceType.add(Namespaces.GFC);
         }
         if (supportedDataTypes.contains(DUBLINCORE)) {
-            acceptedResourceType.add("http://www.opengis.net/cat/csw/2.0.2");
+            acceptedResourceType.add(Namespaces.CSW_202);
         }
         if (supportedDataTypes.contains(EBRIM)) {
             acceptedResourceType.add("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0");
@@ -531,9 +531,9 @@ public class CSWworker {
      * @param lastHarvest The time of the last task launch.
      */
     private void saveSchreduledHarvestTask(String sourceURL, String resourceType, int mode, List<String> emails, long period, long lastHarvest) {
-        HarvestTask newTask       = new HarvestTask(sourceURL, resourceType, mode, emails, period, lastHarvest);
-        File configDir            = getConfigDirectory();
-        File f                    = new File(configDir, harvestTaskFileName);
+        final HarvestTask newTask = new HarvestTask(sourceURL, resourceType, mode, emails, period, lastHarvest);
+        final File configDir      = getConfigDirectory();
+        final File f              = new File(configDir, harvestTaskFileName);
         Marshaller marshaller     = null;
         Unmarshaller unmarshaller = null;
         try {
@@ -550,9 +550,13 @@ public class CSWworker {
                 }
             } else {
                 
-                boolean created = f.createNewFile();
-                final HarvestTasks tasks = new HarvestTasks(Arrays.asList(newTask));
-                marshaller.marshal(tasks, f);
+                final boolean created = f.createNewFile();
+                if (!created) {
+                    LOGGER.severe("unable to create a file HarevestTask.xml");
+                } else {
+                    final HarvestTasks tasks = new HarvestTasks(Arrays.asList(newTask));
+                    marshaller.marshal(tasks, f);
+                }
             }
 
         } catch (IOException ex) {
@@ -629,21 +633,22 @@ public class CSWworker {
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
             if (!requestCapabilities.getService().equals("CSW")) {
-                throw new CstlServiceException("service must be \"CSW\"!", INVALID_PARAMETER_VALUE, "service");
+                throw new CstlServiceException("service must be \"CSW\"!", INVALID_PARAMETER_VALUE, Parameters.SERVICE);
             }
         } else {
             throw new CstlServiceException("Service must be specified!",
-                                             MISSING_PARAMETER_VALUE, "service");
+                                             MISSING_PARAMETER_VALUE, Parameters.SERVICE);
         }
         final AcceptVersions versions = requestCapabilities.getAcceptVersions();
         if (versions != null) {
-            if (!versions.getVersion().contains("2.0.2")){
+            if (!versions.getVersion().contains(Parameters.CSW_202_VERSION)){
                  throw new CstlServiceException("version available : 2.0.2",
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
         }
-        final AcceptFormats formats = requestCapabilities.getAcceptFormats();
         /*
+         final AcceptFormats formats = requestCapabilities.getAcceptFormats();
+        
 
          if (formats != null && formats.getOutputFormat().size() > 0 && !formats.getOutputFormat().contains("text/xml")) {
             
@@ -669,27 +674,27 @@ public class CSWworker {
             
         Sections sections = requestCapabilities.getSections();
         if (sections == null) {
-            sections = new SectionsType("All");
+            sections = new SectionsType(Parameters.ALL);
         }
         
         //according to CITE test a GetCapabilities must always return Filter_Capabilities
-        if (!sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains("All"))
+        if (!sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains(Parameters.ALL))
             sections.add("Filter_Capabilities");
         
         //we enter the information for service identification.
-        if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains("All")) {
+        if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains(Parameters.ALL)) {
                 
             si = skeletonCapabilities.getServiceIdentification();
         }
             
         //we enter the information for service provider.
-        if (sections.getSection().contains("ServiceProvider") || sections.getSection().contains("All")) {
+        if (sections.getSection().contains("ServiceProvider") || sections.getSection().contains(Parameters.ALL)) {
            
             sp = skeletonCapabilities.getServiceProvider();
         }
             
         //we enter the operation Metadata
-        if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains("All")) {
+        if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains(Parameters.ALL)) {
                 
             om = skeletonCapabilities.getOperationsMetadata();
             
@@ -721,11 +726,11 @@ public class CSWworker {
                 // we update the operation parameters
                 final Operation gr = om.getOperation("GetRecords");
                 if (gr != null) {
-                    final DomainType os = gr.getParameter("outputSchema");
+                    final DomainType os = gr.getParameter(Parameters.OUTPUT_SCHEMA);
                     if (os != null) {
                         os.setValue(acceptedResourceType);
                     }
-                    final DomainType tn = gr.getParameter("TypeNames");
+                    final DomainType tn = gr.getParameter(Parameters.TYPENAMES);
                     if (tn != null) {
                         final List<String> values = new ArrayList<String>();
                         for (QName qn : supportedTypeNames) {
@@ -766,7 +771,7 @@ public class CSWworker {
                 
                 final Operation grbi = om.getOperation("GetRecordById");
                 if (grbi != null) {
-                    final DomainType os = grbi.getParameter("outputSchema");
+                    final DomainType os = grbi.getParameter(Parameters.OUTPUT_SCHEMA);
                     if (os != null) {
                         os.setValue(acceptedResourceType);
                     }
@@ -793,13 +798,13 @@ public class CSWworker {
         }
             
         //we enter the information filter capablities.
-        if (sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains("All")) {
+        if (sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains(Parameters.ALL)) {
             
             fc = skeletonCapabilities.getFilterCapabilities();
         }
             
             
-        c = new Capabilities(si, sp, om, "2.0.2", null, fc);
+        c = new Capabilities(si, sp, om, Parameters.CSW_202_VERSION, null, fc);
 
         LOGGER.info("GetCapabilities request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         return c;
@@ -825,17 +830,17 @@ public class CSWworker {
         initializeOutputFormat(request);
         
         //we get the output schema and verify that we handle it
-        String outputSchema = "http://www.opengis.net/cat/csw/2.0.2";
+        String outputSchema = Namespaces.CSW_202;
         if (request.getOutputSchema() != null) {
             outputSchema = request.getOutputSchema();
             if (!acceptedResourceType.contains(outputSchema)) {
-                StringBuilder supportedOutput = new StringBuilder();
+                final StringBuilder supportedOutput = new StringBuilder();
                 for (String s: acceptedResourceType) {
                     supportedOutput.append(s).append('\n');
                 } 
                 throw new CstlServiceException("The server does not support this output schema: " + outputSchema + '\n' +
                                               " supported ones are: " + '\n' + supportedOutput,
-                                              INVALID_PARAMETER_VALUE, "outputSchema");
+                                              INVALID_PARAMETER_VALUE, Parameters.OUTPUT_SCHEMA);
             }
         }
         
@@ -855,7 +860,7 @@ public class CSWworker {
             typeNames =  query.getTypeNames();
             if (typeNames == null || typeNames.size() == 0) {
                 throw new CstlServiceException("The query must specify at least typeName.",
-                                              INVALID_PARAMETER_VALUE, "TypeNames");
+                                              INVALID_PARAMETER_VALUE, Parameters.TYPENAMES);
             } else {
                 for (QName type : typeNames) {
                     if (type != null) {
@@ -871,7 +876,7 @@ public class CSWworker {
                     } else {
                         throw new CstlServiceException("The service was unable to read a typeName:" +'\n' +
                                                        "supported one are:" + '\n' + supportedTypeNames(),
-                                                       INVALID_PARAMETER_VALUE, "TypeNames");
+                                                       INVALID_PARAMETER_VALUE, Parameters.TYPENAMES);
                     }
                     //we verify that the typeName is supported        
                     if (!supportedTypeNames.contains(type)) {
@@ -881,20 +886,21 @@ public class CSWworker {
                             typeName = type.getLocalPart();
                         throw new CstlServiceException("The typeName " + typeName + " is not supported by the service:" +'\n' +
                                                       "supported one are:" + '\n' + supportedTypeNames(),
-                                                      INVALID_PARAMETER_VALUE, "TypeNames");
+                                                      INVALID_PARAMETER_VALUE, Parameters.TYPENAMES);
                     }
                 }
-                // debugging part
-                String var = "variables:" + '\n';
+                /*
+                 * debugging part
+                 */
+                StringBuilder report = new StringBuilder("variables:").append('\n');
                 for (Entry<String, QName> entry : variables.entrySet()) {
-                    var = var + entry.getKey() + " = " + entry.getValue() + '\n';
+                    report.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
                 }
-                LOGGER.info(var);
-                String prefix = "prefixs:" + '\n';
+                report.append("prefixs:").append('\n');
                 for (Entry<String, String> entry : prefixs.entrySet()) {
-                    prefix = prefix +  entry.getKey() + " = " + entry.getValue() + '\n';
+                    report.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
                 }
-                LOGGER.info(prefix);
+                LOGGER.info(report.toString());
             }
             
         } else {
@@ -996,11 +1002,11 @@ public class CSWworker {
         LOGGER.info("local max = " + max + " distributed max = " + maxDistributed);
 
         int mode;
-        if (outputSchema.equals("http://www.isotc211.org/2005/gmd") || outputSchema.equals("http://www.isotc211.org/2005/gfc")) {
+        if (outputSchema.equals(Namespaces.GMD) || outputSchema.equals(Namespaces.GFC)) {
             mode = ISO_19115;
         } else if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0") || outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5")) {
             mode = EBRIM;
-        } else if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
+        } else if (outputSchema.equals(Namespaces.CSW_202)) {
             mode = DUBLINCORE;
         } else {
             throw new IllegalArgumentException("undefined outputSchema");
@@ -1128,12 +1134,12 @@ public class CSWworker {
         }
         
         //we get the output schema and verify that we handle it
-        String outputSchema = "http://www.opengis.net/cat/csw/2.0.2";
+        String outputSchema = Namespaces.CSW_202;
         if (request.getOutputSchema() != null) {
             outputSchema = request.getOutputSchema();
             if (!acceptedResourceType.contains(outputSchema)) {
                 throw new CstlServiceException("The server does not support this output schema: " + outputSchema,
-                                                  INVALID_PARAMETER_VALUE, "outputSchema");
+                                                  INVALID_PARAMETER_VALUE, Parameters.OUTPUT_SCHEMA);
             }
         }
         
@@ -1146,7 +1152,7 @@ public class CSWworker {
         final List<String> unexistingID = new ArrayList<String>();
         
         //we build dublin core object
-        if (outputSchema.equals("http://www.opengis.net/cat/csw/2.0.2")) {
+        if (outputSchema.equals(Namespaces.CSW_202)) {
             final List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
             for (String id:request.getId()) {
                 
@@ -1169,7 +1175,7 @@ public class CSWworker {
             response = new GetRecordByIdResponseType(records, null);
             
         //we build ISO 19139 object    
-        } else if (outputSchema.equals("http://www.isotc211.org/2005/gmd")) {
+        } else if (outputSchema.equals(Namespaces.GMD)) {
            final List<DefaultMetaData> records = new ArrayList<DefaultMetaData>();
            for (String id:request.getId()) {
                
@@ -1197,7 +1203,7 @@ public class CSWworker {
            response = new GetRecordByIdResponseType(null, records);      
         
         //we build a Feature catalogue object
-        } else if (outputSchema.equals("http://www.isotc211.org/2005/gfc")) {
+        } else if (outputSchema.equals(Namespaces.GFC)) {
            final List<Object> records = new ArrayList<Object>();
            for (String id:request.getId()) {
                
@@ -1309,7 +1315,7 @@ public class CSWworker {
         }
         if (value.equals("")) {
             throw new CstlServiceException("The record does not correspound to the specified outputSchema.",
-                                             INVALID_PARAMETER_VALUE, "outputSchema");
+                                             INVALID_PARAMETER_VALUE, Parameters.OUTPUT_SCHEMA);
         } else {
 
             throw new CstlServiceException("The identifiers " + value + " does not exist",
@@ -1360,7 +1366,7 @@ public class CSWworker {
 
                 final InputStream in = Util.getResourceAsStream("org/constellation/metadata/record.xsd");
                 final Document d     = constructor.parse(in);
-                final SchemaComponentType component = new SchemaComponentType("http://www.opengis.net/cat/csw/2.0.2", schemaLanguage, d.getDocumentElement());
+                final SchemaComponentType component = new SchemaComponentType(Namespaces.CSW_202, schemaLanguage, d.getDocumentElement());
                 components.add(component);
             }
             
@@ -1368,7 +1374,7 @@ public class CSWworker {
 
                 final InputStream in = Util.getResourceAsStream("org/constellation/metadata/metadata.xsd");
                 final Document d     = constructor.parse(in);
-                final SchemaComponentType component = new SchemaComponentType("http://www.isotc211.org/2005/gmd", schemaLanguage, d.getDocumentElement());
+                final SchemaComponentType component = new SchemaComponentType(Namespaces.GMD, schemaLanguage, d.getDocumentElement());
                 components.add(component);
             }
             
@@ -1422,7 +1428,7 @@ public class CSWworker {
         // if the two parameter have been filled we launch an exception
         if (parameterName != null && propertyName != null) {
             throw new CstlServiceException("One of propertyName or parameterName must be null",
-                                             INVALID_PARAMETER_VALUE, "parameterName");
+                                             INVALID_PARAMETER_VALUE, Parameters.PARAMETERNAME);
         }
         
         /*
@@ -1454,15 +1460,15 @@ public class CSWworker {
                             responseList.add(value);
                         } else {
                             throw new CstlServiceException("The parameter " + parameter + " in the operation " + operationName + " does not exist",
-                                                          INVALID_PARAMETER_VALUE, "parameterName");
+                                                          INVALID_PARAMETER_VALUE, Parameters.PARAMETERNAME);
                         }
                     } else {
                         throw new CstlServiceException("The operation " + operationName + " does not exist",
-                                                      INVALID_PARAMETER_VALUE, "parameterName");
+                                                      INVALID_PARAMETER_VALUE, Parameters.PARAMETERNAME);
                     }
                 } else {
                     throw new CstlServiceException("ParameterName must be formed like this Operation.parameterName",
-                                                     INVALID_PARAMETER_VALUE, "parameterName");
+                                                     INVALID_PARAMETER_VALUE, Parameters.PARAMETERNAME);
                 }
             }
         
@@ -1499,10 +1505,10 @@ public class CSWworker {
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         // we prepare the report
-        int totalInserted = 0;
-        int totalUpdated  = 0;
-        int totalDeleted  = 0;
-        String requestID  = request.getRequestId();
+        int totalInserted       = 0;
+        int totalUpdated        = 0;
+        int totalDeleted        = 0;
+        final String requestID  = request.getRequestId();
         
         final List<Object> transactions = request.getInsertOrUpdateOrDelete();
         for (Object transaction: transactions) {
@@ -1548,7 +1554,7 @@ public class CSWworker {
                     }
                 } else {
                     throw new CstlServiceException("This kind of transaction (delete) is not supported by this Writer implementation.",
-                                                  NO_APPLICABLE_CODE, "TransactionType");
+                                                  NO_APPLICABLE_CODE, Parameters.TRANSACTION_TYPE);
                 }
                 
                 
@@ -1590,7 +1596,7 @@ public class CSWworker {
                     }
                 } else {
                     throw new CstlServiceException("This kind of transaction (update) is not supported by this Writer implementation.",
-                            NO_APPLICABLE_CODE, "TransactionType");
+                            NO_APPLICABLE_CODE, Parameters.TRANSACTION_TYPE);
                 }
             } else {
                 String className = " null object";
@@ -1598,7 +1604,7 @@ public class CSWworker {
                     className = transaction.getClass().getName();
                 }
                 throw new CstlServiceException("This kind of transaction is not supported by the service: " + className,
-                                              INVALID_PARAMETER_VALUE, "TransactionType");
+                                              INVALID_PARAMETER_VALUE, Parameters.TRANSACTION_TYPE);
             }
             
         }
@@ -1713,13 +1719,13 @@ public class CSWworker {
                                               NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
                 throw new CstlServiceException("The resource can not be parsed: " + ex.getMessage(),
-                                              INVALID_PARAMETER_VALUE, "Source");
+                                              INVALID_PARAMETER_VALUE, Parameters.SOURCE);
             } catch (MalformedURLException ex) {
                 throw new CstlServiceException("The source URL is malformed",
-                                              INVALID_PARAMETER_VALUE, "Source");
+                                              INVALID_PARAMETER_VALUE, Parameters.SOURCE);
             } catch (IOException ex) {
                 throw new CstlServiceException("The service can't open the connection to the source",
-                                              INVALID_PARAMETER_VALUE, "Source");
+                                              INVALID_PARAMETER_VALUE, Parameters.SOURCE);
             } catch (DatatypeConfigurationException ex) {
                 throw new CstlServiceException("The service has made an error of timestamp",
                                               INVALID_PARAMETER_VALUE);
@@ -1727,7 +1733,7 @@ public class CSWworker {
             
         } else {
             throw new CstlServiceException("you must specify a source",
-                                              MISSING_PARAMETER_VALUE, "Source");
+                                              MISSING_PARAMETER_VALUE, Parameters.SOURCE);
         }
         
         LOGGER.info("Harvest operation finished");
@@ -1782,11 +1788,11 @@ public class CSWworker {
             if (request.getService() != null) {
                 if (!request.getService().equals("CSW"))  {
                     throw new CstlServiceException("service must be \"CSW\"!",
-                                                  INVALID_PARAMETER_VALUE, "service");
+                                                  INVALID_PARAMETER_VALUE, Parameters.SERVICE);
                 }
             } else {
                 throw new CstlServiceException("service must be specified!",
-                                              MISSING_PARAMETER_VALUE, "service");
+                                              MISSING_PARAMETER_VALUE, Parameters.SERVICE);
             }
             if (request.getVersion()!= null) {
                 /*
@@ -1794,8 +1800,8 @@ public class CSWworker {
                  *
                  * TODO remove this
                  */
-                if (request.getVersion().equals("2.0.2")) {
-                    this.actingVersion = new ServiceVersion(ServiceType.CSW, "2.0.2");
+                if (request.getVersion().equals(Parameters.CSW_202_VERSION)) {
+                    this.actingVersion = new ServiceVersion(ServiceType.CSW, Parameters.CSW_202_VERSION);
                 } else if (request.getVersion().equals("2.0.0") && (request instanceof GetDomain)) {
                     this.actingVersion = new ServiceVersion(ServiceType.CSW, "2.0.0");
 
@@ -1836,7 +1842,7 @@ public class CSWworker {
         if (format != null && isSupportedFormat(format)) {
             outputFormat = format;
         } else if (format != null && !isSupportedFormat(format)) {
-            StringBuilder supportedFormat = new StringBuilder();
+            final StringBuilder supportedFormat = new StringBuilder();
             for (String s: ACCEPTED_OUTPUT_FORMATS) {
                 supportedFormat.append(s).append('\n');
             } 

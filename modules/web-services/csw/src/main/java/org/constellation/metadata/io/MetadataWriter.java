@@ -50,7 +50,7 @@ public abstract class MetadataWriter {
     /**
      * A debugging logger.
      */
-    protected static Logger LOGGER = Logger.getLogger("org.constellation.metadata");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
     
     /**
      * Record the date format in the metadata.
@@ -132,6 +132,7 @@ public abstract class MetadataWriter {
                         case 2: methodName = "getId";
                                 nameGetter = obj.getClass().getMethod(methodName);
                                 break;
+                        default: break;
                     }
                 
                 
@@ -232,6 +233,7 @@ public abstract class MetadataWriter {
                         case 2: methodName = "getFileIdentifier";
                                 nameGetter = obj.getClass().getMethod(methodName);
                                 break;
+                        default: break;
                     }
 
 

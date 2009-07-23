@@ -54,7 +54,7 @@ public abstract class SpatialFilter extends Filter {
      */
     private static final long serialVersionUID = -1337271653030261124L;
 
-    Logger logger = Logger.getLogger("org.constellation.lucene.filter");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.lucene.filter");
     
     /**
      * The envelope were we search results.
@@ -153,7 +153,7 @@ public abstract class SpatialFilter extends Filter {
             if (f != null)
                 s = f.stringValue();
         
-            logger.severe("Unable to read the bouding box(minx="+ minx +" miny=" + miny + " maxx=" + maxx + " maxy=" + maxy + ")for the Document:" + s + '\n' +
+            LOGGER.severe("Unable to read the bouding box(minx="+ minx +" miny=" + miny + " maxx=" + maxx + " maxy=" + maxy + ")for the Document:" + s + '\n' +
                           "cause: " + e.getMessage());
             e.printStackTrace();
         }
@@ -168,11 +168,11 @@ public abstract class SpatialFilter extends Filter {
                     result.setCoordinateReferenceSystem(sourceCRS);
                     String boxbefore = result.toString(); 
                     if (!CRS.equalsIgnoreMetadata(sourceCRS, geometryCRS)) {
-                        logger.finer("sourceCRS:" + sourceCRS + '\n' +
+                        LOGGER.finer("sourceCRS:" + sourceCRS + '\n' +
                                     "geometryCRS:" + geometryCRS + '\n' +
                                     "equals? " + CRS.equalsIgnoreMetadata(sourceCRS, geometryCRS)); 
                         result = (GeneralEnvelope) GeometricUtilities.reprojectGeometry(geometryCRSName, sourceCRSName, result);
-                        logger.finer("reprojecting from " + sourceCRSName + " to " + geometryCRSName + '\n' +
+                        LOGGER.finer("reprojecting from " + sourceCRSName + " to " + geometryCRSName + '\n' +
                                     "bbox before: " + boxbefore + '\n' +
                                     "bbox after : " + result.toString());
                     }
@@ -180,11 +180,11 @@ public abstract class SpatialFilter extends Filter {
             }
         
         } catch (NoSuchAuthorityCodeException ex) {
-            logger.severe("No such Authority exception while reading boundingBox:" + ex.getAuthority() + ':' + ex.getAuthorityCode());
+            LOGGER.severe("No such Authority exception while reading boundingBox:" + ex.getAuthority() + ':' + ex.getAuthorityCode());
         } catch (FactoryException ex) {
-            logger.severe("Factory exception while reading boundingBox");
+            LOGGER.severe("Factory exception while reading boundingBox");
         }  catch (TransformException ex) {
-            logger.severe("Transform exception while reading boundingBox");
+            LOGGER.severe("Transform exception while reading boundingBox");
         }
 
         return result;
@@ -220,11 +220,11 @@ public abstract class SpatialFilter extends Filter {
             }
         
         } catch (NoSuchAuthorityCodeException ex) {
-            logger.severe("No such Authority exception while reading boundingBox");
+            LOGGER.severe("No such Authority exception while reading boundingBox");
         } catch (FactoryException ex) {
-            logger.severe("Factory exception while reading boundingBox");
+            LOGGER.severe("Factory exception while reading boundingBox");
         }  catch (TransformException ex) {
-            logger.severe("Transform exception while reading boundingBox");
+            LOGGER.severe("Transform exception while reading boundingBox");
         }
         
         return result;
@@ -263,11 +263,11 @@ public abstract class SpatialFilter extends Filter {
             }
         
         } catch (NoSuchAuthorityCodeException ex) {
-            logger.severe("No such Authority exception while reading boundingBox");
+            LOGGER.severe("No such Authority exception while reading boundingBox");
         } catch (FactoryException ex) {
-            logger.severe("Factory exception while reading boundingBox");
+            LOGGER.severe("Factory exception while reading boundingBox");
         }  catch (TransformException ex) {
-            logger.severe("Transform exception while reading boundingBox");
+            LOGGER.severe("Transform exception while reading boundingBox");
         }
         
         return result; 

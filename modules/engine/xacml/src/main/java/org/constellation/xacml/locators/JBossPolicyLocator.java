@@ -47,7 +47,7 @@ public class JBossPolicyLocator implements PolicyLocator, ContextMapOp {
     
     private PolicyFinderModule policyFinderModule;
 
-    private Logger logger = Logger.getLogger("org.constellation.xacml.locators"); 
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.xacml.locators");
     
     /**
      * Build a new Policy locator.
@@ -71,22 +71,22 @@ public class JBossPolicyLocator implements PolicyLocator, ContextMapOp {
     public void setPolicies(Set<XACMLPolicy> policies) {
         for (XACMLPolicy xp : policies) {
             if (xp.getType() == XACMLPolicy.POLICY) {
-                Policy p = (Policy) xp.get(XACMLConstants.UNDERLYING_POLICY);
+                final Policy p = (Policy) xp.get(XACMLConstants.UNDERLYING_POLICY);
                 policyFinderModule =  new WrapperPolicyFinderModule(p);
                 
             } else if (xp.getType() == XACMLPolicy.POLICYSET){
-                PolicySet ps = (PolicySet) xp.get(XACMLConstants.UNDERLYING_POLICY);
+                final PolicySet ps = (PolicySet) xp.get(XACMLConstants.UNDERLYING_POLICY);
                 
-                List<AbstractPolicy> poli = new ArrayList<AbstractPolicy>();
+                final List<AbstractPolicy> poli = new ArrayList<AbstractPolicy>();
                 for (XACMLPolicy xp2 : xp.getEnclosingPolicies()) {
-                    Policy p = (Policy) xp2.get(XACMLConstants.UNDERLYING_POLICY);
+                    final Policy p = (Policy) xp2.get(XACMLConstants.UNDERLYING_POLICY);
                     poli.add(p);
                 }
                 policyFinderModule = new PolicySetFinderModule(ps, poli);
                 
                 
             } else {
-                logger.info("unexpected Policy type:" + xp.getType());
+                LOGGER.info("unexpected Policy type:" + xp.getType());
             }
         }
         this.map.put(XACMLConstants.POLICY_FINDER_MODULE.key, policyFinderModule);

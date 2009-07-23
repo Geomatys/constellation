@@ -39,6 +39,7 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -87,12 +88,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
     /**
      * A date Formater.
      */
-    protected static  List<DateFormat> dateFormats;
+    protected static final List<DateFormat> DATE_FORMATS;
     static {
-        dateFormats = new ArrayList<DateFormat>();
-        dateFormats.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
-        dateFormats.add(new SimpleDateFormat("yyyy-MM-dd"));
-        dateFormats.add(new SimpleDateFormat("yyyy"));
+        DATE_FORMATS = new ArrayList<DateFormat>();
+        DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+        DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd"));
+        DATE_FORMATS.add(new SimpleDateFormat("yyyy"));
     }
     
     /**
@@ -133,7 +134,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
     /**
      * A flag mode indicating we are searching the database for contacts.
      */
-    private static int CONTACT = 10;
+    private static final int CONTACT = 10;
 
     /**
      * Shared Thread Pool for parralele execution
@@ -265,7 +266,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
             Query mainQuery    = configuration.getQueries().getMain().getQuery();
             mainStatement      = connection.prepareStatement(mainQuery.buildSQLQuery());
         } else {
-            logger.severe("The configuration file is malformed, unable to reach the main query");
+            LOGGER.severe("The configuration file is malformed, unable to reach the main query");
         }
         
         singleStatements   = new HashMap<PreparedStatement, List<String>>();
@@ -284,12 +285,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
                         }
                     }
                     String textQuery = query.buildSQLQuery();
-                    logger.finer("new Single query: " + textQuery);
+                    LOGGER.finer("new Single query: " + textQuery);
                     PreparedStatement stmt =  connection.prepareStatement(textQuery);
                     singleStatements.put(stmt, varNames);
                 }
             } else {
-                logger.severe("The configuration file is probably malformed, there is no single query.");
+                LOGGER.severe("The configuration file is probably malformed, there is no single query.");
             }
             
             // initialize the multiple statements
@@ -306,10 +307,10 @@ public abstract class GenericMetadataReader extends MetadataReader {
                     multipleStatements.put(stmt, varNames);
                 }
             } else {
-                logger.severe("The configuration file is probably malformed, there is no single query.");
+                LOGGER.severe("The configuration file is probably malformed, there is no single query.");
             }
         } else {
-            logger.severe("The configuration file is probably malformed, there is no queries part.");
+            LOGGER.severe("The configuration file is probably malformed, there is no queries part.");
         }
     }
 
@@ -320,7 +321,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         Map<String, ResponsibleParty> results = new HashMap<String, ResponsibleParty>();
         if (contactDirectory.isDirectory()) {
             if (contactDirectory.listFiles().length == 0) {
-                logger.severe("the contacts folder is empty :" + contactDirectory.getPath());
+                LOGGER.severe("the contacts folder is empty :" + contactDirectory.getPath());
             }
             for (File f : contactDirectory.listFiles()) {
                 if (f.getName().startsWith("EDMO.") && f.getName().endsWith(".xml")) {
@@ -335,8 +336,8 @@ public abstract class GenericMetadataReader extends MetadataReader {
                             results.put(code, contact);
                         }
                     } catch (JAXBException ex) {
-                        logger.severe("Unable to unmarshall the contact file : " + f.getPath());
-                        ex.printStackTrace();
+                        LOGGER.severe("Unable to unmarshall the contact file : " + f.getPath());
+                        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                     } finally {
                         if (unmarshaller != null) {
                             marshallerPool.release(unmarshaller);
@@ -433,7 +434,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @param identifier
      */
     private void loadData(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
-        logger.finer("loading data for " + identifier);
+        LOGGER.finer("loading data for " + identifier);
         singleValue.clear();
         multipleValue.clear();
 
@@ -467,7 +468,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
                         if (!subMultiStmts.contains(stmt))
                             subMultiStmts.add(stmt);
                     } else {
-                        logger.severe("no statement found for variable: " + var);
+                        LOGGER.severe("no statement found for variable: " + var);
                     }
                 }
             }
@@ -486,14 +487,14 @@ public abstract class GenericMetadataReader extends MetadataReader {
     public void reloadConnection() throws CstlServiceException {
         if (!isReconnecting) {
             try {
-               logger.info("refreshing the connection");
+               LOGGER.info("refreshing the connection");
                BDD db          = configuration.getBdd();
                this.connection = db.getConnection();
                initStatement();
                isReconnecting = false;
 
             } catch(SQLException ex) {
-                logger.severe("SQLException while restarting the connection:" + ex);
+                LOGGER.severe("SQLException while restarting the connection:" + ex);
                 isReconnecting = false;
             }
         }
@@ -569,12 +570,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
             try {
                 cs.take().get();
             } catch (InterruptedException ex) {
-               logger.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
+               LOGGER.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-                if (ex.getCause() != null && ex.getCause() instanceof CstlServiceException) {
+                if (ex.getCause() instanceof CstlServiceException) {
                     throw (CstlServiceException) ex.getCause();
                 } else {
-                    logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
+                    LOGGER.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
                 }
             }
         }
@@ -603,19 +604,19 @@ public abstract class GenericMetadataReader extends MetadataReader {
             try {
                 cs.take().get();
             } catch (InterruptedException ex) {
-               logger.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
+               LOGGER.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-                if (ex.getCause() != null && ex.getCause() instanceof CstlServiceException) {
+                if (ex.getCause() instanceof CstlServiceException) {
                     throw (CstlServiceException) ex.getCause();
                 } else {
-                    logger.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
+                    LOGGER.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
                 }
             }
         }
     }
 
     private void fillSingleValues(PreparedStatement stmt) throws SQLException {
-        ResultSet result = stmt.executeQuery();
+        final ResultSet result = stmt.executeQuery();
         if (result.next()) {
             for (String varName : singleStatements.get(stmt)) {
                 singleValue.put(varName, result.getString(varName));
@@ -625,7 +626,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
     }
 
     private void fillMultipleValues(PreparedStatement stmt) throws SQLException {
-        ResultSet result = stmt.executeQuery();
+        final ResultSet result = stmt.executeQuery();
         for (String varName : multipleStatements.get(stmt)) {
             multipleValue.put(varName, new ArrayList<String>());
         }
@@ -645,16 +646,16 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @param ex
      */
     public void logSqlError(List<String> varList, SQLException ex) {
-        String varlist = "";
+        StringBuilder varlist = new StringBuilder();
         if (varList != null) {
             for (String s : varList) {
-                varlist += s + ',';
+                varlist.append(s).append(',');
             }
         } else {
-            varlist = "no variables";
+            varlist.append("no variables");
         }
-        logger.severe("SQLException while executing query: " + ex.getMessage() + '\n' +
-                      "for variable: " + varlist);
+        LOGGER.severe("SQLException while executing query: " + ex.getMessage() + '\n' +
+                      "for variable: " + varlist.toString());
     }
     
     /**
@@ -764,7 +765,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         Date d = parseDate(date);
         if (d != null)
             revisionDate.setDate(d);
-        else logger.finer("revision date null: " + date);
+        else LOGGER.finer("revision date null: " + date);
         return revisionDate;
     }
     
@@ -780,7 +781,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         Date d = parseDate(date);
         if (d != null)
             revisionDate.setDate(d);
-        else logger.finer("publication date null: " + date);
+        else LOGGER.finer("publication date null: " + date);
         return revisionDate;
     }
 
@@ -791,8 +792,8 @@ public abstract class GenericMetadataReader extends MetadataReader {
         if (date == null)
             return null;
         int i = 0;
-        while (i < dateFormats.size()) {
-            DateFormat dateFormat = dateFormats.get(i);
+        while (i < DATE_FORMATS.size()) {
+            DateFormat dateFormat = DATE_FORMATS.get(i);
             try {
                 Date d;
                 synchronized (dateFormat) {
@@ -803,7 +804,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 i++;
             }
         }
-        logger.severe("unable to parse the date: " + date);
+        LOGGER.severe("unable to parse the date: " + date);
         return null;
     }
     
@@ -816,18 +817,18 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      */
     protected List<GeographicExtent> createGeographicExtent(String westVar, String eastVar, String southVar, String northVar) {
-        List<GeographicExtent> result = new ArrayList<GeographicExtent>();
+        final List<GeographicExtent> result = new ArrayList<GeographicExtent>();
         
-        List<String> w = getVariables(westVar);
-        List<String> e = getVariables(eastVar);
-        List<String> s = getVariables(southVar);
-        List<String> n = getVariables(northVar);
+        final List<String> w = getVariables(westVar);
+        final List<String> e = getVariables(eastVar);
+        final List<String> s = getVariables(southVar);
+        final List<String> n = getVariables(northVar);
         if (w == null || e == null || s == null || n == null) {
-            logger.severe("One or more extent coordinates are null");
+            LOGGER.severe("One or more extent coordinates are null");
             return result;
         }
         if (!(w.size() == e.size() &&  e.size() == s.size() && s.size() == n.size())) {
-            logger.severe("There is not the same number of geographic extent coordinates");
+            LOGGER.severe("There is not the same number of geographic extent coordinates");
             return result;
         }
         int size = w.size();
@@ -870,7 +871,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
                     north = south;
                 }
             } catch (NumberFormatException ex) {
-                logger.severe("Number format exception while parsing boundingBox: " + '\n' +
+                LOGGER.severe("Number format exception while parsing boundingBox: " + '\n' +
                         "current box: " + westValue + ',' + eastValue + ',' + southValue + ',' + northValue);
             }
             GeographicExtent geo = new DefaultGeographicBoundingBox(west, east, south, north);
@@ -888,18 +889,18 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      */
     protected List<BoundingBoxType> createBoundingBoxes(String westVar, String eastVar, String southVar, String northVar) {
-        List<BoundingBoxType> result = new ArrayList<BoundingBoxType>();
+        final List<BoundingBoxType> result = new ArrayList<BoundingBoxType>();
         
-        List<String> w = getVariables(westVar);
-        List<String> e = getVariables(eastVar);
-        List<String> s = getVariables(southVar);
-        List<String> n = getVariables(northVar);
+        final List<String> w = getVariables(westVar);
+        final List<String> e = getVariables(eastVar);
+        final List<String> s = getVariables(southVar);
+        final List<String> n = getVariables(northVar);
         if (w == null || e == null || s == null || n == null) {
-            logger.severe("One or more BBOX coordinates are null");
+            LOGGER.severe("One or more BBOX coordinates are null");
             return result;
         }
         if (!(w.size() == e.size() &&  e.size() == s.size() && s.size() == n.size())) {
-            logger.severe("There is not the same number of geographic BBOX coordinates");
+            LOGGER.severe("There is not the same number of geographic BBOX coordinates");
             return result;
         }
         int size = w.size();
@@ -927,7 +928,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
                     north = south;
                 }
             } catch (NumberFormatException ex) {
-                logger.severe("Number format exception while parsing boundingBox: " + '\n' +
+                LOGGER.severe("Number format exception while parsing boundingBox: " + '\n' +
                         "current box: " + w.get(i) + ',' + e.get(i) + ',' + s.get(i) + ',' + n.get(i));
             }
             //TODO CRS
@@ -944,8 +945,8 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @throws java.sql.SQLException
      */
     public List<DefaultMetaData> getAllEntries() throws CstlServiceException {
-        List<DefaultMetaData> result = new ArrayList<DefaultMetaData>();
-        List<String> identifiers  = getAllIdentifiers();
+        final List<DefaultMetaData> result = new ArrayList<DefaultMetaData>();
+        final List<String> identifiers  = getAllIdentifiers();
         for (String id : identifiers) {
             result.add((DefaultMetaData) getMetadata(id, ISO_19115, ElementSetType.FULL, null));
         }
@@ -958,7 +959,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      */
     private List<String> getAllIdentifiers() throws CstlServiceException {
-        List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<String>();
         try {
             ResultSet res = mainStatement.executeQuery();
             while (res.next()) {
@@ -977,8 +978,8 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @throws org.constellation.ws.CstlServiceException
      */
     public List<String> getAllContactID() throws CstlServiceException {
-        List<String> results = new ArrayList<String>();
-        List<String> identifiers = getAllIdentifiers();
+        final List<String> results = new ArrayList<String>();
+        final List<String> identifiers = getAllIdentifiers();
         for (String id : identifiers) {
             loadData(id, CONTACT, null, null);
             for(String var: getVariablesForContact()) {
@@ -1006,7 +1007,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
     }
     
     @Override
-    public List<String> executeEbrimSQLQuery(String SQLQuery) throws CstlServiceException {
+    public List<String> executeEbrimSQLQuery(String sqlQuery) throws CstlServiceException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
@@ -1033,12 +1034,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
             connection.close();
             pool.shutdown();
         } catch (SQLException ex) {
-            logger.severe("SQLException while destroying Generic metadata reader");
+            LOGGER.severe("SQLException while destroying Generic metadata reader");
         }
         singleValue.clear();
         multipleValue.clear();
         contacts.clear();
-        logger.info("destroying generic metadata reader");
+        LOGGER.info("destroying generic metadata reader");
     }
             
 }

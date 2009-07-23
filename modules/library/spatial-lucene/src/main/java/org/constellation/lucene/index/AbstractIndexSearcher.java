@@ -128,7 +128,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
         File indexDirectory = getFileDirectory();
         IndexReader ireader = IndexReader.open(indexDirectory);
         searcher   = new IndexSearcher(ireader);
-        logger.info("Creating new Index Searcher with index directory:" + indexDirectory.getPath());
+        LOGGER.info("Creating new Index Searcher with index directory:" + indexDirectory.getPath());
        
     }
 
@@ -141,7 +141,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             String metadataID = getMatchingID(searcher.doc(i));
             identifiers.add(i, metadataID);
         }
-        logger.info(identifiers.size() + " records founded.");
+        LOGGER.info(identifiers.size() + " records founded.");
     }
 
     /**
@@ -154,7 +154,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             initSearcher();
             initIdentifiersList();
             cachedQueries.clear();
-            logger.info("refreshing index searcher");
+            LOGGER.info("refreshing index searcher");
         } catch (ParseException ex) {
             throw new IndexingException("Parse exception encountered during refreshing the index", ex);
         } catch (SearchingException ex) {
@@ -200,13 +200,13 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             //we look for a cached Query
             if (isCacheEnabled && cachedQueries.containsKey(spatialQuery)) {
                 results = cachedQueries.get(spatialQuery);
-                logger.info("returning result from cache (" + results.size() + " matching documents)");
+                LOGGER.info("returning result from cache (" + results.size() + " matching documents)");
                 return results;
             }
 
             int maxRecords = searcher.maxDoc();
             if (maxRecords == 0) {
-                logger.severe("The index seems to be empty.");
+                LOGGER.severe("The index seems to be empty.");
                 maxRecords = 1;
             }
 
@@ -232,7 +232,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             if (filter != null) {
                 f = filter.toString();
             }
-            logger.info("Searching for: " + query.toString(field) + '\n' + SerialChainFilter.ValueOf(operator) + '\n' + f + '\n' + sorted + '\n' + "max records: " + maxRecords);
+            LOGGER.info("Searching for: " + query.toString(field) + '\n' + SerialChainFilter.ValueOf(operator) + '\n' + f + '\n' + sorted + '\n' + "max records: " + maxRecords);
 
             // simple query with an AND
             if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && filter == null)) {
@@ -311,7 +311,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             //we put the query in cache
             putInCache(spatialQuery, results);
             
-            logger.info(results.size() + " total matching documents (" + (System.currentTimeMillis() - start) + "ms)");
+            LOGGER.info(results.size() + " total matching documents (" + (System.currentTimeMillis() - start) + "ms)");
             return results;
         } catch (ParseException ex) {
             throw new SearchingException("Parse Exception while performing lucene request", ex);
@@ -345,7 +345,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
             if (searcher != null)
                 searcher.close();
         } catch (IOException ex) {
-            logger.info("IOException while closing the indexer");
+            LOGGER.info("IOException while closing the indexer");
         }
     }
 

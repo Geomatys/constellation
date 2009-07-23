@@ -66,7 +66,7 @@ import org.mdweb.utils.GlobalUtils;
  */
 public abstract class AbstractCSWConfigurer {
     
-    protected Logger LOGGER = Logger.getLogger("org.constellation.configuration.ws.rs");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.configuration.ws.rs");
     
     /**
      * A container notifier allowing to restart the webService. 
@@ -86,7 +86,7 @@ public abstract class AbstractCSWConfigurer {
     /**
      * A CSW factory
      */
-    private AbstractCSWFactory CSWfactory;
+    private AbstractCSWFactory cswfactory;
 
     /**
      * Build a new CSW configurer.
@@ -97,21 +97,21 @@ public abstract class AbstractCSWConfigurer {
     public AbstractCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
         this.containerNotifier = cn;
 
-        File cswConfigDir = getConfigurationDirectory();
+        final File cswConfigDir = getConfigurationDirectory();
         if (cswConfigDir == null || (cswConfigDir != null && !cswConfigDir.isDirectory())) {
             throw new ConfigurationException("No configuration directory have been found");
         }
         
         try {
-            MarshallerPool pool = new MarshallerPool("org.constellation.generic.database");
-            Unmarshaller configUnmarshaller = pool.acquireUnmarshaller();
-            CSWfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
+            final MarshallerPool pool = new MarshallerPool("org.constellation.generic.database");
+            final Unmarshaller configUnmarshaller = pool.acquireUnmarshaller();
+            cswfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
 
             for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(null))) {
                 //we get the csw ID (if single mode return "")
-                String id = getConfigID(configFile);
+                final String id = getConfigID(configFile);
                 // we get the CSW configuration file
-                Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
+                final Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
                 config.setConfigurationDirectory(cswConfigDir);
                 serviceConfiguration.put(id, config);
             }
@@ -139,14 +139,13 @@ public abstract class AbstractCSWConfigurer {
     protected AbstractIndexer initIndexer(String serviceID, MetadataReader currentReader) throws CstlServiceException {
 
         // we get the CSW configuration file
-        Automatic config = serviceConfiguration.get(serviceID);
+        final Automatic config = serviceConfiguration.get(serviceID);
         if (config != null) {
             try {
                 if (currentReader == null) {
-                    currentReader = CSWfactory.getMetadataReader(config);
+                    currentReader = cswfactory.getMetadataReader(config);
                 }
-                AbstractIndexer indexer = CSWfactory.getIndexer(config, currentReader, serviceID);
-                return indexer;
+                return cswfactory.getIndexer(config, currentReader, serviceID);
 
             } catch (IndexingException ex) {
                 throw new CstlServiceException("An eception occurs while initializing the indexer!" + '\n' +
@@ -168,11 +167,10 @@ public abstract class AbstractCSWConfigurer {
     protected MetadataReader initReader(String serviceID) throws CstlServiceException {
 
         // we get the CSW configuration file
-        Automatic config = serviceConfiguration.get(serviceID);
+        final Automatic config = serviceConfiguration.get(serviceID);
         if (config != null) {
             try {
-                MetadataReader currentReader = CSWfactory.getMetadataReader(config);
-                return currentReader;
+                return cswfactory.getMetadataReader(config);
 
             } catch (CstlServiceException ex) {
                 throw new CstlServiceException("JAXBException while initializing the reader!", NO_APPLICABLE_CODE);
@@ -202,7 +200,7 @@ public abstract class AbstractCSWConfigurer {
     public AcknowlegementType refreshCascadedServers(CSWCascadingType request) throws CstlServiceException {
         LOGGER.info("refresh cascaded servers requested");
         
-        File cascadingFile = new File(getConfigurationDirectory(), "CSWCascading.properties");
+        final File cascadingFile = new File(getConfigurationDirectory(), "CSWCascading.properties");
         Properties prop;
         try {
             prop = Util.getPropertiesFromFile(cascadingFile);
@@ -410,10 +408,10 @@ public abstract class AbstractCSWConfigurer {
     private String getConfigID(File configFile) {
         if (configFile == null || (configFile != null && !configFile.exists()))
             return "";
-        String ID = configFile.getName();
-        if (ID.indexOf("config.xml") != -1) {
-            ID = ID.substring(0, ID.indexOf("config.xml"));
-            return ID;
+        String id = configFile.getName();
+        if (id.indexOf("config.xml") != -1) {
+            id = id.substring(0, id.indexOf("config.xml"));
+            return id;
         }
         return "";
     }

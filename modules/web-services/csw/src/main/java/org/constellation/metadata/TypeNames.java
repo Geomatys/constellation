@@ -47,55 +47,55 @@ public class TypeNames {
     /**
      * some QName for ebrim 3.0 types
      */
-    protected static final QName _ExtrinsicObject_QNAME      = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ExtrinsicObject");
-    protected static final QName _RegistryPackage_QNAME      = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "RegistryPackage");
-    protected static final QName _SpecificationLink_QNAME    = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "SpecificationLink");
-    protected static final QName _RegistryObject_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "RegistryObject");
-    protected static final QName _Association_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Association");
-    protected static final QName _AdhocQuery_QNAME           = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "AdhocQuery");
-    protected static final QName _User_QNAME                 = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "User");
-    protected static final QName _ClassificationNode_QNAME   = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ClassificationNode");
-    protected static final QName _AuditableEvent_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "AuditableEvent");
-    protected static final QName _Federation_QNAME           = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Federation");
-    protected static final QName _Subscription_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Subscription");
-    protected static final QName _ObjectRefList_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ObjectRefList");
-    protected static final QName _Classification_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Classification");
-    protected static final QName _Person_QNAME               = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Person");
-    protected static final QName _ServiceBinding_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ServiceBinding");
-    protected static final QName _Notification_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Notification");
-    protected static final QName _ClassificationScheme_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ClassificationScheme");
-    protected static final QName _Service_QNAME              = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Service");
-    protected static final QName _ExternalIdentifier_QNAME   = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ExternalIdentifier");
-    protected static final QName _Registry_QNAME             = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Registry");
-    protected static final QName _Organization_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Organization");
-    protected static final QName _ExternalLink_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ExternalLink");
-    protected static final QName _WRSExtrinsicObject_QNAME   = new QName("http://www.opengis.net/cat/wrs/1.0",          "ExtrinsicObject");
+    protected static final QName EXTRINSIC_OBJECT_QNAME      = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ExtrinsicObject");
+    protected static final QName REGISTRY_PACKAGE_QNAME      = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "RegistryPackage");
+    protected static final QName SPECIFICATION_LINK_QNAME    = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "SpecificationLink");
+    protected static final QName REGISTRY_OBJECT_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "RegistryObject");
+    protected static final QName ASSOCIATION_QNAME           = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Association");
+    protected static final QName ADHOC_QUERY_QNAME           = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "AdhocQuery");
+    protected static final QName USER_QNAME                  = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "User");
+    protected static final QName CLASSIFICATION_NODE_QNAME   = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ClassificationNode");
+    protected static final QName AUDITABLE_EVENT_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "AuditableEvent");
+    protected static final QName FEDERATION_QNAME            = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Federation");
+    protected static final QName SUBSCRIPTION_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Subscription");
+    protected static final QName OBJECT_REF_LIST_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ObjectRefList");
+    protected static final QName CLASSIFICATION_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Classification");
+    protected static final QName PERSON_QNAME                = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Person");
+    protected static final QName SERVICE_BINDING_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ServiceBinding");
+    protected static final QName NOTIFICATION_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Notification");
+    protected static final QName CLASSIFICATION_SCHEME_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ClassificationScheme");
+    protected static final QName SERVICE_QNAME               = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Service");
+    protected static final QName EXTERNAL_IDENTIFIER_QNAME   = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ExternalIdentifier");
+    protected static final QName REGISTRY_QNAME              = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Registry");
+    protected static final QName ORGANIZATION_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "Organization");
+    protected static final QName EXTERNAL_LINK_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", "ExternalLink");
+    protected static final QName WRS_EXTRINSIC_OBJECT_QNAME  = new QName("http://www.opengis.net/cat/wrs/1.0",          "ExtrinsicObject");
     
     /**
      * some QName for ebrim 2.5 types
      */
-    protected static final QName _ExtrinsicObject25_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExtrinsicObject");
-    protected static final QName _Federation25_QNAME            = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Federation");
-    protected static final QName _ExternalLink25_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExternalLink");
-    protected static final QName _ClassificationNode25_QNAME    = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ClassificationNode");
-    protected static final QName _User25_QNAME                  = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "User");
-    protected static final QName _Classification25_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Classification");
-    protected static final QName _RegistryPackage25_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryPackage");
-    protected static final QName _RegistryObject25_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryObject");
-    protected static final QName _Association25_QNAME           = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Association");
-    protected static final QName _RegistryEntry25_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryEntry");
-    protected static final QName _ClassificationScheme25_QNAME  = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ClassificationScheme");
-    protected static final QName _Organization25_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Organization");
-    protected static final QName _ExternalIdentifier25_QNAME    = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExternalIdentifier");
-    protected static final QName _SpecificationLink25_QNAME     = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "SpecificationLink");
-    protected static final QName _Registry25_QNAME              = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Registry");
-    protected static final QName _ServiceBinding25_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ServiceBinding");
-    protected static final QName _Service25_QNAME               = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Service");
-    protected static final QName _AuditableEvent25_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "AuditableEvent");
-    protected static final QName _Subscription25_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Subscription");
-    protected static final QName _Geometry09_QNAME              = new QName("http://www.opengis.net/cat/wrs",              "Geometry");
-    protected static final QName _ApplicationModule09_QNAME     = new QName("http://www.opengis.net/cat/wrs",              "ApplicationModule");
-    protected static final QName _WRSExtrinsicObject09_QNAME    = new QName("http://www.opengis.net/cat/wrs",              "WRSExtrinsicObject");
+    protected static final QName EXTRINSIC_OBJECT_25_QNAME     = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExtrinsicObject");
+    protected static final QName FEDERATION25_QNAME            = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Federation");
+    protected static final QName EXTERNAL_LINK25_QNAME         = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExternalLink");
+    protected static final QName CLASSIFICATION_NODE25_QNAME   = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ClassificationNode");
+    protected static final QName USER25_QNAME                  = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "User");
+    protected static final QName CLASSIFICATION25_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Classification");
+    protected static final QName REGISTRY_PACKAGE25_QNAME      = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryPackage");
+    protected static final QName REGISTRY_OBJECT25_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryObject");
+    protected static final QName ASSOCIATION25_QNAME           = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Association");
+    protected static final QName REGISTRY_ENTRY25_QNAME        = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "RegistryEntry");
+    protected static final QName CLASSIFICATION_SCHEME25_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ClassificationScheme");
+    protected static final QName ORGANIZATION25_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Organization");
+    protected static final QName EXTERNAL_IDENTIFIER25_QNAME   = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExternalIdentifier");
+    protected static final QName SPECIFICATION_LINK25_QNAME    = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "SpecificationLink");
+    protected static final QName REGISTRY25_QNAME              = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Registry");
+    protected static final QName SERVICE_BINDING25_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ServiceBinding");
+    protected static final QName SERVICE25_QNAME               = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Service");
+    protected static final QName AUDITABLE_EVENT25_QNAME       = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "AuditableEvent");
+    protected static final QName SUBSCRIPTION25_QNAME          = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Subscription");
+    protected static final QName GEOMETRY09_QNAME              = new QName("http://www.opengis.net/cat/wrs",              "Geometry");
+    protected static final QName APPLICATION_MODULE09_QNAME    = new QName("http://www.opengis.net/cat/wrs",              "ApplicationModule");
+    protected static final QName WRS_EXTRINSIC_OBJECT09_QNAME  = new QName("http://www.opengis.net/cat/wrs",              "WRSExtrinsicObject");
 
     
     //iso 19115 typeNames
@@ -113,56 +113,56 @@ public class TypeNames {
     //ebrim v3.0 typeNames
     public static final List<QName> EBRIM30_TYPE_NAMES = new ArrayList<QName>();
     static {
-        EBRIM30_TYPE_NAMES.add(_AdhocQuery_QNAME);
-        EBRIM30_TYPE_NAMES.add(_Association_QNAME);
-        EBRIM30_TYPE_NAMES.add(_AuditableEvent_QNAME);
-        EBRIM30_TYPE_NAMES.add(_ClassificationNode_QNAME);
-        EBRIM30_TYPE_NAMES.add(_ClassificationScheme_QNAME);
-        EBRIM30_TYPE_NAMES.add(_Classification_QNAME);
-        EBRIM30_TYPE_NAMES.add(_ExternalIdentifier_QNAME);
-        EBRIM30_TYPE_NAMES.add(_ExternalLink_QNAME);
-        EBRIM30_TYPE_NAMES.add(_ExtrinsicObject_QNAME);
-        EBRIM30_TYPE_NAMES.add(_Federation_QNAME);
-        EBRIM30_TYPE_NAMES.add(_Notification_QNAME);
-        EBRIM30_TYPE_NAMES.add(_ObjectRefList_QNAME);
-        EBRIM30_TYPE_NAMES.add(_Person_QNAME);
-        EBRIM30_TYPE_NAMES.add(_Organization_QNAME);
-        EBRIM30_TYPE_NAMES.add(_RegistryObject_QNAME);
-        EBRIM30_TYPE_NAMES.add(_RegistryPackage_QNAME);
-        EBRIM30_TYPE_NAMES.add(_Registry_QNAME);
-        EBRIM30_TYPE_NAMES.add(_ServiceBinding_QNAME);
-        EBRIM30_TYPE_NAMES.add(_Service_QNAME);
-        EBRIM30_TYPE_NAMES.add(_SpecificationLink_QNAME);
-        EBRIM30_TYPE_NAMES.add(_Subscription_QNAME);
-        EBRIM30_TYPE_NAMES.add(_User_QNAME);
-        EBRIM30_TYPE_NAMES.add(_WRSExtrinsicObject_QNAME);
+        EBRIM30_TYPE_NAMES.add(ADHOC_QUERY_QNAME);
+        EBRIM30_TYPE_NAMES.add(ASSOCIATION_QNAME);
+        EBRIM30_TYPE_NAMES.add(AUDITABLE_EVENT_QNAME);
+        EBRIM30_TYPE_NAMES.add(CLASSIFICATION_NODE_QNAME);
+        EBRIM30_TYPE_NAMES.add(CLASSIFICATION_SCHEME_QNAME);
+        EBRIM30_TYPE_NAMES.add(CLASSIFICATION_QNAME);
+        EBRIM30_TYPE_NAMES.add(EXTERNAL_IDENTIFIER_QNAME);
+        EBRIM30_TYPE_NAMES.add(EXTERNAL_LINK_QNAME);
+        EBRIM30_TYPE_NAMES.add(EXTRINSIC_OBJECT_QNAME);
+        EBRIM30_TYPE_NAMES.add(FEDERATION_QNAME);
+        EBRIM30_TYPE_NAMES.add(NOTIFICATION_QNAME);
+        EBRIM30_TYPE_NAMES.add(OBJECT_REF_LIST_QNAME);
+        EBRIM30_TYPE_NAMES.add(PERSON_QNAME);
+        EBRIM30_TYPE_NAMES.add(ORGANIZATION_QNAME);
+        EBRIM30_TYPE_NAMES.add(REGISTRY_OBJECT_QNAME);
+        EBRIM30_TYPE_NAMES.add(REGISTRY_PACKAGE_QNAME);
+        EBRIM30_TYPE_NAMES.add(REGISTRY_QNAME);
+        EBRIM30_TYPE_NAMES.add(SERVICE_BINDING_QNAME);
+        EBRIM30_TYPE_NAMES.add(SERVICE_QNAME);
+        EBRIM30_TYPE_NAMES.add(SPECIFICATION_LINK_QNAME);
+        EBRIM30_TYPE_NAMES.add(SUBSCRIPTION_QNAME);
+        EBRIM30_TYPE_NAMES.add(USER_QNAME);
+        EBRIM30_TYPE_NAMES.add(WRS_EXTRINSIC_OBJECT_QNAME);
     }
     
     //ebrim v2.5 typenames
     public static final List<QName> EBRIM25_TYPE_NAMES = new ArrayList<QName>();
     static {
-        EBRIM25_TYPE_NAMES.add(_ExtrinsicObject25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_Federation25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_ExternalLink25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_ClassificationNode25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_User25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_Classification25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_RegistryPackage25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_RegistryObject25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_Association25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_RegistryEntry25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_ClassificationScheme25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_Organization25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_ExternalIdentifier25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_SpecificationLink25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_Registry25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_ServiceBinding25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_Service25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_AuditableEvent25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_Subscription25_QNAME);
-        EBRIM25_TYPE_NAMES.add(_Geometry09_QNAME);
-        EBRIM25_TYPE_NAMES.add(_ApplicationModule09_QNAME);
-        EBRIM25_TYPE_NAMES.add(_WRSExtrinsicObject09_QNAME);
+        EBRIM25_TYPE_NAMES.add(EXTRINSIC_OBJECT_25_QNAME);
+        EBRIM25_TYPE_NAMES.add(FEDERATION25_QNAME);
+        EBRIM25_TYPE_NAMES.add(EXTERNAL_LINK25_QNAME);
+        EBRIM25_TYPE_NAMES.add(CLASSIFICATION_NODE25_QNAME);
+        EBRIM25_TYPE_NAMES.add(USER25_QNAME);
+        EBRIM25_TYPE_NAMES.add(CLASSIFICATION25_QNAME);
+        EBRIM25_TYPE_NAMES.add(REGISTRY_PACKAGE25_QNAME);
+        EBRIM25_TYPE_NAMES.add(REGISTRY_OBJECT25_QNAME);
+        EBRIM25_TYPE_NAMES.add(ASSOCIATION25_QNAME);
+        EBRIM25_TYPE_NAMES.add(REGISTRY_ENTRY25_QNAME);
+        EBRIM25_TYPE_NAMES.add(CLASSIFICATION_SCHEME25_QNAME);
+        EBRIM25_TYPE_NAMES.add(ORGANIZATION25_QNAME);
+        EBRIM25_TYPE_NAMES.add(EXTERNAL_IDENTIFIER25_QNAME);
+        EBRIM25_TYPE_NAMES.add(SPECIFICATION_LINK25_QNAME);
+        EBRIM25_TYPE_NAMES.add(REGISTRY25_QNAME);
+        EBRIM25_TYPE_NAMES.add(SERVICE_BINDING25_QNAME);
+        EBRIM25_TYPE_NAMES.add(SERVICE25_QNAME);
+        EBRIM25_TYPE_NAMES.add(AUDITABLE_EVENT25_QNAME);
+        EBRIM25_TYPE_NAMES.add(SUBSCRIPTION25_QNAME);
+        EBRIM25_TYPE_NAMES.add(GEOMETRY09_QNAME);
+        EBRIM25_TYPE_NAMES.add(APPLICATION_MODULE09_QNAME);
+        EBRIM25_TYPE_NAMES.add(WRS_EXTRINSIC_OBJECT09_QNAME);
     }
 
     /**
@@ -173,28 +173,28 @@ public class TypeNames {
      */
     public static final boolean containsOneOfEbrim25(final List<QName> qnames) {
 
-        if (qnames.contains(_ExtrinsicObject25_QNAME)
-         || qnames.contains(_Federation25_QNAME)
-         || qnames.contains(_ExternalLink25_QNAME)
-         || qnames.contains(_ClassificationNode25_QNAME)
-         || qnames.contains(_User25_QNAME)
-         || qnames.contains(_Classification25_QNAME)
-         || qnames.contains(_RegistryPackage25_QNAME)
-         || qnames.contains(_RegistryObject25_QNAME)
-         || qnames.contains(_Association25_QNAME)
-         || qnames.contains(_RegistryEntry25_QNAME)
-         || qnames.contains(_ClassificationScheme25_QNAME)
-         || qnames.contains(_Organization25_QNAME)
-         || qnames.contains(_ExternalIdentifier25_QNAME)
-         || qnames.contains(_SpecificationLink25_QNAME)
-         || qnames.contains(_Registry25_QNAME)
-         || qnames.contains(_ServiceBinding25_QNAME)
-         || qnames.contains(_Service25_QNAME)
-         || qnames.contains(_AuditableEvent25_QNAME)
-         || qnames.contains(_Subscription25_QNAME)
-         || qnames.contains(_Geometry09_QNAME)
-         || qnames.contains(_ApplicationModule09_QNAME)
-         || qnames.contains(_WRSExtrinsicObject09_QNAME))
+        if (qnames.contains(EXTRINSIC_OBJECT_25_QNAME)
+         || qnames.contains(FEDERATION25_QNAME)
+         || qnames.contains(EXTERNAL_LINK25_QNAME)
+         || qnames.contains(CLASSIFICATION_NODE25_QNAME)
+         || qnames.contains(USER25_QNAME)
+         || qnames.contains(CLASSIFICATION25_QNAME)
+         || qnames.contains(REGISTRY_PACKAGE25_QNAME)
+         || qnames.contains(REGISTRY_OBJECT25_QNAME)
+         || qnames.contains(ASSOCIATION25_QNAME)
+         || qnames.contains(REGISTRY_ENTRY25_QNAME)
+         || qnames.contains(CLASSIFICATION_SCHEME25_QNAME)
+         || qnames.contains(ORGANIZATION25_QNAME)
+         || qnames.contains(EXTERNAL_IDENTIFIER25_QNAME)
+         || qnames.contains(SPECIFICATION_LINK25_QNAME)
+         || qnames.contains(REGISTRY25_QNAME)
+         || qnames.contains(SERVICE_BINDING25_QNAME)
+         || qnames.contains(SERVICE25_QNAME)
+         || qnames.contains(AUDITABLE_EVENT25_QNAME)
+         || qnames.contains(SUBSCRIPTION25_QNAME)
+         || qnames.contains(GEOMETRY09_QNAME)
+         || qnames.contains(APPLICATION_MODULE09_QNAME)
+         || qnames.contains(WRS_EXTRINSIC_OBJECT09_QNAME))
             return true;
         return false;
     }
@@ -207,29 +207,29 @@ public class TypeNames {
      */
     public static final boolean containsOneOfEbrim30(final List<QName> qnames) {
 
-        if (qnames.contains(_AdhocQuery_QNAME)
-         || qnames.contains(_Association_QNAME)
-         || qnames.contains(_AuditableEvent_QNAME)
-         || qnames.contains(_ClassificationNode_QNAME)
-         || qnames.contains(_ClassificationScheme_QNAME)
-         || qnames.contains(_Classification_QNAME)
-         || qnames.contains(_ExternalIdentifier_QNAME)
-         || qnames.contains(_ExternalLink_QNAME)
-         || qnames.contains(_ExtrinsicObject_QNAME)
-         || qnames.contains(_Federation_QNAME)
-         || qnames.contains(_Notification_QNAME)
-         || qnames.contains(_ObjectRefList_QNAME)
-         || qnames.contains(_Person_QNAME)
-         || qnames.contains(_Organization_QNAME)
-         || qnames.contains(_RegistryObject_QNAME)
-         || qnames.contains(_RegistryPackage_QNAME)
-         || qnames.contains(_Registry_QNAME)
-         || qnames.contains(_ServiceBinding_QNAME)
-         || qnames.contains(_Service_QNAME)
-         || qnames.contains(_SpecificationLink_QNAME)
-         || qnames.contains(_Subscription_QNAME)
-         || qnames.contains(_User_QNAME)
-         || qnames.contains(_WRSExtrinsicObject_QNAME))
+        if (qnames.contains(ADHOC_QUERY_QNAME)
+         || qnames.contains(ASSOCIATION_QNAME)
+         || qnames.contains(AUDITABLE_EVENT_QNAME)
+         || qnames.contains(CLASSIFICATION_NODE_QNAME)
+         || qnames.contains(CLASSIFICATION_SCHEME_QNAME)
+         || qnames.contains(CLASSIFICATION_QNAME)
+         || qnames.contains(EXTERNAL_IDENTIFIER_QNAME)
+         || qnames.contains(EXTERNAL_LINK_QNAME)
+         || qnames.contains(EXTRINSIC_OBJECT_QNAME)
+         || qnames.contains(FEDERATION_QNAME)
+         || qnames.contains(NOTIFICATION_QNAME)
+         || qnames.contains(OBJECT_REF_LIST_QNAME)
+         || qnames.contains(PERSON_QNAME)
+         || qnames.contains(ORGANIZATION_QNAME)
+         || qnames.contains(REGISTRY_OBJECT_QNAME)
+         || qnames.contains(REGISTRY_PACKAGE_QNAME)
+         || qnames.contains(REGISTRY_QNAME)
+         || qnames.contains(SERVICE_BINDING_QNAME)
+         || qnames.contains(SERVICE_QNAME)
+         || qnames.contains(SPECIFICATION_LINK_QNAME)
+         || qnames.contains(SUBSCRIPTION_QNAME)
+         || qnames.contains(USER_QNAME)
+         || qnames.contains(WRS_EXTRINSIC_OBJECT_QNAME))
             return true;
         return false;
     }
