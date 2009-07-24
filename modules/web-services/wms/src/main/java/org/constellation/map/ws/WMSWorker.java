@@ -631,7 +631,7 @@ public class WMSWorker extends AbstractWMSWorker {
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, time);
-        Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params);
+        final Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params);
 
 
         // 2. VIEW
@@ -649,7 +649,7 @@ public class WMSWorker extends AbstractWMSWorker {
             final Color color = getFI.getBackground();
             background = (color == null) ? Color.WHITE : color;
         }
-        Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(canvasDimension,background);
+        final Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(canvasDimension,background);
 
         // 4. SHAPE
         //     a
@@ -829,7 +829,7 @@ public class WMSWorker extends AbstractWMSWorker {
     //TODO: harmonize with the method getLayerReference().
     private static List<LayerDetails> getAllLayerReferences(final String version) throws CstlServiceException {
 
-    	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+    	List<LayerDetails> layerRefs;
     	try { // WE catch the exception from either service version
 	        if (  version.equals(ServiceDef.WMS_1_1_1.version.toString()) ) {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD );
@@ -851,7 +851,7 @@ public class WMSWorker extends AbstractWMSWorker {
                                                                            throws CstlServiceException
     {
 
-    	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+    	List<LayerDetails> layerRefs;
     	try { // WE catch the exception from either service version
 	        if (  version.equals("1.1.1") ) {
 	        	layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_1_1_SLD, layerNames );

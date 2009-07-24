@@ -153,6 +153,11 @@ public final class WCSWorker {
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.coverage.ws");
 
+    /**
+     * The date format to match.
+     */
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
     /*
      * Set to true for CITE tests.
      */
@@ -206,9 +211,13 @@ public final class WCSWorker {
                            MISSING_PARAMETER_VALUE, "version");
         }
 
-        if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
+        if (version.equals(ServiceDef.WCS_1_0_0.version.toString()) &&
+            abstractRequest instanceof org.geotoolkit.wcs.xml.v100.DescribeCoverageType)
+        {
             return describeCoverage100((org.geotoolkit.wcs.xml.v100.DescribeCoverageType) abstractRequest);
-        } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
+        } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString()) &&
+                   abstractRequest instanceof org.geotoolkit.wcs.xml.v111.DescribeCoverageType)
+        {
             return describeCoverage111((org.geotoolkit.wcs.xml.v111.DescribeCoverageType) abstractRequest);
         } else {
             throw new CstlServiceException("The version number specified for this GetCoverage request " +
@@ -289,7 +298,7 @@ public final class WCSWorker {
                 new org.geotoolkit.wcs.xml.v100.SpatialDomainType(llenvelope);
 
         // temporal metadata
-        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         final List<Object> times = new ArrayList<Object>();
         final SortedSet<Date> dates;
@@ -417,7 +426,7 @@ public final class WCSWorker {
                 new org.geotoolkit.wcs.xml.v111.SpatialDomainType(bboxs);
 
         // temporal metadata
-        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         final List<Object> times = new ArrayList<Object>();
         final SortedSet<Date> dates;
@@ -487,9 +496,13 @@ public final class WCSWorker {
         //this.actingVersion = new ServiceVersion(ServiceType.WCS, version);
         final String format;
 
-        if (version.equals(ServiceDef.WCS_1_0_0.version.toString())) {
+        if (version.equals(ServiceDef.WCS_1_0_0.version.toString()) &&
+            abstractRequest instanceof org.geotoolkit.wcs.xml.v100.GetCapabilitiesType)
+        {
             return getCapabilities100((org.geotoolkit.wcs.xml.v100.GetCapabilitiesType) abstractRequest);
-        } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString())) {
+        } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString()) &&
+                   abstractRequest instanceof org.geotoolkit.wcs.xml.v111.GetCapabilitiesType)
+        {
             // if the user have specified one format accepted (only one for now != spec)
             final AcceptFormatsType formats =
                     ((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType)abstractRequest).getAcceptFormats();
@@ -620,7 +633,7 @@ public final class WCSWorker {
                          */
                         final Date firstDate = dates.first();
                         final Date lastDate = dates.last();
-                        final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                        final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
                         df.setTimeZone(TimeZone.getTimeZone("UTC"));
                         outputBBox.getTimePosition().add(new TimePositionType(df.format(firstDate)));
                         outputBBox.getTimePosition().add(new TimePositionType(df.format(lastDate)));

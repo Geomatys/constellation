@@ -21,10 +21,12 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.geotoolkit.console.CommandLine;
 import org.geotoolkit.console.Option;
+import org.geotoolkit.util.logging.Logging;
 
 
 /**
@@ -36,6 +38,13 @@ import org.geotoolkit.console.Option;
  * @author Cédric Briançon
  */
 public class PrepareDatabase extends CommandLine {
+    /**
+     * The default logger.
+     */
+    private static final Logger LOGGER = Logging.getLogger(PrepareDatabase.class);
+
+    private static final String NULL = "NULL";
+
     /**
      * Layer name.
      */
@@ -112,7 +121,7 @@ public class PrepareDatabase extends CommandLine {
      */
     private static String escapeString(final String text) {
         if (text == null) {
-            return "NULL";
+            return NULL;
         }
         return '\'' + text.replaceAll("'", "''") + '\'';
     }
@@ -127,14 +136,24 @@ public class PrepareDatabase extends CommandLine {
     private boolean isLayerAlreadyPresent(final String name) throws SQLException {
         final String sql = "SELECT count(name) from \"Layers\" " +
                            "WHERE name='"+ name +"';";
-        final Statement stmt = connection.createStatement();
-        final ResultSet res  = stmt.executeQuery(sql);
         int numLayer = 0;
-        while (res.next()) {
-            numLayer = res.getInt(1);
+        Statement stmt = null;
+        ResultSet res = null;
+        try {
+            stmt = connection.createStatement();
+            res  = stmt.executeQuery(sql);
+
+            while (res.next()) {
+                numLayer = res.getInt(1);
+            }
+        } finally {
+            if (res != null) {
+                res.close();
+            }
+            if (stmt != null) {
+                stmt.close();
+            }
         }
-        res.close();
-        stmt.close();
         if (numLayer == 0) {
             return false;
         }
@@ -151,17 +170,27 @@ public class PrepareDatabase extends CommandLine {
      */
     private void processGridCoverage(final String urlFile) throws SQLException {
         final String selectExtent = "SELECT DISTINCT identifier from \"GridGeometries\"";
-        final Statement stmt = connection.createStatement();
-        final ResultSet res = stmt.executeQuery(selectExtent);
-        final String extent = (res.next()) ? res.getString("identifier") : "NULL";
-        res.close();
-        final StringBuilder sql = new StringBuilder(
-                "INSERT INTO \"GridCoverages\" (series, filename, extent) VALUES (");
-        sql.append(escapeString(identifier)); sql.append(", ");
-        sql.append(escapeString(urlFile)); sql.append(", ");
-        sql.append(escapeString(extent)); sql.append(")");
-        stmt.execute(sql.toString());
-        stmt.close();
+        Statement stmt = null;
+        ResultSet res  = null;
+        try {
+            stmt = connection.createStatement();
+            res  = stmt.executeQuery(selectExtent);
+            final String extent = (res.next()) ? res.getString("identifier") : NULL;
+            stmt.close();
+            final StringBuilder sql = new StringBuilder(
+                    "INSERT INTO \"GridCoverages\" (series, filename, extent) VALUES (");
+            sql.append(escapeString(identifier)); sql.append(", ");
+            sql.append(escapeString(urlFile)); sql.append(", ");
+            sql.append(escapeString(extent)); sql.append(")");
+            stmt.execute(sql.toString());
+        } finally {
+            if (res != null) {
+                res.close();
+            }
+            if (stmt != null) {
+                stmt.close();
+            }
+        }
     }
 
     /**
@@ -177,16 +206,23 @@ public class PrepareDatabase extends CommandLine {
         sql.append(escapeString(thematic));  sql.append(", ");
         sql.append(escapeString(procedure)); sql.append(", ");
         if (period == null || Double.isNaN(period)) {
-            sql.append("NULL");
+            sql.append(NULL);
         } else {
             sql.append(period);
         }
         sql.append(", ");
         sql.append(escapeString(description));
         sql.append(");");
-        final Statement stmt = connection.createStatement();
-        stmt.execute(sql.toString());
-        stmt.close();
+
+        Statement stmt = null;
+        try {
+            stmt = connection.createStatement();
+            stmt.execute(sql.toString());
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+            }
+        }
     }
 
     /**
@@ -195,13 +231,14 @@ public class PrepareDatabase extends CommandLine {
      * @throws SQLException
      */
     private void processSerie() throws SQLException {
+        final String dods = "dods";
         String urlFile = "";
-        if (pathName.startsWith("dods")) {
+        if (pathName.startsWith(dods)) {
             if (pathName.endsWith("/")) {
                 //Suppress the / character at the end of the url.
                 pathName = pathName.substring(0, pathName.length() - 1);
             }
-            int indSlash = pathName.lastIndexOf("/");
+            int indSlash = pathName.lastIndexOf('/');
             urlFile = pathName.substring(indSlash + 1);
             pathName = pathName.substring(0, indSlash);
         }
@@ -213,10 +250,18 @@ public class PrepareDatabase extends CommandLine {
         sql.append(escapeString(pathName));   sql.append(", ");
         sql.append(escapeString(extension));  sql.append(", ");
         sql.append(escapeString(format));     sql.append(");");
-        final Statement stmt = connection.createStatement();
-        stmt.execute(sql.toString());
-        stmt.close();
-        if (pathName.startsWith("dods")) {
+
+        Statement stmt = null;
+        try {
+            stmt = connection.createStatement();
+            stmt.execute(sql.toString());
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+            }
+        }
+
+        if (pathName.startsWith(dods)) {
             processGridCoverage(urlFile);
         }
     }
@@ -238,11 +283,11 @@ public class PrepareDatabase extends CommandLine {
         run();
         if (!isLayerAlreadyPresent(layerName)) {
             processLayer();
-            System.out.println("La couche \""+ layerName +"\" a été insérée.");
+            LOGGER.info("La couche \""+ layerName +"\" a été insérée.");
         }
         if (identifier != null) {
             processSerie();
-            System.out.println("La série \""+ identifier +"\" a été insérée.");
+            LOGGER.info("La série \""+ identifier +"\" a été insérée.");
         }
         connection.close();
     }
