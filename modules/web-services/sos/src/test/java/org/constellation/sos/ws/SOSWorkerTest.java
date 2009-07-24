@@ -37,6 +37,7 @@ import org.geotoolkit.sos.xml.v100.DescribeSensor;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -199,7 +200,7 @@ public class SOSWorkerTest {
          */
         AcceptVersionsType acceptVersions = new AcceptVersionsType("1.0.0");
         SectionsType sections             = new SectionsType("All");
-        AcceptFormatsType acceptFormats   = new AcceptFormatsType("application/xml");
+        AcceptFormatsType acceptFormats   = new AcceptFormatsType(MimeType.APP_XML);
         request = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
 
         result = worker.getCapabilities(request);
@@ -217,7 +218,7 @@ public class SOSWorkerTest {
          */
         acceptVersions = new AcceptVersionsType("1.0.0");
         sections       = new SectionsType("OperationsMetadata");
-        acceptFormats  = new AcceptFormatsType("application/xml");
+        acceptFormats  = new AcceptFormatsType(MimeType.APP_XML);
         request = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
 
         result = worker.getCapabilities(request);
@@ -235,7 +236,7 @@ public class SOSWorkerTest {
          */
         acceptVersions = new AcceptVersionsType("1.0.0");
         sections       = new SectionsType("ServiceProvider");
-        acceptFormats  = new AcceptFormatsType("application/xml");
+        acceptFormats  = new AcceptFormatsType(MimeType.APP_XML);
         request = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
 
         result = worker.getCapabilities(request);
@@ -253,7 +254,7 @@ public class SOSWorkerTest {
          */
         acceptVersions = new AcceptVersionsType("1.0.0");
         sections       = new SectionsType("ServiceIdentification");
-        acceptFormats  = new AcceptFormatsType("application/xml");
+        acceptFormats  = new AcceptFormatsType(MimeType.APP_XML);
         request = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
 
         result = worker.getCapabilities(request);
@@ -271,7 +272,7 @@ public class SOSWorkerTest {
          */
         acceptVersions = new AcceptVersionsType("1.0.0");
         sections       = new SectionsType("Contents");
-        acceptFormats  = new AcceptFormatsType("application/xml");
+        acceptFormats  = new AcceptFormatsType(MimeType.APP_XML);
         request = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
 
         result = worker.getCapabilities(request);
@@ -289,7 +290,7 @@ public class SOSWorkerTest {
          */
         acceptVersions = new AcceptVersionsType("2.0.0");
         sections       = new SectionsType("All");
-        acceptFormats  = new AcceptFormatsType("text/xml");
+        acceptFormats  = new AcceptFormatsType(MimeType.TEXT_XML);
         request = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
 
         boolean exLaunched = false;

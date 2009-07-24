@@ -77,6 +77,7 @@ import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
 import org.geotoolkit.wms.xml.v130.OperationType;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.WebService;
 
 //Geotools dependencies
@@ -330,8 +331,8 @@ public class WMSWorker extends AbstractWMSWorker {
             final String beginLegendUrl = url + "wms?REQUEST=GetLegendGraphic&" +
                                                     "VERSION=1.1.0&" +
                                                     "FORMAT=";
-            final String legendUrlGif = beginLegendUrl + IMAGE_GIF + "&LAYER=" + layerName;
-            final String legendUrlPng = beginLegendUrl + IMAGE_PNG + "&LAYER=" + layerName;
+            final String legendUrlGif = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;
+            final String legendUrlPng = beginLegendUrl + MimeType.IMAGE_PNG + "&LAYER=" + layerName;
             final int queryable = (layer.isQueryable(ServiceType.GETINFO)) ? 1 : 0;
             final AbstractLayer outputLayer;
             if (queryVersion.equals(ServiceDef.WMS_1_1_1.version.toString())) {
@@ -350,11 +351,11 @@ public class WMSWorker extends AbstractWMSWorker {
                 org.geotoolkit.wms.xml.v111.OnlineResource or =
                         new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlPng);
                 final org.geotoolkit.wms.xml.v111.LegendURL legendURL1 =
-                        new org.geotoolkit.wms.xml.v111.LegendURL(IMAGE_PNG, or);
+                        new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_PNG, or);
 
                 or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlGif);
                 final org.geotoolkit.wms.xml.v111.LegendURL legendURL2 =
-                        new org.geotoolkit.wms.xml.v111.LegendURL(IMAGE_GIF, or);
+                        new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_GIF, or);
 
                 final List<String> stylesName = layer.getFavoriteStyles();
                 final List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
@@ -397,11 +398,11 @@ public class WMSWorker extends AbstractWMSWorker {
                 org.geotoolkit.wms.xml.v130.OnlineResource or =
                         new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlPng);
                 final org.geotoolkit.wms.xml.v130.LegendURL legendURL1 =
-                        new org.geotoolkit.wms.xml.v130.LegendURL(IMAGE_PNG, or);
+                        new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_PNG, or);
 
                 or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlGif);
                 final org.geotoolkit.wms.xml.v130.LegendURL legendURL2 =
-                        new org.geotoolkit.wms.xml.v130.LegendURL(IMAGE_GIF, or);
+                        new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_GIF, or);
 
                 final List<String> stylesName = layer.getFavoriteStyles();
                 final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
@@ -663,25 +664,25 @@ public class WMSWorker extends AbstractWMSWorker {
         String infoFormat = getFI.getInfoFormat();
         if (infoFormat == null) {
             //Should not happen since the info format parameter is mandatory for the GetFeatureInfo request.
-            infoFormat = TEXT_PLAIN;
+            infoFormat = MimeType.TEXT_PLAIN;
         }
         final TextGraphicVisitor visitor;
-        if (infoFormat.equalsIgnoreCase(TEXT_PLAIN)) {
+        if (infoFormat.equalsIgnoreCase(MimeType.TEXT_PLAIN)) {
             // TEXT / PLAIN
             visitor = new CSVGraphicVisitor(getFI);
-        } else if (infoFormat.equalsIgnoreCase(TEXT_HTML)) {
+        } else if (infoFormat.equalsIgnoreCase(MimeType.TEXT_HTML)) {
             // TEXT / HTML
             visitor = new HTMLGraphicVisitor(getFI);
-        } else if (infoFormat.equalsIgnoreCase(APP_GML) || infoFormat.equalsIgnoreCase(TEXT_XML) ||
-                   infoFormat.equalsIgnoreCase(APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
+        } else if (infoFormat.equalsIgnoreCase(MimeType.APP_GML) || infoFormat.equalsIgnoreCase(MimeType.TEXT_XML) ||
+                   infoFormat.equalsIgnoreCase(MimeType.APP_XML) || infoFormat.equalsIgnoreCase(XML) ||
                    infoFormat.equalsIgnoreCase(GML))
         {
             // GML
             visitor = new GMLGraphicVisitor(getFI);
         } else {
             throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
-                    "You have to choose between: "+ TEXT_PLAIN +", "+ TEXT_HTML +", "+ APP_GML +", "+ GML +
-                    ", "+ APP_XML +", "+ XML+", "+ TEXT_XML,
+                    "You have to choose between: "+ MimeType.TEXT_PLAIN +", "+ MimeType.TEXT_HTML +", "+ MimeType.APP_GML +", "+ GML +
+                    ", "+ MimeType.APP_XML +", "+ XML+", "+ MimeType.TEXT_XML,
                     INVALID_PARAMETER_VALUE, "info_format");
         }
 

@@ -20,8 +20,6 @@ package org.constellation.coverage.ws.rs;
 import static org.constellation.query.Query.KEY_REQUEST;
 import static org.constellation.query.Query.KEY_SERVICE;
 import static org.constellation.query.Query.KEY_VERSION;
-import static org.constellation.query.Query.APP_XML;
-import static org.constellation.query.Query.TEXT_XML;
 import static org.constellation.query.wcs.WCSQuery.DESCRIBECOVERAGE;
 import static org.constellation.query.wcs.WCSQuery.GETCAPABILITIES;
 import static org.constellation.query.wcs.WCSQuery.GETCOVERAGE;
@@ -81,6 +79,7 @@ import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
+import org.constellation.ws.MimeType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.rs.OGCWebService;
@@ -177,7 +176,7 @@ public class WCSService extends OGCWebService {
             marshaller = marshallerPool.acquireMarshaller();
         	// Handle an empty request by sending a basic web page.
         	if (  ( null == objectRequest )  &&  ( 0 == uriContext.getQueryParameters().size() )  ) {
-        		return Response.ok(getIndexPage(), Query.TEXT_HTML).build();
+        		return Response.ok(getIndexPage(), MimeType.TEXT_HTML).build();
         	}
 
             String request = "";
@@ -208,7 +207,7 @@ public class WCSService extends OGCWebService {
                 final GetCapabilitiesResponse capsResponse = worker.getCapabilities(getcaps);
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(capsResponse, sw);
-                return Response.ok(sw.toString(), TEXT_XML).build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             
             if ( DESCRIBECOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof DescribeCoverage) )
@@ -233,7 +232,7 @@ public class WCSService extends OGCWebService {
                 //we marshall the response and return the XML String
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(describeResponse, sw);
-                return Response.ok(sw.toString(), TEXT_XML).build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             
             if ( GETCOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof GetCoverage) )
@@ -309,7 +308,7 @@ public class WCSService extends OGCWebService {
         final StringWriter sw = new StringWriter();
         marshaller.marshal(report, sw);
 
-        return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+        return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.APP_XML).build();
     }
 
     /**

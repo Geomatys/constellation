@@ -50,6 +50,7 @@ import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.constellation.sos.ws.SOSworker;
 import org.constellation.util.Util;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -62,8 +63,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 public class SOService extends OGCWebService {
 
     private SOSworker worker;
-
-    private static final String TEXT_XML = "text/xml";
 
     /**
      * Build a new Restfull SOS service.
@@ -97,8 +96,8 @@ public class SOService extends OGCWebService {
                 final Object response = worker.getObservation(go);
 
                 String outputFormat = go.getResponseFormat();
-                if (outputFormat != null  && outputFormat.startsWith(TEXT_XML)) {
-                    outputFormat = TEXT_XML;
+                if (outputFormat != null  && outputFormat.startsWith(MimeType.TEXT_XML)) {
+                    outputFormat = MimeType.TEXT_XML;
                 }
 
                 String marshalled;
@@ -125,7 +124,7 @@ public class SOService extends OGCWebService {
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.describeSensor(ds), sw);
 
-                return Response.ok(sw.toString(), TEXT_XML).build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
 
              }
 
@@ -139,7 +138,7 @@ public class SOService extends OGCWebService {
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.insertObservation(is), sw);
 
-                return Response.ok(sw.toString(), TEXT_XML).build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
 
              }
 
@@ -153,7 +152,7 @@ public class SOService extends OGCWebService {
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getResult(gr), sw);
 
-                return Response.ok(sw.toString(), TEXT_XML).build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
 
              }
 
@@ -167,7 +166,7 @@ public class SOService extends OGCWebService {
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.registerSensor(rs), sw);
 
-                return Response.ok(sw.toString(), TEXT_XML).build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
 
              }
 
@@ -232,9 +231,9 @@ public class SOService extends OGCWebService {
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(),
                                                          serviceDef.exceptionVersion.toString());
             marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
         } else {
-            return Response.ok("The SOS server is not running cause: unable to create JAXB context!", "text/plain").build();
+            return Response.ok("The SOS server is not running cause: unable to create JAXB context!", MimeType.TEXT_PLAIN).build();
         }
     }
 

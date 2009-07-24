@@ -53,6 +53,7 @@ import javax.xml.bind.UnmarshalException;
 import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.ws.CstlServiceException;
 
+import org.constellation.ws.MimeType;
 import org.geotoolkit.util.Versioned;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.ws.ExceptionCode.*;
@@ -329,7 +330,7 @@ public abstract class WebService {
             }
             return treatIncomingRequest(request);
         } else {
-            return Response.ok("This service is not running", "text/plain").build();
+            return Response.ok("This service is not running", MimeType.TEXT_PLAIN).build();
         }
     }
 
@@ -349,7 +350,7 @@ public abstract class WebService {
         		                     "an XML file using an application/xml or text/xml " +
         		                     "MIME type.",
                                           INVALID_REQUEST.name(), null);
-        return Response.ok(obj, "text/xml").build();
+        return Response.ok(obj, MimeType.TEXT_XML).build();
     }
 
 

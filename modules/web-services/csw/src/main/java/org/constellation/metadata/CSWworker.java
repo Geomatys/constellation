@@ -82,6 +82,7 @@ import org.constellation.metadata.utils.MailSendingUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.WebService;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
@@ -231,10 +232,10 @@ public class CSWworker {
     private static final List<String> ACCEPTED_OUTPUT_FORMATS;
     static {
         ACCEPTED_OUTPUT_FORMATS = new ArrayList<String>();
-        ACCEPTED_OUTPUT_FORMATS.add("text/xml");
-        ACCEPTED_OUTPUT_FORMATS.add("application/xml");
-        ACCEPTED_OUTPUT_FORMATS.add("text/html");
-        ACCEPTED_OUTPUT_FORMATS.add("text/plain");
+        ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_XML);
+        ACCEPTED_OUTPUT_FORMATS.add(MimeType.APPLICATION_XML);
+        ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_HTML);
+        ACCEPTED_OUTPUT_FORMATS.add(MimeType.TEXT_PLAIN);
     }
     
     /**
@@ -650,7 +651,7 @@ public class CSWworker {
          final AcceptFormats formats = requestCapabilities.getAcceptFormats();
         
 
-         if (formats != null && formats.getOutputFormat().size() > 0 && !formats.getOutputFormat().contains("text/xml")) {
+         if (formats != null && formats.getOutputFormat().size() > 0 && !formats.getOutputFormat().contains(MimeType.TEXT_XML)) {
             
              * Acording to the CITE test this case does not return an exception
              throw new OWSWebServiceException("accepted format : text/xml",
@@ -1747,7 +1748,7 @@ public class CSWworker {
      */
     public String getOutputFormat() {
         if (outputFormat == null) {
-            return "application/xml";
+            return MimeType.APP_XML;
         }
         return outputFormat;
     }

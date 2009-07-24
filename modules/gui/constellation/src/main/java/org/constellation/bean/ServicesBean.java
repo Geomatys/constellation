@@ -218,7 +218,7 @@ public class ServicesBean {
     /**
      * Debugging purpose
      */
-    private static final Logger logger = Logger.getLogger("org.constellation.bean");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.bean");
 
     public ServicesBean() throws JAXBException, FileNotFoundException {
         
@@ -377,9 +377,9 @@ public class ServicesBean {
         this.accessConstraints = s.getAccessConstraints();
 
         //we fill the value of ServiceProvider
-        ContactInformation ci    = s.getContactInformation();
-        ContactAddress a         = ci.getContactAddress();
-        ContactPersonPrimary cpp = ci.getContactPersonPrimary();
+        final ContactInformation ci    = s.getContactInformation();
+        final ContactAddress a         = ci.getContactAddress();
+        final ContactPersonPrimary cpp = ci.getContactPersonPrimary();
         this.providerName        = cpp.getContactOrganization();
         this.providerSite        = s.getOnlineResource().getHref();
         this.individualName      = cpp.getContactPerson();
@@ -413,8 +413,7 @@ public class ServicesBean {
      * @return
      */
     private List<SelectItem> keywordsToSelectItem(KeywordsType keywords) {
-        List<SelectItem> results = new ArrayList<SelectItem>();
-
+        final List<SelectItem> results = new ArrayList<SelectItem>();
         for (LanguageStringType keyword : keywords.getKeyword()) {
             results.add(new SelectItem(keyword.getValue()));
         }
@@ -475,16 +474,15 @@ public class ServicesBean {
     public String storeForm() throws JAXBException, IOException, FileNotFoundException {
 
         //we signal to the webService to update is capabilities
-        final File f = new File(servletContext.getRealPath("WEB-INF/change.properties"));
-        final Properties p = new Properties();
-        FileInputStream in = new FileInputStream(f);
+        final File f             = new File(servletContext.getRealPath("WEB-INF/change.properties"));
+        final Properties p       = new Properties();
+        final FileInputStream in = new FileInputStream(f);
         p.load(in);
         in.close();
         p.put("update", "true");
         final FileOutputStream out = new FileOutputStream(f);
         p.store(out, "updated from JSF interface");
         out.close();
-        int i = 0;
         for (Object capa : capabilities) {
 
             //for OWS 1.1.0
@@ -514,15 +512,14 @@ public class ServicesBean {
                 // 1.3.0
                 if (capa instanceof  WMSCapabilities) {
                     ((WMSCapabilities) capa).setService(s.get(0));
-                    logger.info("update WMS version 1.3.0");
+                    LOGGER.info("update WMS version 1.3.0");
                 
                 // 1.1.1
                 } else {
                     ((WMT_MS_Capabilities) capa).setService(s.get(1));
-                    logger.info("update WMS version 1.1.1");
+                    LOGGER.info("update WMS version 1.1.1");
                 }
             }
-            i++;
         }
         storeCapabilitiesFile();
         return "goBack";
@@ -652,10 +649,10 @@ public class ServicesBean {
         final org.geotoolkit.wms.xml.v111.ContactAddress ca111 = new org.geotoolkit.wms.xml.v111.ContactAddress(
                 getAddressType(), deliveryPoint, city, administrativeArea, postalCode, country);
 
-        org.geotoolkit.wms.xml.v111.ContactInformation ci111 = new org.geotoolkit.wms.xml.v111.ContactInformation(cpp111, positionName,
+        final org.geotoolkit.wms.xml.v111.ContactInformation ci111 = new org.geotoolkit.wms.xml.v111.ContactInformation(cpp111, positionName,
                 ca111, phoneVoice, phoneFacsimile, electronicAddress);
 
-        org.geotoolkit.wms.xml.v111.Service service111 = new org.geotoolkit.wms.xml.v111.Service(
+        final org.geotoolkit.wms.xml.v111.Service service111 = new org.geotoolkit.wms.xml.v111.Service(
                 title, title, _abstract,
                 keywordList111,
                 new org.geotoolkit.wms.xml.v111.OnlineResource(providerSite),
@@ -733,7 +730,7 @@ public class ServicesBean {
                 final OutputStream out = new FileOutputStream(f);
                 marshaller.marshal(capabilities[i],out);
                 out.close();
-                logger.info("store " + f.getAbsolutePath());
+                LOGGER.info("store " + f.getAbsolutePath());
                 i++;
             }
             marshallerPool.release(marshaller);
@@ -752,7 +749,7 @@ public class ServicesBean {
                 
             }
         } catch (IOException ex) {
-            logger.severe("IO Exception while storing capabilities file");
+            LOGGER.severe("IO Exception while storing capabilities file");
         }
     }
 
@@ -768,7 +765,7 @@ public class ServicesBean {
             	userData = (UserData) unmarshaller.unmarshal(f);
                 marshallerPool.release(unmarshaller);
             } else {
-                logger.severe("File uploaded null");
+                LOGGER.severe("File uploaded null");
                 return;
             }
 
@@ -786,7 +783,7 @@ public class ServicesBean {
                         marshaller.marshal(userData.getWMSCapabilities()[0], (OutputStream) new FileOutputStream(file));
               
                     } else {
-                        logger.severe("WMS capabilities file version 1.3.0 not found at :" + path + ". unable to load WMS Data");
+                        LOGGER.severe("WMS capabilities file version 1.3.0 not found at :" + path + ". unable to load WMS Data");
                     }
         
                     // the we add to the list of object to update the other sub version
@@ -797,11 +794,11 @@ public class ServicesBean {
                         marshaller.marshal(userData.getWMSCapabilities()[1], (OutputStream) new FileOutputStream(file));
               
                     } else {
-                        logger.severe("WMS capabilities file version 1.1.1 not found at :" + path + ". unable to load WMS Data");
+                        LOGGER.severe("WMS capabilities file version 1.1.1 not found at :" + path + ". unable to load WMS Data");
                     }
                 } else {
                     // TODO afficher fichier non valide
-                    logger.severe("WMS capabilie file uncomplete (!=2)");               
+                    LOGGER.severe("WMS capabilie file uncomplete (!=2)");
                 }
             }
             
@@ -818,7 +815,7 @@ public class ServicesBean {
                         marshaller.marshal(userData.getWCSCapabilities()[0], (OutputStream) new FileOutputStream(file));
               
                     } else {
-                        logger.severe("WCS capabilities file version 1.1.1 not found at :" + path + ". unable to load WCS Data");
+                        LOGGER.severe("WCS capabilities file version 1.1.1 not found at :" + path + ". unable to load WCS Data");
                     }
         
                     // the we add to the list of object to update the other sub version
@@ -829,11 +826,11 @@ public class ServicesBean {
                         marshaller.marshal(userData.getWCSCapabilities()[1], (OutputStream) new FileOutputStream(file));
               
                     } else {
-                        logger.severe("WCS capabilities file version 1.0.0 not found at :" + path + ". unable to load WCS Data");
+                        LOGGER.severe("WCS capabilities file version 1.0.0 not found at :" + path + ". unable to load WCS Data");
                     }
                 } else {
                     // TODO afficher fichier non valide
-                    logger.severe("WCS capabilies file uncomplete (!=2)");               
+                    LOGGER.severe("WCS capabilies file uncomplete (!=2)");
                 }
             }
             
@@ -850,12 +847,12 @@ public class ServicesBean {
                         marshaller.marshal(userData.getCSWCapabilities()[0], (OutputStream) new FileOutputStream(file));
               
                     } else {
-                        logger.severe("CSW capabilities file version 2.0.2 not found at :" + path + ". unable to load CSW Data");
+                        LOGGER.severe("CSW capabilities file version 2.0.2 not found at :" + path + ". unable to load CSW Data");
                     }
                     
                 } else {
                     // TODO afficher fichier non valide
-                    logger.severe("WCS capabilies file uncomplete (!=1)");               
+                    LOGGER.severe("WCS capabilies file uncomplete (!=1)");
                 }
             }
             
@@ -872,12 +869,12 @@ public class ServicesBean {
                         marshaller.marshal(userData.getSOSCapabilities()[0], (OutputStream) new FileOutputStream(file));
               
                     } else {
-                        logger.severe("SOS capabilities file version 1.0.0 not found at :" + path + ". unable to load SOS Data");
+                        LOGGER.severe("SOS capabilities file version 1.0.0 not found at :" + path + ". unable to load SOS Data");
                     }
                     
                 } else {
                     // TODO afficher fichier non valide
-                    logger.severe("SOS capabilies file uncomplete (!=1)");               
+                    LOGGER.severe("SOS capabilies file uncomplete (!=1)");
                 }
             }
             
@@ -913,7 +910,7 @@ public class ServicesBean {
     
     
     public String setWMSMode() throws JAXBException, FileNotFoundException {
-        logger.info("set WMS mode");
+        LOGGER.info("set WMS mode");
         webServiceMode    = "WMS";
         capabilities     = new Object[2];
         capabilitiesFile = new File[2];
@@ -928,7 +925,7 @@ public class ServicesBean {
             fillFormFromWMS((WMSCapabilities) capabilities[0]);
 
         } else {
-            logger.severe("WMS capabilities file version 1.3.0 not found at :" + path);
+            LOGGER.severe("WMS capabilities file version 1.3.0 not found at :" + path);
         }
 
         // the we add to the list of object to update the other sub version
@@ -939,7 +936,7 @@ public class ServicesBean {
             capabilities[1] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[1]));
 
         } else {
-            logger.severe("WMS capabilities file version 1.1.1 not found at :" + path);
+            LOGGER.severe("WMS capabilities file version 1.1.1 not found at :" + path);
         }
         marshallerPool.release(unmarshaller);
         
@@ -963,7 +960,7 @@ public class ServicesBean {
             fillFormFromOWS110((Capabilities) capabilities[0]);
 
         } else {
-            logger.severe("WCS capabilities file version 1.1.1 not found at :" + path);
+            LOGGER.severe("WCS capabilities file version 1.1.1 not found at :" + path);
         }
 
         // the we add to the list of object to update the other sub version
@@ -974,7 +971,7 @@ public class ServicesBean {
             capabilities[1] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[1]));
             
         } else {
-            logger.severe("WCS capabilities file version 1.0.0 not found at :" + path);
+            LOGGER.severe("WCS capabilities file version 1.0.0 not found at :" + path);
         }
         marshallerPool.release(unmarshaller);
 
@@ -998,7 +995,7 @@ public class ServicesBean {
             marshallerPool.release(unmarshaller);
 
         } else {
-            logger.severe("SOS capabilities file version 1.0.0 not found at :" + path);
+            LOGGER.severe("SOS capabilities file version 1.0.0 not found at :" + path);
         }
 
         return "fillForm";
@@ -1020,7 +1017,7 @@ public class ServicesBean {
             marshallerPool.release(unmarshaller);
 
         } else {
-            logger.severe("CSW capabilities file version 2.0.2 not found at :" + path);
+            LOGGER.severe("CSW capabilities file version 2.0.2 not found at :" + path);
         }
 
         return "fillForm";
@@ -1130,7 +1127,7 @@ public class ServicesBean {
                     FacesMessage.SEVERITY_FATAL,
                     x.getClass().getName(), x.getMessage());
             FacesContext.getCurrentInstance().addMessage(null, message);
-            logger.severe("Exception in proccesSubmitFile " + x.getMessage());
+            LOGGER.severe("Exception in proccesSubmitFile " + x.getMessage());
             return null;
         }
         return f;
@@ -1139,7 +1136,7 @@ public class ServicesBean {
     public String doUpload() throws IOException{
         final File f = processSubmitedFile();
         if (f == null) {
-            logger.severe("[doUpload]process uploaded file null");
+            LOGGER.severe("[doUpload]process uploaded file null");
         }
         loadUserData(f);
         return "ok";

@@ -43,6 +43,7 @@ import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
 import org.geotoolkit.swe.xml.v101.TextBlockEntry;
 import org.geotoolkit.swe.xml.v101.TimeType;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
@@ -172,7 +173,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
 
         //static part
-        final List<String> responseFormat = Arrays.asList("application/xml");
+        final List<String> responseFormat = Arrays.asList(MimeType.APP_XML);
         final List<QName> resultModel     = Arrays.asList(OBSERVATION_QNAME);
         final List<ResponseModeType> responseMode = Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
         return new ObservationOfferingEntry(offeringName,

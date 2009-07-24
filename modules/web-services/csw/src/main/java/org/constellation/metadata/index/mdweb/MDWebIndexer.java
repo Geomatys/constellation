@@ -96,7 +96,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             throw new IndexingException("The configuration file does not contains a BDD object");
         }
         try {
-            Connection mdConnection = db.getConnection();
+            final Connection mdConnection = db.getConnection();
             mdWebReader   = new Reader20(Standard.ISO_19115,  mdConnection);
             pathMap       = null;
             classeMap     = null;
@@ -142,7 +142,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             LOGGER.info("Creating lucene index for the first time...");
             final long time = System.currentTimeMillis();
             IndexWriter writer;
-            int nbCatalogs = 0;
+            final int nbCatalogs = 0;
             int nbForms    = 0; 
             try {
                 writer  = new IndexWriter(getFileDirectory(), analyzer, true);
@@ -158,13 +158,13 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 writer.close();
                 
             } catch (CorruptIndexException ex) {
-                LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-                throw new IndexingException("CorruptIndexException while indexing documents.", ex);
+                LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
+                throw new IndexingException(CORRUPTED_MULTI_MSG, ex);
             } catch (LockObtainFailedException ex) {
-                LOGGER.severe("LockObtainException while indexing document: " + ex.getMessage());
-                throw new IndexingException("LockObtainException while indexing documents.", ex);
+                LOGGER.severe(LOCK_SINGLE_MSG + ex.getMessage());
+                throw new IndexingException(LOCK_MULTI_MSG, ex);
             } catch (IOException ex) {
-                LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+                LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
                 throw new IndexingException("IOException while indexing documents.", ex);
             }
             LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
@@ -182,7 +182,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
     public void createIndex() throws IndexingException {
         LOGGER.info("Creating lucene index for MDWeb database please wait...");
         
-        long time = System.currentTimeMillis();
+        final long time = System.currentTimeMillis();
         IndexWriter writer;
         int nbCatalogs = 0;
         int nbForms = 0;
@@ -190,9 +190,9 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             writer = new IndexWriter(getFileDirectory(), analyzer, true);
 
             // getting the objects list and index avery item in the IndexWriter.
-            List<Catalog> cats = mdWebReader.getCatalogs();
+            final List<Catalog> cats = mdWebReader.getCatalogs();
             nbCatalogs = cats.size();
-            List<Form> results = mdWebReader.getAllForm(cats);
+            final List<Form> results = mdWebReader.getAllForm(cats);
             LOGGER.info("all form read in " + (System.currentTimeMillis() - time) + " ms.");
             nbForms = results.size();
             for (Form form : results) {
@@ -206,13 +206,13 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             writer.close();
 
         } catch (CorruptIndexException ex) {
-            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-            throw new IndexingException("CorruptIndexException while indexing documents.", ex);
+            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
+            throw new IndexingException(CORRUPTED_MULTI_MSG, ex);
         } catch (LockObtainFailedException ex) {
-            LOGGER.severe("LockObtainException while indexing document: " + ex.getMessage());
-            throw new IndexingException("LockObtainException while indexing documents.", ex);
+            LOGGER.severe(LOCK_SINGLE_MSG + ex.getMessage());
+            throw new IndexingException(LOCK_MULTI_MSG, ex);
         } catch (IOException ex) {
-            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             throw new IndexingException("IOException while indexing documents.", ex);
         } catch (SQLException ex) {
             LOGGER.severe("SQLException while indexing document: " + ex.getMessage());
@@ -230,9 +230,9 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
     public void createIndex(List<? extends Object> forms) throws IndexingException {
         LOGGER.info("Creating lucene index for MDWeb database please wait...");
 
-        long time = System.currentTimeMillis();
+        final long time = System.currentTimeMillis();
         IndexWriter writer;
-        int nbCatalogs = 0;
+        final int nbCatalogs = 0;
         int nbForms = 0;
         try {
             writer = new IndexWriter(getFileDirectory(), analyzer, true);
@@ -240,7 +240,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             nbForms = forms.size();
             for (Object form : forms) {
                 if (form instanceof Form) {
-                    Form ff = (Form) form;
+                    final Form ff = (Form) form;
                     //if (ff.isFullyValidated()) {
                         indexDocument(writer, ff);
                     //} else {
@@ -254,13 +254,13 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             writer.close();
 
         } catch (CorruptIndexException ex) {
-            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-            throw new IndexingException("CorruptIndexException while indexing documents.", ex);
+            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
+            throw new IndexingException(CORRUPTED_MULTI_MSG, ex);
         } catch (LockObtainFailedException ex) {
-            LOGGER.severe("LockObtainException while indexing document: " + ex.getMessage());
-            throw new IndexingException("LockObtainException while indexing documents.", ex);
+            LOGGER.severe(LOCK_SINGLE_MSG + ex.getMessage());
+            throw new IndexingException(LOCK_MULTI_MSG, ex);
         } catch (IOException ex) {
-            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             throw new IndexingException("SQLException while indexing documents.", ex);
         }
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
@@ -283,10 +283,10 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             LOGGER.severe("SQLException " + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (CorruptIndexException ex) {
-            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
-            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
@@ -300,7 +300,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      */
     public void indexDocument(Form form) {
         try {
-            IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false);
+            final IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false);
             
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(form));
@@ -313,10 +313,10 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             LOGGER.severe("SQLException " + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (CorruptIndexException ex) {
-            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
-            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
@@ -449,7 +449,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 
             coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
             
-            String crs = getValues("CRS", form, DUBLIN_CORE_QUERYABLE, -1);
+            final String crs = getValues("CRS", form, DUBLIN_CORE_QUERYABLE, -1);
                 
             addBoundingBox(doc, minx, maxx, miny, maxy, crs);
             
@@ -493,7 +493,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 String conditionalValue  = null;
                 
                 // if the path ID contains a # we have a conditional value (codeList element) next to the searched value.
-                int separator = fullPathID.indexOf('#'); 
+                final int separator = fullPathID.indexOf('#');
                 if (separator != -1) {
                     pathID            = fullPathID.substring(0, separator);
                     conditionalPathID = pathID.substring(0, pathID.lastIndexOf(':') + 1) + fullPathID.substring(separator + 1, fullPathID.indexOf('='));
@@ -524,7 +524,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 for (Value v: values) {
                     if ( (ordinal == -1 && v instanceof TextValue) || (v instanceof TextValue && v.getOrdinal() == ordinal)) {
                 
-                        TextValue tv = (TextValue) v;
+                        final TextValue tv = (TextValue) v;
                         
                         //for a codelist value we don't write the code but the codlistElement value.
                         if (tv.getType() instanceof CodeList) {

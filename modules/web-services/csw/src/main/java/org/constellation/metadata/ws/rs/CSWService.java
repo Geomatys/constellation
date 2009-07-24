@@ -66,6 +66,7 @@ import org.constellation.metadata.CSWClassesContext;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.util.Util;
+import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 import org.geotoolkit.ogc.xml.v110modified.FilterType;
 import org.geotoolkit.ogc.xml.v110modified.PropertyIsLikeType;
@@ -335,9 +336,9 @@ public class CSWService extends OGCWebService {
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
             final StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
         } else {
-            return Response.ok("The CSW server is not running cause: unable to create JAXB context!", "text/plain").build();
+            return Response.ok("The CSW server is not running cause: unable to create JAXB context!", MimeType.TEXT_PLAIN).build();
         }
     }
     
@@ -412,7 +413,7 @@ public class CSWService extends OGCWebService {
         
         String outputFormat = getParameter("OUTPUTFORMAT", false);
         if (outputFormat == null) {
-            outputFormat = "application/xml";
+            outputFormat = MimeType.APP_XML;
         }
         
         String outputSchema = getParameter("OUTPUTSCHEMA", false);
@@ -633,7 +634,7 @@ public class CSWService extends OGCWebService {
         
         String outputFormat = getParameter("OUTPUTFORMAT", false);
         if (outputFormat == null) {
-            outputFormat = "application/xml";
+            outputFormat = MimeType.APP_XML;
         }
         
         String outputSchema = getParameter("OUTPUTSCHEMA", false);
@@ -669,7 +670,7 @@ public class CSWService extends OGCWebService {
         
         String outputFormat = getParameter("OUTPUTFORMAT", false);
         if (outputFormat == null) {
-            outputFormat = "application/xml";
+            outputFormat = MimeType.APP_XML;
         }
         
         String schemaLanguage = getParameter("SCHEMALANGUAGE", false);
@@ -764,7 +765,7 @@ public class CSWService extends OGCWebService {
         String resourceType = getParameter("RESOURCETYPE", true);
         String resourceFormat = getParameter("RESOURCEFORMAT", false);
         if (resourceFormat == null) {
-            resourceFormat = "application/xml";
+            resourceFormat = MimeType.APP_XML;
         }
         String handler           = getParameter("RESPONSEHANDLER", false);
         String interval          = getParameter("HARVESTINTERVAL", false);

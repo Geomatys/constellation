@@ -66,18 +66,19 @@ public class PostGridProviderService extends AbstractProviderService<String,Laye
         PROVIDERS.clear();
 
         for (final ProviderSource ps : provConf.sources) {
+            final String errorMsg = "[PROVIDER]> Invalid postgrid provider config";
             try {
-                PostGridProvider provider = new PostGridProvider(ps);
+                final PostGridProvider provider = new PostGridProvider(ps);
                 PROVIDERS.add(provider);
                 LOGGER.log(Level.INFO, "[PROVIDER]> postgrid provider created : "
                         + provider.getSource().parameters.get(KEY_DATABASE) + " > "
                         + provider.getSource().parameters.get(KEY_ROOT_DIRECTORY));
             } catch (IllegalArgumentException ex) {
-                LOGGER.log(Level.WARNING, "[PROVIDER]> Invalide postgrid provider config", ex);
+                LOGGER.log(Level.WARNING, errorMsg, ex);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "[PROVIDER]> Invalide postgrid provider config", ex);
+                LOGGER.log(Level.WARNING, errorMsg, ex);
             } catch (SQLException ex) {
-                LOGGER.log(Level.WARNING, "[PROVIDER]> Invalide postgrid provider config", ex);
+                LOGGER.log(Level.WARNING, errorMsg, ex);
             }
         }
     }

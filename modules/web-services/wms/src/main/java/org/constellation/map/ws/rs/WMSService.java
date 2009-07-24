@@ -57,6 +57,7 @@ import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 
 //Geotools dependencies
@@ -154,7 +155,7 @@ public class WMSService extends OGCWebService {
                 //Need to reset the GML mime format to XML for browsers
                 String infoFormat = requestFeatureInfo.getInfoFormat();
                 if (infoFormat.equals(GML)) {
-                    infoFormat = APP_XML;
+                    infoFormat = MimeType.APP_XML;
                 }
                 return Response.ok(result, infoFormat).build();
             }
@@ -188,7 +189,7 @@ public class WMSService extends OGCWebService {
                 //We need to marshall the string to XML
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(response, sw);
-                return Response.ok(sw.toString(), TEXT_XML).build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                            OPERATION_NOT_SUPPORTED, "request");
@@ -226,7 +227,7 @@ public class WMSService extends OGCWebService {
         }
         StringWriter sw = new StringWriter();
         marshaller.marshal(report, sw);
-        return Response.ok(Util.cleanSpecialCharacter(sw.toString()), APP_XML).build();
+        return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.APP_XML).build();
     }
 
     /**
@@ -268,10 +269,10 @@ public class WMSService extends OGCWebService {
                     INVALID_PARAMETER_VALUE, "service");
         }
         String format = getParameter(KEY_FORMAT, false);
-        if (format == null || !(format.equalsIgnoreCase(TEXT_XML) ||
-                format.equalsIgnoreCase(APP_WMS_XML) || format.equalsIgnoreCase(APP_XML)))
+        if (format == null || !(format.equalsIgnoreCase(MimeType.TEXT_XML) ||
+                format.equalsIgnoreCase(MimeType.APP_WMS_XML) || format.equalsIgnoreCase(MimeType.APP_XML)))
         {
-            format = TEXT_XML;
+            format = MimeType.TEXT_XML;
         }
         return new GetCapabilities(bestVersion.version, format);
     }

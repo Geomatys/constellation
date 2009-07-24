@@ -28,6 +28,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
+import org.constellation.ws.MimeType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
@@ -137,7 +138,7 @@ public class SosIOTest {
     public void GetCapabilitiesTest() throws Exception {
         if (configFilesExist) {
             
-            GetCapabilities request = new GetCapabilities("1.0.0", "application/xml");
+            GetCapabilities request = new GetCapabilities("1.0.0", MimeType.APP_XML);
             Capabilities expResult  = defaultWorker.getCapabilities(request);
             Capabilities result     = genericWorker.getCapabilities(request);
 

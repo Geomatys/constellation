@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import org.constellation.query.QueryRequest;
 import org.constellation.util.StringUtilities;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
@@ -339,7 +340,7 @@ public class GetMap extends WMSQuery {
     }
 
     /**
-     * Returns the exception format specified, or {@code "application/vnd.ogc.se_xml"}
+     * Returns the exception format specified, or {@code MimeType.APP_SE_XML}
      * if {@code null}.
      */
     @Override
@@ -348,7 +349,7 @@ public class GetMap extends WMSQuery {
             return exceptions;
         }
         return (super.getVersion().toString().equals("1.1.1")) ?
-            "application/vnd.ogc.se_xml" : "text/xml";
+            MimeType.APP_SE_XML : MimeType.TEXT_XML;
     }
 
     /**

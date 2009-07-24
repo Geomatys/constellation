@@ -57,11 +57,11 @@ public class SLDProvider implements StyleProvider{
     private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.sld");
     private static final MutableStyleFactory SF = (MutableStyleFactory)FactoryFinder.getStyleFactory(
                             new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
-    private static final Collection<String> masks = new ArrayList<String>();
+    private static final Collection<String> MASKS = new ArrayList<String>();
 
     static{
-        masks.add(".xml");
-        masks.add(".sld");
+        MASKS.add(".xml");
+        MASKS.add(".sld");
     }
     
     private final XMLUtilities sldParser = new XMLUtilities();
@@ -73,8 +73,7 @@ public class SLDProvider implements StyleProvider{
     
     protected SLDProvider(ProviderSource source){
         this.source = source;
-        String path = source.parameters.get(KEY_FOLDER_PATH);
-        folder = new File(path);
+        folder = new File(source.parameters.get(KEY_FOLDER_PATH));
 
         if(folder == null || !folder.exists() || !folder.isDirectory()){
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
@@ -128,14 +127,14 @@ public class SLDProvider implements StyleProvider{
         
         final File f = index.get(key);
         if(f != null){
-            
+            final String baseErrorMsg = "[PROVIDER]> SLD Style ";
             //try SLD 1.1
             try {
                 final MutableStyledLayerDescriptor sld = sldParser.readSLD(f, StyledLayerDescriptor.V_1_1_0);
                 final MutableStyle style = getFirstStyle(sld);
                 if(style != null){
                     cache.put(key, style);
-                    LOGGER.log(Level.FINE, "[PROVIDER]> SLD Style " + key + " is an SLD 1.1.0");
+                    LOGGER.log(Level.FINE, baseErrorMsg + key + " is an SLD 1.1.0");
                     return style;
                 }
             } catch (JAXBException ex) { /* dont log*/ }
@@ -146,7 +145,7 @@ public class SLDProvider implements StyleProvider{
                 final MutableStyle style = getFirstStyle(sld);
                 if(style != null){
                     cache.put(key, style);
-                    LOGGER.log(Level.FINE, "[PROVIDER]> SLD Style " + key + " is an SLD 1.0.0");
+                    LOGGER.log(Level.FINE, baseErrorMsg + key + " is an SLD 1.0.0");
                     return style;
                 }
             } catch (JAXBException ex) { /*dont log*/ }
@@ -156,7 +155,7 @@ public class SLDProvider implements StyleProvider{
                 final MutableStyle style = sldParser.readStyle(f, SymbologyEncoding.V_1_1_0);
                 if(style != null){
                     cache.put(key, style);
-                    LOGGER.log(Level.FINE, "[PROVIDER]> SLD Style " + key + " is a UserStyle SLD 1.1.0");
+                    LOGGER.log(Level.FINE, baseErrorMsg + key + " is a UserStyle SLD 1.1.0");
                     return style;
                 }
             } catch (JAXBException ex) { /*dont log*/ }
@@ -166,7 +165,7 @@ public class SLDProvider implements StyleProvider{
                 final MutableStyle style = sldParser.readStyle(f, SymbologyEncoding.SLD_1_0_0);
                 if(style != null){
                     cache.put(key, style);
-                    LOGGER.log(Level.FINE, "[PROVIDER]> SLD Style " + key + " is a UserStyle SLD 1.0.0");
+                    LOGGER.log(Level.FINE, baseErrorMsg + key + " is a UserStyle SLD 1.0.0");
                     return style;
                 }
             } catch (JAXBException ex) { /*dont log*/ }
@@ -178,7 +177,7 @@ public class SLDProvider implements StyleProvider{
                 style.featureTypeStyles().add(fts);
                 if(style != null){
                     cache.put(key, style);
-                    LOGGER.log(Level.FINE, "[PROVIDER]> SLD Style " + key + " is FeatureTypeStyle SE 1.1");
+                    LOGGER.log(Level.FINE, baseErrorMsg + key + " is FeatureTypeStyle SE 1.1");
                     return style;
                 }
             } catch (JAXBException ex) { /*dont log*/ }
@@ -190,12 +189,12 @@ public class SLDProvider implements StyleProvider{
                 style.featureTypeStyles().add(fts);
                 if(style != null){
                     cache.put(key, style);
-                    LOGGER.log(Level.FINE, "[PROVIDER]> SLD Style " + key + " is an FeatureTypeStyle SLD 1.0");
+                    LOGGER.log(Level.FINE, baseErrorMsg + key + " is an FeatureTypeStyle SLD 1.0");
                     return style;
                 }
             } catch (JAXBException ex) { /*dont log*/ }
             
-            LOGGER.log(Level.WARNING, "[PROVIDER]> SLD Style " + key + " could not be parsed");
+            LOGGER.log(Level.WARNING, baseErrorMsg + key + " could not be parsed");
         }
         
         return null;
@@ -245,7 +244,7 @@ public class SLDProvider implements StyleProvider{
     private void visit(File file) {
 
         if (file.isDirectory()) {
-            File[] list = file.listFiles();
+            final File[] list = file.listFiles();
             if (list != null) {
                 for (int i = 0; i < list.length; i++) {
                     visit(list[i]);
@@ -260,9 +259,9 @@ public class SLDProvider implements StyleProvider{
         if(candidate.isFile()){
             final String fullName = candidate.getName();
             final String lowerCase = fullName.toLowerCase();
-            for(final String mask : masks){
+            for(final String mask : MASKS){
                 if(lowerCase.endsWith(mask)){
-                    String name = fullName.substring(0, fullName.length()-4);
+                    final String name = fullName.substring(0, fullName.length()-4);
                     index.put(name, candidate);
                 }
             }

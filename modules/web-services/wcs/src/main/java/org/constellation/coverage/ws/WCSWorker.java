@@ -101,6 +101,7 @@ import org.geotoolkit.wcs.xml.v111.InterpolationMethodType;
 import org.geotoolkit.wcs.xml.v111.InterpolationMethods;
 import org.geotoolkit.wcs.xml.v111.RangeType;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.rs.WebService;
 
@@ -119,8 +120,6 @@ import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 
-import static org.constellation.query.Query.APP_XML;
-import static org.constellation.query.Query.TEXT_XML;
 import static org.constellation.query.wcs.WCSQuery.GEOTIFF;
 import static org.constellation.query.wcs.WCSQuery.MATRIX;
 import static org.constellation.query.wcs.WCSQuery.NETCDF;
@@ -463,10 +462,10 @@ public final class WCSWorker {
         //supported formats
         final List<String> supportedFormat = new ArrayList<String>();
         supportedFormat.add("application/matrix");
-        supportedFormat.add("image/png");
-        supportedFormat.add("image/jpeg");
-        supportedFormat.add("image/bmp");
-        supportedFormat.add("image/gif");
+        supportedFormat.add(MimeType.IMAGE_PNG);
+        supportedFormat.add(MimeType.IMAGE_JPEG);
+        supportedFormat.add(MimeType.IMAGE_BMP);
+        supportedFormat.add(MimeType.IMAGE_GIF);
 
         final CoverageDescriptionType coverage = new CoverageDescriptionType(title, abstractt,
                 keywords, layer.getName(), domain, range, supportedCRS, supportedFormat);
@@ -507,10 +506,10 @@ public final class WCSWorker {
             final AcceptFormatsType formats =
                     ((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType)abstractRequest).getAcceptFormats();
             if (formats == null || formats.getOutputFormat().size() == 0) {
-                format = TEXT_XML;
+                format = MimeType.TEXT_XML;
             } else {
                 format = formats.getOutputFormat().get(0);
-                if (!format.equals(TEXT_XML) && !format.equals(APP_XML)) {
+                if (!format.equals(MimeType.TEXT_XML) && !format.equals(MimeType.APP_XML)) {
                     throw new CstlServiceException("This format " + format + " is not allowed",
                             INVALID_PARAMETER_VALUE, "format");
                 }

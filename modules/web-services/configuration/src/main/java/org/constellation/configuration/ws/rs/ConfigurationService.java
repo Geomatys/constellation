@@ -55,6 +55,7 @@ import org.constellation.util.Util;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.WebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -145,19 +146,19 @@ public class ConfigurationService extends WebService  {
 
             if ("Restart".equalsIgnoreCase(request)) {
                 marshaller.marshal(restartService(), sw);
-                return Response.ok(sw.toString(), "text/xml").build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             
             if ("UpdatePropertiesFile".equalsIgnoreCase(request) || objectRequest instanceof UpdatePropertiesFileType) {
                 final UpdatePropertiesFileType updateProp = (UpdatePropertiesFileType) objectRequest;
                 marshaller.marshal(updatePropertiesFile(updateProp), sw);
-                return Response.ok(sw.toString(), "text/xml").build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
 
             if ("UpdateXMLFile".equalsIgnoreCase(request) || objectRequest instanceof UpdateXMLFileType) {
                 final UpdateXMLFileType updateProp = (UpdateXMLFileType) objectRequest;
                 marshaller.marshal(updateXmlFile(updateProp), sw);
-                return Response.ok(sw.toString(), "text/xml").build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             
             if ("Download".equalsIgnoreCase(request)) {    
@@ -175,7 +176,7 @@ public class ConfigurationService extends WebService  {
                     final String id          = getParameter("ID", false);
                 
                     marshaller.marshal(cswConfigurer.refreshIndex(asynchrone, service, id), sw);
-                    return Response.ok(sw.toString(), "text/xml").build();
+                    return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
                                                   OPERATION_NOT_SUPPORTED, "Request");
@@ -195,7 +196,7 @@ public class ConfigurationService extends WebService  {
                     }
 
                     marshaller.marshal(cswConfigurer.addToIndex(service, id, identifiers), sw);
-                    return Response.ok(sw.toString(), "text/xml").build();
+                    return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
                                                   OPERATION_NOT_SUPPORTED, "Request");
@@ -205,12 +206,12 @@ public class ConfigurationService extends WebService  {
             if ("RefreshCascadedServers".equalsIgnoreCase(request) || objectRequest instanceof CSWCascadingType) {
                 final CSWCascadingType refreshCS = (CSWCascadingType) objectRequest;
                 marshaller.marshal(cswConfigurer.refreshCascadedServers(refreshCS), sw);
-                return Response.ok(sw.toString(), "text/xml").build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             
             if ("UpdateVocabularies".equalsIgnoreCase(request)) {    
                 if (cswFunctionEnabled) {
-                    return Response.ok(cswConfigurer.updateVocabularies(),"text/xml").build();
+                    return Response.ok(cswConfigurer.updateVocabularies(),MimeType.TEXT_XML).build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
                                                   OPERATION_NOT_SUPPORTED, "Request");
@@ -219,7 +220,7 @@ public class ConfigurationService extends WebService  {
             
             if ("UpdateContacts".equalsIgnoreCase(request)) {    
                 if (cswFunctionEnabled) {
-                    return Response.ok(cswConfigurer.updateContacts(),"text/xml").build();
+                    return Response.ok(cswConfigurer.updateContacts(),MimeType.TEXT_XML).build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
                                                   OPERATION_NOT_SUPPORTED, "Request");
@@ -244,7 +245,7 @@ public class ConfigurationService extends WebService  {
             }
             final StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
             
         } finally {
             if (marshaller != null) {
@@ -272,7 +273,7 @@ public class ConfigurationService extends WebService  {
                                                            ServiceDef.CONFIG.exceptionVersion.toString());
             final StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(sw.toString(), "text/xml").build();
+            return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             
         } finally {
             if (marshaller != null) {

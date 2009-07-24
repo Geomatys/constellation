@@ -19,6 +19,7 @@ package org.constellation.query.wms;
 import java.util.List;
 import org.constellation.query.QueryRequest;
 import org.constellation.util.StringUtilities;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.util.Version;
 
 
@@ -47,7 +48,7 @@ public class DescribeLayer extends WMSQuery {
      */
     @Override
     public String getExceptionFormat() {
-        return "application/vnd.ogc.se_xml";
+        return MimeType.APP_SE_XML;
     }
 
     /**

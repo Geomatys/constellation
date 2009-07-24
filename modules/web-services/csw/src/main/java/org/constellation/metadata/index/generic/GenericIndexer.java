@@ -153,13 +153,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             writer.close();
 
         } catch (CorruptIndexException ex) {
-            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-            throw new IndexingException("CorruptIndexException while indexing documents.", ex);
+            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
+            throw new IndexingException(CORRUPTED_MULTI_MSG, ex);
         } catch (LockObtainFailedException ex) {
-            LOGGER.severe("LockObtainException while indexing document: " + ex.getMessage());
-            throw new IndexingException("LockObtainException while indexing documents.", ex);
+            LOGGER.severe(LOCK_SINGLE_MSG + ex.getMessage());
+            throw new IndexingException(LOCK_MULTI_MSG, ex);
         } catch (IOException ex) {
-            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             throw new IndexingException("IOException while indexing documents.", ex);
         } catch (CstlServiceException ex) {
             LOGGER.severe("CstlServiceException while indexing document: " + ex.getMessage());
@@ -189,13 +189,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             writer.close();
 
         } catch (CorruptIndexException ex) {
-            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (LockObtainFailedException ex) {
-            LOGGER.severe("LockObtainException while indexing document: " + ex.getMessage());
+            LOGGER.severe(LOCK_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
-            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
@@ -219,10 +219,10 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             LOGGER.severe("SQLException " + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (CorruptIndexException ex) {
-            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
-            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
@@ -248,10 +248,10 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             LOGGER.severe("SQLException " + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (CorruptIndexException ex) {
-            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
-            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
+            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }

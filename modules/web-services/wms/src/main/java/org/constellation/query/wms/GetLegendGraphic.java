@@ -18,6 +18,7 @@ package org.constellation.query.wms;
 
 import org.constellation.ServiceDef;
 import org.constellation.query.QueryRequest;
+import org.constellation.ws.MimeType;
 
 
 /**
@@ -94,7 +95,7 @@ public class GetLegendGraphic extends WMSQuery {
      */
     @Override
     public String getExceptionFormat() {
-        return "application/vnd.ogc.se_xml";
+        return MimeType.APP_SE_XML;
     }
 
     /**

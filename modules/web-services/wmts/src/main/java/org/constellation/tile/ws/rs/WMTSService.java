@@ -36,6 +36,7 @@ import org.constellation.tile.ws.AbstractWMTSWorker;
 import org.constellation.tile.ws.WMTSWorker;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
@@ -49,8 +50,6 @@ import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.query.Query.KEY_REQUEST;
 import static org.constellation.query.Query.KEY_SERVICE;
 import static org.constellation.query.Query.KEY_VERSION;
-import static org.constellation.query.Query.TEXT_PLAIN;
-import static org.constellation.query.Query.TEXT_XML;
 
 
 /**
@@ -137,7 +136,7 @@ public class WMTSService extends OGCWebService {
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(gc), sw);
 
-                return Response.ok(sw.toString(), TEXT_XML).build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             if (request.equalsIgnoreCase("GetTile") || (objectRequest instanceof GetTile)) {
                 GetTile gt = (GetTile) objectRequest;
@@ -166,7 +165,7 @@ public class WMTSService extends OGCWebService {
                 StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getFeatureInfo(gf), sw);
 
-                return Response.ok(sw.toString(), TEXT_XML).build();
+                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             throw new CstlServiceException("The operation " + request +
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
@@ -362,7 +361,7 @@ public class WMTSService extends OGCWebService {
             serviceDef = getVersionFromNumber(gc.getVersion().toString());
             final StringWriter sw = new StringWriter();
             marshaller.marshal(worker.getCapabilities(gc), sw);
-            return Response.ok(sw.toString(), TEXT_XML).build();
+            return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
 
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, marshaller, serviceDef);
@@ -465,9 +464,9 @@ public class WMTSService extends OGCWebService {
                     ex.getLocator(), serviceDef.exceptionVersion.toString());
             StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), TEXT_XML).build();
+            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
         } else {
-            return Response.ok("The WMTS server is not running cause: unable to create JAXB context!", TEXT_PLAIN).build();
+            return Response.ok("The WMTS server is not running cause: unable to create JAXB context!", MimeType.TEXT_PLAIN).build();
         }
     }
 

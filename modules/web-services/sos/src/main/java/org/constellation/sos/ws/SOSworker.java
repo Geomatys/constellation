@@ -65,6 +65,7 @@ import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.rs.WebService;
 
@@ -173,7 +174,7 @@ public class SOSworker {
     /**
      * The base for offering id.
      */ 
-    private final static String OFFERING_ID_BASE = "offering-";
+    private static final String OFFERING_ID_BASE = "offering-";
     
     /**
      * The base for phenomenon id.
@@ -215,7 +216,9 @@ public class SOSworker {
      */
     private static final List<String> ACCEPTED_OUTPUT_FORMATS;
     static {
-        ACCEPTED_OUTPUT_FORMATS = Arrays.asList("text/xml", "application/xml", "text/plain");
+        ACCEPTED_OUTPUT_FORMATS = Arrays.asList(MimeType.TEXT_XML,
+                                                MimeType.APP_XML,
+                                                MimeType.TEXT_PLAIN);
     }
     
     /**
@@ -288,7 +291,7 @@ public class SOSworker {
         }
 
         LOGGER.info("path to config file=" + configurationDirectory);
-        String notWorkingMsg = "The SOS service is not running!";
+        final String notWorkingMsg = "The SOS service is not running!";
         
         isStarted = true;
         SOSConfiguration configuration = null;
@@ -438,7 +441,7 @@ public class SOSworker {
      * Log some informations about the implementations classes for reader / writer / filter object.
      */
     public void logInfos() {
-        String loaded =  " loaded.\n";
+        final String loaded =  " loaded.\n";
         if (smlReader != null) {
             LOGGER.info(smlReader.getInfos() + loaded);
         } else {
@@ -486,7 +489,7 @@ public class SOSworker {
                 in.close();
             } else {
                 LOGGER.info("No mapping file found creating one.");
-                boolean created = f.createNewFile();
+                final boolean created = f.createNewFile();
                 if (!created) {
                     LOGGER.warning("unable to create a new empty mapping file.");
                 }
@@ -511,17 +514,17 @@ public class SOSworker {
         
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
-            if (!requestCapabilities.getService().equals("SOS")) {
+            if (!requestCapabilities.getService().equals(Parameters.SOS)) {
                 throw new CstlServiceException("service must be \"SOS\"!",
-                                                 INVALID_PARAMETER_VALUE, "service");
+                                                 INVALID_PARAMETER_VALUE, Parameters.SERVICE);
             }
         } else {
             throw new CstlServiceException("Service must be specified!",
-                                             MISSING_PARAMETER_VALUE, "service");
+                                             MISSING_PARAMETER_VALUE, Parameters.SERVICE);
         }
         final AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
         if (versions != null) {
-            if (!versions.getVersion().contains("1.0.0")){
+            if (!versions.getVersion().contains(Parameters.VERSION)){
                  throw new CstlServiceException("version available : 1.0.0",
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
@@ -541,7 +544,7 @@ public class SOSworker {
             }
             
         } else {
-            this.outputFormat = "application/xml";
+            this.outputFormat = MimeType.APP_XML;
         }
         
         //we prepare the response document
@@ -562,19 +565,19 @@ public class SOSworker {
         }
 
         //we enter the information for service identification.
-        if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains("All")) {
+        if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains(Parameters.ALL)) {
 
             si = skeletonCapabilities.getServiceIdentification();
         }
 
         //we enter the information for service provider.
-        if (sections.getSection().contains("ServiceProvider") || sections.getSection().contains("All")) {
+        if (sections.getSection().contains("ServiceProvider") || sections.getSection().contains(Parameters.ALL)) {
 
             sp = skeletonCapabilities.getServiceProvider();
         }
 
         //we enter the operation Metadata
-        if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains("All")) {
+        if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains(Parameters.ALL)) {
 
            om = skeletonCapabilities.getOperationsMetadata();
 
@@ -586,28 +589,28 @@ public class SOSworker {
 
 
            //we update the URL
-           OGCWebService.updateOWSURL(om.getOperation(), serviceURL, "SOS");
+           OGCWebService.updateOWSURL(om.getOperation(), serviceURL, Parameters.SOS);
 
 
            //we update the parameter in operation metadata.
            final Operation go = om.getOperation("GetObservation");
 
            // the list of offering names
-           go.updateParameter("offering", omReader.getOfferingNames());
+           go.updateParameter(Parameters.OFFERING, omReader.getOfferingNames());
 
            // the event time range
            final List<String> eventTime = omReader.getEventTime();
            if (eventTime != null && eventTime.size() == 1) {
                final RangeType range = new RangeType(eventTime.get(0), "now");
-               go.updateParameter("eventTime", range);
+               go.updateParameter(Parameters.EVENT_TIME, range);
            } else if (eventTime != null && eventTime.size() == 2) {
                final RangeType range = new RangeType(eventTime.get(0), eventTime.get(1));
-               go.updateParameter("eventTime", range);
+               go.updateParameter(Parameters.EVENT_TIME, range);
            }
 
            //the process list
            final Collection<String> procNames  = omReader.getProcedureNames();
-           go.updateParameter("procedure", procNames);
+           go.updateParameter(Parameters.PROCEDURE, procNames);
 
            //the phenomenon list
            go.updateParameter("observedProperty", omReader.getPhenomenonNames());
@@ -620,28 +623,28 @@ public class SOSworker {
            for (ResponseModeType rm: acceptedResponseMode) {
                arm.add(rm.value());
            }
-           go.updateParameter("responseMode", arm);
+           go.updateParameter(Parameters.RESPONSE_MODE, arm);
 
            // the different responseFormat available
            go.updateParameter("responseFormat", acceptedResponseFormat);
 
            final Operation ds = om.getOperation("DescribeSensor");
-           ds.updateParameter("procedure", procNames);
+           ds.updateParameter(Parameters.PROCEDURE, procNames);
 
         }
 
         //we enter the information filter capablities.
-        if (sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains("All")) {
+        if (sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains(Parameters.ALL)) {
 
             fc = skeletonCapabilities.getFilterCapabilities();
         }
 
-        if (sections.getSection().contains("Contents") || sections.getSection().contains("All")) {
+        if (sections.getSection().contains("Contents") || sections.getSection().contains(Parameters.ALL)) {
             // we add the list of observation ofeerings 
             final ObservationOfferingList ool = new ObservationOfferingList(omReader.getObservationOfferings());
             cont = new Contents(ool);
         }
-        c = new Capabilities(si, sp, om, "1.0.0", null, fc, cont);
+        c = new Capabilities(si, sp, om, Parameters.VERSION, null, fc, cont);
 
         // we normalize the document
         c = normalizeDocument(c);
@@ -675,7 +678,7 @@ public class SOSworker {
         //we transform the form into an XML string
         if (requestDescSensor.getProcedure() == null) {
             throw new CstlServiceException("You must specify the sensor ID!",
-                                         MISSING_PARAMETER_VALUE, "procedure");
+                                         MISSING_PARAMETER_VALUE, Parameters.PROCEDURE);
         }
         final String sensorId = requestDescSensor.getProcedure();
 
@@ -700,7 +703,7 @@ public class SOSworker {
         //we verify that the output format is good.     
         if (requestObservation.getResponseFormat() != null) {
             if (!acceptedResponseFormat.contains(requestObservation.getResponseFormat())) {
-                StringBuilder arf = new StringBuilder();
+                final StringBuilder arf = new StringBuilder();
                 for (String s : acceptedResponseFormat) {
                     arf.append(s).append('\n');
                 }
@@ -709,12 +712,12 @@ public class SOSworker {
                                                INVALID_PARAMETER_VALUE, "responseFormat");
             }
         } else {
-            String arf = "";
+            final StringBuilder arf = new StringBuilder();
             for (String s : acceptedResponseFormat) {
-                arf = arf + s + '\n';
+                arf.append(s).append('\n');
             }
             throw new CstlServiceException("Response format must be specify\n" +
-                    "Accepted values are:\n" + arf,
+                    "Accepted values are:\n" + arf.toString(),
                     MISSING_PARAMETER_VALUE, "responseFormat");
         }
 
@@ -734,7 +737,7 @@ public class SOSworker {
                 }
                 throw new CstlServiceException("The response Mode: " + requestObservation.getResponseMode() + " is not supported by the service." +
                                                "Supported Values are:\n" + arm,
-                                                 INVALID_PARAMETER_VALUE, "responseMode");
+                                                 INVALID_PARAMETER_VALUE, Parameters.RESPONSE_MODE);
             }
         }
         try {
@@ -754,19 +757,19 @@ public class SOSworker {
             }
             throw new CstlServiceException("This response Mode is not supported by the service" + 
                                            "Supported Values are:\n" + arm,
-                                             OPERATION_NOT_SUPPORTED, "responseMode");
+                                             OPERATION_NOT_SUPPORTED, Parameters.RESPONSE_MODE);
         }
 
         ObservationOfferingEntry off;
         //we verify that there is an offering
         if (requestObservation.getOffering() == null) {
             throw new CstlServiceException("Offering must be specify!",
-                                             MISSING_PARAMETER_VALUE, "offering");
+                                             MISSING_PARAMETER_VALUE, Parameters.OFFERING);
         } else {
             off = omReader.getObservationOffering(requestObservation.getOffering());
             if (off == null) {
                 throw new CstlServiceException("This offering is not registered in the service",
-                                              INVALID_PARAMETER_VALUE, "offering");
+                                              INVALID_PARAMETER_VALUE, Parameters.OFFERING);
             }
         }
 
@@ -803,17 +806,17 @@ public class SOSworker {
                 final ReferenceEntry proc = omReader.getReference(dbId);
                 if (proc == null) {
                     throw new CstlServiceException(" this process is not registred in the table",
-                            INVALID_PARAMETER_VALUE, "procedure");
+                            INVALID_PARAMETER_VALUE, Parameters.PROCEDURE);
                 }
                 if (!off.getProcedure().contains(proc)) {
                     throw new CstlServiceException(" this process is not registred in the offering",
-                            INVALID_PARAMETER_VALUE, "procedure");
+                            INVALID_PARAMETER_VALUE, Parameters.PROCEDURE);
                 }
             } else {
                 //if there is only one proccess null we return error (we'll see)
                 if (procedures.size() == 1) {
                     throw new CstlServiceException("the process is null",
-                            INVALID_PARAMETER_VALUE, "procedure");
+                            INVALID_PARAMETER_VALUE, Parameters.PROCEDURE);
                 }
             }
         }
@@ -917,7 +920,7 @@ public class SOSworker {
                                                      INVALID_PARAMETER_VALUE);
                     }
                 } else {
-                    throw new CstlServiceException("This operation is not take in charge by the Web Service",
+                    throw new CstlServiceException(Parameters.NOT_SUPPORTED,
                                                  OPERATION_NOT_SUPPORTED);
                 }
             }
@@ -959,8 +962,7 @@ public class SOSworker {
 
 
             } else if (result.getPropertyIsLike() != null) {
-                throw new CstlServiceException("This operation is not take in charge by the Web Service",
-                                              OPERATION_NOT_SUPPORTED, "propertyIsLike");
+                throw new CstlServiceException(Parameters.NOT_SUPPORTED, OPERATION_NOT_SUPPORTED, "propertyIsLike");
 
             } else if (result.getPropertyIsBetween() != null) {
 
@@ -980,8 +982,7 @@ public class SOSworker {
                 }
 
             } else {
-                throw new CstlServiceException("This operation is not take in charge by the Web Service",
-                                              OPERATION_NOT_SUPPORTED);
+                throw new CstlServiceException(Parameters.NOT_SUPPORTED,OPERATION_NOT_SUPPORTED);
             }
         }
 
@@ -1144,9 +1145,9 @@ public class SOSworker {
                 final Timestamp tEnd   = result.endTime;
                 final AnyResult a      = omReader.getResult(result.resultID);
                 if (a != null) {
-                    DataArray array = a.getArray();
+                    final DataArray array = a.getArray();
                     if (array != null) {
-                        String resultValues = getResultValues(tBegin, tEnd, array, times);
+                        final String resultValues = getResultValues(tBegin, tEnd, array, times);
                         datablock.append(resultValues).append('\n');
                     } else {
                         throw new IllegalArgumentException("Array is null");
@@ -1347,11 +1348,11 @@ public class SOSworker {
             if(temp == null && obs == null) {
                 throw new CstlServiceException("observation template must be specify",
                                               MISSING_PARAMETER_VALUE,
-                                              "observationTemplate");
+                                              Parameters.OBSERVATION_TEMPLATE);
             } else if (!obs.isComplete()) {
                 throw new CstlServiceException("observation template must specify at least the following fields: procedure ,observedProperty ,featureOfInterest, Result",
                                               INVALID_PARAMETER_VALUE,
-                                              "observationTemplate"); 
+                                              Parameters.OBSERVATION_TEMPLATE);
             }
             
             //we create a new Identifier from the SensorML database
@@ -1410,7 +1411,7 @@ public class SOSworker {
         
         String id = "";
         //we get the id of the sensor and we create a sensor object
-        String sensorId   = requestInsObs.getAssignedSensorId();
+        final String sensorId = requestInsObs.getAssignedSensorId();
         int num = -1;
         if (sensorId.startsWith(sensorIdBase)) {
             num = Integer.parseInt(sensorId.substring(sensorIdBase.length()));
@@ -1429,7 +1430,7 @@ public class SOSworker {
             LOGGER.finer("template received:" + '\n' + obs.toString());
         } else {
             throw new CstlServiceException("The observation template must be specified",
-                                             MISSING_PARAMETER_VALUE, "observationTemplate");
+                                             MISSING_PARAMETER_VALUE, Parameters.OBSERVATION_TEMPLATE);
         }
 
         //we record the observation in the O&M database
@@ -1490,7 +1491,7 @@ public class SOSworker {
                         
                     } else {
                         throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, "eventTime");
+                                                      INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
                     }
                 
                 // The operation Time before    
@@ -1507,7 +1508,7 @@ public class SOSworker {
                         templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getTimePosition());
                     } else {
                         throw new CstlServiceException("TM_Before operation require timeInstant!",
-                                                      INVALID_PARAMETER_VALUE, "eventTime");
+                                                      INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
                     }
                     
                 // The operation Time after    
@@ -1525,7 +1526,7 @@ public class SOSworker {
                         
                     } else {
                        throw new CstlServiceException("TM_After operation require timeInstant!",
-                                                     INVALID_PARAMETER_VALUE, "eventTime");
+                                                     INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
                     }
                     
                 // The time during operation    
@@ -1543,7 +1544,7 @@ public class SOSworker {
                         
                     } else {
                         throw new CstlServiceException("TM_During operation require TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, "eventTime");
+                                                      INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
                     }
                 } else if (time.getTBegins() != null || time.getTBegunBy() != null || time.getTContains() != null ||time.getTEndedBy() != null || time.getTEnds() != null || time.getTMeets() != null
                            || time.getTOveralps() != null || time.getTOverlappedBy() != null) {
@@ -1567,14 +1568,14 @@ public class SOSworker {
         isWorking();
         if (request != null) {
             if (request.getService() != null) {
-                if (!request.getService().equals("SOS"))  {
-                    throw new CstlServiceException("service must be \"SOS\"!", INVALID_PARAMETER_VALUE, "service");
+                if (!request.getService().equals(Parameters.SOS))  {
+                    throw new CstlServiceException("service must be \"SOS\"!", INVALID_PARAMETER_VALUE, Parameters.SERVICE);
                 }
             } else {
-                throw new CstlServiceException("service must be specified!", MISSING_PARAMETER_VALUE, "service");
+                throw new CstlServiceException("service must be specified!", MISSING_PARAMETER_VALUE, Parameters.SERVICE);
             }
             if (request.getVersion()!= null) {
-                if (!request.getVersion().equals("1.0.0")) {
+                if (!request.getVersion().equals(Parameters.VERSION)) {
                     throw new CstlServiceException("version must be \"1.0.0\"!", VERSION_NEGOTIATION_FAILED);
                 }
             } else {
@@ -1680,7 +1681,7 @@ public class SOSworker {
                 //we create a list of accepted responseMode (fixed)
                 final List<ResponseModeType> responses  = Arrays.asList(INLINE, RESULT_TEMPLATE);
                 final List<QName> resultModel           = Arrays.asList(OBSERVATION_QNAME);
-                final List<String> offerinfOutputFormat = Arrays.asList("text/xml");
+                final List<String> offerinfOutputFormat = Arrays.asList(MimeType.TEXT_XML);
                 final List<String> srsName              = Arrays.asList("EPSG:4326");
 
                 // we create a the new Offering
@@ -1751,7 +1752,7 @@ public class SOSworker {
             //we create a list of accepted responseMode (fixed)
             final List<ResponseModeType> responses  = Arrays.asList(RESULT_TEMPLATE, INLINE);
             final List<QName> resultModel           = Arrays.asList(OBSERVATION_QNAME);
-            final List<String> offeringOutputFormat = Arrays.asList("text/xml");
+            final List<String> offeringOutputFormat = Arrays.asList(MimeType.TEXT_XML);
             final List<String> srsName              = Arrays.asList("EPSG:4326");
 
             // we create a the new Offering
@@ -1777,7 +1778,7 @@ public class SOSworker {
      */
     public String getOutputFormat() {
         if (outputFormat == null) {
-            return "application/xml";
+            return MimeType.APP_XML;
         }
         return outputFormat;
     }

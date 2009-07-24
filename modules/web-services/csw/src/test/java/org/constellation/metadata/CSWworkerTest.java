@@ -64,6 +64,7 @@ import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.constellation.generic.database.Automatic;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
@@ -210,7 +211,7 @@ public class CSWworkerTest {
          */
         AcceptVersionsType acceptVersions = new AcceptVersionsType("2.0.2");
         SectionsType sections             = new SectionsType("All");
-        AcceptFormatsType acceptFormats   = new AcceptFormatsType("application/xml");
+        AcceptFormatsType acceptFormats   = new AcceptFormatsType(MimeType.APPLICATION_XML);
         request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
 
         result = worker.getCapabilities(request);
@@ -227,7 +228,7 @@ public class CSWworkerTest {
          */
         acceptVersions = new AcceptVersionsType("2.0.2");
         sections       = new SectionsType("OperationsMetadata");
-        acceptFormats  = new AcceptFormatsType("application/xml");
+        acceptFormats  = new AcceptFormatsType(MimeType.APPLICATION_XML);
         request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
 
         result = worker.getCapabilities(request);
@@ -244,7 +245,7 @@ public class CSWworkerTest {
          */
         acceptVersions = new AcceptVersionsType("2.0.2");
         sections       = new SectionsType("ServiceProvider");
-        acceptFormats  = new AcceptFormatsType("application/xml");
+        acceptFormats  = new AcceptFormatsType(MimeType.APPLICATION_XML);
         request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
 
         result = worker.getCapabilities(request);
@@ -261,7 +262,7 @@ public class CSWworkerTest {
          */
         acceptVersions = new AcceptVersionsType("2.0.2");
         sections       = new SectionsType("ServiceIdentification");
-        acceptFormats  = new AcceptFormatsType("application/xml");
+        acceptFormats  = new AcceptFormatsType(MimeType.APPLICATION_XML);
         request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
 
         result = worker.getCapabilities(request);
@@ -278,7 +279,7 @@ public class CSWworkerTest {
          */
         acceptVersions = new AcceptVersionsType("2.0.4");
         sections       = new SectionsType("All");
-        acceptFormats  = new AcceptFormatsType("text/xml");
+        acceptFormats  = new AcceptFormatsType(MimeType.TEXT_XML);
         request = new GetCapabilitiesType(acceptVersions, sections, acceptFormats, "", "CSW");
 
         boolean exLaunched = false;
@@ -307,7 +308,7 @@ public class CSWworkerTest {
          *  TEST 1 : getRecordById with the first metadata in ISO mode.
          */
         GetRecordByIdType request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                "application/xml", "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
+                MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
         GetRecordByIdResponseType result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
@@ -326,7 +327,7 @@ public class CSWworkerTest {
          *  TEST 2 : getRecordById with the first metadata in DC mode (BRIEF).
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.BRIEF),
-                "application/xml", "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
+                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
@@ -346,7 +347,7 @@ public class CSWworkerTest {
          *  TEST 3 : getRecordById with the first metadata in DC mode (SUMMARY).
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
-                "application/xml", "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
+                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
@@ -366,7 +367,7 @@ public class CSWworkerTest {
          *  TEST 4 : getRecordById with the first metadata in DC mode (FULL).
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                "application/xml", "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
+                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600"));
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
@@ -386,7 +387,7 @@ public class CSWworkerTest {
          *  TEST 5 : getRecordById with two metadata in DC mode (FULL).
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                "application/xml", "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600","42292_9s_19900610041000"));
+                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("42292_5p_19900609195600","42292_9s_19900610041000"));
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
@@ -410,7 +411,7 @@ public class CSWworkerTest {
          *  TEST 6 : getRecordById with no identifier (waiting an exception).
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                "application/xml", "http://www.opengis.net/cat/csw/2.0.2", null);
+                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", null);
         boolean exLaunched = false;
         try {
             worker.getRecordById(request);
@@ -426,7 +427,7 @@ public class CSWworkerTest {
          *  TEST 7 : getRecordById with an unvalid identifier (waiting an exception).
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                "application/xml", "http://www.opengis.net/cat/csw/2.0.2",Arrays.asList("whatever"));
+                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2",Arrays.asList("whatever"));
         exLaunched = false;
         try {
             worker.getRecordById(request);
@@ -442,7 +443,7 @@ public class CSWworkerTest {
          *  TEST 8 : getRecordById with an unvalid outputSchema (waiting an exception).
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                "application/xml", "http://www.opengis.net/whatever",Arrays.asList("42292_5p_19900609195600"));
+                MimeType.APPLICATION_XML, "http://www.opengis.net/whatever",Arrays.asList("42292_5p_19900609195600"));
         exLaunched = false;
         try {
             worker.getRecordById(request);
@@ -474,7 +475,7 @@ public class CSWworkerTest {
          *  TEST 11 : getRecordById with the first metadata with no outputSchema.
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
-                "application/xml", null, Arrays.asList("42292_5p_19900609195600"));
+                MimeType.APPLICATION_XML, null, Arrays.asList("42292_5p_19900609195600"));
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
@@ -494,7 +495,7 @@ public class CSWworkerTest {
          *  TEST 12 : getRecordById with the first metadata with no outputSchema and no ElementSetName.
          */
         request = new GetRecordByIdType("CSW", "2.0.2", null,
-                "application/xml", null, Arrays.asList("42292_5p_19900609195600"));
+                MimeType.APPLICATION_XML, null, Arrays.asList("42292_5p_19900609195600"));
         result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
@@ -529,7 +530,7 @@ public class CSWworkerTest {
         SortByType sortBy                 = null;
         QueryConstraintType constraint    = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
         QueryType query = new QueryType(typeNames, elementSetName, sortBy, constraint);
-        GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.HITS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+        GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.HITS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
         GetRecordsResponseType result = (GetRecordsResponseType) worker.getRecords(request);
 
@@ -551,7 +552,7 @@ public class CSWworkerTest {
         sortBy         = null;
         constraint     = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
         query          = new QueryType(typeNames, elementSetName, sortBy, constraint);
-        request        = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+        request        = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
         result = (GetRecordsResponseType) worker.getRecords(request);
 
@@ -600,7 +601,7 @@ public class CSWworkerTest {
         sortBy         = null;
         constraint     = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
         query          = new QueryType(typeNames, elementSetName, sortBy, constraint);
-        request        = new GetRecordsType("CSW", "2.0.2", ResultType.VALIDATE, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+        request        = new GetRecordsType("CSW", "2.0.2", ResultType.VALIDATE, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
         assertTrue(worker.getRecords(request) instanceof AcknowledgementType);
 
@@ -613,7 +614,7 @@ public class CSWworkerTest {
         sortBy         = null;
         constraint     = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
         query          = new QueryType(typeNames, elementSetName, sortBy, constraint);
-        request        = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+        request        = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
         result = (GetRecordsResponseType) worker.getRecords(request);
 
@@ -667,7 +668,7 @@ public class CSWworkerTest {
         sortBy           = null;
         constraint       = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
         query            = new QueryType(typeNames, cust, sortBy, constraint);
-        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
         result = (GetRecordsResponseType) worker.getRecords(request);
 
@@ -719,7 +720,7 @@ public class CSWworkerTest {
         sortBy           = null;
         constraint       = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
         query            = new QueryType(typeNames, cust, sortBy, constraint);
-        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
         result = (GetRecordsResponseType) worker.getRecords(request);
 
@@ -833,7 +834,7 @@ public class CSWworkerTest {
 
         // first we must be sure that the metadata is present
         GetRecordByIdType requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                "application/xml", "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
+                MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
         GetRecordByIdResponseType GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
@@ -891,7 +892,7 @@ public class CSWworkerTest {
 
         // then we must be sure that the metadata is present
         GetRecordByIdType requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                "application/xml", "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
+                MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
         GetRecordByIdResponseType GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
@@ -930,7 +931,7 @@ public class CSWworkerTest {
         CstlServiceException exe = null;
         try {
             GetRecordByIdType requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                "application/xml", "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
+                MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
             GetRecordByIdResponseType GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
         } catch (CstlServiceException ex) {
             exe = ex;
@@ -944,7 +945,7 @@ public class CSWworkerTest {
         
         // then we must be sure that the replacement metadata is present
         GetRecordByIdType  requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                "application/xml", "http://www.isotc211.org/2005/gmd", Arrays.asList("CTDF02"));
+                MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", Arrays.asList("CTDF02"));
         GetRecordByIdResponseType GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
@@ -967,7 +968,7 @@ public class CSWworkerTest {
         SortPropertyType sp = new SortPropertyType("Identifier", SortOrderType.ASC);
         SortByType sort   = new SortByType(Arrays.asList(sp));
         QueryType query   = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
-        GetRecordsType gr = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        GetRecordsType gr = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         GetRecordsResponseType response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1026,7 +1027,7 @@ public class CSWworkerTest {
          // we make a getRecords request with language=fr to verify that the modified metadata is well indexed
         constraint = new QueryConstraintType("Language = 'fra'", "1.0.0");
         query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
         
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1053,7 +1054,7 @@ public class CSWworkerTest {
         // first we make a getRecords request to verify that the metadata match the request on the Abstract field
         constraint = new QueryConstraintType("Abstract = 'Donnees CTD ANGOLA CAP 7501 78'", "1.0.0");
         query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1104,7 +1105,7 @@ public class CSWworkerTest {
         // then we verify that the modified metadata is well modified and indexed
         constraint = new QueryConstraintType("Abstract = 'Modified datas by CSW-T'", "1.0.0");
         query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1141,7 +1142,7 @@ public class CSWworkerTest {
         // then we verify that the modified metadata is well modified and indexed
         constraint = new QueryConstraintType("Modified after 2009-03-30T00:00:00Z", "1.0.0");
         query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1180,7 +1181,7 @@ public class CSWworkerTest {
         // then we verify that the modified metadata is well modified and indexed
         constraint = new QueryConstraintType("WestBoundLongitude = '1.1'", "1.0.0");
         query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1210,7 +1211,7 @@ public class CSWworkerTest {
         sp         = new SortPropertyType("Identifier", SortOrderType.ASC);
         sort       = new SortByType(Arrays.asList(sp));
         query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
-        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1290,7 +1291,7 @@ public class CSWworkerTest {
         // then we verify that the metadata is not modified
         constraint = new QueryConstraintType("Modified after 2009-03-30T00:00:00Z", "1.0.0");
         query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1335,7 +1336,7 @@ public class CSWworkerTest {
         // then we verify that the metadata is not modified
         constraint = new QueryConstraintType("WestBoundLongitude = '1.1'", "1.0.0");
         query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1363,7 +1364,7 @@ public class CSWworkerTest {
         // first we make a getRecords request to verify that the metadata match the request on the Subject field
         constraint = new QueryConstraintType("Subject = 'research vessel' AND Subject = 'CTD profilers'", "1.0.0");
         query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
-        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1418,7 +1419,7 @@ public class CSWworkerTest {
         // then we verify that the modified metadata is well modified and indexed
         constraint = new QueryConstraintType("Subject = 'Modified datas by CSW-T' AND Subject = 'CTD profilers'", "1.0.0");
         query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1445,7 +1446,7 @@ public class CSWworkerTest {
         // first we make a getRecords request to verify that the metadata match the request on the Subject field
         constraint = new QueryConstraintType("Subject = 'Salinity of the water column' AND Subject = 'CTD profilers'", "1.0.0");
         query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
-        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1506,7 +1507,7 @@ public class CSWworkerTest {
         // then we verify that the modified metadata is well modified and indexed
         constraint = new QueryConstraintType("Subject = 'something' AND Subject = 'CTD profilers'", "1.0.0");
         query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "application/xml", "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
+        gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
         assertTrue(response != null);
@@ -1592,7 +1593,7 @@ public class CSWworkerTest {
 
         // then we must be sure that the metadata is modified
         requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                "application/xml", "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_9s_19900610041000"));
+                MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_9s_19900610041000"));
         GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);

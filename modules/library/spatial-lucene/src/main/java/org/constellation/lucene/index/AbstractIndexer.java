@@ -50,6 +50,16 @@ public abstract class AbstractIndexer<E> extends IndexLucene {
      */
     protected boolean create;
 
+    protected static final String CORRUPTED_SINGLE_MSG = "CorruptIndexException while indexing document: ";
+
+    protected static final String CORRUPTED_MULTI_MSG  = "CorruptIndexException while indexing document: ";
+
+    protected static final String LOCK_SINGLE_MSG      = "LockObtainException while indexing document: ";
+    
+    protected static final String LOCK_MULTI_MSG       = "LockObtainException while indexing documents.";
+
+    protected static final String IO_SINGLE_MSG        = "IOException while indexing document: ";
+
     /**
      * Build a new Indexer witch create an index in the specified directory,
      * with the specified analyzer.
