@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 
 import org.constellation.catalog.CatalogException;
@@ -76,9 +78,9 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
      */
     @Override
     public boolean isStopRequested() {
-        Integer count = gfi.getFeatureCount();
+        final Integer count = gfi.getFeatureCount();
         if (count != null) {
-            return (index == count);
+            return index == count;
         } else {
             return false;
         }
@@ -106,7 +108,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
             if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
                 builder.append(propName.toString()).append(':').append(prop.getType().getBinding().getSimpleName()).append(';');
             } else {
-                Object value = prop.getValue();
+                final Object value = prop.getValue();
                 builder.append(propName.toString()).append(':').append(value).append(';');
             }
         }
@@ -227,10 +229,10 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         try {
             grid = layerPostgrid.getCoverage(objEnv, new Dimension(gfi.getSize()), elevation, time);
         } catch (CatalogException cat) {
-            cat.printStackTrace();
+            Logger.getAnonymousLogger().log(Level.SEVERE, cat.getMessage(), cat);
             return;
         } catch (IOException io) {
-            io.printStackTrace();
+            Logger.getAnonymousLogger().log(Level.SEVERE, io.getMessage(), io);
             return;
         }
         if (grid != null) {

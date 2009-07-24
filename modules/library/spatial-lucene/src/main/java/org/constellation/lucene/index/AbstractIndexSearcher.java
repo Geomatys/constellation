@@ -72,7 +72,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
     /**
      * The maximum size of the map of queries.
      */
-    private final static int maxCachedQueriesSize = 50;
+    private static final int MAX_CACHED_QUERIES_SIZE = 50;
 
     /**
      * A flag indicating if the cache system for query is enabled.
@@ -261,7 +261,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
                     results.add(identifiers.get(doc.doc));
                 }
                 for (ScoreDoc doc : hits2.scoreDocs) {
-                    String id = identifiers.get(doc.doc);
+                    final String id = identifiers.get(doc.doc);
                     if (!results.contains(id)) {
                         results.add(id);
                     }
@@ -287,7 +287,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
                     hits2 = searcher.search(simpleQuery, maxRecords);
                 }
                 for (ScoreDoc doc : hits2.scoreDocs) {
-                    String id = identifiers.get(doc.doc);
+                    final String id = identifiers.get(doc.doc);
                     if (!unWanteds.contains(id)) {
                         results.add(id);
                     }
@@ -330,7 +330,7 @@ public abstract class AbstractIndexSearcher extends IndexLucene {
     private void putInCache(SpatialQuery query, List<String> results) {
         if (isCacheEnabled) {
             // if we had reach the maximum cache size we remove the first request
-            if (cachedQueries.size() >= maxCachedQueriesSize) {
+            if (cachedQueries.size() >= MAX_CACHED_QUERIES_SIZE) {
                 cachedQueries.remove(cachedQueries.keySet().iterator().next());
             }
             cachedQueries.put(query, results);

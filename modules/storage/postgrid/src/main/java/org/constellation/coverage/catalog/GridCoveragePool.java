@@ -64,7 +64,7 @@ final class GridCoveragePool {
      * If more memory is used, then oldest images are removed from {@link #lastAllocated} until memory
      * usage of remaining images fall below this limit.
      */
-    private final long memoryUsageThreshold = 128L * 1024 * 1024;
+    private static final long MEMORY_USAGE_THRESHOLD = 128L * 1024 * 1024;
 
     /**
      * Sum of {@link GridGeometryEntry#getMemoryUsage memory usage} for all coverages in
@@ -107,7 +107,7 @@ final class GridCoveragePool {
             for (final Iterator<GridCoverageEntry> it=lastAllocated.iterator(); it.hasNext();) {
                 final GridCoverageEntry previous = it.next();
                 if (previous != entry) {
-                    if (memoryUsageAllocated <= memoryUsageThreshold) {
+                    if (memoryUsageAllocated <= MEMORY_USAGE_THRESHOLD) {
                         continue;
                     }
                     previous.clearSoftReference();

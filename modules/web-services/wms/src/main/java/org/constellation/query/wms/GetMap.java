@@ -370,8 +370,8 @@ public class GetMap extends WMSQuery {
         kvp            .append(KEY_REQUEST ).append('=').append(GETMAP)
            .append('&').append(KEY_BBOX    ).append('=').append(StringUtilities.toBboxValue(envelope))
            .append('&').append((version.toString().equals("1.1.1")) ?
-                               KEY_CRS_v111 :
-                               KEY_CRS_v130).append('=').append(StringUtilities.toCrsCode(envelope))
+                               KEY_CRS_V111 :
+                               KEY_CRS_V130).append('=').append(StringUtilities.toCrsCode(envelope))
            .append('&').append(KEY_VERSION ).append('=').append(version)
            .append('&').append(KEY_FORMAT  ).append('=').append(format)
            .append('&').append(KEY_LAYERS  ).append('=').append(StringUtilities.toCommaSeparatedValues(layers))

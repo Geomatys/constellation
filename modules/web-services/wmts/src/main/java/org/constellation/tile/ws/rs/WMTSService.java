@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import javax.imageio.IIOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -68,6 +69,7 @@ public class WMTSService extends OGCWebService {
      */
     protected AbstractWMTSWorker worker;
 
+    private static final String NOT_WORKING = "The WMTS service is not running";
     /**
      * Builds a new WMTS service REST (both REST Kvp and RESTFUL). This service only
      * provides the version 1.0.0 of OGC WMTS standard, for the moment.
@@ -106,7 +108,7 @@ public class WMTSService extends OGCWebService {
         ServiceDef serviceDef = null;
         try {
             if (worker == null) {
-                throw new CstlServiceException("The WMTS service is not running",
+                throw new CstlServiceException(NOT_WORKING,
                                               NO_APPLICABLE_CODE);
             }
             marshaller = marshallerPool.acquireMarshaller();
@@ -133,7 +135,7 @@ public class WMTSService extends OGCWebService {
                     gc = createNewGetCapabilitiesRequest();
                 }
                 serviceDef = getVersionFromNumber(gc.getVersion().toString());
-                StringWriter sw = new StringWriter();
+                final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(gc), sw);
 
                 return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
@@ -162,7 +164,7 @@ public class WMTSService extends OGCWebService {
                     gf = createNewGetFeatureInfoRequest();
                 }
                 serviceDef = getVersionFromNumber(gf.getVersion());
-                StringWriter sw = new StringWriter();
+                final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getFeatureInfo(gf), sw);
 
                 return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
@@ -197,11 +199,11 @@ public class WMTSService extends OGCWebService {
              versions = new AcceptVersionsType("1.0.0");
         }
 
-        AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
+        final AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
 
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid.
-        String section = getParameter("Sections", false);
+        final String section = getParameter("Sections", false);
         List<String> requestedSections = new ArrayList<String>();
         if (section != null && !section.equalsIgnoreCase("All")) {
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
@@ -218,7 +220,7 @@ public class WMTSService extends OGCWebService {
             //if there is no requested Sections we add all the sections
             requestedSections = SectionsType.getExistingSections("1.1.1");
         }
-        SectionsType sections     = new SectionsType(requestedSections);
+        final SectionsType sections     = new SectionsType(requestedSections);
         return new GetCapabilities(versions,
                                    sections,
                                    formats,
@@ -354,7 +356,7 @@ public class WMTSService extends OGCWebService {
         try {
             marshaller = marshallerPool.acquireMarshaller();
             if (worker == null) {
-                throw new CstlServiceException("The WMTS service is not running",
+                throw new CstlServiceException(NOT_WORKING,
                                               NO_APPLICABLE_CODE);
             }
             final GetCapabilities gc = createNewGetCapabilitiesRequestRestful(version);
@@ -398,7 +400,7 @@ public class WMTSService extends OGCWebService {
     {
         try {
             if (worker == null) {
-                throw new CstlServiceException("The WMTS service is not running",
+                throw new CstlServiceException(NOT_WORKING,
                                               NO_APPLICABLE_CODE);
             }
             final GetTile gt = createNewGetTileRequestRestful(layer, tileMatrixSet, tileMatrix,
@@ -451,7 +453,7 @@ public class WMTSService extends OGCWebService {
                 !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                 !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
@@ -462,7 +464,7 @@ public class WMTSService extends OGCWebService {
             }
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(),
                     ex.getLocator(), serviceDef.exceptionVersion.toString());
-            StringWriter sw = new StringWriter();
+            final StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
         } else {

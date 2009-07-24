@@ -132,11 +132,11 @@ public class GetFeatureInfo extends GetMap {
         kvp.append('&').append(KEY_QUERY_LAYERS).append('=').append(StringUtilities.toCommaSeparatedValues(queryLayers))
            .append('&').append(KEY_INFO_FORMAT ).append('=').append(infoFormat)
            .append('&').append((version.toString().equals("1.1.1")) ?
-                               KEY_I_v111 :
-                               KEY_I_v130 )     .append('=').append(x)
+                               KEY_I_V111 :
+                               KEY_I_V130 )     .append('=').append(x)
            .append('&').append((version.toString().equals("1.1.1")) ?
-                               KEY_J_v111 :
-                               KEY_J_v130 )     .append('=').append(y);
+                               KEY_J_V111 :
+                               KEY_J_V130 )     .append('=').append(y);
 
         //Optional parameters
         if (featureCount != null) {

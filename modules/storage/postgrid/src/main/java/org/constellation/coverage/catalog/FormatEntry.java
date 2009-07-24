@@ -184,7 +184,7 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
-    public final GridSampleDimension[] getSampleDimensions() {
+    public GridSampleDimension[] getSampleDimensions() {
         return getSampleDimensions(null);
     }
 
@@ -230,14 +230,14 @@ final class FormatEntry extends Entry implements Format {
                     @Override
                     public ImageReader createReaderInstance() throws IOException {
                         final ImageReader reader = super.createReaderInstance();
-                        handleSpecialCases(reader, null);
+                        handleSpecialCases(reader);
                         return reader;
                     }
 
                     @Override
                     public ImageReader createReaderInstance(final Object extension) throws IOException {
                         final ImageReader reader = super.createReaderInstance(extension);
-                        handleSpecialCases(reader, null);
+                        handleSpecialCases(reader);
                         return reader;
                     }
                 };
@@ -271,7 +271,7 @@ final class FormatEntry extends Entry implements Format {
                 throw new IIOException(Resources.format(
                         ResourceKeys.ERROR_TOO_MANY_IMAGE_FORMATS_$1, formatName));
             }
-            handleSpecialCases(reader, null);
+            handleSpecialCases(reader);
         }
         return reader;
     }
@@ -281,7 +281,7 @@ final class FormatEntry extends Entry implements Format {
      *
      * @deprecated We need to figure out a better way to do this stuff.
      */
-    private void handleSpecialCases(final ImageReader reader, final ImageReadParam param) {
+    private void handleSpecialCases(final ImageReader reader) {
         if (reader instanceof NetcdfImageReader) {
             final NetcdfImageReader r = (NetcdfImageReader) reader;
             final GridSampleDimension[] bands = getSampleDimensions(null);
@@ -488,7 +488,7 @@ final class FormatEntry extends Entry implements Format {
          * in two versions: With the "ImageRead" operation, or direct reading
          * through the ImageReader.
          */
-        handleSpecialCases(reader, param);
+        handleSpecialCases(reader);
         if (USE_IMAGE_READ_OPERATION) {
             /*
              * Use of the "ImageRead" operation: This approach defers reading tiles until
@@ -512,10 +512,10 @@ final class FormatEntry extends Entry implements Format {
             if (inputStream != null && XArrays.containsIgnoreCase(spi.getFormatNames(), "raw")) {
             // workaround to mask out no-data values in the new image
             // TODO: add no-data specification in Formats table, or somewhere
-                double[] lower = { -9999 };  //TODO: get these from the database
-                double[] upper = { -999 };
-                double[] fill = { Float.NaN };
-                ParameterBlock pb = new ParameterBlock();
+                final double[] lower = { -9999 };  //TODO: get these from the database
+                final double[] upper = { -999 };
+                final double[] fill = { Float.NaN };
+                final ParameterBlock pb = new ParameterBlock();
                 pb.addSource(image).add(lower).add(upper).add(fill);
                 image = JAI.create("threshold", pb, null);
             }
@@ -627,7 +627,7 @@ final class FormatEntry extends Entry implements Format {
             String name = source.getName();
             final LogRecord record = Resources.getResources(null).getLogRecord(Level.FINE,
                         ResourceKeys.ABORT_IMAGE_READING_$2, name,
-                        new Integer(active.booleanValue() ? 1 : 0));
+                        Integer.valueOf(active.booleanValue() ? 1 : 0));
             record.setSourceClassName("CoverageReference");
             record.setSourceMethodName("abort");
             LOGGER.log(record);
@@ -652,8 +652,8 @@ final class FormatEntry extends Entry implements Format {
     {
         if (expected.width!=imageWidth || expected.height!=imageHeight) {
             throw new IIOException(Resources.format(ResourceKeys.ERROR_IMAGE_SIZE_MISMATCH_$5, getPath(file),
-                                   new Integer(    imageWidth), new Integer(    imageHeight),
-                                   new Integer(expected.width), new Integer(expected.height)));
+                                   Integer.valueOf(imageWidth), Integer.valueOf(imageHeight),
+                                   Integer.valueOf(expected.width), Integer.valueOf(expected.height)));
         }
     }
 
@@ -718,7 +718,7 @@ final class FormatEntry extends Entry implements Format {
      */
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder(40);
+        final StringBuilder buffer = new StringBuilder(40);
         buffer.append(Classes.getShortClassName(this)).append('[');
         return toString(buffer).append(']').toString();
     }

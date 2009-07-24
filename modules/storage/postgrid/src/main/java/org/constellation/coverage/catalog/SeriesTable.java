@@ -205,7 +205,7 @@ final class SeriesTable extends SingletonTable<Series> {
         PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
         statement.setString(indexOf(query.byLayer), layer);
 
-        String ID = null;
+        String id = null;
         final int idIndex = indexOf(query.name);
         final int pnIndex = indexOf(query.pathname);
         final int exIndex = indexOf(query.extension);
@@ -225,7 +225,7 @@ final class SeriesTable extends SingletonTable<Series> {
             if (candidate == null || !candidate.equals(format)) {
                 continue;
             }
-            if (ID != null && !ID.equals(nextID)) {
+            if (id != null && !id.equals(nextID)) {
                 // Could happen if there is insuffisient conditions in the WHERE clause.
                 final LogRecord record = Resources.getResources(getDatabase().getLocale()).
                         getLogRecord(Level.WARNING, ResourceKeys.ERROR_DUPLICATED_RECORD_$1, nextID);
@@ -234,24 +234,24 @@ final class SeriesTable extends SingletonTable<Series> {
                 LOGGER.log(record);
                 continue;
             }
-            ID = nextID;
+            id = nextID;
         }
         results.close();
-        if (ID != null) {
-            return ID;
+        if (id != null) {
+            return id;
         }
         /*
          * No match found. Adds a new record in the database.
          */
         boolean success = false;
-        LayerTable layers = getDatabase().getTable(LayerTable.class);
+        final LayerTable layers = getDatabase().getTable(LayerTable.class);
         final boolean layerExists = layers.exists(layer);
         transactionBegin();
         try {
             final String layerName = layerExists ? layer : layers.getIdentifier(layer);
-            ID = searchFreeIdentifier(layer);
+            id = searchFreeIdentifier(layer);
             statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.name),      ID);
+            statement.setString(indexOf(query.name),      id);
             statement.setString(indexOf(query.layer),     layerName);
             statement.setString(indexOf(query.pathname),  trimRoot(path));
             statement.setString(indexOf(query.extension), extension);
@@ -261,7 +261,7 @@ final class SeriesTable extends SingletonTable<Series> {
         } finally {
             transactionEnd(success);
         }
-        return ID;
+        return id;
     }
 
     /**

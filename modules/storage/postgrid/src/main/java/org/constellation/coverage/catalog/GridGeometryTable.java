@@ -385,7 +385,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         statement.setDouble(indexOf(query.byShearY),         gridToCRS.getShearY());
         statement.setInt   (indexOf(query.byHorizontalSRID), horizontalSRID);
 
-        String ID = null;
+        String id = null;
         boolean strictlyEquals = false;
         int idIndex = indexOf(query.identifier);
         int vsIndex = indexOf(query.verticalSRID);
@@ -425,7 +425,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
              *   2) Otherwise we keep the previous record. A warning will be logged if and only
              *      if the two records are strictly equals.
              */
-            if (ID!=null && !ID.equals(nextID)) {
+            if (id!=null && !id.equals(nextID)) {
                 if (!strict) {
                     continue;
                 }
@@ -439,12 +439,12 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
                     continue;
                 }
             }
-            ID = nextID;
+            id = nextID;
             strictlyEquals = strict;
         }
         results.close();
-        if (ID != null || newIdentifier == null) {
-            return ID;
+        if (id != null || newIdentifier == null) {
+            return id;
         }
         /*
          * No match found. Adds a new record in the database.
@@ -452,9 +452,9 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         boolean success = false;
         transactionBegin();
         try {
-            ID = searchFreeIdentifier(newIdentifier);
+            id = searchFreeIdentifier(newIdentifier);
             statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.identifier),     ID);
+            statement.setString(indexOf(query.identifier),     id);
             statement.setInt   (indexOf(query.width),          size.width );
             statement.setInt   (indexOf(query.height),         size.height);
             statement.setDouble(indexOf(query.scaleX),         gridToCRS.getScaleX());
@@ -487,7 +487,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         } finally {
             transactionEnd(success);
         }
-        return ID;
+        return id;
     }
 
     /**

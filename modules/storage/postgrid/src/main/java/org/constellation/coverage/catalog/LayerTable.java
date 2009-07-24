@@ -220,12 +220,12 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         final LayerQuery query = (LayerQuery) super.query;
         PreparedStatement statement = getStatement(QueryType.SELECT);
         statement.setString(indexOf(query.byName), name);
-        String ID = null;
+        String id = null;
         final int idIndex = indexOf(query.name);
         final ResultSet results = statement.executeQuery();
         while (results.next()) {
             final String nextID = results.getString(idIndex);
-            if (ID != null && !ID.equals(nextID)) {
+            if (id != null && !id.equals(nextID)) {
                 // Could happen if there is insuffisient conditions in the WHERE clause.
                 final LogRecord record = Resources.getResources(getDatabase().getLocale()).
                         getLogRecord(Level.WARNING, ResourceKeys.ERROR_DUPLICATED_RECORD_$1, nextID);
@@ -234,11 +234,11 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
                 LOGGER.log(record);
                 continue;
             }
-            ID = nextID;
+            id = nextID;
         }
         results.close();
-        if (ID != null) {
-            return ID;
+        if (id != null) {
+            return id;
         }
         /*
          * No match found. Adds a new record in the database.
@@ -246,15 +246,15 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         boolean success = false;
         transactionBegin();
         try {
-            ID = searchFreeIdentifier(name);
+            id = searchFreeIdentifier(name);
             statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.name), ID);
+            statement.setString(indexOf(query.name), id);
             success = updateSingleton(statement);
             // 'success' must be assigned last in this try block.
         } finally {
             transactionEnd(success);
         }
-        return ID;
+        return id;
     }
 
     /**

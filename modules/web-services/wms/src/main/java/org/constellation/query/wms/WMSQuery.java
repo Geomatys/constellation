@@ -49,9 +49,9 @@ public abstract class WMSQuery extends Query {
     /** Parameter used in getFeatureInfo */
     public static final String KEY_QUERY_LAYERS = "QUERY_LAYERS";
     /** Parameter used in getMap, getFeatureInfo */
-    public static final String KEY_CRS_v111 = "SRS";
+    public static final String KEY_CRS_V111 = "SRS";
     /** Parameter used in getMap, getFeatureInfo */
-    public static final String KEY_CRS_v130 = "CRS";
+    public static final String KEY_CRS_V130 = "CRS";
     /** Parameter used in getMap, getFeatureInfo */
     public static final String KEY_BBOX = "BBOX";
     /** Parameter used in getMap, getFeatureInfo */
@@ -87,13 +87,13 @@ public abstract class WMSQuery extends Query {
     /** Parameter used in getMap,getLegendGraphic */
     public static final String KEY_REMOTE_OWS_URL = "REMOTE_OWS_URL";
     /** Parameter used in getFeatureInfo */
-    public static final String KEY_I_v130 = "I";
+    public static final String KEY_I_V130 = "I";
     /** Parameter used in getFeatureInfo */
-    public static final String KEY_J_v130 = "J";
+    public static final String KEY_J_V130 = "J";
     /** Parameter used in getFeatureInfo */
-    public static final String KEY_I_v111 = "X";
+    public static final String KEY_I_V111 = "X";
     /** Parameter used in getFeatureInfo */
-    public static final String KEY_J_v111 = "Y";
+    public static final String KEY_J_V111 = "Y";
     /** Parameter used in getFeatureInfo */
     public static final String KEY_INFO_FORMAT= "INFO_FORMAT";
     /** Parameter used in getFeatureInfo */

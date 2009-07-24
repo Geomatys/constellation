@@ -38,12 +38,12 @@ final class PermissionEntry extends Entry {
     /**
      * {@code true} if the data can be displayed in a Web Map Server (WMS).
      */
-    private final boolean WMS;
+    private final boolean wms;
 
     /**
      * {@code true} if the data can be displayed in a Web Coverage Server (WCS).
      */
-    private final boolean WCS;
+    private final boolean wcs;
 
     /**
      * {@code true} if the data can be requested with a GetFeatureInfo request,
@@ -59,12 +59,12 @@ final class PermissionEntry extends Entry {
     /**
      * Creates a new entry.
      */
-    public PermissionEntry(final String name, final String user, final boolean WCS,
-            final boolean WMS, final boolean getInfo, final String remarks)
+    public PermissionEntry(final String name, final String user, final boolean wcs,
+            final boolean wms, final boolean getInfo, final String remarks)
     {
         super(name, remarks);
-        this.WCS     = WCS;
-        this.WMS     = WMS;
+        this.wcs     = wcs;
+        this.wms     = wms;
         this.getInfo = getInfo;
         this.user    = user;
     }
@@ -73,7 +73,7 @@ final class PermissionEntry extends Entry {
      * Returns {@code true} if the user can obtain data of at least one service.
      */
     public boolean isVisible() {
-        return WCS | WMS | getInfo;
+        return wcs | wms | getInfo;
     }
 
     /**
@@ -81,8 +81,8 @@ final class PermissionEntry extends Entry {
      */
     public boolean isAccessibleService(final ServiceType service) {
         switch (service) {
-            case WMS:     return WMS;
-            case WCS:     return WCS;
+            case WMS:     return wms;
+            case WCS:     return wcs;
             case GETINFO: return getInfo;
         }
         return false;
@@ -98,7 +98,7 @@ final class PermissionEntry extends Entry {
         }
         if (super.equals(object)) {
             final PermissionEntry that = (PermissionEntry) object;
-            return this.WMS == that.WMS && this.WCS == that.WCS && this.getInfo == that.getInfo &&
+            return this.wms == that.wms && this.wcs == that.wcs && this.getInfo == that.getInfo &&
                    Utilities.equals(this.user, that.user);
         }
         return false;

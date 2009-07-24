@@ -112,7 +112,7 @@ final class SampleDimensionTable extends Table {
             }
             if (band-1 != lastBand) {
                 throw new IllegalRecordException(Resources.format(ResourceKeys.ERROR_NON_CONSECUTIVE_BANDS_$2,
-                        new Integer(lastBand), new Integer(band)), this, results, bandIndex, format);
+                        Integer.valueOf(lastBand), Integer.valueOf(band)), this, results, bandIndex, format);
             }
             lastBand = band;
             sampleDimensions.add(sampleDimension);

@@ -292,8 +292,8 @@ public class WMSService extends OGCWebService {
             serviceDef = getBestVersion(null);
         }
         isVersionSupported(version);
-        final String strX    = getParameter(version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_I_v111 : KEY_I_v130, true);
-        final String strY    = getParameter(version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_J_v111 : KEY_J_v130, true);
+        final String strX    = getParameter(version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_I_V111 : KEY_I_V130, true);
+        final String strY    = getParameter(version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_J_V111 : KEY_J_V130, true);
         final String strQueryLayers = getParameter(KEY_QUERY_LAYERS, true);
         final String infoFormat  = getParameter(KEY_INFO_FORMAT, true);
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
@@ -304,13 +304,13 @@ public class WMSService extends OGCWebService {
             x = StringUtilities.toInt(strX);
         } catch (NumberFormatException ex) {
             throw new CstlServiceException("Integer value waited. " + ex.getMessage(), ex, INVALID_POINT,
-                    version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_I_v111 : KEY_I_v130);
+                    version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_I_V111 : KEY_I_V130);
         }
         try {
             y = StringUtilities.toInt(strY);
         } catch (NumberFormatException ex) {
             throw new CstlServiceException("Integer value waited. " + ex.getMessage(), ex, INVALID_POINT,
-                    version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_J_v111 : KEY_J_v130);
+                    version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_J_V111 : KEY_J_V130);
         }
         final Integer featureCount;
         if (strFeatureCount == null || strFeatureCount.equals("")) {
@@ -368,7 +368,7 @@ public class WMSService extends OGCWebService {
         isVersionSupported(version);
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
         String strCRS          = getParameter((version.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
-                                            KEY_CRS_v111 : KEY_CRS_v130, true);
+                                            KEY_CRS_V111 : KEY_CRS_V130, true);
         final String strBBox         = getParameter(KEY_BBOX,            true);
         final String strLayers       = getParameter(KEY_LAYERS,          true);
         final String strWidth        = getParameter(KEY_WIDTH,           true);

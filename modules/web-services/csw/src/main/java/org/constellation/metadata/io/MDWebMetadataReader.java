@@ -151,9 +151,9 @@ public class MDWebMetadataReader extends MetadataReader {
     /**
      * A map of binding term-path for each standard.
      */
-    private static final Map<Standard, Map<String, String>> dublinCorePathMap;
+    private static final Map<Standard, Map<String, String>> DUBLINCORE_PATH_MAP;
     static {
-        dublinCorePathMap          = new HashMap<Standard, Map<String, String>>();
+        DUBLINCORE_PATH_MAP          = new HashMap<Standard, Map<String, String>>();
         
         final Map<String, String> isoMap = new HashMap<String, String>();
         isoMap.put("identifier",  "ISO 19115:MD_Metadata:fileIdentifier");
@@ -166,7 +166,7 @@ public class MDWebMetadataReader extends MetadataReader {
         isoMap.put("creator",     "ISO 19115:MD_Metadata:identificationInfo:credit");
         isoMap.put("publisher",   "ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:organisationName");
         isoMap.put("language",    "ISO 19115:MD_Metadata:language");
-        dublinCorePathMap.put(Standard.ISO_19115, isoMap);
+        DUBLINCORE_PATH_MAP.put(Standard.ISO_19115, isoMap);
         
         final Map<String, String> ebrimMap = new HashMap<String, String>();
         ebrimMap.put("identifier", "Ebrim v3.0:RegistryObject:id");
@@ -182,7 +182,7 @@ public class MDWebMetadataReader extends MetadataReader {
         //ebrimMap.put("publisher",  "Ebrim v3:RegistryObject:distributionInfo:distributor:distributorContact:organisationName");
         //ebrimMap.put("language",   "Ebrim v3:RegistryObject:language");
         //TODO find ebrimMap.put("date",       "Ebrim V3:RegistryObject:dateStamp");
-        dublinCorePathMap.put(Standard.EBRIM_V3, ebrimMap);
+        DUBLINCORE_PATH_MAP.put(Standard.EBRIM_V3, ebrimMap);
     }
     
     /**
@@ -428,7 +428,7 @@ public class MDWebMetadataReader extends MetadataReader {
         
         final Value top                   = form.getTopValue();
         final Standard  recordStandard    = top.getType().getStandard();
-        final Map<String, String> pathMap = dublinCorePathMap.get(recordStandard);
+        final Map<String, String> pathMap = DUBLINCORE_PATH_MAP.get(recordStandard);
         
         // we get the title of the form
         final SimpleLiteral title             = new SimpleLiteral(null, form.getTitle());
@@ -808,10 +808,10 @@ public class MDWebMetadataReader extends MetadataReader {
                     // so we must find the codeList element corrrespounding to this code.
                     final org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList) value.getType();
                     try {
-                        CodeListElement element = codelist.getElementByCode(Integer.parseInt(textValue));
+                        final CodeListElement element = codelist.getElementByCode(Integer.parseInt(textValue));
                     
                         Method method;
-                        if ((classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class))) {
+                        if (classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) {
                             method = Util.getMethod("valueOf", classe, String.class);
                         } else if (classe.isEnum()) {
                             temp = "fromValue";
@@ -875,7 +875,7 @@ public class MDWebMetadataReader extends MetadataReader {
                         }
                     }
                     if (child != null) {
-                        CharSequence cs = child.getValue();
+                        final CharSequence cs = child.getValue();
                         return Util.newInstance(classe, cs);
                     } else {
                         LOGGER.severe("The localName is mal-formed");
@@ -925,7 +925,7 @@ public class MDWebMetadataReader extends MetadataReader {
         boolean isMeta  = false;
         boolean wasMeta = false;
         if (result instanceof MetadataEntity) {
-            MetadataEntity meta = (MetadataEntity) result;
+            final MetadataEntity meta = (MetadataEntity) result;
             metaMap = meta.asMap();
             isMeta  = true;
             wasMeta = true;
@@ -934,13 +934,13 @@ public class MDWebMetadataReader extends MetadataReader {
         // then we search the setter for all the child value
         for (Value childValue : form.getValues()) {
             
-            Path path = childValue.getPath();
+            final Path path = childValue.getPath();
 
             if (childValue.getParent()!= null && childValue.getParent().equals(value)) {
                 LOGGER.finer("new childValue:" + path.getName());
 
                 // we get the object from the child Value
-                Object param = getObjectFromValue(form, childValue);
+                final Object param = getObjectFromValue(form, childValue);
                 if (param == null) {
                     continue;
                 }
@@ -964,7 +964,7 @@ public class MDWebMetadataReader extends MetadataReader {
                         if (isMeta) {
                               metaMap.put(attribName, param);
                         } else {
-                            Method setter = Util.getSetterFromName(attribName, param.getClass(), classe);
+                            final Method setter = Util.getSetterFromName(attribName, param.getClass(), classe);
                             if (setter != null)
                                 Util.invokeMethod(setter, result, param);
                         }
@@ -1003,7 +1003,7 @@ public class MDWebMetadataReader extends MetadataReader {
                         tryAgain = false;
                     }
                 }
-                if (wasMeta == true)
+                if (wasMeta)
                     isMeta = true;
             }
         }
@@ -1063,7 +1063,7 @@ public class MDWebMetadataReader extends MetadataReader {
             return result;
         }
         
-        String classNameSave = standardName + ':' + className;
+        final String classNameSave = standardName + ':' + className;
         
         //for the primitive type we return java primitive type
         result = getPrimitiveTypeFromName(className);
@@ -1197,9 +1197,9 @@ public class MDWebMetadataReader extends MetadataReader {
             if (paths != null) {
                 if (paths.size() != 0) {
                     try {
-                        List<String> values = mdReader.getDomainOfValuesFromPaths(paths);
-                        ListOfValuesType listValues = new ListOfValuesType(values);
-                        DomainValuesType value = new DomainValuesType(null, token, listValues, METADATA_QNAME);
+                        final List<String> values = mdReader.getDomainOfValuesFromPaths(paths);
+                        final ListOfValuesType listValues = new ListOfValuesType(values);
+                        final DomainValuesType value = new DomainValuesType(null, token, listValues, METADATA_QNAME);
                         responseList.add(value);
                         if (false) throw new SQLException();
 
@@ -1242,7 +1242,7 @@ public class MDWebMetadataReader extends MetadataReader {
 
     @Override
     public List<? extends Object> getAllEntries() throws CstlServiceException {
-        List<Object> results = new ArrayList<Object>();
+        final List<Object> results = new ArrayList<Object>();
         try {
             final List<Catalog> catalogs = mdReader.getCatalogs();
             final List<Form> forms       = mdReader.getAllForm(catalogs);
