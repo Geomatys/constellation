@@ -46,12 +46,12 @@ public class OfferingPhenomenonQuery extends Query {
      */
     public OfferingPhenomenonQuery(final Database database) {
         super (database, "offering_phenomenons");
-        final QueryType[] SLI  = {SELECT, LIST, INSERT};
-        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
+        //final QueryType[] SLI  = {SELECT, LIST, INSERT};
+        final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         
-        idOffering          = addColumn("id_offering", SLIE);
-        phenomenon          = addColumn("phenomenon",  SLIE);
-        compositePhenomenon = addColumn("composite_phenomenon",  SLIE);
+        idOffering          = addColumn("id_offering", slie);
+        phenomenon          = addColumn("phenomenon",  slie);
+        compositePhenomenon = addColumn("composite_phenomenon",  slie);
         
         byOffering            = addParameter(idOffering, SELECT, LIST, EXISTS);
         byPhenomenon          = addParameter(phenomenon,  SELECT, EXISTS);

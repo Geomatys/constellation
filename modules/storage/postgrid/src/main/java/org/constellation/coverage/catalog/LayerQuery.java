@@ -49,14 +49,14 @@ final class LayerQuery extends Query {
      */
     public LayerQuery(final Database database) {
         super(database, "Layers");
-        final QueryType[] SL   = {SELECT, LIST};
-        final QueryType[] SLEI = {SELECT, LIST, EXISTS, INSERT};
-        name      = addColumn("name",              SLEI);
-        thematic  = addColumn("thematic",    null, SL  );
-        procedure = addColumn("procedure",   null, SL  );
-        period    = addColumn("period",         1, SL  );
-        fallback  = addColumn("fallback",    null, SL  );
-        remarks   = addColumn("description", null, SL  );
+        final QueryType[] sl   = {SELECT, LIST};
+        final QueryType[] slei = {SELECT, LIST, EXISTS, INSERT};
+        name      = addColumn("name",              slei);
+        thematic  = addColumn("thematic",    null, sl  );
+        procedure = addColumn("procedure",   null, sl  );
+        period    = addColumn("period",         1, sl  );
+        fallback  = addColumn("fallback",    null, sl  );
+        remarks   = addColumn("description", null, sl  );
         byName    = addParameter(name, SELECT, EXISTS);
     }
 }

@@ -94,7 +94,7 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
      * @todo Codés en dur pour l'instant. Peut avoir besoin d'être paramètrables dans une
      *       version future.
      */
-    private static final int xDimension=0, yDimension=1;
+    private static final int X_DIMENSION = 0, Y_DIMENSION = 1;
 
     /**
      * Object to use for formatting dates. The symbols are local-dependent, but the time zone
@@ -309,20 +309,20 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
         final boolean change = super.setPreferredResolution(resolution);
         if (change) {
             flush();
-            final int clé;
+            final int key;
             final Object param;
             if (resolution != null) {
-                clé = ResourceKeys.SET_RESOLUTION_$3;
+                key = ResourceKeys.SET_RESOLUTION_$3;
                 param = new Object[] {
                     resolution.getWidth(),
                     resolution.getHeight(),
                     getLayerName()
                 };
             } else {
-                clé = ResourceKeys.UNSET_RESOLUTION_$1;
+                key = ResourceKeys.UNSET_RESOLUTION_$1;
                 param = getLayerName();
             }
-            log("setPreferredResolution", Level.CONFIG, clé, param);
+            log("setPreferredResolution", Level.CONFIG, key, param);
         }
         return change;
     }
@@ -346,17 +346,17 @@ public class GridCoverageTable extends BoundedSingletonTable<CoverageReference> 
         if (!Utilities.equals(operation, this.operation)) {
             flush();
             this.operation = operation;
-            final int clé;
+            final int key;
             final Object param;
             if (operation != null) {
                 param = new String[] {operation.getName(), getLayerName()};
-                clé   = ResourceKeys.SET_OPERATION_$2;
+                key   = ResourceKeys.SET_OPERATION_$2;
             } else {
                 param = getLayerName();
-                clé   = ResourceKeys.UNSET_OPERATION_$1;
+                key   = ResourceKeys.UNSET_OPERATION_$1;
             }
             fireStateChanged("Operation");
-            log("setOperation", Level.CONFIG, clé, param);
+            log("setOperation", Level.CONFIG, key, param);
         }
     }
 
@@ -736,8 +736,8 @@ loop:   for (final CoverageReference newReference : entries) {
          */
         final Envelope envelope = getEnvelope();
         final Rectangle2D geographicArea = XRectangle2D.createFromExtremums(
-                            envelope.getMinimum(xDimension), envelope.getMinimum(yDimension),
-                            envelope.getMaximum(xDimension), envelope.getMaximum(yDimension));
+                            envelope.getMinimum(X_DIMENSION), envelope.getMinimum(Y_DIMENSION),
+                            envelope.getMaximum(X_DIMENSION), envelope.getMaximum(Y_DIMENSION));
         final Dimension2D resolution = getPreferredResolution();
         settings = new GridCoverageSettings(operation, getCoordinateReferenceSystem(),
                             coverageCRS, geographicArea, resolution, dateFormat);
@@ -803,9 +803,9 @@ loop:   for (final CoverageReference newReference : entries) {
     /**
      * Enregistre un évènement dans le journal.
      */
-    private void log(final String method, final Level level, final int clé, final Object param) {
+    private void log(final String method, final Level level, final int key, final Object param) {
         final Resources resources = Resources.getResources(getDatabase().getLocale());
-        final LogRecord record = resources.getLogRecord(level, clé, param);
+        final LogRecord record = resources.getLogRecord(level, key, param);
         record.setSourceClassName("CoverageTable");
         record.setSourceMethodName(method);
         CoverageReference.LOGGER.log(record);

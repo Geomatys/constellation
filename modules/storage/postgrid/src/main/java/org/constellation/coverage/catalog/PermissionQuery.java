@@ -42,7 +42,7 @@ final class PermissionQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    final Column name, user, WMS, WCS, getInfo, description;
+    final Column name, user, wms, wcs, getInfo, description;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -56,14 +56,14 @@ final class PermissionQuery extends Query {
      */
     public PermissionQuery(final Database database) {
         super(database, "Permissions");
-        final QueryType[] SL = {SELECT, LIST};
-        name        = addColumn("name",                  SL);
-        user        = addColumn("user",    DEFAULT,      SL);
-        WMS         = addColumn("WMS",     Boolean.TRUE, SL);
-        WCS         = addColumn("WCS",     Boolean.TRUE, SL);
-        getInfo     = addColumn("getInfo", Boolean.TRUE, SL);
-        description = addColumn("description",           SL);
-        byName      = addParameter(name, SL);
-        byUser      = addParameter(user, SL);
+        final QueryType[] sl = {SELECT, LIST};
+        name        = addColumn("name",                  sl);
+        user        = addColumn("user",    DEFAULT,      sl);
+        wms         = addColumn("WMS",     Boolean.TRUE, sl);
+        wcs         = addColumn("WCS",     Boolean.TRUE, sl);
+        getInfo     = addColumn("getInfo", Boolean.TRUE, sl);
+        description = addColumn("description",           sl);
+        byName      = addParameter(name, sl);
+        byUser      = addParameter(user, sl);
     }
 }

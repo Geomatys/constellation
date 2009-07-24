@@ -49,21 +49,21 @@ public class MeasurementQuery extends Query{
      */
     public MeasurementQuery(final Database database) {
         super(database, "measurements");
-        final QueryType[] SI  = {SELECT, INSERT};
-        final QueryType[] SIE = {SELECT, INSERT, EXISTS};
+        final QueryType[] si  = {SELECT, INSERT};
+        final QueryType[] sie = {SELECT, INSERT, EXISTS};
         
-        name                      = addColumn("name",                        SIE);
-        description               = addColumn("description",                 SI);
-        featureOfInterest         = addColumn("feature_of_interest",         SI);
-        featureOfInterestPoint    = addColumn("feature_of_interest_point",   SI);
-        procedure                 = addColumn("procedure",                   SI);
-        observedProperty          = addColumn("observed_property",           SI);
-        observedPropertyComposite = addColumn("observed_property_composite", SI);
-        distribution              = addColumn("distribution",                SI);
-        samplingTimeBegin         = addColumn("sampling_time_begin",         SI);
-        samplingTimeEnd           = addColumn("sampling_time_end",           SI);
-        result                    = addColumn("result",                      SI);
-        resultDefinition          = addColumn("result_definition",           SI);
+        name                      = addColumn("name",                        sie);
+        description               = addColumn("description",                 si);
+        featureOfInterest         = addColumn("feature_of_interest",         si);
+        featureOfInterestPoint    = addColumn("feature_of_interest_point",   si);
+        procedure                 = addColumn("procedure",                   si);
+        observedProperty          = addColumn("observed_property",           si);
+        observedPropertyComposite = addColumn("observed_property_composite", si);
+        distribution              = addColumn("distribution",                si);
+        samplingTimeBegin         = addColumn("sampling_time_begin",         si);
+        samplingTimeEnd           = addColumn("sampling_time_end",           si);
+        result                    = addColumn("result",                      si);
+        resultDefinition          = addColumn("result_definition",           si);
 /*
         observationMetadata       = addColumn("observationMetadata",         SI);
         quality                   = addColumn("quality",                     SI);

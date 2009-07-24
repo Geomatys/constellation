@@ -50,12 +50,12 @@ final class DistributionQuery extends Query {
      */
     public DistributionQuery(final Database database) {
         super(database, "Distributions");
-        final QueryType[] SLI  = {SELECT, LIST, INSERT};
-        final QueryType[] SLIE  = {SELECT, LIST, INSERT, EXISTS};
-        name   = addColumn   ("name",   SLIE);
-        scale  = addColumn   ("scale",  SLI);
-        offset = addColumn   ("offset", SLI);
-        log    = addColumn   ("log",    SLI);
+        final QueryType[] sli  = {SELECT, LIST, INSERT};
+        final QueryType[] slie  = {SELECT, LIST, INSERT, EXISTS};
+        name   = addColumn   ("name",   slie);
+        scale  = addColumn   ("scale",  sli);
+        offset = addColumn   ("offset", sli);
+        log    = addColumn   ("log",    sli);
         byName = addParameter(name, SELECT, EXISTS);
     }
 }

@@ -50,23 +50,23 @@ final class LayerMetadataQuery extends Query {
      */
     public LayerMetadataQuery(final Database database) {
         super(database, "LayerMetadata");
-        final QueryType[] SL   = {SELECT, LIST};
-        final QueryType[] SLEI = {SELECT, LIST, EXISTS, INSERT};
+        final QueryType[] sl   = {SELECT, LIST};
+        final QueryType[] slei = {SELECT, LIST, EXISTS, INSERT};
 
-        layerName =        addColumn("layerName",               SLEI);
-        layerMetaName =    addColumn("id",              null,   SL  );
-        abbrTitle =        addColumn("abbrTitle",       null,   SL  );
-        shortTitle =       addColumn("shortTitle",      null,   SL  );
-        longTitle =        addColumn("longTitle",       null,   SL  );
-        parameterName =    addColumn("parameterName",   null,   SL  );
-        parameterType =    addColumn("parameterType",   null,   SL  );
-        description =       addColumn("description",      null,   SL  );
-        longDescription =  addColumn("longDescription", null,   SL  );
-        dataSource =       addColumn("dataSource",      null,   SL  );
-        purpose =           addColumn("purpose",          null,   SL  );
-        supplementalInfo = addColumn("supplementalInfo",null,   SL  );
-        updateFrequency =  addColumn("updateFrequency", null,   SL  );
-        useConstraint =    addColumn("useConstraint",   null,   SL  );
+        layerName =        addColumn("layerName",               slei);
+        layerMetaName =    addColumn("id",              null,   sl  );
+        abbrTitle =        addColumn("abbrTitle",       null,   sl  );
+        shortTitle =       addColumn("shortTitle",      null,   sl  );
+        longTitle =        addColumn("longTitle",       null,   sl  );
+        parameterName =    addColumn("parameterName",   null,   sl  );
+        parameterType =    addColumn("parameterType",   null,   sl  );
+        description =       addColumn("description",      null,   sl  );
+        longDescription =  addColumn("longDescription", null,   sl  );
+        dataSource =       addColumn("dataSource",      null,   sl  );
+        purpose =           addColumn("purpose",          null,   sl  );
+        supplementalInfo = addColumn("supplementalInfo",null,   sl  );
+        updateFrequency =  addColumn("updateFrequency", null,   sl  );
+        useConstraint =    addColumn("useConstraint",   null,   sl  );
         byName    = addParameter(layerName, SELECT, EXISTS);
     }
 }

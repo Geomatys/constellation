@@ -292,8 +292,8 @@ public class Database {
                 Element.LOGGER.warning("No " + CONFIG_FILENAME + " file found. Fallback on default.");
             }
         }
-        final String ID = getProperty(ConfigurationKey.TIMEZONE);
-        timezone = (ID!=null && !ID.equalsIgnoreCase("local")) ? TimeZone.getTimeZone(ID) : TimeZone.getDefault();
+        final String id = getProperty(ConfigurationKey.TIMEZONE);
+        timezone = (id!=null && !id.equalsIgnoreCase("local")) ? TimeZone.getTimeZone(id) : TimeZone.getDefault();
         catalog  = getProperty(ConfigurationKey.CATALOG);
         schema   = getProperty(ConfigurationKey.SCHEMA);
         /*
@@ -479,7 +479,7 @@ public class Database {
      */
     public String getProperty(final ConfigurationKey key) {
         // No need to synchronize since 'Properties' is already synchronized.
-        String value = properties.getProperty(key.getKey(), key.getDefaultValue());
+        final String value = properties.getProperty(key.getKey(), key.getDefaultValue());
         if (value == null) {
             if (key.equals(ConfigurationKey.TIMEZONE)) {
                 return timezone.getID();

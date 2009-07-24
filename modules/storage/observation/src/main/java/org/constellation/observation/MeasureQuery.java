@@ -49,12 +49,12 @@ public class MeasureQuery extends Query{
      */
     public MeasureQuery(final Database database) {
         super(database, "measures");
-        final QueryType[] SLI  = {SELECT, LIST, INSERT};
-        final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
+        final QueryType[] sli  = {SELECT, LIST, INSERT};
+        final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         
-        name    = addColumn   ("name",  SLIE);
-        uom     = addColumn   ("uom",   SLI);
-        value   = addColumn   ("value", SLI);
+        name    = addColumn   ("name",  slie);
+        uom     = addColumn   ("uom",   sli);
+        value   = addColumn   ("value", sli);
         
         byName  = addParameter(name, SELECT, EXISTS);
     }

@@ -46,8 +46,6 @@ import org.constellation.catalog.Table;
 //import org.constellation.coverage.model.RegionOfInterest;
 
 // GeoAPI dependencies
-import org.opengis.observation.Phenomenon;
-import org.opengis.observation.Process;
 import org.opengis.observation.Observation;
 
 /**
@@ -231,7 +229,7 @@ public class MergedMeasurementTable extends Table {
                 out.write('(');
                 out.write(code);
                 out.write(')');
-                length += (code.length() + 2);
+                length += code.length() + 2;
             }
             out.write(Utilities.spaces(width[i] - length + 1));
         }
@@ -365,9 +363,9 @@ public class MergedMeasurementTable extends Table {
          */
         int count = 0;
         while (source.next()) {
-            final int ID = source.getInt(1);
+            final int id = source.getInt(1);
             dest.moveToInsertRow();
-            dest.updateInt(1, ID);
+            dest.updateInt(1, id);
             for (int i=2; i<=columnCount; i++) {
                 if (isDate[i-1]) {
                     dest.updateTimestamp(i, source.getTimestamp(i, calendar));

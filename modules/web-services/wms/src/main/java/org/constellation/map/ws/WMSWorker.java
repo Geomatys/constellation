@@ -291,7 +291,7 @@ public class WMSWorker extends AbstractWMSWorker {
                     new org.geotoolkit.wms.xml.v111.Dimension("elevation", "EPSG:5030", defaut, null) :
                     new org.geotoolkit.wms.xml.v130.Dimension("elevation", "EPSG:5030", defaut, null);
                 final StringBuilder elevs = new StringBuilder();
-                for (Iterator<Number> it = elevations.iterator(); it.hasNext();) {
+                for (final Iterator<Number> it = elevations.iterator(); it.hasNext();) {
                     final Number n = it.next();
                     elevs.append(n.toString());
                     if (it.hasNext()) {
@@ -332,7 +332,7 @@ public class WMSWorker extends AbstractWMSWorker {
                                                     "FORMAT=";
             final String legendUrlGif = beginLegendUrl + IMAGE_GIF + "&LAYER=" + layerName;
             final String legendUrlPng = beginLegendUrl + IMAGE_PNG + "&LAYER=" + layerName;
-            final int queryable = (layer.isQueryable(ServiceType.GETINFO) == true) ? 1 : 0;
+            final int queryable = (layer.isQueryable(ServiceType.GETINFO)) ? 1 : 0;
             final AbstractLayer outputLayer;
             if (queryVersion.equals(ServiceDef.WMS_1_1_1.version.toString())) {
                 /*
@@ -349,23 +349,23 @@ public class WMSWorker extends AbstractWMSWorker {
                 // we build The Style part
                 org.geotoolkit.wms.xml.v111.OnlineResource or =
                         new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlPng);
-                org.geotoolkit.wms.xml.v111.LegendURL legendURL1 =
+                final org.geotoolkit.wms.xml.v111.LegendURL legendURL1 =
                         new org.geotoolkit.wms.xml.v111.LegendURL(IMAGE_PNG, or);
 
                 or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlGif);
-                org.geotoolkit.wms.xml.v111.LegendURL legendURL2 =
+                final org.geotoolkit.wms.xml.v111.LegendURL legendURL2 =
                         new org.geotoolkit.wms.xml.v111.LegendURL(IMAGE_GIF, or);
 
-                List<String> stylesName = layer.getFavoriteStyles();
-                List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
+                final List<String> stylesName = layer.getFavoriteStyles();
+                final List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
                 if (stylesName != null && stylesName.size() != 0) {
                     for (String styleName : stylesName) {
-                        org.geotoolkit.wms.xml.v111.Style style = new org.geotoolkit.wms.xml.v111.Style(
+                        final org.geotoolkit.wms.xml.v111.Style style = new org.geotoolkit.wms.xml.v111.Style(
                                 styleName, styleName, null, null, null, legendURL1, legendURL2);
                         styles.add(style);
                     }
                 } else {
-                    org.geotoolkit.wms.xml.v111.Style style = new org.geotoolkit.wms.xml.v111.Style(
+                    final org.geotoolkit.wms.xml.v111.Style style = new org.geotoolkit.wms.xml.v111.Style(
                                 "Style1", "defaultStyle", null, null, null, legendURL1, legendURL2);
                     styles.add(style);
                 }
@@ -396,23 +396,23 @@ public class WMSWorker extends AbstractWMSWorker {
                 // we build a Style Object
                 org.geotoolkit.wms.xml.v130.OnlineResource or =
                         new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlPng);
-                org.geotoolkit.wms.xml.v130.LegendURL legendURL1 =
+                final org.geotoolkit.wms.xml.v130.LegendURL legendURL1 =
                         new org.geotoolkit.wms.xml.v130.LegendURL(IMAGE_PNG, or);
 
                 or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlGif);
-                org.geotoolkit.wms.xml.v130.LegendURL legendURL2 =
+                final org.geotoolkit.wms.xml.v130.LegendURL legendURL2 =
                         new org.geotoolkit.wms.xml.v130.LegendURL(IMAGE_GIF, or);
 
-                List<String> stylesName = layer.getFavoriteStyles();
-                List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
+                final List<String> stylesName = layer.getFavoriteStyles();
+                final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
                 if (stylesName != null && stylesName.size() != 0) {
                     for (String styleName : stylesName) {
-                        org.geotoolkit.wms.xml.v130.Style style = new org.geotoolkit.wms.xml.v130.Style(
+                        final org.geotoolkit.wms.xml.v130.Style style = new org.geotoolkit.wms.xml.v130.Style(
                         styleName, styleName, null, null, null, legendURL1, legendURL2);
                         styles.add(style);
                     }
                 } else {
-                    org.geotoolkit.wms.xml.v130.Style style = new org.geotoolkit.wms.xml.v130.Style(
+                    final org.geotoolkit.wms.xml.v130.Style style = new org.geotoolkit.wms.xml.v130.Style(
                         "Style1", "default Style", null, null, null, legendURL1, legendURL2);
                     styles.add(style);
                 }
@@ -454,11 +454,11 @@ public class WMSWorker extends AbstractWMSWorker {
     private Object getStaticCapabilitiesObject(final String home, final String version) throws JAXBException, IOException {
         final String fileName = "WMSCapabilities" + version + ".xml";
         final File changeFile = getFile("change.properties", home);
-        Properties p = new Properties();
+        final Properties p = new Properties();
 
         // if the flag file is present we load the properties
         if (changeFile != null && changeFile.exists()) {
-            FileInputStream in = new FileInputStream(changeFile);
+            final FileInputStream in = new FileInputStream(changeFile);
             p.load(in);
             in.close();
         } else {
@@ -467,20 +467,20 @@ public class WMSWorker extends AbstractWMSWorker {
 
         //Look if the template capabilities is already in cache.
         Object response = capabilities.get(fileName);
-        boolean update = p.getProperty("update").equals("true");
+        final boolean update = p.getProperty("update").equals("true");
 
         if (response == null || update) {
             if (update) {
                 LOGGER.info("updating metadata");
             }
 
-            File f = getFile(fileName, home);
+            final File f = getFile(fileName, home);
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
                 // If the file is not present in the configuration directory, take the one in resource.
                 if (!f.exists()) {
-                    final InputStream in = getClass().getResourceAsStream(fileName);
+                    final InputStream in = Util.getResourceAsStream(fileName);
                     response = unmarshaller.unmarshal(in);
                     in.close();
                 } else {
@@ -499,7 +499,7 @@ public class WMSWorker extends AbstractWMSWorker {
 
             // if the flag file is present we store the properties
             if (changeFile != null && changeFile.exists()) {
-                FileOutputStream out = new FileOutputStream(changeFile);
+                final FileOutputStream out = new FileOutputStream(changeFile);
                 p.store(out, "updated from WebService");
                 out.close();
             }
@@ -550,15 +550,15 @@ public class WMSWorker extends AbstractWMSWorker {
     {
 
         if (version.toString().equals("1.3.0")) {
-            org.geotoolkit.wms.xml.v130.Request r = (org.geotoolkit.wms.xml.v130.Request) request;
-            List<JAXBElement<OperationType>> extendedOperations = r.getExtendedOperation();
+            final org.geotoolkit.wms.xml.v130.Request r = (org.geotoolkit.wms.xml.v130.Request) request;
+            final List<JAXBElement<OperationType>> extendedOperations = r.getExtendedOperation();
             for(JAXBElement<OperationType> extOp: extendedOperations) {
                 updateURL(extOp.getValue().getDCPType(), url);
             }
 
         // version 1.1.1
         } else {
-           org.geotoolkit.wms.xml.v111.Request r = (org.geotoolkit.wms.xml.v111.Request) request;
+           final org.geotoolkit.wms.xml.v111.Request r = (org.geotoolkit.wms.xml.v111.Request) request;
            AbstractOperation op = r.getDescribeLayer();
            if (op != null)
                 updateURL(op.getDCPType(), url);
@@ -615,7 +615,7 @@ public class WMSWorker extends AbstractWMSWorker {
             } else if (styleNames != null && styles.size() > i) {
                 //try to grab the style if provided
                 //a style has been given for this layer, try to use it
-                String namedStyle = styleNames.get(i);
+                final String namedStyle = styleNames.get(i);
                 style = StyleProviderProxy.getInstance().get(namedStyle);
             } else {
                 //no defined styles, use the favorite one, let the layer get it himself.
@@ -637,7 +637,7 @@ public class WMSWorker extends AbstractWMSWorker {
         // 2. VIEW
         final JTSEnvelope2D refEnv             = new JTSEnvelope2D(getFI.getEnvelope());
         final double azimuth                   = getFI.getAzimuth();
-        Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnv,azimuth);
+        final Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnv,azimuth);
 
 
         // 3. CANVAS
@@ -653,11 +653,11 @@ public class WMSWorker extends AbstractWMSWorker {
 
         // 4. SHAPE
         //     a
-        final int PIXEL_TOLERANCE = 3;
-        final Rectangle selectionArea = new Rectangle( getFI.getX()-PIXEL_TOLERANCE,
-        		                                      getFI.getY()-PIXEL_TOLERANCE,
-        		                                      PIXEL_TOLERANCE*2,
-        		                                      PIXEL_TOLERANCE*2);
+        final int pixelTolerance = 3;
+        final Rectangle selectionArea = new Rectangle( getFI.getX()-pixelTolerance,
+        		                                      getFI.getY()-pixelTolerance,
+        		                                      pixelTolerance*2,
+        		                                      pixelTolerance*2);
 
         // 5. VISITOR
         String infoFormat = getFI.getInfoFormat();
@@ -772,7 +772,7 @@ public class WMSWorker extends AbstractWMSWorker {
             } else if (styleNames != null && styles.size() > i) {
                 //try to grab the style if provided
                 //a style has been given for this layer, try to use it
-                String namedStyle = styleNames.get(i);
+                final String namedStyle = styleNames.get(i);
                 style = StyleProviderProxy.getInstance().get(namedStyle);
             } else {
                 //no defined styles, use the favorite one, let the layer get it himself.
@@ -788,13 +788,13 @@ public class WMSWorker extends AbstractWMSWorker {
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, time);
-        Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params);
+        final Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params);
 
 
         // 2. VIEW
         final JTSEnvelope2D refEnv             = new JTSEnvelope2D(getMap.getEnvelope());
         final double azimuth                   = getMap.getAzimuth();
-        Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnv,azimuth);
+        final Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnv,azimuth);
 
 
         // 3. CANVAS
@@ -806,7 +806,7 @@ public class WMSWorker extends AbstractWMSWorker {
             final Color color = getMap.getBackground();
             background = (color == null) ? Color.WHITE : color;
         }
-        Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(canvasDimension,background);
+        final Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(canvasDimension,background);
 
         // 4. IMAGE
         BufferedImage image;
@@ -905,7 +905,7 @@ public class WMSWorker extends AbstractWMSWorker {
                 for(final MutableLayerStyle mls : mnl.styles()){
                     if(mls instanceof MutableNamedStyle){
                         final MutableNamedStyle mns = (MutableNamedStyle) mls;
-                        String namedStyle = mns.getName();
+                        final String namedStyle = mns.getName();
                         return StyleProviderProxy.getInstance().get(namedStyle);
                     }else if(mls instanceof MutableStyle){
                         return (MutableStyle)mls;

@@ -528,7 +528,7 @@ public class CoverageTableModel extends AbstractTableModel {
                         // Si le tableau est déjà une copie, travaille directement sur lui.
                         System.arraycopy(entries, upper, entries, lower, entriesLength-upper);
                     }
-                    entriesLength -= (upper-lower);
+                    entriesLength -= upper-lower;
                     fireTableRowsDeleted(lower, upper-1);
                 }
                 upper=i;
@@ -555,14 +555,14 @@ public class CoverageTableModel extends AbstractTableModel {
             fieldPosition = new FieldPosition(0);
         }
         final StringBuffer buffer = new StringBuffer(256); // On n'utilise pas le buffer des cellules.
-        final int[] clés = new int[] {
+        final int[] keys = new int[] {
             ResourceKeys.NAME,
             ResourceKeys.START_TIME,
             ResourceKeys.END_TIME
         };
-        for (int i=0; i<clés.length;) {
-            buffer.append(Resources.format(clés[i++]));
-            buffer.append((i<clés.length) ? '\t' : '\n');
+        for (int i=0; i<keys.length;) {
+            buffer.append(Resources.format(keys[i++]));
+            buffer.append((i<keys.length) ? '\t' : '\n');
         }
         for (int i=0; i<rows.length; i++) {
             Date date;
@@ -631,7 +631,6 @@ public class CoverageTableModel extends AbstractTableModel {
             entries[row] = entry = new CoverageProxy(entry);
         }
         switch (column) {
-            default:   return null;
             case NAME: return getCoverageName(entry);
             case DATE: return entry.getTimeRange().getMaxValue();
             case DURATION: {
@@ -653,6 +652,7 @@ public class CoverageTableModel extends AbstractTableModel {
                 }
                 return buffer.toString();
             }
+            default:   return null;
         }
     }
 
@@ -723,9 +723,9 @@ public class CoverageTableModel extends AbstractTableModel {
      */
     private void commitEdit(final CoverageReference[] oldEntries,
                             final CoverageReference[] newEntries,
-                            final int clé) // NO synchronized!
+                            final int key) // NO synchronized!
     {
-        final String name = Resources.format(clé).toLowerCase();
+        final String name = Resources.format(key).toLowerCase();
         if (oldEntries != newEntries) {
             final Object[] listeners=listenerList.getListenerList();
             if (listeners.length != 0) {
@@ -844,7 +844,7 @@ public class CoverageTableModel extends AbstractTableModel {
      * @version $Id$
      * @author Martin Desruisseaux
      */
-    private final static class FileChecker extends Thread {
+    private static final class FileChecker extends Thread {
         /**
          * Thread ayant la charge de vérifier si des fichiers existent.
          */

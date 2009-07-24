@@ -339,10 +339,10 @@ public class WritableGridCoverageTable extends GridCoverageTable {
                     series = entry.choose(candidates);
                 } else {
                     final SeriesTable table = getDatabase().getTable(SeriesTable.class);
-                    final String path = (entry.path != null) ? entry.path.getPath() : "";
-                    final String ID = table.getIdentifier(layer.getName(), path,
+                    final String path       = (entry.path != null) ? entry.path.getPath() : "";
+                    final String id         = table.getIdentifier(layer.getName(), path,
                                     entry.extension, entry.getFormatName(true));
-                    series = table.getEntry(ID);
+                    series = table.getEntry(id);
                 }
             }
             /*
@@ -550,7 +550,7 @@ public class WritableGridCoverageTable extends GridCoverageTable {
              */
             Iterator<Map.Entry<Object,Series>> it;
             while ((it = inputs.entrySet().iterator()).hasNext()) {
-                Map.Entry<Object,Series> entry = it.next();
+                final Map.Entry<Object,Series> entry = it.next();
                 series = entry.getValue();
                 final Object next = entry.getKey();
                 it.remove();

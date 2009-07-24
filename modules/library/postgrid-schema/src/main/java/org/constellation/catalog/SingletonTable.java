@@ -305,7 +305,7 @@ public abstract class SingletonTable<E> extends Table {
         if (entry instanceof Element) {
             name = ((Element)entry).getName();
         } else {
-            Method m = Util.getGetterFromName("name", entry.getClass());
+            final Method m = Util.getGetterFromName("name", entry.getClass());
             name = (String) Util.invokeMethod(entry, m);
         }
         
@@ -387,7 +387,7 @@ public abstract class SingletonTable<E> extends Table {
             return null;
         }
         name = name.trim();
-        E entry = pool.get(name);
+        final E entry = pool.get(name);
         if (entry != null) {
             return entry;
         }
@@ -436,7 +436,7 @@ public abstract class SingletonTable<E> extends Table {
                     if (entry instanceof Element) {
                         name = ((Element) entry).getName();
                     } else {
-                        Method m = Util.getGetterFromName("name", entry.getClass());
+                        final Method m = Util.getGetterFromName("name", entry.getClass());
                         name = (String) Util.invokeMethod(entry, m);
                     }
                     /*
@@ -683,8 +683,8 @@ scan:   for (int n=0; n<=MAXIMUM_AUTO_INCREMENT; n++) {
                 if (n <  10) buffer.append('0');
                 buffer.append(n);
             }
-            final String ID = buffer.toString();
-            statement.setString(byPrimaryKey, ID);
+            final String id = buffer.toString();
+            statement.setString(byPrimaryKey, id);
             final ResultSet results = statement.executeQuery();
             while (results.next()) {
                 if (indexPK != 0) {
@@ -695,7 +695,7 @@ scan:   for (int n=0; n<=MAXIMUM_AUTO_INCREMENT; n++) {
                      * a more elaborated mechanism on top of regular expressions.
                      */
                     final String existing = results.getString(indexPK).trim();
-                    if (!ID.equals(existing)) {
+                    if (!id.equals(existing)) {
                         continue;
                     }
                 }
@@ -705,7 +705,7 @@ scan:   for (int n=0; n<=MAXIMUM_AUTO_INCREMENT; n++) {
             }
             // No match found. We can use this identifier.
             results.close();
-            return ID;
+            return id;
         }
         throw new CatalogException("Trop d'itérations.");
     }

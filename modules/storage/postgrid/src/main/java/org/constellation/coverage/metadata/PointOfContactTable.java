@@ -79,13 +79,13 @@ public class PointOfContactTable extends BoundedSingletonTable<PointOfContact> {
         final String phone =            results.getString(indexOf(query.phone));
         final String email =            results.getString(indexOf(query.email));
         final String org =              results.getString(indexOf(query.org));
-        final String orgAddress1 =      results.getString(indexOf(query.org_address1));
-        final String orgAddress2 =      results.getString(indexOf(query.org_address2));
-        final String orgCity =          results.getString(indexOf(query.org_city));
-        final String orgState =         results.getString(indexOf(query.org_state));
-        final String orgZip =           results.getString(indexOf(query.org_zip));
-        final String orgCountry =       results.getString(indexOf(query.org_country));
-        final String orgContact =       results.getString(indexOf(query.org_contact));
+        final String orgAddress1 =      results.getString(indexOf(query.orgAddress1));
+        final String orgAddress2 =      results.getString(indexOf(query.orgAddress2));
+        final String orgCity =          results.getString(indexOf(query.orgCity));
+        final String orgState =         results.getString(indexOf(query.orgState));
+        final String orgZip =           results.getString(indexOf(query.orgZip));
+        final String orgCountry =       results.getString(indexOf(query.orgCountry));
+        final String orgContact =       results.getString(indexOf(query.orgContact));
         final PointOfContactEntry entry = new PointOfContactEntry(pocId, lastName, firstName, 
                 address1, address2, city, state, country, zip, phone, email, org, orgAddress1,
                 orgAddress2, orgCity, orgState, orgZip, orgCountry, orgContact);

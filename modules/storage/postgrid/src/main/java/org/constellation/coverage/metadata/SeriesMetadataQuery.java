@@ -49,24 +49,24 @@ final class SeriesMetadataQuery extends Query {
      */
     public SeriesMetadataQuery(final Database database) {
         super(database, "SeriesMetadata");
-        final QueryType[] SL   = {SELECT, LIST};
-        final QueryType[] SLEI = {SELECT, LIST, EXISTS, INSERT};
+        final QueryType[] sl   = {SELECT, LIST};
+        final QueryType[] slei = {SELECT, LIST, EXISTS, INSERT};
 
-        seriesName =       addColumn("seriesName",               SLEI);
-        id =               addColumn("id",               null,   SL  );
-        legendURI =        addColumn("legendURI",        null,   SL  );
-        pubDate =          addColumn("pubDate",          null,   SL  );
-        pocId =            addColumn("pocId",            null,   SL  );
-        version =          addColumn("version",          null,   SL  );
-        forecast =         addColumn("forecast",         null,   SL  );
-        themekey1 =        addColumn("themekey1",        null,   SL  );
-        themekey2 =        addColumn("themekey2",        null,   SL  );
-        themekey3 =        addColumn("themekey3",        null,   SL  );
-        themekey4 =        addColumn("themekey4",        null,   SL  );
-        themekey5 =        addColumn("themekey5",        null,   SL  );
-        themekey6 =        addColumn("themekey6",        null,   SL  );
-        themekey7 =        addColumn("themekey7",        null,   SL  );
-        themekey8 =        addColumn("themekey8",        null,   SL  );
+        seriesName =       addColumn("seriesName",               slei);
+        id =               addColumn("id",               null,   sl  );
+        legendURI =        addColumn("legendURI",        null,   sl  );
+        pubDate =          addColumn("pubDate",          null,   sl  );
+        pocId =            addColumn("pocId",            null,   sl  );
+        version =          addColumn("version",          null,   sl  );
+        forecast =         addColumn("forecast",         null,   sl  );
+        themekey1 =        addColumn("themekey1",        null,   sl  );
+        themekey2 =        addColumn("themekey2",        null,   sl  );
+        themekey3 =        addColumn("themekey3",        null,   sl  );
+        themekey4 =        addColumn("themekey4",        null,   sl  );
+        themekey5 =        addColumn("themekey5",        null,   sl  );
+        themekey6 =        addColumn("themekey6",        null,   sl  );
+        themekey7 =        addColumn("themekey7",        null,   sl  );
+        themekey8 =        addColumn("themekey8",        null,   sl  );
         byName    =        addParameter(seriesName, SELECT);
     }
 }

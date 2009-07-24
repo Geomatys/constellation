@@ -48,14 +48,14 @@ final class CoverageMetadataQuery extends Query {
      */
     public CoverageMetadataQuery(final Database database) {
         super(database, "CoverageMetadata");
-        final QueryType[] SL   = {SELECT, LIST};
-        final QueryType[] SLEI = {SELECT, LIST, EXISTS, INSERT};
+        final QueryType[] sl   = {SELECT, LIST};
+        final QueryType[] slei = {SELECT, LIST, EXISTS, INSERT};
         
-        coverageId =       addColumn("coverageId",               SLEI);
-        id =               addColumn("id",               null,   SL  );
-        uri =              addColumn("uri",              null,   SL  );
-        creationDate =     addColumn("creationDate",     null,   SL  );
-        seriesName =       addColumn("seriesName",       null,   SL  );
+        coverageId =       addColumn("coverageId",               slei);
+        id =               addColumn("id",               null,   sl  );
+        uri =              addColumn("uri",              null,   sl  );
+        creationDate =     addColumn("creationDate",     null,   sl  );
+        seriesName =       addColumn("seriesName",       null,   sl  );
         byName    = addParameter(coverageId, SELECT, EXISTS);
     }
 }

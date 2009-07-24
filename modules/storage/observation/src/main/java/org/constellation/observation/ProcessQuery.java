@@ -48,10 +48,10 @@ public class ProcessQuery extends Query{
      */
     public ProcessQuery(final Database database) {
         super(database, "process");
-        final QueryType[] SLI  = {SELECT, INSERT, LIST};
-        final QueryType[] SLIE = {SELECT, EXISTS, INSERT, LIST};
-        name    = addColumn   ("name",        SLIE);
-        remarks = addColumn   ("description", SLI);
+        final QueryType[] sli  = {SELECT, INSERT, LIST};
+        final QueryType[] slie = {SELECT, EXISTS, INSERT, LIST};
+        name    = addColumn   ("name",        slie);
+        remarks = addColumn   ("description", sli);
 
         byName  = addParameter(name, SELECT, EXISTS);
     }

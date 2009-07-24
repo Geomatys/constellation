@@ -107,8 +107,8 @@ final class PermissionTable extends SingletonTable<PermissionEntry> {
         final PermissionQuery query = (PermissionQuery) super.query;
         return new PermissionEntry(results.getString (indexOf(query.name)),
                                    results.getString (indexOf(query.user)),
-                                   results.getBoolean(indexOf(query.WCS)),
-                                   results.getBoolean(indexOf(query.WMS)),
+                                   results.getBoolean(indexOf(query.wcs)),
+                                   results.getBoolean(indexOf(query.wms)),
                                    results.getBoolean(indexOf(query.getInfo)),
                                    results.getString (indexOf(query.description)));
     }

@@ -48,16 +48,16 @@ final class DomainOfLayerQuery extends Query {
      */
     public DomainOfLayerQuery(final Database database) {
         super(database, "DomainOfLayers");
-        final QueryType[] SL = {SELECT, LIST};
-        layer       = addColumn("layer",       SL);
-        startTime   = addColumn("startTime",   SL);
-        endTime     = addColumn("endTime",     SL);
-        west        = addColumn("west",        SL);
-        east        = addColumn("east",        SL);
-        south       = addColumn("south",       SL);
-        north       = addColumn("north",       SL);
-        xResolution = addColumn("xResolution", SL);
-        yResolution = addColumn("yResolution", SL);
+        final QueryType[] sl = {SELECT, LIST};
+        layer       = addColumn("layer",       sl);
+        startTime   = addColumn("startTime",   sl);
+        endTime     = addColumn("endTime",     sl);
+        west        = addColumn("west",        sl);
+        east        = addColumn("east",        sl);
+        south       = addColumn("south",       sl);
+        north       = addColumn("north",       sl);
+        xResolution = addColumn("xResolution", sl);
+        yResolution = addColumn("yResolution", sl);
         byLayer     = addParameter(layer, SELECT);
     }
 }

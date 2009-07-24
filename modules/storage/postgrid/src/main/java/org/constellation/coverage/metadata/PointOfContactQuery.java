@@ -35,8 +35,8 @@ final class PointOfContactQuery extends Query {
      * Column to appear after the {@code "SELECT"} clause.
      */
     final Column pocId, lastName, firstName, address1, address2, city, state, country, 
-            zip, phone, email, org, org_address1, org_address2, org_city, org_state, org_zip, 
-            org_country, org_contact;
+            zip, phone, email, org, orgAddress1, orgAddress2, orgCity, orgState, orgZip,
+            orgCountry, orgContact;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -50,27 +50,27 @@ final class PointOfContactQuery extends Query {
      */
     public PointOfContactQuery(final Database database) {
         super(database, "PointOfContact");
-        final QueryType[] SL   = {SELECT, LIST};
-        final QueryType[] SLEI = {SELECT, LIST, EXISTS, INSERT};
-        pocId =            addColumn("poc_id",                   SLEI);
-        lastName =         addColumn("last_name",        null,   SL  );
-        firstName =        addColumn("first_name",       null,   SL  );
-        address1 =         addColumn("address1",         null,   SL  );
-        address2 =         addColumn("address2",         null,   SL  );
-        city =             addColumn("city",             null,   SL  );
-        state =            addColumn("state",            null,   SL  );
-        country =          addColumn("country",          null,   SL  );
-        zip =              addColumn("zip",              null,   SL  );
-        phone =            addColumn("phone",            null,   SL  );
-        email =            addColumn("email",            null,   SL  );
-        org =              addColumn("org",              null,   SL  );
-        org_address1 =     addColumn("org_address1",     null,   SL  );
-        org_address2 =     addColumn("org_address2",     null,   SL  );
-        org_city =         addColumn("org_city",         null,   SL  );
-        org_state =        addColumn("org_state",        null,   SL  );
-        org_zip =          addColumn("org_zip",          null,   SL  );
-        org_country =      addColumn("org_country",      null,   SL  );
-        org_contact =      addColumn("org_contact",      null,   SL  );
+        final QueryType[] sl   = {SELECT, LIST};
+        final QueryType[] slei = {SELECT, LIST, EXISTS, INSERT};
+        pocId =            addColumn("poc_id",                   slei);
+        lastName =         addColumn("last_name",        null,   sl  );
+        firstName =        addColumn("first_name",       null,   sl  );
+        address1 =         addColumn("address1",         null,   sl  );
+        address2 =         addColumn("address2",         null,   sl  );
+        city =             addColumn("city",             null,   sl  );
+        state =            addColumn("state",            null,   sl  );
+        country =          addColumn("country",          null,   sl  );
+        zip =              addColumn("zip",              null,   sl  );
+        phone =            addColumn("phone",            null,   sl  );
+        email =            addColumn("email",            null,   sl  );
+        org =              addColumn("org",              null,   sl  );
+        orgAddress1 =      addColumn("org_address1",     null,   sl  );
+        orgAddress2 =      addColumn("org_address2",     null,   sl  );
+        orgCity =          addColumn("org_city",         null,   sl  );
+        orgState =         addColumn("org_state",        null,   sl  );
+        orgZip =           addColumn("org_zip",          null,   sl  );
+        orgCountry =       addColumn("org_country",      null,   sl  );
+        orgContact =       addColumn("org_contact",      null,   sl  );
         byName    = addParameter(pocId, SELECT, EXISTS);
     }
 }
