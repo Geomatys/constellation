@@ -37,11 +37,11 @@ import org.constellation.swe.v101.CompositePhenomenonTable;
 
 // OpenGis dependencies
 import org.constellation.swe.v101.PhenomenonTable;
-import org.geotoolkit.gml.xml.v311modified.AbstractTimeGeometricPrimitiveType;
-import org.geotoolkit.gml.xml.v311modified.ReferenceEntry;
-import org.geotoolkit.gml.xml.v311modified.TimeInstantType;
-import org.geotoolkit.gml.xml.v311modified.TimePeriodType;
-import org.geotoolkit.gml.xml.v311modified.TimePositionType;
+import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
+import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.TimeInstantType;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.observation.xml.v100.ProcessEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;

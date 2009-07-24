@@ -23,7 +23,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311modified.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 

@@ -76,14 +76,27 @@ import javax.xml.bind.Marshaller;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.coverage.ws.WCSWorker;
+import org.constellation.query.Query;
+import org.constellation.util.StringUtilities;
+import org.constellation.util.Util;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.ExceptionCode;
+import org.constellation.ws.ServiceExceptionReport;
+import org.constellation.ws.ServiceExceptionType;
+import org.constellation.ws.rs.OGCWebService;
+
+// Geotoolkit dependencies
+import org.geotoolkit.gml.xml.v311.CodeType;
+import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.GridLimitsType;
+import org.geotoolkit.gml.xml.v311.GridType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
-import org.constellation.query.Query;
-import org.constellation.util.StringUtilities;
-import org.constellation.util.Util;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCapabilities;
@@ -91,17 +104,6 @@ import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
 import org.geotoolkit.wcs.xml.GetCoverage;
 import org.geotoolkit.wcs.xml.v111.GridCrsType;
 import org.geotoolkit.wcs.xml.v111.RangeSubsetType.FieldSubset;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.ExceptionCode;
-import org.constellation.ws.ServiceExceptionReport;
-import org.constellation.ws.ServiceExceptionType;
-import org.constellation.ws.rs.OGCWebService;
-import org.geotoolkit.gml.xml.v311modified.CodeType;
-import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
-import org.geotoolkit.gml.xml.v311modified.EnvelopeEntry;
-import org.geotoolkit.gml.xml.v311modified.GridLimitsType;
-import org.geotoolkit.gml.xml.v311modified.GridType;
-import org.geotoolkit.gml.xml.v311modified.TimePositionType;
 
 
 /**
@@ -148,7 +150,7 @@ public class WCSService extends OGCWebService {
                       "org.geotoolkit.ows.xml.v100:" +
                       "org.geotoolkit.wcs.xml.v100:" +
                       "org.geotoolkit.wcs.xml.v111:" +
-                      "org.geotoolkit.gml.xml.v311modified",
+                      "org.geotoolkit.gml.xml.v311",
                       "http://www.opengis.net/wcs");
 
         worker = new WCSWorker(marshallerPool);

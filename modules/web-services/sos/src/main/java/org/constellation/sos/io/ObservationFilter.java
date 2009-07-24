@@ -20,7 +20,7 @@ package org.constellation.sos.io;
 import java.util.List;
 
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311modified.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 

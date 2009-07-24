@@ -28,7 +28,7 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311modified.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;

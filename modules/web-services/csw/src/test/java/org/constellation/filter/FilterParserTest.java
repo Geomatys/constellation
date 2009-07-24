@@ -68,7 +68,7 @@ public class FilterParserTest {
     @Before
     public void setUp() throws Exception {
         filterParser = new LuceneFilterParser();
-        pool = new MarshallerPool("org.geotoolkit.ogc.xml.v110modified:org.geotoolkit.gml.xml.v311modified");
+        pool = new MarshallerPool("org.geotoolkit.ogc.xml.v110modified:org.geotoolkit.gml.xml.v311");
         filterUnmarshaller = pool.acquireUnmarshaller();
     }
 

@@ -28,9 +28,9 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
-import org.geotoolkit.gml.xml.v311modified.TimeInstantType;
-import org.geotoolkit.gml.xml.v311modified.TimePeriodType;
-import org.geotoolkit.gml.xml.v311modified.TimePositionType;
+import org.geotoolkit.gml.xml.v311.TimeInstantType;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.ogc.xml.v110modified.BinaryTemporalOpType;

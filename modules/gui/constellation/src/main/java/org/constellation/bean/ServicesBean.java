@@ -76,7 +76,7 @@ import org.geotoolkit.wms.xml.v130.Service;
 import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
 import org.geotoolkit.wms.xml.v130.WMSCapabilities;
 import org.apache.myfaces.custom.fileupload.UploadedFile;
-import org.geotoolkit.gml.xml.v311modified.CodeListType;
+import org.geotoolkit.gml.xml.v311.CodeListType;
 import org.geotoolkit.xml.MarshallerPool;
 
 /**

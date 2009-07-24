@@ -55,12 +55,32 @@ import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
-import org.geotoolkit.gml.xml.v311modified.AbstractTimeGeometricPrimitiveType;
-import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
-import org.geotoolkit.gml.xml.v311modified.TimeIndeterminateValueType;
-import org.geotoolkit.gml.xml.v311modified.TimePositionType;
-import org.geotoolkit.gml.xml.v311modified.TimeInstantType;
-import org.geotoolkit.gml.xml.v311modified.TimePeriodType;
+import org.constellation.sos.factory.AbstractSOSFactory;
+import org.constellation.sos.io.ObservationFilter;
+import org.constellation.sos.io.ObservationFilterReader;
+import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.io.ObservationResult;
+import org.constellation.sos.io.ObservationWriter;
+import org.constellation.sos.io.SensorReader;
+import org.constellation.sos.io.SensorWriter;
+import org.constellation.util.Util;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.OGCWebService;
+import org.constellation.ws.rs.WebService;
+
+// GeoAPI dependencies
+import org.opengis.observation.Observation;
+import org.opengis.observation.CompositePhenomenon;
+import org.opengis.observation.Phenomenon;
+import org.opengis.observation.sampling.SamplingPoint;
+
+// Geotoolkit dependencies
+import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
+import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.gml.xml.v311.TimeIndeterminateValueType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.gml.xml.v311.TimeInstantType;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.Operation;
@@ -90,35 +110,10 @@ import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;
 import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
-import org.constellation.sos.factory.AbstractSOSFactory;
-import org.constellation.sos.io.ObservationFilter;
-import org.constellation.sos.io.ObservationFilterReader;
-import org.constellation.sos.io.ObservationReader;
-import org.constellation.sos.io.ObservationResult;
-import org.constellation.sos.io.ObservationWriter;
-import org.constellation.sos.io.SensorReader;
-import org.constellation.sos.io.SensorWriter;
-import org.constellation.util.Util;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.OGCWebService;
-
-import org.constellation.ws.rs.WebService;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
-import static org.constellation.sos.ws.Utils.*;
-import static org.constellation.sos.ws.Normalizer.*;
-
-// GeoAPI dependencies
-import org.opengis.observation.Observation;
-import org.opengis.observation.CompositePhenomenon;
-import org.opengis.observation.Phenomenon;
-import org.opengis.observation.sampling.SamplingPoint;
-
-//geotools dependencies
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
-import org.geotoolkit.gml.xml.v311modified.EnvelopeEntry;
-import org.geotoolkit.gml.xml.v311modified.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
@@ -134,6 +129,12 @@ import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.geotoolkit.util.logging.MonolineFormatter;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
+import static org.constellation.sos.ws.Utils.*;
+import static org.constellation.sos.ws.Normalizer.*;
+
 
 /**
  *

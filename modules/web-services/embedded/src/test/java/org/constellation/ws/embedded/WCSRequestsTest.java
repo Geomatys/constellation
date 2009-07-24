@@ -102,7 +102,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         pool = new MarshallerPool("org.constellation.ws:" +
                                   "org.geotoolkit.wcs.xml.v100:" +
                                   "org.geotoolkit.ows.xml.v100:" +
-                                  "org.geotoolkit.gml.xml.v311modified");
+                                  "org.geotoolkit.gml.xml.v311");
     }
 
     /**

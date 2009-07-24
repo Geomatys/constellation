@@ -21,7 +21,7 @@ package org.constellation.sos.ws;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import org.geotoolkit.gml.xml.v311modified.FeaturePropertyType;
+import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sos.xml.v100.Capabilities;

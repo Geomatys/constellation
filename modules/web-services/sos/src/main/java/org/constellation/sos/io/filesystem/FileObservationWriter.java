@@ -28,7 +28,7 @@ import javax.xml.bind.Marshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
+import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;

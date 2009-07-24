@@ -21,7 +21,7 @@ package org.constellation.sos.io;
 import org.constellation.ws.CstlServiceException;
 
 // GeoAPI dependencies
-import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
+import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;

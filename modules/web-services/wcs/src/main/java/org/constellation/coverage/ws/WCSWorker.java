@@ -104,13 +104,13 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.rs.WebService;
 
-// Geotools dependencies
+// Geotoolkit dependencies
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
-import org.geotoolkit.gml.xml.v311modified.CodeListType;
-import org.geotoolkit.gml.xml.v311modified.DirectPositionType;
-import org.geotoolkit.gml.xml.v311modified.TimePositionType;
+import org.geotoolkit.gml.xml.v311.CodeListType;
+import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.xml.MarshallerPool;
 

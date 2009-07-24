@@ -25,7 +25,7 @@ import java.util.List;
 import org.constellation.ws.CstlServiceException;
 
 // GeoAPI
-import org.geotoolkit.gml.xml.v311modified.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.swe.xml.AnyResult;
