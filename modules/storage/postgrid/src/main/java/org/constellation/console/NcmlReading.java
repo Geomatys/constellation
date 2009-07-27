@@ -44,6 +44,8 @@ final class NcmlReading {
     public static final Namespace NETCDFNS = Namespace.getNamespace(
             "http://www.unidata.ucar.edu/namespaces/netcdf/ncml-2.2");
 
+    private NcmlReading() {}
+    
     /**
      * Gets the {@code start, increment and npts} parameters found in the NcML file for
      * the {@code netcdf} tag.

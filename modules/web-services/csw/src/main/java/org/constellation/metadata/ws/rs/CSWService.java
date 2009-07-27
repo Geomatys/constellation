@@ -69,8 +69,6 @@ import org.constellation.util.Util;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 import org.geotoolkit.ogc.xml.v110modified.FilterType;
-import org.geotoolkit.ogc.xml.v110modified.PropertyIsLikeType;
-import org.geotoolkit.ogc.xml.v110modified.PropertyNameType;
 import org.geotoolkit.ogc.xml.v110modified.SortByType;
 import org.geotoolkit.ogc.xml.v110modified.SortOrderType;
 import org.geotoolkit.ogc.xml.v110modified.SortPropertyType;
@@ -78,6 +76,7 @@ import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.xml.Namespaces;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -394,11 +393,11 @@ public class CSWService extends OGCWebService {
      */
     private GetRecordsType createNewGetRecordsRequest() throws CstlServiceException {
         
-        String version    = getParameter("VERSION", true);
-        String service    = getParameter("SERVICE", true);
+        final String version    = getParameter("VERSION", true);
+        final String service    = getParameter("SERVICE", true);
         
         //we get the value of result type, if not set we put default value "HITS"
-        String resultTypeName = getParameter("RESULTTYPE", false);
+        final String resultTypeName = getParameter("RESULTTYPE", false);
         ResultType resultType = ResultType.HITS;
         if (resultTypeName != null) {
             try {
@@ -409,7 +408,7 @@ public class CSWService extends OGCWebService {
             }
         }
         
-        String requestID    = getParameter("REQUESTID", false);
+        final String requestID    = getParameter("REQUESTID", false);
         
         String outputFormat = getParameter("OUTPUTFORMAT", false);
         if (outputFormat == null) {
@@ -418,11 +417,11 @@ public class CSWService extends OGCWebService {
         
         String outputSchema = getParameter("OUTPUTSCHEMA", false);
         if (outputSchema == null) {
-            outputSchema = "http://www.opengis.net/cat/csw/2.0.2";
+            outputSchema = Namespaces.CSW_202;
         }
         
         //we get the value of start position, if not set we put default value "1"
-        String startPos = getParameter("STARTPOSITION", false);
+        final String startPos = getParameter("STARTPOSITION", false);
         Integer startPosition = Integer.valueOf("1");
         if (startPos != null) {
             try {
@@ -434,7 +433,7 @@ public class CSWService extends OGCWebService {
         } 
         
         //we get the value of max record, if not set we put default value "10"
-        String maxRec = getParameter("MAXRECORDS", false);
+        final String maxRec = getParameter("MAXRECORDS", false);
         Integer maxRecords= Integer.valueOf("10");
         if (maxRec != null) {
             try {
@@ -450,8 +449,8 @@ public class CSWService extends OGCWebService {
          */
         
         // we get the namespaces.
-        String namespace               = getParameter("NAMESPACE", false);
-        Map<String, String> namespaces = new HashMap<String, String>();
+        final String namespace               = getParameter("NAMESPACE", false);
+        final Map<String, String> namespaces = new HashMap<String, String>();
         StringTokenizer tokens;
                 
         if (namespace != null) {
@@ -477,19 +476,19 @@ public class CSWService extends OGCWebService {
         
         //if there is not namespace specified, using the default namespace
         if (namespaces.size() == 0) {
-            namespaces.put("csw", "http://www.opengis.net/cat/csw/2.0.2");
-            namespaces.put("gmd", "http://www.isotc211.org/2005/gmd");
+            namespaces.put("csw", Namespaces.CSW_202);
+            namespaces.put("gmd", Namespaces.GMD);
         }
         
-        String names   = getParameter("TYPENAMES", true);
-        List<QName> typeNames = new ArrayList<QName>();
+        final String names          = getParameter("TYPENAMES", true);
+        final List<QName> typeNames = new ArrayList<QName>();
         tokens = new StringTokenizer(names, ",;");
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
 
             if (token.indexOf(':') != -1) {
-                String prefix = token.substring(0, token.indexOf(':'));
-                String localPart = token.substring(token.indexOf(':') + 1);
+                final String prefix = token.substring(0, token.indexOf(':'));
+                final String localPart = token.substring(token.indexOf(':') + 1);
                 typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
             } else {
                 throw new CstlServiceException("The QName " + token + " is malformed",
@@ -497,7 +496,7 @@ public class CSWService extends OGCWebService {
             }
         }
         
-        String eSetName           = getParameter("ELEMENTSETNAME", false);
+        final String eSetName     = getParameter("ELEMENTSETNAME", false);
         ElementSetType elementSet = ElementSetType.SUMMARY;
         if (eSetName != null) {
             try {
@@ -510,8 +509,8 @@ public class CSWService extends OGCWebService {
         }
         
         //we get the list of sort by object
-        String sort = getParameter("SORTBY", false);
-        List<SortPropertyType> sorts = new ArrayList<SortPropertyType>();
+        final String sort                  = getParameter("SORTBY", false);
+        final List<SortPropertyType> sorts = new ArrayList<SortPropertyType>();
         SortByType sortBy = null;
         if (sort != null) {
             tokens = new StringTokenizer(sort, ",;");
@@ -519,8 +518,8 @@ public class CSWService extends OGCWebService {
                 final String token = tokens.nextToken().trim();
                 
                 if (token.indexOf(':') != -1) {
-                    String propName    = token.substring(0, token.indexOf(':'));
-                    String order       = token.substring(token.indexOf(':') + 1);
+                    final String propName    = token.substring(0, token.indexOf(':'));
+                    final String order       = token.substring(token.indexOf(':') + 1);
                     SortOrderType orderType;
                     try {
                         orderType = SortOrderType.fromValue(order);
@@ -540,10 +539,10 @@ public class CSWService extends OGCWebService {
         /*
          * here we build the constraint object
          */ 
-        String constLanguage           = getParameter("CONSTRAINTLANGUAGE", false);
+        final String constLanguage     = getParameter("CONSTRAINTLANGUAGE", false);
         QueryConstraintType constraint = null;
         if (constLanguage != null) {
-            String languageVersion  = getParameter("CONSTRAINT_LANGUAGE_VERSION", false);
+            final String languageVersion  = getParameter("CONSTRAINT_LANGUAGE_VERSION", false);
             
             if (constLanguage.equalsIgnoreCase("CQL_TEXT")) {
 
@@ -556,8 +555,8 @@ public class CSWService extends OGCWebService {
             } else if (constLanguage.equalsIgnoreCase("FILTER")) {
                 Object constraintObject = getComplexParameter("CONSTRAINT", false);
                 if (constraintObject == null) {
-                    final PropertyIsLikeType filter = new PropertyIsLikeType(new PropertyNameType("AnyText"), "%%", "%", "?", "\\");
-                    constraintObject = new FilterType(filter);
+                    //final PropertyIsLikeType filter = new PropertyIsLikeType(new PropertyNameType("AnyText"), "%%", "%", "?", "\\");
+                    //constraintObject = new FilterType(filter);
                 } else if (constraintObject instanceof FilterType){
                     constraint = new QueryConstraintType((FilterType)constraintObject, languageVersion);
                 } else {
@@ -571,7 +570,7 @@ public class CSWService extends OGCWebService {
             }
         }
         
-        QueryType query = new QueryType(typeNames,
+        final QueryType query = new QueryType(typeNames,
                                         new ElementSetNameType(elementSet),
                                         sortBy,
                                         constraint);
@@ -579,11 +578,11 @@ public class CSWService extends OGCWebService {
         /*
          * here we build a optionnal ditributed search object
          */  
-        String distrib = getParameter("DISTRIBUTEDSEARCH", false);
+        final String distrib = getParameter("DISTRIBUTEDSEARCH", false);
         DistributedSearchType distribSearch = null;
         if (distrib != null && distrib.equalsIgnoreCase("true")) {
-            String count = getParameter("HOPCOUNT", false);
-            Integer hopCount = 2;
+            final String count = getParameter("HOPCOUNT", false);
+            Integer hopCount   = 2;
             if (count != null) {
                 try {
                     hopCount = Integer.parseInt(count);
@@ -596,7 +595,7 @@ public class CSWService extends OGCWebService {
         }
         
         // TODO not implemented yet
-        String handler = getParameter("RESPONSEHANDLER", false);
+        // String handler = getParameter("RESPONSEHANDLER", false);
         
         return new GetRecordsType(service, 
                                   version, 
@@ -616,10 +615,10 @@ public class CSWService extends OGCWebService {
      */
     private GetRecordByIdType createNewGetRecordByIdRequest() throws CstlServiceException {
     
-        String version    = getParameter("VERSION", true);
-        String service    = getParameter("SERVICE", true);
+        final String version    = getParameter("VERSION", true);
+        final String service    = getParameter("SERVICE", true);
         
-        String eSetName           = getParameter("ELEMENTSETNAME", false);
+        String eSetName         = getParameter("ELEMENTSETNAME", false);
         ElementSetType elementSet = ElementSetType.SUMMARY;
         if (eSetName != null) {
             try {
@@ -639,12 +638,12 @@ public class CSWService extends OGCWebService {
         
         String outputSchema = getParameter("OUTPUTSCHEMA", false);
         if (outputSchema == null) {
-            outputSchema = "http://www.opengis.net/cat/csw/2.0.2";
+            outputSchema = Namespaces.CSW_202;
         }
         
-        String ids      = getParameter("ID", true);
-        List<String> id = new ArrayList<String>();
-        StringTokenizer tokens = new StringTokenizer(ids, ",;");
+        final String ids             = getParameter("ID", true);
+        final List<String> id        = new ArrayList<String>();
+        final StringTokenizer tokens = new StringTokenizer(ids, ",;");
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
             id.add(token);
@@ -665,8 +664,8 @@ public class CSWService extends OGCWebService {
      */
     private DescribeRecordType createNewDescribeRecordRequest() throws CstlServiceException {
     
-        String version    = getParameter("VERSION", true);
-        String service    = getParameter("SERVICE", true);
+        final String version    = getParameter("VERSION", true);
+        final String service    = getParameter("SERVICE", true);
         
         String outputFormat = getParameter("OUTPUTFORMAT", false);
         if (outputFormat == null) {
@@ -679,17 +678,17 @@ public class CSWService extends OGCWebService {
         }
         
          // we get the namespaces.
-        String namespace               = getParameter("NAMESPACE", false);
-        Map<String, String> namespaces = new HashMap<String, String>();
+        final String namespace               = getParameter("NAMESPACE", false);
+        final Map<String, String> namespaces = new HashMap<String, String>();
         if (namespace != null) {
-            StringTokenizer tokens = new StringTokenizer(namespace, ",;");
+            final StringTokenizer tokens = new StringTokenizer(namespace, ",;");
             while (tokens.hasMoreTokens()) {
                 String token = tokens.nextToken().trim();
                 if (token.startsWith("xmlns(") && token.endsWith(")")) {
                     token = token.substring(6, token.length() -1);
                     if (token.indexOf('=') != -1) {
-                        String prefix = token.substring(0, token.indexOf('='));
-                        String url    = token.substring(token.indexOf('=') + 1);
+                        final String prefix = token.substring(0, token.indexOf('='));
+                        final String url    = token.substring(token.indexOf('=') + 1);
                         namespaces.put(prefix, url);
                     } else {
                          throw new CstlServiceException("The namespace " + token + " is malformed",
@@ -704,19 +703,19 @@ public class CSWService extends OGCWebService {
         //if there is not namespace specified, using the default namespace
         // TODO add gmd...
         if (namespaces.size() == 0) {
-            namespaces.put("csw", "http://www.opengis.net/cat/csw/2.0.2");
-            namespaces.put("gmd", "http://www.isotc211.org/2005/gmd");
+            namespaces.put("csw", Namespaces.CSW_202);
+            namespaces.put("gmd", Namespaces.GMD);
         }
         
-        String names   = getParameter("TYPENAMES", true);
-        List<QName> typeNames = new ArrayList<QName>();
-        StringTokenizer tokens = new StringTokenizer(names, ",;");
+        final String names           = getParameter("TYPENAMES", true);
+        final List<QName> typeNames  = new ArrayList<QName>();
+        final StringTokenizer tokens = new StringTokenizer(names, ",;");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
                 
                 if (token.indexOf(':') != -1) {
-                    String prefix    = token.substring(0, token.indexOf(':'));
-                    String localPart = token.substring(token.indexOf(':') + 1);
+                    final String prefix    = token.substring(0, token.indexOf(':'));
+                    final String localPart = token.substring(token.indexOf(':') + 1);
                     typeNames.add(new QName(namespaces.get(prefix), localPart, null));
                 } else {
                      throw new CstlServiceException("The QName " + token + " is malformed",
@@ -739,13 +738,13 @@ public class CSWService extends OGCWebService {
      */
     private GetDomainType createNewGetDomainRequest() throws CstlServiceException {
     
-        String version    = getParameter("VERSION", true);
-        String service    = getParameter("SERVICE", true);
+        final String version    = getParameter("VERSION", true);
+        final String service    = getParameter("SERVICE", true);
         
         //not supported by the ISO profile
-        String parameterName = getParameter("PARAMETERNAME", false);
+        final String parameterName = getParameter("PARAMETERNAME", false);
         
-        String propertyName = getParameter("PROPERTYNAME", false);
+        final String propertyName = getParameter("PROPERTYNAME", false);
         if (propertyName != null && parameterName != null) {
             throw new CstlServiceException("One of propertyName or parameterName must be null",
                                           INVALID_PARAMETER_VALUE, "parameterName");
@@ -759,21 +758,21 @@ public class CSWService extends OGCWebService {
      */
     private HarvestType createNewHarvestRequest() throws CstlServiceException {
     
-        String version      = getParameter("VERSION", true);
-        String service      = getParameter("SERVICE", true);
-        String source       = getParameter("SOURCE", true);
-        String resourceType = getParameter("RESOURCETYPE", true);
-        String resourceFormat = getParameter("RESOURCEFORMAT", false);
+        final String version      = getParameter("VERSION", true);
+        final String service      = getParameter("SERVICE", true);
+        final String source       = getParameter("SOURCE", true);
+        final String resourceType = getParameter("RESOURCETYPE", true);
+        String resourceFormat     = getParameter("RESOURCEFORMAT", false);
         if (resourceFormat == null) {
             resourceFormat = MimeType.APP_XML;
         }
-        String handler           = getParameter("RESPONSEHANDLER", false);
-        String interval          = getParameter("HARVESTINTERVAL", false);
-        Duration harvestInterval = null;
+        final String handler      = getParameter("RESPONSEHANDLER", false);
+        final String interval     = getParameter("HARVESTINTERVAL", false);
+        Duration harvestInterval  = null;
         if (interval != null) {
             try {
-                DatatypeFactory factory  = DatatypeFactory.newInstance();
-                harvestInterval          = factory.newDuration(interval) ;
+                final DatatypeFactory factory = DatatypeFactory.newInstance();
+                harvestInterval               = factory.newDuration(interval) ;
             } catch (DatatypeConfigurationException ex) {
                 throw new CstlServiceException("The Duration " + interval + " is malformed",
                                               INVALID_PARAMETER_VALUE, "HarvestInsterval");

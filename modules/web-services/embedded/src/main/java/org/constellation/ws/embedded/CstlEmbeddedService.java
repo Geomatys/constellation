@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.ws.Endpoint;
@@ -61,7 +62,7 @@ import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
  *   <li>For JAX-WS, SOAP based services, set the reference of the Service 
  *       Endpoint Interface.
  * <pre>
- *     ServiceInstanceSOAP = org.constellation.sos.ws.soap.SOSService;
+ *     serviceInstanceSOAP = org.constellation.sos.ws.soap.SOSService;
  * </pre>
  *   </li>
  *   <li>Add a simple main, such as:
@@ -121,11 +122,11 @@ public class CstlEmbeddedService extends CommandLine {
     //      map.put("com.sun.jersey.config.property.packages", "org.constellation.coverage.ws.rs");
 	//      map.put(TODO: get providers line from Cedric);
 	//  below we add in one of the properties needed by all services.
-	protected Map<String,String> GrizzlyWebContainerProperties = new HashMap<String,String>();
+	protected Map<String,String> grizzlyWebContainerProperties = new HashMap<String,String>();
 	
 	
 	//FOR SOAP, DEFINE THIS REFERENCE:
-	protected Object ServiceInstanceSOAP = null;
+	protected Object serviceInstanceSOAP = null;
 	
 	
 	//INCLUDE THIS MAIN.
@@ -158,12 +159,12 @@ public class CstlEmbeddedService extends CommandLine {
 		
 		super(null, args);
 
-        GrizzlyWebContainerProperties.put("com.sun.jersey.config.property.packages",
+        grizzlyWebContainerProperties.put("com.sun.jersey.config.property.packages",
                 "org.constellation.map.ws.rs;" +
                 "org.constellation.coverage.ws.rs;" +
                 "org.constellation.ws.rs.provider");
 
-		String base = "http://" + host + "/";
+		final String base = "http://" + host + "/";
     	uri = UriBuilder.fromUri(base).port(port).build();
 		
 	}
@@ -174,29 +175,29 @@ public class CstlEmbeddedService extends CommandLine {
 	 */
 	protected void runREST() {
 		
-        GrizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass",
+        grizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass",
         		                          "com.sun.jersey.api.core.PackagesResourceConfig");
         
-        System.out.println("Starting grizzly server at: " + f.format(new Date()));
+        LOGGER.info("Starting grizzly server at: " + f.format(new Date()));
 
         SelectorThread threadSelector = null;
         try {
-            if (GrizzlyWebContainerProperties.isEmpty()) {
+            if (grizzlyWebContainerProperties.isEmpty()) {
                 threadSelector = GrizzlyWebContainerFactory.create(uri);
             } else {
-                threadSelector = GrizzlyWebContainerFactory.create(uri, GrizzlyWebContainerProperties);
+                threadSelector = GrizzlyWebContainerFactory.create(uri, grizzlyWebContainerProperties);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
 
-        System.out.println("Started Grizzly application server for: " + uri);
-        System.out.println("The service definition file can be found at: " + uri + "application.wadl");
+        LOGGER.info("Started Grizzly application server for: " + uri);
+        LOGGER.info("The service definition file can be found at: " + uri + "application.wadl");
 
         stayAlive();
 
         threadSelector.stopEndpoint();
-        System.out.println("*Stopped grizzly server at: " + f.format(new Date()) + ".");
+        LOGGER.info("*Stopped grizzly server at: " + f.format(new Date()) + ".");
 	}
 	
 	/**
@@ -205,30 +206,30 @@ public class CstlEmbeddedService extends CommandLine {
 	 */
 	protected void runSOAP() {
 		
-		if ( null == ServiceInstanceSOAP){
-			System.out.println("The Service Endpoint Instance was never defined.");
+		if ( null == serviceInstanceSOAP){
+			LOGGER.info("The Service Endpoint Instance was never defined.");
 			System.exit(0);
 		}
 
 
-        System.out.println("Starting jax-ws server at: " + f.format(new Date()));
+        LOGGER.info("Starting jax-ws server at: " + f.format(new Date()));
 
-        String service = uri.toString() + "pep";
+        final String service = uri.toString() + "pep";
         Endpoint ep = null;
-        ep = Endpoint.publish(service, ServiceInstanceSOAP);
+        ep = Endpoint.publish(service, serviceInstanceSOAP);
 //        try {
-//            ep = Endpoint.publish(service, ServiceInstanceSOAP);
+//            ep = Endpoint.publish(service, serviceInstanceSOAP);
 //        } catch (JAXBException e) {
 //            e.printStackTrace();
 //        }
 
-        System.out.println("Started jax-ws application server for: " + service);
-        System.out.println("The service definition file can be found at: " + service + "?wsdl");
+        LOGGER.info("Started jax-ws application server for: " + service);
+        LOGGER.info("The service definition file can be found at: " + service + "?wsdl");
 
         stayAlive();
 
         ep.stop();
-        System.out.println("*Stopped jax-ws server at: " + f.format(new Date()) + ".");
+        LOGGER.info("*Stopped jax-ws server at: " + f.format(new Date()) + ".");
 	}
 	/**
 	 * Will keep either of the services alive either for the number of 
@@ -242,20 +243,20 @@ public class CstlEmbeddedService extends CommandLine {
 		
 		if (duration>0) {
 	        //Survive 'duration' milliseconds
-	        System.out.println("  Service will stop in " + duration / (60 * 1000) + " minutes.");
+	        LOGGER.info("  Service will stop in " + duration / (60 * 1000) + " minutes.");
 	        try {
 	            Thread.sleep(duration);
 	        } catch (InterruptedException iex) {
 	            LOGGER.fine("The grizzly thread has received an interrupted request.");
-                System.out.println("*Stopped grizzly server at: " + f.format(new Date()) + ".");
+                LOGGER.info("*Stopped grizzly server at: " + f.format(new Date()) + ".");
 	        }
 		} else {
 			//Listen and wait for <ENTER>
-			System.out.println("  Hit <ENTER> to stop the service.");
+			LOGGER.info("  Hit <ENTER> to stop the service.");
 	        try {
 				System.in.read();
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			}
 		}
 	}

@@ -579,7 +579,7 @@ public final class Util {
         }
         final StringBuffer hashString = new StringBuffer();
         for (int i = 0; i < hash.length; ++i) {
-            String hex = Integer.toHexString(hash[i]);
+            final String hex = Integer.toHexString(hash[i]);
             if (hex.length() == 1) {
                 hashString.append('0');
                 hashString.append(hex.charAt(hex.length() - 1));
@@ -633,7 +633,7 @@ public final class Util {
                 if (f.isDirectory()) {
                     deleteDirectory(directory);
                 } else {
-                    boolean deleted = f.delete();
+                    final boolean deleted = f.delete();
                     if (!deleted) {
                         LOGGER.warning("unable to delete the file:" + f.getName());
                     }
@@ -878,7 +878,7 @@ public final class Util {
      */
     public static Object invokeMethod(final Object object, final Method method) {
         Object result = null;
-        String baseMessage = "Unable to invoke the method " + method + ": "; 
+        final String baseMessage = "Unable to invoke the method " + method + ": ";
         try {
             if (method != null) {
                 result = method.invoke(object);
@@ -916,7 +916,7 @@ public final class Util {
      */
     public static Object invokeMethod(final Method method, final Object object, final Object parameter) {
         Object result = null;
-        String baseMessage = "Unable to invoke the method " + method + ": "; 
+        final String baseMessage = "Unable to invoke the method " + method + ": ";
         try {
             if (method != null) {
                 result = method.invoke(object, parameter);
@@ -1284,7 +1284,7 @@ public final class Util {
      * Return an input stream of the specified resource. 
      */
     public static InputStream getResourceAsStream(final String url) {
-        ClassLoader cl = getContextClassLoader();
+        final ClassLoader cl = getContextClassLoader();
         return cl.getResourceAsStream(url);
     }
 
@@ -1293,7 +1293,7 @@ public final class Util {
      * example : removePrefix(csw:GetRecords) return "GetRecords".
      */
     public static String removePrefix(String s) {
-        int i = s.indexOf(':');
+        final int i = s.indexOf(':');
         if ( i != -1) {
             s = s.substring(i + 1, s.length());
         }
@@ -1311,7 +1311,7 @@ public final class Util {
      */
     public static Properties getPropertiesFromFile(final File f) throws  IOException {
         if (f != null) {
-            Properties prop = new Properties();
+            final Properties prop = new Properties();
             if (f.exists()) {
                 FileInputStream in = null;
                 in = new FileInputStream(f);
@@ -1337,7 +1337,7 @@ public final class Util {
         if (prop == null || f == null) {
             throw new IllegalArgumentException(" the properties or file can't be null");
         } else {
-            FileOutputStream out = new FileOutputStream(f);
+            final FileOutputStream out = new FileOutputStream(f);
             prop.store(out, "");
             out.close();
         }
@@ -1494,7 +1494,7 @@ public final class Util {
      * @return
      */
     public static String transformCodeName(String code) {
-        StringBuilder result = new StringBuilder();
+        final StringBuilder result = new StringBuilder();
         while (code.indexOf('_') != -1) {
             final String tmp = code.substring(0, code.indexOf('_')).toLowerCase();
             result.append(StringUtilities.firstToUpper(tmp));
@@ -1514,8 +1514,8 @@ public final class Util {
      */
     public static String stringFromFile(File f) throws IOException {
         
-        StringBuilder sb = new StringBuilder();
-        BufferedReader br = new BufferedReader(new FileReader(f));
+        final StringBuilder sb  = new StringBuilder();
+        final BufferedReader br = new BufferedReader(new FileReader(f));
         String line;
         while ((line = br.readLine()) != null){
             sb.append(line).append('\n');
@@ -1526,7 +1526,7 @@ public final class Util {
     }
     
     /**
-     * Read the contents of a file into string.
+     * Write the contents of a file into string.
      * 
      * @param f the file name
      * @return The file contents as string
@@ -1534,7 +1534,7 @@ public final class Util {
      */
     public static void stringToFile(File f, String s) throws IOException {
         
-        BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+        final BufferedWriter bw = new BufferedWriter(new FileWriter(f));
         bw.write(s);
         bw.close();
     }

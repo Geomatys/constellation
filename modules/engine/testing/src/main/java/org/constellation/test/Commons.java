@@ -45,6 +45,9 @@ import static org.junit.Assert.*;
  * @since 0.3
  */
 public final class Commons {
+
+    private Commons() {}
+
     /**
      * Computes the checksum on pixels of the given image. Current implementation assumes that
      * the data type are {@link DataBuffer#TYPE_BYTE}. Note that this computation is sensitive

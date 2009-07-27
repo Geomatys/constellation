@@ -17,15 +17,14 @@
  */
 package org.constellation.observation;
 
-// J2SE dependencies
+/* J2SE dependencies
 import java.sql.SQLException;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;*/
 
 // Constellation dependencies
 import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.ServerException;
-import org.constellation.observation.MeasurementTable;
+//import org.constellation.catalog.ServerException;
 
 
 /**
