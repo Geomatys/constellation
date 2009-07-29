@@ -49,10 +49,10 @@ import org.geotoolkit.gml.xml.v311.CoordinatesType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.LineStringType;
 import org.geotoolkit.gml.xml.v311.PointType;
-import org.geotoolkit.ogc.xml.v110modified.ComparisonOpsType;
-import org.geotoolkit.ogc.xml.v110modified.FilterType;
-import org.geotoolkit.ogc.xml.v110modified.LogicOpsType;
-import org.geotoolkit.ogc.xml.v110modified.SpatialOpsType;
+import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
+import org.geotoolkit.ogc.xml.v110.FilterType;
+import org.geotoolkit.ogc.xml.v110.LogicOpsType;
+import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.referencing.CRS;
 
 // GeoAPI dependencies

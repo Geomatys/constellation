@@ -78,9 +78,9 @@ import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 
 // JUnit dependencies
-import org.geotoolkit.ogc.xml.v110modified.SortByType;
-import org.geotoolkit.ogc.xml.v110modified.SortOrderType;
-import org.geotoolkit.ogc.xml.v110modified.SortPropertyType;
+import org.geotoolkit.ogc.xml.v110.SortByType;
+import org.geotoolkit.ogc.xml.v110.SortOrderType;
+import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;

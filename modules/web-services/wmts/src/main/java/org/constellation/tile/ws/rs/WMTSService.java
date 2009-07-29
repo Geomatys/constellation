@@ -79,7 +79,7 @@ public class WMTSService extends OGCWebService {
         try {
             setXMLContext("org.geotoolkit.wmts.xml.v100:" +
                           "org.geotoolkit.ows.xml.v110:"  +
-                          "org.geotoolkit.gml.xml.v311.modified",
+                          "org.geotoolkit.gml.xml.v311",
                           "http://www.opengis.net/wmts");
             worker = new WMTSWorker();
 
