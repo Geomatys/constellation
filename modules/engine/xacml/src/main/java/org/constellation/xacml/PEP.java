@@ -41,15 +41,15 @@ public class PEP {
     
     private String issuer = "constellation.org";
     
-    private PolicyDecisionPoint PDP;
+    private PolicyDecisionPoint pdp;
     
     /**
      * Build a new Policy Enforcement Point.
      * 
      * @param PDP
      */
-    public PEP(PolicyDecisionPoint PDP) {
-        this.PDP = PDP;
+    public PEP(PolicyDecisionPoint pdp) {
+        this.pdp = pdp;
     }
     
     /**
@@ -63,22 +63,22 @@ public class PEP {
      * @throws java.lang.Exception
      */
     public RequestContext createXACMLRequest(String resourceURI, Principal principal, Group roleGroup, String action) throws URISyntaxException, IOException {
-        RequestContext requestCtx = new CstlRequestContext();
+        final RequestContext requestCtx = new CstlRequestContext();
 
         //Create a subject type
-        SubjectType subject = createSubject(principal, roleGroup);
+        final SubjectType subject = createSubject(principal, roleGroup);
 
         //Create a resource type
-        ResourceType resourceType = createResource(resourceURI);
+        final ResourceType resourceType = createResource(resourceURI);
 
         //Create an action type
-        ActionType actionType = createAction(action);
+        final ActionType actionType = createAction(action);
 
         //Create an Environment Type (Optional)
-        EnvironmentType environmentType = createTimeEnvironement();
+        final EnvironmentType environmentType = createTimeEnvironement();
 
         //Create a Request Type
-        RequestType requestType = new RequestType();
+        final RequestType requestType = new RequestType();
         requestType.getSubject().add(subject);
         requestType.getResource().add(resourceType);
         requestType.setAction(actionType);
@@ -100,22 +100,22 @@ public class PEP {
      * @throws java.lang.Exception
      */
     public RequestContext createXACMLRequest(URI resourceURI, Principal principal, Group roleGroup, String action) throws IOException {
-        RequestContext requestCtx = new CstlRequestContext();
+        final RequestContext requestCtx = new CstlRequestContext();
 
         //Create a subject type
-        SubjectType subject = createSubject(principal, roleGroup);
+        final SubjectType subject = createSubject(principal, roleGroup);
 
         //Create a resource type
-        ResourceType resourceType = createResource(resourceURI);
+        final ResourceType resourceType = createResource(resourceURI);
 
         //Create an action type
-        ActionType actionType = createAction(action);
+        final ActionType actionType = createAction(action);
 
         //Create an Environment Type (Optional)
-        EnvironmentType environmentType = createTimeEnvironement();
+        final EnvironmentType environmentType = createTimeEnvironement();
 
         //Create a Request Type
-        RequestType requestType = new RequestType();
+        final RequestType requestType = new RequestType();
         requestType.getSubject().add(subject);
         requestType.getResource().add(resourceType);
         requestType.setAction(actionType);
@@ -137,16 +137,16 @@ public class PEP {
     protected SubjectType createSubject(Principal user, Group roleGroup) {
     
         //Create a subject type
-        SubjectType subject = new SubjectType();
+        final SubjectType subject = new SubjectType();
         subject.getAttribute().add(
                 RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_SUBJECT_SUBJECTID.key, 
                                                                   issuer, 
                                                                   user.getName()));
         
-        Enumeration<Principal> roles = (Enumeration<Principal>) roleGroup.members();
+        final Enumeration<Principal> roles = (Enumeration<Principal>) roleGroup.members();
         while (roles.hasMoreElements()) {
-            Principal rolePrincipal = roles.nextElement();
-            AttributeType attSubjectID = RequestAttributeFactory.createStringAttributeType(
+            final Principal rolePrincipal = roles.nextElement();
+            final AttributeType attSubjectID = RequestAttributeFactory.createStringAttributeType(
                     XACMLConstants.ATTRIBUTEID_SUBJECT_ROLE.key, issuer, rolePrincipal.getName());
             subject.getAttribute().add(attSubjectID);
         }
@@ -160,12 +160,12 @@ public class PEP {
      * 
      * @return a resource Type whitch is a part of XACML request.
      */
-    protected ResourceType createResource(String URI) throws URISyntaxException {
+    protected ResourceType createResource(String uri) throws URISyntaxException {
     
         //Create a resource type
-        ResourceType resourceType = new ResourceType();
+        final ResourceType resourceType = new ResourceType();
         resourceType.getAttribute().add(
-                RequestAttributeFactory.createAnyURIAttributeType(XACMLConstants.ATTRIBUTEID_RESOURCE_RESOURCEID.key, null, new URI(URI)));
+                RequestAttributeFactory.createAnyURIAttributeType(XACMLConstants.ATTRIBUTEID_RESOURCE_RESOURCEID.key, null, new URI(uri)));
         return resourceType;
     }
     
@@ -176,12 +176,12 @@ public class PEP {
      * 
      * @return a resource Type whitch is a part of XACML request.
      */
-    protected ResourceType createResource(URI URI) {
+    protected ResourceType createResource(URI uri) {
     
         //Create a resource type
-        ResourceType resourceType = new ResourceType();
+        final ResourceType resourceType = new ResourceType();
         resourceType.getAttribute().add(
-                RequestAttributeFactory.createAnyURIAttributeType(XACMLConstants.ATTRIBUTEID_RESOURCE_RESOURCEID.key, null, URI));
+                RequestAttributeFactory.createAnyURIAttributeType(XACMLConstants.ATTRIBUTEID_RESOURCE_RESOURCEID.key, null, uri));
         return resourceType;
     }
     
@@ -195,7 +195,7 @@ public class PEP {
     protected ActionType createAction(String action)  {
         
         //Create an action type
-        ActionType actionType = new ActionType();
+        final ActionType actionType = new ActionType();
         actionType.getAttribute().add(
                 RequestAttributeFactory.createStringAttributeType(XACMLConstants.ATTRIBUTEID_ACTION_ACTIONID.key, issuer, action));
         
@@ -209,7 +209,7 @@ public class PEP {
     protected EnvironmentType createTimeEnvironement() {
             
         //Create an Environment Type
-        EnvironmentType environmentType = new EnvironmentType();
+        final EnvironmentType environmentType = new EnvironmentType();
         environmentType.getAttribute().add(
                 RequestAttributeFactory.createDateTimeAttributeType(XACMLConstants.ATTRIBUTEID_ENVIRONMENT_CURRENTTIME.key, issuer));
         return environmentType;
@@ -224,7 +224,7 @@ public class PEP {
     * @throws Exception
     */
    public ResponseContext getResponse(RequestContext request) {
-      return PDP.evaluate(request);
+      return pdp.evaluate(request);
    }
 
    /**
@@ -235,7 +235,7 @@ public class PEP {
     * @throws Exception
     */
    public int getDecision(RequestContext request) {
-      ResponseContext response = PDP.evaluate(request);
+      ResponseContext response = pdp.evaluate(request);
       return response.getDecision();
    }
 }

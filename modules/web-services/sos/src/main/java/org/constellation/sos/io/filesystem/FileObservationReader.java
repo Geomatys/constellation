@@ -277,7 +277,7 @@ public class FileObservationReader implements ObservationReader {
     }
 
     @Override
-    public String getNewObservationId() throws CstlServiceException {
+    public String getNewObservationId(String type) throws CstlServiceException {
         return observationIdBase + observationDirectory.list().length;
     }
 
@@ -293,7 +293,7 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public String getInfos() {
-        return "Constellation Filesystem O&M Reader 0.3";
+        return "Constellation Filesystem O&M Reader 0.4";
     }
 
     @Override

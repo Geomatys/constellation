@@ -63,9 +63,9 @@ public class SOSConfiguration {
         
     }
 
-    public SOSConfiguration(Automatic SMLConfiguration, Automatic OMConfiguration) {
-        this.OMConfiguration  = OMConfiguration;
-        this.SMLConfiguration = SMLConfiguration;
+    public SOSConfiguration(Automatic smlConfiguration, Automatic omConfiguration) {
+        this.OMConfiguration  = omConfiguration;
+        this.SMLConfiguration = smlConfiguration;
     }
 
     /**
@@ -78,8 +78,8 @@ public class SOSConfiguration {
     /**
      * @param SMLConfiguration the SMLConfiguration to set
      */
-    public void setSMLConfiguration(Automatic SMLConfiguration) {
-        this.SMLConfiguration = SMLConfiguration;
+    public void setSMLConfiguration(Automatic smlConfiguration) {
+        this.SMLConfiguration = smlConfiguration;
     }
 
     /**
@@ -92,8 +92,8 @@ public class SOSConfiguration {
     /**
      * @param OMConfiguration the OMConfiguration to set
      */
-    public void setOMConfiguration(Automatic OMConfiguration) {
-        this.OMConfiguration = OMConfiguration;
+    public void setOMConfiguration(Automatic omConfiguration) {
+        this.OMConfiguration = omConfiguration;
     }
 
     /**
@@ -140,8 +140,8 @@ public class SOSConfiguration {
     /**
      * @param SMLType the SMLType to set
      */
-    public void setSMLType(DataSourceType SMLType) {
-        this.SMLType = SMLType;
+    public void setSMLType(DataSourceType smlType) {
+        this.SMLType = smlType;
     }
 
     /**

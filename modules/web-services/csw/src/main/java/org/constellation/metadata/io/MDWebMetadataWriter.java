@@ -950,7 +950,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         return property;
     }
 
-    private class MixedPath {
+    private static final class MixedPath {
 
         public Path path;
 

@@ -105,7 +105,11 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
             if (uoms == null) {
                 uoms =  getDatabase().getTable(UnitOfMeasureTable.class);
             }
-            statement.setString(indexOf(query.uom), uoms.getIdentifier(meas.getUom()));
+            if (meas.getUom() != null) {
+                statement.setString(indexOf(query.uom), uoms.getIdentifier(meas.getUom()));
+            } else {
+                statement.setNull(indexOf(query.uom), java.sql.Types.VARCHAR);
+            }
             statement.setDouble(indexOf(query.value), meas.getValue());
             updateSingleton(statement);
             success = true;

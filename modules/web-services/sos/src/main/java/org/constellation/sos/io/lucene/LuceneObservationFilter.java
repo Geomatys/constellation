@@ -104,7 +104,7 @@ public class LuceneObservationFilter implements ObservationFilter {
     }
 
     public String getInfos() {
-        return "Constellation Lucene O&M Filter 0.3";
+        return "Constellation Lucene O&M Filter 0.4";
     }
 
     public boolean isBoundedObservation() {

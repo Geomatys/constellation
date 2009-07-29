@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchRecordException;
 import org.constellation.catalog.NoSuchTableException;
@@ -103,6 +104,11 @@ public class DefaultObservationReader implements ObservationReader {
     private final PreparedStatement newObservationIDStmt;
 
     /**
+     * An SQL statement finding the last Measurement ID recorded
+     */
+    private final PreparedStatement newMeasurementIDStmt;
+
+    /**
      * An SQL statement verying if the specified observation already exist.
      */
     private final PreparedStatement observationExistStmt;
@@ -136,13 +142,16 @@ public class DefaultObservationReader implements ObservationReader {
             dataSourceOM.setPassword(db.getPassword());
 
             omDatabase = new Database(dataSourceOM);
+            omDatabase.setProperty(ConfigurationKey.READONLY, "false");
+            
             //we build the database table frequently used.
             obsTable = omDatabase.getTable(ObservationTable.class);
             offTable = omDatabase.getTable(ObservationOfferingTable.class);
             refTable = omDatabase.getTable(ReferenceTable.class);
             //we build the prepared Statement
-            newObservationIDStmt = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observations\" WHERE name LIKE '%" + observationIdBase + "%' ");
-            observationExistStmt = omDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=?");
+            newObservationIDStmt    = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observations\" WHERE name LIKE '%" + observationIdBase + "%' ");
+            newMeasurementIDStmt    = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"measurements\" WHERE name LIKE '%" + observationIdBase + "%' ");
+            observationExistStmt    = omDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=?");
             getMinEventTimeOffering = omDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
         } catch (SQLException ex) {
             throw new CstlServiceException("SQL Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -387,9 +396,14 @@ public class DefaultObservationReader implements ObservationReader {
     /**
      * Create a new identifier for an observation by searching in the O&M database.
      */
-    public String getNewObservationId() throws CstlServiceException {
+    public String getNewObservationId(String type) throws CstlServiceException {
         try {
-            ResultSet res = newObservationIDStmt.executeQuery();
+            ResultSet res;
+            if (type != null && type.equals("measurement")) {
+                res = newMeasurementIDStmt.executeQuery();
+            } else {
+                res = newObservationIDStmt.executeQuery();
+            }
             int id = -1;
             while (res.next()) {
                 id = res.getInt(1);
@@ -439,7 +453,7 @@ public class DefaultObservationReader implements ObservationReader {
     }
 
     public String getInfos() {
-        return "Constellation Postgrid O&M Reader 0.3";
+        return "Constellation Postgrid O&M Reader 0.4";
     }
 
     public List<ResponseModeType> getResponseModes() throws CstlServiceException {

@@ -337,7 +337,7 @@ public abstract class SpatialFilter extends Filter {
         return hash;
     }
 
-    private class BboxFieldSelector implements FieldSelector {
+    private static final class BboxFieldSelector implements FieldSelector {
 
         /**
          * For cross-version compatibility.
@@ -356,7 +356,7 @@ public abstract class SpatialFilter extends Filter {
         }
     }
 
-    private class LineFieldSelector implements FieldSelector {
+    private static final class LineFieldSelector implements FieldSelector {
 
         /**
          * For cross-version compatibility.
@@ -375,7 +375,7 @@ public abstract class SpatialFilter extends Filter {
         }
     }
 
-    private class PointFieldSelector implements FieldSelector {
+    private static final class PointFieldSelector implements FieldSelector {
 
         /**
          * For cross-version compatibility.

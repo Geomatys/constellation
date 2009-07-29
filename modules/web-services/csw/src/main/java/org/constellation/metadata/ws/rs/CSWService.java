@@ -460,8 +460,8 @@ public class CSWService extends OGCWebService {
                 if (token.startsWith("xmlns(") && token.endsWith(")")) {
                     token = token.substring(6, token.length() -1);
                     if (token.indexOf('=') != -1) {
-                        String prefix = token.substring(0, token.indexOf('='));
-                        String url    = token.substring(token.indexOf('=') + 1);
+                        final String prefix = token.substring(0, token.indexOf('='));
+                        final String url    = token.substring(token.indexOf('=') + 1);
                         namespaces.put(prefix, url);
                     } else {
                          throw new CstlServiceException("The namespace " + token + " is malformed",

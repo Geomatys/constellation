@@ -25,6 +25,7 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
 import org.constellation.generic.database.Automatic;
@@ -108,6 +109,7 @@ public class DefaultObservationWriter implements ObservationWriter {
             dataSourceOM.setPassword(db.getPassword());
 
             omDatabase   = new Database(dataSourceOM);
+            omDatabase.setProperty(ConfigurationKey.READONLY, "false");
             
             //we build the database table frequently used.
             obsTable = omDatabase.getTable(ObservationTable.class);
@@ -236,7 +238,7 @@ public class DefaultObservationWriter implements ObservationWriter {
     }
 
     public String getInfos() {
-        return "Constellation Postgrid O&M Writer 0.3";
+        return "Constellation Postgrid O&M Writer 0.4";
     }
 
     public void destroy() {

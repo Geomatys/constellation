@@ -119,7 +119,7 @@ public class FileSensorWriter implements SensorWriter {
 
     @Override
     public String getInfos() {
-        return "Constellation Filesystem Sensor Writer 0.3";
+        return "Constellation Filesystem Sensor Writer 0.4";
     }
 
 }

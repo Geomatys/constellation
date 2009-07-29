@@ -86,6 +86,12 @@ import org.geotoolkit.xml.MarshallerPool;
  */
 public class ServicesBean {
 
+    private static final String WCS = "WCS";
+    private static final String WMS = "WMS";
+    private static final String SOS = "SOS";
+    private static final String CSW = "CSW";
+
+
     /**
      * The service Identification title
      */
@@ -194,7 +200,7 @@ public class ServicesBean {
      * This is an attribute that defines the current selected web service mode.
      * Default is WMS.
      */
-    private String webServiceMode = "WMS";
+    private String webServiceMode = WMS;
     /**
      * 
      * This is the available web services list for the selectOneListbox component.
@@ -735,16 +741,16 @@ public class ServicesBean {
             }
             marshallerPool.release(marshaller);
 
-            if (webServiceMode.equals("WMS")) {
+            if (webServiceMode.equals(WMS)) {
                 userData.setWMSCapabilities(capabilities);
             
-            } else if (webServiceMode.equals("WCS")) {
+            } else if (webServiceMode.equals(WCS)) {
                 userData.setWCSCapabilities(capabilities);
                 
-            } else if (webServiceMode.equals("SOS")) {
+            } else if (webServiceMode.equals(SOS)) {
                 userData.setSOSCapabilities(capabilities);
                 
-            } else if (webServiceMode.equals("CSW")) {
+            } else if (webServiceMode.equals(CSW)) {
                 userData.setCSWCapabilities(capabilities);
                 
             }
@@ -840,8 +846,8 @@ public class ServicesBean {
                 if (userData.getCSWCapabilities().length == 1) {
                     
                     //we begin to write the high lvl document
-                    String path = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
-                    File file   = new File(path);
+                    final String path = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
+                    final File file   = new File(path);
                     if (file.exists()) {
                     
                         marshaller.marshal(userData.getCSWCapabilities()[0], (OutputStream) new FileOutputStream(file));
@@ -862,8 +868,8 @@ public class ServicesBean {
                 if (userData.getSOSCapabilities().length == 1) {
                     
                     //we begin to write the high lvl document
-                    String path = servletContext.getRealPath("WEB-INF/SOSCapabilities1.0.0.xml");
-                    File file   = new File(path);
+                    final String path = servletContext.getRealPath("WEB-INF/SOSCapabilities1.0.0.xml");
+                    final File file   = new File(path);
                     if (file.exists()) {
                     
                         marshaller.marshal(userData.getSOSCapabilities()[0], (OutputStream) new FileOutputStream(file));
@@ -903,7 +909,7 @@ public class ServicesBean {
         final File f = new File(url);
         //f.setWritable(true);
         setExistPrefrence(true);
-        Marshaller marshaller = marshallerPool.acquireMarshaller();
+        final Marshaller marshaller = marshallerPool.acquireMarshaller();
         marshaller.marshal(userData, f);
         marshallerPool.release(marshaller);
     }
@@ -911,7 +917,7 @@ public class ServicesBean {
     
     public String setWMSMode() throws JAXBException, FileNotFoundException {
         LOGGER.info("set WMS mode");
-        webServiceMode    = "WMS";
+        webServiceMode    = WMS;
         capabilities     = new Object[2];
         capabilitiesFile = new File[2];
         final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
@@ -946,7 +952,7 @@ public class ServicesBean {
 
     public String setWCSMode() throws FileNotFoundException, JAXBException {
 
-        webServiceMode = "WCS";
+        webServiceMode = WCS;
         capabilities = new Object[2];
         capabilitiesFile = new File[2];
         final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
@@ -981,15 +987,15 @@ public class ServicesBean {
 
     public String setSOSMode() throws FileNotFoundException, JAXBException {
 
-        webServiceMode = "SOS";
+        webServiceMode = SOS;
         capabilities = new Object[1];
         capabilitiesFile = new File[1];
 
         //we begin to read the high lvl document
-        String path = servletContext.getRealPath("WEB-INF/SOSCapabilities1.0.0.xml");
+        final String path = servletContext.getRealPath("WEB-INF/SOSCapabilities1.0.0.xml");
         capabilitiesFile[0] = new File(path);
         if (capabilitiesFile[0].exists()) {
-            Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+            final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
             fillFormFromOWS110((CapabilitiesBaseType) capabilities[0]);
             marshallerPool.release(unmarshaller);
@@ -1003,15 +1009,15 @@ public class ServicesBean {
 
     public String setCSWMode() throws FileNotFoundException, JAXBException {
 
-        webServiceMode = "CSW";
+        webServiceMode = CSW;
         capabilities = new Object[1];
         capabilitiesFile = new File[1];
 
         //we begin to read the high lvl document
-        String path = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
+        final String path = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
         capabilitiesFile[0] = new File(path);
         if (capabilitiesFile[0].exists()) {
-            Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+            final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
             fillFormFromOWS100((org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) capabilities[0]);
             marshallerPool.release(unmarshaller);
@@ -1030,13 +1036,13 @@ public class ServicesBean {
      * @throws javax.xml.bind.JAXBException
      */
     public String switchMode() throws FileNotFoundException, JAXBException {
-        if (webServiceMode.equals("WMS")) {
+        if (webServiceMode.equals(WMS)) {
             setWMSMode();
-        } else if (webServiceMode.equals("WCS")) {
+        } else if (webServiceMode.equals(WCS)) {
             setWCSMode();
-        } else if (webServiceMode.equals("SOS")) {
+        } else if (webServiceMode.equals(SOS)) {
             setSOSMode();
-        } else if (webServiceMode.equals("CSW")) {
+        } else if (webServiceMode.equals(CSW)) {
             setCSWMode();
         }
         return "fillForm";
@@ -1060,17 +1066,17 @@ public class ServicesBean {
      * this method adds the available web services into the jsf component.
      */
     public void addWebServices() {
-        if (existsCapabilities("CSW")) {
-            webServices.add(new SelectItem("CSW", "CSW metadata", null));
+        if (existsCapabilities(CSW)) {
+            webServices.add(new SelectItem(CSW, "CSW metadata", null));
         }
-        if (existsCapabilities("SOS")) {
-            webServices.add(new SelectItem("SOS", "SOS metadata", null));
+        if (existsCapabilities(SOS)) {
+            webServices.add(new SelectItem(SOS, "SOS metadata", null));
         }
-        if (existsCapabilities("WCS")) {
-            webServices.add(new SelectItem("WCS", "WCS metadata", null));
+        if (existsCapabilities(WCS)) {
+            webServices.add(new SelectItem(WCS, "WCS metadata", null));
         }
-        if (existsCapabilities("WMS")) {
-            webServices.add(new SelectItem("WMS", "WMS metadata", null));
+        if (existsCapabilities(WMS)) {
+            webServices.add(new SelectItem(WMS, "WMS metadata", null));
         }
     }
 
@@ -1078,19 +1084,19 @@ public class ServicesBean {
         boolean exist = false;
         final File file;
         final String path;
-        if (ws.equals("CSW")) {
+        if (ws.equals(CSW)) {
             path = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
             file = new File(path);
             exist = file.exists();
-        } else if (ws.equals("SOS")) {
+        } else if (ws.equals(SOS)) {
             path = servletContext.getRealPath("WEB-INF/SOSCapabilities1.0.0.xml");
             file = new File(path);
             exist = file.exists();
-        } else if (ws.equals("WCS")) {
+        } else if (ws.equals(WCS)) {
             path = servletContext.getRealPath("WEB-INF/WCSCapabilities1.0.0.xml");
             file = new File(path);
             exist = file.exists();
-        } else if (ws.equals("WMS")) {
+        } else if (ws.equals(WMS)) {
             path = servletContext.getRealPath("WEB-INF/WMSCapabilities1.3.0.xml");
             file = new File(path);
             exist = file.exists();

@@ -373,7 +373,7 @@ public class GenericObservationFilter implements ObservationFilter {
     }
 
     public String getInfos() {
-        return "Constellation Generic O&M Filter 0.3";
+        return "Constellation Generic O&M Filter 0.4";
     }
 
     public boolean isBoundedObservation() {

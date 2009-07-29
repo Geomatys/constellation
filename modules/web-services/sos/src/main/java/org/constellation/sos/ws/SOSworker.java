@@ -1412,11 +1412,11 @@ public class SOSworker {
         String id = "";
         //we get the id of the sensor and we create a sensor object
         final String sensorId = requestInsObs.getAssignedSensorId();
-        int num = -1;
+        String num = null;
         if (sensorId.startsWith(sensorIdBase)) {
-            num = Integer.parseInt(sensorId.substring(sensorIdBase.length()));
+            num = sensorId.substring(sensorIdBase.length());
         } else {
-            throw new CstlServiceException("The sensor identifier is not valid",
+            throw new CstlServiceException("The sensor identifier is not valid it must start with " + sensorIdBase,
                                          INVALID_PARAMETER_VALUE, "assignedSensorId");
         }
         final ProcessEntry proc = new ProcessEntry(sensorId);
@@ -1425,9 +1425,13 @@ public class SOSworker {
         final ObservationEntry obs = requestInsObs.getObservation();
         if (obs != null) {
             obs.setProcedure(proc);
-            obs.setName(omReader.getNewObservationId());
+            String obsType = "observation";
+            if (obs instanceof MeasurementEntry) {
+                obsType = "measurement";
+            }
+            obs.setName(omReader.getNewObservationId(obsType));
             LOGGER.finer("samplingTime received: " + obs.getSamplingTime());
-            LOGGER.finer("template received:" + '\n' + obs.toString());
+            LOGGER.info("template received:" + '\n' + obs.toString());
         } else {
             throw new CstlServiceException("The observation template must be specified",
                                              MISSING_PARAMETER_VALUE, Parameters.OBSERVATION_TEMPLATE);

@@ -168,7 +168,7 @@ public class MDWebSensorReader implements SensorReader {
     }
 
     public String getInfos() {
-        return "Constellation MDweb Sensor Reader 0.3";
+        return "Constellation MDweb Sensor Reader 0.4";
     }
 
     @Override

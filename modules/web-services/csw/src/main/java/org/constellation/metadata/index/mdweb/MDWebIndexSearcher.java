@@ -88,7 +88,7 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
         super.destroy();
     }
 
-    private class IDFieldSelector implements FieldSelector {
+    private static final class IDFieldSelector implements FieldSelector {
 
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {

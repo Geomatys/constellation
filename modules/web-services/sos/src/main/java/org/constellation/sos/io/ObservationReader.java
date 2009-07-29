@@ -139,7 +139,7 @@ public interface ObservationReader {
     /**
      * Create a new identifier for an observation.
      */
-    String getNewObservationId() throws CstlServiceException;
+    String getNewObservationId(String type) throws CstlServiceException;
     
     /**
      * Return the minimal/maximal value for the offering event Time

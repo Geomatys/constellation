@@ -250,7 +250,7 @@ public class MDWebSensorWriter implements SensorWriter {
     }
 
     public String getInfos() {
-        return "Constellation MDweb Sensor Writer 0.3";
+        return "Constellation MDweb Sensor Writer 0.4";
     }
 
 }

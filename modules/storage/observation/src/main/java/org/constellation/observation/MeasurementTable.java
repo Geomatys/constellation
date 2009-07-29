@@ -328,7 +328,8 @@ public class MeasurementTable extends SingletonTable<Measurement> {
                 statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.DATE);
                 statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.DATE);
             }
-        
+            statement.setNull(indexOf(query.resultDefinition),   java.sql.Types.VARCHAR);
+
             updateSingleton(statement);
             success = true;
         } finally {

@@ -363,7 +363,7 @@ public class DefaultObservationFilter implements ObservationFilter {
     
     @Override
     public String getInfos() {
-        return "Constellation Postgrid O&M Filter 0.3";
+        return "Constellation Postgrid O&M Filter 0.4";
     }
 
     public boolean isBoundedObservation() {

@@ -169,7 +169,7 @@ public class FileObservationWriter implements ObservationWriter {
 
     @Override
     public String getInfos() {
-        return "Constellation Filesystem O&M Writer 0.3";
+        return "Constellation Filesystem O&M Writer 0.4";
     }
 
     @Override

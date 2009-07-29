@@ -457,7 +457,7 @@ public class Synchronizer {
             if (count == 1) {
                 log(LoggingLevel.UPDATE, "insert", target.format(insertStatement, sql));
             } else {
-                log(Level.WARNING, "insert", String.valueOf(count) + " enregistrements ajoutés.");
+                log(Level.WARNING, "insert", count + " enregistrements ajoutés.");
             }
         }
         /*

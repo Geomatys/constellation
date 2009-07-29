@@ -96,7 +96,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     }
 
     @Override
-    public String getNewObservationId() throws CstlServiceException {
+    public String getNewObservationId(String type) throws CstlServiceException {
         Values values = loadData(Arrays.asList("var05"));
         int id = Integer.parseInt(values.getVariable("var05"));
 
@@ -324,7 +324,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     }
 
     public String getInfos() {
-        return "Constellation Postgrid Generic O&M Reader 0.3";
+        return "Constellation Postgrid Generic O&M Reader 0.4";
     }
 
     public List<ResponseModeType> getResponseModes() throws CstlServiceException {
