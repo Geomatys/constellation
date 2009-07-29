@@ -70,6 +70,14 @@ public abstract class FilterParser {
      * use for debugging purpose
      */
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
+
+    protected static final String PARSE_ERROR_MSG = "The service was unable to parse the Date: ";
+
+    protected static final String UNKNOW_CRS_ERROR_MSG = "Unknow Coordinate Reference System: ";
+
+    protected static final String INCORRECT_BBOX_DIM_ERROR_MSG = "The dimensions of the bounding box are incorrect: ";
+
+    protected static final String FACTORY_BBOX_ERROR_MSG = "Factory exception while parsing spatial filter BBox: ";
     
    /**
      * Build a Filter with the specified CQL query

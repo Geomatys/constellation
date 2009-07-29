@@ -327,9 +327,9 @@ public final class WCSWorker {
         formats.add(new CodeListType("gif"));
         formats.add(new CodeListType("bmp"));
         String nativeFormat = "unknow";
-        Iterator<Series> it = layerRef.getSeries().iterator();
+        final Iterator<Series> it = layerRef.getSeries().iterator();
         if (it.hasNext()) {
-            Series s = it.next();
+            final Series s = it.next();
             nativeFormat = s.getFormat().getImageFormat();
         }
         final SupportedFormatsType supForm = new SupportedFormatsType(
@@ -753,7 +753,7 @@ public final class WCSWorker {
              * TODO delete when overlapping problem is solved
              */
             if (CITE_TESTING) {
-                CoverageSummaryType temp = summary.get(10);
+                final CoverageSummaryType temp = summary.get(10);
                 summary.remove(10);
                 summary.add(0, temp);
             }
@@ -924,7 +924,7 @@ public final class WCSWorker {
 
        // if the flag file is present we load the properties
        if (changeFile != null && changeFile.exists()) {
-           FileInputStream in    = new FileInputStream(changeFile);
+           final FileInputStream in    = new FileInputStream(changeFile);
            p.load(in);
            in.close();
        } else {
@@ -1076,14 +1076,14 @@ public final class WCSWorker {
     /**
      * This method should be considered private.
      */
-    public void internal_initServletContext(final ServletContext servletContext) {
+    public void internalInitServletContext(final ServletContext servletContext) {
         this.servletContext = servletContext;
     }
     
     /**
      * This method should be considered private.
      */
-    public void internal_initUriContext(final UriInfo uriContext) {
+    public void internalInitUriContext(final UriInfo uriContext) {
         this.uriContext = uriContext;
     }
 

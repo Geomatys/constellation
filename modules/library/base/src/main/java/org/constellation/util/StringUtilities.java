@@ -53,7 +53,7 @@ import org.opengis.referencing.crs.VerticalCRS;
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-public class StringUtilities {
+public final class StringUtilities {
 
     private StringUtilities() {}
     
@@ -202,7 +202,7 @@ public class StringUtilities {
     public static Envelope toEnvelope(final String bbox, final CoordinateReferenceSystem crs)
                                                               throws IllegalArgumentException
     {
-        GeneralEnvelope envelope = new GeneralEnvelope(2);
+        final GeneralEnvelope envelope = new GeneralEnvelope(2);
         envelope.setCoordinateReferenceSystem(crs);
         envelope.setToInfinite();
         if (bbox == null) {
@@ -333,8 +333,9 @@ public class StringUtilities {
         }
 
         //create the 2/3/4 D BBox ----------------------------------------------
+        String name = "rendering bbox";
         if (verticalCRS != null && temporalCRS != null) {
-            final CoordinateReferenceSystem finalCRS = new DefaultCompoundCRS("rendering bbox",
+            final CoordinateReferenceSystem finalCRS = new DefaultCompoundCRS(name,
                     new CoordinateReferenceSystem[]{ horizontalCRS,
                                                      verticalCRS,
                                                      temporalCRS });
@@ -345,7 +346,7 @@ public class StringUtilities {
             envelope.setRange(3, dimT[0], dimT[1]);
             return envelope;
         } else if(verticalCRS != null) {
-            final CoordinateReferenceSystem finalCRS = new DefaultCompoundCRS("rendering bbox",
+            final CoordinateReferenceSystem finalCRS = new DefaultCompoundCRS(name,
                     new CoordinateReferenceSystem[]{ horizontalCRS, verticalCRS });
             final GeneralEnvelope envelope = new GeneralEnvelope(finalCRS);
             envelope.setRange(0, dimX[0], dimX[1]);
@@ -353,7 +354,7 @@ public class StringUtilities {
             envelope.setRange(2, dimZ[0], dimZ[1]);
             return envelope;
         } else if(temporalCRS != null) {
-            final CoordinateReferenceSystem finalCRS = new DefaultCompoundCRS("rendering bbox",
+            final CoordinateReferenceSystem finalCRS = new DefaultCompoundCRS(name,
                     new CoordinateReferenceSystem[]{ horizontalCRS, temporalCRS });
             final GeneralEnvelope envelope = new GeneralEnvelope(finalCRS);
             envelope.setRange(0, dimX[0], dimX[1]);
@@ -435,16 +436,16 @@ public class StringUtilities {
      * @return
      */
     public static boolean containsIgnoreCase(List<String> list, String str) {
-        boolean str_available = false;
+        boolean strAvailable = false;
         if (list != null) {
             for (String s : list) {
                 if (s.equalsIgnoreCase(str)) {
-                    str_available = true;
+                    strAvailable = true;
                     break;
                 }
             }
         }
-        return str_available;
+        return strAvailable;
     }
 
     /**

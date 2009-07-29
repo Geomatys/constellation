@@ -201,8 +201,8 @@ public class WCSService extends OGCWebService {
                 }
                 serviceDef = getVersionFromNumber(getcaps.getVersion().toString());
                 //TODO: is this necessary?
-                worker.internal_initServletContext(servletContext);
-                worker.internal_initUriContext(uriContext);
+                worker.internalInitServletContext(servletContext);
+                worker.internalInitUriContext(uriContext);
                 
                 final GetCapabilitiesResponse capsResponse = worker.getCapabilities(getcaps);
                 final StringWriter sw = new StringWriter();

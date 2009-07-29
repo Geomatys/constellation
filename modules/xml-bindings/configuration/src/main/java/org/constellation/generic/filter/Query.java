@@ -281,22 +281,22 @@ public class Query {
         }
         if (where != null) {
             sb.append(" WHERE ");
-            boolean ORblock = false;
+            boolean oRblock = false;
             for (int i = 0; i < where.size(); i++) {
-                Where w = where.get(i);
-                String block = '(' + w.getvalue() + ')';
+                final Where w = where.get(i);
+                final String block = '(' + w.getvalue() + ')';
                 if (i + 1 < where.size()) {
                     if (where.get(i + 1).getGroup().equals(w.getGroup()) && (!"AND".equals(w.getOperator()))) {
-                        if (ORblock) {
+                        if (oRblock) {
                             sb.append(block).append(" OR ");
                         } else {
                             sb.append('(').append(block).append(" OR ");
-                            ORblock = true;
+                            oRblock = true;
                         }
                     } else {
-                        if (ORblock) {
+                        if (oRblock) {
                             sb.append(block).append(") AND ");
-                            ORblock = false;
+                            oRblock = false;
                         } else {
                             sb.append(block).append(" AND ");
                         }
@@ -336,7 +336,7 @@ public class Query {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[Query]:").append('\n');
+        final StringBuilder sb = new StringBuilder("[Query]:").append('\n');
         sb.append("name: ").append(name);
         if (option != null) {
             sb.append(" option: ").append(option);

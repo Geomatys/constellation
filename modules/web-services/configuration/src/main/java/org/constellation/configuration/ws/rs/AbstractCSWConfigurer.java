@@ -248,7 +248,7 @@ public abstract class AbstractCSWConfigurer {
         // CSW indexation
         } else {
             
-            File cswConfigDir = getConfigurationDirectory();
+            final File cswConfigDir = getConfigurationDirectory();
             if (!asynchrone) {
                 synchroneIndexRefresh(cswConfigDir, id);
             } else {
@@ -272,7 +272,10 @@ public abstract class AbstractCSWConfigurer {
         //we delete each index directory
         for (File indexDir : configurationDirectory.listFiles(new IndexDirectoryFilter(id))) {
             for (File f : indexDir.listFiles()) {
-                f.delete();
+                final boolean sucess = f.delete();
+                if (!sucess) {
+                    throw new CstlServiceException("The service can't delete the index file:" + f.getPath(), NO_APPLICABLE_CODE);
+                }
             }
             if (!indexDir.delete()) {
                 throw new CstlServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE);
@@ -298,7 +301,10 @@ public abstract class AbstractCSWConfigurer {
          */
         for (File indexDir : configurationDirectory.listFiles(new NextIndexDirectoryFilter(id))) {
             for (File f : indexDir.listFiles()) {
-                f.delete();
+                final boolean sucess = f.delete();
+                if (!sucess) {
+                    throw new CstlServiceException("The service can't delete the next index file:" + f.getPath(), NO_APPLICABLE_CODE);
+                }
             }
             if (!indexDir.delete()) {
                 throw new CstlServiceException("The service can't delete the next index folder.", NO_APPLICABLE_CODE);
@@ -310,13 +316,16 @@ public abstract class AbstractCSWConfigurer {
          * if there is a specific id in parameter we only index the specified profile
          */
         for (File configFile : configurationDirectory.listFiles(new ConfigurationFileFilter(id))) {
-            String currentId        = getConfigID(configFile);
-            File nexIndexDir        = new File(configurationDirectory, currentId + "nextIndex");
+            final String currentId        = getConfigID(configFile);
+            final File nexIndexDir        = new File(configurationDirectory, currentId + "nextIndex");
             AbstractIndexer indexer = null;
             try {
                 indexer = initIndexer(currentId, null);
                 if (indexer != null) {
-                    nexIndexDir.mkdir();
+                    final boolean success = nexIndexDir.mkdir();
+                    if (!success) {
+                        throw new CstlServiceException("Unable to create a directory nextIndex for  the id:" + id, NO_APPLICABLE_CODE);
+                    }
                     indexer.setFileDirectory(nexIndexDir);
                     indexer.createIndex();
 
@@ -353,43 +362,41 @@ public abstract class AbstractCSWConfigurer {
         // CSW indexation
         } else {
 
-            File cswConfigDir = getConfigurationDirectory();
-            
-        /*
-         * then we create all the nextIndex directory and create the indexes
-         * if there is a specific id in parameter we only index the specified profile
-         */
-        for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(id))) {
-            String currentId        = getConfigID(configFile);
-            AbstractIndexer indexer = null;
-            MetadataReader reader   = null;
-            try {
-                reader  = initReader(currentId);
-                List<Object> objectToIndex = new ArrayList<Object>();
-                if (reader != null) {
-                    for (String identifier : identifiers) {
-                        objectToIndex.add(reader.getMetadata(identifier, MetadataReader.ISO_19115, ElementSetType.FULL, null));
+            final File cswConfigDir = getConfigurationDirectory();
+            /*
+             * then we create all the nextIndex directory and create the indexes
+             * if there is a specific id in parameter we only index the specified profile
+             */
+            for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(id))) {
+                final String currentId        = getConfigID(configFile);
+                AbstractIndexer indexer = null;
+                MetadataReader reader   = null;
+                try {
+                    reader  = initReader(currentId);
+                    final List<Object> objectToIndex = new ArrayList<Object>();
+                    if (reader != null) {
+                        for (String identifier : identifiers) {
+                            objectToIndex.add(reader.getMetadata(identifier, MetadataReader.ISO_19115, ElementSetType.FULL, null));
+                        }
+                    } else {
+                        throw new CstlServiceException("Unable to create a reader for the id:" + id, NO_APPLICABLE_CODE);
                     }
-                } else {
-                    throw new CstlServiceException("Unable to create a reader for the id:" + id, NO_APPLICABLE_CODE);
-                }
 
-                indexer = initIndexer(currentId, reader);
-                if (indexer != null) {
-                    for (Object obj : objectToIndex) {
-                        indexer.indexDocument(obj);
+                    indexer = initIndexer(currentId, reader);
+                    if (indexer != null) {
+                        for (Object obj : objectToIndex) {
+                            indexer.indexDocument(obj);
+                        }
+                    } else {
+                        throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
                     }
-                } else {
-                    throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
-                }
-            
-            } finally {
-                if (indexer != null) {
-                    indexer.destroy();
+
+                } finally {
+                    if (indexer != null) {
+                        indexer.destroy();
+                    }
                 }
             }
-        }
-
             msg = "The specified record have been added to the CSW index";
         }
         return new AcknowlegementType("success", msg);

@@ -394,7 +394,7 @@ public class LuceneFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new CstlServiceException("The service was unable to parse the Date: " + dateValue,
+                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue,
                                                           INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replaceAll("-", "");
@@ -412,7 +412,7 @@ public class LuceneFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new CstlServiceException("The service was unable to parse the Date: " + dateValue,
+                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue,
                                                          INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replaceAll("-", "");
@@ -431,7 +431,7 @@ public class LuceneFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new CstlServiceException("The service was unable to parse the Date: " + dateValue,
+                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue,
                                                           INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replaceAll("-", "");
@@ -449,7 +449,7 @@ public class LuceneFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new CstlServiceException("The service was unable to parse the Date: " + dateValue,
+                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue,
                                                           INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replaceAll("-", "");
@@ -513,13 +513,13 @@ public class LuceneFilterParser extends FilterParser {
                 spatialfilter = new BBOXFilter(envelope, crsName);
                 
             } catch (NoSuchAuthorityCodeException e) {
-                throw new CstlServiceException("Unknow Coordinate Reference System: " + crsName,
+                throw new CstlServiceException(UNKNOW_CRS_ERROR_MSG + crsName,
                                                  INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } catch (FactoryException e) {
-                throw new CstlServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                throw new CstlServiceException(FACTORY_BBOX_ERROR_MSG + e.getMessage(),
                                                  INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } catch (IllegalArgumentException e) {
-                throw new CstlServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
+                throw new CstlServiceException(INCORRECT_BBOX_DIM_ERROR_MSG+ e.getMessage(),
                                                  INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             
@@ -577,13 +577,13 @@ public class LuceneFilterParser extends FilterParser {
                 }
                 
             } catch (NoSuchAuthorityCodeException e) {
-                    throw new CstlServiceException("Unknow Coordinate Reference System: " + crsName,
+                    throw new CstlServiceException(UNKNOW_CRS_ERROR_MSG + crsName,
                                                      INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } catch (FactoryException e) {
-                    throw new CstlServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                    throw new CstlServiceException(FACTORY_BBOX_ERROR_MSG + e.getMessage(),
                                                      INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } catch (IllegalArgumentException e) {
-                    throw new CstlServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
+                    throw new CstlServiceException(INCORRECT_BBOX_DIM_ERROR_MSG + e.getMessage(),
                                                       INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
            
@@ -678,13 +678,13 @@ public class LuceneFilterParser extends FilterParser {
                 }
                 
             } catch (NoSuchAuthorityCodeException e) {
-                throw new CstlServiceException("Unknow Coordinate Reference System: " + crsName,
+                throw new CstlServiceException(UNKNOW_CRS_ERROR_MSG + crsName,
                                               INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } catch (FactoryException e) {
-                throw new CstlServiceException("Factory exception while parsing spatial filter BBox: " + e.getMessage(),
+                throw new CstlServiceException(FACTORY_BBOX_ERROR_MSG + e.getMessage(),
                                               INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             } catch (IllegalArgumentException e) {
-                throw new CstlServiceException("The dimensions of the bounding box are incorrect: " + e.getMessage(),
+                throw new CstlServiceException(INCORRECT_BBOX_DIM_ERROR_MSG+ e.getMessage(),
                                               INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             

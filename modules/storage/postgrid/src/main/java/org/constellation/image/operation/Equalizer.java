@@ -80,7 +80,7 @@ pband:  for (int band=0; band<bands; band++) {
             int upper = pixels.length;
             do if (--upper < 0) continue pband;
             while (Double.isNaN(pixels[upper].value));
-            final double offset = pixels[0].value;
+            //final double offset = pixels[0].value;
             final double scale  = 255.0 / upper;
             for (int i=0; i<upper; i++) {
                 final Pixel p = pixels[i];
