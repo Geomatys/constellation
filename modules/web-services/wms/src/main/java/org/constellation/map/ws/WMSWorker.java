@@ -481,7 +481,7 @@ public class WMSWorker extends AbstractWMSWorker {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
                 // If the file is not present in the configuration directory, take the one in resource.
                 if (!f.exists()) {
-                    final InputStream in = Util.getResourceAsStream(fileName);
+                    final InputStream in = getClass().getResourceAsStream(fileName);
                     response = unmarshaller.unmarshal(in);
                     in.close();
                 } else {
