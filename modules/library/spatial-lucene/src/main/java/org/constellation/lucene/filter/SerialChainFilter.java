@@ -191,7 +191,7 @@ public class SerialChainFilter extends Filter {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof SerialChainFilter)) return false;
-        SerialChainFilter other = (SerialChainFilter) o;
+        final SerialChainFilter other = (SerialChainFilter) o;
 
         if (this.chain.size() != other.getChain().size() ||
         	this.actionType.length != other.getActionType().length)
@@ -225,7 +225,7 @@ public class SerialChainFilter extends Filter {
     
     @Override
     public String toString() {
-    	StringBuffer buf = new StringBuffer();
+    	final StringBuffer buf = new StringBuffer();
     	buf.append("[SerialChainFilter]").append('\n');
         if (chain != null && chain.size() == 1) {
             buf.append("NOT ").append('\n');

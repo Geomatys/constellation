@@ -135,7 +135,6 @@ import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.geotoolkit.ogc.xml.v110.FilterCapabilities;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
-import org.geotoolkit.ows.xml.AcceptFormats;
 import org.geotoolkit.ows.xml.AcceptVersions;
 import org.geotoolkit.ows.xml.Sections;
 import org.geotoolkit.ows.xml.v100.DomainType;
@@ -633,7 +632,7 @@ public class CSWworker {
         
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
-            if (!requestCapabilities.getService().equals("CSW")) {
+            if (!requestCapabilities.getService().equals(Parameters.CSW)) {
                 throw new CstlServiceException("service must be \"CSW\"!", INVALID_PARAMETER_VALUE, Parameters.SERVICE);
             }
         } else {
@@ -679,8 +678,8 @@ public class CSWworker {
         }
         
         //according to CITE test a GetCapabilities must always return Filter_Capabilities
-        if (!sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains(Parameters.ALL))
-            sections.add("Filter_Capabilities");
+        if (!sections.getSection().contains(Parameters.FILTER_CAPABILITIES) || sections.getSection().contains(Parameters.ALL))
+            sections.add(Parameters.FILTER_CAPABILITIES);
         
         //we enter the information for service identification.
         if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains(Parameters.ALL)) {
@@ -708,7 +707,7 @@ public class CSWworker {
                 }
             
                 // we update the URL
-                OGCWebService.updateOWSURL(om.getOperation(), serviceURL, "CSW");
+                OGCWebService.updateOWSURL(om.getOperation(), serviceURL, Parameters.CSW);
 
                 // we add the cascaded services (if there is some)
                 final DomainType cascadedCSW  = om.getConstraint("FederatedCatalogues");
@@ -799,7 +798,7 @@ public class CSWworker {
         }
             
         //we enter the information filter capablities.
-        if (sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains(Parameters.ALL)) {
+        if (sections.getSection().contains(Parameters.FILTER_CAPABILITIES) || sections.getSection().contains(Parameters.ALL)) {
             
             fc = skeletonCapabilities.getFilterCapabilities();
         }
@@ -893,7 +892,7 @@ public class CSWworker {
                 /*
                  * debugging part
                  */
-                StringBuilder report = new StringBuilder("variables:").append('\n');
+                final StringBuilder report = new StringBuilder("variables:").append('\n');
                 for (Entry<String, QName> entry : variables.entrySet()) {
                     report.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
                 }
@@ -966,7 +965,6 @@ public class CSWworker {
                 luceneQuery.setSort(sortFilter);
             }
         
-            LOGGER.info("Lucene query obtained:" + luceneQuery);
             // we try to execute the query
             results = executeLuceneQuery(luceneQuery);
         }
@@ -1087,6 +1085,7 @@ public class CSWworker {
      * @throws CstlServiceException
      */
     private List<String> executeLuceneQuery(final SpatialQuery query) throws CstlServiceException {
+        LOGGER.info("Lucene query obtained:" + query);
         try {
             return indexSearcher.doSearch(query);
         
@@ -1306,7 +1305,7 @@ public class CSWworker {
      * @throws CstlServiceException
      */
     private void throwUnexistingIdentifierException(final List<String> unexistingID) throws CstlServiceException {
-        StringBuilder identifiers = new StringBuilder();
+        final StringBuilder identifiers = new StringBuilder();
         for (String s : unexistingID) {
             identifiers.append(s).append(',');
         }
@@ -1539,7 +1538,6 @@ public class CSWworker {
 
                     // build the lucene query from the specified filter
                     final SpatialQuery luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(deleteRequest.getConstraint(), null, null);
-                    LOGGER.info("Lucene query obtained:" + luceneQuery);
 
                     // we try to execute the query
                     final List<String> results = executeLuceneQuery(luceneQuery);
@@ -1576,7 +1574,6 @@ public class CSWworker {
 
                     // build the lucene query from the specified filter
                     final SpatialQuery luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(updateRequest.getConstraint(), null, null);
-                    LOGGER.info("Lucene query obtained:" + luceneQuery);
 
                     // we try to execute the query
                     final List<String> results = executeLuceneQuery(luceneQuery);
@@ -1787,7 +1784,7 @@ public class CSWworker {
         isWorking();
         if (request != null) {
             if (request.getService() != null) {
-                if (!request.getService().equals("CSW"))  {
+                if (!request.getService().equals(Parameters.CSW))  {
                     throw new CstlServiceException("service must be \"CSW\"!",
                                                   INVALID_PARAMETER_VALUE, Parameters.SERVICE);
                 }

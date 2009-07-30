@@ -100,8 +100,8 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
      */
     protected SimpleDataRecordEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
         final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
-        String idDataBlock = results.getString(indexOf(query.idBlock));
-        String idDataRecord = results.getString(indexOf(query.idDataRecord));
+        final String idDataBlock = results.getString(indexOf(query.idBlock));
+        final String idDataRecord = results.getString(indexOf(query.idDataRecord));
         
         if (fields == null) {
             fields = getDatabase().getTable(AnyScalarTable.class);
@@ -110,7 +110,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
        
         fields.setIdDataBlock(idDataBlock);
         fields.setIdDataRecord(idDataRecord);
-        Collection<AnyScalarPropertyType> scalars = fields.getEntries();
+        final Collection<AnyScalarPropertyType> scalars = fields.getEntries();
         
         return new SimpleDataRecordEntry(idDataBlock, idDataRecord,
                 results.getString(indexOf(query.definition)),
@@ -144,10 +144,10 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
         transactionBegin();
         try {
             if (datarecord.getId() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.idBlock),      dataBlockId);
                 statement.setString(indexOf(query.idDataRecord), datarecord.getId());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return datarecord.getId();
@@ -158,7 +158,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
                 id = searchFreeIdentifier("datarecord");
             }
         
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.idDataRecord), id);
             statement.setString(indexOf(query.idBlock),      dataBlockId);
             statement.setString(indexOf(query.definition),   datarecord.getDefinition());
@@ -174,7 +174,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
                 fields.setIdDataBlock(dataBlockId);
                 fields.setIdDataRecord(id);
             }
-            Iterator<AnyScalarPropertyType> i = datarecord.getField().iterator();
+            final Iterator<AnyScalarPropertyType> i = datarecord.getField().iterator();
         
             while (i.hasNext()) {
                fields.getIdentifier(i.next(), dataBlockId, id);

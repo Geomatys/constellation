@@ -38,9 +38,9 @@ import org.opengis.observation.Observation;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class Normalizer {
+public final class Normalizer {
 
-    private static final Logger logger = Logger.getLogger("org.constellation.sos");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
 
     private Normalizer() {}
     
@@ -141,9 +141,9 @@ public class Normalizer {
                 }
             } else {
                 if (observation.getResult() != null)
-                    logger.severe("NormalizeDocument: Class not recognized for result:" + observation.getResult().getClass().getSimpleName());
+                    LOGGER.severe("NormalizeDocument: Class not recognized for result:" + observation.getResult().getClass().getSimpleName());
                 else
-                    logger.severe("NormalizeDocument: The result is null");
+                    LOGGER.severe("NormalizeDocument: The result is null");
             }
         }
         return collection;

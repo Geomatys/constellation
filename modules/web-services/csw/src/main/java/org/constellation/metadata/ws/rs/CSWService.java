@@ -65,6 +65,7 @@ import org.geotoolkit.csw.xml.v202.ResultType;
 import org.constellation.metadata.CSWClassesContext;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
+import org.constellation.metadata.Parameters;
 import org.constellation.util.Util;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
@@ -465,11 +466,11 @@ public class CSWService extends OGCWebService {
                         namespaces.put(prefix, url);
                     } else {
                          throw new CstlServiceException("The namespace " + token + " is malformed",
-                                                       INVALID_PARAMETER_VALUE, "namespace");
+                                                       INVALID_PARAMETER_VALUE, Parameters.NAMESPACE);
                     }
                 } else {
                     throw new CstlServiceException("The namespace attribute is malformed: good pattern is \"xmlns(ns1=http://namespace1),xmlns(ns2=http://namespace2)\"",
-                                                       INVALID_PARAMETER_VALUE, "namespace");
+                                                       INVALID_PARAMETER_VALUE, Parameters.NAMESPACE);
                 }
             }
         }
@@ -492,7 +493,7 @@ public class CSWService extends OGCWebService {
                 typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
             } else {
                 throw new CstlServiceException("The QName " + token + " is malformed",
-                        INVALID_PARAMETER_VALUE, "namespace");
+                        INVALID_PARAMETER_VALUE, Parameters.NAMESPACE);
             }
         }
         
@@ -692,11 +693,11 @@ public class CSWService extends OGCWebService {
                         namespaces.put(prefix, url);
                     } else {
                          throw new CstlServiceException("The namespace " + token + " is malformed",
-                                                       INVALID_PARAMETER_VALUE, "namespace");
+                                                       INVALID_PARAMETER_VALUE, Parameters.NAMESPACE);
                     }
                 } else {
                     throw new CstlServiceException("The namespace attribute is malformed: good pattern is \"xmlns(ns1=http://namespace1),xmlns(ns2=http://namespace2)\"",
-                                                       INVALID_PARAMETER_VALUE, "namespace");
+                                                       INVALID_PARAMETER_VALUE, Parameters.NAMESPACE);
                 }
             }
         }
@@ -719,7 +720,7 @@ public class CSWService extends OGCWebService {
                     typeNames.add(new QName(namespaces.get(prefix), localPart, null));
                 } else {
                      throw new CstlServiceException("The QName " + token + " is malformed",
-                                                   INVALID_PARAMETER_VALUE, "namespace");
+                                                   INVALID_PARAMETER_VALUE, Parameters.NAMESPACE);
                 }
         }
         

@@ -76,7 +76,7 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
         if (phenomenons == null) {
             phenomenons = getDatabase().getTable(PhenomenonTable.class);
         }
-        PhenomenonEntry component = (PhenomenonEntry)phenomenons.getEntry(results.getString(indexOf(query.idComponent)));
+        final PhenomenonEntry component = (PhenomenonEntry)phenomenons.getEntry(results.getString(indexOf(query.idComponent)));
         
         return new ComponentEntry(results.getString(indexOf(query.idCompositePhenomenon)), component);
     }
@@ -118,12 +118,12 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
             if (phenomenons == null) {
                 phenomenons = getDatabase().getTable(PhenomenonTable.class);
             }
-            String idPheno = phenomenons.getIdentifier(pheno);
+            final String idPheno = phenomenons.getIdentifier(pheno);
         
             PreparedStatement statement = getStatement(QueryType.EXISTS);
             statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
             statement.setString(indexOf(query.idComponent), idPheno);
-            ResultSet result = statement.executeQuery();
+            final ResultSet result = statement.executeQuery();
             if(result.next()) {
                 success = true;
                 return ;

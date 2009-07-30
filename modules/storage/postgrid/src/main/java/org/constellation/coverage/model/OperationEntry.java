@@ -86,6 +86,7 @@ final class OperationEntry extends Entry implements Operation {
      */
     private final int userParameters;
 
+    private static final String INTERPOLATE_OPERATION_NAME = "Interpolate";
     /**
      * Construit une opération par défaut. Ce constructeur est différent de ce que l'on peut
      * obtenir avec les constructeurs publiques ou protégées du fait qu'elle n'applique pas
@@ -95,7 +96,7 @@ final class OperationEntry extends Entry implements Operation {
         super("Default", null);
         prefix = "";
         parameters = new ParameterValueGroup[] {
-            getProcessor().getOperation("Interpolate").getParameters()
+            getProcessor().getOperation(INTERPOLATE_OPERATION_NAME).getParameters()
         };
         parameters[0].parameter("Type").setValue(INTERPOLATIONS);
         userParameters = -1;
@@ -163,10 +164,10 @@ final class OperationEntry extends Entry implements Operation {
                      * we don't want to overwrite the user operation). Since this operation do not
                      * transform the image, we apply it always (at the difference of "NodataFilter").
                      */
-                    if (operation.equalsIgnoreCase("Interpolate")) {
+                    if (operation.equalsIgnoreCase(INTERPOLATE_OPERATION_NAME)) {
                         continue;
                     }
-                    param = getProcessor().getOperation("Interpolate").getParameters();
+                    param = getProcessor().getOperation(INTERPOLATE_OPERATION_NAME).getParameters();
                     param.parameter("Type").setValue(INTERPOLATIONS);
                     break;
                 }

@@ -1431,7 +1431,7 @@ public class SOSworker {
             }
             obs.setName(omReader.getNewObservationId(obsType));
             LOGGER.finer("samplingTime received: " + obs.getSamplingTime());
-            LOGGER.info("template received:" + '\n' + obs.toString());
+            LOGGER.finer("template received:" + '\n' + obs.toString());
         } else {
             throw new CstlServiceException("The observation template must be specified",
                                              MISSING_PARAMETER_VALUE, Parameters.OBSERVATION_TEMPLATE);

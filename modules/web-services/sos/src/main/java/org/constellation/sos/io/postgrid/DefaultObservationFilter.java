@@ -32,6 +32,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
+import org.constellation.sos.ws.Parameters;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
@@ -226,7 +227,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
-                    INVALID_PARAMETER_VALUE, "eventTime");
+                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
         }
     }
 
@@ -249,7 +250,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_Before operation require timeInstant!",
-                    INVALID_PARAMETER_VALUE, "eventTime");
+                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
         }
     }
 
@@ -276,7 +277,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_After operation require timeInstant!",
-                    INVALID_PARAMETER_VALUE, "eventTime");
+                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
         }
     }
 
@@ -312,7 +313,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_During operation require TimePeriod!",
-                    INVALID_PARAMETER_VALUE, "eventTime");
+                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
         }
     }
 

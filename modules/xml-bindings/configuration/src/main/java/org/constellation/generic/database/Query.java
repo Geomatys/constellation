@@ -192,17 +192,18 @@ public class Query {
             throw new IllegalArgumentException("The query :" + name + " is malformed, FROM part missing");
         }
 
+        final String varBegin = ":${";
         if (where != null && where.size() > 0 && where.get(0) != null && !where.get(0).getvalue().equals("")) {
             String sql = where.get(0).getvalue();
-            while (sql.indexOf(":${") != -1 && sql.indexOf('}') != -1) {
-                String paramName = sql.substring(sql.indexOf(":${") + 3, sql.indexOf('}'));
-                String paramValues = staticParameters.get(paramName);
+            while (sql.indexOf(varBegin) != -1 && sql.indexOf('}') != -1) {
+                final String paramName   = sql.substring(sql.indexOf(varBegin) + 3, sql.indexOf('}'));
+                final String paramValues = staticParameters.get(paramName);
                 if (paramValues != null) {
-                    String s = sql.substring(sql.indexOf(":${"), sql.indexOf('}') + 1);
+                    final String s = sql.substring(sql.indexOf(varBegin), sql.indexOf('}') + 1);
                     sql = sql.replace(s, paramValues);
                     
                 } else {
-                    String s = sql.substring(sql.indexOf(":${"), sql.indexOf('}') + 1);
+                    final String s = sql.substring(sql.indexOf(varBegin), sql.indexOf('}') + 1);
                     sql = sql.replace(s, "?");
                 }
             }

@@ -77,7 +77,7 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
         if (process == null) {
             process = getDatabase().getTable(ReferenceTable.class);
         }
-        ReferenceEntry procedure = process.getEntry(results.getString(indexOf(query.procedure)));
+        final ReferenceEntry procedure = process.getEntry(results.getString(indexOf(query.procedure)));
         
         return new OfferingProcedureEntry(results.getString(indexOf(query.idOffering)), procedure);
     }
@@ -117,7 +117,7 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
         boolean success = false;
         transactionBegin();
         try {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            final PreparedStatement statement = getStatement(QueryType.EXISTS);
             statement.setString(indexOf(query.idOffering), offProc.getIdOffering());
          
             if (process == null) {
@@ -126,13 +126,13 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
             idProc = process.getIdentifier(offProc.getComponent());
         
             statement.setString(indexOf(query.procedure), idProc);
-            ResultSet result = statement.executeQuery();
+            final ResultSet result = statement.executeQuery();
             if(result.next()) {
                 success = true;
                 return;
             }
         
-            PreparedStatement insert    = getStatement(QueryType.INSERT);
+            final PreparedStatement insert    = getStatement(QueryType.INSERT);
             insert.setString(indexOf(query.idOffering), offProc.getIdOffering());
             insert.setString(indexOf(query.procedure), idProc);
             updateSingleton(insert);

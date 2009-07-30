@@ -57,9 +57,11 @@ final class RegionOfInterestQuery extends Query {
         dz     = addColumn("dz",   usage);
         dt     = addColumn("dt",   usage);
         byName = addParameter(name, SELECT);
-        dt.setOrdering("DESC", list);
-        dz.setOrdering("DESC", list);
-        dy.setOrdering("DESC", list);
-        dx.setOrdering("DESC", list);
+
+        final String descOrder = "DESC";
+        dt.setOrdering(descOrder, list);
+        dz.setOrdering(descOrder, list);
+        dy.setOrdering(descOrder, list);
+        dx.setOrdering(descOrder, list);
     }
 }

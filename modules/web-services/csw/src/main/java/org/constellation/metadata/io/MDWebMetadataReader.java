@@ -231,19 +231,8 @@ public class MDWebMetadataReader extends MetadataReader {
                 LOGGER.warning("SQLException while initializing the Thesaurus reader: " + thesaurusDB.getConnectURL());
             }
         }
-        
+        initPackage();
         this.dateFormat         = new SimpleDateFormat("yyyy-MM-dd");
-        
-        this.geotoolsPackage    = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
-                                                        "org.geotools.service", "org.geotoolkit.naming", "org.geotools.feature.catalog",
-                                                        "org.geotoolkit.metadata.fra");
-        this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
-                                                        "org.opengis.service", "org.opengis.feature.catalog");
-        this.cswPackage         = Util.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
-                                                        "org.geotoolkit.ogc.xml");
-        this.ebrimV3Package     = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
-        this.ebrimV25Package    = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
-        
         this.classBinding       = initClassBinding(configuration.getConfigurationDirectory());
         this.alreadyRead        = new HashMap<Value, Object>();
         this.classeNotFound     = new ArrayList<String>();
@@ -262,7 +251,17 @@ public class MDWebMetadataReader extends MetadataReader {
             throw new CstlServiceException("SQLException while initializing the MDWeb reader:" +'\n'+
                                            "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
+        initPackage();
         this.dateFormat         = new SimpleDateFormat("yyyy-MM-dd");
+        this.classBinding       = new HashMap<String, Class>();
+        this.alreadyRead        = new HashMap<Value, Object>();
+        this.classeNotFound     = new ArrayList<String>();
+    }
+
+    /**
+     * Fill the package attributes with all the subPackage of the specified ones.
+     */
+    private void initPackage() {
 
         this.geotoolsPackage    = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
                                                         "org.geotools.service", "org.geotoolkit.naming", "org.geotools.feature.catalog",
@@ -273,10 +272,6 @@ public class MDWebMetadataReader extends MetadataReader {
                                                         "org.geotoolkit.ogc.xml");
         this.ebrimV3Package     = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
         this.ebrimV25Package    = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
-
-        this.classBinding       = new HashMap<String, Class>();
-        this.alreadyRead        = new HashMap<Value, Object>();
-        this.classeNotFound     = new ArrayList<String>();
     }
 
     /**

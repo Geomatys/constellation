@@ -44,7 +44,7 @@ public class CSWConfigurationBean extends ConfigurationBean {
     }
 
      public void generateIndex() {
-        logger.info("GUI refresh index");
+        LOGGER.info("GUI refresh index");
         refreshServletRequest();
         String url = getConfigurationURL() + "/WS/configuration?request=refreshIndex&asynchrone=";
         if (currentSynchroneMode.equals("synchrone"))
@@ -52,31 +52,31 @@ public class CSWConfigurationBean extends ConfigurationBean {
         else
             url = url + "true";
 
-        logger.info(url);
+        LOGGER.info(url);
         performRequest(url);
     }
 
     public void addToIndex() {
-        logger.info("GUI add to index");
+        LOGGER.info("GUI add to index");
         refreshServletRequest();
         String url = getConfigurationURL() + "/WS/configuration?request=addToIndex&identifiers=" + getRecordIdentifiers();
-        logger.info(url);
+        LOGGER.info(url);
         performRequest(url);
     }
 
     public void resfreshContact() {
-        logger.info("GUI refresh contact index");
+        LOGGER.info("GUI refresh contact index");
         refreshServletRequest();
         String url = getConfigurationURL() + "/WS/configuration?request=resfreshContact";
-        logger.info(url);
+        LOGGER.info(url);
         performRequest(url);
     }
 
     public void resfreshVocabulary() {
-        logger.info("GUI refresh vocabulary index");
+        LOGGER.info("GUI refresh vocabulary index");
         refreshServletRequest();
         String url = getConfigurationURL() + "/WS/configuration?request=resfreshVocabulary";
-        logger.info(url);
+        LOGGER.info(url);
         performRequest(url);
     }
     

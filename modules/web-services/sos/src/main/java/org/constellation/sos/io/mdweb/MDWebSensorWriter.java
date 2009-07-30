@@ -64,6 +64,7 @@ public class MDWebSensorWriter implements SensorWriter {
      */
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
 
+    private static final String SQL_ERROR_MSG = "The service has throw a SQL Exception:";
     /**
      * A Writer to the SensorML database.
      */
@@ -162,7 +163,7 @@ public class MDWebSensorWriter implements SensorWriter {
                                           INVALID_PARAMETER_VALUE, "sensorDescription");
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         } catch (FileNotFoundException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -189,7 +190,7 @@ public class MDWebSensorWriter implements SensorWriter {
             currentSavePoint = smlConnection.setSavepoint("registerSensorTransaction");
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
@@ -202,7 +203,7 @@ public class MDWebSensorWriter implements SensorWriter {
             smlConnection.setAutoCommit(true);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
@@ -215,7 +216,7 @@ public class MDWebSensorWriter implements SensorWriter {
             smlConnection.setAutoCommit(true);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }
@@ -235,7 +236,7 @@ public class MDWebSensorWriter implements SensorWriter {
             return id + 1;
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
+            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
     }

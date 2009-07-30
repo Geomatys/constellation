@@ -146,12 +146,12 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         for (String phenomenonId : values.getVariables("var12")) {
             if (phenomenonId!= null && !phenomenonId.equals("")) {
                 Values compositeValues = loadData(Arrays.asList("var17"), phenomenonId);
-                List<PhenomenonEntry> components = new ArrayList<PhenomenonEntry>();
+                final List<PhenomenonEntry> components = new ArrayList<PhenomenonEntry>();
                 for (String componentID : compositeValues.getVariables("var17")) {
                     components.add(getPhenomenon(componentID));
                 }
                 compositeValues = loadData(Arrays.asList("var15", "var16"), phenomenonId);
-                CompositePhenomenonEntry phenomenon = new CompositePhenomenonEntry(phenomenonId,
+                final CompositePhenomenonEntry phenomenon = new CompositePhenomenonEntry(phenomenonId,
                                                                                    compositeValues.getVariable("var15"),
                                                                                    compositeValues.getVariable("var16"),
                                                                                    null,
@@ -161,7 +161,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
         for (String phenomenonId : values.getVariables("var11")) {
             if (phenomenonId != null && !phenomenonId.equals("")) {
-                PhenomenonEntry phenomenon = getPhenomenon(phenomenonId);
+                final PhenomenonEntry phenomenon = getPhenomenon(phenomenonId);
                 observedProperties.add(new PhenomenonPropertyType(phenomenon));
             }
         }

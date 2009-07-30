@@ -96,19 +96,15 @@ public class ArraySet<Element> extends AbstractSet<Element> implements Serializa
      */
     public Iterator<Element> iterator() {
         return new Iterator<Element>() {
-            private int index=0;
+            private int index = 0;
 
             public boolean hasNext() {
-                return index<elements.length;
+                return index < elements.length;
             }
 
             public Element next() {
-                if (index >= elements.length) {
-                    throw new NoSuchElementException();
-                }
-                if (elements[index] == null) {
-                    elements[index] = create(index);
-                }
+                if (index >= elements.length) { throw new NoSuchElementException();}
+                if (elements[index] == null)  { elements[index] = create(index);   }
                 return elements[index++];
             }
 

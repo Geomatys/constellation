@@ -150,64 +150,64 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
     @Override
     protected ObservationOfferingEntry createEntry(ResultSet results) throws CatalogException, SQLException {
          final ObservationOfferingQuery query = (ObservationOfferingQuery) super.query;
-         String idOffering = results.getString(indexOf(query.id));
+         final String idOffering              = results.getString(indexOf(query.id));
 
          if (envelopes == null) {
              envelopes = getDatabase().getTable(EnvelopeTable.class);
          }
-         EnvelopeEntry envelope = envelopes.getEntry(results.getString(indexOf(query.boundedBy)));
-         BoundingShapeEntry boundedBy = new  BoundingShapeEntry(envelope);
+         final EnvelopeEntry envelope       = envelopes.getEntry(results.getString(indexOf(query.boundedBy)));
+         final BoundingShapeEntry boundedBy = new  BoundingShapeEntry(envelope);
 
          getPhenomenons().setIdOffering(idOffering);
-         //System.out.println("ID OFERRRRRRRRRRRRRING" + idOffering);
-         Collection<OfferingPhenomenonEntry> entries1 = getPhenomenons().getEntries();
+         
+         final Collection<OfferingPhenomenonEntry> entries1 = getPhenomenons().getEntries();
 
-         List<PhenomenonPropertyType> phenos = new ArrayList<PhenomenonPropertyType>();
+         final List<PhenomenonPropertyType> phenos = new ArrayList<PhenomenonPropertyType>();
 
          Iterator i = entries1.iterator();
          while(i.hasNext()) {
-            OfferingPhenomenonEntry c =(OfferingPhenomenonEntry) i.next();
+            final OfferingPhenomenonEntry c =(OfferingPhenomenonEntry) i.next();
             phenos.add(new PhenomenonPropertyType(c.getComponent()));
          }
 
          getProcedures().setIdOffering(idOffering);
-         Collection<OfferingProcedureEntry> entries2 = getProcedures().getEntries();
+         final Collection<OfferingProcedureEntry> entries2 = getProcedures().getEntries();
 
-         List<ReferenceEntry> process = new ArrayList<ReferenceEntry>();
+         final List<ReferenceEntry> process = new ArrayList<ReferenceEntry>();
 
          i = entries2.iterator();
          while(i.hasNext()) {
-            OfferingProcedureEntry c =(OfferingProcedureEntry) i.next();
+            final OfferingProcedureEntry c =(OfferingProcedureEntry) i.next();
             process.add(c.getComponent());
          }
 
          getStations().setIdOffering(idOffering);
-         Collection<OfferingSamplingFeatureEntry> entries3 = stations.getEntries();
+         final Collection<OfferingSamplingFeatureEntry> entries3 = stations.getEntries();
 
-         List<ReferenceEntry> sampling = new ArrayList<ReferenceEntry>();
+         final List<ReferenceEntry> sampling = new ArrayList<ReferenceEntry>();
 
          i = entries3.iterator();
          while(i.hasNext()) {
-            OfferingSamplingFeatureEntry c =(OfferingSamplingFeatureEntry) i.next();
+            final OfferingSamplingFeatureEntry c =(OfferingSamplingFeatureEntry) i.next();
             sampling.add(c.getComponent());
          }
          TimePositionType beginPosition = null;
          TimePositionType endPosition   = null;
 
          if (results.getTimestamp(indexOf(query.eventTimeBegin)) != null) {
-            Timestamp begin =  results.getTimestamp(indexOf(query.eventTimeBegin));
+            final Timestamp begin =  results.getTimestamp(indexOf(query.eventTimeBegin));
             if (begin != null) {
                 //we normalize the timeStamp by replacing the space by 'T'
-                String normalizedBegin = begin.toString().replace(' ', 'T');
+                final String normalizedBegin = begin.toString().replace(' ', 'T');
                 beginPosition = new TimePositionType(normalizedBegin);
             }
          }
 
          if (results.getTimestamp(indexOf(query.eventTimeEnd)) != null) {
-            Timestamp end =  results.getTimestamp(indexOf(query.eventTimeEnd));
+            final Timestamp end =  results.getTimestamp(indexOf(query.eventTimeEnd));
             if (end != null){
                  //we normalize the timeStamp by replacing the space by 'T'
-                String normalizedEnd = end.toString().replace(' ', 'T');
+                final String normalizedEnd = end.toString().replace(' ', 'T');
                 endPosition = new TimePositionType(normalizedEnd);
             } else {
                 endPosition = new TimePositionType(TimeIndeterminateValueType.NOW);
@@ -216,27 +216,27 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
              endPosition = new TimePositionType(TimeIndeterminateValueType.NOW);
          }
 
-         TimePeriodType eventTime = new TimePeriodType(beginPosition, endPosition);
+         final TimePeriodType eventTime = new TimePeriodType(beginPosition, endPosition);
 
          getResponseModes().setIdOffering(idOffering);
-         Collection<OfferingResponseModeEntry> entries4 = getResponseModes().getEntries();
-         List<ResponseModeType> modes = new ArrayList<ResponseModeType>();
+         final Collection<OfferingResponseModeEntry> entries4 = getResponseModes().getEntries();
+         final List<ResponseModeType> modes = new ArrayList<ResponseModeType>();
          i = entries4.iterator();
 
          while(i.hasNext()) {
-            OfferingResponseModeEntry c =(OfferingResponseModeEntry) i.next();
+            final OfferingResponseModeEntry c =(OfferingResponseModeEntry) i.next();
             modes.add(c.getMode());
          }
-         List<String> responseFormat = new ArrayList<String>();
+         final List<String> responseFormat = new ArrayList<String>();
          responseFormat.add(results.getString(indexOf(query.responseFormat)));
 
-         List<QName> resultModel = new ArrayList<QName>();
-         String namespace        = results.getString(indexOf(query.resultModelNamespace));
+         final List<QName> resultModel = new ArrayList<QName>();
+         final String namespace        = results.getString(indexOf(query.resultModelNamespace));
          resultModel.add(new QName(namespace,
                                    results.getString(indexOf(query.resultModelLocalPart)),
                                    Namespaces.getPreferredPrefix(namespace, "")));
 
-         List<String> srsName = new ArrayList<String>();
+         final List<String> srsName = new ArrayList<String>();
          srsName.add(results.getString(indexOf(query.srsName)));
 
          return new ObservationOfferingEntry(idOffering,
@@ -268,9 +268,9 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
         transactionBegin();
         try {
             if (off.getName() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.id), off.getId());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return off.getId();
@@ -280,7 +280,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             } else {
                 id = searchFreeIdentifier("urn:BRGM:offering:");
             }
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.name), off.getName());
             statement.setString(indexOf(query.id), id);
             if (off.getDescription() != null) {
@@ -296,9 +296,9 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
             // on insere le "eventTime""
             if (off.getTime() != null) {
                 if (off.getTime() instanceof TimePeriodType) {
-                    TimePeriodType time = (TimePeriodType)off.getTime();
-                    String s = time.getBeginPosition().getValue();
-                    Timestamp date = Timestamp.valueOf(s);
+                    final TimePeriodType time = (TimePeriodType)off.getTime();
+                    final String s            = time.getBeginPosition().getValue();
+                    Timestamp date            = Timestamp.valueOf(s);
                     statement.setTimestamp(indexOf(query.eventTimeBegin), date);
 
                     if (time.getEndPosition().getIndeterminatePosition() == null) {
@@ -312,9 +312,9 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
                     }
                 } else if (off.getTime() instanceof TimeInstantType) {
 
-                    TimeInstantType time = (TimeInstantType)off.getTime();
-                    String s = time.getTimePosition().getValue();
-                    Timestamp date = Timestamp.valueOf(s);
+                    final TimeInstantType time = (TimeInstantType)off.getTime();
+                    final String s             = time.getTimePosition().getValue();
+                    final Timestamp date       = Timestamp.valueOf(s);
                     statement.setTimestamp(indexOf(query.eventTimeBegin),  date);
                     statement.setNull(indexOf(query.eventTimeEnd), java.sql.Types.DATE);
 

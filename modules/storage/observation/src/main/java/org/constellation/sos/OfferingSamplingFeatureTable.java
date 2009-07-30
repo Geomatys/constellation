@@ -125,7 +125,7 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
         boolean success = false;
         transactionBegin();
         try {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            final PreparedStatement statement = getStatement(QueryType.EXISTS);
             statement.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
             if ( samplingFeatures == null) {
                 samplingFeatures = getDatabase().getTable(ReferenceTable.class);
@@ -133,12 +133,12 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
             idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
             statement.setString(indexOf(query.samplingFeature), idSF);
  
-            ResultSet result = statement.executeQuery();
+            final ResultSet result = statement.executeQuery();
             if(result.next()) {
                 success = true;
                 return;
             }
-            PreparedStatement insert    = getStatement(QueryType.INSERT);
+            final PreparedStatement insert    = getStatement(QueryType.INSERT);
             insert.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
             if ( samplingFeatures == null) {
                 samplingFeatures = getDatabase().getTable(ReferenceTable.class);

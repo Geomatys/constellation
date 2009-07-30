@@ -67,7 +67,7 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
         if(uoms == null) {
             uoms =  getDatabase().getTable(UnitOfMeasureTable.class);
         }
-        UnitOfMeasureEntry uom = uoms.getEntry(results.getString(indexOf(query.uom)));
+        final UnitOfMeasureEntry uom = uoms.getEntry(results.getString(indexOf(query.uom)));
         return new MeasureEntry(results.getString(indexOf(query.name   )),
                                 uom,
                                 results.getFloat(indexOf(query.value)));
@@ -86,20 +86,21 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
         transactionBegin();
         try {
             if (meas.getName() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.name), meas.getName());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return meas.getName();
                 } else {
                     id = meas.getName();
                 }
+                result.close();
             } else {
                 id = searchFreeIdentifier("mesure");
             }
         
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
         
             statement.setString(indexOf(query.name), id);
             if (uoms == null) {

@@ -164,9 +164,10 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         final String result = builder.toString();
         builder = new StringBuilder();
 
+        final String endMark = ">\n";
         final String layerNameCorrected = layerName.replaceAll("\\W", "");
-        builder.append("\t<").append(layerNameCorrected).append("_layer").append(">\n")
-               .append("\t\t<").append(layerNameCorrected).append("_feature").append(">\n");
+        builder.append("\t<").append(layerNameCorrected).append("_layer").append(endMark)
+               .append("\t\t<").append(layerNameCorrected).append("_feature").append(endMark);
 
         final LayerDetails layerPostgrid = dp.get(layerName);
         final Envelope objEnv = gfi.getEnvelope();
@@ -247,8 +248,8 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         }
         builder.append("\t\t\t<value>").append(result)
                .append("</value>").append("\n")
-               .append("\t\t</").append(layerNameCorrected).append("_feature").append(">\n")
-               .append("\t</").append(layerNameCorrected).append("_layer").append(">\n");
+               .append("\t\t</").append(layerNameCorrected).append("_feature").append(endMark)
+               .append("\t</").append(layerNameCorrected).append("_layer").append(endMark);
 
         strs.add(builder.toString());
     }

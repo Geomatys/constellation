@@ -68,38 +68,38 @@ import org.w3c.dom.Node;
  *  @since  Mar 28, 2008 
  *  @version $Revision$
  */
-public class ExtendedAttributeFactory extends BaseAttributeFactory {
+public final class ExtendedAttributeFactory extends BaseAttributeFactory {
 
     private static ExtendedAttributeFactory instance = null;
-    private static final Map<String, AttributeProxy> supportedDatatypes = new HashMap<String, AttributeProxy>();
+    private static final Map<String, AttributeProxy> SUPPORTED_DATA_TYPES = new HashMap<String, AttributeProxy>();
 
     private ExtendedAttributeFactory() {
-        super(supportedDatatypes);
+        super(SUPPORTED_DATA_TYPES);
 
         // the 1.x datatypes
-        supportedDatatypes.put(BooleanAttribute.identifier,           new BooleanAttributeProxy());
-        supportedDatatypes.put(StringAttribute.identifier,            new StringAttributeProxy());
-        supportedDatatypes.put(DateAttribute.identifier,              new DateAttributeProxy());
-        supportedDatatypes.put(TimeAttribute.identifier,              new TimeAttributeProxy());
-        supportedDatatypes.put(DateTimeAttribute.identifier,          new DateTimeAttributeProxy());
-        supportedDatatypes.put(DayTimeDurationAttribute.identifier,   new DayTimeDurationAttributeProxy());
-        supportedDatatypes.put(YearMonthDurationAttribute.identifier, new YearMonthDurationAttributeProxy());
-        supportedDatatypes.put(DoubleAttribute.identifier,            new DoubleAttributeProxy());
-        supportedDatatypes.put(IntegerAttribute.identifier,           new IntegerAttributeProxy());
-        supportedDatatypes.put(AnyURIAttribute.identifier,            new AnyURIAttributeProxy());
-        supportedDatatypes.put(HexBinaryAttribute.identifier,         new HexBinaryAttributeProxy());
-        supportedDatatypes.put(Base64BinaryAttribute.identifier,      new Base64BinaryAttributeProxy());
-        supportedDatatypes.put(X500NameAttribute.identifier,          new X500NameAttributeProxy());
-        supportedDatatypes.put(RFC822NameAttribute.identifier,        new RFC822NameAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(BooleanAttribute.identifier,           new BooleanAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(StringAttribute.identifier,            new StringAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(DateAttribute.identifier,              new DateAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(TimeAttribute.identifier,              new TimeAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(DateTimeAttribute.identifier,          new DateTimeAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(DayTimeDurationAttribute.identifier,   new DayTimeDurationAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(YearMonthDurationAttribute.identifier, new YearMonthDurationAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(DoubleAttribute.identifier,            new DoubleAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(IntegerAttribute.identifier,           new IntegerAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(AnyURIAttribute.identifier,            new AnyURIAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(HexBinaryAttribute.identifier,         new HexBinaryAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(Base64BinaryAttribute.identifier,      new Base64BinaryAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(X500NameAttribute.identifier,          new X500NameAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(RFC822NameAttribute.identifier,        new RFC822NameAttributeProxy());
 
         // the 2.0 datatypes
-        supportedDatatypes.put(DNSNameAttribute.identifier, new DNSNameAttributeProxy());
-        supportedDatatypes.put(IPAddressAttribute.identifier, new IPAddressAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(DNSNameAttribute.identifier, new DNSNameAttributeProxy());
+        SUPPORTED_DATA_TYPES.put(IPAddressAttribute.identifier, new IPAddressAttributeProxy());
     }
 
     @Override
     public void addDatatype(final String id, final AttributeProxy proxy) {
-        supportedDatatypes.put(id, proxy);
+        SUPPORTED_DATA_TYPES.put(id, proxy);
     }
 
     @Override
@@ -143,7 +143,7 @@ public class ExtendedAttributeFactory extends BaseAttributeFactory {
     }
 
     private AttributeProxy getProxy(final String type) throws UnknownIdentifierException {
-        final AttributeProxy proxy = (AttributeProxy) supportedDatatypes.get(type);
+        final AttributeProxy proxy = (AttributeProxy) SUPPORTED_DATA_TYPES.get(type);
         if (proxy == null) {
             throw new UnknownIdentifierException("proxy null for " + type);
         }

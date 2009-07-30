@@ -37,7 +37,7 @@ public class ConfigurationBean {
     /**
      * Debugging purpose
      */
-    protected static final Logger logger = Logger.getLogger("org.constellation.bean");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.bean");
 
     /**
      * A servlet context allowing to find the path to deployed file.
@@ -63,10 +63,10 @@ public class ConfigurationBean {
     }
     
     public void restartServices() {
-        logger.info("GUI restart services");
+        LOGGER.info("GUI restart services");
         refreshServletRequest();
-        String url = getConfigurationURL() + "/WS/configuration?request=restart";
-        logger.info(url);
+        final String url = getConfigurationURL() + "/WS/configuration?request=restart";
+        LOGGER.info(url);
         performRequest(url);
     }
 
@@ -89,9 +89,9 @@ public class ConfigurationBean {
             return out.toString();
 
         } catch (MalformedURLException ex) {
-            logger.severe("Malformed URL exception: " + url);
+            LOGGER.severe("Malformed URL exception: " + url);
         } catch (IOException ex) {
-            logger.severe("IO exception: " + ex.getMessage());
+            LOGGER.severe("IO exception: " + ex.getMessage());
         }
         return null;
     }

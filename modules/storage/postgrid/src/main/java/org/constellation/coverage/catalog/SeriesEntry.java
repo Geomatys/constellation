@@ -97,6 +97,7 @@ final class SeriesEntry extends Entry implements Series {
         this.extension  = extension;
         this.format     = format;
         this.permission = permission;
+        final String fileProtocol =  "file";
         /*
          * Checks if the pathname contains a URL host.  If it does, then this URL will have
          * precedence over the root parameter. The following section make this check, which
@@ -106,7 +107,7 @@ final class SeriesEntry extends Entry implements Series {
         if (split >= 0) {
             protocol = pathname.substring(0, split).trim();
             split += 3;
-            if (protocol.equalsIgnoreCase("file")) {
+            if (protocol.equalsIgnoreCase(fileProtocol)) {
                 host = null;
                 path = pathname.substring(split);
                 // Path is likely to contains a leading '/' since the syntax is usualy "file:///".
@@ -129,20 +130,20 @@ final class SeriesEntry extends Entry implements Series {
          * but maybe the "root" parameter is an URL. Checks it now.
          */
         if (root == null) {
-            protocol = "file";
+            protocol = fileProtocol;
             host     = null;
             path     = pathname;
             return;
         }
         split = root.indexOf("://");
         if (split < 0) {
-            protocol = "file";
+            protocol = fileProtocol;
             host     = null;
             split    = 0; // Used for computing 'path' later.
         } else {
             protocol = root.substring(0, split).trim();
             split += 3;
-            if (protocol.equalsIgnoreCase("file")) {
+            if (protocol.equalsIgnoreCase(fileProtocol)) {
                 host = null;
             } else {
                 final int base = split;
