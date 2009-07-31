@@ -31,7 +31,7 @@ public class ServiceVersion extends Version {
     /**
      * The first WCS version to be considered as OWS.
      */
-    private static ServiceVersion THRESHOLD = new ServiceVersion(ServiceType.WCS, "1.1");
+    private static final ServiceVersion THRESHOLD = new ServiceVersion(ServiceType.WCS, "1.1");
 
     /**
      * The service.
@@ -58,9 +58,9 @@ public class ServiceVersion extends Version {
      */
     public boolean isOWS() {
         switch (service) {
-            default:  return false;
             case OWS: return true;
             case WCS: return compareTo(THRESHOLD) >= 0;
+            default:  return false;
         }
     }
 }

@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.ServiceLoader;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.geotoolkit.style.MutableStyle;
@@ -35,12 +34,12 @@ import org.geotoolkit.style.MutableStyle;
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
-public class StyleProviderProxy implements Provider<String,MutableStyle>{
+public final class StyleProviderProxy implements Provider<String,MutableStyle>{
 
     /**
      * Default logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(LayerProviderProxy.class.getName());
+     
+    private static final Logger LOGGER = Logger.getLogger(LayerProviderProxy.class.getName());*/
 
     private static final Collection<StyleProviderService> SERVICES = new ArrayList<StyleProviderService>();
 
@@ -107,7 +106,7 @@ public class StyleProviderProxy implements Provider<String,MutableStyle>{
 
         for(StyleProviderService service : SERVICES){
             for(StyleProvider provider : service.getProviders()){
-                MutableStyle style = provider.get(key);
+                final MutableStyle style = provider.get(key);
                 if(style != null) return style;
             }
         }
@@ -145,7 +144,7 @@ public class StyleProviderProxy implements Provider<String,MutableStyle>{
 
     }
 
-    public synchronized static void init(final String configPath){
+    public static synchronized void init(final String configPath){
         if(configPath == null){
             throw new NullPointerException("Configuration path can not be null.");
         }
@@ -168,7 +167,7 @@ public class StyleProviderProxy implements Provider<String,MutableStyle>{
 
     }
 
-    public synchronized static StyleProviderProxy getInstance(){
+    public static synchronized StyleProviderProxy getInstance(){
         if(INSTANCE == null){
             init(ConfigDirectory.getConfigDirectory().getPath() + File.separator);
             INSTANCE = new StyleProviderProxy();

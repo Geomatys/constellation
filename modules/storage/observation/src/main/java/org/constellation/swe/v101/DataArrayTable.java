@@ -74,14 +74,14 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
     @Override
     protected DataArrayEntry createEntry(final ResultSet results) throws SQLException, CatalogException {
         final DataArrayQuery query = (DataArrayQuery) super.query;
-        String idArray = results.getString(indexOf(query.idArray));
+        final String idArray = results.getString(indexOf(query.idArray));
         if (dataRecords == null) {
             dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
             dataRecords = new SimpleDataRecordTable(dataRecords);
         }
         dataRecords.setIdDataBlock(idArray);
         //for data array there is only one data record
-        Iterator<SimpleDataRecordEntry> it = dataRecords.getEntries().iterator();
+        final Iterator<SimpleDataRecordEntry> it = dataRecords.getEntries().iterator();
         SimpleDataRecordEntry entry = null;
         if (it.hasNext()) {
             entry = it.next();
@@ -118,11 +118,11 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
         if (textBlockEncodings == null) {
                 textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
         }
-        String textBlockIdentifier = textBlockEncodings.getIdentifier((TextBlockEntry)array.getEncoding());
+        final String textBlockIdentifier = textBlockEncodings.getIdentifier((TextBlockEntry)array.getEncoding());
             
         try {
             if (array.getId() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.idArray), array.getId());
                 ResultSet result = statement.executeQuery();
                 if(result.next()) {
@@ -135,11 +135,11 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
                 id = searchFreeIdentifier("dataArray");
             }
         
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.idArray), id);
             statement.setInt(indexOf(query.elementCount), count);
 
-           statement.setString(indexOf(query.encoding), textBlockIdentifier);
+            statement.setString(indexOf(query.encoding), textBlockIdentifier);
             
             if (dataRecords == null) {
                 dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
@@ -165,10 +165,10 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
      */
     @Override
     public String searchFreeIdentifier(String base) throws CatalogException, SQLException {
-        PreparedStatement stmt = this.getStatement("SELECT COUNT(id_array_definition) FROM data_array_definition");
-        ResultSet result = stmt.executeQuery();
+        final PreparedStatement stmt = this.getStatement("SELECT COUNT(id_array_definition) FROM data_array_definition");
+        final ResultSet result = stmt.executeQuery();
         result.next();
-        int nbLine = result.getInt(1);
+        final int nbLine = result.getInt(1);
         return base + '-' + nbLine;
     }
 }

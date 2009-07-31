@@ -139,7 +139,7 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         if (compositePhenomenons == null) {
             compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
         }
-        CompositePhenomenonEntry compoPheno = compositePhenomenons.getEntry(result.getString(indexOf(query.observedPropertyComposite)));
+        final CompositePhenomenonEntry compoPheno = compositePhenomenons.getEntry(result.getString(indexOf(query.observedPropertyComposite)));
         
         
         if (stations == null) {
@@ -150,24 +150,24 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         if (stationPoints == null) {
             stationPoints = getDatabase().getTable(SamplingPointTable.class);
         }
-        SamplingPointEntry stationPoint = stationPoints.getEntry(result.getString(indexOf(query.featureOfInterestPoint)));
+        final SamplingPointEntry stationPoint = stationPoints.getEntry(result.getString(indexOf(query.featureOfInterestPoint)));
         
         
         if (procedures == null) {
             procedures = getDatabase().getTable(ProcessTable.class);
         }
-        ProcessEntry procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
+        final ProcessEntry procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
         
         if (measures == null) {
             measures = getDatabase().getTable(MeasureTable.class);
         }
-        MeasureEntry resultat = measures.getEntry(result.getString(indexOf(query.result)));
+        final MeasureEntry resultat = measures.getEntry(result.getString(indexOf(query.result)));
         
         if(pheno == null) pheno = compoPheno;
         if(station == null) station =  stationPoint;
         
-        Timestamp begin = result.getTimestamp(indexOf(query.samplingTimeBegin));
-        Timestamp end = result.getTimestamp(indexOf(query.samplingTimeEnd));
+        final Timestamp begin = result.getTimestamp(indexOf(query.samplingTimeBegin));
+        final Timestamp end = result.getTimestamp(indexOf(query.samplingTimeEnd));
         AbstractTimeGeometricPrimitiveType samplingTime = null;
         TimePositionType beginPosition = null;
         TimePositionType endPosition   = null;
@@ -213,26 +213,27 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         transactionBegin();
         try {
             if (meas.getName() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.name), meas.getName());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return meas.getName();
                 } else {
                     id = meas.getName();
                 }
+                result.close();
             } else {
                 id = searchFreeIdentifier("urn:BRGM:measurement:");
             }
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.name),         id);
             statement.setString(indexOf(query.description),  meas.getDefinition());
             statement.setString(indexOf(query.distribution), "normale");
         
             // on insere la station qui a effectué cette measervation
             if (meas.getFeatureOfInterest() instanceof SamplingPointEntry){
-                SamplingPointEntry station = (SamplingPointEntry)meas.getFeatureOfInterest();
+                final SamplingPointEntry station = (SamplingPointEntry)meas.getFeatureOfInterest();
                 if (stationPoints == null) {
                     stationPoints = getDatabase().getTable(SamplingPointTable.class);
                 }
@@ -240,7 +241,7 @@ public class MeasurementTable extends SingletonTable<Measurement> {
                 statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
        
             } else  if (meas.getFeatureOfInterest() instanceof SamplingFeatureEntry){
-                SamplingFeatureEntry station = (SamplingFeatureEntry)meas.getFeatureOfInterest();
+                final SamplingFeatureEntry station = (SamplingFeatureEntry)meas.getFeatureOfInterest();
                 if (stations == null) {
                     stations = getDatabase().getTable(SamplingFeatureTable.class);
                 }
@@ -254,7 +255,7 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         
             // on insere le phenomene measervé
             if(meas.getObservedProperty() instanceof CompositePhenomenonEntry){
-                CompositePhenomenonEntry pheno = (CompositePhenomenonEntry)meas.getObservedProperty();
+                final CompositePhenomenonEntry pheno = (CompositePhenomenonEntry)meas.getObservedProperty();
                 if (compositePhenomenons == null) {
                     compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
                 }
@@ -262,7 +263,7 @@ public class MeasurementTable extends SingletonTable<Measurement> {
                 statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
         
             } else if(meas.getObservedProperty() instanceof PhenomenonEntry){
-                PhenomenonEntry pheno = (PhenomenonEntry)meas.getObservedProperty();
+                final PhenomenonEntry pheno = (PhenomenonEntry)meas.getObservedProperty();
                 if (phenomenons == null) {
                     phenomenons = getDatabase().getTable(PhenomenonTable.class);
                 }
@@ -276,7 +277,7 @@ public class MeasurementTable extends SingletonTable<Measurement> {
         
             //on insere le capteur
             if (meas.getProcedure() != null) {
-                ProcessEntry process = (ProcessEntry)meas.getProcedure();
+                final ProcessEntry process = (ProcessEntry)meas.getProcedure();
                 if (procedures == null) {
                     procedures = getDatabase().getTable(ProcessTable.class);
                 }
@@ -299,8 +300,8 @@ public class MeasurementTable extends SingletonTable<Measurement> {
             if (meas.getSamplingTime() != null){
                 if (meas.getSamplingTime() instanceof TimePeriodType) {
                     
-                    TimePeriodType sampTime = (TimePeriodType)meas.getSamplingTime();
-                    String s = sampTime.getBeginPosition().getValue();
+                    final TimePeriodType sampTime = (TimePeriodType)meas.getSamplingTime();
+                    final String s = sampTime.getBeginPosition().getValue();
                     Timestamp date = Timestamp.valueOf(s);
                     statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
                     
@@ -315,9 +316,9 @@ public class MeasurementTable extends SingletonTable<Measurement> {
                     }
                     
                 } else if (meas.getSamplingTime() instanceof TimeInstantType) {
-                    TimeInstantType sampTime = (TimeInstantType)meas.getSamplingTime();
-                    String s = sampTime.getTimePosition().getValue();
-                    Timestamp date = Timestamp.valueOf(s);
+                    final TimeInstantType sampTime = (TimeInstantType)meas.getSamplingTime();
+                    final String s = sampTime.getTimePosition().getValue();
+                    final Timestamp date = Timestamp.valueOf(s);
                     statement.setTimestamp(indexOf(query.samplingTimeBegin),  date);
                     statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
                     

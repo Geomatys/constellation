@@ -47,7 +47,7 @@ public final class Cstl {
 	 *           Register Interface}.
 	 */
 	public static PrimitiveRegisterIF getRegister() {
-		return PrimitiveRegister.internal_getInstance();
+		return PrimitiveRegister.internalGetInstance();
 	}
 	
 	/**

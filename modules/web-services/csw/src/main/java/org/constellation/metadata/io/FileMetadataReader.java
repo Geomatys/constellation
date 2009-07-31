@@ -173,12 +173,12 @@ public class FileMetadataReader extends MetadataReader {
     private AbstractRecordType translateISOtoDC(DefaultMetaData metadata, ElementSet type, List<QName> elementName) {
         if (metadata != null) {
 
-            RecordType customRecord = new RecordType();
+            final RecordType customRecord = new RecordType();
 
             /*
              * BRIEF part
              */
-            SimpleLiteral identifier = new SimpleLiteral(metadata.getFileIdentifier());
+            final SimpleLiteral identifier = new SimpleLiteral(metadata.getFileIdentifier());
             if (elementName != null && elementName.contains(_Identifier_QNAME)) {
                 customRecord.setIdentifier(identifier);
             }
@@ -203,11 +203,11 @@ public class FileMetadataReader extends MetadataReader {
                 customRecord.setType(dataType);
             }
 
-            List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
+            final List<BoundingBoxType> bboxes = new ArrayList<BoundingBoxType>();
 
             for (Identification identification: metadata.getIdentificationInfo()) {
                 if (identification instanceof DataIdentification) {
-                    DataIdentification dataIdentification = (DataIdentification) identification;
+                    final DataIdentification dataIdentification = (DataIdentification) identification;
                     for (Extent extent : dataIdentification.getExtents()) {
                         for (GeographicExtent geoExtent :extent.getGeographicElements()) {
                             if (geoExtent instanceof GeographicBoundingBox) {
@@ -246,7 +246,7 @@ public class FileMetadataReader extends MetadataReader {
             final List<SimpleLiteral> subjects = new ArrayList<SimpleLiteral>();
             for (Identification identification: metadata.getIdentificationInfo()) {
                 if (identification instanceof DataIdentification) {
-                    DataIdentification dataIdentification = (DataIdentification) identification;
+                    final DataIdentification dataIdentification = (DataIdentification) identification;
                     for (TopicCategory tc : dataIdentification.getTopicCategories()) {
                         subjects.add(new SimpleLiteral(tc.identifier()));
                     }
@@ -263,7 +263,7 @@ public class FileMetadataReader extends MetadataReader {
 
 
             final List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
-            Distribution distribution   = metadata.getDistributionInfo();
+            final Distribution distribution   = metadata.getDistributionInfo();
             if (distribution != null) {
                 for (Format f: distribution.getDistributionFormats()) {
                     if (f == null || f.getName() == null) {
@@ -322,14 +322,14 @@ public class FileMetadataReader extends MetadataReader {
             }
 
 
-            SimpleLiteral language = new SimpleLiteral(metadata.getLanguage().getLanguage());
+            final SimpleLiteral language = new SimpleLiteral(metadata.getLanguage().getLanguage());
             if (elementName != null && elementName.contains(_Language_QNAME)) {
                 customRecord.setLanguage(language);
             }
 
             // TODO
-            SimpleLiteral spatial = null;
-            SimpleLiteral references = null;
+            final SimpleLiteral spatial = null;
+            final SimpleLiteral references = null;
             if (type != null && type.equals(ElementSetType.FULL))
                 return new RecordType(identifier, title, dataType, subjects, formats, modified, date, abstractt, bboxes, creator, distributor, language, spatial, references);
 
@@ -355,10 +355,10 @@ public class FileMetadataReader extends MetadataReader {
 
     @Override
     public List<? extends Object> getAllEntries() throws CstlServiceException {
-        List<Object> results = new ArrayList<Object>();
+        final List<Object> results = new ArrayList<Object>();
         for (File f : dataDirectory.listFiles()) {
             if (f.getName().endsWith(".xml")) {
-                String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
+                final String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
                 Unmarshaller unmarshaller = null;
                 try {
                     unmarshaller = marshallerPool.acquireUnmarshaller();

@@ -98,7 +98,7 @@ public class FileMetadataWriter extends MetadataWriter {
         Marshaller marshaller = null;
         try {
             marshaller = marshallerPool.acquireMarshaller();
-            String identifier = findIdentifier(obj);
+            final String identifier = findIdentifier(obj);
             f = new File(dataDirectory, identifier + ".xml");
             f.createNewFile();
             marshaller.marshal(obj, f);
@@ -133,9 +133,9 @@ public class FileMetadataWriter extends MetadataWriter {
 
     @Override
     public boolean deleteMetadata(String metadataID) throws CstlServiceException {
-        File metadataFile = new File (dataDirectory,  metadataID + ".xml");
+        final File metadataFile = new File (dataDirectory,  metadataID + ".xml");
         if (metadataFile.exists()) {
-           boolean suceed =  metadataFile.delete();
+           final boolean suceed =  metadataFile.delete();
            if (suceed) {
                indexer.removeDocument(metadataID);
            } else {
@@ -149,7 +149,7 @@ public class FileMetadataWriter extends MetadataWriter {
 
     @Override
     public boolean replaceMetadata(String metadataID, Object any) throws CstlServiceException {
-        boolean succeed = deleteMetadata(metadataID);
+        final boolean succeed = deleteMetadata(metadataID);
         if (!succeed)
             return false;
         return storeMetadata(any);
@@ -157,7 +157,7 @@ public class FileMetadataWriter extends MetadataWriter {
 
     @Override
     public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws CstlServiceException {
-        Object metadata = getObjectFromFile(metadataID);
+        final Object metadata = getObjectFromFile(metadataID);
         for (RecordPropertyType property : properties) {
             String xpath = property.getName();
             // we remove the first / before the type declaration
@@ -202,7 +202,7 @@ public class FileMetadataWriter extends MetadataWriter {
                     if (propertyName.indexOf('[') != -1) {
                         if (propertyName.indexOf(']') != -1) {
                             try {
-                                String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
+                                final String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
                                 ordinal = Integer.parseInt(ordinalValue);
                             } catch (NumberFormatException ex) {
                                 throw new CstlServiceException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
@@ -216,7 +216,7 @@ public class FileMetadataWriter extends MetadataWriter {
 
                     Class parentClass;
                     if (parent instanceof Collection) {
-                        Collection parentCollection = (Collection) parent;
+                        final Collection parentCollection = (Collection) parent;
                         if (parentCollection.size() > 0) {
                             parentClass = parentCollection.iterator().next().getClass();
                         } else  {
@@ -227,7 +227,7 @@ public class FileMetadataWriter extends MetadataWriter {
                     }
 
                     //we try to find a getter for this property
-                    Method getter = Util.getGetterFromName(propertyName, parentClass);
+                    final Method getter = Util.getGetterFromName(propertyName, parentClass);
                     if (getter == null) {
                         throw new CstlServiceException("There is no getter for the property:" + propertyName + " in the class:" + type.getSimpleName(), INVALID_PARAMETER_VALUE);
                     } else {
@@ -235,7 +235,7 @@ public class FileMetadataWriter extends MetadataWriter {
                         if (!(parent instanceof Collection)) {
                             parent = Util.invokeMethod(parent, getter);
                         } else {
-                            Collection tmp = new ArrayList();
+                            final Collection tmp = new ArrayList();
                             for (Object child : (Collection) parent) {
                                 tmp.add(Util.invokeMethod(child, getter));
                             }
@@ -264,7 +264,7 @@ public class FileMetadataWriter extends MetadataWriter {
                 }
 
                 // we update the metadata
-                Object value = property.getValue();
+                final Object value = property.getValue();
                 
                 updateObjects(parent, xpath, value);
 
@@ -291,13 +291,13 @@ public class FileMetadataWriter extends MetadataWriter {
         Class parameterType = value.getClass();
         LOGGER.finer("parameter type:" + parameterType);
 
-        String fullPropertyName = propertyName;
+        final String fullPropertyName = propertyName;
         //we extract the ordinal if there is one
         int ordinal = -1;
         if (propertyName.indexOf('[') != -1) {
             if (propertyName.indexOf(']') != -1) {
                 try {
-                    String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
+                    final String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
                     ordinal = Integer.parseInt(ordinalValue);
                 } catch (NumberFormatException ex) {
                     throw new CstlServiceException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
@@ -349,17 +349,17 @@ public class FileMetadataWriter extends MetadataWriter {
 
         //if there is an ordinal we must get the existant Collection
         if (ordinal != -1) {
-            Method getter = Util.getGetterFromName(propertyName, parent.getClass());
+            final Method getter = Util.getGetterFromName(propertyName, parent.getClass());
             if (getter == null) {
                 throw new CstlServiceException("There is no getter for the property:" + propertyName + " in the class:" + parent.getClass(), INVALID_PARAMETER_VALUE);
             }
-            Object existant = Util.invokeMethod(parent, getter);
+            final Object existant = Util.invokeMethod(parent, getter);
 
             if (!(existant instanceof Collection)) {
                 throw new CstlServiceException("The property:" + propertyName + " in the class:" + parent.getClass() + " is not a collection", INVALID_PARAMETER_VALUE);
             } 
 
-            Collection c = (Collection) existant;
+            final Collection c = (Collection) existant;
             if (c.size() < ordinal) {
                 throw new CstlServiceException("The property:" + propertyName + " in the class:" + parent.getClass() + " got only" + c.size() + " elements", INVALID_PARAMETER_VALUE);
             }
@@ -370,7 +370,7 @@ public class FileMetadataWriter extends MetadataWriter {
 
             // ISSUE how to add in a Collection at a predefined index
             if (c instanceof List) {
-               List l = (List) c;
+               final List l = (List) c;
                l.remove(ordinal);
                l.add(ordinal, value);
             } else {
@@ -391,7 +391,7 @@ public class FileMetadataWriter extends MetadataWriter {
         if (setter == null) {
             throw new CstlServiceException("There is no setter for the property:" + propertyName + " in the class:" + parent.getClass(), INVALID_PARAMETER_VALUE);
         } else {
-            String baseMessage = "Unable to invoke the method " + setter + ": ";
+            final String baseMessage = "Unable to invoke the method " + setter + ": ";
             try {
                 // we execute the setter
                 if (setter.getParameterTypes().length == 1 && setter.getParameterTypes()[0] == Collection.class) {
@@ -434,13 +434,13 @@ public class FileMetadataWriter extends MetadataWriter {
     }
 
     public static Object invokeMethodStrColl(final Method method, final Object object, final String parameter) throws CstlServiceException {
-        String baseMessage = "Unable to invoke the method " + method + ": ";
+        final String baseMessage = "Unable to invoke the method " + method + ": ";
         Object result = null;
         if (method != null) {
             int i = 0;
             while (i < 2) {
                 try {
-                    Collection c = new ArrayList(1);
+                    final Collection c = new ArrayList(1);
                     if (i == 0) {
                         c.add(parameter);
                     } else {
@@ -485,7 +485,7 @@ public class FileMetadataWriter extends MetadataWriter {
      * @throws org.constellation.ws.CstlServiceException
      */
     private Object getObjectFromFile(String identifier) throws CstlServiceException {
-        File metadataFile = new File (dataDirectory,  identifier + ".xml");
+        final File metadataFile = new File (dataDirectory,  identifier + ".xml");
         if (metadataFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {

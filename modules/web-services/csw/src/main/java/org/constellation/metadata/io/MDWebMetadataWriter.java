@@ -183,7 +183,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             
             // unkow types
             } else {
-                String msg = "Can't register ths kind of object:" + object.getClass().getName();
+                final String msg = "Can't register ths kind of object:" + object.getClass().getName();
                 LOGGER.severe(msg);
                 throw new IllegalArgumentException(msg);
             }
@@ -192,12 +192,12 @@ public class MDWebMetadataWriter extends MetadataWriter {
             if  (className.equals("DefaultMetaData")) {
                 defaultProfile = mdReader.getProfile("ISO_19115");
             }
-            Form form = new Form(-1, mdCatalog, title, user, null, defaultProfile, creationDate, false, false, "normalForm");
+            final Form form = new Form(-1, mdCatalog, title, user, null, defaultProfile, creationDate, false, false, "normalForm");
             
-            Classe rootClasse = getClasseFromObject(object);
+            final Classe rootClasse = getClasseFromObject(object);
             if (rootClasse != null) {
                 alreadyWrite.clear();
-                Path rootPath = new Path(rootClasse.getStandard(), rootClasse);
+                final Path rootPath = new Path(rootClasse.getStandard(), rootClasse);
                 addValueFromObject(form, object, rootPath, null);
                 return form;
             } else {
@@ -231,7 +231,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         //if the object is a collection we call the method on each child
         Classe classe;
         if (object instanceof Collection) {
-            Collection c = (Collection) object;
+            final Collection c = (Collection) object;
             for (Object obj: c) {
                 result.addAll(addValueFromObject(form, obj, path, parentValue));
                 
@@ -241,7 +241,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         //if the object is a JAXBElement we desencapsulate it    
         } else {
             if (object instanceof JAXBElement) {
-                JAXBElement jb = (JAXBElement) object;
+                final JAXBElement jb = (JAXBElement) object;
                 object = jb.getValue();
             } 
             classe = getClasseFromObject(object);
@@ -266,7 +266,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         // if its a primitive type we create a TextValue
         if (isPrimitive(classe)) {
             if (classe instanceof CodeList) {
-                CodeList cl = (CodeList) classe;
+                final CodeList cl = (CodeList) classe;
                 String codelistElement;
                 if (classe.getName().equals("LanguageCode")) {
                     codelistElement =  ((Locale) object).getISO3Language();
@@ -292,9 +292,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 } else if (cle != null) {
                     object = cle.getCode();
                 } else {
-                    String values = "";
+                    StringBuilder values = new StringBuilder();
                     for (Property p: classe.getProperties()) {
-                        values += p.getName() +'\n';
+                        values.append(p.getName()).append('\n');
                     }
                     LOGGER.severe("unable to find a codeListElement named " + codelistElement + " in the codelist " + classe.getName() + '\n' +
                                   "allowed values are: " + '\n' +  values);
@@ -338,9 +338,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
                     final Method getter = Util.getGetterFromName(prop.getName(), object.getClass());
                     if (getter != null) {
                         try {
-                            Object propertyValue = getter.invoke(object);
+                            final Object propertyValue = getter.invoke(object);
                             if (propertyValue != null) {
-                                Path childPath = new Path(path, prop); 
+                                final Path childPath = new Path(path, prop);
                             
                                 //if the path is not already in the database we write it
                                 if (mdReader.getPath(childPath.getId()) == null) {
@@ -441,7 +441,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         } 
         
         //we remove the Impl suffix
-        int i = className.indexOf("Impl");
+        final int i = className.indexOf("Impl");
         if (i != -1) {
             className = className.substring(0, i);
         }
@@ -461,7 +461,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             className = className.substring(0, className.length() - 4);
         }
         
-        List<Standard> availableStandards = new ArrayList<Standard>();
+        final List<Standard> availableStandards = new ArrayList<Standard>();
         
         // ISO 19115 and its sub standard (ISO 19119, 19110)
         if (Standard.ISO_19115.equals(mainStandard)) {
@@ -648,9 +648,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
      */
     public boolean storeMetadata(Object obj) throws CstlServiceException {
         // profiling operation
-        long start     = System.currentTimeMillis();
-        long transTime = 0;
-        long writeTime = 0;
+        final long start = System.currentTimeMillis();
+        long transTime   = 0;
+        long writeTime   = 0;
         
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement)obj).getValue();
@@ -816,7 +816,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
                         } else {
                             LOGGER.info("value updated");
                             mdWriter.deleteValue(v);
-                            List<Value> toInsert = addValueFromObject(f, value, mp.path, v.getParent());
+                            final List<Value> toInsert = addValueFromObject(f, value, mp.path, v.getParent());
                             for (Value ins : toInsert) {
                                 mdWriter.writeValue(ins);
                             }
@@ -877,7 +877,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             if (propertyName.indexOf('[') != -1) {
                 if (propertyName.indexOf(']') != -1) {
                     try {
-                        String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
+                        final String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
                         ordinal = Integer.parseInt(ordinalValue);
                     } catch (NumberFormatException ex) {
                         throw new CstlServiceException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
@@ -895,7 +895,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             } else {
                 idValue = idValue + ordinal;
             }
-            Property property = getProperty(type, propertyName);
+            final Property property = getProperty(type, propertyName);
             p = new Path(p, property);
             type = property.getType();
             xpath = xpath.substring(xpath.indexOf('/') + 1);
@@ -906,7 +906,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         if (xpath.indexOf('[') != -1) {
             if (xpath.indexOf(']') != -1) {
                 try {
-                    String ordinalValue = xpath.substring(xpath.indexOf('[') + 1, xpath.indexOf(']'));
+                    final String ordinalValue = xpath.substring(xpath.indexOf('[') + 1, xpath.indexOf(']'));
                     ordinal = Integer.parseInt(ordinalValue);
                 } catch (NumberFormatException ex) {
                     throw new CstlServiceException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
@@ -923,7 +923,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             idValue = idValue + ordinal;
         }
         LOGGER.info("last propertyName:" + xpath + " ordinal:" + ordinal);
-        Property property = getProperty(type, xpath);
+        final Property property = getProperty(type, xpath);
         p = new Path(p, property);
         return new MixedPath(p, idValue);
     }
@@ -936,7 +936,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         Property property = type.getPropertyByName(propertyName);
         if (property == null) {
             // if the property is null we search in the sub-classes
-            List<Classe> subclasses = mdReader.getSubClasses(type);
+            final List<Classe> subclasses = mdReader.getSubClasses(type);
             for (Classe subClasse : subclasses) {
                 property = subClasse.getPropertyByName(propertyName);
                 if (property != null) {

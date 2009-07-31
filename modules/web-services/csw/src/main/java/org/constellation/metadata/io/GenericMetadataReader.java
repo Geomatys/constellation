@@ -166,7 +166,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
         // we get the database informations
-        BDD db = configuration.getBdd();
+        final BDD db = configuration.getBdd();
         if (db == null) {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
@@ -200,7 +200,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }
         // we get the database informations
-        BDD db = configuration.getBdd();
+        final BDD db = configuration.getBdd();
         if (db == null) {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
@@ -258,35 +258,35 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * 
      * @throws java.sql.SQLException
      */
-    private final void initStatement() throws SQLException {
+    private void initStatement() throws SQLException {
         // we initialize the main query
         if (configuration.getQueries() != null           &&
             configuration.getQueries().getMain() != null &&
             configuration.getQueries().getMain().getQuery() != null) {
-            Query mainQuery    = configuration.getQueries().getMain().getQuery();
-            mainStatement      = connection.prepareStatement(mainQuery.buildSQLQuery());
+            final Query mainQuery = configuration.getQueries().getMain().getQuery();
+            mainStatement         = connection.prepareStatement(mainQuery.buildSQLQuery());
         } else {
             LOGGER.severe("The configuration file is malformed, unable to reach the main query");
         }
         
-        singleStatements   = new HashMap<PreparedStatement, List<String>>();
-        multipleStatements = new HashMap<PreparedStatement, List<String>>();
-        Queries queries = configuration.getQueries();
+        singleStatements      = new HashMap<PreparedStatement, List<String>>();
+        multipleStatements    = new HashMap<PreparedStatement, List<String>>();
+        final Queries queries = configuration.getQueries();
         if (queries != null) {
             
             // initialize the single statements
-            Single single = queries.getSingle();
+            final Single single = queries.getSingle();
             if (single != null) {
                 for (Query query : single.getQuery()) {
-                    List<String> varNames = new ArrayList<String>();
+                    final List<String> varNames = new ArrayList<String>();
                     if (query.getSelect() != null) {
                         for (Column col : query.getSelect().getCol()) {
                             varNames.add(col.getVar());
                         }
                     }
-                    String textQuery = query.buildSQLQuery();
+                    final String textQuery = query.buildSQLQuery();
                     LOGGER.finer("new Single query: " + textQuery);
-                    PreparedStatement stmt =  connection.prepareStatement(textQuery);
+                    final PreparedStatement stmt =  connection.prepareStatement(textQuery);
                     singleStatements.put(stmt, varNames);
                 }
             } else {
@@ -294,16 +294,16 @@ public abstract class GenericMetadataReader extends MetadataReader {
             }
             
             // initialize the multiple statements
-            MultiFixed multi = queries.getMultiFixed();
+            final MultiFixed multi = queries.getMultiFixed();
             if (multi != null) {
                 for (Query query : multi.getQuery()) {
-                    List<String> varNames = new ArrayList<String>();
+                    final List<String> varNames = new ArrayList<String>();
                     if (query.getSelect() != null) {
                         for (Column col : query.getSelect().getCol()) {
                             varNames.add(col.getVar());
                         }
                     }
-                    PreparedStatement stmt =  connection.prepareStatement(query.buildSQLQuery());
+                    final PreparedStatement stmt =  connection.prepareStatement(query.buildSQLQuery());
                     multipleStatements.put(stmt, varNames);
                 }
             } else {
@@ -318,7 +318,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Load a Map of contact from the specified directory
      */
     private Map<String, ResponsibleParty> loadContacts(File contactDirectory) {
-        Map<String, ResponsibleParty> results = new HashMap<String, ResponsibleParty>();
+        final Map<String, ResponsibleParty> results = new HashMap<String, ResponsibleParty>();
         if (contactDirectory.isDirectory()) {
             if (contactDirectory.listFiles().length == 0) {
                 LOGGER.severe("the contacts folder is empty :" + contactDirectory.getPath());
@@ -328,9 +328,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
                     Unmarshaller unmarshaller = null;
                     try {
                         unmarshaller = marshallerPool.acquireUnmarshaller();
-                        Object obj = unmarshaller.unmarshal(f);
+                        final Object obj = unmarshaller.unmarshal(f);
                         if (obj instanceof ResponsibleParty) {
-                            ResponsibleParty contact = (ResponsibleParty) obj;
+                            final ResponsibleParty contact = (ResponsibleParty) obj;
                             String code = f.getName();
                             code = code.substring(code.indexOf("EDMO.") + 5, code.indexOf(".xml"));
                             results.put(code, contact);
@@ -390,8 +390,8 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @param identifier
      */
     private void fillStatement(PreparedStatement stmt, String identifier) throws SQLException {
-        ParameterMetaData meta = stmt.getParameterMetaData();
-        int nbParam = meta.getParameterCount();
+        final ParameterMetaData meta = stmt.getParameterMetaData();
+        final int nbParam = meta.getParameterCount();
         int i = 1;
         while (i < nbParam + 1) {
             stmt.setString(i, identifier);
@@ -407,7 +407,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      */
     private PreparedStatement getStatementFromSingleVar(String varName) {
         for (PreparedStatement stmt : singleStatements.keySet()) {
-            List<String> vars = singleStatements.get(stmt);
+            final List<String> vars = singleStatements.get(stmt);
             if (vars.contains(varName))
                 return stmt;
         }
@@ -422,7 +422,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      */
     private PreparedStatement getStatementFromMultipleVar(String varName) {
         for (PreparedStatement stmt : multipleStatements.keySet()) {
-            List<String> vars = multipleStatements.get(stmt);
+            final List<String> vars = multipleStatements.get(stmt);
             if (vars.contains(varName))
                 return stmt;
         }
@@ -488,7 +488,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         if (!isReconnecting) {
             try {
                LOGGER.info("refreshing the connection");
-               BDD db          = configuration.getBdd();
+               final BDD db    = configuration.getBdd();
                this.connection = db.getConnection();
                initStatement();
                isReconnecting = false;
@@ -646,7 +646,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @param ex
      */
     public void logSqlError(List<String> varList, SQLException ex) {
-        StringBuilder varlist = new StringBuilder();
+        final StringBuilder varlist = new StringBuilder();
         if (varList != null) {
             for (String s : varList) {
                 varlist.append(s).append(',');
@@ -747,7 +747,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * 
      */
     protected InternationalString getInternationalStringVariable(String variable) {
-        String value = getVariable(variable);
+        final String value = getVariable(variable);
         if (value != null)
             return new SimpleInternationalString(value);
         else return null;
@@ -760,9 +760,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      */
     protected CitationDate createRevisionDate(String date) {
-        DefaultCitationDate revisionDate = new DefaultCitationDate();
+        final DefaultCitationDate revisionDate = new DefaultCitationDate();
         revisionDate.setDateType(DateType.REVISION);
-        Date d = parseDate(date);
+        final Date d = parseDate(date);
         if (d != null)
             revisionDate.setDate(d);
         else LOGGER.finer("revision date null: " + date);
@@ -776,9 +776,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      */
     protected CitationDate createPublicationDate(String date) {
-        DefaultCitationDate revisionDate = new DefaultCitationDate();
+        final DefaultCitationDate revisionDate = new DefaultCitationDate();
         revisionDate.setDateType(DateType.PUBLICATION);
-        Date d = parseDate(date);
+        final Date d = parseDate(date);
         if (d != null)
             revisionDate.setDate(d);
         else LOGGER.finer("publication date null: " + date);
@@ -793,7 +793,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
             return null;
         int i = 0;
         while (i < DATE_FORMATS.size()) {
-            DateFormat dateFormat = DATE_FORMATS.get(i);
+            final DateFormat dateFormat = DATE_FORMATS.get(i);
             try {
                 Date d;
                 synchronized (dateFormat) {
@@ -831,7 +831,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
             LOGGER.severe("There is not the same number of geographic extent coordinates");
             return result;
         }
-        int size = w.size();
+        final int size = w.size();
         for (int i = 0; i < size; i++) {
             double west = 0; double east = 0; double south = 0; double north = 0;
             String westValue  = null; String eastValue  = null;
@@ -874,7 +874,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
                 LOGGER.severe("Number format exception while parsing boundingBox: " + '\n' +
                         "current box: " + westValue + ',' + eastValue + ',' + southValue + ',' + northValue);
             }
-            GeographicExtent geo = new DefaultGeographicBoundingBox(west, east, south, north);
+            final GeographicExtent geo = new DefaultGeographicBoundingBox(west, east, south, north);
             result.add(geo);
         }
         return result;
@@ -903,7 +903,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
             LOGGER.severe("There is not the same number of geographic BBOX coordinates");
             return result;
         }
-        int size = w.size();
+        final int size = w.size();
         for (int i = 0; i < size; i++) {
             double west = 0; double east = 0; double south = 0; double north = 0;
             try {
@@ -932,7 +932,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
                         "current box: " + w.get(i) + ',' + e.get(i) + ',' + s.get(i) + ',' + n.get(i));
             }
             //TODO CRS
-            BoundingBoxType bbox = new BoundingBoxType("EPSG:4326", west, south, east, north);
+            final BoundingBoxType bbox = new BoundingBoxType("EPSG:4326", west, south, east, north);
             result.add(bbox);
         }
         return result;
@@ -961,7 +961,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
     private List<String> getAllIdentifiers() throws CstlServiceException {
         final List<String> result = new ArrayList<String>();
         try {
-            ResultSet res = mainStatement.executeQuery();
+            final ResultSet res = mainStatement.executeQuery();
             while (res.next()) {
                 result.add(res.getString(1));
             }
@@ -983,9 +983,9 @@ public abstract class GenericMetadataReader extends MetadataReader {
         for (String id : identifiers) {
             loadData(id, CONTACT, null, null);
             for(String var: getVariablesForContact()) {
-                String contactID = getVariable(var);
+                final String contactID = getVariable(var);
                 if (contactID == null) {
-                    List<String> contactIDs = getVariables(var);
+                    final List<String> contactIDs = getVariables(var);
                     if (contactIDs != null) {
                         for (String cID : contactIDs) {
                             if (!results.contains(cID))

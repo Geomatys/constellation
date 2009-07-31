@@ -271,7 +271,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         if (compositePhenomenons == null) {
             compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
         }
-        CompositePhenomenonEntry compoPheno = compositePhenomenons.getEntry(result.getString(indexOf(query.observedPropertyComposite)));
+        final CompositePhenomenonEntry compoPheno = compositePhenomenons.getEntry(result.getString(indexOf(query.observedPropertyComposite)));
         
         if (stations == null) {
             stations = getDatabase().getTable(SamplingFeatureTable.class);
@@ -281,17 +281,17 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         if (stationPoints == null) {
             stationPoints = getDatabase().getTable(SamplingPointTable.class);
         }
-        SamplingPointEntry stationPoint = stationPoints.getEntry(result.getString(indexOf(query.featureOfInterestPoint)));
+        final SamplingPointEntry stationPoint = stationPoints.getEntry(result.getString(indexOf(query.featureOfInterestPoint)));
         
         if (procedures == null) {
             procedures = getDatabase().getTable(ProcessTable.class);
         }
-        ProcessEntry procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
+        final ProcessEntry procedure = procedures.getEntry(result.getString(indexOf(query.procedure)));
         
         if (results == null) {
             results = getDatabase().getTable(AnyResultTable.class);
         }
-        AnyResultEntry any = results.getEntry(result.getInt(indexOf(query.result)));
+        final AnyResultEntry any = results.getEntry(result.getInt(indexOf(query.result)));
         Object resultat = null;
         if (any != null) {
             if (any.getReference() == null && any.getArray() != null) {
@@ -304,17 +304,17 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         if(pheno == null) pheno = compoPheno;
         if(station == null) station =  stationPoint;
         
-        Timestamp begin = result.getTimestamp(indexOf(query.samplingTimeBegin));
-        Timestamp end = result.getTimestamp(indexOf(query.samplingTimeEnd));
+        final Timestamp begin = result.getTimestamp(indexOf(query.samplingTimeBegin));
+        final Timestamp end = result.getTimestamp(indexOf(query.samplingTimeEnd));
         AbstractTimeGeometricPrimitiveType samplingTime = null;
         TimePositionType beginPosition = null;
         TimePositionType endPosition   = null;
         if (begin != null) {
-            String normalizedTime = begin.toString().replace(' ', 'T');
+            final String normalizedTime = begin.toString().replace(' ', 'T');
             beginPosition = new TimePositionType(normalizedTime);
         }
         if (end != null) {
-            String normalizedTime = end.toString().replace(' ', 'T');
+            final String normalizedTime = end.toString().replace(' ', 'T');
             endPosition = new TimePositionType(normalizedTime);
         }
         
@@ -356,19 +356,20 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         transactionBegin();
         try {
             if (obs.getName() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.name), obs.getName());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return obs.getName();
                 } else {
                     id = obs.getName();
                 }
+                result.close();
             } else {
                 id = searchFreeIdentifier("urn:object:observation:BRGM");
             }
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.name),         id);
             statement.setString(indexOf(query.description),  obs.getDefinition());
         
@@ -378,7 +379,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         
             // on insere la station qui a effectué cette observation
             if (obs.getFeatureOfInterest() instanceof SamplingPointEntry){
-                SamplingPointEntry station = (SamplingPointEntry)obs.getFeatureOfInterest();
+                final SamplingPointEntry station = (SamplingPointEntry)obs.getFeatureOfInterest();
                 if (stationPoints == null) {
                     stationPoints = getDatabase().getTable(SamplingPointTable.class);
                 }
@@ -386,7 +387,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
             
             } else if (obs.getFeatureOfInterest() instanceof SamplingFeatureEntry){
-                SamplingFeatureEntry station = (SamplingFeatureEntry)obs.getFeatureOfInterest();
+                final SamplingFeatureEntry station = (SamplingFeatureEntry)obs.getFeatureOfInterest();
                 if (stations == null) {
                     stations = getDatabase().getTable(SamplingFeatureTable.class);
                 }
@@ -399,7 +400,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         
             // on insere le phenomene observé
             if(obs.getObservedProperty() instanceof CompositePhenomenonEntry){
-                CompositePhenomenonEntry pheno = (CompositePhenomenonEntry)obs.getObservedProperty();
+                final CompositePhenomenonEntry pheno = (CompositePhenomenonEntry)obs.getObservedProperty();
                 if (compositePhenomenons == null) {
                     compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
                 }
@@ -407,7 +408,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
         
             } else if(obs.getObservedProperty() instanceof PhenomenonEntry){
-                PhenomenonEntry pheno = (PhenomenonEntry)obs.getObservedProperty();
+                final PhenomenonEntry pheno = (PhenomenonEntry)obs.getObservedProperty();
                 if (phenomenons == null) {
                     phenomenons = getDatabase().getTable(PhenomenonTable.class);
                 }
@@ -421,7 +422,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         
             //on insere le capteur
             if (obs.getProcedure() != null) {
-                ProcessEntry process = (ProcessEntry)obs.getProcedure();
+                final ProcessEntry process = (ProcessEntry)obs.getProcedure();
                 if (procedures == null) {
                     procedures = getDatabase().getTable(ProcessTable.class);
                 }
@@ -435,7 +436,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 if (results == null) {
                     results = getDatabase().getTable(AnyResultTable.class);
                 }
-                String rid = results.getIdentifier(obs.getResult());
+                final String rid = results.getIdentifier(obs.getResult());
                 Integer prid = null;
                 boolean parsed = true;
                 try {
@@ -457,10 +458,10 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
             if (obs.getSamplingTime() != null){
                 if (obs.getSamplingTime() instanceof TimePeriodType) {
                     
-                    TimePeriodType sampTime = (TimePeriodType)obs.getSamplingTime();
+                    final TimePeriodType sampTime = (TimePeriodType)obs.getSamplingTime();
                     if (sampTime.getBeginPosition()!= null) {
-                        String s = sampTime.getBeginPosition().getValue();
-                        Timestamp date = Timestamp.valueOf(s);
+                        final String s = sampTime.getBeginPosition().getValue();
+                        final Timestamp date = Timestamp.valueOf(s);
                         statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
                     } else {
                         statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.TIMESTAMP);
@@ -468,8 +469,8 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                     
                     if (sampTime.getEndPosition() != null) {
                        
-                        String s = sampTime.getEndPosition().getValue();
-                        Timestamp date = Timestamp.valueOf(s);
+                        final String s = sampTime.getEndPosition().getValue();
+                        final Timestamp date = Timestamp.valueOf(s);
                         statement.setTimestamp(indexOf(query.samplingTimeEnd),  date);
                    
                     } else {
@@ -477,10 +478,10 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                     }
                     
                 } else if (obs.getSamplingTime() instanceof TimeInstantType) {
-                    TimeInstantType sampTime = (TimeInstantType)obs.getSamplingTime();
+                    final TimeInstantType sampTime = (TimeInstantType)obs.getSamplingTime();
                     if (sampTime.getTimePosition() !=null) {
-                        String s       = sampTime.getTimePosition().getValue();
-                        Timestamp date = Timestamp.valueOf(s);
+                        final String s       = sampTime.getTimePosition().getValue();
+                        final Timestamp date = Timestamp.valueOf(s);
                         statement.setTimestamp(indexOf(query.samplingTimeBegin),  date);
                         statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
                     } else {

@@ -17,9 +17,6 @@
 package org.constellation.provider;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,10 +25,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.constellation.provider.configuration.ConfigDirectory;
-import org.constellation.util.Util;
 import org.geotoolkit.map.ElevationModel;
 
 /**
@@ -46,8 +40,8 @@ public class LayerProviderProxy implements LayerProvider{
 
     /**
      * Default logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger(LayerProviderProxy.class.getName());
+     
+    private static final Logger LOGGER = Logger.getLogger(LayerProviderProxy.class.getName());*/
 
     private static final Collection<LayerProviderService> SERVICES = new ArrayList<LayerProviderService>();
 
@@ -115,7 +109,7 @@ public class LayerProviderProxy implements LayerProvider{
 
         for(LayerProviderService service : SERVICES){
             for(LayerProvider provider : service.getProviders()){
-                LayerDetails layer = provider.get(key);
+                final LayerDetails layer = provider.get(key);
                 if(layer != null) return layer;
             }
         }
@@ -131,7 +125,7 @@ public class LayerProviderProxy implements LayerProvider{
 
         for(LayerProviderService service : SERVICES){
             for(LayerProvider provider : service.getProviders()){
-                List<String> sts = provider.get(layerName).getFavoriteStyles();
+                final List<String> sts = provider.get(layerName).getFavoriteStyles();
                 styles.addAll(sts);
             }
         }
@@ -144,8 +138,8 @@ public class LayerProviderProxy implements LayerProvider{
 
         for(LayerProviderService service : SERVICES){
             for(LayerProvider provider : service.getProviders()){
-                ElevationModel model = provider.getElevationModel(name);
-            if(model != null) return model;
+                final ElevationModel model = provider.getElevationModel(name);
+                if(model != null) return model;
             }
         }
         
@@ -186,7 +180,7 @@ public class LayerProviderProxy implements LayerProvider{
 
     }
 
-    public synchronized static void init(final String configPath){
+    public static synchronized void init(final String configPath){
         if(configPath == null){
             throw new NullPointerException("Configuration path can not be null.");
         }
@@ -220,7 +214,7 @@ public class LayerProviderProxy implements LayerProvider{
 
     }
 
-    public synchronized static LayerProviderProxy getInstance(){
+    public static synchronized LayerProviderProxy getInstance(){
         if(INSTANCE == null){
             init(ConfigDirectory.getConfigDirectory().getPath() + File.separator);
             INSTANCE = new LayerProviderProxy();

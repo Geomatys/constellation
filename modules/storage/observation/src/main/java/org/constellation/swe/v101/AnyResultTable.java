@@ -72,20 +72,20 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
      */
     protected AnyResultEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
          final AnyResultQuery query = (AnyResultQuery) super.query;
-         String idRef = results.getString(indexOf(query.reference));
+         final String idRef = results.getString(indexOf(query.reference));
          if (idRef != null) {
             if(references == null) {
                  references = getDatabase().getTable(ReferenceTable.class);
             }
-            ReferenceEntry ref = references.getEntry(idRef);
+            final ReferenceEntry ref = references.getEntry(idRef);
             return new AnyResultEntry(results.getInt(indexOf(query.idResult)) + "", ref);
          } else {
 
             if(dataArrays == null) {
                 dataArrays = getDatabase().getTable(DataArrayTable.class);
             }
-            DataArrayEntry entry = dataArrays.getEntry(results.getString(indexOf(query.definition)));
-            DataArrayEntry array = new DataArrayEntry(entry.getId(),
+            final DataArrayEntry entry = dataArrays.getEntry(results.getString(indexOf(query.definition)));
+            final DataArrayEntry array = new DataArrayEntry(entry.getId(),
                                                       entry.getElementCount().getCount().getValue(),  
                                                       entry.getElementType(),
                                                       entry.getEncoding(),
@@ -107,21 +107,21 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
         transactionBegin();
         try {
             if (result instanceof AnyResultEntry) {
-                DataArrayEntry array = ((AnyResultEntry)result).getArray();
-                PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+                final DataArrayEntry array = ((AnyResultEntry)result).getArray();
+                final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
                 statement.setString(indexOf(query.values),array.getValues());
                 statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
                 statement.setString(indexOf(query.definition), array.getId());
-                ResultSet results = statement.executeQuery();
+                final ResultSet results = statement.executeQuery();
                 if(results.next()){
                     success = true;
                     return results.getString(1);
                 }
             } else if (result instanceof DataArrayPropertyType) {
-                DataArrayEntry array = ((DataArrayPropertyType)result).getDataArray();
+                final DataArrayEntry array = ((DataArrayPropertyType)result).getDataArray();
                 if (array == null)
                     throw new CatalogException("The data array is null!");
-                PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+                final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
                 statement.setString(indexOf(query.values),array.getValues());
                 statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
                 statement.setString(indexOf(query.definition), array.getId());
@@ -131,10 +131,10 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                     return results.getString(1);
                 }
             } else if (result instanceof ReferenceEntry) {
-                PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+                final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
                 statement.setString(indexOf(query.reference), ((ReferenceEntry)result).getId());
                 statement.setNull(indexOf(query.values), java.sql.Types.VARCHAR);
-                ResultSet results = statement.executeQuery();
+                final ResultSet results = statement.executeQuery();
                 if(results.next()) {
                     success = true;
                     return results.getString(1);
@@ -146,17 +146,17 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
             PreparedStatement statement = getStatement(QueryType.INSERT);
 
             if (result instanceof AnyResultEntry) {
-                DataArrayEntry array = ((AnyResultEntry)result).getArray();
+                final DataArrayEntry array = ((AnyResultEntry)result).getArray();
                 statement.setString(indexOf(query.values), array.getValues());
                 statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
                 if(dataArrays == null) {
                     dataArrays = getDatabase().getTable(DataArrayTable.class);
                 }
-                String idArray = dataArrays.getIdentifier(array);
+                final String idArray = dataArrays.getIdentifier(array);
                 statement.setString(indexOf(query.definition), idArray);
             
             } else if (result instanceof DataArrayPropertyType) {
-                DataArrayEntry array = ((DataArrayPropertyType)result).getDataArray();
+                final DataArrayEntry array = ((DataArrayPropertyType)result).getDataArray();
                 //we cleanup a little the values
                 String values = array.getValues();
                 values = values.replace("\n", " ");
@@ -169,11 +169,11 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                 if(dataArrays == null) {
                     dataArrays = getDatabase().getTable(DataArrayTable.class);
                 }
-                String idArray = dataArrays.getIdentifier(array);
+                final String idArray = dataArrays.getIdentifier(array);
                 statement.setString(indexOf(query.definition), idArray);
             
             } else if (result instanceof ReferenceEntry) {
-                ReferenceEntry ref = (ReferenceEntry) result;
+                final ReferenceEntry ref = (ReferenceEntry) result;
                 String idRef;
                 
                 if(references == null) {
@@ -193,7 +193,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
             transactionEnd(success);
         }
         //we get the new id generated
-        PreparedStatement p = getStatement("SELECT max(id_result) FROM any_results" );
+        final PreparedStatement p = getStatement("SELECT max(id_result) FROM any_results" );
         ResultSet r = p.executeQuery();
         if (r.next())
             return r.getString(1);
