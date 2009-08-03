@@ -131,6 +131,7 @@ import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.geotoolkit.util.logging.MonolineFormatter;
 
+import org.opengis.observation.Measure;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
 import static org.constellation.sos.ws.Utils.*;
@@ -159,7 +160,7 @@ public class SOSworker {
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
      */ 
-    private final Properties map = new Properties();;
+    private final Properties map = new Properties();
     
     /**
      * The base for sensor id.
@@ -255,11 +256,6 @@ public class SOSworker {
      * The sensorML database writer
      */
     private SensorWriter smlWriter;
-
-    /**
-     * The base Qname for complex observation.
-     */
-    public static final QName OBSERVATION_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
 
     /**
      * A registry factory allowing to load carious SOS factory in function of the build implementation.
@@ -721,6 +717,11 @@ public class SOSworker {
                     MISSING_PARAMETER_VALUE, "responseFormat");
         }
 
+        QName resultModel = requestObservation.getResultModel();
+        if (resultModel == null) {
+            resultModel = Parameters.OBSERVATION_QNAME;
+        }
+
         //we get the mode of result
         boolean template   = false;
         boolean outOfBand  = false;
@@ -741,7 +742,7 @@ public class SOSworker {
             }
         }
         try {
-            omFilter.initFilterObservation(mode);
+            omFilter.initFilterObservation(mode, resultModel);
         } catch (IllegalArgumentException ex) {
             throw new CstlServiceException(ex);
         }
@@ -1008,7 +1009,7 @@ public class SOSworker {
             if (!(omFilter instanceof ObservationFilterReader)) {
                 final List<String> observationIDs = omFilter.filterObservation();
                 for (String observationID : observationIDs) {
-                    matchingResult.add(omReader.getObservation(observationID));
+                    matchingResult.add(omReader.getObservation(observationID, resultModel));
                 }
 
             // case (2)
@@ -1087,8 +1088,15 @@ public class SOSworker {
                                           MISSING_PARAMETER_VALUE, "ObservationTemplateId");
         }
         
+        final QName resultModel;
+        if (template instanceof MeasurementEntry) {
+            resultModel = Parameters.MEASUREMENT_QNAME;
+        } else {
+            resultModel = Parameters.OBSERVATION_QNAME;
+        }
+        
         //we begin to create the sql request
-        omFilter.initFilterGetResult(((ProcessEntry)template.getProcedure()).getHref());
+        omFilter.initFilterGetResult(((ProcessEntry)template.getProcedure()).getHref(), resultModel);
         
         //we treat the time constraint
         final List<EventTime> times = requestResult.getEventTime();
@@ -1143,16 +1151,20 @@ public class SOSworker {
             for (ObservationResult result: results) {
                 final Timestamp tBegin = result.beginTime;
                 final Timestamp tEnd   = result.endTime;
-                final AnyResult a      = omReader.getResult(result.resultID);
-                if (a != null) {
-                    final DataArray array = a.getArray();
+                final Object r         = omReader.getResult(result.resultID, resultModel);
+                if (r instanceof AnyResult) {
+                    final DataArray array = ((AnyResult)r).getArray();
                     if (array != null) {
                         final String resultValues = getResultValues(tBegin, tEnd, array, times);
                         datablock.append(resultValues).append('\n');
                     } else {
                         throw new IllegalArgumentException("Array is null");
                     }
+                } else if (r instanceof Measure) {
+                    Measure meas = (Measure) r;
+                    datablock.append(tBegin).append(',').append(meas.getValue()).append("@@");
                 }
+
             }
             values = datablock.toString();
         }
@@ -1343,9 +1355,10 @@ public class SOSworker {
             //we get the observation template provided with the sensor description.
             final ObservationTemplate temp = requestRegSensor.getObservationTemplate();
             ObservationEntry obs           = null;
-            if (temp != null)
+            if (temp != null) {
                 obs = temp.getObservation();
-            if(temp == null && obs == null) {
+            }
+            if(obs == null) {
                 throw new CstlServiceException("observation template must be specify",
                                               MISSING_PARAMETER_VALUE,
                                               Parameters.OBSERVATION_TEMPLATE);
@@ -1443,7 +1456,7 @@ public class SOSworker {
         } else {
 
             //in first we verify that the observation is conform to the template
-            final ObservationEntry template = (ObservationEntry) omReader.getObservation(observationTemplateIdBase + num);
+            final ObservationEntry template = (ObservationEntry) omReader.getObservation(observationTemplateIdBase + num, Parameters.OBSERVATION_QNAME);
             //if the observation to insert match the template we can insert it in the OM db
             if (obs.matchTemplate(template)) {
                 if (obs.getSamplingTime() != null && obs.getResult() != null) {
@@ -1684,7 +1697,7 @@ public class SOSworker {
 
                 //we create a list of accepted responseMode (fixed)
                 final List<ResponseModeType> responses  = Arrays.asList(INLINE, RESULT_TEMPLATE);
-                final List<QName> resultModel           = Arrays.asList(OBSERVATION_QNAME);
+                final List<QName> resultModel           = Arrays.asList(Parameters.OBSERVATION_QNAME, Parameters.MEASUREMENT_QNAME);
                 final List<String> offerinfOutputFormat = Arrays.asList(MimeType.TEXT_XML);
                 final List<String> srsName              = Arrays.asList("EPSG:4326");
 
@@ -1755,7 +1768,7 @@ public class SOSworker {
 
             //we create a list of accepted responseMode (fixed)
             final List<ResponseModeType> responses  = Arrays.asList(RESULT_TEMPLATE, INLINE);
-            final List<QName> resultModel           = Arrays.asList(OBSERVATION_QNAME);
+            final List<QName> resultModel           = Arrays.asList(Parameters.OBSERVATION_QNAME, Parameters.MEASUREMENT_QNAME);
             final List<String> offeringOutputFormat = Arrays.asList(MimeType.TEXT_XML);
             final List<String> srsName              = Arrays.asList("EPSG:4326");
 
@@ -1809,11 +1822,13 @@ public class SOSworker {
      */
     private void recordMapping(String dbId, String physicalID) throws CstlServiceException {
         try {
-            map.setProperty(physicalID, dbId);
-            final File mappingFile     = new File(WebService.getSicadeDirectory(), "/sos_configuration/mapping.properties");
-            final FileOutputStream out = new FileOutputStream(mappingFile);
-            map.store(out, "");
-            out.close();
+            if (dbId != null && physicalID != null) {
+                map.setProperty(physicalID, dbId);
+                final File mappingFile     = new File(WebService.getSicadeDirectory(), "/sos_configuration/mapping.properties");
+                final FileOutputStream out = new FileOutputStream(mappingFile);
+                map.store(out, "");
+                out.close();
+            }
 
         } catch (FileNotFoundException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);

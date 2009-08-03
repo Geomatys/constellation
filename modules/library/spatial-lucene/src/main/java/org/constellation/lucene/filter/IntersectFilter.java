@@ -55,16 +55,16 @@ public class IntersectFilter extends SpatialFilter {
     @Override
     public BitSet bits(IndexReader reader) throws IOException {
         // we prepare the result
-        BitSet bits = new BitSet(reader.maxDoc());
+        final BitSet bits = new BitSet(reader.maxDoc());
 
-        TermDocs termDocs = reader.termDocs(new Term(GEOMETRY_FIELD));
+        final TermDocs termDocs = reader.termDocs(new Term(GEOMETRY_FIELD));
 
         // we are searching for matching points
         termDocs.seek(new Term(GEOMETRY_FIELD, "point"));
         while (termDocs.next()) {
-            int docNum = termDocs.doc();
-            GeneralDirectPosition tempPoint = readPoint(reader, docNum);
-            Line2D pointLine                = new Line2D.Double(tempPoint.getOrdinate(0), tempPoint.getOrdinate(1),
+            final int docNum = termDocs.doc();
+            final GeneralDirectPosition tempPoint = readPoint(reader, docNum);
+            final Line2D pointLine                = new Line2D.Double(tempPoint.getOrdinate(0), tempPoint.getOrdinate(1),
                                                                 tempPoint.getOrdinate(0), tempPoint.getOrdinate(1));
             if (point != null && point.equals(tempPoint)) {
                 bits.set(docNum);
@@ -80,8 +80,8 @@ public class IntersectFilter extends SpatialFilter {
         //then we search for matching box
         termDocs.seek(new Term(GEOMETRY_FIELD, "boundingbox"));
         while (termDocs.next()) {
-            int docNum = termDocs.doc();
-            GeneralEnvelope tempBox = readBoundingBox(reader, docNum);
+            final int docNum              = termDocs.doc();
+            final GeneralEnvelope tempBox = readBoundingBox(reader, docNum);
             if (tempBox == null)
                 continue;
             if (boundingBox != null && boundingBox.intersects(tempBox, false)) {
@@ -98,8 +98,8 @@ public class IntersectFilter extends SpatialFilter {
         //then we search for matching line
         termDocs.seek(new Term(GEOMETRY_FIELD, "line"));
         while (termDocs.next()) {
-            int docNum = termDocs.doc();
-            Line2D tempLine = readLine(reader, docNum);
+            final int docNum      = termDocs.doc();
+            final Line2D tempLine = readLine(reader, docNum);
             if (boundingBox != null && GeometricUtilities.intersect(boundingBox, tempLine)) {
                 bits.set(docNum);
 

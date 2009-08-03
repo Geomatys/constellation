@@ -19,6 +19,7 @@ package org.constellation.sos.io.lucene;
 
 import java.util.List;
 import java.util.Properties;
+import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
@@ -49,12 +50,12 @@ public class LuceneObservationFilter implements ObservationFilter {
     }
     
     @Override
-    public void initFilterObservation(ResponseModeType requestMode) {
-        throw new UnsupportedOperationException();
+    public void initFilterObservation(ResponseModeType requestMode, QName resultModel) {
+        throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 
     @Override
-    public void initFilterGetResult(String procedure) {
+    public void initFilterGetResult(String procedure, QName resultModel) {
         throw new UnsupportedOperationException(NOT_SUPPORTED_YET);
     }
 

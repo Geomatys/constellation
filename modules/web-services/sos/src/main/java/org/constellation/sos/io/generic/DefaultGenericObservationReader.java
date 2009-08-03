@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.ws.Parameters;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.AbstractDataComponentEntry;
@@ -52,7 +53,6 @@ import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.observation.xml.v100.ProcessEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
-import static org.constellation.sos.ws.SOSworker.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -174,7 +174,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
 
         //static part
         final List<String> responseFormat = Arrays.asList(MimeType.APP_XML);
-        final List<QName> resultModel     = Arrays.asList(OBSERVATION_QNAME);
+        final List<QName> resultModel     = Arrays.asList(Parameters.OBSERVATION_QNAME);
         final List<ResponseModeType> responseMode = Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
         return new ObservationOfferingEntry(offeringName,
                                             offeringName,
@@ -250,14 +250,14 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     }
 
     @Override
-    public ObservationEntry getObservation(String identifier) throws CstlServiceException {
+    public ObservationEntry getObservation(String identifier, QName resultModel) throws CstlServiceException {
         final Values values = loadData(Arrays.asList("var26", "var27", "var28", "var29", "var30", "var31"), identifier);
         final SamplingFeatureEntry featureOfInterest = getFeatureOfInterest(values.getVariable("var26"));
         final PhenomenonEntry observedProperty = getPhenomenon(values.getVariable("var27"));
         final ProcessEntry procedure = new ProcessEntry(values.getVariable("var28"));
 
         final TimePeriodType samplingTime = new TimePeriodType(values.getVariable("var29"), values.getVariable("var30"));
-        final AnyResultEntry anyResult = getResult(values.getVariable("var31"));
+        final AnyResultEntry anyResult = getResult(values.getVariable("var31"), resultModel);
         final DataArrayEntry dataArray = anyResult.getArray();
         final DataArrayPropertyType result = new DataArrayPropertyType(dataArray);
         return new ObservationEntry(identifier,
@@ -270,7 +270,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     }
 
     @Override
-    public AnyResultEntry getResult(String identifier) throws CstlServiceException {
+    public AnyResultEntry getResult(String identifier, QName resutModel) throws CstlServiceException {
         final Values values = loadData(Arrays.asList("var32", "var33", "var34", "var35", "var36", "var37", "var38", "var39",
                 "var40", "var41", "var42", "var43"), identifier);
         final int count = Integer.parseInt(values.getVariable("var32"));

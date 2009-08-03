@@ -20,6 +20,7 @@ package org.constellation.configuration;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.constellation.generic.database.*;
 
@@ -31,7 +32,8 @@ import org.constellation.generic.database.*;
 @XmlRootElement(name = "SOSConfiguration")
 public class SOSConfiguration {
 
-    private Automatic SMLConfiguration;
+    @XmlElement(name="SMLConfiguration")
+    private Automatic smlConfiguration;
 
     private ObservationFilterType observationFilterType;
 
@@ -39,9 +41,11 @@ public class SOSConfiguration {
 
     private ObservationWriterType observationWriterType;
 
-    private DataSourceType SMLType;
+    @XmlElement(name="SMLType")
+    private DataSourceType smlType;
 
-    private Automatic OMConfiguration;
+    @XmlElement(name="OMConfiguration")
+    private Automatic omConfiguration;
 
     private String observationIdBase;
 
@@ -64,36 +68,36 @@ public class SOSConfiguration {
     }
 
     public SOSConfiguration(Automatic smlConfiguration, Automatic omConfiguration) {
-        this.OMConfiguration  = omConfiguration;
-        this.SMLConfiguration = smlConfiguration;
+        this.omConfiguration  = omConfiguration;
+        this.smlConfiguration = smlConfiguration;
     }
 
     /**
      * @return the SMLConfiguration
      */
     public Automatic getSMLConfiguration() {
-        return SMLConfiguration;
+        return smlConfiguration;
     }
 
     /**
      * @param SMLConfiguration the SMLConfiguration to set
      */
     public void setSMLConfiguration(Automatic smlConfiguration) {
-        this.SMLConfiguration = smlConfiguration;
+        this.smlConfiguration = smlConfiguration;
     }
 
     /**
      * @return the OMConfiguration
      */
     public Automatic getOMConfiguration() {
-        return OMConfiguration;
+        return omConfiguration;
     }
 
     /**
      * @param OMConfiguration the OMConfiguration to set
      */
     public void setOMConfiguration(Automatic omConfiguration) {
-        this.OMConfiguration = omConfiguration;
+        this.omConfiguration = omConfiguration;
     }
 
     /**
@@ -132,16 +136,16 @@ public class SOSConfiguration {
      * @return the SMLType
      */
     public DataSourceType getSMLType() {
-        if (SMLType == null)
-            SMLType = DataSourceType.MDWEB;
-        return SMLType;
+        if (smlType == null)
+            smlType = DataSourceType.MDWEB;
+        return smlType;
     }
 
     /**
      * @param SMLType the SMLType to set
      */
     public void setSMLType(DataSourceType smlType) {
-        this.SMLType = smlType;
+        this.smlType = smlType;
     }
 
     /**

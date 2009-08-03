@@ -37,6 +37,7 @@ import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;
@@ -72,6 +73,11 @@ public class DefaultObservationWriter implements ObservationWriter {
      * A database table for insert and get observation
      */
     private final ObservationTable obsTable;
+
+    /**
+     * A database table for insert and get observation
+     */
+    private final MeasurementTable measTable;
 
     /**
      * A database table for insert and get observation offerring.
@@ -112,9 +118,10 @@ public class DefaultObservationWriter implements ObservationWriter {
             omDatabase.setProperty(ConfigurationKey.READONLY, "false");
             
             //we build the database table frequently used.
-            obsTable = omDatabase.getTable(ObservationTable.class);
-            offTable = omDatabase.getTable(ObservationOfferingTable.class);
-            refTable = omDatabase.getTable(ReferenceTable.class);
+            obsTable  = omDatabase.getTable(ObservationTable.class);
+            measTable = omDatabase.getTable(MeasurementTable.class);
+            offTable  = omDatabase.getTable(ObservationOfferingTable.class);
+            refTable  = omDatabase.getTable(ReferenceTable.class);
 
         } catch (NoSuchTableException ex) {
             throw new CstlServiceException("NoSuchTable Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -126,7 +133,9 @@ public class DefaultObservationWriter implements ObservationWriter {
 
     public String writeObservation(Observation observation) throws CstlServiceException {
         try {
-            if (obsTable != null) {
+            if (observation instanceof MeasurementEntry && measTable != null) {
+                return measTable.getIdentifier((Measurement) observation);
+            } else if (obsTable != null) {
                 return obsTable.getIdentifier(observation);
             }
             return null;

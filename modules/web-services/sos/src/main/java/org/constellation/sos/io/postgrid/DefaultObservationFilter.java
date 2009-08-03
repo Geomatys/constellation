@@ -28,6 +28,7 @@ import java.util.Properties;
 
 // Constellation dependencies
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationFilter;
@@ -107,8 +108,12 @@ public class DefaultObservationFilter implements ObservationFilter {
      * Initialize the query.
      */
     @Override
-    public void initFilterObservation(ResponseModeType requestMode) {
-        sqlRequest = new StringBuilder("SELECT name FROM observations WHERE name LIKE '%");
+    public void initFilterObservation(ResponseModeType requestMode, QName resultModel) {
+        if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
+            sqlRequest = new StringBuilder("SELECT name FROM measurements WHERE name LIKE '%");
+        } else {
+            sqlRequest = new StringBuilder("SELECT name FROM observations WHERE name LIKE '%");
+        }
         if (requestMode == INLINE) {
             sqlRequest.append(observationIdBase).append("%' AND ");
 
@@ -121,8 +126,12 @@ public class DefaultObservationFilter implements ObservationFilter {
      * Initialize the query.
      */
     @Override
-    public void initFilterGetResult(String procedure) {
-        sqlRequest = new StringBuilder("SELECT result, sampling_time_begin, sampling_time_end FROM observations WHERE ");
+    public void initFilterGetResult(String procedure, QName resultModel) {
+        if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
+            sqlRequest = new StringBuilder("SELECT result, sampling_time_begin, sampling_time_end FROM measurements WHERE ");
+        } else {
+            sqlRequest = new StringBuilder("SELECT result, sampling_time_begin, sampling_time_end FROM observations WHERE ");
+        }
         //we add to the request the property of the template
         sqlRequest.append("procedure='").append(procedure).append("'");
     }

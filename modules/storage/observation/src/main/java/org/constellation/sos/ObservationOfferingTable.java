@@ -236,6 +236,11 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
                                    results.getString(indexOf(query.resultModelLocalPart)),
                                    Namespaces.getPreferredPrefix(namespace, "")));
 
+         // Dirty Hack to add Measurement QNAMe
+         resultModel.add(new QName(namespace,
+                                   "Measurement",
+                                   Namespaces.getPreferredPrefix(namespace, "")));
+
          final List<String> srsName = new ArrayList<String>();
          srsName.add(results.getString(indexOf(query.srsName)));
 

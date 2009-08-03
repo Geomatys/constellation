@@ -33,6 +33,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
+import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.filter.From;
@@ -126,7 +127,7 @@ public class GenericObservationFilter implements ObservationFilter {
      * Initialize the query.
      */
     @Override
-    public void initFilterObservation(ResponseModeType requestMode) {
+    public void initFilterObservation(ResponseModeType requestMode, QName resultModel) {
         currentQuery        = new Query();
         final Select select = configurationQuery.getSelect("filterObservation");
         final From from     = configurationQuery.getFrom("observations");
@@ -146,7 +147,7 @@ public class GenericObservationFilter implements ObservationFilter {
      * Initialize the query.
      */
     @Override
-    public void initFilterGetResult(String procedure) {
+    public void initFilterGetResult(String procedure, QName resultModel) {
         currentQuery        = new Query();
         final Select select = configurationQuery.getSelect("filterResult");
         final From from     = configurationQuery.getFrom("observations");

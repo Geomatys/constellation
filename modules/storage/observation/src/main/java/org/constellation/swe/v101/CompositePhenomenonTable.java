@@ -78,17 +78,17 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
     protected CompositePhenomenonEntry createEntry(final ResultSet results) throws SQLException, CatalogException{
         final CompositePhenomenonQuery query = (CompositePhenomenonQuery) super.query;
         
-        String idCompositePhenomenon = results.getString(indexOf(query.identifier));
+        final String idCompositePhenomenon = results.getString(indexOf(query.identifier));
         
         components = getComponentTable();
         components.setIdCompositePhenomenon(idCompositePhenomenon);
-        Collection<ComponentEntry> entries = components.getEntries();
+        final Collection<ComponentEntry> entries = components.getEntries();
         
-        Collection<PhenomenonEntry> compos = new HashSet<PhenomenonEntry>();
+        final Collection<PhenomenonEntry> compos = new HashSet<PhenomenonEntry>();
         
-        Iterator i = entries.iterator();
+        final Iterator i = entries.iterator();
         while(i.hasNext()) {
-            ComponentEntry c =(ComponentEntry) i.next();
+            final ComponentEntry c =(ComponentEntry) i.next();
             compos.add(c.getComponent());
         }
         
@@ -112,19 +112,20 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
         transactionBegin();
         try {
             if (pheno.getId() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.identifier), pheno.getId());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return pheno.getId();
                 } else {
                     id = pheno.getId();
                 }
+                result.close();
             } else {
                 id = searchFreeIdentifier("compositepheno");
             }
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
         
             statement.setString(indexOf(query.identifier), id);
             statement.setString(indexOf(query.name), pheno.getName());
@@ -133,10 +134,10 @@ public class CompositePhenomenonTable extends SingletonTable<CompositePhenomenon
             updateSingleton(statement); 
 
             components = getComponentTable();
-            Iterator<PhenomenonEntry> i = pheno.getComponent().iterator();
+            final Iterator<PhenomenonEntry> i = pheno.getComponent().iterator();
         
             while(i.hasNext()) {
-                PhenomenonEntry ph = i.next();
+                final PhenomenonEntry ph = i.next();
                 components.getIdentifier(id, ph);
             }
             success = true;

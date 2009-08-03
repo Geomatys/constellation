@@ -32,6 +32,7 @@ import java.util.Set;
 // Constellation dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.namespace.QName;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
@@ -40,22 +41,25 @@ import org.constellation.catalog.NoSuchTableException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.gml.v311.ReferenceTable;
+import org.constellation.observation.MeasureTable;
+import org.constellation.observation.MeasurementTable;
 import org.constellation.observation.ObservationTable;
 import org.constellation.observation.ProcessTable;
 import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointTable;
 import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationReader;
+import org.constellation.sos.ws.Parameters;
 import org.constellation.swe.v101.AnyResultTable;
 import org.constellation.swe.v101.CompositePhenomenonTable;
 import org.constellation.swe.v101.PhenomenonTable;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
-import org.geotoolkit.swe.xml.v101.AnyResultEntry;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -87,6 +91,11 @@ public class DefaultObservationReader implements ObservationReader {
      * A database table for insert and get observation
      */
     private final ObservationTable obsTable;
+
+    /**
+     * A database table for insert and get observation
+     */
+    private final MeasurementTable measTable;
 
     /**
      * A database table for insert and get observation offerring.
@@ -148,9 +157,10 @@ public class DefaultObservationReader implements ObservationReader {
             omDatabase.setProperty(ConfigurationKey.READONLY, "false");
             
             //we build the database table frequently used.
-            obsTable = omDatabase.getTable(ObservationTable.class);
-            offTable = omDatabase.getTable(ObservationOfferingTable.class);
-            refTable = omDatabase.getTable(ReferenceTable.class);
+            obsTable  = omDatabase.getTable(ObservationTable.class);
+            measTable = omDatabase.getTable(MeasurementTable.class);
+            offTable  = omDatabase.getTable(ObservationOfferingTable.class);
+            refTable  = omDatabase.getTable(ReferenceTable.class);
             //we build the prepared Statement
             newObservationIDStmt    = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observations\" WHERE name LIKE '%" + observationIdBase + "%' ");
             newMeasurementIDStmt    = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"measurements\" WHERE name LIKE '%" + observationIdBase + "%' ");
@@ -167,6 +177,7 @@ public class DefaultObservationReader implements ObservationReader {
 
     }
 
+    @Override
     public Set<String> getOfferingNames() throws CstlServiceException {
         try {
             return offTable.getIdentifiers();
@@ -182,6 +193,7 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    @Override
     public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException {
         try {
             return offTable.getEntry(offeringName);
@@ -197,6 +209,7 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    @Override
     public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
         try {
             final List<ObservationOfferingEntry> loo = new ArrayList<ObservationOfferingEntry>();
@@ -219,6 +232,7 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    @Override
     public Set<String> getProcedureNames() throws CstlServiceException {
         try {
             final ProcessTable procTable = omDatabase.getTable(ProcessTable.class);
@@ -235,6 +249,7 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    @Override
     public Set<String> getPhenomenonNames() throws CstlServiceException {
         try {
             final PhenomenonTable phenoTable               = omDatabase.getTable(PhenomenonTable.class);
@@ -256,6 +271,7 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    @Override
     public PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException {
         try {
             final CompositePhenomenonTable compositePhenomenonTable = omDatabase.getTable(CompositePhenomenonTable.class);
@@ -286,6 +302,7 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    @Override
     public Set<String> getFeatureOfInterestNames() throws CstlServiceException {
         try {
             final SamplingFeatureTable featureTable = omDatabase.getTable(SamplingFeatureTable.class);
@@ -306,6 +323,7 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    @Override
     public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException {
         try {
             final SamplingPointTable foiTable = omDatabase.getTable(SamplingPointTable.class);
@@ -313,6 +331,7 @@ public class DefaultObservationReader implements ObservationReader {
         } catch (NoSuchRecordException ex) {
             return null;
         } catch (CatalogException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("Catalog exception while getting the feature of interest",
                     NO_APPLICABLE_CODE, "featureOfInterest");
         } catch (SQLException ex) {
@@ -322,11 +341,23 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
-    public ObservationEntry getObservation(String identifier) throws CstlServiceException {
+    @Override
+    public ObservationEntry getObservation(String identifier, QName resultModel) throws CstlServiceException {
         try {
-            return (ObservationEntry) obsTable.getEntry(identifier);
+            if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
+                return (MeasurementEntry) measTable.getEntry(identifier);
+            } else {
+                return (ObservationEntry) obsTable.getEntry(identifier);
+            }
         } catch (CatalogException ex) {
-            throw new CstlServiceException("Catalog exception while getting the observations: " + ex.getMessage(),
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            String msg = " null";
+            if ( ex.getMessage() != null) {
+                msg =  ex.getMessage();
+            } else if (ex.getCause() != null) {
+                msg = ex.getCause().getMessage();
+            }
+            throw new CstlServiceException("Catalog exception while getting the observation with identifier: " + identifier +  " of type " + resultModel.getLocalPart() + msg,
                     NO_APPLICABLE_CODE, "getObservation");
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -335,11 +366,18 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
-    public AnyResultEntry getResult(String identifier) throws CstlServiceException {
+    @Override
+    public Object getResult(String identifier, QName resultModel) throws CstlServiceException {
         try {
-            final AnyResultTable resTable = omDatabase.getTable(AnyResultTable.class);
-            final Integer id = Integer.parseInt(identifier);
-            return resTable.getEntry(id);
+            if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
+                final MeasureTable meaTable = omDatabase.getTable(MeasureTable.class);
+                return meaTable.getEntry(identifier);
+            } else {
+                final AnyResultTable resTable = omDatabase.getTable(AnyResultTable.class);
+                final Integer id = Integer.parseInt(identifier);
+                return resTable.getEntry(id);
+            }
+            
         } catch (CatalogException ex) {
             throw new CstlServiceException("Catalog exception while getting the results: " + ex.getMessage(),
                     NO_APPLICABLE_CODE, "getResult");
@@ -353,6 +391,7 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    @Override
     public ReferenceEntry getReference(String href) throws CstlServiceException {
         try {
             final Set<ReferenceEntry> references = refTable.getEntries();
@@ -383,6 +422,7 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    @Override
     public void destroy() {
         try {
             newObservationIDStmt.close();
@@ -402,6 +442,7 @@ public class DefaultObservationReader implements ObservationReader {
     /**
      * Create a new identifier for an observation by searching in the O&M database.
      */
+    @Override
     public String getNewObservationId(String type) throws CstlServiceException {
         try {
             ResultSet res;
@@ -434,6 +475,7 @@ public class DefaultObservationReader implements ObservationReader {
     /**
      * Return the minimal value for the offering event Time
      */
+    @Override
     public List<String> getEventTime() throws CstlServiceException {
         String ret = null;
         try {
@@ -458,14 +500,17 @@ public class DefaultObservationReader implements ObservationReader {
         return null;
     }
 
+    @Override
     public String getInfos() {
         return "Constellation Postgrid O&M Reader 0.4";
     }
 
+    @Override
     public List<ResponseModeType> getResponseModes() throws CstlServiceException {
         return Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
     }
 
+    @Override
     public List<String> getResponseFormats() throws CstlServiceException {
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
     }

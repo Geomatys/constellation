@@ -17,6 +17,8 @@
 
 package org.constellation.sos.ws;
 
+import javax.xml.namespace.QName;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
@@ -46,5 +48,15 @@ public class Parameters {
     public static final String RESPONSE_FORMAT  = "responseFormat";
 
     public static final String NOT_SUPPORTED    = "This operation is not take in charge by the Web Service";
+
+    /**
+     * The base Qname for complex observation.
+     */
+    public static final QName OBSERVATION_QNAME = new QName("http://www.opengis.net/om/1.0", "Observation", "om");
+
+    /**
+     * The base Qname for measurement observation.
+     */
+    public static final QName MEASUREMENT_QNAME = new QName("http://www.opengis.net/om/1.0", "Measurement", "om");
 }
 

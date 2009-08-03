@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
@@ -226,7 +227,7 @@ public class FileObservationReader implements ObservationReader {
     }
 
     @Override
-    public ObservationEntry getObservation(String identifier) throws CstlServiceException {
+    public ObservationEntry getObservation(String identifier, QName resultModel) throws CstlServiceException {
         final File observationFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (observationFile.exists()) {
             Unmarshaller unmarshaller = null;
@@ -249,7 +250,7 @@ public class FileObservationReader implements ObservationReader {
     }
 
     @Override
-    public AnyResult getResult(String identifier) throws CstlServiceException {
+    public AnyResult getResult(String identifier, QName resutModel) throws CstlServiceException {
         final File anyResultFile = new File(resultDirectory, identifier + FILE_EXTENSION);
         if (anyResultFile.exists()) {
             Unmarshaller unmarshaller = null;

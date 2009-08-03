@@ -19,6 +19,7 @@ package org.constellation.sos.io;
 
 import java.util.List;
 
+import javax.xml.namespace.QName;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
@@ -33,12 +34,12 @@ public interface ObservationFilter {
     /**
      * Initialize the query.
      */
-    void initFilterObservation(ResponseModeType requestMode);
+    void initFilterObservation(ResponseModeType requestMode, QName resultModel);
 
     /**
      * Initialize the query.
      */
-    void initFilterGetResult(String procedure);
+    void initFilterGetResult(String procedure, QName resultModel);
 
     /**
      * Add some procedure filter to the request.

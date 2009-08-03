@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 // Constellation dependencies
+import javax.xml.namespace.QName;
 import org.constellation.ws.CstlServiceException;
 
 // GeoAPI
@@ -117,7 +118,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    Observation getObservation(String identifier) throws CstlServiceException;
+    Observation getObservation(String identifier, QName resultModel) throws CstlServiceException;
 
     /**
      * Return a result for the specified identifier.
@@ -126,7 +127,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    AnyResult getResult(String identifier) throws CstlServiceException;
+    Object getResult(String identifier, QName resultModel) throws CstlServiceException;
 
     /**
      * Return a reference from the specified identifier

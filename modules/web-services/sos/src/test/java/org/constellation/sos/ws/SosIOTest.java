@@ -189,7 +189,7 @@ public class SosIOTest {
             BinaryTemporalOpType tduring = new BinaryTemporalOpType(period);
             EventTime timeFilter = new EventTime(null, null, tduring);
 
-            GetObservation request = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), null, null, null, "text/xml; subtype=\"om/1.0.0\"", OBSERVATION_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
+            GetObservation request = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), null, null, null, "text/xml; subtype=\"om/1.0.0\"", Parameters.OBSERVATION_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
 
             ObservationCollectionEntry expResult = (ObservationCollectionEntry) defaultWorker.getObservation(request);
             ObservationCollectionEntry result    = (ObservationCollectionEntry) genericWorker.getObservation(request);
@@ -235,14 +235,14 @@ public class SosIOTest {
             assertEquals(expResult.getMember(), result.getMember());
             assertEquals(expResult, result);
 
-            GetObservation request2 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", OBSERVATION_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
+            GetObservation request2 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", Parameters.OBSERVATION_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
 
             ObservationCollectionEntry expResult2 = (ObservationCollectionEntry) defaultWorker.getObservation(request2);
             ObservationCollectionEntry result2    = (ObservationCollectionEntry) genericWorker.getObservation(request2);
 
             assertEquals(expResult2, result2);
 
-            GetObservation request3 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", OBSERVATION_QNAME, ResponseModeType.INLINE, null);
+            GetObservation request3 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", Parameters.OBSERVATION_QNAME, ResponseModeType.INLINE, null);
 
             ObservationCollectionEntry expResult3 = (ObservationCollectionEntry) defaultWorker.getObservation(request3);
             ObservationCollectionEntry result3    = (ObservationCollectionEntry) genericWorker.getObservation(request3);
@@ -255,7 +255,7 @@ public class SosIOTest {
             TimeInstantType instant   = new TimeInstantType(position);
             BinaryTemporalOpType tafter = new BinaryTemporalOpType(instant);
             timeFilter = new EventTime(tafter, null, null);
-            GetObservation request4 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3", "urn:ogc:object:sensor:BRGM:4"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", OBSERVATION_QNAME, ResponseModeType.INLINE, null);
+            GetObservation request4 = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3", "urn:ogc:object:sensor:BRGM:4"), Arrays.asList("depth"), null, null, "text/xml; subtype=\"om/1.0.0\"", Parameters.OBSERVATION_QNAME, ResponseModeType.INLINE, null);
 
             ObservationCollectionEntry expResult4 = (ObservationCollectionEntry) defaultWorker.getObservation(request4);
             ObservationCollectionEntry result4    = (ObservationCollectionEntry) genericWorker.getObservation(request4);
@@ -282,7 +282,7 @@ public class SosIOTest {
             BinaryTemporalOpType tduring   = new BinaryTemporalOpType(period);
             EventTime timeFilter           = new EventTime(null, null, tduring);
 
-            GetObservation request = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), null, null, null, "text/xml; subtype=\"om/1.0.0\"", OBSERVATION_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
+            GetObservation request = new GetObservation("1.0.0", "offering-allSensor", Arrays.asList(timeFilter), Arrays.asList("urn:ogc:object:sensor:BRGM:3"), null, null, null, "text/xml; subtype=\"om/1.0.0\"", Parameters.OBSERVATION_QNAME, ResponseModeType.RESULT_TEMPLATE, null);
 
             ObservationCollectionEntry expResult1 = (ObservationCollectionEntry) defaultWorker.getObservation(request);
             ObservationCollectionEntry result1    = (ObservationCollectionEntry) genericWorker.getObservation(request);
