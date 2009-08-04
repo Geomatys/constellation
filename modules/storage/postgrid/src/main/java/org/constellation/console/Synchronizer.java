@@ -17,22 +17,28 @@
  */
 package org.constellation.console;
 
-import java.sql.*;
+import java.io.Writer;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.io.Writer;
-import java.io.IOException;
-
-import org.geotoolkit.io.TableWriter;
-import org.geotoolkit.util.Utilities;
 
 import org.constellation.catalog.Database;
 import org.constellation.catalog.Element;
 import org.constellation.catalog.LoggingLevel;
+
+import org.geotoolkit.io.TableWriter;
+import org.geotoolkit.util.Utilities;
 
 
 /**

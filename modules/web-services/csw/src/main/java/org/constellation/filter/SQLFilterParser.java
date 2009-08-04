@@ -745,13 +745,11 @@ public class SQLFilterParser extends FilterParser {
     }
     
     private String treatIDOperator(final List<JAXBElement<? extends AbstractIdType>> jbIdsOps) {
-        final StringBuilder response = new StringBuilder();
-        
         //TODO
-        if (true)
+        if (true) {
             throw new UnsupportedOperationException("Not supported yet.");
-            
-        return response.toString();
+        }
+        return new StringBuilder().toString();
     }
     
     /**

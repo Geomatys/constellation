@@ -51,6 +51,23 @@ import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Series;
+import org.constellation.portrayal.Portrayal;
+import org.constellation.provider.LayerDetails;
+import org.constellation.register.RegisterException;
+import org.constellation.util.StringUtilities;
+import org.constellation.util.Util;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
+import org.constellation.ws.ServiceType;
+import org.constellation.ws.rs.WebService;
+
+// Geotoolkit dependencies
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.geometry.jts.JTSEnvelope2D;
+import org.geotoolkit.gml.xml.v311.CodeListType;
+import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.ows.xml.AbstractDCP;
 import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 import org.geotoolkit.ows.xml.AbstractOperation;
@@ -63,11 +80,7 @@ import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.ows.xml.v110.ServiceIdentification;
 import org.geotoolkit.ows.xml.v110.ServiceProvider;
 import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
-import org.constellation.portrayal.Portrayal;
-import org.constellation.provider.LayerDetails;
-import org.constellation.register.RegisterException;
-import org.constellation.util.StringUtilities;
-import org.constellation.util.Util;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCoverage;
@@ -100,19 +113,6 @@ import org.geotoolkit.wcs.xml.v111.FieldType;
 import org.geotoolkit.wcs.xml.v111.InterpolationMethodType;
 import org.geotoolkit.wcs.xml.v111.InterpolationMethods;
 import org.geotoolkit.wcs.xml.v111.RangeType;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.rs.WebService;
-
-// Geotoolkit dependencies
-import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.geometry.jts.JTSEnvelope2D;
-import org.geotoolkit.gml.xml.v311.CodeListType;
-import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.xml.MarshallerPool;
 
 // GeoAPI dependencies
@@ -993,7 +993,7 @@ public final class WCSWorker {
     //TODO: harmonize with the method getLayerReference().
     private List<LayerDetails> getAllLayerReferences(final String version) throws CstlServiceException {
 
-    	List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
+    	List<LayerDetails> layerRefs;
     	try { // WE catch the exception from either service version
 	        if ( version.equals("1.0.0") ) {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_0_0 );

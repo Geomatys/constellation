@@ -74,7 +74,6 @@ import javax.xml.bind.Marshaller;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.coverage.ws.WCSWorker;
-import org.constellation.query.Query;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
@@ -521,7 +520,7 @@ public class WCSService extends OGCWebService {
     {
         // temporal subset
         org.geotoolkit.wcs.xml.v111.TimeSequenceType temporal = null;
-        String timeParameter = getParameter(KEY_TIMESEQUENCE, false);
+        final String timeParameter = getParameter(KEY_TIMESEQUENCE, false);
         if (timeParameter != null) {
             if (timeParameter.indexOf('/') == -1) {
                 temporal = new org.geotoolkit.wcs.xml.v111.TimeSequenceType(new TimePositionType(timeParameter));
@@ -569,7 +568,7 @@ public class WCSService extends OGCWebService {
 
         //range subset.
         org.geotoolkit.wcs.xml.v111.RangeSubsetType range = null;
-        String rangeSubset = getParameter(KEY_RANGESUBSET, false);
+        final String rangeSubset = getParameter(KEY_RANGESUBSET, false);
         if (rangeSubset != null) {
             //for now we don't handle Axis Identifiers
             if (rangeSubset.indexOf('[') != -1 || rangeSubset.indexOf(']') != -1) {
@@ -608,17 +607,15 @@ public class WCSService extends OGCWebService {
         StringTokenizer tokens = new StringTokenizer(gridOrigin, ",;");
         final List<Double> origin = new ArrayList<Double>(tokens.countTokens());
         while (tokens.hasMoreTokens()) {
-            Double value = StringUtilities.toDouble(tokens.nextToken());
-            origin.add(value);
+            origin.add(StringUtilities.toDouble(tokens.nextToken()));
         }
 
-        String gridOffsets = getParameter(KEY_GRIDOFFSETS, false);
-        List<Double> offset = new ArrayList<Double>();
+        final String gridOffsets = getParameter(KEY_GRIDOFFSETS, false);
+        final List<Double> offset = new ArrayList<Double>();
         if (gridOffsets != null) {
             tokens = new StringTokenizer(gridOffsets, ",;");
             while (tokens.hasMoreTokens()) {
-                Double value = StringUtilities.toDouble(tokens.nextToken());
-                offset.add(value);
+                offset.add(StringUtilities.toDouble(tokens.nextToken()));
             }
         }
         String gridCS = getParameter(KEY_GRIDCS, false);
@@ -642,9 +639,7 @@ public class WCSService extends OGCWebService {
      * Get an html page for the root resource.
      */
     private String getIndexPage(){
-    	
-    	String indexhtml = 
-    		"<html>\n" +
+    	return  "<html>\n" +
     		"  <title>Constellation WCS</title>\n" +
     		"  <body>\n" +
     		"    <h1><i>Constellation:</i></h1>\n" +
@@ -660,8 +655,6 @@ public class WCSService extends OGCWebService {
     		"    </p>\n" + 
     		"  </body>\n" +
     		"</html>\n";
-    	
-    	return indexhtml;
     }
 
 

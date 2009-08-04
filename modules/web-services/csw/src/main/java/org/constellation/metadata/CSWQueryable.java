@@ -27,7 +27,7 @@ import javax.xml.namespace.QName;
  * 
  * @author Guilhem Legal
  */
-public class CSWQueryable {
+public final class CSWQueryable {
 
      public static final QName DEGREE_QNAME                               = new QName("http://www.inspire.org", "Degree",                          "ins");
      public static final QName ACCESS_CONSTRAINTS_QNAME                   = new QName("http://www.inspire.org", "AccessConstraints",               "ins");
