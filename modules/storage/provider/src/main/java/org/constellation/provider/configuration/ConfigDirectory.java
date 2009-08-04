@@ -85,7 +85,8 @@ public final class ConfigDirectory {
             }
 
         } catch (NamingException ex) {
-            LOGGER.log(Level.INFO,"", ex);
+            LOGGER.log(Level.FINE, "Does not succeed in retrieving Constellation's JNDI configuration. " +
+                    "Using the default configuration directory instead.", ex);
         }
 
         return getSicadeDirectory();
