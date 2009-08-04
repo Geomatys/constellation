@@ -47,6 +47,7 @@ import org.constellation.util.Util;
 // geotoolkit dependencies
 import org.geotoolkit.internal.jaxb.metadata.ReferenceIdentifierMetadata;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
+import org.geotoolkit.internal.referencing.VerticalDatumTypes;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
 import org.geotoolkit.metadata.iso.DefaultMetaData;
 import org.geotoolkit.metadata.iso.DefaultMetadataExtensionInformation;
@@ -99,6 +100,7 @@ import org.opengis.metadata.identification.Keywords;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.spatial.GeometricObjectType;
+import org.opengis.metadata.spatial.SpatialRepresentation;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.util.InternationalString;
@@ -201,7 +203,7 @@ public class MetadataUnmarshallTest {
          * Spatial representation info
          */
         DefaultVectorSpatialRepresentation spatialRep = new DefaultVectorSpatialRepresentation();
-        DefaultGeometricObjects geoObj = new DefaultGeometricObjects(GeometricObjectType.valueOf("point"));
+        DefaultGeometricObjects geoObj = new DefaultGeometricObjects(GeometricObjectType.valueOf("POINT"));
         set = new HashSet();
         set.add(geoObj);
         spatialRep.setGeometricObjects(set);
@@ -521,7 +523,7 @@ public class MetadataUnmarshallTest {
         Map<String, Object> prop = new HashMap<String, Object>();
         prop.put(DefaultVerticalDatum.NAME_KEY, datumID);
         prop.put(DefaultVerticalDatum.SCOPE_KEY, null);
-        DefaultVerticalDatum datum = new DefaultVerticalDatum(prop, VerticalDatumType.ELLIPSOIDAL);
+        DefaultVerticalDatum datum = new DefaultVerticalDatum(prop, VerticalDatumTypes.ELLIPSOIDAL);
 
 
         // vertical coordinate system  TODO var 32 uom?
@@ -677,6 +679,15 @@ public class MetadataUnmarshallTest {
         assertEquals(expResult.getReferenceSystemInfo().iterator().next().getScope(), result.getReferenceSystemInfo().iterator().next().getScope());
         assertEquals(expResult.getReferenceSystemInfo().iterator().next(), result.getReferenceSystemInfo().iterator().next());
         assertEquals(expResult.getReferenceSystemInfo(), result.getReferenceSystemInfo());
+
+        assertEquals(expResult.getSpatialRepresentationInfo().size(), result.getSpatialRepresentationInfo().size());
+        DefaultVectorSpatialRepresentation expSpatial = (DefaultVectorSpatialRepresentation) expResult.getSpatialRepresentationInfo().iterator().next();
+        DefaultVectorSpatialRepresentation resSpatial =  (DefaultVectorSpatialRepresentation) result.getSpatialRepresentationInfo().iterator().next();
+        assertEquals(expSpatial.getGeometricObjects().iterator().next().getGeometricObjectCount(), resSpatial.getGeometricObjects().iterator().next().getGeometricObjectCount());
+        assertEquals(expSpatial.getGeometricObjects().iterator().next().getGeometricObjectType(), resSpatial.getGeometricObjects().iterator().next().getGeometricObjectType());
+        assertEquals(expSpatial.getGeometricObjects().iterator().next(), resSpatial.getGeometricObjects().iterator().next());
+        assertEquals(expSpatial.getGeometricObjects(), resSpatial.getGeometricObjects());
+        assertEquals(expResult.getSpatialRepresentationInfo().iterator().next(), result.getSpatialRepresentationInfo().iterator().next());
         assertEquals(expResult.getSpatialRepresentationInfo(), result.getSpatialRepresentationInfo());
 
         assertEquals(expResult.getIdentificationInfo().iterator().next().getAbstract(), result.getIdentificationInfo().iterator().next().getAbstract());
@@ -1238,7 +1249,7 @@ public class MetadataUnmarshallTest {
         Map<String, String> prop = new HashMap<String, String>();
         prop.put(DefaultVerticalDatum.NAME_KEY, datumID);
         prop.put(DefaultVerticalDatum.SCOPE_KEY, null);
-        DefaultVerticalDatum datum = new DefaultVerticalDatum(prop, VerticalDatumType.ELLIPSOIDAL);
+        DefaultVerticalDatum datum = new DefaultVerticalDatum(prop, VerticalDatumType.GEOIDAL);
 
 
         // vertical coordinate system  TODO var 32 uom?

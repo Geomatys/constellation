@@ -298,7 +298,7 @@ public class SosIOTest {
 
             List<EventTime> eventTime   = new ArrayList<EventTime>();
             eventTime.add(timeFilter2);
-            GetResult GRrequest = new GetResult("urn:ogc:object:observationTemplate:BRGM:3-0", eventTime);
+            GetResult GRrequest = new GetResult("urn:ogc:object:observationTemplate:BRGM:3-0", eventTime, "1.0.0");
 
             GetResultResponse expResult2 = defaultWorker.getResult(GRrequest);
             GetResultResponse result2    = genericWorker.getResult(GRrequest);
