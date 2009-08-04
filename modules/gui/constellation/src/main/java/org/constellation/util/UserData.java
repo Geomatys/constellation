@@ -56,35 +56,35 @@ public class UserData {
     private Object[] sosCapabilities;
     
     public Object[] getWMSCapabilities() {
-        return wmsCapabilities;
+        return wmsCapabilities.clone();
     }
 
     public void setWMSCapabilities(Object[] wmsCapabilities) {
-        this.wmsCapabilities = wmsCapabilities;
+        this.wmsCapabilities = wmsCapabilities.clone();
     }
 
     public Object[] getWCSCapabilities() {
-        return wcsCapabilities;
+        return wcsCapabilities.clone();
     }
 
     public void setWCSCapabilities(Object[] wcsCapabilities) {
-        this.wcsCapabilities = wcsCapabilities;
+        this.wcsCapabilities = wcsCapabilities.clone();
     }
 
     public Object[] getCSWCapabilities() {
-        return cswCapabilities;
+        return cswCapabilities.clone();
     }
 
     public void setCSWCapabilities(Object[] cswCapabilities) {
-        this.cswCapabilities = cswCapabilities;
+        this.cswCapabilities = cswCapabilities.clone();
     }
 
     public Object[] getSOSCapabilities() {
-        return sosCapabilities;
+        return sosCapabilities.clone();
     }
 
     public void setSOSCapabilities(Object[] sosCapabilities) {
-        this.sosCapabilities = sosCapabilities;
+        this.sosCapabilities = sosCapabilities.clone();
     }
     
     

@@ -18,7 +18,9 @@ package org.constellation.provider;
 
 import java.io.File;
 import java.util.Collection;
+
 import org.constellation.provider.configuration.ProviderConfig;
+
 
 /**
  *
@@ -28,12 +30,12 @@ import org.constellation.provider.configuration.ProviderConfig;
  */
 public interface ProviderService<K,V> {
 
-    public String getName();
+    String getName();
 
-    public void init(File config);
+    void init(File config);
 
-    public void init(ProviderConfig props);
+    void init(ProviderConfig props);
 
-    public Collection<? extends Provider<K,V>> getProviders();
+    Collection<? extends Provider<K,V>> getProviders();
 
 }

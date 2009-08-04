@@ -42,9 +42,9 @@ import org.constellation.resources.ArraySet;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.data.FeatureSource;
-
-import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
+import org.geotoolkit.map.ElevationModel;
+
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -271,7 +271,7 @@ public class PostGisProvider implements LayerProvider{
             SAXException, IOException, NamingException
     {
 
-        String configFile = ConfigDirectory.getPropertyValue(JNDI_GROUP,KEY_POSTGIS_CONFIG);
+        final String configFile = ConfigDirectory.getPropertyValue(JNDI_GROUP,KEY_POSTGIS_CONFIG);
 
         if (configFile == null || configFile.trim().isEmpty()) {
             return null;

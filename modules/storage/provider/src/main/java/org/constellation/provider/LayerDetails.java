@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -54,35 +54,35 @@ public interface LayerDetails {
     /**
      * Defines the type of provider for a {@linkplain Layer layer}.
      */
-    public static enum TYPE {
+    enum TYPE {
         COVERAGE,
         FEATURE;
     };
 
-    public static final String KEY_DIM_RANGE = "DIM_RANGE";
-    public static final String KEY_ELEVATION = "ELEVATION";
-    public static final String KEY_TIME      = "TIME";
+    String KEY_DIM_RANGE = "DIM_RANGE";
+    String KEY_ELEVATION = "ELEVATION";
+    String KEY_TIME      = "TIME";
 
-    static final MutableStyleFactory STYLE_FACTORY = (MutableStyleFactory)FactoryFinder.getStyleFactory(
+    MutableStyleFactory STYLE_FACTORY = (MutableStyleFactory)FactoryFinder.getStyleFactory(
                             new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
-    static final FilterFactory2 FILTER_FACTORY = (FilterFactory2)FactoryFinder.getFilterFactory(
+    FilterFactory2 FILTER_FACTORY = (FilterFactory2)FactoryFinder.getFilterFactory(
                             new Hints(Hints.FILTER_FACTORY, FilterFactory2.class));
-    static final RandomStyleFactory RANDOM_FACTORY = new RandomStyleFactory();
+    RandomStyleFactory RANDOM_FACTORY = new RandomStyleFactory();
     
     /**
      * Default legend size, if not specified in the {@code GetLegend} request.
      */
-    public static final Dimension LEGEND_SIZE = new Dimension(200, 40);
+    Dimension LEGEND_SIZE = new Dimension(200, 40);
 
     /**
      * @see Layer#getAvailableTimes
      */
-    public SortedSet<Date> getAvailableTimes() throws CatalogException;
+    SortedSet<Date> getAvailableTimes() throws CatalogException;
 
     /**
      * @see Layer#getAvailableElevations
      */
-    public SortedSet<Number> getAvailableElevations() throws CatalogException;
+    SortedSet<Number> getAvailableElevations() throws CatalogException;
 
     /**
      * Returns the coverage requested.
@@ -95,23 +95,23 @@ public interface LayerDetails {
      * @throws org.constellation.catalog.CatalogException
      * @throws java.io.IOException
      */
-    public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
+    GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
             final Double elevation, final Date time) throws CatalogException, IOException;
 
     /**
      * Returns a list of favorites styles associated to this layer.
      */
-    public List<String> getFavoriteStyles();
+    List<String> getFavoriteStyles();
 
     /**
      * @see Layer#getGeographicBoundingBox
      */
-    public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
+    GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
 
     /**
      * @see Layer#getLegend(Dimension)
      */
-    public BufferedImage getLegendGraphic(final Dimension dimension);
+    BufferedImage getLegendGraphic(final Dimension dimension);
 
     /**
      * Create a MapLayer with the given style and parameters.
@@ -120,42 +120,42 @@ public interface LayerDetails {
      * @param style : can be null. reconized types are String/GraphicBuilder/MutableStyle.
      * @param params : can be null.
      */
-    public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) throws PortrayalException;
+    MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) throws PortrayalException;
 
     /**
      * @see Layer#getName
      */
-    public String getName();
+    String getName();
 
     /**
      * @see Layer#getSeries
      */
-    public Set<Series> getSeries();
+    Set<Series> getSeries();
 
     /**
      * @see Layer#getRemarks
      */
-    public String getRemarks();
+    String getRemarks();
 
     /**
      * @see Layer#getSampleValueRanges
      */
-    public MeasurementRange<?>[] getSampleValueRanges();
+    MeasurementRange<?>[] getSampleValueRanges();
 
     /**
      * @see Layer#getThematic
      */
-    public String getThematic();
+    String getThematic();
 
     /**
      * Returns {@code true} if the layer is queryable by the specified service.
      *
      * @see Layer#isQueryable 
      */
-    public boolean isQueryable(ServiceType service);
+    boolean isQueryable(ServiceType service);
 
     /**
      * Returns the type of provider for a {@linkplain Layer layer}.
      */
-    public abstract TYPE getType();
+    abstract TYPE getType();
 }

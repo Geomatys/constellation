@@ -181,7 +181,7 @@ public class RandomStyleFactory extends Factory {
             final AttributeDescriptor att = typ.getGeometryDescriptor();
             final AttributeType type = att.getType();
 
-            Class cla = type.getBinding();
+            final Class cla = type.getBinding();
 
             if (cla.equals(Polygon.class) || cla.equals(MultiPolygon.class)) {
                 ps = sf.polygonSymbolizer();
@@ -211,7 +211,7 @@ public class RandomStyleFactory extends Factory {
             final AttributeDescriptor att = typ.getGeometryDescriptor();
             final AttributeType type = att.getType();
 
-            Class cla = type.getBinding();
+            final Class cla = type.getBinding();
 
             if (cla.equals(Polygon.class) || cla.equals(MultiPolygon.class)) {
                 ps = createPolygonSymbolizer();
@@ -232,28 +232,25 @@ public class RandomStyleFactory extends Factory {
     }
 
     public MutableStyle createRasterStyle() {
-        MutableStyle style = null;
+        final RasterSymbolizer raster = sf.rasterSymbolizer();
 
-        RasterSymbolizer raster = sf.rasterSymbolizer();
-
-        style = sf.style(new Symbolizer[]{raster});
-        return style;
+        return sf.style(new Symbolizer[]{raster});
     }
 
     //-----------------------random---------------------------------------------
     private int randomPointSize() {
-        return sizes[((int) (Math.random() * sizes.length))];
+        return sizes[(int) (Math.random() * sizes.length)];
     }
 
     private int randomWidth() {
-        return widths[((int) (Math.random() * widths.length))];
+        return widths[(int) (Math.random() * widths.length)];
     }
 
     private String randomPointShape() {
-        return pointShapes[((int) (Math.random() * pointShapes.length))];
+        return pointShapes[(int) (Math.random() * pointShapes.length)];
     }
 
     private Color randomColor() {
-        return colors[((int) (Math.random() * colors.length))];
+        return colors[(int) (Math.random() * colors.length)];
     }
 }

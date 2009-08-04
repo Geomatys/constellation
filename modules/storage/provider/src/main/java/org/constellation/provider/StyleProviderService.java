@@ -17,6 +17,7 @@
 package org.constellation.provider;
 
 import java.util.Collection;
+
 import org.geotoolkit.style.MutableStyle;
 
 
@@ -29,6 +30,6 @@ import org.geotoolkit.style.MutableStyle;
 public interface StyleProviderService extends ProviderService<String,MutableStyle>{
 
     @Override
-    public Collection<? extends StyleProvider> getProviders();
+    Collection<? extends StyleProvider> getProviders();
 
 }
