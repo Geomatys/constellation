@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Configuration of "web-services" module from Constellation project.
+  Configuration of "testing" module from Constellation project.
   Version: $Id$
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -18,11 +18,11 @@
     Module description.
   -->
   <groupId>org.constellation</groupId>
-  <artifactId>web-services</artifactId>
+  <artifactId>testing</artifactId>
   <packaging>pom</packaging>
-  <name>Modules for web services</name>
+  <name>Modules for applying tests on web services</name>
   <description>
-    A group of standardized Web Services.
+    Regroup some standard tests on the Constellation's OGC webservices.
   </description>
 
 
@@ -67,59 +67,13 @@
   </developers>
 
 
-  <!--
-    By default, build all webservices. Several profiles are defined
-    to specifically build a webservice.
-  -->
-  <profiles>
-    <profile>
-      <id>all</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>csw</module>
-        <module>sos</module>
-        <module>wms</module>
-        <module>wmts</module>
-        <module>wcs</module>
-        <module>configuration</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>wms</id>
-      <modules>
-        <module>wms</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>wcs</id>
-      <modules>
-        <module>wcs</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>sos</id>
-      <modules>
-        <module>sos</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>csw</id>
-      <modules>
-        <module>csw</module>
-        <module>configuration</module>
-      </modules>
-    </profile>
-  </profiles>
-
 
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
-    <module>base</module>
-    <module>ogc</module>
+    <module>embedded</module>
+    <!--module>cite</module-->
   </modules>
 
 </project>

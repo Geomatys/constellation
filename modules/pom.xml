@@ -81,6 +81,7 @@
     <module>storage</module>
     <module>engine</module>
     <module>web-services</module>
+    <module>testing</module>
   </modules>
 
 </project>

@@ -8,7 +8,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.constellation</groupId>
-    <artifactId>web-services</artifactId>
+    <artifactId>testing</artifactId>
     <version>0.4-SNAPSHOT</version>
   </parent>
 
@@ -17,10 +17,10 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation.web-services</groupId>
-  <artifactId>cstl-web-embedded</artifactId>
+  <groupId>org.constellation.testing</groupId>
+  <artifactId>cstl-test-embedded</artifactId>
   <packaging>jar</packaging>
-  <name>Web service embedded</name>
+  <name>Testing web services embedded</name>
   <description>
     Grizzly service that allows to launch Constellation web services.
   </description>
