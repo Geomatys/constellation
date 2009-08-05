@@ -22,15 +22,15 @@ import java.io.File;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.lucene.IndexingException;
-import org.constellation.lucene.index.AbstractIndexSearcher;
-import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.CstlServiceException;
 
 // Geotools dependencies
 import org.geotoolkit.factory.Factory;
+import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.AbstractIndexer;
 
 /**
  *

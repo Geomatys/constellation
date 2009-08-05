@@ -21,31 +21,31 @@ package org.constellation.filter;
 import java.awt.geom.Line2D;
 import java.util.logging.Logger;
 
-// Constellation dependencies 
-import org.constellation.lucene.filter.BBOXFilter;
-import org.constellation.lucene.filter.BeyondFilter;
-import org.constellation.lucene.filter.ContainsFilter;
-import org.constellation.lucene.filter.CrossesFilter;
-import org.constellation.lucene.filter.DWithinFilter;
-import org.constellation.lucene.filter.DisjointFilter;
-import org.constellation.lucene.filter.DistanceFilter;
-import org.constellation.lucene.filter.EqualsFilter;
-import org.constellation.lucene.filter.IntersectFilter;
-import org.constellation.lucene.filter.OverlapsFilter;
-import org.constellation.lucene.filter.SerialChainFilter;
-import org.constellation.lucene.filter.SpatialFilter;
-import org.constellation.lucene.filter.SpatialQuery;
-import org.constellation.lucene.filter.TouchesFilter;
-import org.constellation.lucene.filter.WithinFilter;
-
 // Geotools dependencies
 import org.geotoolkit.filter.FilterFactoryImpl;
 import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.GeneralEnvelope;
 
 // JUnit dependencies
+import org.geotoolkit.lucene.filter.LuceneOGCFilter;
+import org.geotoolkit.lucene.filter.SerialChainFilter;
+import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.junit.*;
+import org.opengis.filter.Filter;
+import org.opengis.filter.spatial.BBOX;
+import org.opengis.filter.spatial.Beyond;
+import org.opengis.filter.spatial.BinarySpatialOperator;
+import org.opengis.filter.spatial.Contains;
+import org.opengis.filter.spatial.Crosses;
+import org.opengis.filter.spatial.DWithin;
+import org.opengis.filter.spatial.Disjoint;
+import org.opengis.filter.spatial.Equals;
+import org.opengis.filter.spatial.Intersects;
+import org.opengis.filter.spatial.Overlaps;
+import org.opengis.filter.spatial.SpatialOperator;
+import org.opengis.filter.spatial.Touches;
+import org.opengis.filter.spatial.Within;
 import static org.junit.Assert.*;
 
 /**
@@ -287,11 +287,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        SpatialFilter spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        Filter spatialFilter = (Filter) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof IntersectFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spatialFilter instanceof Intersects);
         
         /**
          * Test 2: a simple Distance Filter DWithin
@@ -309,12 +308,12 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof DistanceFilter);
-        DistanceFilter Dfilter= (DistanceFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        DWithin Dfilter = (DWithin) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
+
                 
-        assertTrue(Dfilter instanceof  DWithinFilter);
-        assertTrue(Dfilter.getGeometry() instanceof GeneralDirectPosition);
-        assertEquals(Dfilter.getDistanceUnit(), "meters");
+        assertTrue(Dfilter instanceof  DWithin);
+        assertEquals(Dfilter.getDistanceUnits(), "meters");
         assertTrue(Dfilter.getDistance() == 10.0);
         
         /**
@@ -333,13 +332,12 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof DistanceFilter);
-        Dfilter = (DistanceFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        Beyond Bfilter = (Beyond) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(Dfilter instanceof BeyondFilter);
-        assertTrue(Dfilter.getGeometry() instanceof GeneralDirectPosition);
-        assertEquals(Dfilter.getDistanceUnit(), "meters");
-        assertTrue(Dfilter.getDistance() == 10.0);
+        assertTrue(Bfilter instanceof Beyond);
+        assertEquals(Bfilter.getDistanceUnits(), "meters");
+        assertTrue(Bfilter.getDistance() == 10.0);
         
         /**
          * Test 4: a simple BBOX filter
@@ -357,11 +355,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        BBOX spabbox = (BBOX) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof BBOXFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spabbox instanceof BBOX);
         
         /**
          * Test 4: a simple Contains filter
@@ -379,11 +376,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        Contains spaC = (Contains) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof ContainsFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
+        assertTrue(spaC instanceof Contains);
         
         /**
          * Test 5: a simple Contains filter
@@ -401,11 +397,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaC = (Contains) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof  ContainsFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof Line2D);
+        assertTrue(spaC instanceof  Contains);
         
         /*
          * Test 6: a simple Contains filter
@@ -423,11 +418,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaC = (Contains) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof ContainsFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spaC instanceof Contains);
         
          /**
          * Test 7: a simple Crosses filter
@@ -445,11 +439,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        Crosses spaCr = (Crosses) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof CrossesFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
+        assertTrue(spaCr instanceof Crosses);
         
         /**
          * Test 8: a simple Crosses filter
@@ -467,11 +460,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaCr = (Crosses) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof CrossesFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spaCr instanceof Crosses);
         
         /**
          * Test 9: a simple Disjoint filter
@@ -489,11 +481,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        Disjoint spaDis = (Disjoint) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof  DisjointFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
+        assertTrue(spaDis instanceof  Disjoint);
         
         /**
          * Test 10: a simple Disjoint filter
@@ -511,11 +502,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaDis = (Disjoint) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof DisjointFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spaDis instanceof Disjoint);
         
         /**
          * Test 11: a simple Equals filter
@@ -533,11 +523,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        Equals spaEq = (Equals) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof  EqualsFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
+        assertTrue(spaEq instanceof  Equals);
         
         /**
          * Test 12: a simple Equals filter
@@ -555,11 +544,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaEq = (Equals) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof  EqualsFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spaEq instanceof  Equals);
         
         /**
          * Test 13: a simple Overlaps filter
@@ -577,11 +565,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        Overlaps spaOver = (Overlaps) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof OverlapsFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
+        assertTrue(spaOver instanceof Overlaps);
         
         /**
          * Test 14: a simple Overlaps filter
@@ -599,11 +586,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaOver = (Overlaps) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof OverlapsFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spaOver instanceof Overlaps);
         
         /**
          * Test 15: a simple Touches filter
@@ -621,11 +607,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        Touches spaTou = (Touches) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof TouchesFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
+        assertTrue(spaTou instanceof Touches);
         
         /**
          * Test 16: a simple Touches filter
@@ -643,11 +628,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaTou = (Touches) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof TouchesFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spaTou instanceof Touches);
         
         /**
          * Test 17: a simple Within filter
@@ -665,11 +649,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        spatialFilter = (Filter) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof WithinFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralDirectPosition);
+        assertTrue(spatialFilter instanceof Within);
         
         /**
          * Test 18: a simple Within filter
@@ -687,11 +670,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spatialFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        spatialFilter = (Filter) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
                 
-        assertTrue(spatialFilter instanceof WithinFilter);
-        assertTrue(spatialFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spatialFilter instanceof Within);
     }
     
     /**
@@ -757,20 +739,17 @@ public class CQLParserTest {
         assertEquals(cf1.getActionType()[0],      SerialChainFilter.OR);
         assertEquals(chainFilter.getChain().size(),       2);
         
-        assertTrue(cf1.getChain().get(0) instanceof SpatialFilter);
-        SpatialFilter cf1_1 = (SpatialFilter) cf1.getChain().get(0);
-        assertTrue(cf1_1 instanceof IntersectFilter);
-        assertTrue(cf1_1.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(cf1.getChain().get(0) instanceof LuceneOGCFilter);
+        LuceneOGCFilter cf1_1 = (LuceneOGCFilter) cf1.getChain().get(0);
+        assertTrue(cf1_1.getOGCFilter() instanceof Intersects);
         
-        assertTrue(cf1.getChain().get(1) instanceof SpatialFilter);
-        SpatialFilter cf1_2 = (SpatialFilter) cf1.getChain().get(1);
-        assertTrue(cf1_2 instanceof ContainsFilter);
-        assertTrue  (cf1_2.getGeometry() instanceof GeneralDirectPosition);
+        assertTrue(cf1.getChain().get(1) instanceof LuceneOGCFilter);
+        LuceneOGCFilter cf1_2 = (LuceneOGCFilter) cf1.getChain().get(1);
+        assertTrue(cf1_2.getOGCFilter() instanceof Contains);
         
-        assertTrue(chainFilter.getChain().get(1) instanceof SpatialFilter);
-        SpatialFilter f2 = (SpatialFilter) chainFilter.getChain().get(1);
-        assertTrue(f2 instanceof BBOXFilter);
-        assertTrue(  f2.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(chainFilter.getChain().get(1) instanceof LuceneOGCFilter);
+        LuceneOGCFilter f2 = (LuceneOGCFilter) chainFilter.getChain().get(1);
+        assertTrue(f2.getOGCFilter() instanceof BBOX);
         
         /**
          * Test 3: three spatial Filter F1 AND (F2 OR F3)
@@ -798,9 +777,8 @@ public class CQLParserTest {
         assertEquals(chainFilter.getChain().size(),       2);
         
         //we verify each filter
-        SpatialFilter f1 = (SpatialFilter) chainFilter.getChain().get(1);
-        assertTrue(f1 instanceof IntersectFilter);
-        assertTrue(f1.getGeometry() instanceof GeneralEnvelope);
+        LuceneOGCFilter f1 = (LuceneOGCFilter) chainFilter.getChain().get(1);
+        assertTrue(f1.getOGCFilter() instanceof Intersects);
         
         SerialChainFilter cf2 = (SerialChainFilter) chainFilter.getChain().get(0);
         assertEquals(cf2.getActionType().length,  1);
@@ -808,13 +786,11 @@ public class CQLParserTest {
         assertEquals(cf2.getChain().size(),       2);
         
         
-        SpatialFilter cf2_1 = (SpatialFilter) cf2.getChain().get(0);
-        assertTrue(cf2_1 instanceof ContainsFilter);
-        assertTrue  (cf2_1.getGeometry() instanceof GeneralDirectPosition);
+        LuceneOGCFilter cf2_1 = (LuceneOGCFilter) cf2.getChain().get(0);
+        assertTrue(cf2_1.getOGCFilter() instanceof Contains);
         
-        SpatialFilter cf2_2 = (SpatialFilter) cf2.getChain().get(1);
-        assertTrue(cf2_2 instanceof BBOXFilter);
-        assertTrue  (cf2_2.getGeometry() instanceof GeneralEnvelope);
+        LuceneOGCFilter cf2_2 = (LuceneOGCFilter) cf2.getChain().get(1);
+        assertTrue(cf2_2.getOGCFilter() instanceof BBOX);
         
          /**
          * Test 4: three spatial Filter (NOT F1) AND F2 AND F3
@@ -833,10 +809,9 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "metafile:doc");
         assertEquals(spaQuery.getSubQueries().size(), 1);
 
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        SpatialFilter f3 = (SpatialFilter) spaQuery.getSpatialFilter();
-        assertTrue(f3 instanceof BBOXFilter);
-        assertTrue(f3.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        LuceneOGCFilter f3 = (LuceneOGCFilter) ((LuceneOGCFilter) spaQuery.getSpatialFilter());
+        assertTrue(f3.getOGCFilter() instanceof BBOX);
 
         assertTrue(spaQuery.getSubQueries().get(0).getSpatialFilter() instanceof SerialChainFilter);
         chainFilter = (SerialChainFilter) spaQuery.getSubQueries().get(0).getSpatialFilter();
@@ -852,15 +827,13 @@ public class CQLParserTest {
         assertEquals(cf1.getActionType().length,  1);
         assertEquals(cf1.getActionType()[0],    SerialChainFilter.NOT);
 
-        assertTrue(cf1.getChain().get(0) instanceof SpatialFilter);
-        SpatialFilter cf1_cf1_1 = (SpatialFilter) cf1.getChain().get(0);
-        assertTrue(cf1_cf1_1 instanceof IntersectFilter);
-        assertTrue  (cf1_cf1_1.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(cf1.getChain().get(0) instanceof LuceneOGCFilter);
+        LuceneOGCFilter cf1_cf1_1 = (LuceneOGCFilter) cf1.getChain().get(0);
+        assertTrue(cf1_cf1_1.getOGCFilter() instanceof Intersects);
 
-        assertTrue(chainFilter.getChain().get(1) instanceof SpatialFilter);
-        f2 = (SpatialFilter) chainFilter.getChain().get(1);
-        assertTrue(f2 instanceof ContainsFilter);
-        assertTrue  (f2.getGeometry() instanceof GeneralDirectPosition);
+        assertTrue(chainFilter.getChain().get(1) instanceof LuceneOGCFilter);
+        f2 = (LuceneOGCFilter) chainFilter.getChain().get(1);
+        assertTrue(f2.getOGCFilter() instanceof Contains);
 
         /**
          * Test 5: three spatial Filter NOT (F1 OR F2) AND F3
@@ -899,19 +872,16 @@ public class CQLParserTest {
         assertEquals(cf1_cf1.getActionType().length,  1);
         assertEquals(cf1_cf1.getActionType()[0],      SerialChainFilter.OR);
         
-        assertTrue(cf1_cf1.getChain().get(0) instanceof SpatialFilter);
-        cf1_cf1_1 = (SpatialFilter) cf1_cf1.getChain().get(0);
-        assertTrue(cf1_cf1_1 instanceof IntersectFilter);
-        assertTrue  (cf1_cf1_1.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(cf1_cf1.getChain().get(0) instanceof LuceneOGCFilter);
+        cf1_cf1_1 = (LuceneOGCFilter) cf1_cf1.getChain().get(0);
+        assertTrue(cf1_cf1_1.getOGCFilter() instanceof Intersects);
         
-        assertTrue(cf1_cf1.getChain().get(1) instanceof SpatialFilter);
-        SpatialFilter cf1_cf1_2 = (SpatialFilter) cf1_cf1.getChain().get(1);
-        assertTrue(cf1_cf1_2 instanceof ContainsFilter);
-        assertTrue  (cf1_cf1_2.getGeometry() instanceof GeneralDirectPosition);
+        assertTrue(cf1_cf1.getChain().get(1) instanceof LuceneOGCFilter);
+        LuceneOGCFilter cf1_cf1_2 = (LuceneOGCFilter) cf1_cf1.getChain().get(1);
+        assertTrue(cf1_cf1_2.getOGCFilter() instanceof Contains);
         
-        f2 = (SpatialFilter) chainFilter.getChain().get(1);
-        assertTrue(f2 instanceof BBOXFilter);
-        assertTrue(f2.getGeometry() instanceof GeneralEnvelope);
+        f2 = (LuceneOGCFilter) chainFilter.getChain().get(1);
+        assertTrue(f2.getOGCFilter() instanceof BBOX);
    
     }
     
@@ -940,11 +910,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getQuery(), "(Title:*VM*)");
         assertEquals(spaQuery.getSubQueries().size(), 0);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        SpatialFilter spaFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        LuceneOGCFilter spaFilter = (LuceneOGCFilter) ((LuceneOGCFilter) spaQuery.getSpatialFilter());
                 
-        assertTrue(spaFilter instanceof IntersectFilter);
-        assertTrue  (spaFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spaFilter.getOGCFilter() instanceof Intersects);
         
         /**
          * Test 2: PropertyIsLike AND INTERSECT AND propertyIsEquals
@@ -969,11 +938,10 @@ public class CQLParserTest {
         assertEquals(subQuery.getQuery(), "(Title:*VM*)");
         assertEquals(subQuery.getSubQueries().size(), 0);
         
-        assertTrue(subQuery.getSpatialFilter() instanceof SpatialFilter);
-        spaFilter = (SpatialFilter) subQuery.getSpatialFilter();
+        assertTrue(subQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaFilter = (LuceneOGCFilter) subQuery.getSpatialFilter();
                 
-        assertTrue(spaFilter instanceof IntersectFilter);
-        assertTrue  (spaFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spaFilter.getOGCFilter() instanceof Intersects);
         
         /**
          * Test 3:  INTERSECT AND propertyIsEquals AND BBOX
@@ -991,18 +959,16 @@ public class CQLParserTest {
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getSubQueries().size(), 1);
 
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        SpatialFilter f1 =  (SpatialFilter) spaQuery.getSpatialFilter();
-        assertTrue (f1 instanceof BBOXFilter);
-        assertTrue   (f1.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        LuceneOGCFilter f1 =  (LuceneOGCFilter) ((LuceneOGCFilter) spaQuery.getSpatialFilter());
+        assertTrue (f1.getOGCFilter() instanceof BBOX);
         
         subQuery = spaQuery.getSubQueries().get(0);
         assertTrue(subQuery.getSpatialFilter() != null);
         assertTrue(subQuery.getLogicalOperator() == SerialChainFilter.AND);
         
-        SpatialFilter f2 = (SpatialFilter) subQuery.getSpatialFilter();
-        assertTrue (f2 instanceof IntersectFilter);
-        assertTrue   (f2.getGeometry() instanceof GeneralEnvelope);
+        LuceneOGCFilter f2 = (LuceneOGCFilter) subQuery.getSpatialFilter();
+        assertTrue (f2.getOGCFilter() instanceof Intersects);
         assertEquals(subQuery.getQuery(), "(Title:\"VM\")");
         
         /**
@@ -1027,11 +993,10 @@ public class CQLParserTest {
         assertEquals(subQuery.getQuery(), "(Title:*VM*)");
         assertEquals(subQuery.getSubQueries().size(), 0);
         assertEquals(subQuery.getLogicalOperator(), SerialChainFilter.OR);
-        assertTrue(subQuery.getSpatialFilter() instanceof SpatialFilter);
-        spaFilter = (SpatialFilter) subQuery.getSpatialFilter();
+        assertTrue(subQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaFilter = (LuceneOGCFilter) subQuery.getSpatialFilter();
                 
-        assertTrue(spaFilter instanceof IntersectFilter);
-        assertTrue  (spaFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(spaFilter.getOGCFilter() instanceof Intersects);
         
         /**
          * Test 5:  INTERSECT OR propertyIsEquals OR BBOX
@@ -1051,21 +1016,19 @@ public class CQLParserTest {
         assertEquals(spaQuery.getSubQueries().size(), 1);
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.OR);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
         
-        f1 = (SpatialFilter) spaQuery.getSpatialFilter();
-        assertTrue (f1 instanceof  BBOXFilter);
-        assertTrue   (f1.getGeometry() instanceof GeneralEnvelope);
+        f1 = (LuceneOGCFilter) ((LuceneOGCFilter) spaQuery.getSpatialFilter());
+        assertTrue (f1.getOGCFilter() instanceof  BBOX);
         
         subQuery = spaQuery.getSubQueries().get(0);
         assertEquals(subQuery.getQuery(), "(Title:\"VM\")");
         assertTrue(subQuery.getSpatialFilter() != null);
         assertEquals(subQuery.getLogicalOperator(), SerialChainFilter.OR);
         
-        assertTrue(subQuery.getSpatialFilter() instanceof SpatialFilter);
-        f2 = (SpatialFilter) subQuery.getSpatialFilter();
-        assertTrue (f2 instanceof  IntersectFilter);
-        assertTrue   (f2.getGeometry() instanceof GeneralEnvelope);
+        assertTrue(subQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        f2 = (LuceneOGCFilter) subQuery.getSpatialFilter();
+        assertTrue (f2.getOGCFilter() instanceof  Intersects);
         
         /**
          * Test 6:  INTERSECT AND (propertyIsEquals OR BBOX)
@@ -1085,11 +1048,10 @@ public class CQLParserTest {
         assertEquals(spaQuery.getSubQueries().size(), 1);
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.AND);
         
-        assertTrue(spaQuery.getSpatialFilter() instanceof SpatialFilter);
-        spaFilter = (SpatialFilter) spaQuery.getSpatialFilter();
+        assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaFilter = (LuceneOGCFilter) ((LuceneOGCFilter) spaQuery.getSpatialFilter());
         
-        assertTrue (spaFilter instanceof IntersectFilter);
-        assertTrue   (spaFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue (spaFilter.getOGCFilter() instanceof Intersects);
         
         SpatialQuery subQuery1 = spaQuery.getSubQueries().get(0);
         assertTrue  (subQuery1.getSpatialFilter() != null);
@@ -1097,11 +1059,10 @@ public class CQLParserTest {
         assertEquals(subQuery1.getSubQueries().size(), 0);
         assertEquals(subQuery1.getLogicalOperator(), SerialChainFilter.OR);
         
-        assertTrue(subQuery1.getSpatialFilter() instanceof SpatialFilter);
-        spaFilter = (SpatialFilter) subQuery1.getSpatialFilter();
+        assertTrue(subQuery1.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaFilter = (LuceneOGCFilter) subQuery1.getSpatialFilter();
         
-        assertTrue (spaFilter instanceof BBOXFilter);
-        assertTrue   (spaFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue (spaFilter.getOGCFilter() instanceof BBOX);
         
         
         /**
@@ -1128,11 +1089,10 @@ public class CQLParserTest {
         assertEquals(subQuery1.getSubQueries().size(), 0);
         assertEquals(subQuery1.getLogicalOperator(), SerialChainFilter.AND);
         
-        assertTrue(subQuery1.getSpatialFilter() instanceof SpatialFilter);
-        spaFilter = (SpatialFilter) subQuery1.getSpatialFilter();
+        assertTrue(subQuery1.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaFilter = (LuceneOGCFilter) subQuery1.getSpatialFilter();
         
-        assertTrue (spaFilter instanceof DWithinFilter);
-        assertTrue   (spaFilter.getGeometry() instanceof GeneralDirectPosition);
+        assertTrue (spaFilter.getOGCFilter() instanceof DWithin);
         
 
         /**
@@ -1216,11 +1176,10 @@ public class CQLParserTest {
         assertEquals(subQuery1_1.getLogicalOperator(), SerialChainFilter.AND);
         assertEquals(subQuery1_1.getQuery(), "(Title:*VM*)");
         assertTrue  (subQuery1_1.getSpatialFilter() != null);
-        assertTrue  (subQuery1_1.getSpatialFilter() instanceof SpatialFilter);
-        spaFilter = (SpatialFilter) subQuery1_1.getSpatialFilter();
+        assertTrue  (subQuery1_1.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaFilter = (LuceneOGCFilter) subQuery1_1.getSpatialFilter();
         
-        assertTrue (spaFilter instanceof IntersectFilter);
-        assertTrue   (spaFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue (spaFilter.getOGCFilter() instanceof Intersects);
         
         SpatialQuery subQuery1_2 = subQuery1.getSubQueries().get(1);
         assertTrue  (subQuery1_2.getSpatialFilter() != null);
@@ -1228,11 +1187,10 @@ public class CQLParserTest {
         assertEquals(subQuery1_2.getSubQueries().size(), 0);
         assertEquals(subQuery1_2.getLogicalOperator(), SerialChainFilter.OR);
         
-        assertTrue(subQuery1_2.getSpatialFilter() instanceof SpatialFilter);
-        spaFilter = (SpatialFilter) subQuery1_2.getSpatialFilter();
+        assertTrue(subQuery1_2.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaFilter = (LuceneOGCFilter) subQuery1_2.getSpatialFilter();
         
-        assertTrue (spaFilter instanceof  BBOXFilter);
-        assertTrue   (spaFilter.getGeometry() instanceof GeneralEnvelope);
+        assertTrue (spaFilter.getOGCFilter() instanceof  BBOX);
         
         SpatialQuery subQuery2 = spaQuery.getSubQueries().get(1);
         assertTrue  (subQuery2.getSpatialFilter() == null);
@@ -1246,11 +1204,10 @@ public class CQLParserTest {
         assertEquals(subQuery2_1.getSubQueries().size(), 0);
         assertEquals(subQuery2_1.getLogicalOperator(), SerialChainFilter.AND);
         
-        assertTrue(subQuery2_1.getSpatialFilter() instanceof SpatialFilter);
-        spaFilter = (SpatialFilter) subQuery2_1.getSpatialFilter();
+        assertTrue(subQuery2_1.getSpatialFilter() instanceof LuceneOGCFilter);
+        spaFilter = (LuceneOGCFilter) subQuery2_1.getSpatialFilter();
         
-        assertTrue (spaFilter instanceof BeyondFilter);
-        assertTrue   (spaFilter.getGeometry() instanceof GeneralDirectPosition);
+        assertTrue (spaFilter.getOGCFilter() instanceof Beyond);
         
     }
 }

@@ -22,13 +22,12 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-// apache Lucene dependencies
 import java.util.logging.Level;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
@@ -38,8 +37,11 @@ import org.apache.lucene.store.LockObtainFailedException;
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.lucene.IndexingException;
-import org.constellation.lucene.index.AbstractIndexer;
+
+import org.geotoolkit.geometry.jts.SRIDGenerator;
+import org.geotoolkit.geometry.jts.SRIDGenerator.Version;
+import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.lucene.index.AbstractIndexer;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // MDweb dependencies
@@ -59,26 +61,26 @@ import org.mdweb.sql.v20.Reader20;
 
 /**
  * A Lucene index handler for an MDWeb Database.
- * 
+ *
  * @author Guilhem Legal
  */
 public class MDWebIndexer extends AbstractIndexer<Form> {
-    
+
     /**
      * The Reader of this lucene index (MDWeb DB mode).
      */
     private Reader mdWebReader;
-    
+
      /**
      * A Map containg all the paths (used when reader is null)
      */
     private Map<String, Path> pathMap;
-    
+
     /**
      * A Map containing some classes (used when reader is null)
      */
     private Map<String, Classe> classeMap;
-    
+
      /**
      * Creates a new CSW indexer for a MDWeb database.
      *
@@ -106,15 +108,15 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             throw new IndexingException("SQL Exception while creating mdweb reader: " +ex.getMessage());
         }
     }
-    
+
     /**
      * Creates a new Lucene Index with the specified list of Form.
      * This mode of lucene index don't use a MDweb reader (he don't need a database).
      * for now it is used only in JUnit test.
-     * 
+     *
      * @param forms The list of MDweb formular to index
      * @param paths The list of path used in the forms (necesary because of there is no reader)
-     * @param configDirectory A directory where the index can write indexation file. 
+     * @param configDirectory A directory where the index can write indexation file.
      */
     protected MDWebIndexer(List<Form> forms, List<Classe> classes, List<Path> paths, File configDirectory) throws IndexingException {
         super("", configDirectory);
@@ -125,7 +127,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         for (Classe c: classes) {
             classeMap.put(c.getName(), c);
         }
-        
+
         //we fill the map of path
         pathMap = new HashMap<String, Path>();
         for (Path p: paths) {
@@ -134,16 +136,16 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
         // we get the configuration file
         final File f = new File(configDirectory, "index");
-        
+
         setFileDirectory(f);
-        
+
         //if the index File exists we don't need to index the documents again.
         if(!getFileDirectory().exists()) {
             LOGGER.info("Creating lucene index for the first time...");
             final long time = System.currentTimeMillis();
             IndexWriter writer;
             final int nbCatalogs = 0;
-            int nbForms    = 0; 
+            int nbForms    = 0;
             try {
                 writer  = new IndexWriter(getFileDirectory(), analyzer, true);
                 nbForms =  forms.size();
@@ -156,7 +158,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 }
                 writer.optimize();
                 writer.close();
-                
+
             } catch (CorruptIndexException ex) {
                 LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
                 throw new IndexingException(CORRUPTED_MULTI_MSG, ex);
@@ -173,21 +175,22 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             LOGGER.info("Index already created");
         }
     }
-    
+
     /**
      * Create a new Index from the MDweb database.
-     * 
+     *
      * @throws java.sql.SQLException
      */
+    @Override
     public void createIndex() throws IndexingException {
         LOGGER.info("Creating lucene index for MDWeb database please wait...");
-        
+
         final long time = System.currentTimeMillis();
         IndexWriter writer;
         int nbCatalogs = 0;
         int nbForms = 0;
         try {
-            writer = new IndexWriter(getFileDirectory(), analyzer, true);
+            writer = new IndexWriter(getFileDirectory(), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
 
             // getting the objects list and index avery item in the IndexWriter.
             final List<Catalog> cats = mdWebReader.getCatalogs();
@@ -227,6 +230,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      *
      * @throws java.sql.SQLException
      */
+    @Override
     public void createIndex(List<? extends Object> forms) throws IndexingException {
         LOGGER.info("Creating lucene index for MDWeb database please wait...");
 
@@ -235,7 +239,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         final int nbCatalogs = 0;
         int nbForms = 0;
         try {
-            writer = new IndexWriter(getFileDirectory(), analyzer, true);
+            writer = new IndexWriter(getFileDirectory(), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
 
             nbForms = forms.size();
             for (Object form : forms) {
@@ -266,19 +270,20 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 "catalogs: " + nbCatalogs + " documents indexed: " + nbForms + ".");
     }
-    
+
     /**
      * This method add to index of lucene a new document based on Form object.
      * (implements AbstractIndex.indexDocument() )
-     * 
+     *
      * @param writer A lucene Index Writer.
      * @param object A MDweb formular.
      */
+    @Override
     public void indexDocument(IndexWriter writer, Form form) {
         try {
             writer.addDocument(createDocument(form));
             LOGGER.finer("Form: " + form.getTitle() + " indexed");
-            
+
         } catch (SQLException ex) {
             LOGGER.severe("SQLException " + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -295,20 +300,21 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      * This method add to index of lucene a new document based on Form object.
      * (implements AbstractIndex.indexDocument() )
      * object must be a Form.
-     * 
+     *
      * @param object A MDweb formular.
      */
+    @Override
     public void indexDocument(Form form) {
         try {
-            final IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false);
-            
+            final IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false,IndexWriter.MaxFieldLength.UNLIMITED);
+
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(form));
             LOGGER.finer("Form: " + form.getTitle() + " indexed");
-        
+
             writer.optimize();
             writer.close();
-            
+
         } catch (SQLException ex) {
             LOGGER.severe("SQLException " + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -320,22 +326,23 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
-    
+
     /**
     * Makes a document for a MDWeb formular.
-    * 
+    *
     * @param Form An MDweb formular to index.
     * @return A Lucene document.
     */
+    @Override
     protected Document createDocument(Form form) throws SQLException {
-        
+
         // make a new, empty document
         final Document doc = new Document();
-        
-        doc.add(new Field("id",      form.getId() + "",            Field.Store.YES, Field.Index.TOKENIZED));
-        doc.add(new Field("catalog", form.getCatalog().getCode() , Field.Store.YES, Field.Index.TOKENIZED));        
-        doc.add(new Field("Title",   form.getTitle(),              Field.Store.YES, Field.Index.TOKENIZED));
-        
+
+        doc.add(new Field("id",      form.getId() + "",            Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("catalog", form.getCatalog().getCode() , Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("Title",   form.getTitle(),              Field.Store.YES, Field.Index.ANALYZED));
+
         Classe identifiable, registryObject;
         if (mdWebReader == null) {
             identifiable   = classeMap.get("Identifiable");
@@ -344,23 +351,23 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             identifiable   = mdWebReader.getClasse("Identifiable", Standard.EBRIM_V3);
             registryObject = mdWebReader.getClasse("RegistryObject", Standard.EBRIM_V2_5);
         }
-        
+
         if (form.getTopValue() == null) {
             LOGGER.severe("unable to index form:" + form.getId() + " top value is null");
-            
+
         } else if (form.getTopValue().getType() == null) {
             LOGGER.severe("unable to index form:" + form.getId() + " top value type is null");
-        
+
         // For an ISO 19115 form
         } else if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
-            
+
             LOGGER.finer("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
             //TODO add ANyText
             for (String term :ISO_QUERYABLE.keySet()) {
-                doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
-                doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.UN_TOKENIZED));
+                doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.NOT_ANALYZED));
             }
-        
+
            //we add the geometry parts
             String coord = "null";
             try {
@@ -369,54 +376,54 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
                 coord = getValues("EastBoundLongitude", form, ISO_QUERYABLE, -1);
                 final double maxx = Double.parseDouble(coord);
-            
+
                 coord = getValues("NorthBoundLatitude", form, ISO_QUERYABLE, -1);
                 final double maxy = Double.parseDouble(coord);
-            
+
                 coord = getValues("SouthBoundLatitude", form, ISO_QUERYABLE, -1);
                 final double miny = Double.parseDouble(coord);
-                
-                addBoundingBox(doc, minx, maxx, miny, maxy, "EPSG:4326");
-            
+
+                addBoundingBox(doc, minx, maxx, miny, maxy, SRID_4326);
+
             } catch (NumberFormatException e) {
                 if (!coord.equals("null"))
                     LOGGER.severe("unable to spatially index form: " + form.getTitle() + '\n' +
                                   "cause:  unable to parse double: " + coord);
             }
-            
-         // For an ebrim v 3.0 form    
+
+         // For an ebrim v 3.0 form
         } else if (form.getTopValue().getType().isSubClassOf(identifiable)) {
             LOGGER.finer("indexing Ebrim 3.0 Record");
-            
+
            /* for (String term :EBRIM_QUERYABLE.keySet()) {
                 doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
                 doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.UN_TOKENIZED));
             }*/
-        
-             // For an ebrim v 2.5 form    
+
+             // For an ebrim v 2.5 form
         } else if (form.getTopValue().getType().isSubClassOf(registryObject)) {
             LOGGER.finer("indexing Ebrim 2.5 Record");
-            
+
             /*for (String term :EBRIM_QUERYABLE.keySet()) {
                 doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
                 doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.UN_TOKENIZED));
             }*/
-            
-            
+
+
         // For a csw:Record (indexing is made in next generic indexing bloc)
         } else if (form.getTopValue().getType().getName().equals("Record")){
             LOGGER.finer("indexing CSW Record");
-            
+
         } else {
             LOGGER.severe("unknow Form classe unable to index: " + form.getTopValue().getType().getName());
         }
-        
-        
+
+
         // All form types must be compatible with dublinCore.
-        
+
         final StringBuilder anyText = new StringBuilder();
         for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
-                
+
             String values = getValues(term,  form, DUBLIN_CORE_QUERYABLE, -1);
             if (!values.equals("null")) {
                 LOGGER.finer("put " + term + " values: " + values);
@@ -425,73 +432,79 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             if (term.equals("date") || term.equals("modified")) {
                 values = values.replaceAll("-","");
             }
-            doc.add(new Field(term, values,   Field.Store.YES, Field.Index.TOKENIZED));
-            doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.UN_TOKENIZED));
+            doc.add(new Field(term, values,   Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
-            
+
         //we add the anyText values
-        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.TOKENIZED));
-            
+        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
+
         //we add the geometry parts
         String coord = "null";
         try {
             coord = getValues("WestBoundLongitude", form, DUBLIN_CORE_QUERYABLE, 1);
             final double minx = Double.parseDouble(coord);
-                
+
             coord = getValues("EastBoundLongitude", form, DUBLIN_CORE_QUERYABLE, 1);
             final double maxx = Double.parseDouble(coord);
-            
+
             coord = getValues("NorthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
             final double maxy = Double.parseDouble(coord);
-            
+
             coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
             final double miny = Double.parseDouble(coord);
-                
+
             coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
-            
-            final String crs = getValues("CRS", form, DUBLIN_CORE_QUERYABLE, -1);
-                
-            addBoundingBox(doc, minx, maxx, miny, maxy, crs);
-            
+
+            String crs = getValues("CRS", form, DUBLIN_CORE_QUERYABLE, -1);
+
+            if(crs == null || "null".equalsIgnoreCase(crs)){
+                crs = "CRS:84";
+            }
+
+            addBoundingBox(doc, minx, maxx, miny, maxy, SRIDGenerator.toSRID(crs, Version.V1));
+
         } catch (NumberFormatException e) {
             if (!coord.equals("null"))
                 LOGGER.severe("unable to spatially index form: " + form.getTitle() + '\n' +
                               "cause:  unable to parse double: " + coord);
         }
-        
-        
-        
-        // add a default meta field to make searching all documents easy 
-	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.TOKENIZED));
-        
+
+
+
+        // add a default meta field to make searching all documents easy
+	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
+
         return doc;
     }
-    
+
     /**
      * Return a string description for the specified terms.
-     * 
+     *
      * @param term An ISO queryable term defined in CSWWorker (like Title, Subject, Abstract,...)
      * @param form An MDWeb formular from whitch we extract the values correspounding to the specified term.
      * @param ordinal If we want only one value for a path we add an ordinal to select the value we want. else put -1.
-     * 
+     *
      * @return A string concataining the differents values correspounding to the specified term, coma separated.
      */
-    private String getValues(String term, Form form, Map<String,List<String>> queryable, int ordinal) throws SQLException {
-        final StringBuilder response  = new StringBuilder("");
+    private String getValues(final String term, final Form form, final Map<String,List<String>> queryable,
+            final int ordinal) throws SQLException {
+
+        final StringBuilder response  = new StringBuilder();
         final List<String> paths      = queryable.get(term);
-        
+
         if (term.equalsIgnoreCase("Type") && form.getProfile() != null) {
-            response.append(form.getProfile().getName()).append(','); 
+            response.append(form.getProfile().getName()).append(',');
         }
-            
+
         if (paths != null) {
-            for (String fullPathID: paths) {
-                Path path;
-                String pathID;
+            for (final String fullPathID: paths) {
+                final Path path;
+                final String pathID;
                 Path conditionalPath     = null;
                 String conditionalPathID = null;
                 String conditionalValue  = null;
-                
+
                 // if the path ID contains a # we have a conditional value (codeList element) next to the searched value.
                 final int separator = fullPathID.indexOf('#');
                 if (separator != -1) {
@@ -500,13 +513,14 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                     conditionalValue  = fullPathID.substring(fullPathID.indexOf('=') + 1);
                     LOGGER.finer("pathID           : " + pathID            + '\n' +
                                 "conditionalPathID: " + conditionalPathID + '\n' +
-                                "conditionalValue : " + conditionalValue); 
+                                "conditionalValue : " + conditionalValue);
                 } else {
                     pathID = fullPathID;
                 }
-                
+
+
                 if (mdWebReader != null) {
-                    path   = mdWebReader.getPath(pathID);
+                    path = mdWebReader.getPath(pathID);
                     if (conditionalPathID != null)
                         conditionalPath = mdWebReader.getPath(conditionalPathID);
                 } else {
@@ -514,33 +528,36 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                     if (conditionalPathID != null)
                         conditionalPath = pathMap.get(conditionalPathID);
                 }
-                List<Value> values;
+
+                final List<Value> values;
                 if (conditionalPath == null) {
                     values = form.getValueFromPath(path);
                 } else {
-                    values = new ArrayList<Value>();
-                    values.add(form.getConditionalValueFromPath(path, conditionalPath, conditionalValue));
+                    values = Collections.singletonList(
+                            form.getConditionalValueFromPath(path, conditionalPath, conditionalValue));
                 }
-                for (Value v: values) {
-                    if ( (ordinal == -1 && v instanceof TextValue) || (v instanceof TextValue && v.getOrdinal() == ordinal)) {
-                
-                        final TextValue tv = (TextValue) v;
-                        
+
+                for(final Value v: values) {
+                    //only handle textvalue
+                    if(!(v instanceof TextValue)) continue;
+                    final TextValue tv = (TextValue) v;
+
+                    if (ordinal == -1 || ordinal == tv.getOrdinal()) {
+
                         //for a codelist value we don't write the code but the codlistElement value.
                         if (tv.getType() instanceof CodeList) {
                             final CodeList cl = (CodeList) tv.getType();
-                            
+
                             // we look if the codelist contains locale element.
                             boolean locale = false;
                             final List<Property> props = cl.getProperties();
                             if (props != null && props.size() > 0) {
-                                if (props.get(0) instanceof Locale)
-                                    locale = true;
+                                locale = props.get(0) instanceof Locale;
                             }
-                            
+
                             if (locale) {
-                                response.append(tv.getValue()).append(','); 
-                                
+                                response.append(tv.getValue()).append(',');
+
                             } else {
                                 int code = 1;
                                 try {
@@ -549,12 +566,12 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                                     LOGGER.severe("NumberFormat Exception while parsing a codelist code: " + tv.getValue());
                                 }
                                 final CodeListElement element = cl.getElementByCode(code);
-                            
+
                                 if (element != null) {
                                     response.append(element.getName()).append(',');
                                 } else {
                                     LOGGER.severe("Unable to find a codelistElement for the code: " + code + " in the codelist: " + cl.getName());
-                                } 
+                                }
                             }
                         } else if (tv.getType().getName().equals("Date")) {
                             String value = tv.getValue();
@@ -562,23 +579,26 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                                 value = value.replaceAll("-", "");
                             }
                             response.append(value).append(',');
-                        // else we write the text value.    
+                        // else we write the text value.
                         } else {
-                            response.append(tv.getValue()).append(','); 
+                            response.append(tv.getValue()).append(',');
                         }
-                    } 
+                    }
                 }
             }
         }
-        if (response.toString().equals("")) {
+
+        if (response.length() == 0) {
             response.append("null");
         } else {
             // we remove the last ','
-            response.delete(response.length() - 1, response.length()); 
+            response.deleteCharAt(response.length()-1);
         }
+
         return response.toString();
     }
-    
+
+    @Override
     public void destroy() {
         if (pathMap != null)
             pathMap.clear();

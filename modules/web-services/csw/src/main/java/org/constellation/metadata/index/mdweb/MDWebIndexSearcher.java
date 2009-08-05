@@ -31,11 +31,11 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.lucene.SearchingException;
+import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 
 // Constellation dependencies
-import org.constellation.lucene.IndexingException;
-import org.constellation.lucene.SearchingException;
-import org.constellation.lucene.index.AbstractIndexSearcher;
 
 /**
  *

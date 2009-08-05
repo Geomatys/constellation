@@ -42,8 +42,6 @@ import org.constellation.configuration.filter.ConfigurationFileFilter;
 import org.constellation.configuration.filter.IndexDirectoryFilter;
 import org.constellation.configuration.filter.NextIndexDirectoryFilter;
 import org.constellation.generic.database.Automatic;
-import org.constellation.lucene.IndexingException;
-import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.util.Util;
@@ -56,6 +54,8 @@ import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
 
 // MDWeb dependencies
+import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.xml.MarshallerPool;
 import org.mdweb.utils.GlobalUtils;
 
@@ -147,7 +147,7 @@ public abstract class AbstractCSWConfigurer {
                 }
                 return cswfactory.getIndexer(config, currentReader, serviceID);
 
-            } catch (IndexingException ex) {
+            } catch (Exception ex) {
                 throw new CstlServiceException("An eception occurs while initializing the indexer!" + '\n' +
                         "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
             }

@@ -49,11 +49,11 @@ import org.apache.lucene.store.LockObtainFailedException;
 // constellation dependencies
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.generic.database.Automatic;
-import org.constellation.lucene.IndexingException;
-import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.util.Util;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.lucene.index.AbstractIndexer;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // geotoolkit dependencies
@@ -140,7 +140,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         IndexWriter writer;
         int nbEntries = 0;
         try {
-            writer = new IndexWriter(getFileDirectory(), analyzer, true);
+            writer = new IndexWriter(getFileDirectory(), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
 
             // TODO getting the objects list and index avery item in the IndexWriter.
             List<? extends Object> ids = reader.getAllEntries();
@@ -180,7 +180,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         IndexWriter writer;
         int nbEntries = 0;
         try {
-            writer = new IndexWriter(getFileDirectory(), analyzer, true);
+            writer = new IndexWriter(getFileDirectory(), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
             nbEntries = toIndex.size();
             for (Object entry : toIndex) {
                 indexDocument(writer, entry);
@@ -235,7 +235,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      */
     public void indexDocument(Object meta) {
         try {
-            final IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false);
+            final IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false,IndexWriter.MaxFieldLength.UNLIMITED);
 
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
@@ -341,7 +341,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
             if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
                 for (int j = 0; j < minx.length; j++)  {
-                    addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], "EPSG:4326");
+                    addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
                 }
             } else {
                 LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
@@ -425,7 +425,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 
             if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
                 for (int j = 0; j < minx.length; j++)  {
-                    addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], "EPSG:4326");
+                    addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
                 }
             } else {
                 LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +

@@ -39,9 +39,9 @@ import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
 import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.util.Utilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 

@@ -17,6 +17,7 @@
 package org.constellation.filter;
 
 // J2SE dependencies
+import com.vividsolutions.jts.geom.Geometry;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,35 +31,28 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.ws.CstlServiceException;
-import org.constellation.lucene.filter.SerialChainFilter;
-import org.constellation.lucene.filter.SpatialFilter;
-import org.constellation.lucene.filter.SpatialQuery;
-import org.constellation.lucene.filter.BBOXFilter;
-import org.constellation.lucene.filter.BeyondFilter;
-import org.constellation.lucene.filter.ContainsFilter;
-import org.constellation.lucene.filter.CrossesFilter;
-import org.constellation.lucene.filter.DWithinFilter;
-import org.constellation.lucene.filter.DisjointFilter;
-import org.constellation.lucene.filter.EqualsFilter;
-import org.constellation.lucene.filter.IntersectFilter;
-import org.constellation.lucene.filter.OverlapsFilter;
-import org.constellation.lucene.filter.SpatialFilterType;
-import org.constellation.lucene.filter.TouchesFilter;
-import org.constellation.lucene.filter.WithinFilter;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Lucene dependencies
 import org.apache.lucene.search.Filter;
 
 // geotools dependencies
+import org.geotoolkit.gml.GMLUtilities;
 import org.constellation.metadata.Parameters;
 import org.geotoolkit.csw.xml.QueryConstraint;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
 import org.geotoolkit.filter.text.cql2.CQLException;
-import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.geometry.jts.SRIDGenerator;
+import org.geotoolkit.geometry.jts.SRIDGenerator.Version;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.LineStringType;
 import org.geotoolkit.gml.xml.v311.PointType;
+import org.geotoolkit.lucene.filter.LuceneOGCFilter;
+import org.geotoolkit.lucene.filter.SerialChainFilter;
+import org.geotoolkit.lucene.filter.SpatialFilterType;
+import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.ogc.xml.v110.AbstractIdType;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.BinaryComparisonOpType;
@@ -75,12 +69,15 @@ import org.geotoolkit.ogc.xml.v110.PropertyIsNullType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
-import org.geotoolkit.referencing.CRS;
 
 // GeoAPI dependencies
+import org.geotoolkit.referencing.CRS;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
+import static org.geotoolkit.lucene.filter.LuceneOGCFilter.*;
 
 /**
  * A parser for filter 1.1.0 and CQL 2.0
@@ -477,7 +474,7 @@ public class LuceneFilterParser extends FilterParser {
      */
     @Override
     protected Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> jbSpatialOps) throws CstlServiceException {
-        SpatialFilter spatialfilter = null;
+        LuceneOGCFilter spatialfilter = null;
         
         final SpatialOpsType spatialOps = jbSpatialOps.getValue();
         
@@ -503,25 +500,9 @@ public class LuceneFilterParser extends FilterParser {
                                              INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
             
-            //we transform the EnvelopeEntry in GeneralEnvelope
-            final double[] min = {bbox.getMinX(), bbox.getMinY()};
-            final double[] max = {bbox.getMaxX(), bbox.getMaxY()};
-            try {
-                final GeneralEnvelope envelope      = new GeneralEnvelope(min, max);
-                final CoordinateReferenceSystem crs = CRS.decode(crsName, true);
-                envelope.setCoordinateReferenceSystem(crs);
-                spatialfilter = new BBOXFilter(envelope, crsName);
+            //we transform the EnvelopeEntry in bbox filter
+            spatialfilter = wrap(FF.bbox(GEOMETRY_PROPERTY, bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY(), crsName));
                 
-            } catch (NoSuchAuthorityCodeException e) {
-                throw new CstlServiceException(UNKNOW_CRS_ERROR_MSG + crsName,
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            } catch (FactoryException e) {
-                throw new CstlServiceException(FACTORY_BBOX_ERROR_MSG + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            } catch (IllegalArgumentException e) {
-                throw new CstlServiceException(INCORRECT_BBOX_DIM_ERROR_MSG+ e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
             
         } else if (spatialOps instanceof DistanceBufferType) {
             
@@ -544,33 +525,35 @@ public class LuceneFilterParser extends FilterParser {
                  throw new CstlServiceException("An distanceBuffer operator must specified a geometric object.",
                                                   INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
-           
-            Object geometry  = jbGeom.getValue();
+
+            final Object gml = jbGeom.getValue();
+            Geometry geometry = null;
             //String propName  = dist.getPropertyName().getPropertyName();
             String crsName   = null;
+
            
             // we transform the gml geometry in treatable geometry
             try {
-                if (geometry instanceof PointType) {
-                    final PointType gmlPoint = (PointType) geometry;
+                if (gml instanceof PointType) {
+                    final PointType gmlPoint = (PointType) gml;
                     crsName  = gmlPoint.getSrsName();
-                    geometry = gmlPointToGeneralDirectPosition(gmlPoint);
-                    
-                } else if (geometry instanceof LineStringType) {
-                    final LineStringType gmlLine =  (LineStringType) geometry;
+                    geometry = GMLUtilities.toJTS(gmlPoint);
+
+                } else if (gml instanceof LineStringType) {
+                    final LineStringType gmlLine =  (LineStringType) gml;
                     crsName  = gmlLine.getSrsName();
-                    geometry = gmlLineToline2d(gmlLine);
-                    
-                } else if (geometry instanceof EnvelopeEntry) {
-                    final EnvelopeEntry gmlEnvelope = (EnvelopeEntry) geometry;
+                    geometry = GMLUtilities.toJTS(gmlLine);
+
+                } else if (gml instanceof EnvelopeEntry) {
+                    final EnvelopeEntry gmlEnvelope = (EnvelopeEntry) gml;
                     crsName  = gmlEnvelope.getSrsName();
-                    geometry = gmlEnvelopeToGeneralEnvelope(gmlEnvelope);
+                    geometry = GMLUtilities.toJTS(gmlEnvelope);
                 }
 
                 if (operator.equals("DWithin")) {
-                    spatialfilter = new DWithinFilter(geometry, crsName, distance, units);
+                    spatialfilter = wrap(FF.dwithin(GEOMETRY_PROPERTY,FF.literal(geometry),distance, units));
                 } else if (operator.equals("Beyond")) {
-                    spatialfilter = new BeyondFilter(geometry, crsName, distance, units);
+                    spatialfilter = wrap(FF.beyond(GEOMETRY_PROPERTY,FF.literal(geometry),distance, units));
                 } else {
                     throw new CstlServiceException("Unknow DistanceBuffer operator.",
                             INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
@@ -594,7 +577,7 @@ public class LuceneFilterParser extends FilterParser {
             String propertyName = null;
             String operator     = jbSpatialOps.getName().getLocalPart();
             operator            = operator.toUpperCase();
-            Object geometry     = null;
+            Object gmlGeometry     = null;
             
             // the propertyName
             if (binSpatial.getPropertyName() != null && binSpatial.getPropertyName().getValue() != null) {
@@ -604,7 +587,7 @@ public class LuceneFilterParser extends FilterParser {
                 
             // geometric object: envelope    
             if (binSpatial.getEnvelope() != null && binSpatial.getEnvelope().getValue() != null) {
-                geometry = binSpatial.getEnvelope().getValue();
+                gmlGeometry = binSpatial.getEnvelope().getValue();
             }
                 
             
@@ -613,11 +596,11 @@ public class LuceneFilterParser extends FilterParser {
                 
                 // geometric object: point
                 if (ab instanceof PointType) {
-                    geometry     = (PointType) ab;
+                    gmlGeometry     = (PointType) ab;
                  
                 // geometric object: Line    
                 } else if (ab instanceof LineStringType) {
-                    geometry     = (LineStringType) ab;    
+                    gmlGeometry     = (LineStringType) ab;
                 
                 } else if (ab == null) {
                    throw new IllegalArgumentException("null value in BinarySpatialOp type");
@@ -627,7 +610,7 @@ public class LuceneFilterParser extends FilterParser {
                 }
             }
             
-            if (propertyName == null && geometry == null) {
+            if (propertyName == null && gmlGeometry == null) {
                 throw new CstlServiceException("An Binarary spatial operator must specified a propertyName and a geometry.",
                                               INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
             }
@@ -645,36 +628,39 @@ public class LuceneFilterParser extends FilterParser {
             
             String crsName = "undefined CRS";
             try {
-                Object filterGeometry = null;
-                if (geometry instanceof EnvelopeEntry) {
-                    
+                Geometry filterGeometry = null;
+                if (gmlGeometry instanceof EnvelopeEntry) {
+
                     //we transform the EnvelopeEntry in GeneralEnvelope
-                    final EnvelopeEntry gmlEnvelope = (EnvelopeEntry)geometry;
-                    crsName                         = gmlEnvelope.getSrsName();
-                    filterGeometry                  = gmlEnvelopeToGeneralEnvelope(gmlEnvelope);
-                
-                } else if (geometry instanceof PointType) {
-                    final PointType gmlPoint  = (PointType) geometry;
+                    final EnvelopeEntry gmlEnvelope = (EnvelopeEntry)gmlGeometry;
+                    crsName                   = gmlEnvelope.getSrsName();
+                    filterGeometry            = GMLUtilities.toJTS(gmlEnvelope);
+
+                } else if (gmlGeometry instanceof PointType) {
+                    final PointType gmlPoint  = (PointType) gmlGeometry;
                     crsName                   = gmlPoint.getSrsName();
-                    filterGeometry            = gmlPointToGeneralDirectPosition(gmlPoint);
-                
-                } else if (geometry instanceof LineStringType) {
-                    final LineStringType gmlLine = (LineStringType) geometry;
-                    crsName                      = gmlLine.getSrsName();
-                    filterGeometry               = gmlLineToline2d(gmlLine);
+                    filterGeometry            = GMLUtilities.toJTS(gmlPoint);
+
+                } else if (gmlGeometry instanceof LineStringType) {
+                    final LineStringType gmlLine =  (LineStringType) gmlGeometry;
+                    crsName                = gmlLine.getSrsName();
+                    filterGeometry         = GMLUtilities.toJTS(gmlLine);
                 }
 
+                final int srid = SRIDGenerator.toSRID(crsName, Version.V1);
+                filterGeometry.setSRID(srid);
+
                 switch (filterType) {
-                    case CONTAINS   : spatialfilter = new ContainsFilter(filterGeometry, crsName);  break;
-                    case CROSSES    : spatialfilter = new CrossesFilter(filterGeometry, crsName);   break;
-                    case DISJOINT   : spatialfilter = new DisjointFilter(filterGeometry, crsName);  break;
-                    case EQUALS     : spatialfilter = new EqualsFilter(filterGeometry, crsName);    break;
-                    case INTERSECTS : spatialfilter = new IntersectFilter(filterGeometry, crsName); break;
-                    case OVERLAPS   : spatialfilter = new OverlapsFilter(filterGeometry, crsName);  break;
-                    case TOUCHES    : spatialfilter = new TouchesFilter(filterGeometry, crsName);   break;
-                    case WITHIN     : spatialfilter = new WithinFilter(filterGeometry, crsName);    break;
-                    default         : LOGGER.info("default filter within");
-                                      spatialfilter = new WithinFilter(filterGeometry, crsName);    break;
+                    case CONTAINS   : spatialfilter = wrap(FF.contains(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
+                    case CROSSES    : spatialfilter = wrap(FF.crosses(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
+                    case DISJOINT   : spatialfilter = wrap(FF.disjoint(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
+                    case EQUALS     : spatialfilter = wrap(FF.equal(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
+                    case INTERSECTS : spatialfilter = wrap(FF.intersects(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
+                    case OVERLAPS   : spatialfilter = wrap(FF.overlaps(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
+                    case TOUCHES    : spatialfilter = wrap(FF.touches(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
+                    case WITHIN     : spatialfilter = wrap(FF.within(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
+                    default         : LOGGER.info("using default filter within");
+                                      spatialfilter = wrap(FF.within(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
                 }
                 
             } catch (NoSuchAuthorityCodeException e) {

@@ -32,10 +32,10 @@ import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.dublincore.xml.AbstractSimpleLiteral;
 import org.geotoolkit.ebrim.xml.EbrimInternationalString;
 import org.geotoolkit.ebrim.xml.RegistryObject;
-import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.ws.CstlServiceException;
 
 //geotools dependencies
+import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.metadata.iso.DefaultMetaData;
 
 // geotools dependencies

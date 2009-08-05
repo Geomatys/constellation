@@ -46,12 +46,12 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.CSWClassesContext;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
 // GeoApi dependencies
+import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.opengis.util.InternationalString;
 
 

@@ -75,12 +75,11 @@
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-skos</artifactId>
+      <artifactId>geotk-spatial-lucene</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.constellation.library</groupId>
-      <artifactId>cstl-lib-spatial-lucene</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-skos</artifactId>
     </dependency>
     <dependency>
      <groupId>org.geotoolkit.pending</groupId>
@@ -106,6 +105,25 @@
       <artifactId>mail</artifactId>
       <version>1.4.1</version>
     </dependency>
+
+    <dependency>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-epsg</artifactId>
+        <scope>test</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.apache.derby</groupId>
+        <artifactId>derby</artifactId>
+        <scope>test</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
 </project>

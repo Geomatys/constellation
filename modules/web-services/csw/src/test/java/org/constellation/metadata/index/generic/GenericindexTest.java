@@ -27,10 +27,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
-import org.constellation.lucene.filter.SerialChainFilter;
-import org.constellation.lucene.filter.SpatialQuery;
-import org.constellation.lucene.filter.BBOXFilter;
-import org.constellation.lucene.filter.SpatialFilter;
 import org.constellation.util.Util;
 
 // lucene dependencies
@@ -39,9 +35,14 @@ import org.apache.lucene.search.Sort;
 
 // geotools dependencies
 import org.constellation.metadata.CSWClassesContext;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.lucene.filter.LuceneOGCFilter;
+import org.geotoolkit.lucene.filter.SerialChainFilter;
+import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.metadata.iso.DefaultMetaData;
 
 // GeoAPI dependencies
@@ -51,6 +52,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 //Junit dependencies
 import org.junit.*;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Expression;
 import static org.junit.Assert.*;
 
 /**
@@ -59,6 +62,9 @@ import static org.junit.Assert.*;
  * @author Guilhem Legal (Geomatys)
  */
 public class GenericindexTest {
+
+    protected static final FilterFactory2 FF = (FilterFactory2)
+            FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
 
 
     private Logger logger = Logger.getLogger("org.constellation.metadata");
@@ -451,7 +457,7 @@ public class GenericindexTest {
         GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
         CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
         bbox.setCoordinateReferenceSystem(crs);
-        SpatialFilter sf          = new BBOXFilter(bbox, "EPSG:4326");
+        LuceneOGCFilter sf = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", sf, SerialChainFilter.AND);
 
         List<String> result = indexSearcher.doSearch(spatialQuery);
@@ -474,7 +480,7 @@ public class GenericindexTest {
         resultReport = "";
         List<Filter> lf = new ArrayList<Filter>();
         //sf           = new BBOXFilter(bbox, "urn:x-ogc:def:crs:EPSG:6.11:4326");
-        sf           = new BBOXFilter(bbox, "EPSG:4326");
+        sf           = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
 
         lf.add(sf);
         int[] op = {SerialChainFilter.NOT};

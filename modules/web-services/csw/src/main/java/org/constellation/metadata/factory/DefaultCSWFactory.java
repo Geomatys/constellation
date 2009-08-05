@@ -22,10 +22,7 @@ import java.io.File;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.lucene.IndexingException;
 import org.constellation.metadata.CSWworker;
-import org.constellation.lucene.index.AbstractIndexSearcher;
-import org.constellation.lucene.index.AbstractIndexer;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.index.generic.GenericIndexSearcher;
 import org.constellation.metadata.index.mdweb.MDWebIndexer;
@@ -38,6 +35,9 @@ import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import static org.constellation.generic.database.Automatic.*;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.AbstractIndexer;
 
 /**
  * A default implementation of the CSW factory.
@@ -56,6 +56,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * 
      * @throws org.constellation.ws.CstlServiceException
      */
+    @Override
     public MetadataReader getMetadataReader(Automatic configuration) throws CstlServiceException {
         int type = -1;
         if (configuration != null)
@@ -77,6 +78,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
+    @Override
     public MetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer) throws CstlServiceException {
         int type = -1;
         if (configuration != null)
@@ -97,6 +99,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * 
      * @return DISCOVERY or TRANSACTIONAL 
      */
+    @Override
     public int getProfile(int dbType) {
         switch (dbType) {
             case MDWEB :
@@ -118,6 +121,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
+    @Override
     public AbstractIndexer getIndexer(Automatic configuration, MetadataReader reader, String serviceID) throws IndexingException {
         int type = -1;
         if (configuration != null)

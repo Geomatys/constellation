@@ -37,6 +37,8 @@ import org.apache.lucene.search.Filter;
 import org.constellation.metadata.Parameters;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.csw.xml.QueryConstraint;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
 import org.geotoolkit.filter.FilterFactoryImpl;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -56,6 +58,7 @@ import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.referencing.CRS;
 
 // GeoAPI dependencies
+import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -65,7 +68,10 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Guilhem Legal
  */
 public abstract class FilterParser {
-    
+
+    protected static final FilterFactory2 FF = (FilterFactory2)
+            FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
+
      /**
      * use for debugging purpose
      */
