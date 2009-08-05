@@ -14,7 +14,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.ws.embedded;
 
 import java.io.IOException;
@@ -35,6 +34,7 @@ import org.geotoolkit.console.Option;
 
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+
 
 /**
  * An Abstract class to run the web service in an embedded container.
@@ -89,47 +89,40 @@ import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
  *
  */
 public class CstlEmbeddedService extends CommandLine {
+
     /**
      * Logger for this service.
      */
-	private static final Logger LOGGER = Logger.getLogger("org.constellation.ws.embedded");
-
-	// THESE ARE INJECTED BY THE CommandLine CLASS
-	//   TODO: these default values clobber main's args; fixed in Geotidy
-	@Option
-	protected Boolean useFacadeREST = true;       //Default value
-	@Option
-	protected String  host          = "localhost";//Default value
-	@Option
-	protected Integer port          = 9090;       //Default value
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.ws.embedded");
+    // THESE ARE INJECTED BY THE CommandLine CLASS
+    //   TODO: these default values clobber main's args; fixed in Geotidy
     @Option
-    protected Integer duration      = 20*60*1000; //minutes*seconds*millseconds; set to <=0 to last until <enter>
-	
-    
-	final URI uri;
-	final DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-	
-	
-	/* ***********************************************************************
-	 *   CONCRETE CLASSES MUST: (see below)
-	 * ********************************************************************** */
-	
-	//FOR REST, COMPLETE THIS PARAMETER MAP
-	//  Grizzly is used by the REST service. Extending classes need to add the
-	//  package(s) containing the service(s) they desire to run and the 
-	//  providers on which those services depend, e.g. :
+    protected Boolean useFacadeREST = true;       //Default value
+    @Option
+    protected String host = "localhost";//Default value
+    @Option
+    protected Integer port = 9090;       //Default value
+    @Option
+    protected Integer duration = 20 * 60 * 1000; //minutes*seconds*millseconds; set to <=0 to last until <enter>
+
+    final URI uri;
+    final DateFormat f = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    /* ***********************************************************************
+     *   CONCRETE CLASSES MUST: (see below)
+     * ********************************************************************** */
+    //FOR REST, COMPLETE THIS PARAMETER MAP
+    //  Grizzly is used by the REST service. Extending classes need to add the
+    //  package(s) containing the service(s) they desire to run and the
+    //  providers on which those services depend, e.g. :
     //      map.put("com.sun.jersey.config.property.packages", "org.constellation.map.ws.rs");
     //      map.put("com.sun.jersey.config.property.packages", "org.constellation.coverage.ws.rs");
-	//      map.put(TODO: get providers line from Cedric);
-	//  below we add in one of the properties needed by all services.
-	protected Map<String,String> grizzlyWebContainerProperties = new HashMap<String,String>();
-	
-	
-	//FOR SOAP, DEFINE THIS REFERENCE:
-	protected Object serviceInstanceSOAP = null;
-	
-	
-	//INCLUDE THIS MAIN.
+    //      map.put(TODO: get providers line from Cedric);
+    //  below we add in one of the properties needed by all services.
+    protected Map<String, String> grizzlyWebContainerProperties = new HashMap<String, String>();
+    //FOR SOAP, DEFINE THIS REFERENCE:
+    protected Object serviceInstanceSOAP = null;
+
+    //INCLUDE THIS MAIN.
 //	public static void main(String[] args) {
 //		
 //		EXTENDOR sei = new EXTENDOR(args);
@@ -143,41 +136,38 @@ public class CstlEmbeddedService extends CommandLine {
 //
 //	}
 
-	/* ***********************************************************************
-	 *   CONCRETE CLASSES MUST HAVE: (see above)
-	 * ********************************************************************** */
-	
-	
-	
-	/**
-	 * Constructor which passes the arguments for processing to the 
-	 * CommandLine parent and sets the URI.
-	 * <p>
-	 * Extending classes using the REST facade should 
-	 */
-	protected CstlEmbeddedService(String[] args){
-		
-		super(null, args);
+    /* ***********************************************************************
+     *   CONCRETE CLASSES MUST HAVE: (see above)
+     * ********************************************************************** */
+    /**
+     * Constructor which passes the arguments for processing to the
+     * CommandLine parent and sets the URI.
+     * <p>
+     * Extending classes using the REST facade should
+     */
+    protected CstlEmbeddedService(String[] args) {
+
+        super(null, args);
 
         grizzlyWebContainerProperties.put("com.sun.jersey.config.property.packages",
                 "org.constellation.map.ws.rs;" +
                 "org.constellation.coverage.ws.rs;" +
                 "org.constellation.ws.rs.provider");
 
-		final String base = "http://" + host + "/";
-    	uri = UriBuilder.fromUri(base).port(port).build();
-		
-	}
-	
-	/**
-	 * Should be called by the {@code main()} method for any web service wishing
-	 * to implement a JAX-RS REST facade.
-	 */
-	protected void runREST() {
-		
+        final String base = "http://" + host + "/";
+        uri = UriBuilder.fromUri(base).port(port).build();
+
+    }
+
+    /**
+     * Should be called by the {@code main()} method for any web service wishing
+     * to implement a JAX-RS REST facade.
+     */
+    protected void runREST() {
+
         grizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass",
-        		                          "com.sun.jersey.api.core.PackagesResourceConfig");
-        
+                "com.sun.jersey.api.core.PackagesResourceConfig");
+
         LOGGER.info("Starting grizzly server at: " + f.format(new Date()));
 
         SelectorThread threadSelector = null;
@@ -198,18 +188,18 @@ public class CstlEmbeddedService extends CommandLine {
 
         threadSelector.stopEndpoint();
         LOGGER.info("*Stopped grizzly server at: " + f.format(new Date()) + ".");
-	}
-	
-	/**
-	 * Should be called by the {@code main()} method for any web service wishing
-	 * to implement a JAX-WS SOAP facade.
-	 */
-	protected void runSOAP() {
-		
-		if ( null == serviceInstanceSOAP){
-			LOGGER.info("The Service Endpoint Instance was never defined.");
-			System.exit(0);
-		}
+    }
+
+    /**
+     * Should be called by the {@code main()} method for any web service wishing
+     * to implement a JAX-WS SOAP facade.
+     */
+    protected void runSOAP() {
+
+        if (null == serviceInstanceSOAP) {
+            LOGGER.info("The Service Endpoint Instance was never defined.");
+            System.exit(0);
+        }
 
 
         LOGGER.info("Starting jax-ws server at: " + f.format(new Date()));
@@ -230,36 +220,37 @@ public class CstlEmbeddedService extends CommandLine {
 
         ep.stop();
         LOGGER.info("*Stopped jax-ws server at: " + f.format(new Date()) + ".");
-	}
-	/**
-	 * Will keep either of the services alive either for the number of 
-	 * milliseconds defined in the command-line parameter {@code duration} if 
-	 * that value is greater than zero or until the user presses the 
-	 * {@code <ENTER>} (or {@code <RETURN>}) key of the keyboard depending if 
-	 * the duration time is greater than zero.
-	 * 
-	 */
-	protected void stayAlive() {
-		
-		if (duration>0) {
-	        //Survive 'duration' milliseconds
-	        LOGGER.info("  Service will stop in " + duration / (60 * 1000) + " minutes.");
-	        try {
-	            Thread.sleep(duration);
-	        } catch (InterruptedException iex) {
-	            LOGGER.fine("The grizzly thread has received an interrupted request.");
+    }
+
+    /**
+     * Will keep either of the services alive either for the number of
+     * milliseconds defined in the command-line parameter {@code duration} if
+     * that value is greater than zero or until the user presses the
+     * {@code <ENTER>} (or {@code <RETURN>}) key of the keyboard depending if
+     * the duration time is greater than zero.
+     *
+     */
+    protected void stayAlive() {
+
+        if (duration > 0) {
+            //Survive 'duration' milliseconds
+            LOGGER.info("  Service will stop in " + duration / (60 * 1000) + " minutes.");
+            try {
+                Thread.sleep(duration);
+            } catch (InterruptedException iex) {
+                LOGGER.fine("The grizzly thread has received an interrupted request.");
                 LOGGER.info("*Stopped grizzly server at: " + f.format(new Date()) + ".");
-	        }
-		} else {
-			//Listen and wait for <ENTER>
-			LOGGER.info("  Hit <ENTER> to stop the service.");
-	        try {
-				System.in.read();
-			} catch (IOException e) {
-				LOGGER.log(Level.SEVERE, e.getMessage(), e);
-			}
-		}
-	}
+            }
+        } else {
+            //Listen and wait for <ENTER>
+            LOGGER.info("  Hit <ENTER> to stop the service.");
+            try {
+                System.in.read();
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            }
+        }
+    }
 
     public static void main(String[] args) {
         new CstlEmbeddedService(args).runREST();
