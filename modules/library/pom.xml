@@ -63,49 +63,12 @@
   </developers>
 
 
-  <!--
-    By default, build all modules in library. If we are in the profile csw,
-    we build spatial-lucene, otherwise in others profile, we do not build it.
-  -->
-  <!--
-    As long as xml-bindings csw is imported in every profiles, the spatial-lucene
-    module has to be built.
-  -->
-  <!--profiles>
-    <profile>
-      <id>all</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>spatial-lucene</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>csw</id>
-      <modules>
-        <module>spatial-lucene</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>sos</id>
-    </profile>
-    <profile>
-      <id>wms</id>
-    </profile>
-    <profile>
-      <id>wcs</id>
-    </profile>
-  </profiles-->
-
-
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
   <modules>
     <module>base</module>
     <module>postgrid-schema</module>
-    <module>spatial-lucene</module>
   </modules>
 
 </project>
