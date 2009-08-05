@@ -278,7 +278,7 @@ public class FileObservationReader implements ObservationReader {
     }
 
     @Override
-    public String getNewObservationId(String type) throws CstlServiceException {
+    public String getNewObservationId() throws CstlServiceException {
         return observationIdBase + observationDirectory.list().length;
     }
 

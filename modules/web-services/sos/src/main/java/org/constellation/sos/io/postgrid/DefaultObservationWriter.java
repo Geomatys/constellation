@@ -151,7 +151,6 @@ public class DefaultObservationWriter implements ObservationWriter {
 
     public String writeMeasurement(Measurement measurement) throws CstlServiceException {
         try {
-            final MeasurementTable measTable = omDatabase.getTable(MeasurementTable.class);
             return measTable.getIdentifier(measurement);
         } catch (CatalogException ex) {
             throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),

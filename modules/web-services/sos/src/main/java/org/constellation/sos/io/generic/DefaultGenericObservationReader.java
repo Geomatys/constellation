@@ -96,7 +96,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     }
 
     @Override
-    public String getNewObservationId(String type) throws CstlServiceException {
+    public String getNewObservationId() throws CstlServiceException {
         Values values = loadData(Arrays.asList("var05"));
         int id = Integer.parseInt(values.getVariable("var05"));
 

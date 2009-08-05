@@ -1438,11 +1438,7 @@ public class SOSworker {
         final ObservationEntry obs = requestInsObs.getObservation();
         if (obs != null) {
             obs.setProcedure(proc);
-            String obsType = "observation";
-            if (obs instanceof MeasurementEntry) {
-                obsType = "measurement";
-            }
-            obs.setName(omReader.getNewObservationId(obsType));
+            obs.setName(omReader.getNewObservationId());
             LOGGER.finer("samplingTime received: " + obs.getSamplingTime());
             LOGGER.finer("template received:" + '\n' + obs.toString());
         } else {
@@ -1452,7 +1448,8 @@ public class SOSworker {
 
         //we record the observation in the O&M database
        if (obs instanceof MeasurementEntry) {
-           omWriter.writeMeasurement((MeasurementEntry)obs);
+           id = omWriter.writeMeasurement((MeasurementEntry)obs);
+           LOGGER.info("new Measurement inserted: id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
         } else {
 
             //in first we verify that the observation is conform to the template
@@ -1461,7 +1458,7 @@ public class SOSworker {
             if (obs.matchTemplate(template)) {
                 if (obs.getSamplingTime() != null && obs.getResult() != null) {
                     id = omWriter.writeObservation(obs);
-                    LOGGER.info("new observation inserted:"+ "id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
+                    LOGGER.info("new observation inserted: id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
                 } else {
                     throw new CstlServiceException("The observation sampling time and the result must be specify",
                                                   MISSING_PARAMETER_VALUE, "samplingTime");

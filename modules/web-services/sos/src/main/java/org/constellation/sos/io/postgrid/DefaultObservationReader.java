@@ -164,7 +164,7 @@ public class DefaultObservationReader implements ObservationReader {
             //we build the prepared Statement
             newObservationIDStmt    = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observations\" WHERE name LIKE '%" + observationIdBase + "%' ");
             newMeasurementIDStmt    = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"measurements\" WHERE name LIKE '%" + observationIdBase + "%' ");
-            observationExistStmt    = omDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=?");
+            observationExistStmt    = omDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=? UNION SELECT name FROM \"measurements\" WHERE name=?");
             getMinEventTimeOffering = omDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
         } catch (SQLException ex) {
             throw new CstlServiceException("SQL Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -443,24 +443,32 @@ public class DefaultObservationReader implements ObservationReader {
      * Create a new identifier for an observation by searching in the O&M database.
      */
     @Override
-    public String getNewObservationId(String type) throws CstlServiceException {
+    public String getNewObservationId() throws CstlServiceException {
         try {
-            ResultSet res;
-            if (type != null && type.equals("measurement")) {
-                res = newMeasurementIDStmt.executeQuery();
-            } else {
-                res = newObservationIDStmt.executeQuery();
-            }
-            int id = -1;
-            while (res.next()) {
-                id = res.getInt(1);
+            ResultSet res = newMeasurementIDStmt.executeQuery();
+            int nbMeas = 0;
+            if (res.next()) {
+                nbMeas = res.getInt(1);
             }
             res.close();
+            
+            int nbObs = 0;
+            res = newObservationIDStmt.executeQuery();
+            if (res.next()) {
+                nbObs = res.getInt(1);
+            }
+            res.close();
+
+
+            int id = nbMeas + nbObs;
+
+            System.out.println("nb obs:" + nbObs + " nb meas" + nbMeas + "id = " + id);
             //there is a possibility that someone delete some observation manually.
             // so we must verify that this id is not already assigned. if it is we must find a free identifier
             do {
                 id ++;
                 observationExistStmt.setString(1, observationIdBase + id);
+                observationExistStmt.setString(2, observationIdBase + id);
                 res = observationExistStmt.executeQuery();
             } while (res.next());
             res.close();
