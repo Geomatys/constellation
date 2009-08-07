@@ -592,8 +592,7 @@ public class WMSWorker extends AbstractWMSWorker {
         // 1. SCENE
         //       -- get the List of layer references
         final List<String> layerNames = getFI.getQueryLayers();
-        final List<LayerDetails> layerRefs;
-        layerRefs = getLayerReferences(layerNames, getFI.getVersion().toString());
+        final List<LayerDetails> layerRefs = getLayerReferences(layerNames, getFI.getVersion().toString());
 
         for (LayerDetails layer : layerRefs) {
             if (!layer.isQueryable(ServiceType.GETINFO)) {
@@ -606,24 +605,7 @@ public class WMSWorker extends AbstractWMSWorker {
         final List<String> styleNames          = getFI.getStyles();
         final MutableStyledLayerDescriptor sld = getFI.getSld();
 
-        final List<MutableStyle> styles = new ArrayList<MutableStyle>();
-        for (int i=0; i<layerRefs.size(); i++) {
-
-            final MutableStyle style;
-            if (sld != null) {
-                //try to use the provided SLD
-                style = extractStyle(layerRefs.get(i).getName(),sld);
-            } else if (styleNames != null && styles.size() > i) {
-                //try to grab the style if provided
-                //a style has been given for this layer, try to use it
-                final String namedStyle = styleNames.get(i);
-                style = StyleProviderProxy.getInstance().get(namedStyle);
-            } else {
-                //no defined styles, use the favorite one, let the layer get it himself.
-                style = null;
-            }
-            styles.add(style);
-        }
+        final List<MutableStyle> styles        = getStyles(layerRefs, sld, styleNames);
         //       -- create the rendering parameter Map
         final Double elevation                 = getFI.getElevation();
         final Date time                        = getFI.getTime();
@@ -763,24 +745,7 @@ public class WMSWorker extends AbstractWMSWorker {
         final List<String> styleNames          = getMap.getStyles();
         final MutableStyledLayerDescriptor sld = getMap.getSld();
 
-        final List<MutableStyle> styles = new ArrayList<MutableStyle>();
-        for (int i=0; i<layerRefs.size(); i++) {
-
-            final MutableStyle style;
-            if (sld != null) {
-                //try to use the provided SLD
-                style = extractStyle(layerRefs.get(i).getName(),sld);
-            } else if (styleNames != null && styles.size() > i) {
-                //try to grab the style if provided
-                //a style has been given for this layer, try to use it
-                final String namedStyle = styleNames.get(i);
-                style = StyleProviderProxy.getInstance().get(namedStyle);
-            } else {
-                //no defined styles, use the favorite one, let the layer get it himself.
-                style = null;
-            }
-            styles.add(style);
-        }
+        final List<MutableStyle> styles = getStyles(layerRefs, sld, styleNames);
         //       -- create the rendering parameter Map
         final Double elevation                 = getMap.getElevation();
         final Date time                        = getMap.getTime();
@@ -920,4 +885,27 @@ public class WMSWorker extends AbstractWMSWorker {
         return null;
     }
 
+    private List<MutableStyle> getStyles(final List<LayerDetails> layerRefs, final MutableStyledLayerDescriptor sld,
+                                         final List<String> styleNames)
+    {
+        final List<MutableStyle> styles = new ArrayList<MutableStyle>();
+        for (int i=0; i<layerRefs.size(); i++) {
+
+            final MutableStyle style;
+            if (sld != null) {
+                //try to use the provided SLD
+                style = extractStyle(layerRefs.get(i).getName(), sld);
+            } else if (styleNames != null && styleNames.size() > i) {
+                //try to grab the style if provided
+                //a style has been given for this layer, try to use it
+                final String namedStyle = styleNames.get(i);
+                style = StyleProviderProxy.getInstance().get(namedStyle);
+            } else {
+                //no defined styles, use the favorite one, let the layer get it himself.
+                style = null;
+            }
+            styles.add(style);
+        }
+        return styles;
+    }
 }
