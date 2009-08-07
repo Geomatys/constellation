@@ -50,6 +50,7 @@ public class ProviderConfig {
     private static final String PARAM_ELEVATION_END = "elevation_end";
     private static final String PARAM_ELEVATION_MODEL = "elevation_model";
     private static final String PARAM_IS_ELEVATION_MODEL = "is_elevation_model";
+    private static final String PARAM_LOAD_ALL = "load_all";
     
     public final List<ProviderSource> sources = new ArrayList<ProviderSource>();
     
@@ -79,7 +80,14 @@ public class ProviderConfig {
         
         final NodeList paramNodes = element.getElementsByTagName(TAG_PARAMETER);
         final NodeList layerNodes = element.getElementsByTagName(TAG_LAYER);
-        
+
+
+        // parse properties
+        final String loadAll = element.getAttribute(PARAM_LOAD_ALL);
+        if (loadAll != null && Boolean.valueOf(loadAll)) {
+            source.loadAll = true;
+        }
+
         //parse parameters
         for(int i=0, n=paramNodes.getLength(); i<n; i++){
             final Element paramNode = (Element)paramNodes.item(i);

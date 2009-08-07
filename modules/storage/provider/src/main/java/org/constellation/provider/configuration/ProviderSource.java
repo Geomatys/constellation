@@ -30,6 +30,12 @@ import java.util.Map;
  * @author Johann Sorel (Geomatys)
  */
 public class ProviderSource {
+    /**
+     * Defines whether all data found in the directory specified in {@link #parameters}
+     * are taken in account, or just the one listed in {@link #layers}.
+     * By default, {@code false}, meaning only layers defined in {@link #layers} are handled.
+     */
+    public boolean loadAll = false;
 
     public final Map<String,String> parameters = new HashMap<String, String>();
     

@@ -19,6 +19,7 @@ package org.constellation.provider.shapefile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,7 +53,10 @@ public class ShapeFileProvider implements LayerProvider {
      * Default logger.
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.shapefile");
-    public static final String KEY_SHAPEFILE_CONFIG = "shapefile_config";
+
+    /**
+     * Key for the path of the directory which contains shapefiles.
+     */
     public static final String KEY_FOLDER_PATH = "path";
 
     /**
@@ -150,14 +154,24 @@ public class ShapeFileProvider implements LayerProvider {
 
         if(store != null) {
             final ProviderLayer layer = source.getLayer(key);
-            final List<String> styles = layer.styles;
-            try {
-                return new ShapeFileLayerDetails(key, store.getFeatureSource(key), styles,
-                        layer.dateStartField,layer.dateEndField,
-                        layer.elevationStartField,layer.elevationEndField);
-            } catch (IOException ex) {
-                //we could not create the feature source
-                LOGGER.log(Level.SEVERE, "we could not create the feature source", ex);
+            if (layer == null) {
+                try {
+                    return new ShapeFileLayerDetails(key, store.getFeatureSource(key), null,
+                            null, null, null, null);
+                } catch (IOException ex) {
+                    //we could not create the feature source
+                    LOGGER.log(Level.SEVERE, "we could not create the feature source", ex);
+                }
+            } else {
+                final List<String> styles = layer.styles;
+                try {
+                    return new ShapeFileLayerDetails(key, store.getFeatureSource(key), styles,
+                            layer.dateStartField, layer.dateEndField,
+                            layer.elevationStartField, layer.elevationEndField);
+                } catch (IOException ex) {
+                    //we could not create the feature source
+                    LOGGER.log(Level.SEVERE, "we could not create the feature source", ex);
+                }
             }
         }
 
@@ -218,7 +232,7 @@ public class ShapeFileProvider implements LayerProvider {
             String fullName = candidate.getName();
             if(fullName.toLowerCase().endsWith(MASK)){
                 String name = fullName.substring(0, fullName.length()-4);
-                if(source.containsLayer(name)){
+                if(source.loadAll || source.containsLayer(name)){
                     index.put(name, candidate);
                 }
             }

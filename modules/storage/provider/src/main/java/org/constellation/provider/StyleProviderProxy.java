@@ -19,6 +19,7 @@ package org.constellation.provider;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -112,6 +113,10 @@ public final class StyleProviderProxy implements Provider<String,MutableStyle>{
         }
 
         return null;
+    }
+
+    public Collection<StyleProviderService> getServices() {
+        return Collections.unmodifiableCollection(SERVICES);
     }
 
     /**
