@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco"
+                 xmlns:gmd="http://www.isotc211.org/2005/gmd"
+                 xmlns:fra="http://www.cnig.gouv.fr/2005/fra"
+                 xmlns:gmx="http://www.isotc211.org/2005/gmx"
+                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                 xmlns:gml="http://www.opengis.net/gml">
+    <gmd:fileIdentifier>
+        <gco:CharacterString>MDWeb_FR_SY_couche_vecteur_258</gco:CharacterString>
+    </gmd:fileIdentifier>
+    <gmd:language>
+        <gco:CharacterString>fra</gco:CharacterString>
+    </gmd:language>
+    <gmd:characterSet>
+        <gmd:MD_CharacterSetCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#8859part1" codeListValue="8859part1"/>
+    </gmd:characterSet>
+    <gmd:contact>
+        <gmd:CI_ResponsibleParty>
+            <gmd:organisationName>
+                <gco:CharacterString>ifremer Laboratoire Environnement Ressource du Languedoc Roussillon (LER LR)</gco:CharacterString>
+            </gmd:organisationName>
+            <gmd:contactInfo>
+                <gmd:CI_Contact>
+                    <gmd:address>
+                        <gmd:CI_Address>
+                            <gmd:deliveryPoint>
+                                <gco:CharacterString>avenue jean monnet BP 171</gco:CharacterString>
+                            </gmd:deliveryPoint>
+                            <gmd:city>
+                                <gco:CharacterString>Sete</gco:CharacterString>
+                            </gmd:city>
+                            <gmd:postalCode>
+                                <gco:CharacterString>34203 Cedex</gco:CharacterString>
+                            </gmd:postalCode>
+                            <gmd:electronicMailAddress>
+                                <gco:CharacterString>gregory.messiaen@ifremer.fr</gco:CharacterString>
+                            </gmd:electronicMailAddress>
+                        </gmd:CI_Address>
+                    </gmd:address>
+                    <gmd:onlineResource>
+                        <gmd:CI_OnlineResource>
+                            <gmd:linkage>
+                                <gmd:URL>http://www.ifremer.fr/lerlr/</gmd:URL>
+                            </gmd:linkage>
+                            <gmd:protocol>
+                                <gco:CharacterString>http</gco:CharacterString>
+                            </gmd:protocol>
+                        </gmd:CI_OnlineResource>
+                    </gmd:onlineResource>
+                </gmd:CI_Contact>
+            </gmd:contactInfo>
+            <gmd:role>
+                <gmd:CI_RoleCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#pointOfContact" codeListValue="pointOfContact"/>
+            </gmd:role>
+        </gmd:CI_ResponsibleParty>
+    </gmd:contact>
+    <gmd:dateStamp>
+        <gco:DateTime>2006-10-06T00:00:00+02:00</gco:DateTime>
+    </gmd:dateStamp>
+    <gmd:metadataStandardName>
+        <gco:CharacterString>ISO 19115 - FDIS 2003</gco:CharacterString>
+    </gmd:metadataStandardName>
+    <gmd:metadataStandardVersion>
+        <gco:CharacterString>Thème vecteur</gco:CharacterString>
+    </gmd:metadataStandardVersion>
+    <gmd:referenceSystemInfo>
+        <gmd:MD_ReferenceSystem xsi:type="fra:FRA_DirectReferenceSystem" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+    </gmd:referenceSystemInfo>
+    <gmd:identificationInfo>
+        <fra:FRA_DataIdentification>
+            <gmd:citation>
+                <gmd:CI_Citation>
+                    <gmd:title>
+                        <gco:CharacterString>Physico-chimie de la colonne d'eau (cyanopicophytoplancton), acquis dans le cadre du Réseau du Suivi Lagunaire: lagune de Thau</gco:CharacterString>
+                    </gmd:title>
+                    <gmd:date>
+                        <gmd:CI_Date>
+                            <gmd:date>
+                                <gco:DateTime>2006-01-01T00:00:00+01:00</gco:DateTime>
+                            </gmd:date>
+                            <gmd:dateType>
+                                <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#creation" codeListValue="creation"/>
+                            </gmd:dateType>
+                        </gmd:CI_Date>
+                    </gmd:date>
+                    <gmd:citedResponsibleParty>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:organisationName>
+                                <gco:CharacterString>ifremer Laboratoire Environnement Ressource du Languedoc Roussillon (LER LR)</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:contactInfo>
+                                <gmd:CI_Contact>
+                                    <gmd:address>
+                                        <gmd:CI_Address>
+                                            <gmd:deliveryPoint>
+                                                <gco:CharacterString>avenue jean monnet BP 171</gco:CharacterString>
+                                            </gmd:deliveryPoint>
+                                            <gmd:city>
+                                                <gco:CharacterString>Sete</gco:CharacterString>
+                                            </gmd:city>
+                                            <gmd:postalCode>
+                                                <gco:CharacterString>34203 Cedex</gco:CharacterString>
+                                            </gmd:postalCode>
+                                            <gmd:electronicMailAddress>
+                                                <gco:CharacterString>gregory.messiaen@ifremer.fr</gco:CharacterString>
+                                            </gmd:electronicMailAddress>
+                                        </gmd:CI_Address>
+                                    </gmd:address>
+                                    <gmd:onlineResource>
+                                        <gmd:CI_OnlineResource>
+                                            <gmd:linkage>
+                                                <gmd:URL>http://www.ifremer.fr/lerlr/</gmd:URL>
+                                            </gmd:linkage>
+                                            <gmd:protocol>
+                                                <gco:CharacterString>http</gco:CharacterString>
+                                            </gmd:protocol>
+                                        </gmd:CI_OnlineResource>
+                                    </gmd:onlineResource>
+                                </gmd:CI_Contact>
+                            </gmd:contactInfo>
+                            <gmd:role>
+                                <gmd:CI_RoleCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#pointOfContact" codeListValue="pointOfContact"/>
+                            </gmd:role>
+                        </gmd:CI_ResponsibleParty>
+                    </gmd:citedResponsibleParty>
+                    <gmd:presentationForm>
+                        <gmd:CI_PresentationFormCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#vector theme" codeListValue="vector theme"/>
+                    </gmd:presentationForm>
+                </gmd:CI_Citation>
+            </gmd:citation>
+            <gmd:abstract>
+                <gco:CharacterString>Abondance de cellule de cyanopicophytoplancton (&lt; 3 µm). Méthode: cytométrie en flux.</gco:CharacterString>
+            </gmd:abstract>
+            <gmd:credit>
+                <gco:CharacterString>LERLR ifremer</gco:CharacterString>
+            </gmd:credit>
+            <gmd:status>
+                <gmd:MD_ProgressCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#planned" codeListValue="planned"/>
+            </gmd:status>
+            <gmd:resourceFormat>
+                <gmd:MD_Format>
+                    <gmd:name>
+                        <gco:CharacterString>shape file</gco:CharacterString>
+                    </gmd:name>
+                    <gmd:version>
+                        <gco:CharacterString>Arcview 8.3</gco:CharacterString>
+                    </gmd:version>
+                </gmd:MD_Format>
+            </gmd:resourceFormat>
+            <gmd:descriptiveKeywords>
+                <gmd:MD_Keywords>
+                    <gmd:keyword>
+                        <gco:CharacterString>Eutrophisation</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:keyword>
+                        <gco:CharacterString>thau</gco:CharacterString>
+                    </gmd:keyword>
+                </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+            <gmd:spatialRepresentationType>
+                <gmd:MD_SpatialRepresentationTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#vector" codeListValue="vector"/>
+            </gmd:spatialRepresentationType>
+            <gmd:spatialResolution>
+                <gmd:MD_Resolution>
+                    <gmd:equivalentScale>
+                        <gmd:MD_RepresentativeFraction>
+                            <gmd:denominator>
+                                <gco:Integer>32</gco:Integer>
+                            </gmd:denominator>
+                        </gmd:MD_RepresentativeFraction>
+                    </gmd:equivalentScale>
+                </gmd:MD_Resolution>
+            </gmd:spatialResolution>
+            <gmd:language>
+                <gco:CharacterString>fra</gco:CharacterString>
+            </gmd:language>
+            <gmd:characterSet>
+                <gmd:MD_CharacterSetCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#8859part1" codeListValue="8859part1"/>
+            </gmd:characterSet>
+            <gmd:topicCategory>
+                <gmd:MD_TopicCategoryCode>environment</gmd:MD_TopicCategoryCode>
+            </gmd:topicCategory>
+            <gmd:extent>
+                <gmd:EX_Extent>
+                    <gmd:geographicElement>
+                        <gmd:EX_GeographicBoundingBox>
+                            <gmd:westBoundLongitude>
+                                <gco:Decimal>3.54323</gco:Decimal>
+                            </gmd:westBoundLongitude>
+                            <gmd:eastBoundLongitude>
+                                <gco:Decimal>3.692524</gco:Decimal>
+                            </gmd:eastBoundLongitude>
+                            <gmd:southBoundLatitude>
+                                <gco:Decimal>43.331364</gco:Decimal>
+                            </gmd:southBoundLatitude>
+                            <gmd:northBoundLatitude>
+                                <gco:Decimal>43.456142</gco:Decimal>
+                            </gmd:northBoundLatitude>
+                        </gmd:EX_GeographicBoundingBox>
+                    </gmd:geographicElement>
+                    <gmd:geographicElement>
+                        <gmd:EX_GeographicDescription>
+                            <gmd:geographicIdentifier>
+                                <gmd:RS_Identifier>
+                                    <gmd:code>
+                                        <gco:CharacterString>N_43.456_E_3.692_S_43.331_W_3.543</gco:CharacterString>
+                                    </gmd:code>
+                                </gmd:RS_Identifier>
+                            </gmd:geographicIdentifier>
+                        </gmd:EX_GeographicDescription>
+                    </gmd:geographicElement>
+                    <gmd:temporalElement>
+                        <gmd:EX_TemporalExtent/>
+                    </gmd:temporalElement>
+                </gmd:EX_Extent>
+            </gmd:extent>
+        </fra:FRA_DataIdentification>
+    </gmd:identificationInfo>
+    <gmd:distributionInfo>
+        <gmd:MD_Distribution>
+            <gmd:distributionFormat>
+                <gmd:MD_Format>
+                    <gmd:name>
+                        <gco:CharacterString>shape file</gco:CharacterString>
+                    </gmd:name>
+                    <gmd:version>
+                        <gco:CharacterString>Arcview 8.3</gco:CharacterString>
+                    </gmd:version>
+                </gmd:MD_Format>
+            </gmd:distributionFormat>
+            <gmd:distributor>
+                <gmd:MD_Distributor>
+                    <gmd:distributorContact>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:organisationName>
+                                <gco:CharacterString>ifremer Laboratoire Environnement Ressource du Languedoc Roussillon (LER LR)</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:contactInfo>
+                                <gmd:CI_Contact>
+                                    <gmd:address>
+                                        <gmd:CI_Address>
+                                            <gmd:deliveryPoint>
+                                                <gco:CharacterString>avenue jean monnet BP 171</gco:CharacterString>
+                                            </gmd:deliveryPoint>
+                                            <gmd:city>
+                                                <gco:CharacterString>Sete</gco:CharacterString>
+                                            </gmd:city>
+                                            <gmd:postalCode>
+                                                <gco:CharacterString>34203 Cedex</gco:CharacterString>
+                                            </gmd:postalCode>
+                                            <gmd:electronicMailAddress>
+                                                <gco:CharacterString>gregory.messiaen@ifremer.fr</gco:CharacterString>
+                                            </gmd:electronicMailAddress>
+                                        </gmd:CI_Address>
+                                    </gmd:address>
+                                    <gmd:onlineResource>
+                                        <gmd:CI_OnlineResource>
+                                            <gmd:linkage>
+                                                <gmd:URL>http://www.ifremer.fr/lerlr/</gmd:URL>
+                                            </gmd:linkage>
+                                            <gmd:protocol>
+                                                <gco:CharacterString>http</gco:CharacterString>
+                                            </gmd:protocol>
+                                        </gmd:CI_OnlineResource>
+                                    </gmd:onlineResource>
+                                </gmd:CI_Contact>
+                            </gmd:contactInfo>
+                            <gmd:role>
+                                <gmd:CI_RoleCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#pointOfContact" codeListValue="pointOfContact"/>
+                            </gmd:role>
+                        </gmd:CI_ResponsibleParty>
+                    </gmd:distributorContact>
+                </gmd:MD_Distributor>
+            </gmd:distributor>
+            <gmd:transferOptions>
+                <gmd:MD_DigitalTransferOptions>
+                    <gmd:transferSize>
+                        <gco:Decimal>0.0050</gco:Decimal>
+                    </gmd:transferSize>
+                    <gmd:offLine>
+                        <gmd:MD_Medium>
+                            <gmd:name>
+                                <gmd:MD_MediumNameCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#none" codeListValue="none"/>
+                            </gmd:name>
+                            <gmd:mediumFormat>
+                                <gmd:MD_MediumFormatCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#none" codeListValue="none"/>
+                            </gmd:mediumFormat>
+                        </gmd:MD_Medium>
+                    </gmd:offLine>
+                </gmd:MD_DigitalTransferOptions>
+            </gmd:transferOptions>
+        </gmd:MD_Distribution>
+    </gmd:distributionInfo>
+    <gmd:dataQualityInfo>
+        <gmd:DQ_DataQuality>
+            <gmd:scope>
+                <gmd:DQ_Scope>
+                    <gmd:level>
+                        <gmd:MD_ScopeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#dataset" codeListValue="dataset"/>
+                    </gmd:level>
+                </gmd:DQ_Scope>
+            </gmd:scope>
+        </gmd:DQ_DataQuality>
+    </gmd:dataQualityInfo>
+</gmd:MD_Metadata>

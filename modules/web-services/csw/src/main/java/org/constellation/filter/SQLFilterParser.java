@@ -39,9 +39,7 @@ import org.geotoolkit.csw.xml.QueryConstraint;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotools dependencies
-import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.filter.text.cql2.CQLException;
-import org.geotoolkit.geometry.GeneralEnvelope;
 
 // MDWeb dependencies
 import org.geotoolkit.geometry.jts.SRIDGenerator;
@@ -73,8 +71,6 @@ import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 import org.mdweb.model.schemas.Standard;
 
 // GeoAPI dependencies
-import org.opengis.filter.expression.Expression;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 

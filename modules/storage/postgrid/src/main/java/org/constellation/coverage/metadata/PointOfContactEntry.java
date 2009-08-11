@@ -91,30 +91,31 @@ final class PointOfContactEntry extends Entry implements PointOfContact {
     }    
 
     public String getMetadata() {
+        final String closeRow = "</td></tr>";
         String res = "<table border=1>" +
-                //"<tr><td>poc id:</td><td>           " + pocId + "</td></tr>" +
+                //"<tr><td>poc id:</td><td>           " + pocId + closeRow +
                 "<th colspan=2>Point Of Contact</th>" +
-                "<tr><td>Last Name:</td><td>        " + lastName + "</td></tr>" +
-                "<tr><td>First Name:</td><td>       " + firstName + "</td></tr>" +
-                "<tr><td>Address Line 1:</td><td>   " + address1 + "</td></tr>" +
-                "<tr><td>Address Line 2:</td><td>   " + address2 + "</td></tr>" +
-                "<tr><td>City:</td><td>             " + city + "</td></tr>" +
-                "<tr><td>State:</td><td>            " + state + "</td></tr>" +
-                "<tr><td>Country:</td><td>          " + country + "</td></tr>" +
-                "<tr><td>Zip:</td><td>              " + zip + "</td></tr>" +
-                "<tr><td>Phone:</td><td>            " + phone + "</td></tr>" +
-                "<tr><td>Email:</td><td>            " + email + "</td></tr>" +
+                "<tr><td>Last Name:</td><td>        " + lastName  + closeRow +
+                "<tr><td>First Name:</td><td>       " + firstName + closeRow +
+                "<tr><td>Address Line 1:</td><td>   " + address1  + closeRow +
+                "<tr><td>Address Line 2:</td><td>   " + address2  + closeRow +
+                "<tr><td>City:</td><td>             " + city      + closeRow +
+                "<tr><td>State:</td><td>            " + state     + closeRow +
+                "<tr><td>Country:</td><td>          " + country   + closeRow +
+                "<tr><td>Zip:</td><td>              " + zip       + closeRow +
+                "<tr><td>Phone:</td><td>            " + phone     + closeRow +
+                "<tr><td>Email:</td><td>            " + email     + closeRow +
                 "</table>" +
                 "<table border=1>" +
-                //"<tr><td>Organization:</td><td>     " + org + "</td></tr>" +
+                //"<tr><td>Organization:</td><td>     " + org + closeRow +
                 "<th colspan=2>" + org + "</th>" +
-                "<tr><td>Address Line 1:</td><td>   " + orgAddress1 + "</td></tr>" +
-                "<tr><td>Address Line 2:</td><td>   " + orgAddress2 + "</td></tr>" +
-                "<tr><td>City:</td><td>             " + orgCity + "</td></tr>" +
-                "<tr><td>State:</td><td>            " + orgState + "</td></tr>" +
-                "<tr><td>Country:</td><td>          " + orgCountry + "</td></tr>" +
-                "<tr><td>Zip:</td><td>              " + orgZip + "</td></tr>" +
-                "<tr><td>Contact:</td><td>          " + orgContact + "</td></tr>" +
+                "<tr><td>Address Line 1:</td><td>   " + orgAddress1 + closeRow +
+                "<tr><td>Address Line 2:</td><td>   " + orgAddress2 + closeRow +
+                "<tr><td>City:</td><td>             " + orgCity     + closeRow +
+                "<tr><td>State:</td><td>            " + orgState    + closeRow +
+                "<tr><td>Country:</td><td>          " + orgCountry  + closeRow +
+                "<tr><td>Zip:</td><td>              " + orgZip      + closeRow +
+                "<tr><td>Contact:</td><td>          " + orgContact  + closeRow +
                 "</table>";
                 
         return res;

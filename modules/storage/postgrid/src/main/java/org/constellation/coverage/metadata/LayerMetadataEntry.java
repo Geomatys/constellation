@@ -76,22 +76,24 @@ final class LayerMetadataEntry extends Entry implements LayerMetadata {
     }    
 
     public String getMetadata() {
-        String res = "<table border=1>" +
-                //"<tr><td>layer meta name:   " + layerMetaName + "</td></tr>" +
-                //"<tr><td>Layer Name:</td><td>        " + layerName + "</td></tr>" +
+        final String closeRow = "</td></tr>";
+
+        final String res = "<table border=1>" +
+                //"<tr><td>layer meta name:   " + layerMetaName + closeRow +
+                //"<tr><td>Layer Name:</td><td>        " + layerName + closeRow +
                 "<th colspan=2>" + shortTitle + "</th>" +
-                "<tr><td>Abbrev. Title:</td><td>        " + abbrTitle + "</td></tr>" +
-                "<tr><td>Short Title:</td><td>       " + shortTitle + "</td></tr>" +
-                "<tr><td>Long Title:</td><td>        " + longTitle + "</td></tr>" +
-                "<tr><td>Parameter Pame:</td><td>    " + parameterName + "</td></tr>" +
-                "<tr><td>Parameter Type:</td><td>    "+ parameterType + "</td></tr>" +
-                "<tr><td>Description:</td><td>       " + description + "</td></tr>" +
-                "<tr><td>Long Description:</td><td>  " + longDescription + "</td></tr>" +
-                "<tr><td>Data Source:</td><td>       " + dataSource + "</td></tr>" +
-                "<tr><td>Purpose:</td><td>            " + purpose + "</td></tr>" +
-                "<tr><td>Supplemental Info:</td><td> " + supplementalInfo + "</td></tr>" +
-                "<tr><td>Update Frequency:</td><td>  " + updateFrequency + "</td></tr>" +
-                "<tr><td>Use Constraint:</td><td>    " + useConstraint +"</td></tr>" +
+                "<tr><td>Abbrev. Title:</td><td>        " + abbrTitle     + closeRow +
+                "<tr><td>Short Title:</td><td>       " + shortTitle       + closeRow +
+                "<tr><td>Long Title:</td><td>        " + longTitle        + closeRow +
+                "<tr><td>Parameter Pame:</td><td>    " + parameterName    + closeRow +
+                "<tr><td>Parameter Type:</td><td>    " + parameterType    + closeRow +
+                "<tr><td>Description:</td><td>       " + description      + closeRow +
+                "<tr><td>Long Description:</td><td>  " + longDescription  + closeRow +
+                "<tr><td>Data Source:</td><td>       " + dataSource       + closeRow +
+                "<tr><td>Purpose:</td><td>           " + purpose          + closeRow +
+                "<tr><td>Supplemental Info:</td><td> " + supplementalInfo + closeRow +
+                "<tr><td>Update Frequency:</td><td>  " + updateFrequency  + closeRow +
+                "<tr><td>Use Constraint:</td><td>    " + useConstraint    + closeRow +
                 "</table>" ;
         return res;
     }

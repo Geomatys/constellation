@@ -49,7 +49,7 @@ import org.constellation.ws.rs.WebService;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class MailSendingUtilities {
+public final class MailSendingUtilities {
 
     private static final String FROM;
     private static final String MAILHOST;
@@ -84,10 +84,11 @@ public class MailSendingUtilities {
 
 
         final Properties mailingProps = System.getProperties();
-        mailingProps.put("mail." + PROTOCOLE + ".auth", AUTH);
-        mailingProps.put("mail." + PROTOCOLE + ".port", PORT);
-        mailingProps.put("mail." + PROTOCOLE + ".user", USER);
-        mailingProps.put("mail." + PROTOCOLE + ".host", MAILHOST);
+        final String prefix           = "mail.";
+        mailingProps.put(prefix + PROTOCOLE + ".auth", AUTH);
+        mailingProps.put(prefix + PROTOCOLE + ".port", PORT);
+        mailingProps.put(prefix + PROTOCOLE + ".user", USER);
+        mailingProps.put(prefix + PROTOCOLE + ".host", MAILHOST);
 
         final char[] keyStorePassword = "pass".toCharArray();
         final String keyAlias = "secretKeyAlias";
@@ -171,7 +172,7 @@ public class MailSendingUtilities {
 
         //send the message
         final SMTPTransport transport = (SMTPTransport) SESSION.getTransport(PROTOCOLE);
-        if (Boolean.valueOf(AUTH) == true) { transport.connect(MAILHOST, PORT, USER, PASSWORD); }
+        if (Boolean.valueOf(AUTH)) { transport.connect(MAILHOST, PORT, USER, PASSWORD); }
         else {      transport.connect(); }
 
         transport.sendMessage(msg, msg.getAllRecipients());

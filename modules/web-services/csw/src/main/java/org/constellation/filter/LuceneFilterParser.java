@@ -40,8 +40,6 @@ import org.apache.lucene.search.Filter;
 import org.geotoolkit.gml.GMLUtilities;
 import org.constellation.metadata.Parameters;
 import org.geotoolkit.csw.xml.QueryConstraint;
-import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.factory.Hints;
 import org.geotoolkit.filter.text.cql2.CQLException;
 import org.geotoolkit.geometry.jts.SRIDGenerator;
 import org.geotoolkit.geometry.jts.SRIDGenerator.Version;
@@ -71,9 +69,6 @@ import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 
 // GeoAPI dependencies
-import org.geotoolkit.referencing.CRS;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.Expression;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 

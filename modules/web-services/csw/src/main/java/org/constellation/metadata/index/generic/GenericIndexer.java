@@ -86,6 +86,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      */
     private ExecutorService pool = Executors.newFixedThreadPool(6);
 
+    private static final String NULL_VALUE = "null";
+
     /**
      * Creates a new Lucene Index into the specified directory with the specified generic database reader.
      * 
@@ -143,7 +145,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             writer = new IndexWriter(getFileDirectory(), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
 
             // TODO getting the objects list and index avery item in the IndexWriter.
-            List<? extends Object> ids = reader.getAllEntries();
+            final List<? extends Object> ids = reader.getAllEntries();
             LOGGER.info("all entries read in " + (System.currentTimeMillis() - time) + " ms.");
             nbEntries = ids.size();
             for (Object entry : ids) {
@@ -176,7 +178,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      */
     public void createIndex(List<? extends Object> toIndex) throws IndexingException {
         LOGGER.info("Creating lucene index for Generic database please wait...");
-        long time = System.currentTimeMillis();
+        final long time = System.currentTimeMillis();
         IndexWriter writer;
         int nbEntries = 0;
         try {
@@ -288,7 +290,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 if (values.term != null && !values.term.equals("AnyText")) {
                     doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
                     doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                    if (values.value != null && !values.value.equals("null") && anyText.indexOf(values.value) == -1) {
+                    if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
                         anyText.append(values.value).append(" ");
                     }
                 }
@@ -301,7 +303,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         }
         
         //we add the geometry parts
-        String coord = "null";
+        String coord = NULL_VALUE;
         try {
             coord = getValues(metadata, ISO_QUERYABLE.get("WestBoundLongitude"));
             StringTokenizer tokens = new StringTokenizer(coord, ",;");
@@ -349,7 +351,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             }
 
         } catch (NumberFormatException e) {
-            if (!coord.equals("null")) {
+            if (!coord.equals(NULL_VALUE)) {
                 LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
                         "cause:  unable to parse double: " + coord);
             }
@@ -371,7 +373,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 final TermValue values = cs.take().get();
                 doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
                 doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                if (values.value != null && !values.value.equals("null") && anyText.indexOf(values.value) == -1) {
+                if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
                     anyText.append(values.value).append(" ");
                 }
                 
@@ -383,7 +385,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         }
             
         //we add the geometry parts
-        coord = "null";
+        coord = NULL_VALUE;
         try {
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"));
             StringTokenizer tokens = new StringTokenizer(coord, ",;");
@@ -433,7 +435,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             }
             
         } catch (NumberFormatException e) {
-            if (!coord.equals("null"))
+            if (!coord.equals(NULL_VALUE))
                 LOGGER.severe("unable to spatially index metadata: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
                               "cause:  unable to parse double: " + coord);
         }
@@ -443,7 +445,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             for (String term : additionalQueryable.keySet()) {
 
                 String values = getValues(metadata, additionalQueryable.get(term));
-                if (!values.equals("null")) {
+                if (!values.equals(NULL_VALUE)) {
                     LOGGER.finer("put " + term + " values: " + values);
                     anyText.append(values).append(" ");
                 }
@@ -496,7 +498,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 
                 if (conditionalAttribute == null) {
                     final String value = getValuesFromPath(pathID, metadata);
-                    if (value != null && !value.equals("") && !value.equals("null"))
+                    if (value != null && !value.equals("") && !value.equals(NULL_VALUE))
                         response.append(value).append(',');
                 } else {
                     response.append(getConditionalValuesFromPath(pathID, conditionalAttribute, conditionalValue, metadata)).append(',');
@@ -504,7 +506,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             }
         }
         if (response.toString().equals("")) {
-            response.append("null");
+            response.append(NULL_VALUE);
         } else {
             // we remove the last ','
             response.delete(response.length() - 1, response.length()); 
@@ -577,7 +579,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     private String getStringValue(Object obj) {
         String result = "";
         if (obj == null) {
-            return "null";
+            return NULL_VALUE;
         } else if (obj instanceof String) {
             result = (String) obj;
         } else if (obj instanceof InternationalString) {
@@ -596,7 +598,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             if (result.indexOf(',') != -1)
             result = result.substring(0, result.length() - 1);
             if (result.length() == 0)
-                result = "null";
+                result = NULL_VALUE;
         } else if (obj instanceof org.opengis.util.CodeList) {
             result = ((org.opengis.util.CodeList)obj).name();
         
@@ -609,7 +611,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             if (inst.getPosition() != null && inst.getPosition().getDate() != null) {
                 result = dateFormat.format(inst.getPosition().getDate());
             } else {
-                result = "null";
+                result = NULL_VALUE;
             }
             
         } else if (obj instanceof Date) {

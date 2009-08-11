@@ -105,7 +105,6 @@ import org.opengis.metadata.identification.Keywords;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.spatial.GeometricObjectType;
-import org.opengis.metadata.spatial.SpatialRepresentation;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.datum.VerticalDatumType;
 import org.opengis.temporal.Period;
@@ -871,6 +870,12 @@ public class MetadataUnmarshallTest {
         TemporalPrimitive tmpObj = extent2.getTemporalElements().iterator().next().getExtent();
 
         assertTrue(tmpObj instanceof Period);
+
+
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta7.xml"));
+
+        assertTrue(obj instanceof DefaultMetaData);
+        result = (DefaultMetaData) obj;
 
     }
 
