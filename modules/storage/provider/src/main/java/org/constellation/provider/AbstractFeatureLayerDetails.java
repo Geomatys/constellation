@@ -179,8 +179,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
             }
 
             if(renv != null){
-                GeographicBoundingBox bbox = new DefaultGeographicBoundingBox(renv);
-                return bbox;
+                return new DefaultGeographicBoundingBox(renv);
             }
 
         }catch(Exception e){
@@ -221,7 +220,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
                 features = coll.features();
                 while(features.hasNext()){
                     final SimpleFeature sf = features.next();
-                    Date date = (Date) sf.getAttribute(dateStartField);
+                    final Date date = (Date) sf.getAttribute(dateStartField);
                     if(date != null){
                         dates.add(date);
                     }
@@ -269,7 +268,7 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
                 features = coll.features();
                 while(features.hasNext()){
                     final SimpleFeature sf = features.next();
-                    Number date = (Number) sf.getAttribute(elevationStartField);
+                    final Number date = (Number) sf.getAttribute(elevationStartField);
                     if(date != null){
                         elevations.add(date);
                     }

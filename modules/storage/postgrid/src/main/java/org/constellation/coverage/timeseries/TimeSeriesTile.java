@@ -95,7 +95,7 @@ public class TimeSeriesTile {
     /**
      * La bande à prendre en compte dans {@link #coverage}.
      */
-    private final int band = 0;
+    private static final int BAND = 0;
 
     /**
      * Un tableau contenant toutes les valeurs d'une bande à une position données.
@@ -293,7 +293,7 @@ public class TimeSeriesTile {
             Logging.unexpectedException(TimeSeriesTile.class, "evaluate", exception);
             return Double.NaN;
         }
-        return samples[band];
+        return samples[BAND];
     }
 
     /**

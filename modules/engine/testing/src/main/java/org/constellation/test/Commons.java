@@ -107,7 +107,6 @@ public final class Commons {
      */
     public static RenderedImage flip(final RenderedImage image) {
         final AffineTransform flip = new AffineTransform(0, 1, 1, 0, 0, 0);
-        final RenderedImage imageFlipped = AffineDescriptor.create(image, flip, null, null, null);
-        return imageFlipped;
+        return  AffineDescriptor.create(image, flip, null, null, null);
     }
 }

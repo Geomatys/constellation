@@ -19,6 +19,7 @@
 package org.constellation.metadata;
 
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -91,9 +93,12 @@ import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.constraint.Restriction;
 import org.opengis.metadata.distribution.Format;
+import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.identification.AssociationType;
 import org.opengis.metadata.identification.CharacterSet;
+import org.opengis.metadata.identification.DataIdentification;
+import org.opengis.metadata.identification.Identification;
 import org.opengis.metadata.identification.InitiativeType;
 import org.opengis.metadata.identification.KeywordType;
 import org.opengis.metadata.identification.Keywords;
@@ -103,6 +108,8 @@ import org.opengis.metadata.spatial.GeometricObjectType;
 import org.opengis.metadata.spatial.SpatialRepresentation;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.referencing.datum.VerticalDatumType;
+import org.opengis.temporal.Period;
+import org.opengis.temporal.TemporalPrimitive;
 import org.opengis.util.InternationalString;
 
 /**
@@ -778,6 +785,92 @@ public class MetadataUnmarshallTest {
         assertEquals(expResult.getIdentificationInfo(), result.getIdentificationInfo());
 
         assertEquals(expResult, result);
+
+        String xml =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + '\n' +
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gco=\"http://www.isotc211.org/2005/gco\" xmlns:gml=\"http://www.opengis.net/gml\">" + '\n' +
+        "   <gmd:identificationInfo>" + '\n' +
+	"	<gmd:MD_DataIdentification>" + '\n' +
+	"		<gmd:extent>" + '\n' +
+	"			<gmd:EX_Extent>" + '\n' +
+	"				<gmd:description>" + '\n' +
+	"					<gco:CharacterString> vertical : Ocean surface, geographical : Global scale, temporal : Near real time, </gco:CharacterString>" + '\n' +
+	"				</gmd:description>" + '\n' +
+	"				<gmd:geographicElement>" + '\n' +
+	"					<gmd:EX_BoundingPolygon>" + '\n' +
+	"						<gmd:polygon>" + '\n' +
+	"							<gml:LineString gml:id=\"ls1\"> " + '\n' +
+	"								<gml:identifier codeSpace=\"#\"> MED</gml:identifier>" + '\n' +
+	"								<gml:name>MED</gml:name>" + '\n' +
+	"								<gml:coordinates>35.47,-5.54 36.15,-5.54 46,5 46,15 40.25,26.41 38,38 30,35 29,19,35.47,-5.54</gml:coordinates>" + '\n' +
+	"							</gml:LineString>" + '\n' +
+	"						</gmd:polygon>" + '\n' +
+	"					</gmd:EX_BoundingPolygon>" + '\n' +
+	"				</gmd:geographicElement>" + '\n' +
+	"				<gmd:temporalElement>" + '\n' +
+	"					<gmd:EX_TemporalExtent>" + '\n' +
+	"						<gmd:extent>" + '\n' +
+	"							<gml:TimePeriod gml:id=\"tp1\">" + '\n' +
+	"								<gml:begin>" + '\n' +
+	"									<gml:TimeInstant gml:id=\"ti1\">" + '\n' +
+	"										<gml:timePosition>2009-06-01</gml:timePosition>" + '\n' +
+	"									</gml:TimeInstant>" + '\n' +
+	"								</gml:begin>" + '\n' +
+	"								<gml:end/>" + '\n' +
+	"							</gml:TimePeriod>" + '\n' +
+	"						</gmd:extent>" + '\n' +
+	"					</gmd:EX_TemporalExtent>" + '\n' +
+	"				</gmd:temporalElement>" + '\n' +
+	"			</gmd:EX_Extent>" + '\n' +
+	"		</gmd:extent>" + '\n' +
+	"		<gmd:extent>" + '\n' +
+	"			<gmd:EX_Extent>" + '\n' +
+	"				<gmd:description><gco:CharacterString>delta time</gco:CharacterString></gmd:description>" + '\n' +
+	"				<gmd:temporalElement>" + '\n' +
+	"					<gmd:EX_TemporalExtent>" + '\n' +
+	"						<gmd:extent>" + '\n' +
+	"							<gml:TimePeriod gml:id=\"tp2\">" + '\n' +
+	"								<gml:begin>" + '\n' +
+	"									<gml:TimeInstant gml:id=\"ti4\">" + '\n' +
+	"										<gml:timePosition>2009-01-26T12:21:45.750+01:00</gml:timePosition>" + '\n' +
+	"									</gml:TimeInstant>" + '\n' +
+	"								</gml:begin>" + '\n' +
+	"								<gml:end>" + '\n' +
+	"									<gml:TimeInstant gml:id=\"ti5\">" + '\n' +
+	"										<gml:timePosition>2009-01-27T12:21:45.750+01:00</gml:timePosition>" + '\n' +
+	"									</gml:TimeInstant>" + '\n' +
+	"								</gml:end>" + '\n' +
+	"							</gml:TimePeriod>" + '\n' +
+	"						</gmd:extent>" + '\n' +
+	"					</gmd:EX_TemporalExtent>" + '\n' +
+	"				</gmd:temporalElement>" + '\n' +
+	"			</gmd:EX_Extent>" + '\n' +
+	"		</gmd:extent>" + '\n' +
+	"	</gmd:MD_DataIdentification>" + '\n' +
+	"</gmd:identificationInfo>" + '\n' +
+        "</gmd:MD_Metadata>";
+
+        StringReader sr = new StringReader(xml);
+        obj = unmarshaller.unmarshal(sr);
+
+        assertTrue(obj instanceof DefaultMetaData);
+        DefaultMetaData meta = (DefaultMetaData) obj;
+
+        assertTrue(meta.getIdentificationInfo().size() == 1);
+        Identification ident = meta.getIdentificationInfo().iterator().next();
+        assertTrue(ident instanceof DataIdentification);
+
+        DataIdentification dataIdent = (DataIdentification) ident;
+
+        assertTrue(dataIdent.getExtents().size() == 2);
+        Iterator<? extends Extent> it = dataIdent.getExtents().iterator();
+        Extent extent1 = it.next();
+        Extent extent2 = it.next();
+
+        assertTrue(extent2.getTemporalElements().size() == 1);
+        TemporalPrimitive tmpObj = extent2.getTemporalElements().iterator().next().getExtent();
+
+        assertTrue(tmpObj instanceof Period);
 
     }
 
