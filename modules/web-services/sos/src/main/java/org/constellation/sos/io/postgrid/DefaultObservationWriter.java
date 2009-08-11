@@ -89,6 +89,10 @@ public class DefaultObservationWriter implements ObservationWriter {
      */
     private final ReferenceTable refTable;
 
+    private static final String SQL_ERROR_MSG = "The service has throw a SQL Exception:";
+
+    private static final String CAT_ERROR_MSG = "The service has throw a Catalog Exception:";
+
     /**
      *
      * @param dataSourceOM
@@ -140,8 +144,7 @@ public class DefaultObservationWriter implements ObservationWriter {
             }
             return null;
         } catch (CatalogException ex) {
-            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
+            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
@@ -153,12 +156,10 @@ public class DefaultObservationWriter implements ObservationWriter {
         try {
             return measTable.getIdentifier(measurement);
         } catch (CatalogException ex) {
-            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
+            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
+            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(), NO_APPLICABLE_CODE);
         }
     }
 
@@ -167,12 +168,10 @@ public class DefaultObservationWriter implements ObservationWriter {
             return offTable.getIdentifier(offering);
 
         } catch (CatalogException ex) {
-            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
+            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
+            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(), NO_APPLICABLE_CODE);
         }
     }
 
@@ -186,12 +185,10 @@ public class DefaultObservationWriter implements ObservationWriter {
                 offTable.getStations().getIdentifier(offSF);
 
         } catch (CatalogException ex) {
-            throw new CstlServiceException("the service has throw a Catalog Exception:" + ex.getMessage(),
-                                             NO_APPLICABLE_CODE);
+            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
+            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(), NO_APPLICABLE_CODE);
         }
     }
 
@@ -240,8 +237,7 @@ public class DefaultObservationWriter implements ObservationWriter {
             stmt2.close();
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + e.getMessage(),
-                                             NO_APPLICABLE_CODE);
+            throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(), NO_APPLICABLE_CODE);
         }
     }
 

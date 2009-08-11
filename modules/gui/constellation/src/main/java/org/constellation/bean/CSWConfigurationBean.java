@@ -35,19 +35,21 @@ public class CSWConfigurationBean extends ConfigurationBean {
 
     private String recordIdentifiers;
 
+    private final static String SYNCHRONE = "synchrone";
+
     public CSWConfigurationBean() {
         
         synchroneMode = new ArrayList<SelectItem>();
-        synchroneMode.add(new SelectItem("synchrone", "synchrone"));
+        synchroneMode.add(new SelectItem(SYNCHRONE, SYNCHRONE));
         synchroneMode.add(new SelectItem("asynchrone", "asynchrone"));
-        currentSynchroneMode = "synchrone";
+        currentSynchroneMode = SYNCHRONE;
     }
 
      public void generateIndex() {
         LOGGER.info("GUI refresh index");
         refreshServletRequest();
         String url = getConfigurationURL() + "/WS/configuration?request=refreshIndex&asynchrone=";
-        if (currentSynchroneMode.equals("synchrone"))
+        if (currentSynchroneMode.equals(SYNCHRONE))
             url = url + "false";
         else
             url = url + "true";
@@ -59,7 +61,7 @@ public class CSWConfigurationBean extends ConfigurationBean {
     public void addToIndex() {
         LOGGER.info("GUI add to index");
         refreshServletRequest();
-        String url = getConfigurationURL() + "/WS/configuration?request=addToIndex&identifiers=" + getRecordIdentifiers();
+        final String url = getConfigurationURL() + "/WS/configuration?request=addToIndex&identifiers=" + getRecordIdentifiers();
         LOGGER.info(url);
         performRequest(url);
     }
@@ -67,7 +69,7 @@ public class CSWConfigurationBean extends ConfigurationBean {
     public void resfreshContact() {
         LOGGER.info("GUI refresh contact index");
         refreshServletRequest();
-        String url = getConfigurationURL() + "/WS/configuration?request=resfreshContact";
+        final String url = getConfigurationURL() + "/WS/configuration?request=resfreshContact";
         LOGGER.info(url);
         performRequest(url);
     }
@@ -75,7 +77,7 @@ public class CSWConfigurationBean extends ConfigurationBean {
     public void resfreshVocabulary() {
         LOGGER.info("GUI refresh vocabulary index");
         refreshServletRequest();
-        String url = getConfigurationURL() + "/WS/configuration?request=resfreshVocabulary";
+        final String url = getConfigurationURL() + "/WS/configuration?request=resfreshVocabulary";
         LOGGER.info(url);
         performRequest(url);
     }

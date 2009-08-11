@@ -1369,8 +1369,20 @@ public class SOSworker {
             }
             
             //we create a new Identifier from the SensorML database
-            final int num = smlWriter.getNewSensorId();
-            id = sensorIdBase + num;
+            String num = "";
+            if (obs.getProcedure() instanceof ProcessEntry) {
+                final ProcessEntry pentry = (ProcessEntry) obs.getProcedure();
+                if (pentry.getHref() != null && pentry.getHref().startsWith(sensorIdBase)) {
+                    id  = pentry.getHref();
+                    num = id.substring(sensorIdBase.length());
+                    LOGGER.info("using specified sensor ID:" + id + " num =" + num);
+                }
+            } 
+
+            if (id.equals("")) {
+                num = smlWriter.getNewSensorId() + "";
+                id  = sensorIdBase + num;
+            }
             
             //and we write it in the sensorML Database
             smlWriter.writeSensor(id, process);
