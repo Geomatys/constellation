@@ -14,7 +14,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.portrayal;
 
 import java.awt.Dimension;
@@ -38,53 +37,52 @@ import org.geotoolkit.display.exception.PortrayalException;
  */
 public interface PortrayalServiceIF {
 
-	/**
-	 * Portray a set of Layers over a given geographic extent with a given 
-	 * resolution yielding a {@code BufferedImage} of the scene.
-	 * @param sdef A structure which defines the scene.
-	 * @param vdef A structure which defines the view.
-	 * @param cdef A structure which defines the canvas.
-	 * 
-	 * @return A rendered image of the scene, in the chosen view and for the 
-	 *           given canvas.
-	 * @throws PortrayalException For errors during portrayal, TODO: common examples?
-	 */
-	BufferedImage portray( final Portrayal.SceneDef  sdef,
-								  final Portrayal.ViewDef   vdef,
-								  final Portrayal.CanvasDef cdef) 
-			throws PortrayalException;
+    /**
+     * Portray a set of Layers over a given geographic extent with a given
+     * resolution yielding a {@code BufferedImage} of the scene.
+     * @param sdef A structure which defines the scene.
+     * @param vdef A structure which defines the view.
+     * @param cdef A structure which defines the canvas.
+     *
+     * @return A rendered image of the scene, in the chosen view and for the
+     *           given canvas.
+     * @throws PortrayalException For errors during portrayal, TODO: common examples?
+     */
+    BufferedImage portray(final Portrayal.SceneDef sdef,
+            final Portrayal.ViewDef vdef,
+            final Portrayal.CanvasDef cdef)
+            throws PortrayalException;
 
-	/**
-	 * Apply the Visitor to all the 
-	 * {@link org.opengis.display.primitive.Graphic} objects which lie within 
-	 * the {@link java.awt.Shape} in the given scene.
-	 * <p>
-	 * The visitor could be an extension of the AbstractGraphicVisitor class in
-	 * this same package.
-	 * </p>
-	 * 
-	 * TODO: why are the last two arguments not final?
-	 * 
-	 * @see AbstractGraphicVisitor
-	 */
-	void visit( final Portrayal.SceneDef  sdef,
-					   final Portrayal.ViewDef   vdef,
-					   final Portrayal.CanvasDef cdef,
-					   Shape selectedArea, 
-					   GraphicVisitor visitor)
-			throws PortrayalException;
+    /**
+     * Apply the Visitor to all the
+     * {@link org.opengis.display.primitive.Graphic} objects which lie within
+     * the {@link java.awt.Shape} in the given scene.
+     * <p>
+     * The visitor could be an extension of the AbstractGraphicVisitor class in
+     * this same package.
+     * </p>
+     *
+     * TODO: why are the last two arguments not final?
+     *
+     * @see AbstractGraphicVisitor
+     */
+    void visit(final Portrayal.SceneDef sdef,
+            final Portrayal.ViewDef vdef,
+            final Portrayal.CanvasDef cdef,
+            Shape selectedArea,
+            GraphicVisitor visitor)
+            throws PortrayalException;
 
-	/**
-	 * Creates an image of the given {@link Exception}. This is useful for 
-	 * several OGC web services which need to record that an exception has 
-	 * occurred but only return an image in the message exchange protocol.
-	 * 
-	 * TODO: document how the size of the text should be chosen.
-	 * 
-	 * @param e      The exception to document in the generated image.
-	 * @param dim    The dimension in pixels of the generated image.
-	 * @return       An image of the exception message text. TODO: verify this.
-	 */
-	BufferedImage writeInImage(Exception e, Dimension dim);
-
+    /**
+     * Creates an image of the given {@link Exception}. This is useful for
+     * several OGC web services which need to record that an exception has
+     * occurred but only return an image in the message exchange protocol.
+     *
+     * TODO: document how the size of the text should be chosen.
+     *
+     * @param e      The exception to document in the generated image.
+     * @param dim    The dimension in pixels of the generated image.
+     * @return       An image of the exception message text. TODO: verify this.
+     */
+    BufferedImage writeInImage(Exception e, Dimension dim);
 }
