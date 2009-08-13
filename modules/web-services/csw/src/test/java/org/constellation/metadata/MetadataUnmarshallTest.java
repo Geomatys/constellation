@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -148,6 +149,8 @@ public class MetadataUnmarshallTest {
      */
     @Test
     public void unmarshallTest() throws Exception {
+        TimeZone.setDefault(TimeZone.getTimeZone("Europe/Paris"));
+
         unmarshaller = testPool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
 
