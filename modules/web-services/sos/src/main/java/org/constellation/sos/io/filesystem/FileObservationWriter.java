@@ -89,7 +89,7 @@ public class FileObservationWriter implements ObservationWriter {
         try {
             marshaller = marshallerPool.acquireMarshaller();
             final File observationFile = new File(observationDirectory, observation.getName() + FILE_EXTENSION);
-            boolean created = observationFile.createNewFile();
+            final boolean created      = observationFile.createNewFile();
             if (!created) {
                 throw new CstlServiceException("unable to create an observation file.", NO_APPLICABLE_CODE);
             }

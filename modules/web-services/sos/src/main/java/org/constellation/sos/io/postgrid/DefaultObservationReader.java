@@ -428,14 +428,9 @@ public class DefaultObservationReader implements ObservationReader {
             newObservationIDStmt.close();
             observationExistStmt.close();
             getMinEventTimeOffering.close();
-            obsTable.clear();
-            offTable.clear();
-            refTable.clear();
             omDatabase.close();
-        } catch (CatalogException ex) {
-            LOGGER.severe("Catalog Exception while destroy observation reader");
         } catch (SQLException ex) {
-            LOGGER.severe("SQL Exception while destroy observation reader");
+            LOGGER.log(Level.SEVERE, "SQL Exception while destroy observation reader");
         }
     }
 
@@ -462,7 +457,6 @@ public class DefaultObservationReader implements ObservationReader {
 
             int id = nbMeas + nbObs;
 
-            System.out.println("nb obs:" + nbObs + " nb meas" + nbMeas + "id = " + id);
             //there is a possibility that someone delete some observation manually.
             // so we must verify that this id is not already assigned. if it is we must find a free identifier
             do {

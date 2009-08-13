@@ -131,10 +131,10 @@ public final class Utils {
             String value = time.getValue();
             value = value.replace("T", " ");
 
-            //we delete the data after the second
+            /*we delete the data after the second
             if (value.indexOf('.') != -1) {
                 value = value.substring(0, value.indexOf('.'));
-            }
+            }*/
              try {
                  //here t is not used but it allow to verify the syntax of the timestamp
                  final Timestamp t = Timestamp.valueOf(value);

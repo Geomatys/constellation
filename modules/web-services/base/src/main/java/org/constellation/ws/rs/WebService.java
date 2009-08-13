@@ -290,7 +290,6 @@ public abstract class WebService {
     @POST
     @Consumes("*/xml")
     public Response doPOSTXml(InputStream is) throws JAXBException  {
-        LOGGER.info("request POST xml: ");
         if (marshallerPool != null) {
             Object request = null;
             Unmarshaller unmarshaller = null;
@@ -326,7 +325,7 @@ public abstract class WebService {
                 } else {
                     type = request.getClass().getName();
                 }
-                LOGGER.info("request type:" + type);
+                LOGGER.finer("request type:" + type);
             }
             return treatIncomingRequest(request);
         } else {

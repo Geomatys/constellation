@@ -328,7 +328,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
     @Override
     public List<ObservationResult> filterResult() throws CstlServiceException {
-        LOGGER.info("request:" + sqlRequest.toString());
+        LOGGER.finer("request:" + sqlRequest.toString());
         try {
             final List<ObservationResult> results = new ArrayList<ObservationResult>();
             final Statement currentStatement      = connection.createStatement();
@@ -343,7 +343,7 @@ public class DefaultObservationFilter implements ObservationFilter {
             return results;
 
         } catch (SQLException ex) {
-            LOGGER.severe("SQLExcpetion while executing the query: " + sqlRequest.toString());
+            LOGGER.severe("SQLException while executing the query: " + sqlRequest.toString());
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }

@@ -142,7 +142,7 @@ public class DescriptorTable extends SingletonTable<Descriptor> {
                     }
                     builder.setCharAt(i, n);
                 }
-                String modified = builder.toString();
+                final String modified = builder.toString();
                 if (!modified.equals(name)) try {
                     return getEntry(modified);
                 } catch (NoSuchRecordException ignore) {

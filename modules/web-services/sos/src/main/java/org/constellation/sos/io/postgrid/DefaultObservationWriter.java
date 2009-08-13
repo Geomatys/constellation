@@ -247,12 +247,7 @@ public class DefaultObservationWriter implements ObservationWriter {
 
     public void destroy() {
         try {
-            obsTable.clear();
-            offTable.clear();
-            refTable.clear();
             omDatabase.close();
-        } catch (CatalogException ex) {
-            LOGGER.severe("Catalog exception while destroying observation writer");
         } catch (SQLException ex) {
             LOGGER.severe("SQL exception while destroying observation writer");
         }

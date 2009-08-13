@@ -230,7 +230,7 @@ public class SOSworker {
     /**
      * A date formater used to parse datablock.
      */
-    private final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    private final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
     
     /**
      * The Observation database reader
@@ -1100,7 +1100,7 @@ public class SOSworker {
         
         //we treat the time constraint
         final List<EventTime> times = requestResult.getEventTime();
-        
+
         /**
          * The template time :
          */ 

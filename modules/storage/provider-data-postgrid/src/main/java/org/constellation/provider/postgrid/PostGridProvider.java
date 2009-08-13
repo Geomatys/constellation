@@ -141,12 +141,12 @@ public class PostGridProvider implements LayerProvider{
             if(layer == null) return null;
 
             //create a mutable copy
-            GridCoverageTable gridTable = new GridCoverageTable(coverageTable);
+            final GridCoverageTable gridTable = new GridCoverageTable(coverageTable);
             gridTable.setLayer(layer);
-            PostGridReader reader = new PostGridReader(gridTable);
+            final PostGridReader reader = new PostGridReader(gridTable);
 
-            //reader is null, this layer is not registered in this provider.
-            if(reader == null) return null;
+            /*-reader is null, this layer is not registered in this provider.
+            if(reader == null) return null;*/
 
             final ProviderLayer layerDef = source.getLayer(key);
             final List<String> styles = new ArrayList<String>();
@@ -224,9 +224,9 @@ public class PostGridProvider implements LayerProvider{
     @Override
     public ElevationModel getElevationModel(String name) {
 
-        ProviderLayer layer = source.getLayer(name);
+        final ProviderLayer layer = source.getLayer(name);
         if(layer != null && layer.isElevationModel){
-            PostGridLayerDetails pgld = (PostGridLayerDetails) get(name);
+            final PostGridLayerDetails pgld = (PostGridLayerDetails) get(name);
             if(pgld != null){
                 return MapBuilder.createElevationModel(pgld.getReader());
             }

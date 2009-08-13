@@ -98,7 +98,7 @@ public abstract class AbstractCSWConfigurer {
         this.containerNotifier = cn;
 
         final File cswConfigDir = getConfigurationDirectory();
-        if (cswConfigDir == null || (cswConfigDir != null && !cswConfigDir.isDirectory())) {
+        if (cswConfigDir == null || !cswConfigDir.isDirectory()) {
             throw new ConfigurationException("No configuration directory have been found");
         }
         
@@ -413,8 +413,9 @@ public abstract class AbstractCSWConfigurer {
      * Return the ID of the CSW given by the configuration file Name.
      */
     private String getConfigID(File configFile) {
-        if (configFile == null || (configFile != null && !configFile.exists()))
+        if (configFile == null || !configFile.exists()) {
             return "";
+        }
         String id = configFile.getName();
         if (id.indexOf("config.xml") != -1) {
             id = id.substring(0, id.indexOf("config.xml"));

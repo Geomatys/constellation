@@ -120,6 +120,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 
+import static org.constellation.query.Query.KEY_VERSION;
 import static org.constellation.query.wcs.WCSQuery.GEOTIFF;
 import static org.constellation.query.wcs.WCSQuery.MATRIX;
 import static org.constellation.query.wcs.WCSQuery.NETCDF;
@@ -207,7 +208,7 @@ public final class WCSWorker {
         final String version = abstractRequest.getVersion().toString();
         if (version == null) {
             throw new CstlServiceException("The parameter SERVICE must be specified.",
-                           MISSING_PARAMETER_VALUE, "version");
+                           MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
         }
 
         if (version.equals(ServiceDef.WCS_1_0_0.version.toString()) &&
@@ -220,7 +221,7 @@ public final class WCSWorker {
             return describeCoverage111((org.geotoolkit.wcs.xml.v111.DescribeCoverageType) abstractRequest);
         } else {
             throw new CstlServiceException("The version number specified for this GetCoverage request " +
-                    "is not handled.", NO_APPLICABLE_CODE, "version");
+                    "is not handled.", NO_APPLICABLE_CODE, KEY_VERSION.toLowerCase());
         }
     }
 
@@ -518,7 +519,7 @@ public final class WCSWorker {
             return getCapabilities111((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType) abstractRequest);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", NO_APPLICABLE_CODE, "version");
+                    "is not handled.", NO_APPLICABLE_CODE, KEY_VERSION.toLowerCase());
         }
     }
 
@@ -786,7 +787,7 @@ public final class WCSWorker {
         final String inputVersion = abstractRequest.getVersion().toString();
         if(inputVersion == null) {
             throw new CstlServiceException("The parameter version must be specified",
-                           MISSING_PARAMETER_VALUE, "version");
+                           MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
         }
         //this.actingVersion = new ServiceVersion(ServiceType.WCS, inputVersion);
 
