@@ -19,11 +19,13 @@ package org.constellation.portrayal;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.constellation.provider.LayerDetails;
+import org.geotoolkit.display2d.service.PortrayalExtension;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.style.MutableStyle;
 
@@ -101,29 +103,41 @@ public final class Portrayal {
         public final List<MutableStyle> styleRefs = new ArrayList<MutableStyle>();
         //Hold some extra parameters, like dimensions and DIM_RANGE styles.
         public final Map<String, Object> renderingParameters = new HashMap<String, Object>();
-
-        public SceneDef(List<LayerDetails> layerRefs,
-                List<MutableStyle> styleRefs,
-                Map<String, Object> renderingParameters) {
-            if (layerRefs.size() == 0) {
-                throw new IllegalArgumentException("A scene definition must have at least one layer.");
-            }
-
-            this.layerRefs.addAll(layerRefs);
-            this.styleRefs.addAll(styleRefs);
-            this.renderingParameters.putAll(renderingParameters);
-        }
+        public final List<PortrayalExtension> extensions = new ArrayList<PortrayalExtension>();
 
         public SceneDef(LayerDetails layerRef,
                 MutableStyle styleRef,
                 Map<String, Object> renderingParameters) {
-            if (layerRef == null) {
-                throw new NullPointerException("The scene's layer is not defined.");
+            this(Collections.singletonList(layerRef),
+                 Collections.singletonList(styleRef),
+                 renderingParameters);
+        }
+
+        public SceneDef(List<LayerDetails> layerRefs,
+                List<MutableStyle> styleRefs,
+                Map<String, Object> renderingParameters) {
+            this(layerRefs,styleRefs,renderingParameters,null);
+        }
+
+        public SceneDef(List<LayerDetails> layerRefs,
+                List<MutableStyle> styleRefs,
+                Map<String, Object> renderingParameters,
+                List<PortrayalExtension> extensions) {
+            if (layerRefs == null || layerRefs.size() == 0) {
+                throw new IllegalArgumentException("A scene definition must have at least one layer.");
             }
 
-            this.layerRefs.add(layerRef);
-            this.styleRefs.add(styleRef);
-            this.renderingParameters.putAll(renderingParameters);
+            this.layerRefs.addAll(layerRefs);
+            if(styleRefs != null){
+                this.styleRefs.addAll(styleRefs);
+            }
+            if(renderingParameters != null){
+                this.renderingParameters.putAll(renderingParameters);
+            }
+            if(extensions != null){
+                this.extensions.addAll(extensions);
+            }
         }
+
     }
 }

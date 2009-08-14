@@ -29,6 +29,7 @@ import org.geotoolkit.display.canvas.GraphicVisitor;
 import org.geotoolkit.display.canvas.control.FailOnErrorMonitor;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
+import org.geotoolkit.display2d.service.PortrayalExtension;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapLayer;
@@ -101,11 +102,15 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
             final BufferedImage buffer = DefaultPortrayalService.portray(
                     context,
                     vdef.envelope,
+                    null,null,
                     cdef.dimension,
                     true,
                     (float)vdef.azimuth,
                     monitor,
-                    cdef.background);
+                    cdef.background,
+                    null,
+                    sdef.extensions.toArray(new PortrayalExtension[sdef.extensions.size()])
+                    );
 
             final Exception exp = monitor.getLastException();
             if(exp != null){

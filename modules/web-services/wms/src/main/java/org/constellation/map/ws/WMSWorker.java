@@ -45,6 +45,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 //Constellation dependencies
+import javax.xml.parsers.ParserConfigurationException;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.catalog.CatalogException;
@@ -55,6 +56,7 @@ import org.constellation.map.visitor.TextGraphicVisitor;
 import org.constellation.portrayal.Portrayal;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
@@ -82,6 +84,7 @@ import org.constellation.ws.rs.WebService;
 
 //Geotools dependencies
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display2d.service.PortrayalExtension;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
 import org.geotoolkit.sld.MutableLayer;
@@ -102,6 +105,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
 
 import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.query.wms.WMSQuery.*;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -137,8 +141,32 @@ public class WMSWorker extends AbstractWMSWorker {
      */
     private final MarshallerPool marshallerPool;
 
+    /**
+     * Decoration extension for map queries.
+     */
+    private PortrayalExtension extension = null;
+
     public WMSWorker(final MarshallerPool marshallerPool) {
         this.marshallerPool = marshallerPool;
+
+        //load the portrayal extension
+        final String path = ConfigDirectory.getConfigDirectory().getPath() + File.separator + "WMSPortrayal.xml";
+
+        File f = new File(path);
+        try {
+            extension = WMSMapDecoration.read(f);
+        } catch (ParserConfigurationException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        } catch (SAXException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    public void setPortrayalExtension(PortrayalExtension extension) {
+        this.extension = extension;
     }
 
     /**
@@ -754,7 +782,9 @@ public class WMSWorker extends AbstractWMSWorker {
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, time);
-        final Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params);
+        final List<PortrayalExtension> exts = new ArrayList<PortrayalExtension>();
+        exts.add(extension);
+        final Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params,exts);
 
 
         // 2. VIEW

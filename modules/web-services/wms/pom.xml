@@ -86,6 +86,10 @@
       <artifactId>geotk-xml-wms</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-go2-style-extension</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-epsg</artifactId>
     </dependency>
