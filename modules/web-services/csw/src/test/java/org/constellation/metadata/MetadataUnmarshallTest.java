@@ -48,7 +48,6 @@ import static org.junit.Assert.*;
 import org.constellation.util.Util;
 
 // geotoolkit dependencies
-import org.geotoolkit.internal.jaxb.metadata.ReferenceIdentifierMetadata;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
 import org.geotoolkit.internal.referencing.VerticalDatumTypes;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
@@ -75,6 +74,7 @@ import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.metadata.iso.identification.DefaultKeywords;
 import org.geotoolkit.metadata.iso.spatial.DefaultGeometricObjects;
 import org.geotoolkit.metadata.iso.spatial.DefaultVectorSpatialRepresentation;
+import org.geotoolkit.referencing.DefaultReferenceIdentifier;
 import org.geotoolkit.referencing.NamedIdentifier;
 import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
@@ -233,11 +233,11 @@ public class MetadataUnmarshallTest {
         set.add(new SimpleInternationalString("L101"));
         RScitation.setAlternateTitles(set);
         set = new HashSet();
-        set.add(new ReferenceIdentifierMetadata(null, null, "http://www.seadatanet.org/urnurl/"));
+        set.add(new DefaultReferenceIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
         RScitation.setIdentifiers(set);
         RScitation.setEdition(new SimpleInternationalString("2"));
 
-        ReferenceIdentifierMetadata Nidentifier = new ReferenceIdentifierMetadata(RScitation, "L101", code);
+        DefaultReferenceIdentifier Nidentifier = new DefaultReferenceIdentifier(RScitation, "L101", code);
         ReferenceSystemMetadata rs = new ReferenceSystemMetadata(Nidentifier);
         set = new HashSet();
         set.add(rs);
@@ -933,7 +933,7 @@ public class MetadataUnmarshallTest {
         citation.setDates(set);
         citation.setEdition(new SimpleInternationalString(version));
         set = new HashSet();
-        set.add(new ReferenceIdentifierMetadata(null, null, "http://www.seadatanet.org/urnurl/"));
+        set.add(new DefaultReferenceIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
         citation.setIdentifiers(set);
         keyword.setThesaurusName(citation);
 
@@ -1051,11 +1051,11 @@ public class MetadataUnmarshallTest {
         set.add(new SimpleInternationalString("L101"));
         RScitation.setAlternateTitles(set);
         set = new HashSet();
-        set.add(new ReferenceIdentifierMetadata(null, null, "http://www.seadatanet.org/urnurl/"));
+        set.add(new DefaultReferenceIdentifier(null, null, "http://www.seadatanet.org/urnurl/"));
         RScitation.setIdentifiers(set);
         RScitation.setEdition(new SimpleInternationalString("2"));
 
-        ReferenceIdentifierMetadata Nidentifier = new ReferenceIdentifierMetadata(RScitation, "L101", code);
+        DefaultReferenceIdentifier Nidentifier = new DefaultReferenceIdentifier(RScitation, "L101", code);
         ReferenceSystemMetadata rs = new ReferenceSystemMetadata(Nidentifier);
         set = new HashSet();
         set.add(rs);
