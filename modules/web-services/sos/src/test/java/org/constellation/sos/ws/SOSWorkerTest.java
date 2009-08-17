@@ -21,12 +21,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
+import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
@@ -38,7 +41,11 @@ import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sos.xml.v100.GetObservation;
+import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -87,6 +94,13 @@ public class SOSWorkerTest {
             featureDirectory.mkdir();
             writeDataFile(featureDirectory, "feature1.xml", "10972X0137-PONT");
 
+            File observationsDirectory = new File(configDir, "observations");
+            observationsDirectory.mkdir();
+            writeDataFile(observationsDirectory, "observation1.xml", "urn:ogc:object:observation:BRGM:304");
+            writeDataFile(observationsDirectory, "observation2.xml", "urn:ogc:object:observation:BRGM:305");
+            writeDataFile(observationsDirectory, "observation3.xml", "urn:ogc:object:observation:BRGM:406");
+            writeDataFile(observationsDirectory, "observation4.xml", "urn:ogc:object:observation:BRGM:307");
+
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic SMLConfiguration = new Automatic();
@@ -95,6 +109,7 @@ public class SOSWorkerTest {
             OMConfiguration.setDataDirectory("SOSWorkerTest");
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
             configuration.setObservationReaderType(ObservationReaderType.FILESYSTEM);
+            configuration.setObservationWriterType(ObservationWriterType.FILESYSTEM);
             configuration.setSMLType(DataSourceType.FILE_SYSTEM);
             configuration.setObservationFilterType(ObservationFilterType.LUCENE);
             marshaller.marshal(configuration, configFile);
@@ -117,6 +132,13 @@ public class SOSWorkerTest {
                     f.delete();
                 }
                 dataDirectory.delete();
+            }
+            File indexDirectory = new File(configDirectory, "index");
+            if (indexDirectory.exists()) {
+                for (File f : indexDirectory.listFiles()) {
+                    f.delete();
+                }
+                indexDirectory.delete();
             }
             dataDirectory = new File(configDirectory, "offerings");
             if (dataDirectory.exists()) {
@@ -194,6 +216,8 @@ public class SOSWorkerTest {
 
         assertTrue(result.getContents() != null);
         assertTrue(result.getContents().getObservationOfferingList() != null);
+        assertTrue(result.getContents().getObservationOfferingList().getObservationOffering() != null);
+        assertTrue(result.getContents().getObservationOfferingList().getObservationOffering().size() == 1);
 
         /*
          *  TEST 2 : full get capabilities
@@ -211,6 +235,9 @@ public class SOSWorkerTest {
         assertTrue(result.getServiceIdentification() != null);
         assertTrue(result.getServiceProvider() != null);
         assertTrue(result.getContents() != null);
+        assertTrue(result.getContents().getObservationOfferingList() != null);
+        assertTrue(result.getContents().getObservationOfferingList().getObservationOffering() != null);
+        assertTrue(result.getContents().getObservationOfferingList().getObservationOffering().size() == 1);
         assertTrue(result != null);
 
         /*
@@ -268,7 +295,7 @@ public class SOSWorkerTest {
         assertTrue(result != null);
 
         /*
-         *  TEST 6 : get capabilities section Service Identification
+         *  TEST 6 : get capabilities section Contents
          */
         acceptVersions = new AcceptVersionsType("1.0.0");
         sections       = new SectionsType("Contents");
@@ -282,7 +309,10 @@ public class SOSWorkerTest {
         assertTrue(result.getOperationsMetadata() == null);
         assertTrue(result.getServiceIdentification() == null);
         assertTrue(result.getServiceProvider() == null);
-         assertTrue(result.getContents() != null);
+        assertTrue(result.getContents() != null);
+        assertTrue(result.getContents().getObservationOfferingList() != null);
+        assertTrue(result.getContents().getObservationOfferingList().getObservationOffering() != null);
+        assertTrue(result.getContents().getObservationOfferingList().getObservationOffering().size() == 1);
         assertTrue(result != null);
 
         /*
@@ -327,6 +357,39 @@ public class SOSWorkerTest {
         expResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component.xml"));
 
         assertEquals(expResult, result);
+        marshallerPool.release(unmarshaller);
+    }
+
+    /**
+     * Tests the DescribeSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void GetObservationTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        GetObservation request  = new GetObservation("1.0.0",
+                                                     "offering-allSensor",
+                                                     null,
+                                                     Arrays.asList("urn:ogc:object:sensor:BRGM:4"),
+                                                     null,
+                                                     null,
+                                                     null,
+                                                     "text/xml; subtype=\"om/1.0.0\"",
+                                                     Parameters.OBSERVATION_QNAME,
+                                                     ResponseModeType.RESULT_TEMPLATE,
+                                                     null);
+        ObservationCollectionEntry result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
+
+        ObservationEntry expResult = (ObservationEntry)obj.getValue();
+
+        assertEquals(result.getMember().size(), 1);
+
+        // TODO assertEquals(expResult, result.getMember().iterator().next());
+
+        
         marshallerPool.release(unmarshaller);
     }
 

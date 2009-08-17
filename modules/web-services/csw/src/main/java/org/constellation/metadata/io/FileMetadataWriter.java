@@ -79,7 +79,7 @@ public class FileMetadataWriter extends MetadataWriter {
      */
     public FileMetadataWriter(Automatic configuration, AbstractIndexer index) throws CstlServiceException {
         super(index);
-        dataDirectory   = configuration.getdataDirectory();
+        dataDirectory   = configuration.getDataDirectory();
         if (dataDirectory == null || !dataDirectory.exists()) {
             throw new CstlServiceException("Unable to find the data directory", NO_APPLICABLE_CODE);
         }

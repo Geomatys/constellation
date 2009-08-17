@@ -156,6 +156,31 @@ public final class Utils {
           }
     }
 
+    public static String getPeriodDescription(long time) {
+        long temp = time / 1000;
+        long ms   = time - (temp * 1000);
+        time      = time - ms;
+
+        // we pass in second
+        time      = time / 1000;
+
+        temp      = time / 60;
+        long sec  = time - (temp * 60);
+        time      = time - sec;
+
+        if (time == 0) return sec + "s " + ms + "ms";
+
+        //we pass in minute
+        time      = time / 60;
+
+        temp      = time / 60;
+        long min  = time - (temp * 60);
+        time      = time - min;
+
+        System.out.println("time=" + time);
+        return min + "min " + sec + "s " + ms + "ms";
+    }
+
     /**
      * Return an envelope containing all the Observation member of the collection.
      *

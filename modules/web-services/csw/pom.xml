@@ -99,25 +99,22 @@
       <artifactId>cstl-web-ogc</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- Mailing API -->
-    <dependency>
-      <groupId>javax.mail</groupId>
-      <artifactId>mail</artifactId>
-      <version>1.4.1</version>
-    </dependency>
-
     <dependency>
         <groupId>org.geotoolkit</groupId>
         <artifactId>geotk-epsg</artifactId>
         <scope>test</scope>
     </dependency>
-
+    <!-- Mailing API -->
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4.1</version>
+    </dependency>    
     <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derby</artifactId>
         <scope>test</scope>
     </dependency>
-
     <dependency>
         <groupId>postgresql</groupId>
         <artifactId>postgresql</artifactId>

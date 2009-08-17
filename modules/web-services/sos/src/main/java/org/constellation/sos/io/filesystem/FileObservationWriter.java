@@ -21,14 +21,18 @@ import java.io.File;
 import java.io.IOException;
 
 // JAXB dependencies
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationWriter;
+import org.constellation.sos.io.lucene.LuceneObservationIndexer;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;
@@ -61,11 +65,13 @@ public class FileObservationWriter implements ObservationWriter {
 
     private MarshallerPool marshallerPool;
 
+    private LuceneObservationIndexer indexer;
+
     private static final String FILE_EXTENSION = ".xml";
 
     public FileObservationWriter(Automatic configuration) throws CstlServiceException {
         super();
-        final File dataDirectory = configuration.getdataDirectory();
+        final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory.exists()) {
             offeringDirectory    = new File(dataDirectory, "offerings");
             phenomenonDirectory  = new File(dataDirectory, "phenomenons");
@@ -75,10 +81,14 @@ public class FileObservationWriter implements ObservationWriter {
             resultDirectory      = new File(dataDirectory, "results");
         }
         try {
+            indexer        = new LuceneObservationIndexer(configuration, "");
             marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100");
         } catch(JAXBException ex) {
             throw new CstlServiceException("JAXB exception while initializing the file observation reader", ex, NO_APPLICABLE_CODE);
+        } catch (IndexingException ex) {
+            throw new CstlServiceException("Indexing exception while initializing the file observation reader", ex, NO_APPLICABLE_CODE);
         }
+
 
     }
 

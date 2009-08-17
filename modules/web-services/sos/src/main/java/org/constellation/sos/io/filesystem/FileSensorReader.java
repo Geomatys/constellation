@@ -53,7 +53,7 @@ public class FileSensorReader implements SensorReader {
             //we initialize the unmarshaller
             marshallerPool = new MarshallerPool("org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
 
-            this.dataDirectory  = configuration.getdataDirectory();
+            this.dataDirectory  = configuration.getDataDirectory();
         } catch (JAXBException ex) {
             Logger.getAnonymousLogger().log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("JAXBException while starting the file system Sensor reader", NO_APPLICABLE_CODE);

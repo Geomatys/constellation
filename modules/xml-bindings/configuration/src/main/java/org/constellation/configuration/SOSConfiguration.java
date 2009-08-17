@@ -63,6 +63,10 @@ public class SOSConfiguration {
 
     private String logFolder;
 
+    private boolean debugMode;
+
+    private boolean verifySynchronization;
+
     public SOSConfiguration() {
         
     }
@@ -258,6 +262,34 @@ public class SOSConfiguration {
      */
     public void setLogFolder(String logFolder) {
         this.logFolder = logFolder;
+    }
+
+    /**
+     * @return the debugMode
+     */
+    public boolean isDebugMode() {
+        return debugMode;
+    }
+
+    /**
+     * @param debugMode the debugMode to set
+     */
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
+    }
+
+    /**
+     * @return the verifySynchronization
+     */
+    public boolean isVerifySynchronization() {
+        return verifySynchronization;
+    }
+
+    /**
+     * @param verifySynchronization the verifySynchronization to set
+     */
+    public void setVerifySynchronization(boolean verifySynchronization) {
+        this.verifySynchronization = verifySynchronization;
     }
 
 }

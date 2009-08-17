@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -73,7 +74,7 @@ public class FileObservationReader implements ObservationReader {
 
     public FileObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException {
         this.observationIdBase = observationIdBase;
-        final File dataDirectory = configuration.getdataDirectory();
+        final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
             offeringDirectory    = new File(dataDirectory, "offerings");
             phenomenonDirectory  = new File(dataDirectory, "phenomenons");
@@ -83,7 +84,7 @@ public class FileObservationReader implements ObservationReader {
             resultDirectory      = new File(dataDirectory, "results");
         }
         try {
-            marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100");
+            marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100:org.geotoolkit.sampling.xml.v100");
         } catch(JAXBException ex) {
             throw new CstlServiceException("JAXB exception while initializing the file observation reader", ex, NO_APPLICABLE_CODE);
         }
@@ -103,7 +104,7 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException {
-        final File offeringFile = new File(observationDirectory, offeringName + FILE_EXTENSION);
+        final File offeringFile = new File(offeringDirectory, offeringName + FILE_EXTENSION);
         if (offeringFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
@@ -131,13 +132,18 @@ public class FileObservationReader implements ObservationReader {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(offeringFile);
+                Object obj = unmarshaller.unmarshal(offeringFile);
                 if (obj instanceof ObservationOfferingEntry) {
                     offerings.add((ObservationOfferingEntry) obj);
+                } else {
+                    throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
                 }
-                throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
-                LOGGER.severe("Unable to unmarshall The file " + offeringFile);
+                String msg = ex.getMessage();
+                if (msg == null && ex.getCause() != null) {
+                    msg = ex.getCause().getMessage();
+                }
+                LOGGER.severe("Unable to unmarshall The file " + offeringFile + " cause:" + msg);
             } finally {
                 if (unmarshaller != null) {
                     marshallerPool.release(unmarshaller);
@@ -233,11 +239,14 @@ public class FileObservationReader implements ObservationReader {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(observationFile);
+                Object obj = unmarshaller.unmarshal(observationFile);
+                if (obj instanceof JAXBElement) {
+                    obj = ((JAXBElement)obj).getValue();
+                }
                 if (obj instanceof ObservationEntry) {
                     return (ObservationEntry) obj;
                 }
-                throw new CstlServiceException("The file " + observationFile + " does not contains an foi Object.", NO_APPLICABLE_CODE);
+                throw new CstlServiceException("The file " + observationFile + " does not contains an observation Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
                 throw new CstlServiceException("Unable to unmarshall The file " + observationFile, ex, NO_APPLICABLE_CODE);
             } finally {
@@ -274,7 +283,7 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public ReferenceEntry getReference(String href) throws CstlServiceException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return new ReferenceEntry(null, href);
     }
 
     @Override

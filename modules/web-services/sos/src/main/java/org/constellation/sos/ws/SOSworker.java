@@ -230,7 +230,7 @@ public class SOSworker {
     /**
      * A date formater used to parse datablock.
      */
-    private final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS");
+    private final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
     
     /**
      * The Observation database reader
@@ -276,6 +276,12 @@ public class SOSworker {
      * The supported Response Format for GetObservation request (depends on reader capabilities)
      */
     private List<String> acceptedResponseFormat;
+
+    /**
+     * A debug flag.
+     * If true the server will verify the gap between a the samplingTime of an observation and the time of insertion.
+     */
+    private boolean verifySynchronization;
 
     /**
      * Initialize the database connection.
@@ -324,6 +330,8 @@ public class SOSworker {
             } else {
                 LOGGER.info("Transactional profile loaded." + '\n');
             }
+
+            this.verifySynchronization = configuration.isVerifySynchronization();
 
             // the file who record the map between phisycal ID and DB ID.
             loadMapping(configurationDirectory);
@@ -790,7 +798,12 @@ public class SOSworker {
         //we verify that the resultModel (if there is one) is advertised in the offering
         if (requestObservation.getResultModel() != null) {
             if (!off.getResultModel().contains(requestObservation.getResultModel())) {
-                throw new CstlServiceException("This result model is not advertised in the offering",
+                String availableRM = "";
+                for (QName s : off.getResultModel()) {
+                    availableRM = availableRM + s + '\n';
+                }
+                throw new CstlServiceException("This result model is not advertised in the offering:" + requestObservation.getResultModel() + '\n' +
+                                               "Available result model for this offering are:",
                                                 INVALID_PARAMETER_VALUE, "resultModel");
             }
         }
@@ -1456,6 +1469,23 @@ public class SOSworker {
         } else {
             throw new CstlServiceException("The observation template must be specified",
                                              MISSING_PARAMETER_VALUE, Parameters.OBSERVATION_TEMPLATE);
+        }
+
+        // Debug part
+        if (verifySynchronization) {
+            if (obs.getSamplingTime() instanceof TimeInstantType) {
+                TimeInstantType timeInstant = (TimeInstantType) obs.getSamplingTime();
+                try {
+                    
+                    Date d = dateformat.parse(timeInstant.getTimePosition().getValue());
+                    Date now = new Date(System.currentTimeMillis());
+                    LOGGER.info("time value: " + timeInstant.getTimePosition().getValue() + " now: " + dateformat.format(now));
+                    long t = System.currentTimeMillis() - d.getTime();
+                    LOGGER.info("gap between time of reception and time of sampling: " + t + " ms (" + Utils.getPeriodDescription(t) + ')');
+                } catch (ParseException ex) {
+                    LOGGER.warning("unable to parse the samplingTime");
+                }
+            }
         }
 
         //we record the observation in the O&M database

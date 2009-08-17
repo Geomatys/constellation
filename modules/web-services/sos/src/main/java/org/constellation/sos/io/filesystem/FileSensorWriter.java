@@ -59,10 +59,10 @@ public class FileSensorWriter implements SensorWriter {
         }
         this.sensorIdBase = sensorIdBase;
         uncommittedFiles = new ArrayList<File>();
-        if (configuration.getdataDirectory() == null) {
+        if (configuration.getDataDirectory() == null) {
             throw new CstlServiceException("The sensor data directory is null", NO_APPLICABLE_CODE);
         }
-        this.dataDirectory = configuration.getdataDirectory();
+        this.dataDirectory = configuration.getDataDirectory();
         try {
             marshallerPool = new MarshallerPool("org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
         } catch (JAXBException ex) {

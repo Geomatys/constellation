@@ -115,7 +115,7 @@ public class Automatic {
         this.format = format;
     }
     
-    public File getdataDirectory() {
+    public File getDataDirectory() {
         if (dataDirectory != null) {
             return new File(dataDirectory);
         }
