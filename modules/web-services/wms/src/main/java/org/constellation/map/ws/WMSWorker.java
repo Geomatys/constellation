@@ -783,7 +783,9 @@ public class WMSWorker extends AbstractWMSWorker {
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, time);
         final List<PortrayalExtension> exts = new ArrayList<PortrayalExtension>();
-        exts.add(extension);
+        if (extension != null) {
+            exts.add(extension);
+        }
         final Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params,exts);
 
 
