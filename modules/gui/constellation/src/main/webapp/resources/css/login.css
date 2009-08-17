@@ -1,0 +1,71 @@
+html{
+	overflow-y:hidden;
+	overflow-x:hidden;
+}
+
+
+/* Show only to IE PC \*/
+* html .boxhead h2 {height: 1%;} /* For IE 5 PC */
+
+.sidebox {
+	margin: 0 auto; /* center for now */
+	width:460px; /* ems so it will grow */
+	background: url(../img/sbbody-r.gif) no-repeat bottom right;
+	font-size: 100%;
+}
+.boxhead {
+	background: url(../img/sbhead-r.gif) no-repeat top right;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+        height : 22px;
+}
+.boxhead h2 {
+	background: url(../img/sbhead-l.gif) no-repeat top left;
+	margin: 0;
+	padding: 22px 30px 5px;
+	color: black;
+	font-weight: bold;
+	font-size: 1.2em;
+	line-height: 1em;
+        height : 22px;
+	text-shadow: rgba(0,0,0,.4) 0px 2px 5px; /* Safari-only, but cool */
+}
+.boxbody {
+	background: url(../img/sbbody-l.gif) no-repeat bottom left;
+	margin: 0;
+	padding: 5px 30px 38px;
+        text-align: center;
+}
+
+
+a.button {
+    background: transparent url('../img/bg_button_a.gif') no-repeat scroll top right;
+    color: #444;
+    display: block;
+    font: normal 12px arial, sans-serif;
+    height: 24px;
+    width:100px;
+    margin-right: 6px;
+    padding-right: 18px; /* sliding doors padding */
+    text-decoration: none;
+}
+
+a.button span {
+    background: transparent url('../img/bg_button_span.gif') no-repeat;
+    display: block;
+    line-height: 14px;
+    padding: 5px 0 5px 18px;
+}
+
+a.button:active {
+    background-position: bottom right;
+    color: #000;
+    outline: none; /* hide dotted outline in Firefox */
+}
+
+a.button:active span {
+    background-position: bottom left;
+    padding: 6px 0 4px 18px; /* push text down 1px */
+}
+

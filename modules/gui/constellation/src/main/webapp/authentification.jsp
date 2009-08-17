@@ -15,32 +15,46 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Constellation Authentification</title>
-        <link rel="stylesheet" type="text/css" href="resources/css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="resources/css/login.css"/>
     </head>
     <body>
-        <f:view>
-            <h:form id="form_1" enctype="multipart/form-data">
-                <div id="contentUpload" class="content">
-                    <h:outputText value="Enter your login and password : " style="font-size:17px;font-weight:bold;"/>
-                    <br/>
-		    <br/>
-                    <%-- Authentification panel --%>
-                    <h:panelGrid id="authentification_panel" columns="2">
-                        <h:outputText id="login_label" value="login : " />
-                        <h:inputText id="loginId" value="#{authentificationBean.login}"/>
 
-			<h:outputText id="pass_label" value="Pass : " />
-                        <h:inputSecret id="passId" value="#{authentificationBean.password}"/>
-                        
-                        <t:commandLink styleClass="button" id="authentificationButton" style="margin:20px;" action="#{authentificationBean.authentify}">
-                            <h:outputText id="labelAuthentification" value="Connection"/>
-                        </t:commandLink>
-                        <f:verbatim><br></f:verbatim>
-                        
-                    </h:panelGrid>
-                </div>
-            </h:form>
+        <div style="top: 15%; position: absolute; width: 100%;">
+
+        <f:view>
+            <center><h:graphicImage url="resources/img/constellation400.png"/></center>
+
+            <div class="sidebox">
+                <h:form>
+
+                    <div class="boxhead">
+                        <h2></h2>
+                    </div>
+
+                    <div class="boxbody">
+
+                        <div style="text-align:right; padding:15px; width:300px">
+                            <h:outputText id="login_label" value="Login : " />
+                            <h:inputText id="loginId" value="#{authentificationBean.login}"/>
+                            <br/>
+                            <h:outputText id="pass_label" value="Password : " />
+                            <h:inputSecret id="passId" value="#{authentificationBean.password}"/>
+                        </div>
+
+                        <center>
+                            <t:commandLink styleClass="button" id="authentificationButton"  action="#{authentificationBean.authentify}">
+                                <h:outputText id="labelAuthentification" value="Connection"/>
+                            </t:commandLink>
+                        </center>
+
+                    </div>
+                </h:form>
+            </div>
+
+            <center>2007-2009 <b>Geomatys</b></center>
 
         </f:view>
+
+        </div>
     </body>
 </html>
