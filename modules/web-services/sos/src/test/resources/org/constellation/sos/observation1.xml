@@ -27,7 +27,7 @@
             </sa:position>
         </sa:SamplingPoint>
     </om:featureOfInterest>
-    <om:result>
+    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="swe:DataArrayPropertyType">
         <swe:DataArray gml:id="dataArray-2">
             <swe:elementCount>
                 <swe:Count>

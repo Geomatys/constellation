@@ -84,7 +84,10 @@ public class FileObservationReader implements ObservationReader {
             resultDirectory      = new File(dataDirectory, "results");
         }
         try {
-            marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100:org.geotoolkit.sampling.xml.v100");
+            marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:" +
+                                                "org.geotoolkit.observation.xml.v100:" +
+                                                "org.geotoolkit.sampling.xml.v100:" +
+                                                "org.geotoolkit.swe.xml.v101");
         } catch(JAXBException ex) {
             throw new CstlServiceException("JAXB exception while initializing the file observation reader", ex, NO_APPLICABLE_CODE);
         }

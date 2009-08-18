@@ -156,6 +156,44 @@ public final class Utils {
           }
     }
 
+    /**
+     * return a SQL formatted timestamp
+     *
+     * @param time a GML time position object.
+     */
+    public static String getLuceneTimeValue(final TimePositionType time) throws CstlServiceException {
+        if (time != null && time.getValue() != null) {
+            String value = time.getValue();
+            value = value.replace("T", " ");
+
+            // we delete the data after the second TODO remove
+            if (value.indexOf('.') != -1) {
+                value = value.substring(0, value.indexOf('.'));
+            }
+            try {
+                //here t is not used but it allow to verify the syntax of the timestamp
+                final Timestamp t = Timestamp.valueOf(value);
+
+            } catch(IllegalArgumentException e) {
+               throw new CstlServiceException("Unable to parse the value: " + value + '\n' +
+                                              "Bad format of timestamp: accepted format yyyy-mm-jjThh:mm:ss.msmsms.",
+                                              INVALID_PARAMETER_VALUE, "eventTime");
+            }
+            value = value.replace(" ", "");
+            value = value.replace("-", "");
+            value = value.replace(":", "");
+            return value;
+          } else {
+            String locator;
+            if (time == null)
+                locator = "Timeposition";
+            else
+                locator = "TimePosition value";
+            throw new  CstlServiceException("bad format of time, " + locator + " mustn't be null",
+                                              MISSING_PARAMETER_VALUE, "eventTime");
+          }
+    }
+
     public static String getPeriodDescription(long time) {
         long temp = time / 1000;
         long ms   = time - (temp * 1000);

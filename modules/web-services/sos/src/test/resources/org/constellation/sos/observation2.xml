@@ -9,7 +9,7 @@
     </om:samplingTime>
     <om:procedure xlink:href="urn:ogc:object:sensor:BRGM:3"/>
     <om:observedProperty>
-       <swe:Phenomenon gml:id="depth">
+        <swe:Phenomenon gml:id="depth">
             <gml:description>profondeur</gml:description>
             <gml:name>urn:ogc:def:phenomenon:BRGM:depth</gml:name>
         </swe:Phenomenon>
@@ -27,14 +27,14 @@
             </sa:position>
         </sa:SamplingPoint>
     </om:featureOfInterest>
-    <om:result>
+    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="swe:DataArrayPropertyType">
         <swe:DataArray gml:id="dataArray-2">
             <swe:elementCount>
                 <swe:Count>
                     <swe:value>5</swe:value>
                 </swe:Count>
             </swe:elementCount>
-             <swe:elementType name="dataArray-2">
+            <swe:elementType name="dataArray-2">
                 <swe:SimpleDataRecord gml:id="datarecord">
                     <swe:field name="Time">
                         <swe:Time definition="urn:ogc:data:time:iso8601">

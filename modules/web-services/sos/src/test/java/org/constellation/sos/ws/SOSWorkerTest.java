@@ -21,7 +21,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -41,9 +43,13 @@ import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.geotoolkit.gml.xml.v311.TimeInstantType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sos.xml.v100.EventTime;
 import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.xml.MarshallerPool;
@@ -179,7 +185,7 @@ public class SOSWorkerTest {
     @Before
     public void setUp() throws Exception {
 
-        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100:org.geotoolkit.sml.xml.v100");
+        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100:org.geotoolkit.sml.xml.v100:org.geotoolkit.sampling.xml.v100:org.geotoolkit.swe.xml.v101");
         
         File configDir = new File("SOSWorkerTest");
         worker = new SOSworker(configDir);
@@ -368,6 +374,10 @@ public class SOSWorkerTest {
     @Test
     public void GetObservationTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+        /**
+         *  Test 1: getObservation with procedure urn:ogc:object:sensor:BRGM:4
+         */
         GetObservation request  = new GetObservation("1.0.0",
                                                      "offering-allSensor",
                                                      null,
@@ -377,7 +387,7 @@ public class SOSWorkerTest {
                                                      null,
                                                      "text/xml; subtype=\"om/1.0.0\"",
                                                      Parameters.OBSERVATION_QNAME,
-                                                     ResponseModeType.RESULT_TEMPLATE,
+                                                     ResponseModeType.INLINE,
                                                      null);
         ObservationCollectionEntry result = (ObservationCollectionEntry) worker.getObservation(request);
 
@@ -387,9 +397,58 @@ public class SOSWorkerTest {
 
         assertEquals(result.getMember().size(), 1);
 
-        // TODO assertEquals(expResult, result.getMember().iterator().next());
+        ObservationEntry obsResult = (ObservationEntry) result.getMember().iterator().next();
 
-        
+
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 2: getObservation with procedure urn:ogc:object:sensor:BRGM:3
+         */
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:BRGM:3"),
+                                      null,
+                                      null,
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.INLINE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        assertEquals(result.getMember().size(), 3);
+
+        /**
+         *  Test 2: getObservation with procedure urn:ogc:object:sensor:BRGM:3
+         *          + Time filter 
+         */
+        List<EventTime> times = new ArrayList<EventTime>();
+        TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
+        BinaryTemporalOpType filter = new BinaryTemporalOpType(instant);
+        EventTime before            = new EventTime(null, filter, null);
+        times.add(before);
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      times,
+                                      Arrays.asList("urn:ogc:object:sensor:BRGM:3"),
+                                      null,
+                                      null,
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.INLINE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+//        assertEquals(result.getMember().size(), 1);
+
         marshallerPool.release(unmarshaller);
     }
 
