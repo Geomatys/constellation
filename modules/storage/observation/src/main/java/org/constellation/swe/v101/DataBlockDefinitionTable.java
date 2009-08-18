@@ -75,20 +75,20 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
     @Override
     protected DataBlockDefinition createEntry(final ResultSet results) throws SQLException, CatalogException {
         final DataBlockDefinitionQuery query = (DataBlockDefinitionQuery) super.query;
-        String idDataBlock = results.getString(indexOf(query.id));
+        final String idDataBlock = results.getString(indexOf(query.id));
         
         if (dataRecords == null) {
             dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
             dataRecords = new SimpleDataRecordTable(dataRecords);
         }
         dataRecords.setIdDataBlock(idDataBlock);
-        Collection<SimpleDataRecordEntry> entries = dataRecords.getEntries();
+        final Collection<SimpleDataRecordEntry> entries = dataRecords.getEntries();
         
         if (textBlockEncodings == null) {
             textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
         }
         
-        TextBlockEntry encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
+        final TextBlockEntry encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
         
         return new DataBlockDefinitionEntry(idDataBlock, entries, encoding);
     }
@@ -106,9 +106,9 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
         transactionBegin();
         try {
             if (databloc.getId() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.id), databloc.getId());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return databloc.getId();
@@ -119,7 +119,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
                 id = searchFreeIdentifier("datablockDef");
             }
         
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.id), id);
 
             if (textBlockEncodings == null) {
@@ -135,7 +135,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
             } else {
                 dataRecords.setIdDataBlock(id);
             }
-            Iterator i = databloc.getComponents().iterator();
+            final Iterator i = databloc.getComponents().iterator();
             while (i.hasNext()) {
                 dataRecords.getIdentifier((SimpleDataRecordEntry) i.next(), id);
             }

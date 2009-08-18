@@ -42,6 +42,7 @@ import org.constellation.generic.filter.Select;
 import org.constellation.generic.filter.Where;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
+import org.constellation.sos.ws.Parameters;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.constellation.ws.CstlServiceException;
@@ -151,8 +152,8 @@ public class GenericObservationFilter implements ObservationFilter {
         currentQuery        = new Query();
         final Select select = configurationQuery.getSelect("filterResult");
         final From from     = configurationQuery.getFrom("observations");
-        final Where where   = configurationQuery.getWhere("procedure");
-        where.replaceVariable("procedure", procedure, true);
+        final Where where   = configurationQuery.getWhere(Parameters.PROCEDURE);
+        where.replaceVariable(Parameters.PROCEDURE, procedure, true);
         currentQuery.addSelect(select);
         currentQuery.addFrom(from);
         currentQuery.addWhere(where);
@@ -174,16 +175,16 @@ public class GenericObservationFilter implements ObservationFilter {
                     if (dbId == null) {
                         dbId = s;
                     }
-                    final Where where = configurationQuery.getWhere("procedure");
-                    where.replaceVariable("procedure", dbId, true);
+                    final Where where = configurationQuery.getWhere(Parameters.PROCEDURE);
+                    where.replaceVariable(Parameters.PROCEDURE, dbId, true);
                     currentQuery.addWhere(where);
                 }
             }
         } else {
             //if is not specified we use all the process of the offering
             for (ReferenceEntry proc : off.getProcedure()) {
-                 final Where where = configurationQuery.getWhere("procedure");
-                 where.replaceVariable("procedure", proc.getHref(), true);
+                 final Where where = configurationQuery.getWhere(Parameters.PROCEDURE);
+                 where.replaceVariable(Parameters.PROCEDURE, proc.getHref(), true);
                  currentQuery.addWhere(where);
             }
         }
@@ -253,7 +254,7 @@ public class GenericObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
-                    INVALID_PARAMETER_VALUE, "eventTime");
+                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
         }
     }
 
@@ -276,7 +277,7 @@ public class GenericObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_Before operation require timeInstant!",
-                    INVALID_PARAMETER_VALUE, "eventTime");
+                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
         }
     }
 
@@ -299,7 +300,7 @@ public class GenericObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_After operation require timeInstant!",
-                    INVALID_PARAMETER_VALUE, "eventTime");
+                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
         }
     }
 
@@ -323,7 +324,7 @@ public class GenericObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_During operation require TimePeriod!",
-                    INVALID_PARAMETER_VALUE, "eventTime");
+                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
         }
     }
 

@@ -125,7 +125,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                 statement.setString(indexOf(query.values),array.getValues());
                 statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
                 statement.setString(indexOf(query.definition), array.getId());
-                ResultSet results = statement.executeQuery();
+                final ResultSet results = statement.executeQuery();
                 if(results.next()){
                     success = true;
                     return results.getString(1);
@@ -143,7 +143,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                 throw new CatalogException(" this kind of result is not allowed");
             }
         
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
 
             if (result instanceof AnyResultEntry) {
                 final DataArrayEntry array = ((AnyResultEntry)result).getArray();
@@ -194,7 +194,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
         }
         //we get the new id generated
         final PreparedStatement p = getStatement("SELECT max(id_result) FROM any_results" );
-        ResultSet r = p.executeQuery();
+        final ResultSet r = p.executeQuery();
         if (r.next())
             return r.getString(1);
         else

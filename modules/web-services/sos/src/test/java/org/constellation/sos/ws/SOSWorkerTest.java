@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
@@ -57,6 +58,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // JUnit dependencies
 import org.junit.*;
+import org.opengis.observation.Observation;
 import static org.junit.Assert.*;
 
 /**
@@ -427,7 +429,7 @@ public class SOSWorkerTest {
 
         /**
          *  Test 2: getObservation with procedure urn:ogc:object:sensor:BRGM:3
-         *          + Time filter 
+         *          + Time filter TBefore
          */
         List<EventTime> times = new ArrayList<EventTime>();
         TimeInstantType instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
@@ -447,7 +449,36 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
 
-//        assertEquals(result.getMember().size(), 1);
+        assertEquals(result.getMember().size(), 1);
+
+        assertEquals(result.getMember().iterator().next().getName(), "urn:ogc:object:observation:BRGM:304");
+
+        /**
+         *  Test 3: getObservation with procedure urn:ogc:object:sensor:BRGM:3
+         *          + Time filter TAFter
+         */
+        times = new ArrayList<EventTime>();
+        EventTime after            = new EventTime(filter,null, null);
+        times.add(after);
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      times,
+                                      Arrays.asList("urn:ogc:object:sensor:BRGM:3"),
+                                      null,
+                                      null,
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.INLINE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        assertEquals(result.getMember().size(), 3);
+
+        final Iterator<Observation> i = result.getMember().iterator();
+        assertEquals(i.next().getName(), "urn:ogc:object:observation:BRGM:304");
+        assertEquals(i.next().getName(), "urn:ogc:object:observation:BRGM:307");
+        assertEquals(i.next().getName(), "urn:ogc:object:observation:BRGM:305");
 
         marshallerPool.release(unmarshaller);
     }

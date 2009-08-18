@@ -1174,7 +1174,7 @@ public class SOSworker {
                         throw new IllegalArgumentException("Array is null");
                     }
                 } else if (r instanceof Measure) {
-                    Measure meas = (Measure) r;
+                    final Measure meas = (Measure) r;
                     datablock.append(tBegin).append(',').append(meas.getValue()).append("@@");
                 }
 
@@ -1474,13 +1474,10 @@ public class SOSworker {
         // Debug part
         if (verifySynchronization) {
             if (obs.getSamplingTime() instanceof TimeInstantType) {
-                TimeInstantType timeInstant = (TimeInstantType) obs.getSamplingTime();
+               final TimeInstantType timeInstant = (TimeInstantType) obs.getSamplingTime();
                 try {
-                    
-                    Date d = dateformat.parse(timeInstant.getTimePosition().getValue());
-                    Date now = new Date(System.currentTimeMillis());
-                    LOGGER.info("time value: " + timeInstant.getTimePosition().getValue() + " now: " + dateformat.format(now));
-                    long t = System.currentTimeMillis() - d.getTime();
+                    final Date d = dateformat.parse(timeInstant.getTimePosition().getValue());
+                    final long t = System.currentTimeMillis() - d.getTime();
                     LOGGER.info("gap between time of reception and time of sampling: " + t + " ms (" + Utils.getPeriodDescription(t) + ')');
                 } catch (ParseException ex) {
                     LOGGER.warning("unable to parse the samplingTime");

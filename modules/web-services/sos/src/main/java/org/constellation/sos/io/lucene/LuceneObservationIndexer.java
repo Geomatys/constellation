@@ -33,6 +33,8 @@ import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.constellation.generic.database.Automatic;
+import org.constellation.sos.ws.Utils;
+import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
@@ -228,18 +230,22 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
 
         doc.add(new Field("feature_of_interest",   ((SamplingFeatureEntry)observation.getFeatureOfInterest()).getName(), Field.Store.YES, Field.Index.ANALYZED));
 
-        AbstractTimeGeometricPrimitiveType time = observation.getSamplingTime();
-        if (time instanceof TimePeriodType) {
-            TimePeriodType period = (TimePeriodType) time;
-            doc.add(new Field("sampling_time_begin",   period.getBeginPosition().getValue(), Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field("sampling_time_end",   period.getEndPosition().getValue(), Field.Store.YES, Field.Index.ANALYZED));
+        try {
+            final AbstractTimeGeometricPrimitiveType time = observation.getSamplingTime();
+            if (time instanceof TimePeriodType) {
+                final TimePeriodType period = (TimePeriodType) time;
+                doc.add(new Field("sampling_time_begin",   Utils.getLuceneTimeValue(period.getBeginPosition()), Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field("sampling_time_end",   Utils.getLuceneTimeValue(period.getEndPosition()), Field.Store.YES, Field.Index.ANALYZED));
 
-        } else if (time instanceof TimeInstantType) {
-            TimeInstantType instant = (TimeInstantType) time;
-            doc.add(new Field("sampling_time_begin",   instant.getTimePosition().getValue(), Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field("sampling_time_end",    "NULL", Field.Store.YES, Field.Index.ANALYZED));
-        } else {
-            LOGGER.severe("unrecognized sampling time type:" + time);
+            } else if (time instanceof TimeInstantType) {
+                final TimeInstantType instant = (TimeInstantType) time;
+                doc.add(new Field("sampling_time_begin",   Utils.getLuceneTimeValue(instant.getTimePosition()), Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field("sampling_time_end",    "NULL", Field.Store.YES, Field.Index.ANALYZED));
+            } else {
+                LOGGER.severe("unrecognized sampling time type:" + time);
+            }
+        } catch(CstlServiceException ex) {
+            LOGGER.severe("error while indexing sampling time.");
         }
         // add a default meta field to make searching all documents easy
 	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));

@@ -47,7 +47,6 @@ import org.geotoolkit.swe.xml.v101.DataArrayEntry;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
 import org.geotoolkit.xml.MarshallerPool;
-import static org.constellation.sos.ws.SOSworker.*;
 
 // Junit dependencies
 import org.junit.Test;

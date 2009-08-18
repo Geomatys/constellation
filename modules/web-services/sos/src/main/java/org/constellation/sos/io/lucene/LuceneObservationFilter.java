@@ -19,6 +19,8 @@ package org.constellation.sos.io.lucene;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilter;
@@ -45,26 +47,20 @@ import static org.constellation.sos.ws.Utils.*;
  */
 public class LuceneObservationFilter implements ObservationFilter {
 
-    private static final String NOT_SUPPORTED_YET = "Not supported yet.";
-
-    private String observationIdBase;
-    private String observationTemplateIdBase;
     private Properties map;
-    private Automatic configuration;
 
     private StringBuilder luceneRequest;
 
     private LuceneObservationSearcher searcher;
 
+    private static final String OR_OPERATOR = " OR ";
+
     public LuceneObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
-        this.configuration             = configuration;
         this.map                       = map;
-        this.observationIdBase         = observationIdBase;
-        this.observationTemplateIdBase = observationTemplateIdBase;
         try {
             this.searcher = new LuceneObservationSearcher(configuration.getConfigurationDirectory(), "");
         } catch (IndexingException ex) {
-            ex.printStackTrace();
+            Logger.getAnonymousLogger().log(Level.SEVERE, "IndexingException in LuceneObservationFilter constructor", ex);
             throw new CstlServiceException("IndexingException in LuceneObservationFilter constructor", ex, NO_APPLICABLE_CODE);
         }
     }
@@ -115,11 +111,11 @@ public class LuceneObservationFilter implements ObservationFilter {
     public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon) {
         luceneRequest.append(" AND( ");
         for (String p : phenomenon) {
-            luceneRequest.append(" observed_property:").append(p).append(" OR ");
+            luceneRequest.append(" observed_property:").append(p).append(OR_OPERATOR);
 
         }
         for (String p : compositePhenomenon) {
-            luceneRequest.append(" observed_property:").append(p).append(" OR ");
+            luceneRequest.append(" observed_property:").append(p).append(OR_OPERATOR);
         }
         luceneRequest.delete(luceneRequest.length() - 3, luceneRequest.length());
         luceneRequest.append(") ");
@@ -155,7 +151,7 @@ public class LuceneObservationFilter implements ObservationFilter {
 
             // case 1 a single observation
             luceneRequest.append("(sampling_time_begin:'").append(position).append("' AND sampling_time_end:NULL)");
-            luceneRequest.append(" OR ");
+            luceneRequest.append(OR_OPERATOR);
 
             //case 2 multiple observations containing a matching value
             luceneRequest.append("(sampling_time_begin[19700000 ").append(position).append("] ").append(" AND sampling_time_end: [").append(position).append("30000000]))");
@@ -175,7 +171,7 @@ public class LuceneObservationFilter implements ObservationFilter {
             luceneRequest.append("AND (");
 
             // the single and multpile observations whitch begin after the bound
-            luceneRequest.append("(sampling_time_begin: [19700000 ").append(position).append("]))");
+            luceneRequest.append("(sampling_time_begin: [19700000000000 ").append(position).append("]))");
 
         } else {
             throw new CstlServiceException("TM_Before operation require timeInstant!",
@@ -193,7 +189,7 @@ public class LuceneObservationFilter implements ObservationFilter {
 
             // the single and multpile observations whitch begin after the bound
             luceneRequest.append("(sampling_time_begin:[").append(position).append(" 30000000])");
-            luceneRequest.append(" OR ");
+            luceneRequest.append(OR_OPERATOR);
             // the multiple observations overlapping the bound
             luceneRequest.append("(sampling_time_begin: [19700000 ").append(position).append("] AND sampling_time_end:[").append(position).append(" 30000000]))");
 
@@ -214,16 +210,16 @@ public class LuceneObservationFilter implements ObservationFilter {
 
             // the multiple observations included in the period
             luceneRequest.append(" (sampling_time_begin:[").append(begin).append(" 30000000] AND sampling_time_end:[19700000 ").append(end).append("])");
-            luceneRequest.append(" OR ");
+            luceneRequest.append(OR_OPERATOR);
             // the single observations included in the period
             luceneRequest.append(" (sampling_time_begin:[").append(begin).append(" 30000000] AND sampling_time_begin:[19700000 ").append(end).append("] AND sampling_time_end IS NULL)");
-            luceneRequest.append(" OR ");
+            luceneRequest.append(OR_OPERATOR);
             // the multiple observations whitch overlaps the first bound
             luceneRequest.append(" (sampling_time_begin:[19700000 ").append(begin).append("] AND sampling_time_end:[19700000 ").append(end).append("] AND sampling_time_end:[").append(begin).append(" 30000000])");
-            luceneRequest.append(" OR ");
+            luceneRequest.append(OR_OPERATOR);
             // the multiple observations whitch overlaps the second bound
             luceneRequest.append(" (sampling_time_begin:[").append(begin).append(" 30000000] AND sampling_time_end:[").append(end).append(" 30000000] AND sampling_time_begin:[19700000 ").append(end).append("])");
-            luceneRequest.append(" OR ");
+            luceneRequest.append(OR_OPERATOR);
             // the multiple observations whitch overlaps the whole period
             luceneRequest.append(" (sampling_time_begin:[19700000 ").append(begin).append("] AND sampling_time_end:[").append(end).append(" 30000000]))");
 

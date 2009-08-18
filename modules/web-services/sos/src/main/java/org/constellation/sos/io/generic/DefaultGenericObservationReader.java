@@ -65,6 +65,8 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
      * The base for observation id.
      */
     protected final String observationIdBase;
+
+    private static final String VAR01 = "var01";
     
     public DefaultGenericObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException {
         super(configuration);
@@ -73,8 +75,8 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
 
     @Override
     public List<String> getOfferingNames() throws CstlServiceException {
-        final Values values = loadData(Arrays.asList("var01"));
-        return values.getVariables("var01");
+        final Values values = loadData(Arrays.asList(VAR01));
+        return values.getVariables(VAR01);
     }
 
     @Override
@@ -193,9 +195,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
 
     @Override
     public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
-        final Values values = loadData(Arrays.asList("var01"));
+        final Values values = loadData(Arrays.asList(VAR01));
         final List<ObservationOfferingEntry> offerings = new ArrayList<ObservationOfferingEntry>();
-        final List<String> offeringNames = values.getVariables("var01");
+        final List<String> offeringNames = values.getVariables(VAR01);
         for (String offeringName : offeringNames) {
             offerings.add(getObservationOffering(offeringName));
         }

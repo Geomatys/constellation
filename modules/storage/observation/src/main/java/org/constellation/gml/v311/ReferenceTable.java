@@ -71,7 +71,7 @@ public class ReferenceTable extends SingletonTable<ReferenceEntry>{
         transactionBegin();
         try {
             if (ref.getId() == null) {
-                PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+                final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
                 if (ref.getActuate() != null) {
                     statement.setString(indexOf(query.byActuate), ref.getActuate());
                 } else {
@@ -113,7 +113,7 @@ public class ReferenceTable extends SingletonTable<ReferenceEntry>{
                     statement.setString(indexOf(query.byType), "");
                 }
 
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return result.getString("id_reference");
@@ -125,7 +125,7 @@ public class ReferenceTable extends SingletonTable<ReferenceEntry>{
                 return id;
             }
         
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.idReference), id);
         
             if (ref.getActuate() != null) {

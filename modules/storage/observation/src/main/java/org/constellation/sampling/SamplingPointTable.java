@@ -62,14 +62,14 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
     protected SamplingPointEntry createEntry(final ResultSet result) throws CatalogException, SQLException {
         final SamplingPointQuery query = (SamplingPointQuery) super.query;
         
-        List<Double> value = new ArrayList<Double>();
-        value.add(result.getDouble(indexOf((query.positionValueX))));
-        value.add(result.getDouble(indexOf((query.positionValueY))));
+        final List<Double> value = new ArrayList<Double>();
+        value.add(result.getDouble(indexOf(query.positionValueX)));
+        value.add(result.getDouble(indexOf(query.positionValueY)));
                 
-        PointType p = new PointType(result.getString(indexOf(query.pointIdentifier)),
-                                    new DirectPositionType(result.getString(indexOf(query.srsName)),
-                                    result.getInt(indexOf(query.srsDimension)),
-                                    value));
+        final PointType p = new PointType(result.getString(indexOf(query.pointIdentifier)),
+                                          new DirectPositionType(result.getString(indexOf(query.srsName)),
+                                          result.getInt(indexOf(query.srsDimension)),
+                                          value));
                             
         return new SamplingPointEntry( result.getString(indexOf(query.identifier)),
                                        result.getString(indexOf(query.name)),
@@ -93,9 +93,9 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
         try {
             // the station recived by xml have no ID so we use the name as a second primary key
             if (station.getName() != null) {
-                PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+                final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
                 statement.setString(indexOf(query.byName), station.getName());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     id = result.getString("id");
@@ -112,7 +112,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
                throw new CatalogException("the station must have a name"); 
             }
             station.setId(id);
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.identifier), id);
         
             if (station.getDescription() != null) {
@@ -122,7 +122,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
             }
         
             statement.setString(indexOf(query.name), station.getName());
-            Iterator i = station.getSampledFeatures().iterator();
+            final Iterator i = station.getSampledFeatures().iterator();
             statement.setString(indexOf(query.sampledFeature), (String)i.next());
         
             if( station.getPosition() != null ) {

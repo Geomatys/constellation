@@ -130,7 +130,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
         boolean success = false;
         transactionBegin();
         try {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            final PreparedStatement statement = getStatement(QueryType.EXISTS);
         
             statement.setString(indexOf(query.idOffering), offPheno.getIdOffering());
         
@@ -143,7 +143,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
                 statement.setString(indexOf(query.compositePhenomenon), idPheno);
                 statement.setString(indexOf(query.phenomenon), "");
         
-            } else if (offPheno.getComponent() instanceof PhenomenonEntry) {
+            } else {
                 if ( phenomenons == null) {
                     phenomenons = getDatabase().getTable(PhenomenonTable.class);
                 }
@@ -152,13 +152,13 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
                 statement.setString(indexOf(query.compositePhenomenon), "");
             
             }
-            ResultSet result = statement.executeQuery();
+            final ResultSet result = statement.executeQuery();
             if(result.next()) {
                 success = true;
                 return;
             }
         
-            PreparedStatement insert    = getStatement(QueryType.INSERT);
+            final PreparedStatement insert    = getStatement(QueryType.INSERT);
             insert.setString(indexOf(query.idOffering), offPheno.getIdOffering());
             if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
                 if (compositePhenomenons == null) {

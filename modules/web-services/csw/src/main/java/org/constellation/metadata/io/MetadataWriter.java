@@ -61,7 +61,11 @@ public abstract class MetadataWriter {
      * An indexer lucene to add object into the index.
      */
     protected final AbstractIndexer indexer;
-    
+
+    private static final String UNKNOW_TITLE = "unknow title";
+
+    private static final String UNKNOW_IDENTIFIER = "unknow_identifier";
+
     /**
      * Build a new metadata writer.
      * 
@@ -78,13 +82,13 @@ public abstract class MetadataWriter {
      * 
      * @param obj the object for wich we want a title
      * 
-     * @return the founded title or "Unknow title"
+     * @return the founded title or UNKNOW_TITLE
      */
     protected String findTitle(Object obj) {
         
         //here we try to get the title
         AbstractSimpleLiteral titleSL = null;
-        String title = "unknow title";
+        String title = UNKNOW_TITLE;
         if (obj instanceof Record) {
             titleSL = ((Record) obj).getTitle();
             if (titleSL == null) {
@@ -92,22 +96,22 @@ public abstract class MetadataWriter {
             }
                                
             if (titleSL == null) {
-                title = "unknow title";
+                title = UNKNOW_TITLE;
             } else {
                 if (titleSL.getContent().size() > 0)
                     title = titleSL.getContent().get(0);
             }
                             
         } else if (obj instanceof DefaultMetaData) {
-            Collection<Identification> idents = ((DefaultMetaData) obj).getIdentificationInfo();
+            final Collection<Identification> idents = ((DefaultMetaData) obj).getIdentificationInfo();
             if (idents.size() != 0) {
-                Identification ident = idents.iterator().next();
+                final Identification ident = idents.iterator().next();
                 if (ident != null && ident.getCitation() != null && ident.getCitation().getTitle() != null) {
                     title = ident.getCitation().getTitle().toString();
                 } 
             }
         } else if (obj instanceof RegistryObject) {
-            EbrimInternationalString ident = ((RegistryObject) obj).getName();
+            final EbrimInternationalString ident = ((RegistryObject) obj).getName();
             if (ident != null && ident.getLocalizedString().size() > 0) {
                 title = ident.getLocalizedString().get(0).getValue();
             } else {
@@ -150,7 +154,7 @@ public abstract class MetadataWriter {
             
             if (nameGetter != null) {
                 try {
-                    Object objT = nameGetter.invoke(obj);
+                    final Object objT = nameGetter.invoke(obj);
                     if (objT instanceof String) {
                         title = (String) obj;
                     
@@ -158,14 +162,14 @@ public abstract class MetadataWriter {
                         titleSL = (AbstractSimpleLiteral) objT;
                         if (titleSL.getContent().size() > 0)
                             title = titleSL.getContent().get(0);
-                        else title = "unknow title";
+                        else title = UNKNOW_TITLE;
                     
                     } else {
-                        title = "unknow title";
+                        title = UNKNOW_TITLE;
                     }
                     
                     if (title == null)
-                        title = "unknow title";
+                        title = UNKNOW_TITLE;
                 } catch (IllegalAccessException ex) {
                     LOGGER.severe("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' + 
                                   "cause: " + ex.getMessage());
@@ -178,7 +182,7 @@ public abstract class MetadataWriter {
                 }
             }
             
-            if (title.equals("unknow title"))
+            if (title.equals(UNKNOW_TITLE))
                 LOGGER.severe("unknow type: " + obj.getClass().getName() + " unable to find a title");
         }
         return title;
@@ -192,18 +196,18 @@ public abstract class MetadataWriter {
      *
      * @param obj the object for wich we want a title
      *
-     * @return the founded title or "Unknow title"
+     * @return the founded title or UNKNOW_TITLE
      */
     protected String findIdentifier(Object obj) {
 
         //here we try to get the identifier
         AbstractSimpleLiteral identifierSL = null;
-        String identifier = "unknow_identifier";
+        String identifier = UNKNOW_IDENTIFIER;
         if (obj instanceof Record) {
             identifierSL = ((Record) obj).getIdentifier();
             
             if (identifierSL == null) {
-                identifier = "unknow_identifier";
+                identifier = UNKNOW_IDENTIFIER;
             } else {
                 if (identifierSL.getContent().size() > 0)
                     identifier = identifierSL.getContent().get(0);
@@ -251,7 +255,7 @@ public abstract class MetadataWriter {
 
             if (nameGetter != null) {
                 try {
-                    Object objT = nameGetter.invoke(obj);
+                    final Object objT = nameGetter.invoke(obj);
                     if (objT instanceof String) {
                         identifier = (String) obj;
 
@@ -259,14 +263,14 @@ public abstract class MetadataWriter {
                         identifierSL = (AbstractSimpleLiteral) objT;
                         if (identifierSL.getContent().size() > 0)
                             identifier = identifierSL.getContent().get(0);
-                        else identifier = "unknow_identifier";
+                        else identifier = UNKNOW_IDENTIFIER;
 
                     } else {
-                        identifier = "unknow_identifier";
+                        identifier = UNKNOW_IDENTIFIER;
                     }
 
                     if (identifier == null)
-                        identifier = "unknow_identifier";
+                        identifier = UNKNOW_IDENTIFIER;
                 } catch (IllegalAccessException ex) {
                     LOGGER.severe("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' +
                                   "cause: " + ex.getMessage());
@@ -279,7 +283,7 @@ public abstract class MetadataWriter {
                 }
             }
 
-            if (identifier.equals("unknow_identifier"))
+            if (identifier.equals(UNKNOW_IDENTIFIER))
                 LOGGER.severe("unknow type: " + obj.getClass().getName() + " unable to find an identifier");
         }
         return identifier;

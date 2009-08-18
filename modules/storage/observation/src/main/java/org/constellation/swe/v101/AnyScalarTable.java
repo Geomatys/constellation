@@ -167,11 +167,11 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
         transactionBegin();
         try {
             if (field.getName() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.byIdDataBlock), blockId);
                 statement.setString(indexOf(query.idDataRecord),  dataRecordId);
                 statement.setString(indexOf(query.name),          field.getName());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return field.getName();
@@ -182,7 +182,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
                 id = searchFreeIdentifier("field");
             }
         
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.idDataRecord), dataRecordId);
             statement.setString(indexOf(query.idDataBlock),  blockId);
             statement.setString(indexOf(query.name),         id);
@@ -192,7 +192,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
                 statement.setNull(indexOf(query.definition), java.sql.Types.VARCHAR);   
             
             if (field.getComponent() instanceof QuantityType) {
-                QuantityType q = (QuantityType) field.getComponent();
+                final QuantityType q = (QuantityType) field.getComponent();
             
                 statement.setString(indexOf(query.type), "Quantity");
                 if ( q.getUom().getCode() != null)
@@ -208,7 +208,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
                 statement.setNull(indexOf(query.value), java.sql.Types.BOOLEAN);
             
             } else if (field.getComponent() instanceof TimeType) {
-                TimeType t = (TimeType) field.getComponent();
+                final TimeType t = (TimeType) field.getComponent();
             
                 statement.setString(indexOf(query.type), "Time");
                 if ( t.getUom() != null && t.getUom().getCode() != null)
@@ -224,7 +224,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
                 statement.setNull(indexOf(query.value), java.sql.Types.BOOLEAN);
             
             } else if (field.getComponent() instanceof BooleanType) {
-                BooleanType b = (BooleanType) field.getComponent();
+                final BooleanType b = (BooleanType) field.getComponent();
             
                 statement.setString(indexOf(query.type), "Boolean");
                 if (b.isValue() != null)

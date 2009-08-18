@@ -79,7 +79,7 @@ import org.xml.sax.SAXException;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class WMSMapDecoration {
+public final class WMSMapDecoration {
 
     private static final Logger LOGGER = Logging.getLogger(WMSMapDecoration.class);
 
@@ -522,8 +522,8 @@ public class WMSMapDecoration {
                     canvas.getContainer().add(imageDeco);
 
                 }else if(type.equalsIgnoreCase(TYPE_LEGEND)){
-                    LegendTemplate legendTemplate = (LegendTemplate) params.get(TYPE_LEGEND);
-                    GraphicLegendJ2D legendDeco = new GraphicLegendJ2D(canvas, legendTemplate);
+                    final LegendTemplate legendTemplate = (LegendTemplate) params.get(TYPE_LEGEND);
+                    final GraphicLegendJ2D legendDeco = new GraphicLegendJ2D(canvas, legendTemplate);
                     legendDeco.setPosition((Integer)params.get(PARAM_POSITION));
                     legendDeco.setOffset((Integer)params.get(PARAM_OFFSET_X), (Integer)params.get(PARAM_OFFSET_Y));
                     canvas.getContainer().add(legendDeco);

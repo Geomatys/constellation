@@ -77,11 +77,11 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
         transactionBegin();
         try {
             if (textbloc.getId() == null) {
-                PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
+                final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
                 statement.setString(indexOf(query.byBlockSeparator), textbloc.getBlockSeparator());
                 statement.setString(indexOf(query.byDecimalSeparator), textbloc.getDecimalSeparator());
                 statement.setString(indexOf(query.byTokenSeparator), textbloc.getTokenSeparator());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                      return result.getString("id_encoding");
@@ -94,7 +94,7 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
                 return id;
             }
              
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.id), id);
             statement.setString(indexOf(query.decimalSeparator), textbloc.getDecimalSeparator());
             statement.setString(indexOf(query.blockSeparator)  , textbloc.getBlockSeparator());

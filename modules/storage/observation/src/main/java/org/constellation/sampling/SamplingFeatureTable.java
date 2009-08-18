@@ -50,7 +50,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
      */
     public SamplingFeatureTable(final Database database) {
         super(new SamplingFeatureQuery(database));
-        SamplingFeatureQuery query = new SamplingFeatureQuery(database);
+        final SamplingFeatureQuery query = new SamplingFeatureQuery(database);
         setIdentifierParameters(query.byIdentifier, null);
     }
     
@@ -135,9 +135,9 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
         transactionBegin();
         try {
             if (station.getId() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.identifier), station.getId());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return station.getId();
@@ -148,7 +148,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
                 id = searchFreeIdentifier("station");
             }
         
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.identifier), id);
         
             if (station.getDescription() != null) {
@@ -158,7 +158,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
             }
         
             statement.setString(indexOf(query.name), station.getName());
-            Iterator i = station.getSampledFeatures().iterator();
+            final Iterator i = station.getSampledFeatures().iterator();
             statement.setString(indexOf(query.sampledFeature), (String)i.next());
         
             updateSingleton(statement);

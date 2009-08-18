@@ -46,7 +46,7 @@ public class PhenomenonTable<EntryType extends Phenomenon> extends SingletonTabl
      */
     public PhenomenonTable(final Database database) {
         super(new PhenomenonQuery(database));
-        PhenomenonQuery query = new PhenomenonQuery(database);
+        final PhenomenonQuery query = new PhenomenonQuery(database);
         setIdentifierParameters(query.byName, null);
     }
     
@@ -81,9 +81,9 @@ public class PhenomenonTable<EntryType extends Phenomenon> extends SingletonTabl
         transactionBegin();
         try {
             if (pheno.getId() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.identifier), pheno.getId());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return pheno.getId();
@@ -93,7 +93,7 @@ public class PhenomenonTable<EntryType extends Phenomenon> extends SingletonTabl
             } else {
                 id = searchFreeIdentifier("pheno");
             }
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.identifier), id);
             statement.setString(indexOf(query.name), pheno.getName());
             statement.setString(indexOf(query.remarks), pheno.getDescription());

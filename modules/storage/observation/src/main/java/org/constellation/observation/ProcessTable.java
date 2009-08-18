@@ -75,9 +75,9 @@ public class ProcessTable extends SingletonTable<ProcessEntry> {
         transactionBegin();
         try {
             if (proc.getName() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.name), proc.getName());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return proc.getName();
@@ -88,7 +88,7 @@ public class ProcessTable extends SingletonTable<ProcessEntry> {
                 id = searchFreeIdentifier("procedure");
             }
         
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
         
             statement.setString(indexOf(query.name), id);
             statement.setNull(indexOf(query.remarks), java.sql.Types.VARCHAR);

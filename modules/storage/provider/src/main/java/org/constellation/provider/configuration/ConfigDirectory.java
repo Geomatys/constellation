@@ -67,9 +67,9 @@ public final class ConfigDirectory {
 
     public static File getConfigDirectory() {
         try {
-            String path = getPropertyValue("Constellation", "config_dir");
+            final String path = getPropertyValue("Constellation", "config_dir");
             if(path != null){
-                File folder = new File(path);
+                final File folder = new File(path);
                 if(folder.exists() && folder.canRead() && folder.canWrite()){
                     return folder;
                 }else{
@@ -99,7 +99,7 @@ public final class ConfigDirectory {
      */
     public static File getSicadeDirectory() {
         File sicadeDirectory;
-        String home = System.getProperty("user.home");
+        final String home = System.getProperty("user.home");
 
         if (System.getProperty("os.name", "").startsWith("Windows")) {
              sicadeDirectory = new File(home, WINDOWS_DIRECTORY);
@@ -169,14 +169,14 @@ public final class ConfigDirectory {
         LOGGER.warning("Connecting to the database using WAR packaged config.xml file !");
 
 
-        InputStream is = Util.getResourceAsStream("/config.xml");
+        final InputStream is = Util.getResourceAsStream("/config.xml");
         if (is != null) {
             int i;
             try {
 
-                File configFile = File.createTempFile("temp", ".xml");
+                final File configFile = File.createTempFile("temp", ".xml");
 
-                FileOutputStream fos = new FileOutputStream(configFile);
+                final FileOutputStream fos = new FileOutputStream(configFile);
                 while ((i = is.read()) != -1) {
                     fos.write(i);
                 }
