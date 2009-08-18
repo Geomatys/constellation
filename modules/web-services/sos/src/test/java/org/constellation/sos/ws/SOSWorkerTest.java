@@ -476,9 +476,14 @@ public class SOSWorkerTest {
         assertEquals(result.getMember().size(), 3);
 
         final Iterator<Observation> i = result.getMember().iterator();
-        assertEquals(i.next().getName(), "urn:ogc:object:observation:BRGM:304");
-        assertEquals(i.next().getName(), "urn:ogc:object:observation:BRGM:307");
-        assertEquals(i.next().getName(), "urn:ogc:object:observation:BRGM:305");
+        List<String> results = new ArrayList<String>();
+        results.add(i.next().getName());
+        results.add(i.next().getName());
+        results.add(i.next().getName());
+
+        assertTrue(results.contains("urn:ogc:object:observation:BRGM:304"));
+        assertTrue(results.contains("urn:ogc:object:observation:BRGM:307"));
+        assertTrue(results.contains("urn:ogc:object:observation:BRGM:305"));
 
         marshallerPool.release(unmarshaller);
     }
