@@ -352,19 +352,69 @@ public class SOSWorkerTest {
     @Test
     public void DescribeSensorTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-        DescribeSensor request  = new DescribeSensor("urn:ogc:object:sensor:BRGM:1", "text/xml;subtype=\"SensorML/1.0.0\"");
+
+        /**
+         * Test 1 bad outputFormat
+         */
+        boolean exLaunched = false;
+        DescribeSensor request  = new DescribeSensor("urn:ogc:object:sensor:BRGM:1", "text/xml; subtype=\"SensorML/1.0.0\"");
+        try {
+            worker.describeSensor(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "outputFormat");
+        }
+        assertTrue(exLaunched);
+
+        /**
+         * Test 2 missing outputFormat
+         */
+        exLaunched = false;
+        request  = new DescribeSensor("urn:ogc:object:sensor:BRGM:1", null);
+        try {
+            worker.describeSensor(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "outputFormat");
+        }
+        assertTrue(exLaunched);
+
+        /**
+         * Test 3 missing sensorID
+         */
+        exLaunched = false;
+        request  = new DescribeSensor(null, "text/xml;subtype=\"SensorML/1.0.0\"");
+        try {
+            worker.describeSensor(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), Parameters.PROCEDURE);
+        }
+        assertTrue(exLaunched);
+
+        /**
+         * Test 4 system sensor
+         */
+        request  = new DescribeSensor("urn:ogc:object:sensor:BRGM:1", "text/xml;subtype=\"SensorML/1.0.0\"");
         AbstractSensorML result = (AbstractSensorML) worker.describeSensor(request);
 
         AbstractSensorML expResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
 
         assertEquals(expResult, result);
 
+        /**
+         * Test 5 component sensor
+         */
         request  = new DescribeSensor("urn:ogc:object:sensor:BRGM:2", "text/xml;subtype=\"SensorML/1.0.0\"");
         result = (AbstractSensorML) worker.describeSensor(request);
 
         expResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component.xml"));
 
         assertEquals(expResult, result);
+
         marshallerPool.release(unmarshaller);
     }
 
@@ -377,8 +427,8 @@ public class SOSWorkerTest {
     public void GetObservationTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
-        /**
-         *  Test 1: getObservation with procedure urn:ogc:object:sensor:BRGM:4
+         /**
+         *  Test 1: getObservation with bad response format
          */
         GetObservation request  = new GetObservation("1.0.0",
                                                      "offering-allSensor",
@@ -387,8 +437,57 @@ public class SOSWorkerTest {
                                                      null,
                                                      null,
                                                      null,
-                                                     "text/xml; subtype=\"om/1.0.0\"",
+                                                     "text/xml;subtype=\"om/2.0.0\"",
                                                      Parameters.OBSERVATION_QNAME,
+                                                     ResponseModeType.INLINE,
+                                                     null);
+        boolean exLaunched = false;
+        try {
+            worker.getObservation(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), Parameters.RESPONSE_FORMAT);
+        }
+        assertTrue(exLaunched);
+
+        /**
+         *  Test 2: getObservation with bad response format
+         */
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:BRGM:4"),
+                                      null,
+                                      null,
+                                      null,
+                                      null,
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.INLINE,
+                                      null);
+        exLaunched = false;
+        try {
+            worker.getObservation(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), Parameters.RESPONSE_FORMAT);
+        }
+        assertTrue(exLaunched);
+
+
+        /**
+         *  Test 3: getObservation with procedure urn:ogc:object:sensor:BRGM:4 and no resultModel
+         */
+        request  = new GetObservation("1.0.0",
+                                                     "offering-allSensor",
+                                                     null,
+                                                     Arrays.asList("urn:ogc:object:sensor:BRGM:4"),
+                                                     null,
+                                                     null,
+                                                     null,
+                                                     "text/xml; subtype=\"om/1.0.0\"",
+                                                     null,
                                                      ResponseModeType.INLINE,
                                                      null);
         ObservationCollectionEntry result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -400,6 +499,71 @@ public class SOSWorkerTest {
         assertEquals(result.getMember().size(), 1);
 
         ObservationEntry obsResult = (ObservationEntry) result.getMember().iterator().next();
+
+
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 4: getObservation with procedure urn:ogc:object:sensor:BRGM:4 avec responseMode null
+         */
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:BRGM:4"),
+                                      null,
+                                      null,
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      null,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
+
+        expResult = (ObservationEntry)obj.getValue();
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult = (ObservationEntry) result.getMember().iterator().next();
+
+
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+
+        /**
+         *  Test 1: getObservation with procedure urn:ogc:object:sensor:BRGM:4
+         */
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:BRGM:4"),
+                                      null,
+                                      null,
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.INLINE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
+
+        expResult = (ObservationEntry)obj.getValue();
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult = (ObservationEntry) result.getMember().iterator().next();
 
 
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());

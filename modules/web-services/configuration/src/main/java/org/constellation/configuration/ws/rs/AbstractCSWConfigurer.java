@@ -405,8 +405,13 @@ public abstract class AbstractCSWConfigurer {
     /**
      * Reload all the web-services.
      */
-    protected void restart() {
-        containerNotifier.reload();
+    protected boolean restart() {
+        if (containerNotifier != null) {
+            containerNotifier.reload();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**

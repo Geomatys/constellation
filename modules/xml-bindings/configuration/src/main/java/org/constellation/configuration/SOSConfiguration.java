@@ -250,6 +250,10 @@ public class SOSConfiguration {
         return 0;
     }
 
+    public void setProfile(String profile) {
+        this.profile = profile;
+    }
+
     /**
      * @return the logFolder
      */

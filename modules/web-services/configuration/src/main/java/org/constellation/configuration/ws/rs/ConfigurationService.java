@@ -289,8 +289,13 @@ public class ConfigurationService extends WebService  {
      */
     private AcknowlegementType restartService() {
         LOGGER.info("\n restart requested \n");
-        cn.reload();
-        return new AcknowlegementType("success", "services succefully restarted");
+        if (cn != null) {
+            cn.reload();
+            return new AcknowlegementType("success", "services succefully restarted");
+        } else {
+            return new AcknowlegementType("failed", "The services can not be restarted (ContainerNotifier is null)");
+        }
+        
     }
     
     /**

@@ -264,6 +264,7 @@ public class SOSWorkerInitialisationTest {
         configFile.createNewFile();
 
         configuration = new SOSConfiguration(new Automatic(), new Automatic());
+        configuration.setProfile("transactional");
         configuration.setTemplateValidTime("ff:oo");
         marshaller.marshal(configuration, configFile);
 
