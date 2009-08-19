@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Configuration of "cite" module from Constellation project.
+  Version: $Id$
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.constellation</groupId>
+    <artifactId>testing</artifactId>
+    <version>0.4-SNAPSHOT</version>
+  </parent>
+
+
+
+  <!--
+    Module description.
+  -->
+  <groupId>org.constellation.testing</groupId>
+  <artifactId>cstl-test-cite</artifactId>
+  <packaging>jar</packaging>
+  <name>Testing Cite Tests</name>
+  <description>
+    Runs a suite of Cite tests.
+  </description>
+
+
+
+  <!--
+    Developers and contributors.
+  -->
+  <developers>
+    <developer>
+      <id>glegal</id>
+      <name>Guilhem Legal</name>
+      <email>guilhem.legal@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>desruisseaux</id>
+      <name>Martin Desruisseaux</name>
+      <email>desruisseaux@users.sourceforge.net</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>cedricbr</id>
+      <name>Cédric Briançon</name>
+      <email>cedric.briancon@geomatys.fr</email>
+      <organization>Geomatys</organization>
+      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+
+  <!--
+    Required dependencies for building. These dependencies wil be included into
+    the JARs list that Maven will put into the directory "target/binaries".
+  -->
+  <dependencies>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-server</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-wms</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-postgis</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-postgrid</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-data-shapefile</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-style-sld</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-style-unnormalize</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!--  For the embedded service. -->
+    <dependency>
+      <groupId>com.sun.grizzly</groupId>
+      <artifactId>grizzly-servlet-webserver</artifactId>
+      <version>1.8.6.3</version>
+    </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <scope>${javadb.scope}</scope>
+     </dependency>
+    <!-- For testing static methods -->
+    <dependency>
+      <groupId>org.constellation.engine</groupId>
+      <artifactId>cstl-engine-testing</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>java</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <mainClass>org.constellation.ws.embedded.LaunchTests</mainClass>
+          <arguments>
+            <argument>wms-1.1.1</argument>
+          </arguments>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+            <version>1.6.5</version>
+          </dependency>
+          <dependency>
+            <groupId>ant-contrib</groupId>
+            <artifactId>ant-contrib</artifactId>
+            <version>1.0b3</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>pre</id>
+            <phase>process-sources</phase>
+            <configuration>
+              <tasks> 
+                <typedef resource="net/sf/antcontrib/antlib.xml">
+                  <classpath refid="maven.dependency.classpath"/>
+                </typedef>
+
+                <!-- copy the test scripts into the engine/script dir -->
+                <if>
+                  <available file="${basedir}/tests/wms-1.1.1"/>
+                  <then>
+                    <copy todir="${basedir}/engine/scripts/wms-1.1.1">
+                      <fileset dir="${basedir}/tests/wms-1.1.1" includes="**/*" excludes="**/.svn"/>
+                    </copy>
+                  </then>
+                </if>
+                <if>
+                  <available file="${basedir}/tests/wms-1.3.0"/>
+                  <then>
+                    <copy todir="${basedir}/engine/scripts/wms-1.3.0">
+                      <fileset dir="${basedir}/tests/wms-1.3.0" includes="**/*" excludes="**/.svn"/>
+                    </copy>
+                  </then>
+                </if>
+                <if>
+                  <available file="${basedir}/tests/wcs-1.0.0"/>
+                  <then>
+                    <copy todir="${basedir}/engine/scripts/wcs-1.0.0">
+                      <fileset dir="${basedir}/tests/wcs-1.0.0" includes="**/*" excludes="**/.svn"/>
+                    </copy>
+                  </then>
+                </if>
+
+                <!-- copy the legacy components into the engine/components dir -->
+                <copy todir="${basedir}/engine/components">
+                     <fileset dir="${basedir}" includes="cite1/**/*" excludes="/**/.svn"/>
+                </copy>
+
+                <!-- create work and logs directory into the target one -->
+                <mkdir dir="${basedir}/target/work"/>
+                <mkdir dir="${basedir}/target/logs"/>
+
+                <!-- launch the ant task to build the teamengine jar, and the components -->
+                <ant dir="${basedir}/engine" target="jar.engine"/>
+                <ant dir="${basedir}/engine" target="jar.components"/>
+              </tasks> 
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>windows</id>
+      <activation>   
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                 <groupId>sun.jdk</groupId>
+                 <artifactId>tools</artifactId>
+                 <version>1.5.0</version>
+                 <scope>system</scope>
+                 <systemPath>${java.home}/../lib/tools.jar</systemPath>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>linux</id>
+      <activation>
+        <os>
+          <family>linux</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                 <groupId>sun.jdk</groupId>
+                 <artifactId>tools</artifactId>
+                 <version>1.5.0</version>
+                 <scope>system</scope>
+                 <systemPath>${java.home}/../lib/tools.jar</systemPath>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+
+</project>

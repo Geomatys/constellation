@@ -73,7 +73,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>embedded</module>
-    <!--module>cite</module-->
+    <module>cite</module>
   </modules>
 
 </project>

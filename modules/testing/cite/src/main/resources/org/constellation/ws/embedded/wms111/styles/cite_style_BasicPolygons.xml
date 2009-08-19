@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sld:UserStyle xmlns:se="http://www.opengis.net/se" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">
+    <se:Name>Polygons</se:Name>
+    <se:Description>
+        <se:Title></se:Title>
+        <se:Abstract></se:Abstract>
+    </se:Description>
+    <sld:IsDefault>false</sld:IsDefault>
+    <se:FeatureTypeStyle>
+        <se:Description>
+            <se:Title>Title</se:Title>
+            <se:Abstract>Description</se:Abstract>
+        </se:Description>
+        <se:Rule>
+            <se:Description>
+                <se:Title>Title</se:Title>
+                <se:Abstract>Description</se:Abstract>
+            </se:Description>
+            <se:MinScaleDenominator>0.0</se:MinScaleDenominator>
+            <se:MaxScaleDenominator>1.7976931348623157E308</se:MaxScaleDenominator>
+            <se:PolygonSymbolizer uom="http://www.opengeospatial.org/se/units/pixel">
+                <se:Description>
+                    <se:Title></se:Title>
+                    <se:Abstract></se:Abstract>
+                </se:Description>
+                <se:Fill>
+                    <se:SvgParameter name="fill">
+                        <ogc:Literal>#C0C0C0</ogc:Literal>
+                    </se:SvgParameter>
+                    <se:SvgParameter name="fill-opacity">
+                        <ogc:Literal>1</ogc:Literal>
+                    </se:SvgParameter>
+                </se:Fill>
+                <se:Stroke>
+                    <se:SvgParameter name="stroke">
+                        <ogc:Literal>#000000</ogc:Literal>
+                    </se:SvgParameter>
+                    <se:SvgParameter name="stroke-dashoffset">
+                        <ogc:Literal>0.0</ogc:Literal>
+                    </se:SvgParameter>
+                    <se:SvgParameter name="stroke-linecap">
+                        <ogc:Literal>butt</ogc:Literal>
+                    </se:SvgParameter>
+                    <se:SvgParameter name="stroke-linejoin">
+                        <ogc:Literal>bevel</ogc:Literal>
+                    </se:SvgParameter>
+                    <se:SvgParameter name="stroke-opacity">
+                        <ogc:Literal>1.0</ogc:Literal>
+                    </se:SvgParameter>
+                    <se:SvgParameter name="stroke-width">
+                        <ogc:Literal>1.0</ogc:Literal>
+                    </se:SvgParameter>
+                </se:Stroke>
+                <se:Displacement>
+                    <se:DisplacementX>
+                        <ogc:Literal>0.0</ogc:Literal>
+                    </se:DisplacementX>
+                    <se:DisplacementY>
+                        <ogc:Literal>0.0</ogc:Literal>
+                    </se:DisplacementY>
+                </se:Displacement>
+                <se:PerpendicularOffset>
+                    <ogc:Literal>0</ogc:Literal>
+                </se:PerpendicularOffset>
+            </se:PolygonSymbolizer>
+        </se:Rule>
+    </se:FeatureTypeStyle>
+</sld:UserStyle>

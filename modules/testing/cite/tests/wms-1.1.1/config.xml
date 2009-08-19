@@ -1,0 +1,19 @@
+<config>
+	<organization>
+		<name>OGC</name>
+	</organization>
+	<standard>
+		<name>WMS</name>
+	</standard>
+	<version>
+		<name>1.1.1</name>
+	</version>
+	<suite>
+		<namespace-uri>http://www.opengis.net/wms</namespace-uri>
+		<prefix>wms</prefix>
+		<local-name>main_wms</local-name>
+	</suite>
+	<source>ctl</source>
+	<web>yes</web>
+</config>
+

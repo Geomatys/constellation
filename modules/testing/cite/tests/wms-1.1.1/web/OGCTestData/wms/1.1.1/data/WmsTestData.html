@@ -1,0 +1,70 @@
+<html>
+	<head>
+		<title>WMS 1.1.1 Test Data Definition</title>
+	</head>
+	<body>
+		<h2>WMS 1.1.1 Test Data Definition</h2>
+		<p>
+			The majority of the CITE standard dataset is based on the
+			<a target="otherwindow" href="http://www.opengis.org/testing/docs/98-046r1.rtf">
+				Conformance Test Guidelines for OpenGIS Simple Features Specification for SQL, Revision 1.0
+			</a>.  This set of features makes up a map of a fictional location called Blue Lake.
+			The features are as described in the Simple Features Specification for SQL document,
+			except they have been converted to WGS84 coordinates and have been reoriented so the
+			area is centered at 0 degrees latitude, 0 degrees longitude.
+			Figure 1 shows an overview map of the area with the prominent features labeled.
+			Figure 2 shows the location of each of the data points.<br/>
+			<br/>
+			<table>
+				<caption align="bottom">Figure 1:  Overview of Blue Lake vicinity features</caption>
+				<tr><td><img src="WmsTestData_files/bluelake_features.gif"/></td></tr>
+			</table>
+			<br/>
+			<table border="1">
+				<caption align="bottom">Figure 2:  Blue Lake vicinity data points</caption>
+				<tr><td><img src="WmsTestData_files/bluelake_coordinates.gif"/></td></tr>
+			</table>
+			<br/>
+			Additional features have also been defined to test data at a larger scale.
+			These consist of a diamond and two overlapping squares, as shown in figure 3.
+			It does not matter which square appears on top.<br/>
+			<br/>
+			<table border="1">
+				<caption align="bottom">Figure 3:  Basic Polygon Features</caption>
+				<tr><td><img src="WmsTestData_files/basic_polygons.gif"/></td></tr>
+			</table>
+			<br/>
+			The features are organized into layers as shown in table 1.  The layers may be named
+			in any fashion, but must be titled exactly as shown in the table.<br/>
+			<br/>
+			<table border="1">
+				<caption align="bottom">Table 1:  Layer titles and features</caption>
+				<tr><td valign="top"><b>Layer Title</b></td>
+				    <td><b>Features Contained</b></td></tr>
+				<tr><td valign="top">cite:BasicPolygons</td>
+				    <td>Contains all the featrues shown in figure 3</td></tr>
+				<tr><td valign="top">cite:Bridges</td>
+				    <td>Contains Cam Bridge</td></tr>
+				<tr><td valign="top">cite:Buildings</td>
+				    <td>Contains the two buildings along Main Street</td></tr>
+				<tr><td valign="top">cite:DividedRoutes</td>
+				    <td>Contains both lanes of Route 75</td></tr>
+				<tr><td valign="top">cite:Forests</td>
+				    <td>Contains the State Forest polygon</td></tr>
+				<tr><td valign="top">cite:Lakes</td>
+				    <td>Contains Blue Lake</td></tr>
+				<tr><td valign="top">cite:MapNeatline</td>
+				    <td>Contains the border surrounding the Blue Lake vicinity</td></tr>
+				<tr><td valign="top">cite:NamedPlaces</td>
+				    <td>Contains Ashton and Goose Island</td></tr>
+				<tr><td valign="top">cite:Ponds</td>
+				    <td>Contains both pools of Stock Pond</td></tr>
+				<tr><td valign="top">cite:RoadSegments</td>
+				    <td>Contains all the sections of Route 5, Main Street, and the dirt road</td></tr>
+				<tr><td valign="top">cite:Streams</td>
+				    <td>Contains Cam Stream and the unnamed stream south of Blue Lake</td></tr>
+			</table>
+		</p>
+	</body>
+</html>
+

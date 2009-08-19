@@ -1,0 +1,56 @@
+body {
+	background-color: #FFFFFF;
+	color: #000000;
+	font-family: Arial, sans-serif;
+	font-size: 10pt;
+}
+
+h1 {
+	text-align: center;
+}
+
+h2 {
+	color: Red;
+}
+
+h3 {
+	color: Green;
+}
+
+h4 {
+	color: Blue;
+}
+
+span.underline {
+	text-decoration: underline;
+}
+
+div.ogc_docinfo1 {
+	text-align: right;
+	font-weight: bold;
+}
+
+div.ogc_doctitle {
+	margin-top: .5in;
+}
+
+div.ogc_docinfo2 {
+	margin-top: 1in;
+}
+
+div.ogc_legalnotice {
+	margin-top: .5in;
+}
+
+div.example {
+	font-size: 8pt;
+	margin-left: 0.5in;
+	margin-right: 0.5in;
+}
+
+div.note {
+	font-size: 8pt;
+	margin-left: 0.5in;
+	margin-right: 0.5in;
+}
+

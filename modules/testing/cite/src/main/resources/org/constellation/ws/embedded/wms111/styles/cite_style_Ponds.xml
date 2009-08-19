@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sld:UserStyle xmlns:se="http://www.opengis.net/se" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sld="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml">
+    <se:Name></se:Name>
+    <se:Description>
+        <se:Title></se:Title>
+        <se:Abstract></se:Abstract>
+    </se:Description>
+    <sld:IsDefault>false</sld:IsDefault>
+    <se:FeatureTypeStyle>
+        <se:Description>
+            <se:Title>Title</se:Title>
+            <se:Abstract>Description</se:Abstract>
+        </se:Description>
+        <se:Rule>
+            <se:Description>
+                <se:Title>Title</se:Title>
+                <se:Abstract>Description</se:Abstract>
+            </se:Description>
+            <se:MinScaleDenominator>0.0</se:MinScaleDenominator>
+            <se:MaxScaleDenominator>1.7976931348623157E308</se:MaxScaleDenominator>
+            <se:PolygonSymbolizer uom="http://www.opengeospatial.org/se/units/pixel">
+                <se:Description>
+                    <se:Title></se:Title>
+                    <se:Abstract></se:Abstract>
+                </se:Description>
+                <se:Fill>
+                    <se:SvgParameter name="fill">
+                        <ogc:Literal>#00FFFF</ogc:Literal>
+                    </se:SvgParameter>
+                    <se:SvgParameter name="fill-opacity">
+                        <ogc:Literal>1.0</ogc:Literal>
+                    </se:SvgParameter>
+                </se:Fill>
+                <se:Stroke>
+                    <se:SvgParameter name="stroke">
+                        <ogc:Literal>#000000</ogc:Literal>
+                    </se:SvgParameter>
+                    <se:SvgParameter name="stroke-dashoffset">
+                        <ogc:Literal>0.0</ogc:Literal>
+                    </se:SvgParameter>
+                    <se:SvgParameter name="stroke-linecap">
+                        <ogc:Literal>butt</ogc:Literal>
+                    </se:SvgParameter>
+                    <se:SvgParameter name="stroke-linejoin">
+                        <ogc:Literal>bevel</ogc:Literal>
+                    </se:SvgParameter>
+                    <se:SvgParameter name="stroke-opacity">
+                        <ogc:Literal>1.0</ogc:Literal>
+                    </se:SvgParameter>
+                    <se:SvgParameter name="stroke-width">
+                        <ogc:Literal>1.0</ogc:Literal>
+                    </se:SvgParameter>
+                </se:Stroke>
+                <se:Displacement>
+                    <se:DisplacementX>
+                        <ogc:Literal>0.0</ogc:Literal>
+                    </se:DisplacementX>
+                    <se:DisplacementY>
+                        <ogc:Literal>0.0</ogc:Literal>
+                    </se:DisplacementY>
+                </se:Displacement>
+                <se:PerpendicularOffset>
+                    <ogc:Literal>0</ogc:Literal>
+                </se:PerpendicularOffset>
+            </se:PolygonSymbolizer>
+
+<se:TextSymbolizer uom="http://www.opengeospatial.org/se/units/pixel">
+    <se:Description>
+        <se:Title></se:Title>
+        <se:Abstract></se:Abstract>
+    </se:Description>
+    <se:Label><ogc:PropertyName>TYPE</ogc:PropertyName></se:Label>
+    <se:Font>
+        <se:SvgParameter name="font-family"><ogc:Literal>arial</ogc:Literal></se:SvgParameter>
+        <se:SvgParameter name="font-family"><ogc:Literal>serif</ogc:Literal></se:SvgParameter>
+        <se:SvgParameter name="font-size"><ogc:Literal>12</ogc:Literal></se:SvgParameter>
+    </se:Font>
+    <se:LabelPlacement>
+        <se:PointPlacement>
+            <se:AnchorPoint>
+                <se:AnchorPointX><ogc:Literal>0.5</ogc:Literal></se:AnchorPointX>
+                <se:AnchorPointY><ogc:Literal>0.5</ogc:Literal></se:AnchorPointY>
+            </se:AnchorPoint>
+            <se:Displacement>
+                <se:DisplacementX><ogc:Literal>0</ogc:Literal></se:DisplacementX>
+                <se:DisplacementY><ogc:Literal>0</ogc:Literal></se:DisplacementY>
+            </se:Displacement>
+            <se:Rotation><ogc:Literal>0</ogc:Literal></se:Rotation>
+        </se:PointPlacement>
+    </se:LabelPlacement>
+    <se:Halo>
+        <se:Radius><ogc:Literal>0.0</ogc:Literal></se:Radius>
+        <se:Fill>
+            <se:SvgParameter name="fill"><ogc:Literal>#FFAFAF</ogc:Literal></se:SvgParameter>
+            <se:SvgParameter name="fill-opacity"><ogc:Literal>0.0</ogc:Literal></se:SvgParameter>
+        </se:Fill>
+    </se:Halo>
+    <se:Fill>
+        <se:SvgParameter name="fill"><ogc:Literal>#000000</ogc:Literal></se:SvgParameter>
+        <se:SvgParameter name="fill-opacity"><ogc:Literal>1.0</ogc:Literal></se:SvgParameter>
+    </se:Fill>
+</se:TextSymbolizer>
+
+
+
+        </se:Rule>
+    </se:FeatureTypeStyle>
+</sld:UserStyle>
