@@ -17,15 +17,7 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.Collections;
-import java.util.Iterator;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 
 // Constellation dependencies
 import org.constellation.provider.LayerProviderProxy;
@@ -49,11 +41,16 @@ import org.constellation.provider.sld.SLDProviderService;
  * @author Cédric Briançon (Geomatys)
  * @since 0.4
  */
-public class GrizzlyServer {
+public final class GrizzlyServer {
     /**
      * The grizzly server that will received some HTTP requests.
      */
-    protected static GrizzlyThread grizzly = null;
+    static GrizzlyThread grizzly = null;
+
+    /**
+     * Prevents instanciation.
+     */
+    private GrizzlyServer() {}
 
     /**
      * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
@@ -159,49 +156,10 @@ public class GrizzlyServer {
     }
 
     /**
-     * Returned the {@link BufferedImage} from an URL requesting an image.
-     *
-     * @param url  The url of a request of an image.
-     * @param mime The mime type of the image to return.
-     *
-     * @return The {@link BufferedImage} or {@code null} if an error occurs.
-     * @throws IOException
-     */
-    protected static BufferedImage getImageFromURL(final URL url, final String mime) throws IOException {
-        // Try to get the image from the url.
-        final InputStream in = url.openStream();
-        final ImageInputStream iis = ImageIO.createImageInputStream(in);
-        final Iterator<ImageReader> irs = ImageIO.getImageReadersByMIMEType(mime);
-        if (!irs.hasNext()) {
-            return null;
-        }
-        final ImageReader ir = irs.next();
-        ir.setInput(iis, true, true);
-        final BufferedImage image = ir.read(0);
-        ir.dispose();
-        iis.close();
-        // For debugging, uncomment the JFrame creation and the Thread.sleep further,
-        // in order to see the image in a popup.
-//        javax.swing.JFrame frame = new javax.swing.JFrame();
-//        frame.setContentPane(new javax.swing.JLabel(new javax.swing.ImageIcon(image)));
-//        frame.setDefaultCloseOperation(javax.swing.JFrame.DISPOSE_ON_CLOSE);
-//        frame.pack();
-//        frame.setVisible(true);
-//        try {
-//            Thread.sleep(5 * 1000);
-//            frame.dispose();
-//        } catch (InterruptedException ex) {
-//            assumeNoException(ex);
-//        }
-        return image;
-    }
-
-
-    /**
      * Thread that launches a Grizzly server in a separate thread.
      * Requests will be done on this working server.
      */
-    protected static class GrizzlyThread extends Thread {
+    private static class GrizzlyThread extends Thread {
         /**
          * Runs a Grizzly server for five minutes.
          */

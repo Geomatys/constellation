@@ -19,23 +19,23 @@ package org.constellation.ws.embedded;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.logging.Logger;
-import org.geotoolkit.util.logging.Logging;
 
 
 /**
- * Launch the {@code Cite tests} on a Grizzly server that embedds Constellation's web services.
+ * Launch the {@code Cite tests} on a {@linkplain GrizzlyServer Grizzly server} that
+ * embedds Constellation's web services.
  *
  * @version $Id$
  *
  * @author Cédric Briançon (Geomatys)
  * @since 0.4
+ * @see GrizzlyServer
  */
-public class LaunchTests {
+public final class LaunchTests {
     /**
-     * The default logger.
+     * Prevents instanciation.
      */
-    private static final Logger LOGGER = Logging.getLogger(LaunchTests.class);
+    private LaunchTests() {}
 
     public static void main(String[] args) throws IOException {
         // Launch the server.
