@@ -296,7 +296,7 @@
       <!-- mdweb -->
       <dependency>
         <groupId>org.mdweb</groupId>
-       <artifactId>model</artifactId>
+       <artifactId>mdweb-model</artifactId>
         <version>2.0-SNAPSHOT</version>
       </dependency>
       <!-- geoapi -->
