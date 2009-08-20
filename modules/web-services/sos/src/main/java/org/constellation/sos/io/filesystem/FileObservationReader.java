@@ -125,7 +125,7 @@ public class FileObservationReader implements ObservationReader {
                 }
             }
         }
-        throw new CstlServiceException("The file " + offeringFile + " does not exist", NO_APPLICABLE_CODE);
+        return null;
     }
 
     @Override
@@ -185,7 +185,10 @@ public class FileObservationReader implements ObservationReader {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(phenomenonFile);
+                Object obj = unmarshaller.unmarshal(phenomenonFile);
+                if (obj instanceof JAXBElement) {
+                    obj = ((JAXBElement)obj).getValue();
+                }
                 if (obj instanceof PhenomenonEntry) {
                     return (PhenomenonEntry) obj;
                 }
@@ -198,7 +201,7 @@ public class FileObservationReader implements ObservationReader {
                 }
             }
         }
-        throw new CstlServiceException("The file " + phenomenonFile + " does not exist", NO_APPLICABLE_CODE);
+        return null;
     }
 
     @Override

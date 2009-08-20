@@ -167,7 +167,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
                 idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
                 insert.setString(indexOf(query.compositePhenomenon), idPheno);
                 insert.setString(indexOf(query.phenomenon), "");
-            } else if (offPheno.getComponent() instanceof PhenomenonEntry) {
+            } else {
             if ( phenomenons == null) {
                     phenomenons = getDatabase().getTable(PhenomenonTable.class);
             }

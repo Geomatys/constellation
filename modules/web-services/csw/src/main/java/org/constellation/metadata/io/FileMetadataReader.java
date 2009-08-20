@@ -384,6 +384,20 @@ public class FileMetadataReader extends MetadataReader {
     }
 
     @Override
+    public List<String> getAllIdentifiers() throws CstlServiceException {
+        List<String> results = new ArrayList<String>();
+        for (File f : dataDirectory.listFiles()) {
+            if (f.getName().endsWith(".xml")) {
+                String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
+                results.add(identifier);
+            } else {
+                throw new CstlServiceException("The metadataFile : " + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
+            }
+        }
+        return results;
+    }
+
+    @Override
     public List<Integer> getSupportedDataTypes() {
         return Arrays.asList(ISO_19115, DUBLINCORE);
     }

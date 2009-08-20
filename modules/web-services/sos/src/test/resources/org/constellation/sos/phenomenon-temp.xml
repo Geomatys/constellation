@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<swe:Phenomenon gml:id="temperature">
+<swe:Phenomenon gml:id="temperature" xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:gml="http://www.opengis.net/gml">
     <gml:description>temperature</gml:description>
     <gml:name>urn:ogc:def:phenomenon:BRGM:temperature</gml:name>
 </swe:Phenomenon>

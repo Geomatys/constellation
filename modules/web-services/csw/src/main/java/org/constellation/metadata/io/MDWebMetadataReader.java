@@ -1249,6 +1249,11 @@ public class MDWebMetadataReader extends MetadataReader {
         }
         return results;
     }
+
+    @Override
+    public List<String> getAllIdentifiers() throws CstlServiceException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
     
     @Override
     public List<Integer> getSupportedDataTypes() {

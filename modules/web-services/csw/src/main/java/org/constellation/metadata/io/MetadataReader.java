@@ -94,6 +94,11 @@ public abstract class MetadataReader {
      * Return all the entries from the database
      */
     public abstract List<? extends Object> getAllEntries() throws CstlServiceException;
+
+     /**
+     * Return all the entries from the database
+     */
+    public abstract List<String> getAllIdentifiers() throws CstlServiceException;
     
     /**
      * Return the list of supported data types.

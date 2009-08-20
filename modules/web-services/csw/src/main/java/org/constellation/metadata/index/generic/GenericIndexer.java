@@ -52,6 +52,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.util.Util;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.csw.xml.v202.ElementSetType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -137,6 +138,16 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @throws java.sql.SQLException
      */
     public void createIndex() throws IndexingException {
+        createIndexLightMemory();
+    }
+
+    /**
+     * Create a new Index from a generic database.
+     *
+     * @throws java.sql.SQLException
+     */
+    @Deprecated
+    private void createIndexHeavyMemory() throws IndexingException {
         LOGGER.info("Creating lucene index for Generic database please wait...");
         final long time = System.currentTimeMillis();
         IndexWriter writer;
@@ -162,6 +173,47 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             throw new IndexingException(LOCK_MULTI_MSG, ex);
         } catch (IOException ex) {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
+            throw new IndexingException("IOException while indexing documents.", ex);
+        } catch (CstlServiceException ex) {
+            LOGGER.severe("CstlServiceException while indexing document: " + ex.getMessage());
+            throw new IndexingException("CstlServiceException while indexing documents.", ex);
+        }
+        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+                " documents indexed: " + nbEntries);
+    }
+
+    /**
+     * Create a new Index from a generic database.
+     *
+     * @throws java.sql.SQLException
+     */
+    private void createIndexLightMemory() throws IndexingException {
+        LOGGER.info("(light memory) Creating lucene index for Generic database please wait...");
+        long time = System.currentTimeMillis();
+        IndexWriter writer;
+        int nbEntries = 0;
+        try {
+            writer = new IndexWriter(getFileDirectory(), analyzer, true);
+
+            // TODO getting the objects list and index avery item in the IndexWriter.
+            List<String> ids = reader.getAllIdentifiers();
+            nbEntries = ids.size();
+            LOGGER.info( nbEntries + " metadata to index (light memory mode)");
+            for (String id : ids) {
+                Object entry = reader.getMetadata(id, MetadataReader.ISO_19115, ElementSetType.FULL, null);
+                indexDocument(writer, entry);
+            }
+            writer.optimize();
+            writer.close();
+
+        } catch (CorruptIndexException ex) {
+            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
+            throw new IndexingException("CorruptIndexException while indexing documents.", ex);
+        } catch (LockObtainFailedException ex) {
+            LOGGER.severe("LockObtainException while indexing document: " + ex.getMessage());
+            throw new IndexingException("LockObtainException while indexing documents.", ex);
+        } catch (IOException ex) {
+            LOGGER.severe("IOException while indexing document: " + ex.getMessage());
             throw new IndexingException("IOException while indexing documents.", ex);
         } catch (CstlServiceException ex) {
             LOGGER.severe("CstlServiceException while indexing document: " + ex.getMessage());

@@ -1069,7 +1069,7 @@ public class SOSworker {
             if (omFilter instanceof ObservationFilterReader) {
                 sReponse = ((ObservationFilterReader)omFilter).getOutOfBandResults();
             } else {
-                throw new IllegalArgumentException("Out of band response mode has been implemented only for ObservationFilterReader for now");
+                throw new CstlServiceException("Out of band response mode has been implemented only for ObservationFilterReader for now", NO_APPLICABLE_CODE, Parameters.RESPONSE_MODE);
             }
             response = sReponse;
         }

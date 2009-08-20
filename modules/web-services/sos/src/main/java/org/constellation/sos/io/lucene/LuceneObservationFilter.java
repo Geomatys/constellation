@@ -111,11 +111,11 @@ public class LuceneObservationFilter implements ObservationFilter {
     public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon) {
         luceneRequest.append(" AND( ");
         for (String p : phenomenon) {
-            luceneRequest.append(" observed_property:").append(p).append(OR_OPERATOR);
+            luceneRequest.append(" observed_property:\"").append(p).append('"').append(OR_OPERATOR);
 
         }
         for (String p : compositePhenomenon) {
-            luceneRequest.append(" observed_property:").append(p).append(OR_OPERATOR);
+            luceneRequest.append(" observed_property:\"").append(p).append('"').append(OR_OPERATOR);
         }
         luceneRequest.delete(luceneRequest.length() - 3, luceneRequest.length());
         luceneRequest.append(") ");
@@ -140,8 +140,8 @@ public class LuceneObservationFilter implements ObservationFilter {
 
             // we request directly a multiple observation or a period observation (one measure during a period)
             luceneRequest.append("AND (");
-            luceneRequest.append(" sampling_time_begin:'").append(begin).append("' AND ");
-            luceneRequest.append(" sampling_time_end:'").append(end).append("') ");
+            luceneRequest.append(" sampling_time_begin:").append(begin).append(" AND ");
+            luceneRequest.append(" sampling_time_end:").append(end).append(") ");
 
         // if the temporal object is a timeInstant
         } else if (time instanceof TimeInstantType) {

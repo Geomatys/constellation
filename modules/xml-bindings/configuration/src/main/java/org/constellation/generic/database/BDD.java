@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.geotoolkit.util.Utilities;
 
 /**
@@ -31,6 +32,7 @@ import org.geotoolkit.util.Utilities;
  * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "BDD")
 public class BDD {
 
     /**

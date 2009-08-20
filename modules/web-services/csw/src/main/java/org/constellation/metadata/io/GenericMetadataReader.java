@@ -958,7 +958,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * 
      * @return
      */
-    private List<String> getAllIdentifiers() throws CstlServiceException {
+    public List<String> getAllIdentifiers() throws CstlServiceException {
         final List<String> result = new ArrayList<String>();
         try {
             final ResultSet res = mainStatement.executeQuery();

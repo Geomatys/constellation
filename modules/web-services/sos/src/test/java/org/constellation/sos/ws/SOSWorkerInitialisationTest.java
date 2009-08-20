@@ -23,6 +23,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.generic.database.ObjectFactory;
 import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.constellation.util.Util;
@@ -182,7 +184,30 @@ public class SOSWorkerInitialisationTest {
         marshaller = JAXBContext.newInstance(SOSConfiguration.class).createMarshaller();
 
         /**
-         * Test 4: A configuration file with missing part.
+         * Test 4: A malformed configuration file (bad unrecognized type).
+         */
+        configFile = new File(configurationDirectory, "config.xml");
+        configFile.createNewFile();
+
+
+        marshaller.marshal(new BDD(), configFile);
+
+        worker = new SOSworker(configurationDirectory);
+        worker.setSkeletonCapabilities(skeletonCapabilities);
+
+        exceptionLaunched = false;
+        try {
+
+            worker.getCapabilities(request);
+
+        } catch(CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
+            assertEquals(ex.getMessage(), "The service is not running!");
+            exceptionLaunched = true;
+        }
+
+        /**
+         * Test 5: A configuration file with missing part.
          */
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
@@ -207,7 +232,7 @@ public class SOSWorkerInitialisationTest {
         assertTrue(exceptionLaunched);
 
         /**
-         * Test 5: A configuration file with missing part.
+         * Test 6: A configuration file with missing part.
          */
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
@@ -232,7 +257,7 @@ public class SOSWorkerInitialisationTest {
         assertTrue(exceptionLaunched);
 
         /**
-         * Test 6: A configuration file with two empty configuration object.
+         * Test 7: A configuration file with two empty configuration object.
          */
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
@@ -258,7 +283,7 @@ public class SOSWorkerInitialisationTest {
         assertTrue(exceptionLaunched);
 
         /**
-         * Test 7: A configuration file with two empty configuration object and a malformed template valid time.
+         * Test 8: A configuration file with two empty configuration object and a malformed template valid time.
          */
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
