@@ -56,7 +56,7 @@ public final class GrizzlyServer {
      * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
      * and defines a PostGrid data provider.
      */
-    public static void initServer() {
+    public static synchronized void initServer() {
         // Protective test in order not to launch a new instance of the grizzly server for
         // each sub classes.
         if (grizzly != null) {
@@ -149,8 +149,8 @@ public final class GrizzlyServer {
     /**
      * Stop the grizzly server, if it is still alive.
      */
-    public static void finish() {
-        if (grizzly.isAlive()) {
+    public static synchronized void finish() {
+        if (grizzly != null && grizzly.isAlive()) {
             grizzly.interrupt();
         }
     }
@@ -169,9 +169,5 @@ public final class GrizzlyServer {
             cstlServer.duration = 20*60*1000;
             cstlServer.runREST();
         }
-    }
-
-    public static void main(String[] args) {
-        initServer();
     }
 }
