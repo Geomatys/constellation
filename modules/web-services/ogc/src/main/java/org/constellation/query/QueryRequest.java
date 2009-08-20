@@ -27,7 +27,7 @@ public abstract class QueryRequest {
     /**
      * The key of the request parameter.
      */
-    private final String key;
+    public final String key;
 
     protected QueryRequest(final String key) {
         this.key = key;

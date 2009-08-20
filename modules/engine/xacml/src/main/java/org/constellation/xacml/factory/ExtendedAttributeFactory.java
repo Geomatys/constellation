@@ -108,8 +108,6 @@ public final class ExtendedAttributeFactory extends BaseAttributeFactory {
     {
         try {
             return getProxy(dataType.toString()).getInstance(value);
-        } catch (UnknownIdentifierException e) {
-            throw e;
         } catch (Exception e) {
             throw new ParsingException(e);
         }
@@ -121,8 +119,6 @@ public final class ExtendedAttributeFactory extends BaseAttributeFactory {
     {
         try {
             return getProxy(type).getInstance(root);
-        } catch (UnknownIdentifierException e) {
-            throw e;
         } catch (Exception e) {
             throw new ParsingException(e);
         }
@@ -135,7 +131,7 @@ public final class ExtendedAttributeFactory extends BaseAttributeFactory {
         return createValue(root, dataType.toString());
     }
 
-    public static ExtendedAttributeFactory getFactory() {
+    public static synchronized ExtendedAttributeFactory getFactory() {
         if (instance == null) {
             instance = new ExtendedAttributeFactory();
         }

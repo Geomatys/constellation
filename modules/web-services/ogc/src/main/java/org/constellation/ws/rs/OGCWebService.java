@@ -176,7 +176,7 @@ public abstract class OGCWebService extends WebService {
      */
     protected void isVersionSupported(String versionNumber) throws CstlServiceException {
         if (getVersionFromNumber(versionNumber) == null) {
-            StringBuilder messageb = new StringBuilder("The parameter ");
+            final StringBuilder messageb = new StringBuilder("The parameter ");
             for (ServiceDef vers : supportedVersions) {
                 messageb.append("VERSION=").append(vers.version.toString()).append(" OR ");
             }
