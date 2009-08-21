@@ -28,6 +28,7 @@ import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sml.xml.AbstractClassification;
 import org.geotoolkit.sml.xml.AbstractClassifier;
 import org.geotoolkit.sml.xml.AbstractDerivableComponent;
@@ -85,9 +86,9 @@ public final class Utils {
      */
     public static List<String> getNetworkNames(final AbstractSensorML sensor) {
         final List<String> results = new ArrayList<String>();
-        if (sensor.getMember().size() == 1) {
-            if (sensor.getMember().get(0) instanceof AbstractProcess) {
-                final AbstractProcess component = (AbstractProcess) sensor.getMember().get(0);
+        if (sensor != null && sensor.getMember().size() == 1) {
+            if (sensor.getMember().get(0).getRealProcess() instanceof AbstractProcess) {
+                final AbstractProcess component = (AbstractProcess) sensor.getMember().get(0).getRealProcess();
                 for (AbstractClassification cl : component.getClassification()) {
                     if (cl.getClassifierList() != null) {
                         for (AbstractClassifier classifier : cl.getClassifierList().getClassifier()) {
@@ -110,8 +111,8 @@ public final class Utils {
      */
     public static DirectPositionType getSensorPosition(final AbstractSensorML sensor) {
         if (sensor.getMember().size() == 1) {
-            if (sensor.getMember().get(0) instanceof AbstractDerivableComponent) {
-                final AbstractDerivableComponent component = (AbstractDerivableComponent) sensor.getMember().get(0);
+            if (sensor.getMember().get(0).getRealProcess() instanceof AbstractDerivableComponent) {
+                final AbstractDerivableComponent component = (AbstractDerivableComponent) sensor.getMember().get(0).getRealProcess();
                 if (component.getSMLLocation() != null && component.getSMLLocation().getPoint() != null &&
                     component.getSMLLocation().getPoint() != null && component.getSMLLocation().getPoint().getPos() != null)
                 return component.getSMLLocation().getPoint().getPos();

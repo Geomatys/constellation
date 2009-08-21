@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <om:Observation xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sa="http://www.opengis.net/sa/1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <gml:name>urn:ogc:object:observation:GEOM:307</gml:name>
-    <om:samplingTime>
-        <gml:TimePeriod>
-            <gml:beginPosition>2007-05-01T17:59:00.0</gml:beginPosition>
-            <gml:endPosition>2007-05-01T21:59:00.0</gml:endPosition>
-        </gml:TimePeriod>
-    </om:samplingTime>
+    <gml:name>urn:ogc:object:observation:template:GEOM:3</gml:name>
+    <om:samplingTime/>
     <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:3"/>
     <om:observedProperty>
-       <swe:Phenomenon gml:id="depth">
+        <swe:Phenomenon gml:id="depth">
             <gml:description>profondeur</gml:description>
             <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
         </swe:Phenomenon>
@@ -31,10 +26,10 @@
         <swe:DataArray gml:id="dataArray-2">
             <swe:elementCount>
                 <swe:Count>
-                    <swe:value>5</swe:value>
+                    <swe:value>0</swe:value>
                 </swe:Count>
             </swe:elementCount>
-             <swe:elementType name="dataArray-2">
+            <swe:elementType name="dataArray-2">
                 <swe:SimpleDataRecord gml:id="datarecord">
                     <swe:field name="Time">
                         <swe:Time definition="urn:ogc:data:time:iso8601">
@@ -51,7 +46,9 @@
             <swe:encoding>
                 <swe:TextBlock blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="textblock"/>
             </swe:encoding>
-            <swe:values>2007-05-01T17:59:00,6.560@@2007-05-01T18:59:00,6.550@@2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@</swe:values>
+            <swe:values></swe:values>
         </swe:DataArray>
     </om:result>
 </om:Observation>
+
+

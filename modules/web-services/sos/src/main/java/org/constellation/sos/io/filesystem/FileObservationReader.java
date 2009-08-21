@@ -36,6 +36,9 @@ import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.swe.xml.AnyResult;
+import org.geotoolkit.swe.xml.v101.AnyResultEntry;
+import org.geotoolkit.swe.xml.v101.DataArrayEntry;
+import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -62,11 +65,11 @@ public class FileObservationReader implements ObservationReader {
 
     private File observationDirectory;
 
+    private File observationTemplateDirectory;
+
     private File sensorDirectory;
 
     private File foiDirectory;
-
-    private File resultDirectory;
 
     private MarshallerPool marshallerPool;
 
@@ -76,12 +79,12 @@ public class FileObservationReader implements ObservationReader {
         this.observationIdBase = observationIdBase;
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
-            offeringDirectory    = new File(dataDirectory, "offerings");
-            phenomenonDirectory  = new File(dataDirectory, "phenomenons");
-            observationDirectory = new File(dataDirectory, "observations");
-            sensorDirectory      = new File(dataDirectory, "sensors");
-            foiDirectory         = new File(dataDirectory, "features");
-            resultDirectory      = new File(dataDirectory, "results");
+            offeringDirectory            = new File(dataDirectory, "offerings");
+            phenomenonDirectory          = new File(dataDirectory, "phenomenons");
+            observationDirectory         = new File(dataDirectory, "observations");
+            observationTemplateDirectory = new File(dataDirectory, "observationTemplates");
+            sensorDirectory              = new File(dataDirectory, "sensors");
+            foiDirectory                 = new File(dataDirectory, "features");
         }
         try {
             marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:" +
@@ -240,7 +243,10 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public ObservationEntry getObservation(String identifier, QName resultModel) throws CstlServiceException {
-        final File observationFile = new File(observationDirectory, identifier + FILE_EXTENSION);
+        File observationFile = new File(observationDirectory, identifier + FILE_EXTENSION);
+        if (!observationFile.exists()) {
+            observationFile = new File(observationTemplateDirectory, identifier + FILE_EXTENSION);
+        }
         if (observationFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
@@ -266,16 +272,21 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public AnyResult getResult(String identifier, QName resutModel) throws CstlServiceException {
-        final File anyResultFile = new File(resultDirectory, identifier + FILE_EXTENSION);
+        final File anyResultFile = new File(observationDirectory, identifier + FILE_EXTENSION);
         if (anyResultFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(anyResultFile);
-                if (obj instanceof AnyResult) {
-                    return (AnyResult) obj;
+                Object obj = unmarshaller.unmarshal(anyResultFile);
+                if (obj instanceof JAXBElement) {
+                    obj = ((JAXBElement)obj).getValue();
                 }
-                throw new CstlServiceException("The file " + anyResultFile + " does not contains an foi Object.", NO_APPLICABLE_CODE);
+                if (obj instanceof ObservationEntry) {
+                    final ObservationEntry obs = (ObservationEntry) obj;
+                    DataArrayPropertyType arrayP = (DataArrayPropertyType) obs.getResult();
+                    return new AnyResultEntry(null, arrayP.getDataArray());
+                }
+                throw new CstlServiceException("The file " + anyResultFile + " does not contains an observation Object.", NO_APPLICABLE_CODE);
             } catch (JAXBException ex) {
                 throw new CstlServiceException("Unable to unmarshall The file " + anyResultFile, ex, NO_APPLICABLE_CODE);
             } finally {

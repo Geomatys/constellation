@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <swe:CompositePhenomenon dimension="2" gml:id="aggregatePhenomenon" xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:gml="http://www.opengis.net/gml">
-    <gml:name>urn:ogc:def:phenomenon:BRGM:aggregate</gml:name>
+    <gml:name>urn:ogc:def:phenomenon:GEOM:aggregate</gml:name>
     <swe:component gml:id="depth">
-        <gml:name>urn:ogc:def:phenomenon:BRGM:depth</gml:name>
+        <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
         <gml:description>un phenomene</gml:description>
     </swe:component>
     <swe:component gml:id="temperature">
-        <gml:name>urn:ogc:def:phenomenon:BRGM:height</gml:name>
+        <gml:name>urn:ogc:def:phenomenon:GEOM:height</gml:name>
         <gml:description>un phenomene</gml:description>
     </swe:component>
 </swe:CompositePhenomenon>

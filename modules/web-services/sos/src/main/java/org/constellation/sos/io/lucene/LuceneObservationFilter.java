@@ -17,11 +17,13 @@
 
 package org.constellation.sos.io.lucene;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+import org.apache.lucene.search.Sort;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
@@ -71,6 +73,12 @@ public class LuceneObservationFilter implements ObservationFilter {
             luceneRequest = new StringBuilder("type:measurement ");
         } else {
             luceneRequest = new StringBuilder("type:observation ");
+        }
+
+        if (ResponseModeType.RESULT_TEMPLATE.equals(requestMode)) {
+            luceneRequest.append("template:TRUE ");
+        } else {
+            luceneRequest.append("template:FALSE ");
         }
     }
 
@@ -232,12 +240,15 @@ public class LuceneObservationFilter implements ObservationFilter {
 
     @Override
     public List<ObservationResult> filterResult() throws CstlServiceException {
+        List<ObservationResult> results = new ArrayList<ObservationResult>();
         try {
-            searcher.doSearch(new SpatialQuery(luceneRequest.toString()));
-            return null;
+            SpatialQuery query = new SpatialQuery(luceneRequest.toString());
+            query.setSort(new Sort("sampling_time_begin"));
+            results = searcher.doResultSearch(query);
         } catch(SearchingException ex) {
-            throw new CstlServiceException("Search exception while filtering the obsevation", ex, NO_APPLICABLE_CODE);
+            throw new CstlServiceException("Search exception while filtering the observation", ex, NO_APPLICABLE_CODE);
         }
+        return results;
     }
 
     @Override
@@ -245,7 +256,7 @@ public class LuceneObservationFilter implements ObservationFilter {
         try {
             return searcher.doSearch(new SpatialQuery(luceneRequest.toString()));
         } catch(SearchingException ex) {
-            throw new CstlServiceException("Search exception while filtering the obsevation", ex, NO_APPLICABLE_CODE);
+            throw new CstlServiceException("Search exception while filtering the observation", ex, NO_APPLICABLE_CODE);
         }
     }
 

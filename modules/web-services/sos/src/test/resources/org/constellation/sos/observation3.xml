@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <om:Observation xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sa="http://www.opengis.net/sa/1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <gml:name>urn:ogc:object:observation:BRGM:406</gml:name>
+    <gml:name>urn:ogc:object:observation:GEOM:406</gml:name>
     <om:samplingTime>
         <gml:TimePeriod>
             <gml:beginPosition>2007-05-01T12:59:00.0</gml:beginPosition>
             <gml:endPosition>2007-05-01T16:59:00.0</gml:endPosition>
         </gml:TimePeriod>
     </om:samplingTime>
-    <om:procedure xlink:href="urn:ogc:object:sensor:BRGM:4"/>
+    <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:4"/>
     <om:observedProperty>
        <swe:Phenomenon gml:id="depth">
             <gml:description>profondeur</gml:description>
-            <gml:name>urn:ogc:def:phenomenon:BRGM:depth</gml:name>
+            <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
         </swe:Phenomenon>
     </om:observedProperty>
     <om:featureOfInterest>
@@ -42,7 +42,7 @@
                         </swe:Time>
                     </swe:field>
                     <swe:field name="depth">
-                        <swe:Quantity definition="urn:x-ogc:def:phenonmenon:BRGM:depth">
+                        <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:depth">
                             <swe:uom code="m"/>
                         </swe:Quantity>
                     </swe:field>

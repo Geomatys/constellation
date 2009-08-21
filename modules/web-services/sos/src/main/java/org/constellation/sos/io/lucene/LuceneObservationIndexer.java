@@ -55,7 +55,11 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
 
     private File observationDirectory;
 
+    private File observationTemplateDirectory;
+
     private MarshallerPool marshallerPool;
+
+    private boolean template = false;
 
     /**
      * Creates a new SOS indexer for a FileSystem reader.
@@ -73,6 +77,10 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
             observationDirectory = new File(dataDirectory, "observations");
             if (!observationDirectory.exists()) {
                 observationDirectory.mkdir();
+            }
+            observationTemplateDirectory = new File(dataDirectory, "observationTemplates");
+            if (!observationTemplateDirectory.exists()) {
+                observationTemplateDirectory.mkdir();
             }
         } else {
             throw new IndexingException("The data directory does not exist: ");
@@ -94,6 +102,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
         final long time = System.currentTimeMillis();
         IndexWriter writer;
         int nbObservation = 0;
+        int nbTemplate    = 0;
         Unmarshaller unmarshaller = null;
         try {
             unmarshaller = marshallerPool.acquireUnmarshaller();
@@ -112,6 +121,20 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
                      LOGGER.info("The observation file " + observationFile.getName() + " does not contains an observation:" + observation);
                 }
             }
+            template = true;
+            for (File observationFile : observationTemplateDirectory.listFiles()) {
+                Object observation = unmarshaller.unmarshal(observationFile);
+                if (observation instanceof JAXBElement) {
+                    observation = ((JAXBElement)observation).getValue();
+                }
+                if (observation instanceof ObservationEntry) {
+                    indexDocument(writer, (ObservationEntry) observation);
+                    nbTemplate++;
+                } else {
+                     LOGGER.info("The template observation file " + observationFile.getName() + " does not contains an observation:" + observation);
+                }
+            }
+            template = false;
             writer.optimize();
             writer.close();
 
@@ -136,7 +159,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
         }
 
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
-                    "Observations indexed: " + nbObservation + ".");
+                    "Observations indexed: " + nbObservation + ". Template indexed:" + nbTemplate + ".");
     }
 
     @Override
@@ -250,6 +273,11 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
             }
         } catch(CstlServiceException ex) {
             LOGGER.severe("error while indexing sampling time.");
+        }
+        if (template) {
+            doc.add(new Field("template", "TRUE", Field.Store.YES, Field.Index.ANALYZED));
+        } else {
+            doc.add(new Field("template", "FALSE", Field.Store.YES, Field.Index.ANALYZED));
         }
         // add a default meta field to make searching all documents easy
 	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));

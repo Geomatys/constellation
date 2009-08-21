@@ -19,6 +19,7 @@ package org.constellation.sos.io.lucene;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
@@ -26,11 +27,21 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.FieldSelectorResult;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryParser.QueryParser.Operator;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+import org.constellation.sos.io.ObservationResult;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
+import org.geotoolkit.lucene.filter.SerialChainFilter;
+import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 
 /**
@@ -74,6 +85,203 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
     @Override
     public String getMatchingID(Document doc) throws SearchingException {
         return doc.get("id");
+    }
+
+    public List<ObservationResult> doResultSearch(SpatialQuery spatialQuery) throws SearchingException {
+        final Query simpleQuery = new TermQuery(new Term("metafile", "doc"));
+        try {
+            final long start = System.currentTimeMillis();
+            List<ObservationResult> results = new ArrayList<ObservationResult>();
+
+            int maxRecords = searcher.maxDoc();
+            if (maxRecords == 0) {
+                LOGGER.severe("The index seems to be empty.");
+                maxRecords = 1;
+            }
+
+            final String field       = "Title";
+            final QueryParser parser = new QueryParser(field, analyzer);
+            parser.setDefaultOperator(Operator.AND);
+
+            // we enable the leading wildcard mode if the first character of the query is a '*'
+            if (spatialQuery.getQuery().indexOf(":*") != -1 || spatialQuery.getQuery().indexOf(":?") != -1 || spatialQuery.getQuery().indexOf(":(*") != -1
+             || spatialQuery.getQuery().indexOf(":(+*") != -1 || spatialQuery.getQuery().indexOf(":+*") != -1) {
+                parser.setAllowLeadingWildcard(true);
+                BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+            }
+            final Query query = parser.parse(spatialQuery.getQuery());
+            final Filter filter = spatialQuery.getSpatialFilter();
+            final int operator = spatialQuery.getLogicalOperator();
+            final Sort sort = spatialQuery.getSort();
+            String sorted = "no Sorted";
+            if (sort != null) {
+                sorted = "order by: " + sort.toString();
+            }
+            String f = "no Filter";
+            if (filter != null) {
+                f = filter.toString();
+            }
+            LOGGER.info("Searching for result: " + query.toString(field) + '\n' + SerialChainFilter.valueOf(operator) + '\n' + f + '\n' + sorted + '\n' + "max records: " + maxRecords);
+
+            // simple query with an AND
+            if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && filter == null)) {
+                final TopDocs docs;
+                if (sort != null) {
+                    docs = searcher.search(query, filter, maxRecords, sort);
+                } else {
+                    docs = searcher.search(query, filter, maxRecords);
+                }
+                for (ScoreDoc doc : docs.scoreDocs) {
+                    final Document d = searcher.doc(doc.doc);
+                    Timestamp begin  = null;
+                    Timestamp end    = null;
+                    try  {
+                        begin = Timestamp.valueOf(d.get("sampling_time_begin"));
+                    } catch(IllegalArgumentException ex) {
+                        LOGGER.finer("unable  to parse the timestamp");
+                    }
+                    try  {
+                        end = Timestamp.valueOf(d.get("sampling_time_begin"));
+                    } catch(IllegalArgumentException ex) {
+                        LOGGER.finer("unable  to parse the timestamp");
+                    }
+                    final ObservationResult or = new ObservationResult(d.get("id"),
+                                                                 begin,
+                                                                 end);
+                    results.add(or);
+                }
+
+            // for a OR we need to perform many request
+            } else if (operator == SerialChainFilter.OR) {
+                final TopDocs hits1;
+                final TopDocs hits2;
+                if (sort != null) {
+                    hits1 = searcher.search(query, null, maxRecords, sort);
+                    hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), maxRecords, sort);
+                } else {
+                    hits1 = searcher.search(query, maxRecords);
+                    hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), maxRecords);
+                }
+                for (ScoreDoc doc : hits1.scoreDocs) {
+                    final Document d = searcher.doc(doc.doc);
+                    Timestamp begin  = null;
+                    Timestamp end    = null;
+                    try  {
+                        begin = Timestamp.valueOf(d.get("sampling_time_begin"));
+                    } catch(IllegalArgumentException ex) {
+                        LOGGER.finer("unable  to parse the timestamp");
+                    }
+                    try  {
+                        end = Timestamp.valueOf(d.get("sampling_time_begin"));
+                    } catch(IllegalArgumentException ex) {
+                        LOGGER.finer("unable  to parse the timestamp");
+                    }
+                    final ObservationResult or = new ObservationResult(d.get("id"),
+                                                                 begin,
+                                                                 end);
+                    results.add(or);
+                }
+                for (ScoreDoc doc : hits2.scoreDocs) {
+                    final Document d = searcher.doc(doc.doc);
+                    Timestamp begin  = null;
+                    Timestamp end    = null;
+                    try  {
+                        begin = Timestamp.valueOf(d.get("sampling_time_begin"));
+                    } catch(IllegalArgumentException ex) {
+                        LOGGER.finer("unable  to parse the timestamp");
+                    }
+                    try  {
+                        end = Timestamp.valueOf(d.get("sampling_time_begin"));
+                    } catch(IllegalArgumentException ex) {
+                        LOGGER.finer("unable  to parse the timestamp");
+                    }
+                    final ObservationResult or = new ObservationResult(d.get("id"),
+                                                                 begin,
+                                                                 end);
+                    if (!results.contains(or)) {
+                        results.add(or);
+                    }
+                }
+
+            // for a NOT we need to perform many request
+            } else if (operator == SerialChainFilter.NOT) {
+                final TopDocs hits1;
+                if (sort != null) {
+                    hits1 = searcher.search(query, filter, maxRecords, sort);
+                } else {
+                    hits1 = searcher.search(query, filter, maxRecords);
+                }
+                final List<ObservationResult> unWanteds = new ArrayList<ObservationResult>();
+                for (ScoreDoc doc : hits1.scoreDocs) {
+                    final Document d = searcher.doc(doc.doc);
+                    Timestamp begin  = null;
+                    Timestamp end    = null;
+                    try  {
+                        begin = Timestamp.valueOf(d.get("sampling_time_begin"));
+                    } catch(IllegalArgumentException ex) {
+                        LOGGER.finer("unable  to parse the timestamp");
+                    }
+                    try  {
+                        end = Timestamp.valueOf(d.get("sampling_time_begin"));
+                    } catch(IllegalArgumentException ex) {
+                        LOGGER.finer("unable  to parse the timestamp");
+                    }
+                    final ObservationResult or = new ObservationResult(d.get("id"),
+                                                                 begin,
+                                                                 end);
+                    unWanteds.add(or);
+                }
+
+                final TopDocs hits2;
+                if (sort != null) {
+                    hits2 = searcher.search(simpleQuery, null, maxRecords, sort);
+                } else {
+                    hits2 = searcher.search(simpleQuery, maxRecords);
+                }
+                for (ScoreDoc doc : hits2.scoreDocs) {
+                    final Document d = searcher.doc(doc.doc);
+                    Timestamp begin  = null;
+                    Timestamp end    = null;
+                    try  {
+                        begin = Timestamp.valueOf(d.get("sampling_time_begin"));
+                    } catch(IllegalArgumentException ex) {
+                        LOGGER.finer("unable  to parse the timestamp");
+                    }
+                    try  {
+                        end = Timestamp.valueOf(d.get("sampling_time_begin"));
+                    } catch(IllegalArgumentException ex) {
+                        LOGGER.finer("unable  to parse the timestamp");
+                    }
+                    final ObservationResult or = new ObservationResult(d.get("id"),
+                                                                 begin,
+                                                                 end);
+                    if (!unWanteds.contains(or)) {
+                        results.add(or);
+                    }
+                }
+
+            } else {
+                throw new IllegalArgumentException("unsupported logical Operator");
+            }
+
+            // if we have some subQueries we execute it separely and merge the result
+            if (spatialQuery.getSubQueries().size() > 0) {
+                final SpatialQuery sub        = spatialQuery.getSubQueries().get(0);
+                final List<ObservationResult> subResults = doResultSearch(sub);
+                for (ObservationResult r : results) {
+                    if (!subResults.contains(r)) {
+                        results.remove(r);
+                    }
+                }
+            }
+
+            LOGGER.info(results.size() + " total matching documents (" + (System.currentTimeMillis() - start) + "ms)");
+            return results;
+        } catch (ParseException ex) {
+            throw new SearchingException("Parse Exception while performing lucene request", ex);
+        } catch (IOException ex) {
+           throw new SearchingException("IO Exception while performing lucene request", ex);
+        }
     }
 
     private static final class IDFieldSelector implements FieldSelector {

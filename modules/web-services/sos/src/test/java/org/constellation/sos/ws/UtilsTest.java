@@ -17,15 +17,37 @@
 
 package org.constellation.sos.ws;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 // Junit dependencies
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import org.constellation.util.Util;
+import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.gml.xml.v311.AbstractFeatureEntry;
+import org.geotoolkit.gml.xml.v311.BoundingShapeEntry;
+import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.xml.MarshallerPool;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.opengis.observation.Observation;
 import static org.junit.Assert.*;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *
@@ -35,7 +57,7 @@ public class UtilsTest {
 
     private Logger logger = Logger.getLogger("org.constellation.sos.ws");
 
-
+    private MarshallerPool marshallerPool;
 
 
     @BeforeClass
@@ -56,6 +78,10 @@ public class UtilsTest {
 
     }
 
+    public UtilsTest() throws JAXBException {
+        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100:org.geotoolkit.sml.xml.v100:org.geotoolkit.sampling.xml.v100:org.geotoolkit.swe.xml.v101");
+        
+    }
 
     /**
      *
@@ -67,5 +93,224 @@ public class UtilsTest {
         assertEquals("1s 12ms", Utils.getPeriodDescription(1012));
 
         assertEquals("1min 7s 12ms", Utils.getPeriodDescription(67012));
+    }
+
+    /**
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getPhysicalIDTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
+        String phyID = Utils.getPhysicalID(sensor);
+        assertEquals("00ARGLELES", phyID);
+
+        sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component.xml"));
+        phyID  = Utils.getPhysicalID(sensor);
+        assertEquals("00ARGLELES_2000", phyID);
+
+        sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component2.xml"));
+        phyID  = Utils.getPhysicalID(sensor);
+        assertEquals(null, phyID);
+
+        marshallerPool.release(unmarshaller);
+    }
+
+    /**
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getNetworkNamesTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
+        List<String> names      = Utils.getNetworkNames(sensor);
+        List<String> expNames   = new ArrayList<String>();
+        expNames.add("600000221");
+        expNames.add("600000025");
+        assertEquals(expNames, names);
+
+        sensor   = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component.xml"));
+        names    = Utils.getNetworkNames(sensor);
+        expNames = new ArrayList<String>();
+        assertEquals(expNames, names);
+
+        marshallerPool.release(unmarshaller);
+    }
+
+    /**
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getSensorPositionTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
+        DirectPositionType result = Utils.getSensorPosition(sensor);
+        DirectPositionType expResult = new DirectPositionType("urn:ogc:crs:EPSG:27582", 2, Arrays.asList(65400.0,1731368.0));
+
+        assertEquals(expResult, result);
+
+        sensor    = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component.xml"));
+        result    = Utils.getSensorPosition(sensor);
+        expResult = null;
+
+        assertEquals(expResult, result);
+
+        marshallerPool.release(unmarshaller);
+    }
+
+    /**
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getTimeValueTest() throws Exception {
+
+        TimePositionType position = new TimePositionType("2007-05-01T07:59:00.0");
+        String result             = Utils.getTimeValue(position);
+        String expResult          = "2007-05-01 07:59:00.0";
+
+        assertEquals(expResult, result);
+
+        position = new TimePositionType("2007051T07:59:00.0");
+
+        boolean exLaunched = false;
+        try {
+            Utils.getTimeValue(position);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "eventTime");
+        }
+
+        assertTrue(exLaunched);
+
+        String t = null;
+        position = new TimePositionType(t);
+
+        exLaunched = false;
+        try {
+            Utils.getTimeValue(position);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "eventTime");
+        }
+
+        assertTrue(exLaunched);
+
+        exLaunched = false;
+        try {
+            Utils.getTimeValue(null);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "eventTime");
+        }
+
+        assertTrue(exLaunched);
+    }
+
+    /**
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getLuceneTimeValueTest() throws Exception {
+
+        TimePositionType position = new TimePositionType("2007-05-01T07:59:00.0");
+        String result             = Utils.getLuceneTimeValue(position);
+        String expResult          = "20070501075900";
+
+        assertEquals(expResult, result);
+
+        position = new TimePositionType("2007051T07:59:00.0");
+
+        boolean exLaunched = false;
+        try {
+            Utils.getLuceneTimeValue(position);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "eventTime");
+        }
+
+        assertTrue(exLaunched);
+
+        String t = null;
+        position = new TimePositionType(t);
+
+        exLaunched = false;
+        try {
+            Utils.getLuceneTimeValue(position);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "eventTime");
+        }
+
+        assertTrue(exLaunched);
+
+        exLaunched = false;
+        try {
+            Utils.getLuceneTimeValue(null);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "eventTime");
+        }
+
+        assertTrue(exLaunched);
+    }
+
+     /**
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getCollectionBoundTest() throws Exception {
+
+        PhenomenonEntry pheno = new PhenomenonEntry("test", "test");
+
+        ObservationCollectionEntry collection = new ObservationCollectionEntry();
+
+        ObservationEntry obs1 = new ObservationEntry();
+        ObservationEntry obs2 = new ObservationEntry();
+        ObservationEntry obs3 = new ObservationEntry();
+
+        collection.add(obs1);
+        collection.add(obs2);
+        collection.add(obs3);
+
+        EnvelopeEntry result = Utils.getCollectionBound(collection);
+
+        EnvelopeEntry expResult = new EnvelopeEntry(null, new DirectPositionType(-180.0, -90.0), new DirectPositionType(180.0, 90.0), "urn:ogc:crs:espg:4326");
+        assertEquals(expResult, result);
+
+
+        SamplingPointEntry sp1 = new SamplingPointEntry(null, null, null, null, null);
+        sp1.setBoundedBy(new EnvelopeEntry(null, new DirectPositionType(-10.0, -10.0), new DirectPositionType(10.0, 10.0), "urn:ogc:crs:espg:4326"));
+        obs1 = new ObservationEntry(null, null, sp1, pheno, null, this, null);
+
+        SamplingPointEntry sp2 = new SamplingPointEntry(null, null, null, null, null);
+        sp2.setBoundedBy(new EnvelopeEntry(null, new DirectPositionType(-5.0, -5.0), new DirectPositionType(15.0, 15.0), "urn:ogc:crs:espg:4326"));
+        obs2 = new ObservationEntry(null, null, sp2, pheno, null, this, null);
+
+        SamplingPointEntry sp3 = new SamplingPointEntry(null, null, null, null, null);
+        sp3.setBoundedBy(new EnvelopeEntry(null, new DirectPositionType(0.0, -8.0), new DirectPositionType(20.0, 10.0), "urn:ogc:crs:espg:4326"));
+        obs3 = new ObservationEntry(null, null, sp3, pheno, null, this, null);
+
+        collection = new ObservationCollectionEntry();
+        collection.add(obs1);
+        collection.add(obs2);
+        collection.add(obs3);
+
+        result = Utils.getCollectionBound(collection);
+
+        expResult = new EnvelopeEntry(null, new DirectPositionType(-10.0, -10.0), new DirectPositionType(20.0, 15.0), "urn:ogc:crs:espg:4326");
+        assertEquals(expResult, result);
+
     }
 }

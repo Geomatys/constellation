@@ -1946,6 +1946,7 @@ public class SOSworker {
         for (Timer t : schreduledTask) {
             t.cancel();
         }
+        isStarted = false;
     }
     
     /**

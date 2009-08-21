@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <om:Observation xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sa="http://www.opengis.net/sa/1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <gml:name>urn:ogc:object:observation:BRGM:507</gml:name>
+    <gml:name>urn:ogc:object:observation:GEOM:507</gml:name>
     <om:samplingTime>
         <gml:TimePeriod>
             <gml:beginPosition>2007-05-01T12:59:00.0</gml:beginPosition>
             <gml:endPosition>2007-05-01T16:59:00.0</gml:endPosition>
         </gml:TimePeriod>
     </om:samplingTime>
-    <om:procedure xlink:href="urn:ogc:object:sensor:BRGM:5"/>
+    <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:5"/>
     <om:observedProperty>
         <swe:CompositePhenomenon dimension="2" gml:id="aggregatePhenomenon">
-            <gml:name>urn:ogc:def:phenomenon:BRGM:aggregate</gml:name>
+            <gml:name>urn:ogc:def:phenomenon:GEOM:aggregate</gml:name>
             <swe:component gml:id="depth">
-                <gml:name>urn:ogc:def:phenomenon:BRGM:depth</gml:name>
+                <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
                 <gml:description>un phenomene</gml:description>
             </swe:component>
             <swe:component gml:id="temperature">
-                <gml:name>urn:ogc:def:phenomenon:BRGM:height</gml:name>
+                <gml:name>urn:ogc:def:phenomenon:GEOM:height</gml:name>
                 <gml:description>un phenomene</gml:description>
             </swe:component>
         </swe:CompositePhenomenon>
@@ -49,7 +49,7 @@
                         </swe:Time>
                     </swe:field>
                     <swe:field name="depth">
-                        <swe:Quantity definition="urn:x-ogc:def:phenonmenon:BRGM:depth">
+                        <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:depth">
                             <swe:uom code="m"/>
                         </swe:Quantity>
                     </swe:field>
