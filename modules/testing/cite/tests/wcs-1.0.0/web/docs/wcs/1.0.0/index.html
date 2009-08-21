@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>WCS 1.0.0 compliance test suite</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+
+<h1>Overview</h1>
+<p>This executable test suite is based on the following OGC specifications:</p>
+<ul>
+  <li id="OGC-03-065r6"><a href="http://www.opengeospatial.org/standards/wcs">
+        OpenGIS&reg; Web Coverage Service (WCS) Implementation Specification</a> 
+        (OGC-03-065r6)</li>
+  <li id="OGC-05-076"><a href="http://www.opengeospatial.org/standards/wcs">
+        OpenGIS&reg; Web Coverage Service (WCS) Implementation Specification Corrigendum (1.0.0)</a> 
+        (OGC-05-076)</li>
+</ul>
+<p>The only difference in testing an implementation of the original WCS 1.0.0 spec (03-065r6) or the
+corrigendum (05-076) is the schemas used for validation.  Both are tested using test module wcs1-0-0:main
+in the abtstract test suite.  When the test suite is started,
+the user can select which version of the schemas is implemented.</p>
+
+<h2>What is tested</h2>
+<p>Only the protocol is tested.</p>
+<ul>
+      <li>GetCapabilities, GET KVP, POST KVP, and POST XML encodings</li>
+      <li>DescribeCoverage, GET KVP, POST KVP, and POST XML encodings</li>
+      <li>GetFeature, GET KVP, POST KVP, and POST XML encodings</li>
+</ul>
+<p>Each encoding is optional except for the GetCapabilities GET KVP encoding. The optional encodings are only tested when the 
+GetCapabilities response indicates that the encoding is supported.</p>
+<p>The user is prompted for the end point URL of the server. If there is no server at that location, the testing stops.</p>
+
+<h2>What is not tested</h2>
+
+<ul>
+  <li>The coverage returned by a GetCoverage request</li>
+</ul>
+
+<h2>Test data</h2>
+
+<p>There is no test data required for the WCS 1.0.0 executable test suite.</p>
+
+<h2>Namespaces</h2>
+
+<p>
+  There are two namespaces used by the WCS.
+  <table>
+    <tbody>
+      <tr>
+        <th>ogc</th>
+        <td>http://www.opengis.net/ogc</td>
+      </tr>
+      <tr>
+        <th>wcs</th>
+        <td>http://www.opengis.net/wcs</td>
+      </tr>
+    </tbody>
+  </table>
+</p>
+
+<h2>Schemas</h2>
+
+<p>The schemas for the corrigendum are currently available online at <a href="http://schemas.opengis.net/wcs/1.0.0">http://schemas.opengis.net/wcs/1.0.0</a>.</p>
+
+<h2>Abstract Test Suite</h2>
+
+<p>Details on the tests performed are available in the <a href="wcs-1.0.0-ats.html">abstract test suite</a>.</p>
+
+</body>
+</html>
+

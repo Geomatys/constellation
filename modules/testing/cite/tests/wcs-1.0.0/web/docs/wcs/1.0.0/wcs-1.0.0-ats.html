@@ -1,0 +1,3187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+   <head>
+      <title>Abstract Test Suite for WCS 1.0.0</title>
+      <style type="text/css" media="screen,print">
+    body {
+      color: black;
+      background: white;
+      font-family: Georgia, serif;
+    }
+    h1, h2, h3 {
+      font-family: Verdana, sans-serif;
+      color: #000099;
+      text-align: left;
+    }
+    h1 { font-size: 1.50em; margin-top: 2em;}
+    h2 { font-size: 1.25em; }
+    h3 { font-size: 1em; margin-bottom: 0.5em; }
+    li, li p, td p, td ul { margin: 0.25em; }
+    table {
+      margin-top: 0.5em;
+      margin-bottom: 1em;
+      border-collapse: collapse;
+    }
+    td, th { padding: 0.25em; }
+    caption {
+      font-family: Verdana, sans-serif;
+      font-size: 1em;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+      color: #000099;
+      text-align: left;
+    }
+    dt {  margin-top: 0.5em; }
+    pre { background: AliceBlue; }
+    a:link img, a:visited img { border-style: none }
+    div.authorgroup, div.list-of-tables, div.toc { margin-bottom: 2em; }
+    div.itemizedlist ul { margin: 0.5em;}
+    p.title { margin: 0em;}
+    div.module { margin-left: 3em;}
+    div.atc th, td.rowhead {
+      font-weight: bold;
+      font-size: 0.80em;
+      font-family: verdana, sans-serif;
+      text-align: left;
+      vertical-align: top;
+      background: #eeeeee;
+      color: #000099;
+    }
+    div.revhistory th {
+      font-size: 0.80em;
+      font-family: verdana, sans-serif;
+      text-align: left;
+      background: #000099;
+      color: white;
+    }
+    </style>
+   </head>
+   <body>
+      <div class="header">
+         <img alt="OGC logo" src="http://www.opengeospatial.org/themes/ogc/logo.png"/>
+      </div>
+      <h1>Abstract Test Suite for WCS 1.0.0</h1>
+      <div>
+         <h3>1 Test module wcs1-0-0:main</h3>
+         <div class="module">
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.1 Test case wcs1-0-0:main</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:main</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that the WCS 1.0.0 implementation being tested behaves properly</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if all the submodules and subtests (1.1.2 - 1.1.107) pass.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td/>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.2 Test case wcs1-0-0:basic_service_elements-general_http_request_rules-4</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:basic_service_elements-general_http_request_rules-4</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request contains a parameter which is not defined by the spec, the result is valid.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request contains a parameter which is not defined by the spec, the result is valid.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#6.3.2.2_Parameter_ordering_and_case">OGC 03-065r6: cl. 6.3.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.3 Test case wcs1-0-0:basic_service_elements-general_http_request_rules-5</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:basic_service_elements-general_http_request_rules-5</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a DescribeCoverage request contains a parameter which is not defined by the spec, the result is valid.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a DescribeCoverage request contains a parameter which is not defined by the spec, the result is valid.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#6.3.2.2_Parameter_ordering_and_case">OGC 03-065r6: cl. 6.3.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.4 Test case wcs1-0-0:basic_service_elements-general_http_request_rules-6</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:basic_service_elements-general_http_request_rules-6</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request contains a parameter which is not defined by the spec, the result is valid.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request contains a parameter which is not defined by the spec, the result is valid.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#6.3.2.2_Parameter_ordering_and_case">OGC 03-065r6: cl. 6.3.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.5 Test case wcs1-0-0:basic_service_elements-service_exceptions-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:basic_service_elements-service_exceptions-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when an Exception is returned from a request, Service Exception must have the MIME type as "application/vnd.ogc.se_xml".</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when an Exception is returned from a request, Service Exception must have the MIME type as "application/vnd.ogc.se_xml".</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#6.5_Service_exceptions">OGC 03-065r6: cl. 6.5</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.6 Test case wcs1-0-0:basic_service_elements-version_numbering_and_negotiation-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:basic_service_elements-version_numbering_and_negotiation-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made without a version number, then the response is the highest version supported.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made without a version number, then the response is the highest version supported.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#6.2_Version_numbering_and_negotiation">OGC 03-065r6: cl. 6.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.7 Test case wcs1-0-0:basic_service_elements-version_numbering_and_negotiation-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:basic_service_elements-version_numbering_and_negotiation-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made for a supported version, then the response is the requested version.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made for a supported version, then the response is the requested version.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#6.2_Version_numbering_and_negotiation">OGC 03-065r6: cl. 6.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.8 Test case wcs1-0-0:basic_service_elements-version_numbering_and_negotiation-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:basic_service_elements-version_numbering_and_negotiation-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made for a version that is unknown to the server is requested, the server sends the highest version it knows that is less than the requested version.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made for a version that is unknown to the server is requested, the server sends the highest version it knows that is less than the requested version.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#6.2_Version_numbering_and_negotiation">OGC 03-065r6: cl. 6.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.9 Test case wcs1-0-0:basic_service_elements-version_numbering_and_negotiation-4</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:basic_service_elements-version_numbering_and_negotiation-4</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made for a version lower than any of those known to the server, the server sends the lowest version it knows.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made for a version lower than any of those known to the server, the server sends the lowest version it knows.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#6.2_Version_numbering_and_negotiation">OGC 03-065r6: cl. 6.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.10 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-get-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-get-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a DescribeCoverage request is made without version, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a DescribeCoverage request is made without version, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.2_Key-value_pair_encoding">OGC 03-065r6: cl. 8.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.11 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-get-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-get-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a DescribeCoverage request is made with an invalid version, the server return a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a DescribeCoverage request is made with an invalid version, the server return a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.2_Key-value_pair_encoding">OGC 03-065r6: cl. 8.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.12 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-get-kvp-5</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-get-kvp-5</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a DescribeCoverage request is made with COVERAGE = name1, name2  (name1, name2 are in the Capabilities XML),  the server returns CoverageDescription  including only the requested coverage descriptions.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a DescribeCoverage request is made with COVERAGE = name1, name2  (name1, name2 are in the Capabilities XML),  the server returns CoverageDescription  including only the requested coverage descriptions.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.2_Key-value_pair_encoding">OGC 03-065r6: cl. 8.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.13 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-get-kvp-6</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-get-kvp-6</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a DescribeCoverage request is made with COVERAGE = name1 (name1 is not in the Capabilities XML), the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a DescribeCoverage request is made with COVERAGE = name1 (name1 is not in the Capabilities XML), the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.2_Key-value_pair_encoding">OGC 03-065r6: cl. 8.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.14 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-get-kvp-7</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-get-kvp-7</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a DescribeCoverage request is made with COVERAGE = name1, name2 (name1 is in, and name2 is not in the Capabilities XML), the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a DescribeCoverage request is made with COVERAGE = name1, name2 (name1 is in, and name2 is not in the Capabilities XML), the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.2_Key-value_pair_encoding">OGC 03-065r6: cl. 8.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.15 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-post-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-post-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a DescribeCoverage request is made without version, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a DescribeCoverage request is made without version, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.2_Key-value_pair_encoding">OGC 03-065r6: cl. 8.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.16 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-post-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-post-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a DescribeCoverage request is made with a invalid version, the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a DescribeCoverage request is made with a invalid version, the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.2_Key-value_pair_encoding">OGC 03-065r6: cl. 8.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.17 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-post-kvp-5</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-post-kvp-5</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a DescribeCoverage request is made with COVERAGE = name1, name2 (name1, name2 are in the Capabilities XML), the server returns CoverageDescription  including only the requested coverage descriptions.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a DescribeCoverage request is made with COVERAGE = name1, name2 (name1, name2 are in the Capabilities XML), the server returns CoverageDescription  including only the requested coverage descriptions.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.2_Key-value_pair_encoding">OGC 03-065r6: cl. 8.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.18 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-post-kvp-6</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-post-kvp-6</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a DescribeCoverage request is made with COVERAGE = name1 (name1 is not in the Capabilities XML), the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a DescribeCoverage request is made with COVERAGE = name1 (name1 is not in the Capabilities XML), the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.2_Key-value_pair_encoding">OGC 03-065r6: cl. 8.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.19 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-post-kvp-7</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-post-kvp-7</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a DescribeCoverage request is made with COVERAGE = name1, name2  (name1 is in, and name2 is not in the Capabilities XML), the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a DescribeCoverage request is made with COVERAGE = name1, name2  (name1 is in, and name2 is not in the Capabilities XML), the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.2_Key-value_pair_encoding">OGC 03-065r6: cl. 8.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.20 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-post-xml-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-post-xml-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a DescribeCoverage request is made without version, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a DescribeCoverage request is made without version, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.3_XML_encoding">OGC 03-065r6: cl. 8.2.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.21 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-post-xml-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-post-xml-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a DescribeCoverage request is made with an invalid version, the server return a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a DescribeCoverage request is made with an invalid version, the server return a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.3_XML_encoding">OGC 03-065r6: cl. 8.2.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.22 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-post-xml-5</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-post-xml-5</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a DescribeCoverage request is made with COVERAGE = name1, name2 (name1, name2 are in the Capabilities XML),  the server returns CoverageDescription  including only the requested coverage descriptions.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a DescribeCoverage request is made with COVERAGE = name1, name2 (name1, name2 are in the Capabilities XML),  the server returns CoverageDescription  including only the requested coverage descriptions.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.3_XML_encoding">OGC 03-065r6: cl. 8.2.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.23 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-post-xml-6</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-post-xml-6</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a DescribeCoverage request is made with COVERAGE = name1 (name1 is not in the Capabilities XML), the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a DescribeCoverage request is made with COVERAGE = name1 (name1 is not in the Capabilities XML), the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.3_XML_encoding">OGC 03-065r6: cl. 8.2.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.24 Test case wcs1-0-0:describecoverage_operations-describecoverage_request-post-xml-7</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_request-post-xml-7</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a DescribeCoverage request is made with COVERAGE = name1, name2 (name1 is in, and name2 is not in the Capabilities XML), the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a DescribeCoverage request is made with COVERAGE = name1, name2 (name1 is in, and name2 is not in the Capabilities XML), the server returns a service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.2.3_XML_encoding">OGC 03-065r6: cl. 8.2.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.25 Test case wcs1-0-0:describecoverage_operations-describecoverage_response-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:describecoverage_operations-describecoverage_response-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a DescribeCoverage request is made, supportedFormats in the response XML provides at least one of the following format: GeoTIFF, HDF-EOS,DTED,NITF, GML.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a DescribeCoverage request is made, supportedFormats in the response XML provides at least one of the following format: GeoTIFF, HDF-EOS,DTED,NITF, GML.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#8.3_DescribeCoverage_response">OGC 03-065r6: cl. 8.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.26 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made with an UPDATESEQUENCE parameter, the UPDATESEQUENCE parameter is ignored.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made with an UPDATESEQUENCE parameter, the UPDATESEQUENCE parameter is ignored.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.27 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to the current update sequence value, then  the server returns a valid exception (cose = CurrentUpdateSequence).</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to the current update sequence value, then  the server returns a valid exception (cose = CurrentUpdateSequence).</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.28 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value lower than the current update sequence value, then the server returns capabilities XML.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value lower than the current update sequence value, then the server returns capabilities XML.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.29 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-4</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-4</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value higher than the current update sequence value, then the server returns a service exception (code="InvalidUpdateSequence ").</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value higher than the current update sequence value, then the server returns a service exception (code="InvalidUpdateSequence ").</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.30 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-5</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-5</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCapabilities request is made without an UPDATESEQUENCE parameter set, then the server returns most recent capabilities XML.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCapabilities request is made without an UPDATESEQUENCE parameter set, then the server returns most recent capabilities XML.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.31 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-6</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-6</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCapabilities request is made without a SECTION parameter, then the entire capabilities are returned.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCapabilities request is made without a SECTION parameter, then the entire capabilities are returned.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.32 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-7</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-get-kvp-7</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCapabilities request is made with a SECTION parameter set  to a value as  "/", then the entire capabilities are returned.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCapabilities request is made with a SECTION parameter set  to a value as  "/", then the entire capabilities are returned.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.33 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made with an UPDATESEQUENCE parameter, the UPDATESEQUENCE parameter is ignored.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made with an UPDATESEQUENCE parameter, the UPDATESEQUENCE parameter is ignored.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.34 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to the current update sequence value, then  the server returns a valid exception (code=CurrentUpdateSequence).</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to the current update sequence value, then  the server returns a valid exception (code=CurrentUpdateSequence).</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.35 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value lower than the current update sequence value, then the server returns capabilities XML.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value lower than the current update sequence value, then the server returns capabilities XML.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.36 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-4</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-4</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value higher than the current update sequence value, then the server returns a service exception (code = InvalidUpdateSequence ).</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value higher than the current update sequence value, then the server returns a service exception (code = InvalidUpdateSequence ).</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.37 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-5</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-5</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCapabilities request is made without an UPDATESEQUENCE parameter set, then the server returns most recent capabilities XML.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCapabilities request is made without an UPDATESEQUENCE parameter set, then the server returns most recent capabilities XML.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.38 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-6</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-6</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCapabilities request is made without a SECTION parameter, Capabilities returned includes the portion: Service, Capabilities, and ContentMetadata.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCapabilities request is made without a SECTION parameter, Capabilities returned includes the portion: Service, Capabilities, and ContentMetadata.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.39 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-7</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-kvp-7</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCapabilities request is made with a SECTION parameter set to a value as  "/", Capabilities returned includes the portion: Service, Capabilities, and ContentMetadata.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCapabilities request is made with a SECTION parameter set to a value as  "/", Capabilities returned includes the portion: Service, Capabilities, and ContentMetadata.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.1_Key-value_pair_encoding">OGC 03-065r6: cl. 7.2.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.40 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made with an UPDATESEQUENCE parameter, the UPDATESEQUENCE parameter is ignored.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made with an UPDATESEQUENCE parameter, the UPDATESEQUENCE parameter is ignored.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.2_XML_encoding">OGC 03-065r6: cl. 7.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.41 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to the current update sequence value, then  the server returns a valid exception (cose = CurrentUpdateSequence).</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to the current update sequence value, then  the server returns a valid exception (cose = CurrentUpdateSequence).</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.2_XML_encoding">OGC 03-065r6: cl. 7.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.42 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value lower than the current update sequence value, then the server returns capabilities XML.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value lower than the current update sequence value, then the server returns capabilities XML.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.2_XML_encoding">OGC 03-065r6: cl. 7.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.43 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-4</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-4</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value higher than the current update sequence value, then the server returns a service exception (code = InvalidUpdateSequence).</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCapabilities request is made with an UPDATESEQUENCE parameter set to a value higher than the current update sequence value, then the server returns a service exception (code = InvalidUpdateSequence).</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.2_XML_encoding">OGC 03-065r6: cl. 7.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.44 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-5</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-5</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCapabilities request is made without an UPDATESEQUENCE parameter set, then the server returns most recent capabilities XML.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCapabilities request is made without an UPDATESEQUENCE parameter set, then the server returns most recent capabilities XML.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.2_XML_encoding">OGC 03-065r6: cl. 7.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.45 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-6</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-6</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that    When a GetCapabilities request is made without a SECTION parameter, Capabilities returned includes the portion: Service, Capabilities, and ContentMetadata.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if    When a GetCapabilities request is made without a SECTION parameter, Capabilities returned includes the portion: Service, Capabilities, and ContentMetadata.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.2_XML_encoding">OGC 03-065r6: cl. 7.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.46 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-7</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_request-post-xml-7</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCapabilities request is made with a SECTION parameter set to a value as  "/", Capabilities returned includes the portion: Service, Capabilities, and ContentMetadata.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCapabilities request is made with a SECTION parameter set to a value as  "/", Capabilities returned includes the portion: Service, Capabilities, and ContentMetadata.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.2.2_XML_encoding">OGC 03-065r6: cl. 7.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.47 Test case wcs1-0-0:getcapabilities_operations-getcapabilities_response-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcapabilities_operations-getcapabilities_response-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that each OnlineResource URL intended for HTTP Get requests in the capabilities document is a URL prefix.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if each OnlineResource URL intended for HTTP Get requests in the capabilities document is a URL prefix.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#7.3_GetCapabilities_response">OGC 03-065r6: cl. 7.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.48 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-bbox-get-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-bbox-get-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made with a BBOX outside the defined Bounding BOX, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made with a BBOX outside the defined Bounding BOX, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.7_BBOX">OGC 03-065r6: cl. 9.2.2.7</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.49 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-bbox-get-kvp-4</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-bbox-get-kvp-4</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCoverage request is made without a BBOX and without a TIME, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCoverage request is made without a BBOX and without a TIME, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.7_BBOX">OGC 03-065r6: cl. 9.2.2.7</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.50 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-bbox-post-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-bbox-post-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made with a BBOX outside the defined Bounding BOX, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made with a BBOX outside the defined Bounding BOX, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.7_BBOX">OGC 03-065r6: cl. 9.2.2.7</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.51 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-bbox-post-kvp-4</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-bbox-post-kvp-4</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCoverage request is made without a BBOX and without a TIME, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCoverage request is made without a BBOX and without a TIME, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.7_BBOX">OGC 03-065r6: cl. 9.2.2.7</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.52 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-bbox-post-xml-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-bbox-post-xml-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made with a BBOX outside the defined Bounding BOX, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made with a BBOX outside the defined Bounding BOX, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.3_DomainSubset">OGC 03-065r6: cl. 9.2.3.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.53 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-bbox-post-xml-4</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-bbox-post-xml-4</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCoverage request is made without a BBOX and without a TIME, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCoverage request is made without a BBOX and without a TIME, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.3_DomainSubset">OGC 03-065r6: cl. 9.2.3.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.54 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-coverage-get-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-coverage-get-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCoverage request is made without coverage, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCoverage request is made without coverage, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.4_COVERAGEname">OGC 03-065r6: cl. 9.2.2.4</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.55 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-coverage-get-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-coverage-get-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made with coverage=name and name is not a valid coverage identifier, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made with coverage=name and name is not a valid coverage identifier, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.4_COVERAGEname">OGC 03-065r6: cl. 9.2.2.4</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.56 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-coverage-post-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-coverage-post-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCoverage request is made without coverage, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCoverage request is made without coverage, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.4_COVERAGEname">OGC 03-065r6: cl. 9.2.2.4</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.57 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-coverage-post-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-coverage-post-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made with coverage=name and name is not a valid coverage identifier, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made with coverage=name and name is not a valid coverage identifier, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.4_COVERAGEname">OGC 03-065r6: cl. 9.2.2.4</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.58 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-coverage-post-xml-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-coverage-post-xml-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCoverage request is made without coverage, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCoverage request is made without coverage, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.2_sourceCoverage">OGC 03-065r6: cl. 9.2.3.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.59 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-coverage-post-xml-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-coverage-post-xml-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made with coverage=name and name is not a valid coverage identifier, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made with coverage=name and name is not a valid coverage identifier, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.2_sourceCoverage">OGC 03-065r6: cl. 9.2.3.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.60 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-crs-get-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-crs-get-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made without CRS, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made without CRS, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.5_CRS">OGC 03-065r6: cl. 9.2.2.5</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.61 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-crs-get-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-crs-get-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a CRS and CRS value is not one of the  requestResponseCRSs or requestCRSs element under the requested coverage, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a CRS and CRS value is not one of the  requestResponseCRSs or requestCRSs element under the requested coverage, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.5_CRS">OGC 03-065r6: cl. 9.2.2.5</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.62 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-crs-post-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-crs-post-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made without CRS, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made without CRS, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.5_CRS">OGC 03-065r6: cl. 9.2.2.5</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.63 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-crs-post-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-crs-post-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a CRS and CRS value is not one of the  requestResponseCRSs or requestCRSs element under the requested coverage, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a CRS and CRS value is not one of the  requestResponseCRSs or requestCRSs element under the requested coverage, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.5_CRS">OGC 03-065r6: cl. 9.2.2.5</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.64 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-crs-post-xml-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-crs-post-xml-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a CRS and CRS value is not one of the  requestResponseCRSs or requestCRSs element under the requested coverage, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a CRS and CRS value is not one of the  requestResponseCRSs or requestCRSs element under the requested coverage, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.3_DomainSubset">OGC 03-065r6: cl. 9.2.3.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.65 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-exception-get-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-exception-get-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with EXCEPTIONS contains value  "application/vnd.ogc.se_xml", the server recognize it. 
+    </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with EXCEPTIONS contains value  "application/vnd.ogc.se_xml", the server recognize it. 
+    </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.13_EXCEPTIONS">OGC 03-065r6: cl. 9.2.2.13</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.66 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-exception-get-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-exception-get-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a FORMAT not listed in a supportedFormats/formats under the selected coverage offering in the DescribeCoverage reply, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a FORMAT not listed in a supportedFormats/formats under the selected coverage offering in the DescribeCoverage reply, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.13_EXCEPTIONS">OGC 03-065r6: cl. 9.2.2.13</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.67 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-exception-post-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-exception-post-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with EXCEPTIONS contains value  "application/vnd.ogc.se_xml", the server recognize it. 
+    </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with EXCEPTIONS contains value  "application/vnd.ogc.se_xml", the server recognize it. 
+    </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.13_EXCEPTIONS">OGC 03-065r6: cl. 9.2.2.13</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.68 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-exception-post-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-exception-post-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a FORMAT not listed in a supportedFormats/formats under the selected coverage offering in the DescribeCoverage reply, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a FORMAT not listed in a supportedFormats/formats under the selected coverage offering in the DescribeCoverage reply, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.13_EXCEPTIONS">OGC 03-065r6: cl. 9.2.2.13</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.69 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-format-get-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-format-get-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a FORMAT not listed in a supportedFormats/formats under the selected coverage offering in the DescribeCoverage reply, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a FORMAT not listed in a supportedFormats/formats under the selected coverage offering in the DescribeCoverage reply, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.12_FORMAT">OGC 03-065r6: cl. 9.2.2.12</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.70 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-format-get-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-format-get-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made without a FORMAT, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made without a FORMAT, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.12_FORMAT">OGC 03-065r6: cl. 9.2.2.12</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.71 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-format-post-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-format-post-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a FORMAT not listed in a supportedFormats/formats under the selected coverage offering in the DescribeCoverage reply, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a FORMAT not listed in a supportedFormats/formats under the selected coverage offering in the DescribeCoverage reply, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.12_FORMAT">OGC 03-065r6: cl. 9.2.2.12</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.72 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-format-post-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-format-post-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made without a FORMAT, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made without a FORMAT, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.12_FORMAT">OGC 03-065r6: cl. 9.2.2.12</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.73 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-format-post-xml-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-format-post-xml-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a FORMAT not listed in a supportedFormats/formats under the selected coverage offering in the DescribeCoverage reply, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a FORMAT not listed in a supportedFormats/formats under the selected coverage offering in the DescribeCoverage reply, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.6_Output_CRS_and_Format">OGC 03-065r6: cl. 9.2.3.6</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.74 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-format-post-xml-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-format-post-xml-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made without a FORMAT, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made without a FORMAT, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.6_Output_CRS_and_Format">OGC 03-065r6: cl. 9.2.3.6</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.75 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-grid_resolution-get-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-grid_resolution-get-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a specific grid resolution, the server should return the requested content .</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a specific grid resolution, the server should return the requested content .</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.11_Grid_resolution:_RESX_RESY">OGC 03-065r6: cl. 9.2.2.11</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.76 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-grid_resolution-post-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-grid_resolution-post-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a specific grid resolution, the server should return the requested content .</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a specific grid resolution, the server should return the requested content .</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.11_Grid_resolution:_RESX_RESY">OGC 03-065r6: cl. 9.2.2.11</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.77 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-grid_size-get-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-grid_size-get-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made without a specific grid size and without a grid resolution, the server returns service exception .</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made without a specific grid size and without a grid resolution, the server returns service exception .</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.10_Grid_size:_WIDTH_HEIGHT_DEPTH">OGC 03-065r6: cl. 9.2.2.10</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.78 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-grid_size-get-xml-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-grid_size-get-xml-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made without a specific grid size and without a grid resolution, the server returns service exception .</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made without a specific grid size and without a grid resolution, the server returns service exception .</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.3_DomainSubset">OGC 03-065r6: cl. 9.2.3.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.79 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-interpolationmethod-post-xml-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-interpolationmethod-post-xml-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with an INTERPLOATIONMETHOD value that is listed in the CoverageDescription, the server should return the requested content.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with an INTERPLOATIONMETHOD value that is listed in the CoverageDescription, the server should return the requested content.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.5_InterpolationMethod">OGC 03-065r6: cl. 9.2.3.5</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.80 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-interpolationmethod-post-xml-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-interpolationmethod-post-xml-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a INTERPLOATIONMETHOD not listed in the DescribeCoverage reply, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a INTERPLOATIONMETHOD not listed in the DescribeCoverage reply, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.5_InterpolationMethod">OGC 03-065r6: cl. 9.2.3.5</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.81 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-parameter-get-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-parameter-get-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a PARAMETER name that is listed in the range set, but PARAMETER signed a value that is not defined in AxisDescription, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a PARAMETER name that is listed in the range set, but PARAMETER signed a value that is not defined in AxisDescription, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.9_PARAMETER">OGC 03-065r6: cl. 9.2.2.9</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.82 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-parameter-get-kvp-4</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-parameter-get-kvp-4</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a PARAMETER name that is listed in the range set, PARAMETER signed value that is defined in AxisDescription, the server should return the requested content.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a PARAMETER name that is listed in the range set, PARAMETER signed value that is defined in AxisDescription, the server should return the requested content.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.9_PARAMETER">OGC 03-065r6: cl. 9.2.2.9</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.83 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-parameter-post-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-parameter-post-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a PARAMETER name that is listed in the range set, but PARAMETER signed a value that is not defined in AxisDescription, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a PARAMETER name that is listed in the range set, but PARAMETER signed a value that is not defined in AxisDescription, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.9_PARAMETER">OGC 03-065r6: cl. 9.2.2.9</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.84 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-parameter-post-kvp-4</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-parameter-post-kvp-4</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a PARAMETER name that is listed in the range set, PARAMETER signed value that is defined in AxisDescription, the server should return the requested content.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a PARAMETER name that is listed in the range set, PARAMETER signed value that is defined in AxisDescription, the server should return the requested content.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.9_PARAMETER">OGC 03-065r6: cl. 9.2.2.9</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.85 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-parameter-post-xml-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-parameter-post-xml-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a PARAMETER name that is listed in the range set, but PARAMETER signed a value that is not defined in AxisDescription, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a PARAMETER name that is listed in the range set, but PARAMETER signed a value that is not defined in AxisDescription, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.4_RangeSubset">OGC 03-065r6: cl. 9.2.3.4</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.86 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-parameter-post-xml-4</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-parameter-post-xml-4</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a PARAMETER name that is listed in the range set, PARAMETER signed value that is defined in AxisDescription, the server should return the requested content.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a PARAMETER name that is listed in the range set, PARAMETER signed value that is defined in AxisDescription, the server should return the requested content.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.4_RangeSubset">OGC 03-065r6: cl. 9.2.3.4</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.87 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-response_crs-get-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-response_crs-get-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCoverage request is made with a valid RESPONSE_CRS, the server should return the requested content with this CRS.
+     </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCoverage request is made with a valid RESPONSE_CRS, the server should return the requested content with this CRS.
+     </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.6_RESPONSE_CRS">OGC 03-065r6: cl. 9.2.2.6</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.88 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-response_crs-get-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-response_crs-get-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made with an invalid RESPONSE_CRS, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made with an invalid RESPONSE_CRS, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.6_RESPONSE_CRS">OGC 03-065r6: cl. 9.2.2.6</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.89 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-response_crs-post-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-response_crs-post-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCoverage request is made with a valid RESPONSE_CRS, the server should return the requested content with this CRS.
+     </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCoverage request is made with a valid RESPONSE_CRS, the server should return the requested content with this CRS.
+     </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.6_RESPONSE_CRS">OGC 03-065r6: cl. 9.2.2.6</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.90 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-response_crs-post-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-response_crs-post-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made with an invalid RESPONSE_CRS, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made with an invalid RESPONSE_CRS, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.6_RESPONSE_CRS">OGC 03-065r6: cl. 9.2.2.6</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.91 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-response_crs-post-xml-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-response_crs-post-xml-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCoverage request is made with a valid RESPONSE_CRS, the server should return the requested content with this CRS.
+     </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCoverage request is made with a valid RESPONSE_CRS, the server should return the requested content with this CRS.
+     </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.6_Output_CRS_and_Format">OGC 03-065r6: cl. 9.2.3.6</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.92 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-response_crs-post-xml-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-response_crs-post-xml-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made with an invalid RESPONSE_CRS, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made with an invalid RESPONSE_CRS, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.6_Output_CRS_and_Format">OGC 03-065r6: cl. 9.2.3.6</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.93 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-get-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-get-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made without version, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made without version, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.2_SERVICEWCS__VERSIONversione">OGC 03-065r6: cl. 9.2.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.94 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-get-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-get-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCoverage request is made with an invalid version, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCoverage request is made with an invalid version, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.2_SERVICEWCS__VERSIONversione">OGC 03-065r6: cl. 9.2.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.95 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-get-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-get-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made with a version=1.0.0, the server should return the requested content (if other condition satisfied). </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made with a version=1.0.0, the server should return the requested content (if other condition satisfied). </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.2_SERVICEWCS__VERSIONversione">OGC 03-065r6: cl. 9.2.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.96 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-post-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-post-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made without version, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made without version, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.2_SERVICEWCS__VERSIONversione">OGC 03-065r6: cl. 9.2.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.97 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-post-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-post-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCoverage request is made with an invalid version, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCoverage request is made with an invalid version, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.2_SERVICEWCS__VERSIONversione">OGC 03-065r6: cl. 9.2.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.98 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-post-kvp-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-post-kvp-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made with a version=1.0.0, the server should return the requested content (if other condition satisfied). </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made with a version=1.0.0, the server should return the requested content (if other condition satisfied). </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.2_SERVICEWCS__VERSION">OGC 03-065r6: cl. 9.2.2.2</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.99 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-post-xml-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-post-xml-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made without version, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made without version, the server returns service exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.1_Overview">OGC 03-065r6: cl. 9.2.3.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.100 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-post-xml-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-post-xml-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that   When a GetCoverage request is made with a version an invalid version, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if   When a GetCoverage request is made with a version an invalid version, the server returns service exception. </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.1_Overview">OGC 03-065r6: cl. 9.2.3.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.101 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-post-xml-3</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-service_version-post-xml-3</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that  When a GetCoverage request is made with a version=1.0.0, the server should return the requested content (if other condition satisfied). </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if  When a GetCoverage request is made with a version=1.0.0, the server should return the requested content (if other condition satisfied). </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.1_Overview">OGC 03-065r6: cl. 9.2.3.1</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.102 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-time-get-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-time-get-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a VALID TIME, the server should return the requested content </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a VALID TIME, the server should return the requested content </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.8_TIME">OGC 03-065r6: cl. 9.2.2.8</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.103 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-time-get-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-time-get-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made WITH an invalid TIME, the server returns a service  exception.
+    </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made WITH an invalid TIME, the server returns a service  exception.
+    </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.8_TIME">OGC 03-065r6: cl. 9.2.2.8</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.104 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-time-post-kvp-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-time-post-kvp-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a VALID TIME, the server should return the requested content </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a VALID TIME, the server should return the requested content </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.8_TIME">OGC 03-065r6: cl. 9.2.2.8</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.105 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-time-post-kvp-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-time-post-kvp-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made WITH an invalid TIME, the server returns a service  exception.
+    </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made WITH an invalid TIME, the server returns a service  exception.
+    </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.2.8_TIME">OGC 03-065r6: cl. 9.2.2.8</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.106 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-time-post-xml-1</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-time-post-xml-1</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made with a VALID TIME, the server should return the requested content </td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made with a VALID TIME, the server should return the requested content </td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.3_DomainSubset">OGC 03-065r6: cl. 9.2.3.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div class="atc">
+               <table frame="border">
+                  <caption>1.107 Test case wcs1-0-0:getcoverage_operations-getcoverage_request-time-post-xml-2</caption>
+                  <tbody>
+                     <tr>
+                        <th>Test case ID</th>
+                        <td>wcs1-0-0:getcoverage_operations-getcoverage_request-time-post-xml-2</td>
+                     </tr>
+                     <tr>
+                        <th>Test purpose</th>
+                        <td>Verify that when a GetCoverage request is made WITH an invalid TIME, the server returns a service  exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Test method</th>
+                        <td>Pass if when a GetCoverage request is made WITH an invalid TIME, the server returns a service  exception.</td>
+                     </tr>
+                     <tr>
+                        <th>Reference</th>
+                        <td>
+                           <a href="http://cite.opengeospatial.org/OGCTestData/wcs/1.0.0/specs/03-065r6.html#9.2.3.3_DomainSubset">OGC 03-065r6: cl. 9.2.3.3</a>
+                        </td>
+                     </tr>
+                     <tr>
+                        <th>Test type</th>
+                        <td>Capability</td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+   </body>
+</html>

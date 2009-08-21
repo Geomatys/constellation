@@ -18,7 +18,11 @@ package org.constellation.ws.embedded;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.geotoolkit.util.logging.Logging;
 
 
 /**
@@ -33,9 +37,30 @@ import java.io.InputStreamReader;
  */
 public final class LaunchTests {
     /**
+     * The default logger.
+     */
+    private static final Logger LOGGER = Logging.getLogger(LaunchTests.class);
+
+    /**
      * Prevents instanciation.
      */
     private LaunchTests() {}
+
+    /**
+     * Display the result of a process into the standard output.
+     *
+     * @param in Stream returned by the execution of the tests.
+     * @throws IOException
+     */
+    private static void displayResult(final InputStream in) throws IOException {
+        final InputStreamReader isr = new InputStreamReader(in);
+        final BufferedReader br = new BufferedReader(isr);
+        String line;
+        while ((line = br.readLine()) != null) {
+            System.out.println(line);
+        }
+        br.close();
+    }
 
     public static void main(String[] args) throws IOException {
         // Launch the server.
@@ -43,17 +68,19 @@ public final class LaunchTests {
 
         // Launch the test suite.
         final Runtime runtime = Runtime.getRuntime();
-        final String argSerie = (args.length > 0) ? args[0] : null;
-        final Process process = runtime.exec(new String[]{"./run.sh", argSerie});
-
-        // Display the result.
-        final InputStreamReader isr = new InputStreamReader(process.getInputStream());
-        final BufferedReader br = new BufferedReader(isr);
-        String line;
-        while ((line = br.readLine()) != null) {
-            System.out.println(line);
+        if (args.length == 0) {
+            LOGGER.info("No argument have been given to the script. Usage run.sh [profile...]");
         }
-        br.close();
+        for (String arg : args) {
+            final Process process = runtime.exec(new String[]{"./run.sh", arg});
+            displayResult(process.getInputStream());
+            try {
+                // Makes sure the test suite has been totally executed.
+                process.waitFor();
+            } catch (InterruptedException ex) {
+                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+            }
+        }
 
         // Then we can kill the server.
         GrizzlyServer.finish();

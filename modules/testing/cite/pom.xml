@@ -152,6 +152,7 @@
           <mainClass>org.constellation.ws.embedded.LaunchTests</mainClass>
           <arguments>
             <argument>wms-1.1.1</argument>
+            <argument>wcs-1.0.0</argument>
           </arguments>
         </configuration>
       </plugin>

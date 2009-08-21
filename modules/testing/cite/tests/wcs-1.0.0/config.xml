@@ -1,0 +1,20 @@
+<config>
+	<organization>
+		<name>OGC</name>
+	</organization>
+	<standard>
+		<name>WCS</name>
+	</standard>
+	<version>
+		<name>1.0.0</name>
+	</version>
+	<suite>
+		<namespace-uri>http://www.opengis.net/wcs</namespace-uri>
+		<prefix>wcs1-0-0</prefix>
+		<local-name>main_wcs1-0-0</local-name>
+	</suite>
+	<source>ctl</source>
+	<resources>resources</resources>
+	<web>web</web>
+</config>
+
