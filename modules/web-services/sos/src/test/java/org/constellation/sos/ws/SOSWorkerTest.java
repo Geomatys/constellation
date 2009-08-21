@@ -45,6 +45,7 @@ import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.geotoolkit.gml.xml.v311.TimeIndeterminateValueType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
@@ -94,8 +95,9 @@ public class SOSWorkerTest {
 
             File phenomenonDirectory = new File(configDir, "phenomenons");
             phenomenonDirectory.mkdir();
-            writeDataFile(phenomenonDirectory, "phenomenon-depth.xml", "urn:ogc:def:phenomenon:BRGM:depth");
-            writeDataFile(phenomenonDirectory, "phenomenon-temp.xml",  "urn:ogc:def:phenomenon:BRGM:temperature");
+            writeDataFile(phenomenonDirectory, "phenomenon-depth.xml", "depth");
+            writeDataFile(phenomenonDirectory, "phenomenon-temp.xml",  "temperature");
+            writeDataFile(phenomenonDirectory, "phenomenon-depth-temp.xml",  "aggregatePhenomenon");
 
             File sensorDirectory = new File(configDir, "sensors");
             sensorDirectory.mkdir();
@@ -105,6 +107,7 @@ public class SOSWorkerTest {
             File featureDirectory = new File(configDir, "features");
             featureDirectory.mkdir();
             writeDataFile(featureDirectory, "feature1.xml", "10972X0137-PONT");
+            writeDataFile(featureDirectory, "feature2.xml", "10972X0137-PLOUF");
 
             File observationsDirectory = new File(configDir, "observations");
             observationsDirectory.mkdir();
@@ -112,6 +115,7 @@ public class SOSWorkerTest {
             writeDataFile(observationsDirectory, "observation2.xml", "urn:ogc:object:observation:BRGM:305");
             writeDataFile(observationsDirectory, "observation3.xml", "urn:ogc:object:observation:BRGM:406");
             writeDataFile(observationsDirectory, "observation4.xml", "urn:ogc:object:observation:BRGM:307");
+            writeDataFile(observationsDirectory, "observation5.xml", "urn:ogc:object:observation:BRGM:507");
 
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
@@ -124,6 +128,7 @@ public class SOSWorkerTest {
             configuration.setObservationWriterType(ObservationWriterType.FILESYSTEM);
             configuration.setSMLType(DataSourceType.FILE_SYSTEM);
             configuration.setObservationFilterType(ObservationFilterType.LUCENE);
+            configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:BRGM:");
             marshaller.marshal(configuration, configFile);
 
         }
@@ -1017,6 +1022,152 @@ public class SOSWorkerTest {
 
         /**
          *  Test 19: getObservation with procedure urn:ogc:object:sensor:BRGM:4
+         *           with resultTemplate mode
+         *           with timeFilter TEquals
+         */
+        times = new ArrayList<EventTime>();
+        period = new TimePeriodType(new TimePositionType("2007-05-01T02:59:00.0"), new TimePositionType("2007-05-01T06:59:00.0"));
+        filter = new BinaryTemporalOpType(period);
+        equals = new EventTime(filter);
+        times.add(equals);
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      times,
+                                      Arrays.asList("urn:ogc:object:sensor:BRGM:4"),
+                                      null,
+                                      null,
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.RESULT_TEMPLATE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
+
+        expResult = (ObservationEntry)obj.getValue();
+
+        //for template the sampling time is 1970 to now
+        expResult.setSamplingTime(period);
+
+        // and we empty the result object
+        arrayP = (DataArrayPropertyType) expResult.getResult();
+        array = arrayP.getDataArray();
+        array.setElementCount(0);
+        array.setValues("");
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult = (ObservationEntry) result.getMember().iterator().next();
+
+
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 20: getObservation with procedure urn:ogc:object:sensor:BRGM:4
+         *           with resultTemplate mode
+         *           with timeFilter Tafter
+         */
+        times = new ArrayList<EventTime>();
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T17:58:00.0"));
+        filter = new BinaryTemporalOpType(instant);
+        after = new EventTime(filter,null, null);
+        times.add(after);
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      times,
+                                      Arrays.asList("urn:ogc:object:sensor:BRGM:4"),
+                                      null,
+                                      null,
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.RESULT_TEMPLATE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
+
+        expResult = (ObservationEntry)obj.getValue();
+
+        //for template the sampling time is 1970 to now
+        period = new TimePeriodType(instant.getTimePosition());
+        expResult.setSamplingTime(period);
+
+        // and we empty the result object
+        arrayP = (DataArrayPropertyType) expResult.getResult();
+        array = arrayP.getDataArray();
+        array.setElementCount(0);
+        array.setValues("");
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult = (ObservationEntry) result.getMember().iterator().next();
+
+
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 21: getObservation with procedure urn:ogc:object:sensor:BRGM:4
+         *           with resultTemplate mode
+         *           with timeFilter Tbefore
+         */
+        times = new ArrayList<EventTime>();
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T17:58:00.0"));
+        filter = new BinaryTemporalOpType(instant);
+        before = new EventTime(null, filter, null);
+        times.add(before);
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      times,
+                                      Arrays.asList("urn:ogc:object:sensor:BRGM:4"),
+                                      null,
+                                      null,
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.RESULT_TEMPLATE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
+
+        expResult = (ObservationEntry)obj.getValue();
+
+        //for template the sampling time is 1970 to now
+        period = new TimePeriodType(TimeIndeterminateValueType.BEFORE, instant.getTimePosition());
+        expResult.setSamplingTime(period);
+
+        // and we empty the result object
+        arrayP = (DataArrayPropertyType) expResult.getResult();
+        array = arrayP.getDataArray();
+        array.setElementCount(0);
+        array.setValues("");
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult = (ObservationEntry) result.getMember().iterator().next();
+
+
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 22: getObservation with procedure urn:ogc:object:sensor:BRGM:4
          *           with observedproperties = urn:ogc:def:phenomenon:BRGM:depth
          */
         request  = new GetObservation("1.0.0",
@@ -1049,7 +1200,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, obsResult);
 
         /**
-         *  Test 20: getObservation with procedure urn:ogc:object:sensor:BRGM:4
+         *  Test 23: getObservation with procedure urn:ogc:object:sensor:BRGM:4
          *          and with wrong observed prop
          */
         request  = new GetObservation("1.0.0",
@@ -1074,7 +1225,100 @@ public class SOSWorkerTest {
         }
         assertTrue(exLaunched);
 
+        /**
+         *  Test 24: getObservation with procedure urn:ogc:object:sensor:BRGM:5
+         *           with observedproperties = urn:ogc:def:phenomenon:BRGM:aggreagtePhenomenon
+         */
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:BRGM:5"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:BRGM:aggregatePhenomenon"),
+                                      null,
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.INLINE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation5.xml"));
+
+        expResult = (ObservationEntry)obj.getValue();
+        assertEquals(result.getMember().size(), 1);
+
+
+        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        assertTrue(obsResult != null);
+
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 25: getObservation with procedure urn:ogc:object:sensor:BRGM:5
+         *           with observedproperties = urn:ogc:def:phenomenon:BRGM:aggreagtePhenomenon
+         *           with foi                =  10972X0137-PLOUF
+         */
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:BRGM:5"),
+                                      Arrays.asList("urn:ogc:def:phenomenon:BRGM:aggregatePhenomenon"),
+                                      new GetObservation.FeatureOfInterest(Arrays.asList("10972X0137-PLOUF")),
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.INLINE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation5.xml"));
+
+        expResult = (ObservationEntry)obj.getValue();
+        assertEquals(result.getMember().size(), 1);
+
+
+        obsResult = (ObservationEntry) result.getMember().iterator().next();
+        assertTrue(obsResult != null);
+
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
         marshallerPool.release(unmarshaller);
+
+        /**
+         *  Test 26: getObservation with procedure urn:ogc:object:sensor:BRGM:5
+         *          and with wrong foi
+         */
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:BRGM:4"),
+                                      null,
+                                      new GetObservation.FeatureOfInterest(Arrays.asList("NIMP")),
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.INLINE,
+                                      null);
+
+        exLaunched = false;
+        try {
+            worker.getObservation(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "featureOfInterest");
+        }
+        assertTrue(exLaunched);
     }
 
 

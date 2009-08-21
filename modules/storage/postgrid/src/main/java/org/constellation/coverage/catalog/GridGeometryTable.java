@@ -17,7 +17,6 @@
  */
 package org.constellation.coverage.catalog;
 
-import java.util.*;
 import java.sql.Types;
 import java.sql.Array;
 import java.sql.ResultSet;
@@ -25,6 +24,16 @@ import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.awt.Dimension;
 import java.awt.geom.AffineTransform;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import static java.lang.reflect.Array.getLength;
@@ -156,7 +165,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
         final CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
         final PostgisAuthorityFactory factory = getAuthorityFactory();
         final IdentifiedObjectFinder finder = factory.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
-        String srid = finder.findIdentifier(crs);
+        final String srid = finder.findIdentifier(crs);
         if (srid == null) {
             return 0;
         }
@@ -284,7 +293,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * @param  centroids The date-extents map.
      * @return The same reference than {@code centroids}, but casted as a date-altitudes map.
      */
-    final SortedMap<Date,SortedSet<Number>> identifiersToAltitudes(final SortedMap<Date,List<String>> centroids)
+    SortedMap<Date,SortedSet<Number>> identifiersToAltitudes(final SortedMap<Date,List<String>> centroids)
             throws CatalogException, SQLException
     {
         final Map<Number,Number> numbers = new HashMap<Number,Number>(); // For sharing instances.
@@ -365,7 +374,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * @throws SQLException
      *              If the operation failed.
      */
-    final synchronized String getIdentifier(final Dimension size,
+    synchronized String getIdentifier(final Dimension size,
                                             final AffineTransform  gridToCRS, final int horizontalSRID,
                                             final double[] verticalOrdinates, final int verticalSRID,
                                             final String newIdentifier)
@@ -387,10 +396,10 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
 
         String id = null;
         boolean strictlyEquals = false;
-        int idIndex = indexOf(query.identifier);
+        final int idIndex = indexOf(query.identifier);
         int vsIndex = indexOf(query.verticalSRID);
         int voIndex = indexOf(query.verticalOrdinates);
-        ResultSet results = statement.executeQuery();
+        final ResultSet results = statement.executeQuery();
         while (results.next()) {
             final String nextID = results.getString(idIndex);
             final int  nextSRID = results.getInt   (vsIndex);

@@ -480,15 +480,22 @@ public class ServicesBean {
     public String storeForm() throws JAXBException, IOException, FileNotFoundException {
 
         //we signal to the webService to update is capabilities
-        final File f             = new File(servletContext.getRealPath("WEB-INF/change.properties"));
-        final Properties p       = new Properties();
-        final FileInputStream in = new FileInputStream(f);
-        p.load(in);
-        in.close();
-        p.put("update", "true");
-        final FileOutputStream out = new FileOutputStream(f);
-        p.store(out, "updated from JSF interface");
-        out.close();
+        FileInputStream in   = null;
+        FileOutputStream out = null;
+        try {
+            final File f       = new File(servletContext.getRealPath("WEB-INF/change.properties"));
+            final Properties p = new Properties();
+            in                 = new FileInputStream(f);
+            p.load(in);
+            in.close();
+            p.put("update", "true");
+            out = new FileOutputStream(f);
+            p.store(out, "updated from JSF interface");
+            out.close();
+        } finally {
+            if (in  != null) in.close();
+            if (out != null) out.close();
+        }
         for (Object capa : capabilities) {
 
             //for OWS 1.1.0
@@ -885,15 +892,21 @@ public class ServicesBean {
             }
             
             //we signal to the webService to update is capabilities
-            final File change        = new File(servletContext.getRealPath("WEB-INF/change.properties"));
-            final Properties p       = new Properties();
-            final FileInputStream in = new FileInputStream(change);
-            p.load(in);
-            in.close();
-            p.put("update", "true");
-            final FileOutputStream out = new FileOutputStream(change);
-            p.store(out, "updated from JSF interface");
-            out.close();
+            FileInputStream in   = null;
+            FileOutputStream out = null;
+            try {
+                final File change  = new File(servletContext.getRealPath("WEB-INF/change.properties"));
+                final Properties p = new Properties();
+                in                 = new FileInputStream(change);
+                p.load(in);
+
+                p.put("update", "true");
+                out = new FileOutputStream(change);
+                p.store(out, "updated from JSF interface");
+            } finally {
+                if (in  != null) in.close();
+                if (out != null) out.close();
+            }
 
             marshallerPool.release(marshaller);
             
@@ -1112,21 +1125,21 @@ public class ServicesBean {
     public File processSubmitedFile() throws IOException {
         upload();
         final File f = File.createTempFile("userData", "geomatys");
+        InputStream inputStream  = null;
+        InputStreamReader infile = null;
+        FileWriter writer        = null;
         try {
            
-            final InputStream inputStream  = uploadedFile.getInputStream();
-            final InputStreamReader infile = new InputStreamReader(inputStream);
-            final BufferedReader inbuf     = new BufferedReader(infile);
-            final FileWriter writer        = new FileWriter(f);
+            inputStream                = uploadedFile.getInputStream();
+            infile                     = new InputStreamReader(inputStream);
+            final BufferedReader inbuf = new BufferedReader(infile);
+            writer                     = new FileWriter(f);
 
             String line;
             while ((line = inbuf.readLine()) != null) {
                 writer.append(line);
                 writer.append('\n');
             }
-            inputStream.close();
-            infile.close();
-            writer.close();
             
         } catch (Exception x) {
             final FacesMessage message = new FacesMessage(
@@ -1135,6 +1148,10 @@ public class ServicesBean {
             FacesContext.getCurrentInstance().addMessage(null, message);
             LOGGER.severe("Exception in proccesSubmitFile " + x.getMessage());
             return null;
+        } finally {
+            if (inputStream != null) inputStream.close();
+            if (infile      != null) infile.close();
+            if (writer      != null) writer.close();
         }
         return f;
     }
