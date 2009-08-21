@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<om:Observation xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sa="http://www.opengis.net/sa/1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <gml:name>urn:ogc:object:observation:BRGM:507</gml:name>
+    <om:samplingTime>
+        <gml:TimePeriod>
+            <gml:beginPosition>2007-05-01T12:59:00.0</gml:beginPosition>
+            <gml:endPosition>2007-05-01T16:59:00.0</gml:endPosition>
+        </gml:TimePeriod>
+    </om:samplingTime>
+    <om:procedure xlink:href="urn:ogc:object:sensor:BRGM:5"/>
+    <om:observedProperty>
+        <swe:CompositePhenomenon dimension="2" gml:id="aggregatePhenomenon">
+            <gml:name>urn:ogc:def:phenomenon:BRGM:aggregate</gml:name>
+            <swe:component gml:id="depth">
+                <gml:name>urn:ogc:def:phenomenon:BRGM:depth</gml:name>
+                <gml:description>un phenomene</gml:description>
+            </swe:component>
+            <swe:component gml:id="temperature">
+                <gml:name>urn:ogc:def:phenomenon:BRGM:height</gml:name>
+                <gml:description>un phenomene</gml:description>
+            </swe:component>
+        </swe:CompositePhenomenon>
+    </om:observedProperty>
+    <om:featureOfInterest>
+        <sa:SamplingPoint>
+            <gml:description>Point d'eau BSSS</gml:description>
+            <gml:name>10972X0137-PLOUF</gml:name>
+            <gml:boundedBy>
+                <gml:Null>not_bounded</gml:Null>
+            </gml:boundedBy>
+            <sa:sampledFeature>urn:-sandre:object:bdrhf:123X</sa:sampledFeature>
+            <sa:position gml:id="STATION-LOCALISATION">
+                <gml:pos srsName="urn:ogc:crs:EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
+            </sa:position>
+        </sa:SamplingPoint>
+    </om:featureOfInterest>
+    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="swe:DataArrayPropertyType">
+        <swe:DataArray gml:id="dataArray-2">
+            <swe:elementCount>
+                <swe:Count>
+                    <swe:value>5</swe:value>
+                </swe:Count>
+            </swe:elementCount>
+             <swe:elementType name="dataArray-2">
+                <swe:SimpleDataRecord gml:id="datarecord">
+                    <swe:field name="Time">
+                        <swe:Time definition="urn:ogc:data:time:iso8601">
+                            <swe:uom/>
+                        </swe:Time>
+                    </swe:field>
+                    <swe:field name="depth">
+                        <swe:Quantity definition="urn:x-ogc:def:phenonmenon:BRGM:depth">
+                            <swe:uom code="m"/>
+                        </swe:Quantity>
+                    </swe:field>
+                </swe:SimpleDataRecord>
+            </swe:elementType>
+            <swe:encoding>
+                <swe:TextBlock blockSeparator="@@" decimalSeparator="." tokenSeparator="," id="textblock"/>
+            </swe:encoding>
+            <swe:values>2007-05-01T12:59:00,6.560@@2007-05-01T13:59:00,6.560@@2007-05-01T14:59:00,6.560@@2007-05-01T15:59:00,6.560@@2007-05-01T16:59:00,6.560@@</swe:values>
+        </swe:DataArray>
+    </om:result>
+</om:Observation>
+
