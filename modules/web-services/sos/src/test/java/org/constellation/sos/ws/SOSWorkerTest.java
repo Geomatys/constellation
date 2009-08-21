@@ -1504,7 +1504,7 @@ public class SOSWorkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
+    @Ignore
     public void destroyTest() throws Exception {
         worker.destroy();
         GetCapabilities request = new GetCapabilities();
