@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sos:Capabilities xmlns:sos="http://www.opengis.net/sos/1.0" xmlns:ogc="http://www.opengis.net/ogc" xmlns:ns3="http://catalog.seagis.net" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sa="http://www.opengis.net/sa/1.0" xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0.0">
+	<ows:ServiceIdentification>
+		<ows:Title xml:lang="fr">BRGM SOS</ows:Title>
+		<ows:Abstract xml:lang="fr">BRGM SOS Server</ows:Abstract>
+		<ows:Keywords>
+			<ows:Keyword>SOS</ows:Keyword>
+			<ows:Keyword>Geomatys</ows:Keyword>
+			<ows:Keyword>BRGM</ows:Keyword>
+		</ows:Keywords>
+		<ows:ServiceType codeSpace="http://www.opengeospatial.net">OGC:SOS</ows:ServiceType>
+		<ows:ServiceTypeVersion>1.0.0</ows:ServiceTypeVersion>
+		<ows:Fees>NONE</ows:Fees>
+		<ows:AccessConstraints>NONE</ows:AccessConstraints>
+	</ows:ServiceIdentification>
+	<ows:ServiceProvider>
+		<ows:ProviderName>BRGM</ows:ProviderName>
+		<ows:ProviderSite xlink:href="http://www.brgm.fr/"/>
+		<ows:ServiceContact>
+			<ows:IndividualName>????</ows:IndividualName>
+			<ows:PositionName>????</ows:PositionName>
+			<ows:ContactInfo>
+				<ows:Phone>
+					<ows:Voice>??-??-??-??-??</ows:Voice>
+					<ows:Facsimile>??-??-??-??-??</ows:Facsimile>
+				</ows:Phone>
+				<ows:Address>
+					<ows:DeliveryPoint>BRGM</ows:DeliveryPoint>
+					<ows:City>Orleans</ows:City>
+					<ows:PostalCode>????</ows:PostalCode>
+					<ows:Country>FRANCE</ows:Country>
+				</ows:Address>
+			</ows:ContactInfo>
+		</ows:ServiceContact>
+	</ows:ServiceProvider>
+	<ows:OperationsMetadata>
+		<ows:Operation name="GetCapabilities">
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Get xlink:href=""/>
+					<ows:Post xlink:href=""/>
+				</ows:HTTP>
+			</ows:DCP>
+			<ows:Parameter name="service">
+				<ows:AllowedValues>
+					<ows:Value>SOS</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="Acceptversions">
+				<ows:AllowedValues>
+					<ows:Value>1.0.0</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="Sections">
+				<ows:AllowedValues>
+					<ows:Value>ServiceIdentification</ows:Value>
+					<ows:Value>ServiceProvider</ows:Value>
+					<ows:Value>OperationsMetadata</ows:Value>
+					<ows:Value>Contents</ows:Value>
+					<ows:Value>Filter_Capabilities</ows:Value>
+					<ows:Value>All</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="AcceptFormats">
+				<ows:AllowedValues>
+					<ows:Value>text/xml</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+		</ows:Operation>
+		<ows:Operation name="RegisterSensor">
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Post xlink:href=""/>
+				</ows:HTTP>
+			</ows:DCP>
+			<ows:Parameter name="version">
+				<ows:AllowedValues>
+					<ows:Value>1.0.0</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="service">
+				<ows:AllowedValues>
+					<ows:Value>SOS</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+		</ows:Operation>
+		<ows:Operation name="GetResult">
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Post xlink:href=""/>
+				</ows:HTTP>
+			</ows:DCP>
+			<ows:Parameter name="version">
+				<ows:AllowedValues>
+					<ows:Value>1.0.0</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="service">
+				<ows:AllowedValues>
+					<ows:Value>SOS</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+		</ows:Operation>
+		<ows:Operation name="GetObservation">
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Post xlink:href=""/>
+				</ows:HTTP>
+			</ows:DCP>
+			<ows:Parameter name="version">
+				<ows:AllowedValues>
+					<ows:Value>1.0.0</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="service">
+				<ows:AllowedValues>
+					<ows:Value>SOS</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="srsName">
+				<ows:AnyValue/>
+			</ows:Parameter>
+			<ows:Parameter name="offering">
+				<ows:AllowedValues>
+					<ows:Value>offering-AllSensor</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="eventTime">
+				<ows:AllowedValues>
+					<ows:Range>
+						<ows:MinimumValue>now</ows:MinimumValue>
+						<ows:MaximumValue>now</ows:MaximumValue>
+					</ows:Range>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="procedure">
+				<ows:AllowedValues>
+					<ows:Value>toUpdate</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="observedProperty">
+				<ows:AllowedValues>
+					<ows:Value>toUpdate</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="featureOfInterest">
+				<ows:AllowedValues>
+					<ows:Value>toUpdate</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="result">
+				<ows:AnyValue/>
+			</ows:Parameter>
+			<ows:Parameter name="responseFormat">
+				<ows:AllowedValues>
+					<ows:Value>text/xml; subtype="om/1.0.0"</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="resultModel">
+				<ows:AnyValue/>
+			</ows:Parameter>
+			<ows:Parameter name="responseMode">
+				<ows:AllowedValues>
+					<ows:Value>resultTemplate</ows:Value>
+					<ows:Value>inline</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+		</ows:Operation>
+		<ows:Operation name="InsertObservation">
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Post xlink:href=""/>
+				</ows:HTTP>
+			</ows:DCP>
+			<ows:Parameter name="version">
+				<ows:AllowedValues>
+					<ows:Value>1.0.0</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="service">
+				<ows:AllowedValues>
+					<ows:Value>SOS</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+		</ows:Operation>
+		<ows:Operation name="DescribeSensor">
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Post xlink:href=""/>
+				</ows:HTTP>
+			</ows:DCP>
+			<ows:Parameter name="version">
+				<ows:AllowedValues>
+					<ows:Value>1.0.0</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="service">
+				<ows:AllowedValues>
+					<ows:Value>SOS</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="outputFormat">
+				<ows:AllowedValues>
+					<ows:Value>text/xml;subtype="sensorML/1.0.0"</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="procedure">
+				<ows:AllowedValues>
+					<ows:Value>toUpdate</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+		</ows:Operation>
+		<ows:Constraint name="PostEncoding">
+			<ows:AllowedValues>
+				<ows:Value>XML</ows:Value>
+			</ows:AllowedValues>
+		</ows:Constraint>
+	</ows:OperationsMetadata>
+	<sos:Filter_Capabilities xmlns:ogc="http://www.opengis.net/ogc" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:om="http://www.opengis.net/om/1.0" xmlns:swe="http://www.opengis.net/swe/1.0">
+		<ogc:Spatial_Capabilities>
+			<ogc:GeometryOperands>
+				<ogc:GeometryOperand>gml:Envelope</ogc:GeometryOperand>
+			</ogc:GeometryOperands>
+			<ogc:SpatialOperators>
+				<ogc:SpatialOperator name="BBOX"/>
+			</ogc:SpatialOperators>
+		</ogc:Spatial_Capabilities>
+		<ogc:Temporal_Capabilities>
+			<ogc:TemporalOperands>
+				<ogc:TemporalOperand>gml:TimeInstant</ogc:TemporalOperand>
+				<ogc:TemporalOperand>gml:TimePeriod</ogc:TemporalOperand>
+			</ogc:TemporalOperands>
+			<ogc:TemporalOperators>
+				<ogc:TemporalOperator name="TM_During"/>
+				<ogc:TemporalOperator name="TM_Equals"/>
+				<ogc:TemporalOperator name="TM_After"/>
+				<ogc:TemporalOperator name="TM_Before"/>
+			</ogc:TemporalOperators>
+		</ogc:Temporal_Capabilities>
+		<ogc:Scalar_Capabilities>
+			<ogc:ComparisonOperators>
+				<ogc:ComparisonOperator>Between</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>EqualTo</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>NotEqualTo</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>LessThan</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>LessThanEqualTo</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>GreaterThan</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>GreaterThanEqualTo</ogc:ComparisonOperator>
+				<ogc:ComparisonOperator>Like</ogc:ComparisonOperator>
+			</ogc:ComparisonOperators>
+		</ogc:Scalar_Capabilities>
+		<ogc:Id_Capabilities>
+			<ogc:FID/>
+			<ogc:EID/>
+		</ogc:Id_Capabilities>
+	</sos:Filter_Capabilities>
+</sos:Capabilities>

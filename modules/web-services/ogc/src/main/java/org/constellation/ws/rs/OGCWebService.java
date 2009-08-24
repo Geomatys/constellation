@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -302,7 +303,15 @@ public abstract class OGCWebService extends WebService {
            Unmarshaller unmarshaller = null;
            try {
                unmarshaller = marshallerPool.acquireUnmarshaller();
-               response = unmarshaller.unmarshal(f);
+               if (f == null || !f.exists()) {
+                   final InputStream in = getClass().getResourceAsStream(fileName);
+                   response = unmarshaller.unmarshal(in);
+                   in.close();
+               } else {
+                   response = unmarshaller.unmarshal(f);
+               }
+           } catch (IOException ex) {
+               LOGGER.info("Unable to close the skeleton capabilities input stream.");
            } finally {
                if (unmarshaller != null) {
                    marshallerPool.release(unmarshaller);
