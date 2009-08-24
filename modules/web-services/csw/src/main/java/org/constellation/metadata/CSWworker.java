@@ -377,7 +377,8 @@ public class CSWworker {
      * we search the CATALINA_HOME/webapps/sdn-csw_WS/WEB-INF/csw_configuration
      */
     private File getConfigDirectory() {
-        final File configDir = new File(WebService.getConfigDirectory(), "csw_configuration/");
+        final String configUrl = "csw_configuration";
+        final File configDir = new File(WebService.getConfigDirectory(), configUrl);
         if (configDir.exists()) {
             LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
             return configDir;
@@ -386,7 +387,7 @@ public class CSWworker {
             /* Ifremer's server does not contain any .sicade directory, so the
              * configuration files are put under the WEB-INF/classes/configuration directory of the WAR file.
              */
-            return Util.getDirectoryFromResource("configuration");
+            return Util.getDirectoryFromResource(configUrl);
         }
     }
 
