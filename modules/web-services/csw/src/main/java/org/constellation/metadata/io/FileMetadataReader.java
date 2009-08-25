@@ -107,7 +107,12 @@ public class FileMetadataReader extends MetadataReader {
      */
     public FileMetadataReader(Automatic configuration) throws CstlServiceException {
         super(true, false);
-        dataDirectory = configuration.getDataDirectory();
+        File dataDir = configuration.getDataDirectory();
+        if (dataDir == null || !dataDir.exists()) {
+            final File configDir = configuration.getConfigurationDirectory();
+            dataDir = new File(configDir, dataDir.getName());
+        }
+        dataDirectory = dataDir;
         if (dataDirectory == null || !dataDirectory.exists() || !dataDirectory.isDirectory()) {
             throw new CstlServiceException("cause: The unable to find the data directory", NO_APPLICABLE_CODE);
         }
