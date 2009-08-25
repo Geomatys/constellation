@@ -766,7 +766,9 @@ public class CSWworker {
                         for (QName name : mdReader.getAdditionalQueryableQName()) {
                             values.add(name.getPrefix() + ':' + name.getLocalPart());
                         }
-                        additionalQueryable.setValue(values);
+                        if (values.size() > 0) {
+                            additionalQueryable.setValue(values);
+                        }
                     }
                 }
                 
