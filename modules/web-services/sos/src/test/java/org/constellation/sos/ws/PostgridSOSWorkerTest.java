@@ -153,6 +153,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
     @After
     public void tearDown() throws Exception {
+        worker.destroy();
     }
 
 

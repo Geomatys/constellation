@@ -208,6 +208,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
     @After
     public void tearDown() throws Exception {
+        worker.destroy();
     }
 
     /**
