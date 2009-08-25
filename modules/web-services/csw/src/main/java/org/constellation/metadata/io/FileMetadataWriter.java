@@ -15,8 +15,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
-
 package org.constellation.metadata.io;
 
 import java.io.File;
@@ -79,7 +77,12 @@ public class FileMetadataWriter extends MetadataWriter {
      */
     public FileMetadataWriter(Automatic configuration, AbstractIndexer index) throws CstlServiceException {
         super(index);
-        dataDirectory   = configuration.getDataDirectory();
+        File dataDir = configuration.getDataDirectory();
+        if (dataDir == null || !dataDir.exists()) {
+            final File configDir = configuration.getConfigurationDirectory();
+            dataDir = new File(configDir, dataDir.getName());
+        }
+        dataDirectory = dataDir;
         if (dataDirectory == null || !dataDirectory.exists()) {
             throw new CstlServiceException("Unable to find the data directory", NO_APPLICABLE_CODE);
         }
@@ -87,7 +90,7 @@ public class FileMetadataWriter extends MetadataWriter {
         try {
             marshallerPool = new MarshallerPool(CSWClassesContext.getAllClasses());
         } catch (JAXBException ex) {
-            throw new CstlServiceException("JAXB excepiton while creating unmarshaller", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("JAXB exception while creating unmarshaller", NO_APPLICABLE_CODE);
         }
         
     }

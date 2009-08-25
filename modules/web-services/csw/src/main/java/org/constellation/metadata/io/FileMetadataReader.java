@@ -114,12 +114,12 @@ public class FileMetadataReader extends MetadataReader {
         }
         dataDirectory = dataDir;
         if (dataDirectory == null || !dataDirectory.exists() || !dataDirectory.isDirectory()) {
-            throw new CstlServiceException("cause: The unable to find the data directory", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("cause: unable to find the data directory", NO_APPLICABLE_CODE);
         }
         try {
             marshallerPool = new MarshallerPool(CSWClassesContext.getAllClasses());
         } catch (JAXBException ex) {
-            throw new CstlServiceException("cause: JAXB excepiton while creating unmarshaller", ex, NO_APPLICABLE_CODE);
+            throw new CstlServiceException("cause: JAXB exception while creating unmarshaller", ex, NO_APPLICABLE_CODE);
         }
     }
     

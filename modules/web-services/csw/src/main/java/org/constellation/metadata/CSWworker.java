@@ -1746,7 +1746,7 @@ public class CSWworker {
      */
     public String getOutputFormat() {
         if (outputFormat == null) {
-            return MimeType.APP_XML;
+            return MimeType.APPLICATION_XML;
         }
         return outputFormat;
     }

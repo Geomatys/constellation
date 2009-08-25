@@ -53,6 +53,7 @@ import org.constellation.util.Util;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.csw.xml.v202.ElementSetType;
+import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -267,8 +268,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         try {
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            LOGGER.finer("Metadata: " + ((DefaultMetaData)meta).getFileIdentifier() + " indexed");
-
+            if (meta instanceof DefaultMetaData) {
+                LOGGER.finer("Metadata: " + ((DefaultMetaData)meta).getFileIdentifier() + " indexed");
+            } else if (meta instanceof RecordType) {
+                LOGGER.finer("Metadata: " + ((RecordType)meta).getIdentifier() + " indexed");
+            } else {
+                LOGGER.finer("Unexpected metadata type");
+            }
         } catch (SQLException ex) {
             LOGGER.severe("SQLException " + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -293,7 +299,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            LOGGER.finer("Metadata: " + ((DefaultMetaData)meta).getFileIdentifier() + " indexed");
+            if (meta instanceof DefaultMetaData) {
+                LOGGER.finer("Metadata: " + ((DefaultMetaData)meta).getFileIdentifier() + " indexed");
+            } else if (meta instanceof RecordType) {
+                LOGGER.finer("Metadata: " + ((RecordType)meta).getIdentifier() + " indexed");
+            } else {
+                LOGGER.finer("Unexpected metadata type");
+            }
 
             writer.optimize();
             writer.close();
@@ -322,7 +334,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         final Document doc = new Document();
         CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
 
-        doc.add(new Field("id", ((DefaultMetaData)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.NOT_ANALYZED));
+        if (metadata instanceof DefaultMetaData) {
+            doc.add(new Field("id", ((DefaultMetaData)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.NOT_ANALYZED));
+        } else if (metadata instanceof RecordType) {
+            doc.add(new Field("id", ((RecordType)metadata).getIdentifier().getContent().get(0),  Field.Store.YES, Field.Index.NOT_ANALYZED));
+        } else {
+            throw new IllegalArgumentException("unexpected metadata type");
+        }
         //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.ANALYZED));
 
         final StringBuilder anyText = new StringBuilder();
@@ -398,14 +416,28 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
                 }
             } else {
-                LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                if (metadata instanceof DefaultMetaData) {
+                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
                         "cause: missing coordinates.: " + coord);
+                } else if (metadata instanceof RecordType) {
+                    LOGGER.severe("unable to spatially index form: " + ((RecordType)metadata).getIdentifier() + '\n' +
+                        "cause: missing coordinates.: " + coord);
+                } else {
+                    LOGGER.finer("Unexpected metadata type");
+                }
             }
 
         } catch (NumberFormatException e) {
             if (!coord.equals(NULL_VALUE)) {
-                LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
-                        "cause:  unable to parse double: " + coord);
+                if (metadata instanceof DefaultMetaData) {
+                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                        "cause: unable to parse double: " + coord);
+                } else if (metadata instanceof RecordType) {
+                    LOGGER.severe("unable to spatially index form: " + ((RecordType)metadata).getIdentifier() + '\n' +
+                        "cause: unable to parse double: " + coord);
+                } else {
+                    LOGGER.finer("Unexpected metadata type");
+                }
             }
         }
             
@@ -482,14 +514,29 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
                 }
             } else {
-                LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                if (metadata instanceof DefaultMetaData) {
+                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
                         "cause: missing coordinates.: " + coord);
+                } else if (metadata instanceof RecordType) {
+                    LOGGER.severe("unable to spatially index form: " + ((RecordType)metadata).getIdentifier() + '\n' +
+                        "cause: missing coordinates.: " + coord);
+                } else {
+                    LOGGER.finer("Unexpected metadata type");
+                }
             }
             
         } catch (NumberFormatException e) {
-            if (!coord.equals(NULL_VALUE))
-                LOGGER.severe("unable to spatially index metadata: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
-                              "cause:  unable to parse double: " + coord);
+            if (!coord.equals(NULL_VALUE)) {
+                if (metadata instanceof DefaultMetaData) {
+                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                        "cause: unable to parse double: " + coord);
+                } else if (metadata instanceof RecordType) {
+                    LOGGER.severe("unable to spatially index form: " + ((RecordType)metadata).getIdentifier() + '\n' +
+                        "cause: unable to parse double: " + coord);
+                } else {
+                    LOGGER.finer("Unexpected metadata type");
+                }
+            }
         }
 
         // we add to the index the special queryable element of the metadata reader
