@@ -142,17 +142,40 @@ public class CstlEmbeddedService extends CommandLine {
     /**
      * Constructor which passes the arguments for processing to the
      * CommandLine parent and sets the URI.
+     * By default, only start the WMS and WCS services.
      * <p>
      * Extending classes using the REST facade should
      */
     protected CstlEmbeddedService(String[] args) {
+        this(args, new String[] {
+            "org.constellation.map.ws.rs",
+            "org.constellation.coverage.ws.rs",
+            "org.constellation.ws.rs.provider"
+        });
+    }
+
+    /**
+     * Constructor which passes the arguments for processing to the
+     * CommandLine parent and sets the URI.
+     * <p>
+     * Extending classes using the REST facade should
+     *
+     * @param args The command line arguments.
+     * @param providerPackages The packages for providers to start.
+     */
+    protected CstlEmbeddedService(String[] args, String[] providerPackages) {
 
         super(null, args);
-
-        grizzlyWebContainerProperties.put("com.sun.jersey.config.property.packages",
-                "org.constellation.map.ws.rs;" +
-                "org.constellation.coverage.ws.rs;" +
-                "org.constellation.ws.rs.provider");
+        final StringBuilder sb = new StringBuilder();
+        final int length = providerPackages.length;
+        for (int i=0; i<length; i++) {
+            final String pack = providerPackages[i];
+            sb.append(pack);
+            if (i != length - 1) {
+                sb.append(';');
+            }
+        }
+        grizzlyWebContainerProperties.put("com.sun.jersey.config.property.packages", sb.toString());
 
         final String base = "http://" + host + "/";
         uri = UriBuilder.fromUri(base).port(port).build();

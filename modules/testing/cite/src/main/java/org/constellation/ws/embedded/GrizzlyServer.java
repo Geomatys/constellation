@@ -165,7 +165,13 @@ public final class GrizzlyServer {
          */
         @Override
         public void run() {
-            final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{});
+            final CstlEmbeddedService cstlServer = new CstlEmbeddedService(new String[]{}, new String[] {
+                "org.constellation.map.ws.rs",
+                "org.constellation.coverage.ws.rs",
+              //  "org.constellation.sos.ws.rs",
+                "org.constellation.metadata.ws.rs",
+                "org.constellation.ws.rs.provider"
+            });
             cstlServer.duration = 20*60*1000;
             cstlServer.runREST();
         }

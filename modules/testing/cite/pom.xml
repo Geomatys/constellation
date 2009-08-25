@@ -78,7 +78,22 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-wcs</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-wms</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!--dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-sos</artifactId>
+      <version>${project.version}</version>
+    </dependency-->
+    <dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-csw</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -151,6 +166,7 @@
         <configuration>
           <mainClass>org.constellation.ws.embedded.LaunchTests</mainClass>
           <arguments>
+            <!--argument>csw-2.0.2</argument-->
             <argument>wms-1.1.1</argument>
             <argument>wcs-1.0.0</argument>
           </arguments>
@@ -203,6 +219,22 @@
                   <then>
                     <copy todir="${basedir}/engine/scripts/wcs-1.0.0">
                       <fileset dir="${basedir}/tests/wcs-1.0.0" includes="**/*" excludes="**/.svn"/>
+                    </copy>
+                  </then>
+                </if>
+                <if>
+                  <available file="${basedir}/tests/sos-1.0.0"/>
+                  <then>
+                    <copy todir="${basedir}/engine/scripts/sos-1.0.0">
+                      <fileset dir="${basedir}/tests/sos-1.0.0" includes="**/*" excludes="**/.svn"/>
+                    </copy>
+                  </then>
+                </if>
+                <if>
+                  <available file="${basedir}/tests/csw-2.0.2"/>
+                  <then>
+                    <copy todir="${basedir}/engine/scripts/csw-2.0.2">
+                      <fileset dir="${basedir}/tests/csw-2.0.2" includes="**/*" excludes="**/.svn"/>
                     </copy>
                   </then>
                 </if>
