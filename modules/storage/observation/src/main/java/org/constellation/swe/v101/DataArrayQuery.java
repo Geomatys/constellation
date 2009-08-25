@@ -48,7 +48,7 @@ public class DataArrayQuery extends Query{
      * @param database The database for which this query is created.
      */
     public DataArrayQuery(final Database database) {
-        super(database, "data_array_definition");
+        super(database, "data_array_definition", "observation");
         final QueryType[] si   = {SELECT, INSERT};
         final QueryType[] sief = {SELECT, INSERT, EXISTS, FILTERED_LIST};
         idArray        = addColumn ("id_array_definition", sief);

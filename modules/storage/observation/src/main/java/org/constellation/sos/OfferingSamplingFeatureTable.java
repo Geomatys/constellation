@@ -108,7 +108,7 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
         return idOffering;
     }
 
-    public void setIdOffering(String idOffering) {
+    public synchronized void setIdOffering(String idOffering) {
         if (!Utilities.equals(this.idOffering, idOffering)) {
             this.idOffering = idOffering;
             fireStateChanged("idOffering");

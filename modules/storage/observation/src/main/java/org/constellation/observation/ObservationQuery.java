@@ -51,7 +51,7 @@ public class ObservationQuery extends Query {
      * @param database The database for which this query is created.
      */
     public ObservationQuery(final Database database) {
-        super(database, "observations");
+        super(database, "observations", "observation");
         final QueryType[] si  = {SELECT, INSERT};
         final QueryType[] sie = {SELECT, INSERT, EXISTS};
         

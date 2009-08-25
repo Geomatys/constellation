@@ -48,7 +48,7 @@ public class SurveyProcedureQuery extends Query {
      * @param database The database for which this query is created.
      */
     public SurveyProcedureQuery(final Database database) {
-        super(database, "SurveyProcedure");
+        super(database, "SurveyProcedure", "observation");
         final QueryType[] usage = {SELECT, LIST};
         name              = addColumn   ("name",              usage);
         operator          = addColumn   ("operator",          usage);

@@ -52,7 +52,7 @@ public class SamplingPointQuery extends Query {
     * @param database The database for which this query is created.
     */
     public SamplingPointQuery(final Database database) {
-        super(database, "sampling_points");
+        super(database, "sampling_points", "observation");
         //final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         final QueryType[] sli   = {SELECT, LIST, INSERT};
         final QueryType[] slif  = {SELECT, LIST, INSERT, FILTERED_LIST};

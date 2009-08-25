@@ -531,11 +531,6 @@
       <name>GeoToolkit repository</name>
       <url>http://maven.geotoolkit.org/</url>
     </repository>
-    <repository>
-      <id>apache</id>
-      <name>Other projects</name>
-      <url>http://people.apache.org/maven-snapshot-repository</url>
-    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>

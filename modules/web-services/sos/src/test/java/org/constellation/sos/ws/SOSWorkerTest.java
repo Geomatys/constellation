@@ -17,34 +17,24 @@
 
 package org.constellation.sos.ws;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
 import javax.xml.namespace.QName;
-import org.constellation.configuration.DataSourceType;
-import org.constellation.configuration.ObservationFilterType;
-import org.constellation.configuration.ObservationReaderType;
-import org.constellation.configuration.ObservationWriterType;
-import org.constellation.configuration.SOSConfiguration;
-import org.constellation.generic.database.Automatic;
+
+import org.constellation.util.Util;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
+
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
-import org.constellation.util.Util;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
 import org.geotoolkit.gml.xml.v311.TimeIndeterminateValueType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
@@ -58,184 +48,38 @@ import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.GetResultResponse;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
 import org.geotoolkit.swe.xml.v101.DataArrayEntry;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
+import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
+import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
-// JUnit dependencies
-import org.junit.*;
 import org.opengis.observation.Observation;
+
+// JUnit dependencies
+import org.junit.Ignore;
 import static org.junit.Assert.*;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
+@Ignore
 public class SOSWorkerTest {
 
-    private SOSworker worker;
+    protected SOSworker worker;
 
-    private MarshallerPool marshallerPool;
+    protected MarshallerPool marshallerPool;
 
-    private static final String URL = "http://pulsar.geomatys.fr/SOServer/SOService";
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        deleteTemporaryFile();
-
-        MarshallerPool pool   = new MarshallerPool(org.constellation.configuration.ObjectFactory.class);
-        Marshaller marshaller =  pool.acquireMarshaller();
-        
-        
-        File configDir = new File("SOSWorkerTest");
-        if (!configDir.exists()) {
-            configDir.mkdir();
-
-            //we write the data files
-            File offeringDirectory = new File(configDir, "offerings");
-            offeringDirectory.mkdir();
-            writeDataFile(offeringDirectory, "offering-1.xml", "offering-allSensor");
-
-            File phenomenonDirectory = new File(configDir, "phenomenons");
-            phenomenonDirectory.mkdir();
-            writeDataFile(phenomenonDirectory, "phenomenon-depth.xml", "depth");
-            writeDataFile(phenomenonDirectory, "phenomenon-temp.xml",  "temperature");
-            writeDataFile(phenomenonDirectory, "phenomenon-depth-temp.xml",  "aggregatePhenomenon");
-
-            File sensorDirectory = new File(configDir, "sensors");
-            sensorDirectory.mkdir();
-            writeDataFile(sensorDirectory, "system.xml",    "urn:ogc:object:sensor:GEOM:1");
-            writeDataFile(sensorDirectory, "component.xml", "urn:ogc:object:sensor:GEOM:2");
-
-            File featureDirectory = new File(configDir, "features");
-            featureDirectory.mkdir();
-            writeDataFile(featureDirectory, "feature1.xml", "10972X0137-PONT");
-            writeDataFile(featureDirectory, "feature2.xml", "10972X0137-PLOUF");
-
-            File observationsDirectory = new File(configDir, "observations");
-            observationsDirectory.mkdir();
-            writeDataFile(observationsDirectory, "observation1.xml", "urn:ogc:object:observation:GEOM:304");
-            writeDataFile(observationsDirectory, "observation2.xml", "urn:ogc:object:observation:GEOM:305");
-            writeDataFile(observationsDirectory, "observation3.xml", "urn:ogc:object:observation:GEOM:406");
-            writeDataFile(observationsDirectory, "observation4.xml", "urn:ogc:object:observation:GEOM:307");
-            writeDataFile(observationsDirectory, "observation5.xml", "urn:ogc:object:observation:GEOM:507");
-
-            File observationTemplatesDirectory = new File(configDir, "observationTemplates");
-            observationTemplatesDirectory.mkdir();
-            writeDataFile(observationTemplatesDirectory, "observationTemplate-3.xml", "urn:ogc:object:observation:template:GEOM:3");
-            writeDataFile(observationTemplatesDirectory, "observationTemplate-4.xml", "urn:ogc:object:observation:template:GEOM:4");
-            writeDataFile(observationTemplatesDirectory, "observationTemplate-5.xml", "urn:ogc:object:observation:template:GEOM:5");
-
-            //we write the configuration file
-            File configFile = new File(configDir, "config.xml");
-            Automatic SMLConfiguration = new Automatic();
-            SMLConfiguration.setDataDirectory("SOSWorkerTest/sensors");
-            Automatic OMConfiguration  = new Automatic();
-            OMConfiguration.setDataDirectory("SOSWorkerTest");
-            SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
-            configuration.setObservationReaderType(ObservationReaderType.FILESYSTEM);
-            configuration.setObservationWriterType(ObservationWriterType.FILESYSTEM);
-            configuration.setSMLType(DataSourceType.FILE_SYSTEM);
-            configuration.setObservationFilterType(ObservationFilterType.LUCENE);
-            configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
-            configuration.setProfile("transactional");
-            configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
-            marshaller.marshal(configuration, configFile);
-
-        }
-        pool.release(marshaller);
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-        deleteTemporaryFile();
-    }
-
-    public static void deleteTemporaryFile() {
-        File configDirectory = new File("SOSWorkerTest");
-        if (configDirectory.exists()) {
-            File dataDirectory = new File(configDirectory, "sensors");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            File indexDirectory = new File(configDirectory, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-            dataDirectory = new File(configDirectory, "offerings");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            dataDirectory = new File(configDirectory, "observations");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            dataDirectory = new File(configDirectory, "observationTemplates");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            dataDirectory = new File(configDirectory, "features");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            dataDirectory = new File(configDirectory, "phenomenons");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            File conf = new File(configDirectory, "config.xml");
-            conf.delete();
-            File map = new File(configDirectory, "mapping.properties");
-            map.delete();
-            configDirectory.delete();
-        }
-    }
-
-    @Before
-    public void setUp() throws Exception {
-
-        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100:org.geotoolkit.sml.xml.v100:org.geotoolkit.sampling.xml.v100:org.geotoolkit.swe.xml.v101");
-        
-        File configDir = new File("SOSWorkerTest");
-        worker = new SOSworker(configDir);
-        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-        Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
-        worker.setSkeletonCapabilities(stcapa);
-        worker.setServiceURL(URL);
-        marshallerPool.release(unmarshaller);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
+    protected static final String URL = "http://pulsar.geomatys.fr/SOServer/SOService";
 
     /**
      * Tests the getcapabilities method
      *
      * @throws java.lang.Exception
      */
-    @Test
     public void getCapabilitiesTest() throws Exception {
 
         /*
@@ -411,7 +255,6 @@ public class SOSWorkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
     public void DescribeSensorTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
@@ -485,7 +328,6 @@ public class SOSWorkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
     public void GetObservationTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
@@ -563,10 +405,39 @@ public class SOSWorkerTest {
         ObservationEntry obsResult = (ObservationEntry) result.getMember().iterator().next();
 
 
+        assertTrue(obsResult != null);
         assertEquals(expResult.getName(), obsResult.getName());
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
         assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        assertTrue(expResult.getResult() instanceof DataArrayPropertyType);
+
+        DataArrayPropertyType expR = (DataArrayPropertyType) expResult.getResult();
+        DataArrayPropertyType obsR = (DataArrayPropertyType) obsResult.getResult();
+
+        assertTrue(obsR.getDataArray().getElementType() instanceof SimpleDataRecordEntry);
+        SimpleDataRecordEntry expSdr = (SimpleDataRecordEntry) expR.getDataArray().getElementType();
+        SimpleDataRecordEntry obsSdr = (SimpleDataRecordEntry) obsR.getDataArray().getElementType();
+        obsSdr.setBlockId(null);
+
+        Iterator<AnyScalarPropertyType> i1 = expSdr.getField().iterator();
+        Iterator<AnyScalarPropertyType> i2 = obsSdr.getField().iterator();
+        TimeType expT = (TimeType) i1.next().getComponent();
+        TimeType obsT = (TimeType) i2.next().getComponent();
+
+        assertEquals(expT.getUom(), obsT.getUom());
+        assertEquals(expT, obsT);
+        assertEquals(i1.next(), i2.next());
+        //assertEquals(expSdr.getField(), obsSdr.getField());
+        assertEquals(expSdr, obsSdr);
+        assertEquals(expR.getDataArray().getElementType(), obsR.getDataArray().getElementType());
+        assertEquals(expR.getDataArray().getEncoding(),    obsR.getDataArray().getEncoding());
+        assertEquals(expR.getDataArray().getValues(),    obsR.getDataArray().getValues());
+        assertEquals(expR.getDataArray().getId(),    obsR.getDataArray().getId());
+        assertEquals(expR.getDataArray().getElementCount(),    obsR.getDataArray().getElementCount());
+        assertEquals(expR.getDataArray(),                  obsR.getDataArray());
+
         assertEquals(expResult.getResult(), obsResult.getResult());
         assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(expResult, obsResult);
@@ -595,6 +466,7 @@ public class SOSWorkerTest {
 
         obsResult = (ObservationEntry) result.getMember().iterator().next();
 
+        assertTrue(obsResult != null);
         assertEquals(expResult.getName(), obsResult.getName());
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
@@ -629,6 +501,7 @@ public class SOSWorkerTest {
         obsResult = (ObservationEntry) result.getMember().iterator().next();
 
 
+        assertTrue(obsResult != null);
         assertEquals(expResult.getName(), obsResult.getName());
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
@@ -1016,7 +889,7 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
 
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-4.xml"));
 
         expResult = (ObservationEntry)obj.getValue();
 
@@ -1036,7 +909,7 @@ public class SOSWorkerTest {
 
         obsResult = (ObservationEntry) result.getMember().iterator().next();
 
-
+        assertTrue(obsResult != null);
         assertEquals(expResult.getName(), obsResult.getName());
         assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
@@ -1068,7 +941,7 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
 
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-4.xml"));
 
         expResult = (ObservationEntry)obj.getValue();
 
@@ -1119,7 +992,7 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
 
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-4.xml"));
 
         expResult = (ObservationEntry)obj.getValue();
 
@@ -1171,7 +1044,7 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
 
-        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-4.xml"));
 
         expResult = (ObservationEntry)obj.getValue();
 
@@ -1304,7 +1177,7 @@ public class SOSWorkerTest {
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:5"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"),
-                                      new GetObservation.FeatureOfInterest(Arrays.asList("10972X0137-PLOUF")),
+                                      new GetObservation.FeatureOfInterest(Arrays.asList("station-002")),
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
                                       Parameters.OBSERVATION_QNAME,
@@ -1365,7 +1238,7 @@ public class SOSWorkerTest {
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
                                       Arrays.asList("urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon"),
-                                      new GetObservation.FeatureOfInterest(Arrays.asList("10972X0137-PLOUF")),
+                                      new GetObservation.FeatureOfInterest(Arrays.asList("station-002")),
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
                                       Parameters.OBSERVATION_QNAME,
@@ -1385,7 +1258,6 @@ public class SOSWorkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
     public void GetResultTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
         
@@ -1452,7 +1324,7 @@ public class SOSWorkerTest {
                                       null);
         ObservationCollectionEntry obsCollResult = (ObservationCollectionEntry) worker.getObservation(GOrequest);
 
-        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation1.xml"));
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
 
         ObservationEntry templateExpResult = (ObservationEntry)obj.getValue();
 
@@ -1472,6 +1344,11 @@ public class SOSWorkerTest {
 
         ObservationEntry obsResult = (ObservationEntry) obsCollResult.getMember().iterator().next();
 
+        DataArrayPropertyType obsR = (DataArrayPropertyType) obsResult.getResult();
+        SimpleDataRecordEntry obsSdr = (SimpleDataRecordEntry) obsR.getDataArray().getElementType();
+        obsSdr.setBlockId(null);
+
+        assertTrue(obsResult != null);
         assertEquals(templateExpResult.getName(), obsResult.getName());
         assertEquals(templateExpResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(templateExpResult.getObservedProperty(), obsResult.getObservedProperty());
@@ -1500,11 +1377,10 @@ public class SOSWorkerTest {
     }
 
     /**
-     * Tests the GetResult method
+     * Tests the destroy method
      *
      * @throws java.lang.Exception
      */
-    @Ignore
     public void destroyTest() throws Exception {
         worker.destroy();
         GetCapabilities request = new GetCapabilities();
@@ -1519,23 +1395,5 @@ public class SOSWorkerTest {
         }
 
         assertTrue(exLaunched);
-    }
-
-
-
-    public static void writeDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {
-
-        File dataFile = new File(dataDirectory, identifier + ".xml");
-        FileWriter fw = new FileWriter(dataFile);
-        InputStream in = Util.getResourceAsStream("org/constellation/sos/" + resourceName);
-
-        byte[] buffer = new byte[1024];
-        int size;
-
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            fw.write(new String(buffer, 0, size));
-        }
-        in.close();
-        fw.close();
     }
 }

@@ -29,7 +29,6 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
-import org.geotoolkit.swe.xml.AnyResult;
 import org.opengis.observation.Observation;
 import org.opengis.observation.Phenomenon;
 import org.opengis.observation.sampling.SamplingFeature;

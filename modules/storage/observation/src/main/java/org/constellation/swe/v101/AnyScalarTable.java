@@ -89,7 +89,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
      *
      * @param idDataBlock le nouvel identifiant du dataBlock.
      */
-    public void setIdDataBlock(final String idDataBlock) {
+    public synchronized void setIdDataBlock(final String idDataBlock) {
         if (!Utilities.equals(this.idDataBlock, idDataBlock)) {
             this.idDataBlock = idDataBlock;
             fireStateChanged("idDataBlock");
@@ -108,7 +108,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
      *
      * @param idDataRecoed le nouvel identifiant du dataRecord.
      */
-    public void setIdDataRecord(final String idDataRecord) {
+    public synchronized void setIdDataRecord(final String idDataRecord) {
         if (!Utilities.equals(this.idDataRecord, idDataRecord)) {
             this.idDataRecord = idDataRecord;
             fireStateChanged("idDataRecord");

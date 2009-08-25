@@ -48,7 +48,7 @@ public class MeasurementQuery extends Query{
      * @param database The database for which this query is created.
      */
     public MeasurementQuery(final Database database) {
-        super(database, "measurements");
+        super(database, "measurements", "observation");
         final QueryType[] si  = {SELECT, INSERT};
         final QueryType[] sie = {SELECT, INSERT, EXISTS};
         

@@ -71,6 +71,11 @@ public class Query {
     protected final Database database;
 
     /**
+     * The name of the schema containing table.
+     */
+    protected final String schema;
+
+    /**
      * The name of the main table.
      */
     protected final String table;
@@ -113,6 +118,21 @@ public class Query {
     public Query(final Database database, final String table) {
         this.database = database;
         this.table    = table;
+        this.schema   = null;
+        disableInheritance = false;
+    }
+
+    /**
+     * Creates an initially empty query with a schema.
+     *
+     * @param database The database for which this query is created, or {@code null}.
+     * @param schema   The schema containing the table.
+     * @param table    The main table name.
+     */
+    public Query(final Database database, final String table, final String schema) {
+        this.database = database;
+        this.table    = table;
+        this.schema   = schema;
         disableInheritance = false;
     }
 
@@ -127,6 +147,7 @@ public class Query {
     public Query(final Database database, final String table, final boolean includeChildTables) {
         this.database = database;
         this.table    = table;
+        this.schema   = null;
         disableInheritance = !includeChildTables;
     }
 
@@ -442,7 +463,13 @@ scan:       while (!tables.isEmpty()) {
         separator = disableInheritance ? " FROM ONLY " : " FROM ";
         for (final Map.Entry<String,CrossReference> entry : tables.entrySet()) {
             final String table = entry.getKey();
-            buffer.append(separator).append(quote).append(table).append(quote);
+            buffer.append(separator);
+            if (this.schema != null) {
+                buffer.append(quote).append(this.schema).append(quote).append('.');
+                buffer.append(quote).append(table).append(quote);
+            } else {
+                buffer.append(quote).append(table).append(quote);
+            }
             if (separator != JOIN) {
                 separator = JOIN;
                 assert entry.getValue() == null : entry;
@@ -676,6 +703,8 @@ scan:       while (!tables.isEmpty()) {
         }
         if (database.schema != null) {
             buffer.append(quote).append(database.schema).append(quote).append('.');
+        } else if (schema != null) {
+            buffer.append(quote).append(schema).append(quote).append('.');
         }
         buffer.append(quote).append(table).append(quote);
     }

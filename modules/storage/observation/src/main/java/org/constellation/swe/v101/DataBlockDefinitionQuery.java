@@ -48,7 +48,7 @@ public class DataBlockDefinitionQuery extends Query{
      * @param database The database for which this query is created.
      */
     public DataBlockDefinitionQuery(final Database database) {
-        super(database, "data_block_definitions");
+        super(database, "data_block_definitions", "observation");
         final QueryType[] si  = {SELECT, INSERT};
         final QueryType[] sie = {SELECT, INSERT, EXISTS};
         id       = addColumn ("id",       sie);

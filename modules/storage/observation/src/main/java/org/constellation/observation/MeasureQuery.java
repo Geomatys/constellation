@@ -48,7 +48,7 @@ public class MeasureQuery extends Query{
      * @param database The database for which this query is created.
      */
     public MeasureQuery(final Database database) {
-        super(database, "measures");
+        super(database, "measures", "observation");
         final QueryType[] sli  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         

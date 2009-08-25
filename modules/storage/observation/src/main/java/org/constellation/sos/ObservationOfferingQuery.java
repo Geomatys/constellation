@@ -46,7 +46,7 @@ public class ObservationOfferingQuery extends Query {
      * @param database The database for which this query is created.
      */
     public ObservationOfferingQuery(final Database database) {
-        super (database, "observation_offerings");
+        super (database, "observation_offerings", "sos");
         final QueryType[] sil  = {SELECT, INSERT, LIST};
         final QueryType[] siel = {SELECT,INSERT, EXISTS, LIST};
         id                   = addColumn("id",                     siel);

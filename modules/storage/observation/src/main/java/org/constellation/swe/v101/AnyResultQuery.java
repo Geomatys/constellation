@@ -48,7 +48,7 @@ public class AnyResultQuery extends Query {
      * @param database The database for which this query is created.
      */
     public AnyResultQuery(final Database database) {
-        super(database, "any_results");
+        super(database, "any_results", "observation");
         final QueryType[] ssi  = {SELECT, SELECT_BY_NUMBER, INSERT, FILTERED_LIST};
         //final QueryType[] SSIE = {SELECT, SELECT_BY_NUMBER, INSERT, EXISTS};
         final QueryType[] sse   = {SELECT,SELECT_BY_NUMBER,  EXISTS};

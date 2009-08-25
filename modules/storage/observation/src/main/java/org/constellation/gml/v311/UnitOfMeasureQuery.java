@@ -46,7 +46,7 @@ public class UnitOfMeasureQuery extends Query{
      * @param database The database for which this query is created.
      */
     public UnitOfMeasureQuery(final Database database) {
-        super(database, "unit_of_measures");
+        super(database, "unit_of_measures", "observation");
         final QueryType[] sli  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         

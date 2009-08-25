@@ -48,7 +48,7 @@ public class SimpleDataRecordQuery extends Query{
      * @param database The database for which this query is created.
      */
     public SimpleDataRecordQuery(final Database database) {
-        super(database, "simple_data_records");
+        super(database, "simple_data_records", "observation");
         final QueryType[] sli  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         idBlock       = addColumn("id_datablock",  slie);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sa:SamplingPoint xmlns:sa="http://www.opengis.net/sa/1.0" xmlns:gml="http://www.opengis.net/gml">
+<sa:SamplingPoint xmlns:sa="http://www.opengis.net/sa/1.0" xmlns:gml="http://www.opengis.net/gml" gml:id="station-001">
     <gml:description>Point d'eau BSSS</gml:description>
     <gml:name>10972X0137-PONT</gml:name>
     <gml:boundedBy>

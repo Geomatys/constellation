@@ -179,7 +179,7 @@ public class ConfigurationService extends WebService  {
                     return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, "Request");
+                                                  OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
                 }
             }
 
@@ -199,7 +199,7 @@ public class ConfigurationService extends WebService  {
                     return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, "Request");
+                                                  OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
                 }
             }
             
@@ -214,7 +214,7 @@ public class ConfigurationService extends WebService  {
                     return Response.ok(cswConfigurer.updateVocabularies(),MimeType.TEXT_XML).build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, "Request");
+                                                  OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
                 }
             }
             
@@ -223,13 +223,13 @@ public class ConfigurationService extends WebService  {
                     return Response.ok(cswConfigurer.updateContacts(),MimeType.TEXT_XML).build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
-                                                  OPERATION_NOT_SUPPORTED, "Request");
+                                                  OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
                 }
             }
             
             
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                                                 OPERATION_NOT_SUPPORTED, "Request");
+                                                 OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
             
         
         } catch (CstlServiceException ex) {
@@ -291,7 +291,7 @@ public class ConfigurationService extends WebService  {
         LOGGER.info("\n restart requested \n");
         if (cn != null) {
             cn.reload();
-            return new AcknowlegementType("success", "services succefully restarted");
+            return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
         } else {
             return new AcknowlegementType("failed", "The services can not be restarted (ContainerNotifier is null)");
         }
@@ -314,14 +314,14 @@ public class ConfigurationService extends WebService  {
         
         if ( service == null) {
             throw new CstlServiceException("You must specify the service parameter.",
-                                              MISSING_PARAMETER_VALUE, "service");
+                                              MISSING_PARAMETER_VALUE, Parameters.SERVICE);
         } else if (!SERVCE_DIRECTORY.keySet().contains(service)) {
-            StringBuilder msg = new StringBuilder("Invalid value for the service parameter: ").append(service).append('\n');
+            final StringBuilder msg = new StringBuilder("Invalid value for the service parameter: ").append(service).append('\n');
             msg.append("accepted values are:");
             for (String s: SERVCE_DIRECTORY.keySet()) {
                 msg .append(s).append(',');
             }
-            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, "service");
+            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, Parameters.SERVICE);
             
         }
         
@@ -353,7 +353,7 @@ public class ConfigurationService extends WebService  {
                                           NO_APPLICABLE_CODE);
         }
         
-        return new AcknowlegementType("success", "properties file sucessfully updated");
+        return new AcknowlegementType(Parameters.SUCCESS, "properties file sucessfully updated");
     }
 
     /**
@@ -372,14 +372,14 @@ public class ConfigurationService extends WebService  {
 
         if ( service == null) {
             throw new CstlServiceException("You must specify the service parameter.",
-                                              MISSING_PARAMETER_VALUE, "service");
+                                              MISSING_PARAMETER_VALUE, Parameters.SERVICE);
         } else if (!SERVCE_DIRECTORY.keySet().contains(service)) {
-            StringBuilder msg = new StringBuilder("Invalid value for the service parameter: ").append(service).append('\n');
+            final StringBuilder msg = new StringBuilder("Invalid value for the service parameter: ").append(service).append('\n');
             msg.append("accepted values are:");
             for (String s: SERVCE_DIRECTORY.keySet()) {
                 msg.append(s).append(',');
             }
-            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, "service");
+            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, Parameters.SERVICE);
 
         }
 
@@ -408,7 +408,7 @@ public class ConfigurationService extends WebService  {
             }
         }
 
-        return new AcknowlegementType("success", "xml file sucessfully updated");
+        return new AcknowlegementType(Parameters.SUCCESS, "xml file sucessfully updated");
     }
 
     /**
@@ -437,7 +437,7 @@ public class ConfigurationService extends WebService  {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             return new AcknowlegementType("failed", "IO exception while performing upload");
         }
-        return new AcknowlegementType("success", "the file has been successfully uploaded");
+        return new AcknowlegementType(Parameters.SUCCESS, "the file has been successfully uploaded");
     }
     
     /**

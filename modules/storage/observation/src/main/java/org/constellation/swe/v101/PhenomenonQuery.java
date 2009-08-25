@@ -48,7 +48,7 @@ public class PhenomenonQuery extends Query{
      * @param database The database for which this query is created.
      */
     public PhenomenonQuery(final Database database) {
-        super(database, "phenomenons");
+        super(database, "phenomenons", "observation");
         final QueryType[] sil = {SELECT, INSERT, LIST};
         final QueryType[] siel = {SELECT, INSERT, EXISTS, LIST};
         

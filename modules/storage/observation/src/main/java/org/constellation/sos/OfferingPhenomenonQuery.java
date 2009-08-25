@@ -45,7 +45,7 @@ public class OfferingPhenomenonQuery extends Query {
      * @param database The database for which this query is created.
      */
     public OfferingPhenomenonQuery(final Database database) {
-        super (database, "offering_phenomenons");
+        super (database, "offering_phenomenons", "sos");
         //final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         

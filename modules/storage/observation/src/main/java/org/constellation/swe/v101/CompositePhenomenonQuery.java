@@ -50,7 +50,7 @@ public class CompositePhenomenonQuery extends Query{
      * @param database The database for which this query is created.
      */
     public CompositePhenomenonQuery(final Database database) {
-        super(database, "composite_phenomenons");
+        super(database, "composite_phenomenons", "observation");
         final QueryType[] sil  = {SELECT, INSERT, LIST};
         final QueryType[] siel = {SELECT, INSERT, EXISTS, LIST};
         

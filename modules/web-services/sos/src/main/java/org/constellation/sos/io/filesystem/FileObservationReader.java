@@ -37,7 +37,6 @@ import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.v101.AnyResultEntry;
-import org.geotoolkit.swe.xml.v101.DataArrayEntry;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.geotoolkit.xml.MarshallerPool;
@@ -85,6 +84,8 @@ public class FileObservationReader implements ObservationReader {
             observationTemplateDirectory = new File(dataDirectory, "observationTemplates");
             sensorDirectory              = new File(dataDirectory, "sensors");
             foiDirectory                 = new File(dataDirectory, "features");
+        } else {
+            throw new CstlServiceException("There is no data Directory", NO_APPLICABLE_CODE);
         }
         try {
             marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:" +
@@ -100,10 +101,12 @@ public class FileObservationReader implements ObservationReader {
     @Override
     public Collection<String> getOfferingNames() throws CstlServiceException {
         final List<String> offeringNames = new ArrayList<String>();
-        for (File offeringFile: offeringDirectory.listFiles()) {
-            String offeringName = offeringFile.getName();
-            offeringName = offeringName.substring(0, offeringName.indexOf(FILE_EXTENSION));
-            offeringNames.add(offeringName);
+        if (offeringDirectory.exists()) {
+            for (File offeringFile: offeringDirectory.listFiles()) {
+                String offeringName = offeringFile.getName();
+                offeringName = offeringName.substring(0, offeringName.indexOf(FILE_EXTENSION));
+                offeringNames.add(offeringName);
+            }
         }
         return offeringNames;
     }
@@ -134,25 +137,27 @@ public class FileObservationReader implements ObservationReader {
     @Override
     public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
         final List<ObservationOfferingEntry> offerings = new ArrayList<ObservationOfferingEntry>();
-        for (File offeringFile: offeringDirectory.listFiles()) {
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(offeringFile);
-                if (obj instanceof ObservationOfferingEntry) {
-                    offerings.add((ObservationOfferingEntry) obj);
-                } else {
-                    throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
-                }
-            } catch (JAXBException ex) {
-                String msg = ex.getMessage();
-                if (msg == null && ex.getCause() != null) {
-                    msg = ex.getCause().getMessage();
-                }
-                LOGGER.severe("Unable to unmarshall The file " + offeringFile + " cause:" + msg);
-            } finally {
-                if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
+        if (offeringDirectory.exists()) {
+            for (File offeringFile: offeringDirectory.listFiles()) {
+                Unmarshaller unmarshaller = null;
+                try {
+                    unmarshaller = marshallerPool.acquireUnmarshaller();
+                    Object obj = unmarshaller.unmarshal(offeringFile);
+                    if (obj instanceof ObservationOfferingEntry) {
+                        offerings.add((ObservationOfferingEntry) obj);
+                    } else {
+                        throw new CstlServiceException("The file " + offeringFile + " does not contains an offering Object.", NO_APPLICABLE_CODE);
+                    }
+                } catch (JAXBException ex) {
+                    String msg = ex.getMessage();
+                    if (msg == null && ex.getCause() != null) {
+                        msg = ex.getCause().getMessage();
+                    }
+                    LOGGER.severe("Unable to unmarshall The file " + offeringFile + " cause:" + msg);
+                } finally {
+                    if (unmarshaller != null) {
+                        marshallerPool.release(unmarshaller);
+                    }
                 }
             }
         }
@@ -162,10 +167,12 @@ public class FileObservationReader implements ObservationReader {
     @Override
     public Collection<String> getProcedureNames() throws CstlServiceException {
         final List<String> sensorNames = new ArrayList<String>();
-        for (File sensorFile: sensorDirectory.listFiles()) {
-            String sensorName = sensorFile.getName();
-            sensorName = sensorName.substring(0, sensorName.indexOf(FILE_EXTENSION));
-            sensorNames.add(sensorName);
+        if (sensorDirectory.exists()) {
+            for (File sensorFile: sensorDirectory.listFiles()) {
+                String sensorName = sensorFile.getName();
+                sensorName = sensorName.substring(0, sensorName.indexOf(FILE_EXTENSION));
+                sensorNames.add(sensorName);
+            }
         }
         return sensorNames;
     }
@@ -173,10 +180,12 @@ public class FileObservationReader implements ObservationReader {
     @Override
     public Collection<String> getPhenomenonNames() throws CstlServiceException {
         final List<String> phenomenonNames = new ArrayList<String>();
-        for (File phenomenonFile: phenomenonDirectory.listFiles()) {
-            String phenomenonName = phenomenonFile.getName();
-            phenomenonName = phenomenonName.substring(0, phenomenonName.indexOf(FILE_EXTENSION));
-            phenomenonNames.add(phenomenonName);
+        if (phenomenonDirectory.exists()) {
+            for (File phenomenonFile: phenomenonDirectory.listFiles()) {
+                String phenomenonName = phenomenonFile.getName();
+                phenomenonName = phenomenonName.substring(0, phenomenonName.indexOf(FILE_EXTENSION));
+                phenomenonNames.add(phenomenonName);
+            }
         }
         return phenomenonNames;
     }
@@ -210,10 +219,12 @@ public class FileObservationReader implements ObservationReader {
     @Override
     public Collection<String> getFeatureOfInterestNames() throws CstlServiceException {
         final List<String> foiNames = new ArrayList<String>();
-        for (File foiFile: foiDirectory.listFiles()) {
-            String foiName = foiFile.getName();
-            foiName = foiName.substring(0, foiName.indexOf(FILE_EXTENSION));
-            foiNames.add(foiName);
+        if (foiDirectory.exists()) {
+            for (File foiFile: foiDirectory.listFiles()) {
+                String foiName = foiFile.getName();
+                foiName = foiName.substring(0, foiName.indexOf(FILE_EXTENSION));
+                foiNames.add(foiName);
+            }
         }
         return foiNames;
     }

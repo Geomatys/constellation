@@ -32,6 +32,7 @@ import java.util.Set;
 // Constellation dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
@@ -55,6 +56,7 @@ import org.constellation.swe.v101.CompositePhenomenonTable;
 import org.constellation.swe.v101.PhenomenonTable;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.internal.jdbc.DefaultDataSource;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
@@ -146,12 +148,18 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException("The configuration file does not contains a BDD object (DefaultObservationReader)", NO_APPLICABLE_CODE);
         }
         try {
-            final PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
-            dataSourceOM.setServerName(db.getHostName());
-            dataSourceOM.setPortNumber(db.getPortNumber());
-            dataSourceOM.setDatabaseName(db.getDatabaseName());
-            dataSourceOM.setUser(db.getUser());
-            dataSourceOM.setPassword(db.getPassword());
+            final DataSource dataSourceOM;
+            if (db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver")) {
+                final PGSimpleDataSource PGdataSourceOM = new PGSimpleDataSource();
+                PGdataSourceOM.setServerName(db.getHostName());
+                PGdataSourceOM.setPortNumber(db.getPortNumber());
+                PGdataSourceOM.setDatabaseName(db.getDatabaseName());
+                PGdataSourceOM.setUser(db.getUser());
+                PGdataSourceOM.setPassword(db.getPassword());
+                dataSourceOM = PGdataSourceOM;
+            } else {
+                dataSourceOM = new DefaultDataSource(db.getConnectURL());
+            }
 
             omDatabase = new Database(dataSourceOM);
             omDatabase.setProperty(ConfigurationKey.READONLY, "false");
@@ -162,10 +170,10 @@ public class DefaultObservationReader implements ObservationReader {
             offTable  = omDatabase.getTable(ObservationOfferingTable.class);
             refTable  = omDatabase.getTable(ReferenceTable.class);
             //we build the prepared Statement
-            newObservationIDStmt    = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observations\" WHERE name LIKE '%" + observationIdBase + "%' ");
-            newMeasurementIDStmt    = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"measurements\" WHERE name LIKE '%" + observationIdBase + "%' ");
-            observationExistStmt    = omDatabase.getConnection().prepareStatement("SELECT name FROM \"observations\" WHERE name=? UNION SELECT name FROM \"measurements\" WHERE name=?");
-            getMinEventTimeOffering = omDatabase.getConnection().prepareStatement("select MIN(event_time_begin) from observation_offerings");
+            newObservationIDStmt    = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observation\".\"observations\" WHERE \"name\" LIKE '%" + observationIdBase + "%' ");
+            newMeasurementIDStmt    = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observation\".\"measurements\" WHERE \"name\" LIKE '%" + observationIdBase + "%' ");
+            observationExistStmt    = omDatabase.getConnection().prepareStatement("SELECT \"name\" FROM \"observation\".\"observations\" WHERE \"name\"=? UNION SELECT \"name\" FROM \"observation\".\"measurements\" WHERE \"name\"=?");
+            getMinEventTimeOffering = omDatabase.getConnection().prepareStatement("select MIN(\"event_time_begin\") from \"sos\".\"observation_offerings\"");
         } catch (SQLException ex) {
             throw new CstlServiceException("SQL Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (NoSuchTableException ex) {
@@ -227,7 +235,10 @@ public class DefaultObservationReader implements ObservationReader {
                     NO_APPLICABLE_CODE);
         } catch (Throwable e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
-            throw new CstlServiceException("the service has throw a Runtime Exception:" + e.getMessage(),
+            throw new CstlServiceException("The service has throw a Runtime Exception:\n" +
+                                           "Type:"      + e.getClass().getSimpleName() +
+                                           "\nMessage:" + e.getMessage() +
+                                           "Cause:" + e.getCause() ,
                     NO_APPLICABLE_CODE);
         }
     }

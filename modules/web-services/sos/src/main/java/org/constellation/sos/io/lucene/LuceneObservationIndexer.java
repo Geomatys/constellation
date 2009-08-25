@@ -255,7 +255,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
 
         doc.add(new Field("observed_property",   ((PhenomenonEntry)observation.getObservedProperty()).getId(), Field.Store.YES, Field.Index.ANALYZED));
 
-        doc.add(new Field("feature_of_interest",   ((SamplingFeatureEntry)observation.getFeatureOfInterest()).getName(), Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("feature_of_interest",   ((SamplingFeatureEntry)observation.getFeatureOfInterest()).getId(), Field.Store.YES, Field.Index.ANALYZED));
 
         try {
             final AbstractTimeGeometricPrimitiveType time = observation.getSamplingTime();

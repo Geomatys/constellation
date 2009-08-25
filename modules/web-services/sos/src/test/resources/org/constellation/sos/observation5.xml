@@ -11,18 +11,22 @@
     <om:observedProperty>
         <swe:CompositePhenomenon dimension="2" gml:id="aggregatePhenomenon">
             <gml:name>urn:ogc:def:phenomenon:GEOM:aggregate</gml:name>
-            <swe:component gml:id="depth">
-                <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
-                <gml:description>un phenomene</gml:description>
+            <swe:component>
+                <swe:Phenomenon gml:id="depth">
+                    <gml:name>urn:ogc:def:phenomenon:GEOM:depth</gml:name>
+                    <gml:description>profondeur</gml:description>
+                </swe:Phenomenon>
             </swe:component>
-            <swe:component gml:id="temperature">
-                <gml:name>urn:ogc:def:phenomenon:GEOM:height</gml:name>
-                <gml:description>un phenomene</gml:description>
+            <swe:component>
+                <swe:Phenomenon gml:id="temperature">
+                    <gml:name>urn:ogc:def:phenomenon:GEOM:temperature</gml:name>
+                    <gml:description>temperature</gml:description>
+                </swe:Phenomenon>
             </swe:component>
         </swe:CompositePhenomenon>
     </om:observedProperty>
     <om:featureOfInterest>
-        <sa:SamplingPoint>
+        <sa:SamplingPoint gml:id="station-002">
             <gml:description>Point d'eau BSSS</gml:description>
             <gml:name>10972X0137-PLOUF</gml:name>
             <gml:boundedBy>
@@ -44,9 +48,7 @@
              <swe:elementType name="dataArray-2">
                 <swe:SimpleDataRecord gml:id="datarecord">
                     <swe:field name="Time">
-                        <swe:Time definition="urn:ogc:data:time:iso8601">
-                            <swe:uom/>
-                        </swe:Time>
+                        <swe:Time definition="urn:ogc:data:time:iso8601"/>
                     </swe:field>
                     <swe:field name="depth">
                         <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:depth">

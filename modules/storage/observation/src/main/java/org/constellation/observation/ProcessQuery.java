@@ -47,7 +47,7 @@ public class ProcessQuery extends Query{
      * @param database The database for which this query is created.
      */
     public ProcessQuery(final Database database) {
-        super(database, "process");
+        super(database, "process", "observation");
         final QueryType[] sli  = {SELECT, INSERT, LIST};
         final QueryType[] slie = {SELECT, EXISTS, INSERT, LIST};
         name    = addColumn   ("name",        slie);

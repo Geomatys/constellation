@@ -48,7 +48,7 @@ public class AnyScalarQuery extends Query{
      * @param database The database for which this query is created.
      */
     public AnyScalarQuery(final Database database) {
-        super (database, "any_scalars");
+        super (database, "any_scalars", "observation");
         final QueryType[] sli  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         idDataRecord  = addColumn("id_datarecord", slie);

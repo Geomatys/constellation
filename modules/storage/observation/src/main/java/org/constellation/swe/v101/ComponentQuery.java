@@ -47,7 +47,7 @@ public class ComponentQuery extends Query {
      * @param database The database for which this query is created.
      */
     public ComponentQuery(final Database database) {
-        super (database, "components");
+        super (database, "components", "observation");
         //final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         

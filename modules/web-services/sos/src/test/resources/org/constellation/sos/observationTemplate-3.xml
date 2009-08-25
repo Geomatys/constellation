@@ -10,7 +10,7 @@
         </swe:Phenomenon>
     </om:observedProperty>
     <om:featureOfInterest>
-        <sa:SamplingPoint>
+        <sa:SamplingPoint gml:id="station-001">
             <gml:description>Point d'eau BSSS</gml:description>
             <gml:name>10972X0137-PONT</gml:name>
             <gml:boundedBy>
@@ -23,18 +23,16 @@
         </sa:SamplingPoint>
     </om:featureOfInterest>
     <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="swe:DataArrayPropertyType">
-        <swe:DataArray gml:id="dataArray-2">
+        <swe:DataArray gml:id="dataArray-0">
             <swe:elementCount>
                 <swe:Count>
                     <swe:value>0</swe:value>
                 </swe:Count>
             </swe:elementCount>
-            <swe:elementType name="dataArray-2">
+            <swe:elementType name="dataArray-0">
                 <swe:SimpleDataRecord gml:id="datarecord">
                     <swe:field name="Time">
-                        <swe:Time definition="urn:ogc:data:time:iso8601">
-                            <swe:uom/>
-                        </swe:Time>
+                        <swe:Time definition="urn:ogc:data:time:iso8601"/>
                     </swe:field>
                     <swe:field name="depth">
                         <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:depth">

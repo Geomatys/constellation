@@ -42,6 +42,9 @@ import java.security.AccessController;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivilegedAction;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1537,5 +1540,43 @@ public final class Util {
         final BufferedWriter bw = new BufferedWriter(new FileWriter(f));
         bw.write(s);
         bw.close();
+    }
+
+    /**
+     * Execute a SQL script located into the resources.
+     *
+     * @param path the path to the name of the file example : org.constellation.sos.sql in Resources folder.
+     * @param connection.
+     */
+    public static void executeSQLScript(String path, Connection connection) {
+        try {
+            InputStream in  = getResourceAsStream(path);
+            StringWriter sw = new StringWriter();
+            byte[] buffer   = new byte[1024];
+            int size;
+            while ((size = in.read(buffer, 0, 1024)) > 0) {
+                sw.append(new String(buffer, 0, size));
+            }
+            in.close();
+
+            Statement stmt  = connection.createStatement();
+            String SQLQuery = sw.toString();
+            int end         = SQLQuery.indexOf(';');
+            while (end != -1) {
+                String singleQuery = SQLQuery.substring(0, end);
+                try {
+                    stmt.execute(singleQuery);
+
+                } catch (SQLException ex) {
+                    LOGGER.severe("SQLException while executing: " + singleQuery + '\n' + ex.getMessage());
+                }
+                SQLQuery = SQLQuery.substring(end + 1);
+                end      = SQLQuery.indexOf(';');
+            }
+        } catch (IOException ex) {
+            LOGGER.severe("IOException creating statement:" + '\n' + ex.getMessage());
+        } catch (SQLException ex) {
+            LOGGER.severe("SQLException creating statement:" + '\n' + ex.getMessage());
+        }
     }
 }

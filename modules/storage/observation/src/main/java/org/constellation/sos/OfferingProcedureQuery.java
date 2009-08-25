@@ -45,7 +45,7 @@ public class OfferingProcedureQuery extends Query {
      * @param database The database for which this query is created.
      */
     public OfferingProcedureQuery(final Database database) {
-        super (database, "offering_procedures");
+        super (database, "offering_procedures", "sos");
         //final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         

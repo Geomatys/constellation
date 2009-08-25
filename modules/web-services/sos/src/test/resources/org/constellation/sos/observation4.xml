@@ -15,7 +15,7 @@
         </swe:Phenomenon>
     </om:observedProperty>
     <om:featureOfInterest>
-        <sa:SamplingPoint>
+        <sa:SamplingPoint gml:id="station-001">
             <gml:description>Point d'eau BSSS</gml:description>
             <gml:name>10972X0137-PONT</gml:name>
             <gml:boundedBy>
@@ -37,9 +37,7 @@
              <swe:elementType name="dataArray-2">
                 <swe:SimpleDataRecord gml:id="datarecord">
                     <swe:field name="Time">
-                        <swe:Time definition="urn:ogc:data:time:iso8601">
-                            <swe:uom/>
-                        </swe:Time>
+                        <swe:Time definition="urn:ogc:data:time:iso8601"/>
                     </swe:field>
                     <swe:field name="depth">
                         <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:depth">

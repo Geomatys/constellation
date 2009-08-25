@@ -47,7 +47,7 @@ public class TextBlockQuery extends Query{
      * @param database The database for which this query is created.
      */
     public TextBlockQuery(final Database database) {
-        super(database, "text_block_encodings");
+        super(database, "text_block_encodings", "observation");
         final QueryType[] si   = {SELECT, INSERT};
         final QueryType[] sief = {SELECT, INSERT, EXISTS,  FILTERED_LIST};
         id               = addColumn("id_encoding",       sief);

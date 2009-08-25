@@ -413,7 +413,7 @@ public class CSWService extends OGCWebService {
         
         String outputFormat = getParameter("OUTPUTFORMAT", false);
         if (outputFormat == null) {
-            outputFormat = MimeType.APP_XML;
+            outputFormat = MimeType.APPLICATION_XML;
         }
         
         String outputSchema = getParameter("OUTPUTSCHEMA", false);
@@ -634,7 +634,7 @@ public class CSWService extends OGCWebService {
         
         String outputFormat = getParameter("OUTPUTFORMAT", false);
         if (outputFormat == null) {
-            outputFormat = MimeType.APP_XML;
+            outputFormat = MimeType.APPLICATION_XML;
         }
         
         String outputSchema = getParameter("OUTPUTSCHEMA", false);
@@ -670,7 +670,7 @@ public class CSWService extends OGCWebService {
         
         String outputFormat = getParameter("OUTPUTFORMAT", false);
         if (outputFormat == null) {
-            outputFormat = MimeType.APP_XML;
+            outputFormat = MimeType.APPLICATION_XML;
         }
         
         String schemaLanguage = getParameter("SCHEMALANGUAGE", false);
@@ -765,7 +765,7 @@ public class CSWService extends OGCWebService {
         final String resourceType = getParameter("RESOURCETYPE", true);
         String resourceFormat     = getParameter("RESOURCEFORMAT", false);
         if (resourceFormat == null) {
-            resourceFormat = MimeType.APP_XML;
+            resourceFormat = MimeType.APPLICATION_XML;
         }
         final String handler      = getParameter("RESPONSEHANDLER", false);
         final String interval     = getParameter("HARVESTINTERVAL", false);

@@ -46,7 +46,7 @@ public class ReferenceQuery extends Query {
      * @param database The database for which this query is created.
      */
     public ReferenceQuery(final Database database) {
-        super(database, "references");
+        super(database, "references", "observation");
         final QueryType[] sli   = {SELECT, LIST, INSERT};
         final QueryType[] slief = {SELECT, INSERT, LIST, EXISTS, FILTERED_LIST};
         idReference = addColumn("id_reference", slief);

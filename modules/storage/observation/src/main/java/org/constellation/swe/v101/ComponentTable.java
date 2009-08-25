@@ -98,7 +98,7 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
         return idCompositePhenomenon;
     }
     
-    public void setIdCompositePhenomenon(String idCompositePhenomenon) {
+    public synchronized void setIdCompositePhenomenon(String idCompositePhenomenon) {
         if (!Utilities.equals(this.idCompositePhenomenon, idCompositePhenomenon)) {
             this.idCompositePhenomenon = idCompositePhenomenon;
             fireStateChanged("idCompositePhenomenon");

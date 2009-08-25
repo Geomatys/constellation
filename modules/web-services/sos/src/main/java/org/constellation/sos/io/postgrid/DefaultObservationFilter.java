@@ -110,9 +110,9 @@ public class DefaultObservationFilter implements ObservationFilter {
     @Override
     public void initFilterObservation(ResponseModeType requestMode, QName resultModel) {
         if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
-            sqlRequest = new StringBuilder("SELECT name FROM measurements WHERE name LIKE '%");
+            sqlRequest = new StringBuilder("SELECT \"name\" FROM \"observation\".\"measurements\" WHERE \"name\" LIKE '%");
         } else {
-            sqlRequest = new StringBuilder("SELECT name FROM observations WHERE name LIKE '%");
+            sqlRequest = new StringBuilder("SELECT \"name\" FROM \"observation\".\"observations\" WHERE \"name\" LIKE '%");
         }
         if (requestMode == INLINE) {
             sqlRequest.append(observationIdBase).append("%' AND ");
@@ -128,12 +128,12 @@ public class DefaultObservationFilter implements ObservationFilter {
     @Override
     public void initFilterGetResult(String procedure, QName resultModel) {
         if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
-            sqlRequest = new StringBuilder("SELECT result, sampling_time_begin, sampling_time_end FROM measurements WHERE ");
+            sqlRequest = new StringBuilder("SELECT \"result\", \"sampling_time_begin\", \"sampling_time_end\" FROM \"observation\".\"measurements\" WHERE ");
         } else {
-            sqlRequest = new StringBuilder("SELECT result, sampling_time_begin, sampling_time_end FROM observations WHERE ");
+            sqlRequest = new StringBuilder("SELECT \"result\", \"sampling_time_begin\", \"sampling_time_end\" FROM \"observation\".\"observations\" WHERE ");
         }
         //we add to the request the property of the template
-        sqlRequest.append("procedure='").append(procedure).append("'");
+        sqlRequest.append("\"procedure\"='").append(procedure).append("'");
     }
 
     /**
@@ -154,13 +154,13 @@ public class DefaultObservationFilter implements ObservationFilter {
                     if (dbId == null) {
                         dbId = s;
                     }
-                    sqlRequest.append(" procedure='").append(dbId).append("' OR ");
+                    sqlRequest.append(" \"procedure\"='").append(dbId).append("' OR ");
                 }
             }
         } else {
             //if is not specified we use all the process of the offering
             for (ReferenceEntry proc : off.getProcedure()) {
-                sqlRequest.append(" procedure='").append(proc.getHref()).append("' OR ");
+                sqlRequest.append(" \"procedure\"='").append(proc.getHref()).append("' OR ");
             }
         }
         sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
@@ -177,11 +177,11 @@ public class DefaultObservationFilter implements ObservationFilter {
     public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon) {
         sqlRequest.append(" AND( ");
         for (String p : phenomenon) {
-            sqlRequest.append(" observed_property='").append(p).append("' OR ");
+            sqlRequest.append(" \"observed_property\"='").append(p).append("' OR ");
 
         }
         for (String p : compositePhenomenon) {
-            sqlRequest.append(" observed_property_composite='").append(p).append("' OR ");
+            sqlRequest.append(" \"observed_property_composite\"='").append(p).append("' OR ");
         }
         sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
         sqlRequest.append(") ");
@@ -197,7 +197,7 @@ public class DefaultObservationFilter implements ObservationFilter {
     public void setFeatureOfInterest(List<String> fois) {
         sqlRequest.append(" AND (");
         for (String foi : fois) {
-            sqlRequest.append("feature_of_interest_point='").append(foi).append("' OR");
+            sqlRequest.append("\"feature_of_interest_point\"='").append(foi).append("' OR");
         }
         sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
         sqlRequest.append(") ");
@@ -218,8 +218,8 @@ public class DefaultObservationFilter implements ObservationFilter {
 
             // we request directly a multiple observation or a period observation (one measure during a period)
             sqlRequest.append("AND (");
-            sqlRequest.append(" sampling_time_begin='").append(begin).append("' AND ");
-            sqlRequest.append(" sampling_time_end='").append(end).append("') ");
+            sqlRequest.append(" \"sampling_time_begin\"='").append(begin).append("' AND ");
+            sqlRequest.append(" \"sampling_time_end\"='").append(end).append("') ");
 
         // if the temporal object is a timeInstant
         } else if (time instanceof TimeInstantType) {
@@ -228,11 +228,11 @@ public class DefaultObservationFilter implements ObservationFilter {
             sqlRequest.append("AND (");
 
             // case 1 a single observation
-            sqlRequest.append("(sampling_time_begin='").append(position).append("' AND sampling_time_end=NULL)");
+            sqlRequest.append("(\"sampling_time_begin\"='").append(position).append("' AND \"sampling_time_end\"=NULL)");
             sqlRequest.append(" OR ");
 
             //case 2 multiple observations containing a matching value
-            sqlRequest.append("(sampling_time_begin<='").append(position).append("' AND sampling_time_end>='").append(position).append("'))");
+            sqlRequest.append("(\"sampling_time_begin\"<='").append(position).append("' AND \"sampling_time_end\">='").append(position).append("'))");
 
         } else {
             throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
@@ -255,7 +255,7 @@ public class DefaultObservationFilter implements ObservationFilter {
             sqlRequest.append("AND (");
 
             // the single and multpile observations whitch begin after the bound
-            sqlRequest.append("(sampling_time_begin<='").append(position).append("'))");
+            sqlRequest.append("(\"sampling_time_begin\"<='").append(position).append("'))");
 
         } else {
             throw new CstlServiceException("TM_Before operation require timeInstant!",
@@ -278,10 +278,10 @@ public class DefaultObservationFilter implements ObservationFilter {
             sqlRequest.append("AND (");
 
             // the single and multpile observations whitch begin after the bound
-            sqlRequest.append("(sampling_time_begin>='").append(position).append("')");
+            sqlRequest.append("(\"sampling_time_begin\">='").append(position).append("')");
             sqlRequest.append(" OR ");
             // the multiple observations overlapping the bound
-            sqlRequest.append("(sampling_time_begin<='").append(position).append("' AND sampling_time_end>='").append(position).append("'))");
+            sqlRequest.append("(\"sampling_time_begin\"<='").append(position).append("' AND \"sampling_time_end\">='").append(position).append("'))");
 
 
         } else {
@@ -305,19 +305,19 @@ public class DefaultObservationFilter implements ObservationFilter {
             sqlRequest.append("AND (");
 
             // the multiple observations included in the period
-            sqlRequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_end<= '").append(end).append("')");
+            sqlRequest.append(" (\"sampling_time_begin\">='").append(begin).append("' AND \"sampling_time_end\"<= '").append(end).append("')");
             sqlRequest.append(" OR ");
             // the single observations included in the period
-            sqlRequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_begin<='").append(end).append("' AND sampling_time_end IS NULL)");
+            sqlRequest.append(" (\"sampling_time_begin\">='").append(begin).append("' AND \"sampling_time_begin\"<='").append(end).append("' AND \"sampling_time_end\" IS NULL)");
             sqlRequest.append(" OR ");
             // the multiple observations whitch overlaps the first bound
-            sqlRequest.append(" (sampling_time_begin<='").append(begin).append("' AND sampling_time_end<= '").append(end).append("' AND sampling_time_end>='").append(begin).append("')");
+            sqlRequest.append(" (\"sampling_time_begin\"<='").append(begin).append("' AND \"sampling_time_end\"<= '").append(end).append("' AND \"sampling_time_end\">='").append(begin).append("')");
             sqlRequest.append(" OR ");
             // the multiple observations whitch overlaps the second bound
-            sqlRequest.append(" (sampling_time_begin>='").append(begin).append("' AND sampling_time_end>= '").append(end).append("' AND sampling_time_begin<='").append(end).append("')");
+            sqlRequest.append(" (\"sampling_time_begin\">='").append(begin).append("' AND \"sampling_time_end\">= '").append(end).append("' AND \"sampling_time_begin\"<='").append(end).append("')");
             sqlRequest.append(" OR ");
             // the multiple observations whitch overlaps the whole period
-            sqlRequest.append(" (sampling_time_begin<='").append(begin).append("' AND sampling_time_end>= '").append(end).append("'))");
+            sqlRequest.append(" (\"sampling_time_begin\"<='").append(begin).append("' AND \"sampling_time_end\">= '").append(end).append("'))");
 
 
         } else {

@@ -88,7 +88,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
      *
      * @param idDataBlock le nouvel identifiant du dataBlock.
      */
-    public void setIdDataBlock(final String idDataBlock) {
+    public synchronized void setIdDataBlock(final String idDataBlock) {
         if (!Utilities.equals(this.idDataBlock, idDataBlock)) {
             this.idDataBlock = idDataBlock;
             fireStateChanged("idDataBlock");

@@ -46,7 +46,7 @@ public class SamplingFeatureQuery extends Query {
      * @param database The database for which this query is created.
      */
     public SamplingFeatureQuery(final Database database) {
-        super(database, "sampling_features");
+        super(database, "sampling_features", "observation");
         final QueryType[] sli = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         

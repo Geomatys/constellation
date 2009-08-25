@@ -45,7 +45,7 @@ public class OfferingResponseModeQuery extends Query {
      * @param database The database for which this query is created.
      */
     public OfferingResponseModeQuery(final Database database) {
-        super (database, "offering_response_modes");
+        super (database, "offering_response_modes", "sos");
         //final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         
