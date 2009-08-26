@@ -33,8 +33,8 @@
       <ctl:assertion>The implementation under test minimally conforms to the CSW 
       part (Clause 10) of Catalogue 2.0.2 (OGC 07-006r1).</ctl:assertion>
       <ctl:code>         
-         <xsl:variable name="form-values">
-            <!--ctl:form height="600" width="800">
+         <!--xsl:variable name="form-values">
+            <ctl:form height="600" width="800">
                <body>
                   <h2>CSW Catalogue 2.0.2 - Test setup</h2>
                   <h3>Service metadata</h3>
@@ -59,8 +59,8 @@
                   <br />
                   <input type="submit" value="Start"/>
                </body>
-            </ctl:form-->
-         </xsl:variable>
+            </ctl:form>
+         </xsl:variable-->
 
 		<!-- Populate global variables from form data -->
 		<xsl:variable name="csw.capabilities.url">http://localhost:9090/csw?request=GetCapabilities&amp;service=CSW&amp;version=2.0.2</xsl:variable>

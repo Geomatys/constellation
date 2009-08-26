@@ -35,31 +35,42 @@ import org.geotoolkit.util.logging.Logging;
  * @since 0.4
  * @see GrizzlyServer
  */
-public final class LaunchTests {
+public final class LaunchTests implements Runnable {
     /**
      * The default logger.
      */
     private static final Logger LOGGER = Logging.getLogger(LaunchTests.class);
 
     /**
-     * Prevents instanciation.
+     * The running process.
      */
-    private LaunchTests() {}
+    private final Process process;
 
     /**
-     * Display the result of a process into the standard output.
-     *
-     * @param in Stream returned by the execution of the tests.
-     * @throws IOException
+     * Creates a new monitor for the given process.
      */
-    private static void displayResult(final InputStream in) throws IOException {
-        final InputStreamReader isr = new InputStreamReader(in);
-        final BufferedReader br = new BufferedReader(isr);
-        String line;
-        while ((line = br.readLine()) != null) {
-            System.out.println(line);
+    private LaunchTests(final Process process) {
+        this.process = process;
+    }
+
+    /**
+     * Displays the result of the process into the standard output.
+     * This method is public as an implementation side-effect - do not use.
+     */
+    @Override
+    public void run() {
+        try {
+            final BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                System.out.println(line);
+            }
+            in.close();
+        } catch (IOException e) {
+            // May be normal if we killed the process. Prints only
+            // a summary of the exception, not the full stack trace.
+            System.err.println(e);
         }
-        br.close();
     }
 
     public static void main(String[] args) throws IOException {
@@ -67,22 +78,25 @@ public final class LaunchTests {
         GrizzlyServer.initServer();
 
         // Launch the test suite.
-        final Runtime runtime = Runtime.getRuntime();
         if (args.length == 0) {
             LOGGER.info("No argument have been given to the script. Usage run.sh [profile...]");
         }
+        final Runtime rt = Runtime.getRuntime();
         for (String arg : args) {
-            final Process process = runtime.exec(new String[]{"./run.sh", arg});
-            displayResult(process.getInputStream());
+            final Process process = rt.exec(new String[]{"./run.sh", arg});
+            final Thread t = new Thread(new LaunchTests(process));
+            t.setDaemon(true);
+            t.start();
             try {
-                // Makes sure the test suite has been totally executed.
-                process.waitFor();
-            } catch (InterruptedException ex) {
-                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+                t.join(2*60*1000L);
+            } catch (InterruptedException e) {
+                // Ignore. We will kill the process.
             }
+            process.destroy();
         }
 
         // Then we can kill the server.
         GrizzlyServer.finish();
+        System.exit(0);
     }
 }
