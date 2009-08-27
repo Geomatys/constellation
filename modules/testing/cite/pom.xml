@@ -244,6 +244,11 @@
                      <fileset dir="${basedir}" includes="cite1/**/*" excludes="/**/.svn"/>
                 </copy>
 
+                <!-- copy the setenv.sh script into the engine/bin dir -->
+                <copy todir="${basedir}/engine/bin">
+                     <fileset dir="${basedir}" includes="setenv.sh"/>
+                </copy>
+
                 <!-- create work and logs directory into the target one -->
                 <mkdir dir="${basedir}/target/work"/>
                 <mkdir dir="${basedir}/target/logs"/>
