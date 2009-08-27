@@ -58,7 +58,6 @@ public final class LogParser {
             serviceAndVersion = serviceAndVersion.substring(0, serviceAndVersion.indexOf("/"));
         }
         final String[] serviceAndVersionArray = serviceAndVersion.split("-");
-        return new Result(serviceAndVersionArray[0], serviceAndVersionArray[1],
-                          lineSplitted[1], directory, passed, date);
+        return new Result(date, lineSplitted[1], directory, passed);
     }
 }

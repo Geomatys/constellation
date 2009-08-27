@@ -23,9 +23,11 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 // Geotoolkit dependencies
+import java.util.Map;
 import org.geotoolkit.internal.jdbc.DefaultDataSource;
 
 
@@ -49,14 +51,23 @@ public final class ResultsDatabase {
     /**
      * Insertion requests.
      */
-    private static final String INSERT_RESULT = "INSERT INTO \"Results\" VALUES (?,?,?,?,?,?);";
+    private static final String INSERT_RESULT  = "INSERT INTO \"Results\" VALUES (?,?,?,?);";
     private static final String INSERT_SERVICE = "INSERT INTO \"Services\" VALUES (?,?);";
+    private static final String INSERT_SUITE   = "INSERT INTO \"Suites\" VALUES (?,?,?);";
 
     /**
-     * Count request.
+     * Count requests.
      */
-    private static final String COUNT_SERVICE = "SELECT COUNT(name) FROM \"Services\" " +
+    private static final String COUNT_SERVICE = "SELECT COUNT(name) FROM \"Services\" "+
                                                         "WHERE name=? AND version=?;";
+    private static final String COUNT_SUITE   = "SELECT COUNT(date) FROM \"Suites\" "+
+                                                        "WHERE date=?;";
+
+    /**
+     * Select requests.
+     */
+    private static final String SELECT_TESTS_FAILED =
+            "SELECT * FROM \"TestsFailed\" WHERE service=? AND version=? AND date=?;";
 
     /**
      * The connection to the database of Cite Tests results.
@@ -69,6 +80,16 @@ public final class ResultsDatabase {
     private final List<Service> existingServices = new ArrayList<Service>();
 
     /**
+     * List of existing suites, already checked from the database as present.
+     */
+    private final List<Suite> existingSuites = new ArrayList<Suite>();
+
+    /**
+     * Stores the ids for a session, and their number of occurrences.
+     */
+    private final Map<String,Integer> ids = new HashMap<String,Integer>();
+
+    /**
      * Initialize the connection to the database.
      *
      * @throws SQLException if an exception occurs while trying to connect to the database.
@@ -79,15 +100,39 @@ public final class ResultsDatabase {
     }
 
     /**
+     *
+     * @param service
+     * @param version
+     * @param date
+     * @throws SQLException
+     */
+    public void compareResults(final String service, final String version, final Date date)
+                               throws SQLException
+    {
+        ensureConnectionOpened();
+
+        final PreparedStatement ps = connection.prepareStatement(SELECT_TESTS_FAILED);
+        ps.setString(1, service);
+        ps.setString(2, version);
+        ps.setTimestamp(3, new Timestamp(date.getTime()));
+
+        final ResultSet rs = ps.executeQuery();
+    }
+
+    /**
      * Insert a result into the matching table.
      *
      * @param result A result to insert.
+     * @param service The service name.
+     * @param version The service version.
      * @return
      * @throws SQLException if an error occurs in the insert request.
      */
-    public int insertResult(final Result result) throws SQLException {
-        return insertResult(result.getName(), result.getVersion(), result.getId(),
-                            result.getDirectory(), result.isPassed(), result.getDate());
+    public int insertResult(final Result result, final String service, final String version)
+                            throws SQLException
+    {
+        return insertResult(service, version, result.getId(), result.getDirectory(),
+                            result.isPassed(), result.getDate());
     }
 
     /**
@@ -110,13 +155,28 @@ public final class ResultsDatabase {
         // try to add the service.
         addService(service, version);
 
+        // add the test suite.
+        addSuite(date, service, version);
+
+        // Verify that the name is not of the test id is not already defined.
+        // If already defined, we use the id name concatenated with the index number,
+        // and we increment the count of this id into the hashmap.
+        final String finalId;
+        final Integer numberId = ids.get(id);
+        if (numberId == null) {
+            ids.put(id, 0);
+            finalId = id;
+        } else {
+            ids.put(id, numberId + 1);
+            finalId = id + (numberId + 1);
+        }
+
         final PreparedStatement ps = connection.prepareStatement(INSERT_RESULT);
-        ps.setString(1, service);
-        ps.setString(2, version);
-        ps.setString(3, id);
+        ps.setTimestamp(1, new Timestamp(date.getTime()));
+        ps.setString(2, finalId);
+        ps.setBoolean(3, passed);
         ps.setString(4, directory);
-        ps.setBoolean(5, passed);
-        ps.setTimestamp(6, new Timestamp(date.getTime()));
+
         final int result = ps.executeUpdate();
         ps.close();
 
@@ -144,6 +204,20 @@ public final class ResultsDatabase {
     private void addService(final String service, final String version) throws SQLException {
         if (!serviceExists(service, version)) {
             insertService(service, version);
+        }
+    }
+
+    /**
+     * Add a suite if it is not already present into the database.
+     *
+     * @param date    The date of the suite.
+     * @param service The service name.
+     * @param version The service version.
+     * @throws SQLException
+     */
+    private void addSuite(final Date date, final String service, final String version) throws SQLException {
+        if (!suiteExists(date, service, version)) {
+            insertSuite(date, service, version);
         }
     }
 
@@ -180,6 +254,27 @@ public final class ResultsDatabase {
     }
 
     /**
+     * Inserts a new suite in the database.
+     *
+     * @param date    The date of the suite.
+     * @param service The service name.
+     * @param version The service version.
+     * @throws SQLException
+     */
+    private void insertSuite(final Date date, final String service, final String version) throws SQLException {
+        ensureConnectionOpened();
+
+        final PreparedStatement ps = connection.prepareStatement(INSERT_SUITE);
+        ps.setTimestamp(1, new Timestamp(date.getTime()));
+        ps.setString(2, service);
+        ps.setString(3, version);
+        ps.execute();
+        ps.close();
+
+        existingSuites.add(new Suite(date, service, version));
+    }
+
+    /**
      * Verify if the service already exists in {@link #existingServices} and if not in the
      * database.
      *
@@ -200,6 +295,40 @@ public final class ResultsDatabase {
         final PreparedStatement ps = connection.prepareStatement(COUNT_SERVICE);
         ps.setString(1, service);
         ps.setString(2, version);
+        final ResultSet rs = ps.executeQuery();
+        int result = 0;
+        if (rs.next()) {
+            result = rs.getInt(1);
+        }
+        rs.close();
+        ps.close();
+
+        if (result == 0) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Verify if the suite already exists in {@link #existingSuites} and if not in the
+     * database.
+     *
+     * @param date    The date of the suite.
+     * @param service The service name.
+     * @param version The service version.
+     * @return {@code True} if the service exists, false otherwise.
+     * @throws SQLException if an error occurs while trying to get the suites contained in the database.
+     */
+    private boolean suiteExists(final Date date, final String service, final String version) throws SQLException {
+        // Verify that the service is not already present in the list.
+        if (!existingSuites.isEmpty() && existingSuites.contains(new Suite(date, service, version))) {
+            return true;
+        }
+
+        ensureConnectionOpened();
+
+        final PreparedStatement ps = connection.prepareStatement(COUNT_SUITE);
+        ps.setTimestamp(1, new Timestamp(date.getTime()));
         final ResultSet rs = ps.executeQuery();
         int result = 0;
         if (rs.next()) {

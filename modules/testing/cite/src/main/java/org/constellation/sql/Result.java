@@ -29,14 +29,9 @@ import java.util.Date;
  */
 public final class Result {
     /**
-     * The service name.
+     * The date of execution.
      */
-    private final String name;
-
-    /**
-     * The service version.
-     */
-    private final String version;
+    private final Date date;
 
     /**
      * The identifier of the test.
@@ -49,45 +44,22 @@ public final class Result {
     private final String directory;
 
     /**
-     * The date of execution.
-     */
-    private final Date date;
-
-    /**
      * Defined whether the test has passed or not.
      */
     private final boolean passed;
 
-    /**
-     *
-     * @param name
-     * @param version
-     * @param id
-     * @param passed
-     */
-    public Result(final String name, final String version, final String id,
-                  final String directory, final boolean passed, final Date date)
-    {
-        this.name = name;
-        this.version = version;
+    public Result(final Date date, final String id, final String directory, final boolean passed) {
+        this.date = date;
         this.id = id;
         this.directory = directory;
         this.passed = passed;
-        this.date = date;
     }
 
     /**
-     * Returns the service name.
+     * Returns the date of test.
      */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the service version.
-     */
-    public String getVersion() {
-        return version;
+    public Date getDate() {
+        return date;
     }
 
     /**
@@ -111,23 +83,14 @@ public final class Result {
         return passed;
     }
 
-    /**
-     * Returns the date of execution of the test.
-     */
-    public Date getDate() {
-        return date;
-    }
-
     @Override
     public String toString() {
-        return "Result["+ name +","+ version +","+ id +","+ directory +","+ passed +"]";
+        return "Result["+ date +","+ id +","+ directory +","+ passed +"]";
     }
 
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 31 * hash + (this.name != null ? this.name.hashCode() : 0);
-        hash = 31 * hash + (this.version != null ? this.version.hashCode() : 0);
         hash = 31 * hash + (this.id != null ? this.id.hashCode() : 0);
         hash = 31 * hash + (this.directory != null ? this.directory.hashCode() : 0);
         hash = 31 * hash + (this.passed ? 1 : 0);
@@ -144,12 +107,6 @@ public final class Result {
             return false;
         }
         final Result other = (Result) obj;
-        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
-            return false;
-        }
-        if ((this.version == null) ? (other.version != null) : !this.version.equals(other.version)) {
-            return false;
-        }
         if ((this.id == null) ? (other.id != null) : !this.id.equals(other.id)) {
             return false;
         }
