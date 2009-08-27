@@ -111,23 +111,25 @@ public class MDWebSensorWriter implements SensorWriter {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
         try {
-            smlConnection  = db.getConnection();
-            sensorMLWriter = new Writer20(smlConnection);
-            sensorMLReader = new Reader20(Standard.SENSORML, smlConnection);
-            sensorMLCatalog     = sensorMLReader.getCatalog("SMLC");
-            mainUser       = sensorMLReader.getUser("admin");
+            smlConnection   = db.getConnection();
+            boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
+            sensorMLWriter  = new Writer20(smlConnection);
+            sensorMLReader  = new Reader20(Standard.SENSORML, smlConnection, isPostgres);
+            sensorMLCatalog = sensorMLReader.getCatalog("SMLC");
+            mainUser        = sensorMLReader.getUser("admin");
 
              //we build the prepared Statement
-            newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Forms\" WHERE title LIKE '%" + sensorIdBase + "%' ");
+            newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Storage\".\"Forms\" WHERE \"title\" LIKE '%" + sensorIdBase + "%' ");
 
             //we initialize the marshaller
             marshallerPool = new MarshallerPool("http://www.opengis.net/sensorML/1.0", "org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
 
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("JAXBException while starting the MDweb Senor reader", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("JAXBException while starting the MDweb Sensor writer", NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
-            throw new CstlServiceException("SQLBException while starting the MDweb Senor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
+            ex.printStackTrace();
+            throw new CstlServiceException("SQ1LException while starting the MDweb Sensor writer: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
 

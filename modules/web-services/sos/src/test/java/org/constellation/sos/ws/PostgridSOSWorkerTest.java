@@ -46,9 +46,21 @@ import org.junit.*;
 public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
     private static File directory;
+
+    private static File directory2;
     
     @BeforeClass
     public static void setUpClass() throws Exception {
+
+        directory2 = new File(System.getProperty("java.io.tmpdir", "/tmp"), "MDPostgridSOSWorkerTest").getAbsoluteFile();
+        String url2 = "jdbc:derby:" + directory2.getPath().replace('\\','/');
+        DefaultDataSource ds2 = new DefaultDataSource(url2 + ";create=true");
+
+        Connection con2 = ds2.getConnection();
+
+        Util.executeSQLScript("org/constellation/sos/sql/structure-mdweb.sql", con2);
+        Util.executeSQLScript("org/constellation/sos/sql/sml-schema.sql", con2);
+        Util.executeSQLScript("org/constellation/sos/sql/sml-data.sql", con2);
 
         directory = new File(System.getProperty("java.io.tmpdir", "/tmp"), "PostgridSOSWorkerTest").getAbsoluteFile();
         String url = "jdbc:derby:" + directory.getPath().replace('\\','/');
@@ -79,14 +91,19 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic SMLConfiguration = new Automatic();
-            SMLConfiguration.setDataDirectory("SOSWorkerTest/sensors");
+            //SMLConfiguration.setDataDirectory("SOSWorkerTest/sensors");
+            BDD smBdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url2, "", "");
+            //BDD smBdd = new BDD("org.postgresql.Driver","jdbc:postgresql://localhost:5432/sensorml-mdweb", "guilhem", "brehan");
+            SMLConfiguration.setBdd(smBdd);
+            SMLConfiguration.setFormat("mdweb");
+            
             Automatic OMConfiguration  = new Automatic();
             BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
             OMConfiguration.setBdd(bdd);
             SOSConfiguration configuration = new SOSConfiguration(SMLConfiguration, OMConfiguration);
             configuration.setObservationReaderType(ObservationReaderType.DEFAULT);
             configuration.setObservationWriterType(ObservationWriterType.DEFAULT);
-            configuration.setSMLType(DataSourceType.FILE_SYSTEM);
+            configuration.setSMLType(DataSourceType.MDWEB);
             configuration.setObservationFilterType(ObservationFilterType.DEFAULT);
             configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
             configuration.setProfile("transactional");
@@ -117,6 +134,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
         deleteDirectory(directory);
+        deleteDirectory(directory2);
         deleteDirectory(new File("SOSWorkerTest"));
     }
 
@@ -153,7 +171,9 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
     @After
     public void tearDown() throws Exception {
-        worker.destroy();
+        if (worker != null) {
+            worker.destroy();
+        }
     }
 
 

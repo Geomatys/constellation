@@ -106,8 +106,9 @@ public class MDWebSensorReader implements SensorReader {
         }
         try {
             sensorMLConnection = db.getConnection();
-            sensorMLReader     = new Reader20(Standard.SENSORML, sensorMLConnection);
-            sensorMLCatalog         = sensorMLReader.getCatalog("SMLC");
+            boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
+            sensorMLReader     = new Reader20(Standard.SENSORML, sensorMLConnection, isPostgres);
+            sensorMLCatalog    = sensorMLReader.getCatalog("SMLC");
             xmlWriter          = new Writer(sensorMLReader);
             this.map           = map;
 
@@ -118,6 +119,7 @@ public class MDWebSensorReader implements SensorReader {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("JAXBException while starting the MDweb Sensor reader", NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
+            ex.printStackTrace();
             throw new CstlServiceException("SQLException while starting the MDweb Sensor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
@@ -142,15 +144,17 @@ public class MDWebSensorReader implements SensorReader {
                         INVALID_PARAMETER_VALUE, "procedure");
             }
             //we transform the form into an XML string
-           final StringReader sr = new StringReader(xmlWriter.writeForm(f));
-           unmarshaller = marshallerPool.acquireUnmarshaller();
-           Object unmarshalled = unmarshaller.unmarshal(sr);
-           if (unmarshalled instanceof JAXBElement) {
-               unmarshalled = ((JAXBElement)unmarshalled).getValue();
-           }
-           if (unmarshalled instanceof AbstractSensorML)
+            final String xml      = xmlWriter.writeForm(f);
+            final StringReader sr = new StringReader(xml);
+            unmarshaller = marshallerPool.acquireUnmarshaller();
+           
+            Object unmarshalled = unmarshaller.unmarshal(sr);
+            if (unmarshalled instanceof JAXBElement) {
+                unmarshalled = ((JAXBElement)unmarshalled).getValue();
+            }
+            if (unmarshalled instanceof AbstractSensorML)
                return (AbstractSensorML) unmarshalled;
-           else
+            else
               throw new CstlServiceException("The form unmarshalled is not a sensor", NO_APPLICABLE_CODE);
 
         } catch (SQLException ex) {
@@ -159,7 +163,7 @@ public class MDWebSensorReader implements SensorReader {
                                          NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("JAXBException while unmarshalling the sensor", NO_APPLICABLE_CODE);
+            throw new CstlServiceException("JAXBException while unmarshalling the sensor:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } finally {
             if (unmarshaller != null) {
                 marshallerPool.release(unmarshaller);

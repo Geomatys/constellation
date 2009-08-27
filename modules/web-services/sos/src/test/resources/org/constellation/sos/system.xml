@@ -120,7 +120,7 @@
 				</swe:DataRecord>
 			</characteristics>
 			<!-- description des capacites generales du piezometre, notamment les eventuelles limites et perecisions -->
-            <capabilities>
+                        <capabilities>
 				<swe:DataRecord definition="urn:x-ogc:def:property:measurementProperties">
 					<gml:description>Toutes les informations sur les  contraintes sur les donnees</gml:description>
 				
@@ -143,11 +143,11 @@
 					<individualName>BLAISE Marion (BRGM)</individualName>
 					<organizationName>BRGM</organizationName>
 					<contactInfo>
-						<address>
+						<!--address MDWeb reader have an issues with this part >
 								<deliveryPoint>SGR LRO-1039 Rue de Pinville-34000 Montpellier</deliveryPoint>
 									<city>MONTPELLIER</city>
 									<electronicMailAddress>m.blaise@brgm.fr</electronicMailAddress>
-								</address>
+						</address-->
 						</contactInfo>
 				</ResponsibleParty>
 			</contact>
@@ -156,6 +156,7 @@
 					<individualName>ASSENS Martine (CG66)</individualName>
 					<organizationName>CONSEIL GENERAL DES PYRENEES ORIENTALES</organizationName>
 					<contactInfo>
+                                                <!-- because it write it on this form -->
            					<Contact>
 							<address>
 								<Address>
@@ -185,9 +186,7 @@
 					<gml:usesEngineeringDatum>
 						<gml:EngineeringDatum gml:id="datum">
 							<gml:datumName>Sensor Datum</gml:datumName>
-							<gml:anchorPoint>
-							    X, Y et Z sont orthogonal au regard d'un point de reference. Toutes les mesures s'effectuent depuis ce point.
-							</gml:anchorPoint>
+							<gml:anchorPoint>X, Y et Z sont orthogonal au regard d'un point de reference. Toutes les mesures s'effectuent depuis ce point.</gml:anchorPoint>
 						</gml:EngineeringDatum>
 					</gml:usesEngineeringDatum>
 				</gml:EngineeringCRS>
@@ -265,7 +264,7 @@
 					<!--~~~~~~~~~~~~~~~-->
 					<!--  les capteurs   -->
 					<!--~~~~~~~~~~~~~~~-->
-					<component name="Profondeur" xlink:role="urn:x-ogc:def:sensor:detector" xlink:href="capteur_"/>
+					<component xlink:role="urn:x-ogc:def:sensor:detector" xlink:href="capteur_"/>
 				</ComponentList>
 			</components>
 			<positions>
@@ -306,7 +305,7 @@
 					<position name="piezoPosition">
 						<swe:Position localFrame="#PIEZOMETER_FRAME" referenceFrame="#REFERENCE_POINT">
 							<swe:location>
-								<swe:Vector definition="urn:ogc:def:phenomenon:location">
+								<swe:Vector> <!-- issues with mdweb definition="urn:ogc:def:phenomenon:location" -->
 									<swe:coordinate name="x">
 										<swe:Quantity definition="urn:ogc:def:phenomenon:distance" axisID="X">
 											<swe:uom code="m"/>

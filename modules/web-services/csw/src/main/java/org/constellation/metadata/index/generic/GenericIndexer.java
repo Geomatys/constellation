@@ -344,99 +344,87 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.ANALYZED));
 
         final StringBuilder anyText = new StringBuilder();
-        
-        LOGGER.finer("indexing ISO 19119 MD_Metadata");
-        for (final String term : ISO_QUERYABLE.keySet()) {
-             cs.submit(new Callable<TermValue>() {
-                public TermValue call() {
-                    return new TermValue(term, getValues(metadata, ISO_QUERYABLE.get(term)));
-                }
-           });
-        }
 
-        for (int i = 0; i < ISO_QUERYABLE.size(); i++) {
-            try {
-                final TermValue values = cs.take().get();
-                if (values.term != null && !values.term.equals("AnyText")) {
-                    doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
-                    doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                    if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
-                        anyText.append(values.value).append(" ");
+        if (metadata instanceof DefaultMetaData) {
+            LOGGER.finer("indexing ISO 19119 MD_Metadata");
+            for (final String term : ISO_QUERYABLE.keySet()) {
+                 cs.submit(new Callable<TermValue>() {
+                    public TermValue call() {
+                        return new TermValue(term, getValues(metadata, ISO_QUERYABLE.get(term)));
                     }
+               });
+            }
+
+            for (int i = 0; i < ISO_QUERYABLE.size(); i++) {
+                try {
+                    final TermValue values = cs.take().get();
+                    if (values.term != null && !values.term.equals("AnyText")) {
+                        doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
+                        doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                        if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
+                            anyText.append(values.value).append(" ");
+                        }
+                    }
+                } catch (InterruptedException ex) {
+                   LOGGER.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
+                } catch (ExecutionException ex) {
+                   LOGGER.severe("ExecutionException in parralele create document:" + '\n' + ex.getCause());
+                   LOGGER.log(Level.SEVERE, ex.getCause().getMessage(), ex.getCause());
                 }
-            } catch (InterruptedException ex) {
-               LOGGER.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
-            } catch (ExecutionException ex) {
-               LOGGER.severe("ExecutionException in parralele create document:" + '\n' + ex.getCause());
-               LOGGER.log(Level.SEVERE, ex.getCause().getMessage(), ex.getCause());
-            }
-        }
-        
-        //we add the geometry parts
-        String coord = NULL_VALUE;
-        try {
-            coord = getValues(metadata, ISO_QUERYABLE.get("WestBoundLongitude"));
-            StringTokenizer tokens = new StringTokenizer(coord, ",;");
-            final double[] minx = new double[tokens.countTokens()];
-            int i = 0;
-            while (tokens.hasMoreTokens()) {
-                minx[i] = Double.parseDouble(tokens.nextToken());
-                i++;
             }
 
-            coord = getValues(metadata, ISO_QUERYABLE.get("EastBoundLongitude"));
-            tokens = new StringTokenizer(coord, ",;");
-            final double[] maxx = new double[tokens.countTokens()];
-            i = 0;
-            while (tokens.hasMoreTokens()) {
-                maxx[i] = Double.parseDouble(tokens.nextToken());
-                i++;
-            }
-
-            coord = getValues(metadata, ISO_QUERYABLE.get("NorthBoundLatitude"));
-            tokens = new StringTokenizer(coord, ",;");
-            final double[] maxy = new double[tokens.countTokens()];
-            i = 0;
-            while (tokens.hasMoreTokens()) {
-                maxy[i] = Double.parseDouble(tokens.nextToken());
-                i++;
-            }
-
-            coord = getValues(metadata, ISO_QUERYABLE.get("SouthBoundLatitude"));
-            tokens = new StringTokenizer(coord, ",;");
-            final double[] miny = new double[tokens.countTokens()];
-            i = 0;
-            while (tokens.hasMoreTokens()) {
-                miny[i] = Double.parseDouble(tokens.nextToken());
-                i++;
-            }
-
-            if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
-                for (int j = 0; j < minx.length; j++)  {
-                    addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
+            //we add the geometry parts
+            String coord = NULL_VALUE;
+            try {
+                coord = getValues(metadata, ISO_QUERYABLE.get("WestBoundLongitude"));
+                StringTokenizer tokens = new StringTokenizer(coord, ",;");
+                final double[] minx = new double[tokens.countTokens()];
+                int i = 0;
+                while (tokens.hasMoreTokens()) {
+                    minx[i] = Double.parseDouble(tokens.nextToken());
+                    i++;
                 }
-            } else {
-                if (metadata instanceof DefaultMetaData) {
-                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
-                        "cause: missing coordinates.: " + coord);
-                } else if (metadata instanceof RecordType) {
-                    LOGGER.severe("unable to spatially index form: " + ((RecordType)metadata).getIdentifier() + '\n' +
-                        "cause: missing coordinates.: " + coord);
+
+                coord = getValues(metadata, ISO_QUERYABLE.get("EastBoundLongitude"));
+                tokens = new StringTokenizer(coord, ",;");
+                final double[] maxx = new double[tokens.countTokens()];
+                i = 0;
+                while (tokens.hasMoreTokens()) {
+                    maxx[i] = Double.parseDouble(tokens.nextToken());
+                    i++;
+                }
+
+                coord = getValues(metadata, ISO_QUERYABLE.get("NorthBoundLatitude"));
+                tokens = new StringTokenizer(coord, ",;");
+                final double[] maxy = new double[tokens.countTokens()];
+                i = 0;
+                while (tokens.hasMoreTokens()) {
+                    maxy[i] = Double.parseDouble(tokens.nextToken());
+                    i++;
+                }
+
+                coord = getValues(metadata, ISO_QUERYABLE.get("SouthBoundLatitude"));
+                tokens = new StringTokenizer(coord, ",;");
+                final double[] miny = new double[tokens.countTokens()];
+                i = 0;
+                while (tokens.hasMoreTokens()) {
+                    miny[i] = Double.parseDouble(tokens.nextToken());
+                    i++;
+                }
+
+                if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
+                    for (int j = 0; j < minx.length; j++)  {
+                        addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
+                    }
                 } else {
-                    LOGGER.finer("Unexpected metadata type");
-                }
-            }
-
-        } catch (NumberFormatException e) {
-            if (!coord.equals(NULL_VALUE)) {
-                if (metadata instanceof DefaultMetaData) {
                     LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
-                        "cause: unable to parse double: " + coord);
-                } else if (metadata instanceof RecordType) {
-                    LOGGER.severe("unable to spatially index form: " + ((RecordType)metadata).getIdentifier() + '\n' +
-                        "cause: unable to parse double: " + coord);
-                } else {
-                    LOGGER.finer("Unexpected metadata type");
+                            "cause: missing coordinates.: " + coord);
+                }
+
+            } catch (NumberFormatException e) {
+                if (!coord.equals(NULL_VALUE)) {
+                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                            "cause: unable to parse double: " + coord);
                 }
             }
         }
@@ -469,7 +457,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         }
             
         //we add the geometry parts
-        coord = NULL_VALUE;
+        String coord = NULL_VALUE;
         try {
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"));
             StringTokenizer tokens = new StringTokenizer(coord, ",;");
@@ -631,9 +619,15 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      */
     private String getValuesFromPath(String pathID, Object metadata) {
         String result = "";
-        if (pathID.startsWith("ISO 19115:MD_Metadata:")) {
-            // we remove the prefix path part 
-            pathID = pathID.substring(22);
+        if ((pathID.startsWith("ISO 19115:MD_Metadata:") && metadata instanceof DefaultMetaData) ||
+            (pathID.startsWith("Catalog Web Service:Record:") && metadata instanceof RecordType)) {
+            
+            // we remove the prefix path part
+            if (pathID.startsWith("ISO 19115:MD_Metadata:")) {
+                pathID = pathID.substring(22);
+            } else if (pathID.startsWith("Catalog Web Service:Record:")) {
+                pathID = pathID.substring(27);
+            }
             
             //for each part of the path we execute a (many) getter
             while (!pathID.equals("")) {
