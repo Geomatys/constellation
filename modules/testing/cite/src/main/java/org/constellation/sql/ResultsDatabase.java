@@ -28,7 +28,7 @@ import java.util.List;
 
 // Geotoolkit dependencies
 import java.util.Map;
-import org.geotoolkit.internal.jdbc.DefaultDataSource;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 
 
 /**

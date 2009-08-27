@@ -56,7 +56,7 @@ import org.constellation.swe.v101.CompositePhenomenonTable;
 import org.constellation.swe.v101.PhenomenonTable;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
-import org.geotoolkit.internal.jdbc.DefaultDataSource;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;

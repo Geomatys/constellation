@@ -33,7 +33,7 @@ import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
-import org.geotoolkit.internal.jdbc.DefaultDataSource;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.xml.MarshallerPool;
 

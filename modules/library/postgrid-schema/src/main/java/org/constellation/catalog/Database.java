@@ -53,7 +53,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.lang.reflect.Constructor;
 
 import org.geotoolkit.io.TableWriter;
-import org.geotoolkit.internal.jdbc.JDBC;
+import org.geotoolkit.internal.sql.JDBC;
 import org.geotoolkit.util.converter.Classes;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
