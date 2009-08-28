@@ -55,10 +55,6 @@
       <artifactId>geotk-coverage</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gtm-metadata</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.constellation.library</groupId>
       <artifactId>cstl-lib-base</artifactId>
       <version>${project.version}</version>

@@ -24,13 +24,13 @@ import java.sql.SQLException;
 import org.constellation.catalog.*;
 
 // OpenGIS dependencies
+import org.geotoolkit.metadata.MetadataStandard;
 import org.opengis.metadata.citation.Citation;
 import org.opengis.metadata.quality.DataQuality;
 
 // Geotools dependencies
-import org.geotools.metadata.sql.MetadataSource;
+import org.geotoolkit.metadata.sql.MetadataSource;
 import org.geotoolkit.metadata.iso.citation.DefaultCitation;
-import org.geotoolkit.metadata.iso.quality.DefaultDataQuality;
 
 
 /**
@@ -81,7 +81,7 @@ public class MetadataTable extends Table {
         T candidate = type.cast(p.get(identifier));
         if (candidate == null) {
             if (source == null) {
-                source = new MetadataSource(getDatabase().getConnection());
+                source = new MetadataSource(MetadataStandard.ISO_19115, null, "metadata"); // TODO: provide a data source.
             }
             candidate = type.cast(source.getEntry(type, identifier));
             /*

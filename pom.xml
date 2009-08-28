@@ -155,7 +155,6 @@
     be the one declared below.
   -->
   <properties>
-    <geotools.version>2.6-SNAPSHOT</geotools.version>
     <geotoolkit.version>SNAPSHOT</geotoolkit.version>
     <constellation.config>org.constellation.configuration.ws</constellation.config>
     <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
@@ -316,17 +315,16 @@
         <artifactId>jts</artifactId>
         <version>1.10</version>
       </dependency>
-      <!-- geotools -->
-      <dependency>
-        <groupId>org.geotools</groupId>
-        <artifactId>gtm-metadata</artifactId>
-        <version>${geotools.version}</version>
-      </dependency>
 
       <!-- Geotoolkit version -->
       <dependency>
         <groupId>org.geotoolkit</groupId>
         <artifactId>geotk-metadata</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-metadata-sql</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
       <dependency>
