@@ -126,12 +126,12 @@ public final class ResultsDatabase {
         if (previousSuite != null) {
             previousTestsFailed = getTestsFailed(previousSuite);
             for (Result currentTest : currentTestsFailed) {
-                if (!previousTestsFailed.contains(currentTest)) {
+                if (!isTestPresentInList(currentTest, previousTestsFailed)) {
                     problematicTests.add(currentTest);
                 }
             }
             for (Result previousTest : previousTestsFailed) {
-                if (!currentTestsFailed.contains(previousTest)) {
+                if (!isTestPresentInList(previousTest, currentTestsFailed)) {
                     newlyPassedTests.add(previousTest);
                 }
             }
@@ -389,6 +389,24 @@ public final class ResultsDatabase {
         ps.close();
 
         existingSuites.add(new Suite(date, service, version));
+    }
+
+    /**
+     * Returns {@code true} if the test is present in the list specified. {@code False}
+     * otherwise.
+     *
+     * @param test  The test to verify the existence in the list.
+     * @param tests The list of tests into which we search the test.
+     */
+    private boolean isTestPresentInList(final Result test, final List<Result> tests) {
+        for (Result currentTest : tests) {
+            if (currentTest.getDirectory().equals(test.getDirectory()) &&
+                currentTest.getId().equals(test.getId()))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
