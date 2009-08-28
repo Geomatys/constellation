@@ -85,7 +85,7 @@ public final class Result {
 
     @Override
     public String toString() {
-        return "Result["+ date +","+ id +","+ directory +","+ passed +"]";
+        return "Result["+ ResultsDatabase.DATE_FORMAT.format(date) +","+ id +","+ directory +","+ passed +"]";
     }
 
     @Override

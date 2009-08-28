@@ -21,6 +21,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,6 +41,11 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
  * @since 0.4
  */
 public final class ResultsDatabase {
+    /**
+     * The pattern for the ouput of a date.
+     */
+    public static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+
     /**
      * Database connection parameters.
      */
@@ -136,7 +143,7 @@ public final class ResultsDatabase {
                 }
             }
         }
-        displayComparaisonResults(problematicTests, newlyPassedTests, date, previousSuite);
+        displayComparaisonResults(problematicTests, newlyPassedTests, date, previousSuite, service, version);
     }
 
     /**
@@ -250,22 +257,27 @@ public final class ResultsDatabase {
      * @param previous         The date of the previous suite of tests. Note that if it is
      *                         {@code null}, we can't compare the current session with
      *                         another one.
+     * @param service          The service name.
+     * @param version          The service version.
      */
     private void displayComparaisonResults(final List<Result> problematicTests,
                                            final List<Result> newlyPassedTests,
-                                           final Date date, final Date previous)
+                                           final Date date, final Date previous,
+                                           final String service, final String version)
     {
         final char endOfLine = '\n';
         final char tab       = '\t';
         final StringBuilder sb;
         if (previous == null) {
-            sb = new StringBuilder("This is the first session of tests launched. " +
-                    "We can't compare the results with a previous one.");
+            sb = new StringBuilder("This is the first session of tests launched for ");
+            sb.append(service).append(" ").append(version)
+              .append(". We can't compare the results with a previous one.");
             System.out.println(sb.toString());
             return;
         }
-        sb = new StringBuilder("Results for the session executed at: ").append(date.toString());
-        sb.append(", compared to the one at:").append(previous.toString()).append(endOfLine);
+        sb = new StringBuilder("Results for the session ");
+        sb.append(service).append(" ").append(version).append(", executed at ").append(DATE_FORMAT.format(date));
+        sb.append(" compared to the one at ").append(previous.toString()).append(endOfLine);
         if (newlyPassedTests.isEmpty()) {
             sb.append(tab).append("No tests have been corrected in the current session.").append(endOfLine);
         } else {
