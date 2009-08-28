@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 // Geotoolkit dependencies
-import java.util.Map;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 
 
@@ -67,7 +67,9 @@ public final class ResultsDatabase {
      * Select requests.
      */
     private static final String SELECT_TESTS_FAILED =
-            "SELECT * FROM \"TestsFailed\" WHERE service=? AND version=? AND date=?;";
+            "SELECT date,id,directory FROM \"Results\" WHERE date=? AND passed=FALSE;";
+    private static final String SELECT_PREVIOUS_SUITE =
+            "SELECT date FROM \"Suites\" WHERE date < ? AND service=? AND version=? ORDER BY date DESC;";
 
     /**
      * The connection to the database of Cite Tests results.
@@ -100,23 +102,41 @@ public final class ResultsDatabase {
     }
 
     /**
+     * Compare the results between the current session and the previous one.
      *
-     * @param service
-     * @param version
-     * @param date
+     * @param date    The execution date of the tests.
+     * @param service The service name.
+     * @param version The service version.
      * @throws SQLException
      */
-    public void compareResults(final String service, final String version, final Date date)
+    public void compareResults(final Date date, final String service, final String version)
                                throws SQLException
     {
-        ensureConnectionOpened();
+        // Contains all tests that have failed for the current session.
+        final List<Result> currentTestsFailed  = getTestsFailed(date);
 
-        final PreparedStatement ps = connection.prepareStatement(SELECT_TESTS_FAILED);
-        ps.setString(1, service);
-        ps.setString(2, version);
-        ps.setTimestamp(3, new Timestamp(date.getTime()));
+        final Date previousSuite = getPreviousSuiteDate(date, service, version);
+        // Contains all tests that have failed for the previous session.
+        final List<Result> previousTestsFailed;
 
-        final ResultSet rs = ps.executeQuery();
+        // Will contain the tests that have passed for the last session, but not for the current one.
+        final List<Result> problematicTests = new ArrayList<Result>();
+        // Will contain the tests that have passed for the current session, but not for the last one.
+        final List<Result> newlyPassedTests = new ArrayList<Result>();
+        if (previousSuite != null) {
+            previousTestsFailed = getTestsFailed(previousSuite);
+            for (Result currentTest : currentTestsFailed) {
+                if (!previousTestsFailed.contains(currentTest)) {
+                    problematicTests.add(currentTest);
+                }
+            }
+            for (Result previousTest : previousTestsFailed) {
+                if (!currentTestsFailed.contains(previousTest)) {
+                    newlyPassedTests.add(previousTest);
+                }
+            }
+        }
+        displayComparaisonResults(problematicTests, newlyPassedTests, date, previousSuite);
     }
 
     /**
@@ -222,6 +242,55 @@ public final class ResultsDatabase {
     }
 
     /**
+     * Display the results for the current session, compared to the last one.
+     *
+     * @param problematicTests List of problematic tests, that no more passed.
+     * @param newlyPassedTests List of tests that are corrected in the current session.
+     * @param date             The date of the suite of tests.
+     * @param previous         The date of the previous suite of tests. Note that if it is
+     *                         {@code null}, we can't compare the current session with
+     *                         another one.
+     */
+    private void displayComparaisonResults(final List<Result> problematicTests,
+                                           final List<Result> newlyPassedTests,
+                                           final Date date, final Date previous)
+    {
+        final char endOfLine = '\n';
+        final char tab       = '\t';
+        final StringBuilder sb;
+        if (previous == null) {
+            sb = new StringBuilder("This is the first session of tests launched. " +
+                    "We can't compare the results with a previous one.");
+            System.out.println(sb.toString());
+            return;
+        }
+        sb = new StringBuilder("Results for the session executed at: ").append(date.toString());
+        sb.append(", compared to the one at:").append(previous.toString()).append(endOfLine);
+        if (newlyPassedTests.isEmpty()) {
+            sb.append(tab).append("No tests have been corrected in the current session.").append(endOfLine);
+        } else {
+            sb.append(tab).append("Tests which have been corrected in the current session:").append(endOfLine);
+            for (Result res : newlyPassedTests) {
+                sb.append(tab).append(tab).append(res.toString()).append(endOfLine);
+            }
+        }
+
+        if (problematicTests.isEmpty()) {
+            sb.append(tab).append("No new tests have failed in the current session.").append(endOfLine);
+        } else {
+            sb.append(tab).append("/!\\ Some tests are now failing !! You should fix them").append(endOfLine);
+            for (Result res : problematicTests) {
+                sb.append(tab).append(tab).append(res.toString()).append(endOfLine);
+            }
+            System.out.println(sb.toString());
+            throw new RuntimeException("Some tests are now failing, but not in the previous suite. " +
+                    "Please correct the service responsible to fix the build !");
+        }
+
+        System.out.println(sb.toString());
+    }
+
+    /**
      * Throws an {@link SQLException} if the connection to the database is closed.
      * This method should be invoked before trying to perform an action on the
      * database.
@@ -231,6 +300,54 @@ public final class ResultsDatabase {
             throw new SQLException("The connection to the database is already closed. " +
                                    "Unable to perform the wished action.");
         }
+    }
+
+    /**
+     * Returns the date of the previous session of tests, or {@code null} if there is no other
+     * test suite in the database.
+     *
+     * @param date The date of the current session.
+     * @param service The service name.
+     * @param version The service version.
+     * @throws SQLException
+     */
+    private Date getPreviousSuiteDate(final Date date, final String service, final String version)
+                                      throws SQLException
+    {
+        ensureConnectionOpened();
+
+        final PreparedStatement ps = connection.prepareStatement(SELECT_PREVIOUS_SUITE);
+        ps.setTimestamp(1, new Timestamp(date.getTime()));
+        ps.setString(2, service);
+        ps.setString(3, version);
+        final ResultSet rs = ps.executeQuery();
+        final Date dateResult = (rs.next()) ? rs.getTimestamp(1) : null;
+        rs.close();
+
+        return dateResult;
+    }
+
+    /**
+     * Returns a list of {@link Result} that have failed for the session at the date specified.
+     * This list can be empty, but never {@code null}.
+     *
+     * @param date The date of the session.
+     * @throws SQLException
+     */
+    private List<Result> getTestsFailed(final Date date) throws SQLException {
+        ensureConnectionOpened();
+
+        final PreparedStatement psCurrent = connection.prepareStatement(SELECT_TESTS_FAILED);
+        psCurrent.setTimestamp(1, new Timestamp(date.getTime()));
+
+        final List<Result> results = new ArrayList<Result>();
+        final ResultSet rs = psCurrent.executeQuery();
+        while (rs.next()) {
+            results.add(new Result(rs.getTimestamp(1), rs.getString(2), rs.getString(3), false));
+        }
+        rs.close();
+
+        return results;
     }
 
     /**

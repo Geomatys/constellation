@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import org.constellation.sql.Result;
 import org.constellation.sql.ResultsDatabase;
@@ -63,6 +65,9 @@ public final class HandleLogs {
             String line;
             resDB = new ResultsDatabase();
             while ((line = br.readLine()) != null) {
+                if (line.trim().startsWith("Error")) {
+                    throw new IllegalArgumentException("Error the session does not exist.");
+                }
                 final Result result = logParser.toResult(line);
                 resDB.insertResult(result, service, version);
             }
@@ -85,12 +90,12 @@ public final class HandleLogs {
         }
     }
 
-    private static void analyseResult(final String service, final String version, final Date date) {
+    private static void analyseResult(final Date date, final String service, final String version) {
 
         ResultsDatabase resDB = null;
         try {
             resDB = new ResultsDatabase();
-            resDB.compareResults(service, version, date);
+            resDB.compareResults(date, service, version);
         } catch (SQLException ex) {
             // May be normal if we killed the process. Prints only
             // a summary of the exception, not the full stack trace.
@@ -109,8 +114,11 @@ public final class HandleLogs {
             LOGGER.info("No argument have been given to the script. Usage log.sh [profile...]");
         }
         final Runtime rt = Runtime.getRuntime();
+        // Store the date for each sessions.
+        final Map<String,Date> dateOfSessions = new HashMap<String,Date>();
         for (String arg : args) {
             final Date date = new Date();
+            dateOfSessions.put(arg, date);
             if (!arg.contains("-")) {
                 LOGGER.severe("The session argument should respect the syntax \"service-version\".");
             }
@@ -124,7 +132,12 @@ public final class HandleLogs {
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
-            //analyseResult(arg, date);
+        }
+        for (String arg : args) {
+            final String[] argValue = arg.split("-");
+            final String service = argValue[0];
+            final String version = argValue[1];
+            analyseResult(dateOfSessions.get(arg), service, version);
         }
 
         System.exit(0);
