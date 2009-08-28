@@ -95,6 +95,10 @@ public final class LaunchTests implements Runnable {
 
         // Then we can kill the server.
         GrizzlyServer.finish();
+
+        // Launch the process that will analyse the tests results.
+        HandleLogs.main(args);
+
         System.exit(0);
     }
 }
