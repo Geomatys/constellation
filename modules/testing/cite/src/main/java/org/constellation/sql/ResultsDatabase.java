@@ -34,6 +34,13 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 
 
 /**
+ * <p>Allow to store results of a {@code Cite tests} session into a database.
+ * A comparison between the current and the previous session can be performed,
+ * and a summary is then displayed.</p>
+ * <p>If some tests are now failing but passed in the previous session, then the
+ * compilation will fail and the user will be informed about the tests that
+ * are now failing. The complete error logs can be retrieved in the directory
+ * specified.</p>
  *
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
@@ -290,13 +297,16 @@ public final class ResultsDatabase {
         if (problematicTests.isEmpty()) {
             sb.append(tab).append("No new tests have failed in the current session.").append(endOfLine);
         } else {
-            sb.append(tab).append("/!\\ Some tests are now failing !! You should fix them").append(endOfLine);
+            sb.append(tab).append("/!\\ Some tests are now failing ! You should fix them to restore the build /!\\")
+              .append(endOfLine);
             for (Result res : problematicTests) {
-                sb.append(tab).append(tab).append(res.toString()).append(endOfLine);
+                sb.append(tab).append(tab).append("Id: ").append(res.getId()).append(endOfLine);
+                sb.append(tab).append(tab).append(tab).append("==> Directory: ").append(res.getDirectory())
+                  .append(endOfLine);
             }
             System.out.println(sb.toString());
             throw new RuntimeException("Some tests are now failing, but not in the previous suite. " +
-                    "Please correct the service responsible to fix the build !");
+                    "Please fix the service responsible of the failure of these tests !");
         }
 
         System.out.println(sb.toString());

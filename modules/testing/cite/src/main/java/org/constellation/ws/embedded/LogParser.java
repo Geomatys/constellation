@@ -21,6 +21,8 @@ import org.constellation.sql.Result;
 
 
 /**
+ * Parse the log lines gotten from the execution of the script {@code log.sh [session]},
+ * for the date specified.
  *
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
@@ -55,7 +57,7 @@ public final class LogParser {
         serviceAndVersion = serviceAndVersion.substring(1, serviceAndVersion.length() - 1);
         final String directory = serviceAndVersion;
         if (serviceAndVersion.contains("/")) {
-            serviceAndVersion = serviceAndVersion.substring(0, serviceAndVersion.indexOf("/"));
+            serviceAndVersion = serviceAndVersion.substring(0, serviceAndVersion.indexOf('/'));
         }
         return new Result(date, lineSplitted[1], directory, passed);
     }

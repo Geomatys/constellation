@@ -31,8 +31,7 @@ import org.geotoolkit.util.logging.Logging;
 
 
 /**
- * Launch the {@code Cite tests} on a {@linkplain GrizzlyServer Grizzly server} that
- * embedds Constellation's web services.
+ * Perform actions on the logs gotten from the execution of {@code Cite tests}.
  *
  * @version $Id$
  *
@@ -53,7 +52,11 @@ public final class HandleLogs {
 
     /**
      * Displays the result of the process into the standard output.
-     * This method is public as an implementation side-effect - do not use.
+     *
+     * @param in      The input stream to display.
+     * @param service The service name.
+     * @param version The service version.
+     * @param date    The execution date of the tests suite.
      */
     private static void copyResult(final InputStream in, final String service,
                                    final String version, final Date date)
@@ -90,6 +93,13 @@ public final class HandleLogs {
         }
     }
 
+    /**
+     * Analyses the result gotten from this session, with the ones of the previous session.
+     *
+     * @param date    The execution date of the current {@code Cite tests} session.
+     * @param service The service name.
+     * @param version The service version.
+     */
     private static void analyseResult(final Date date, final String service, final String version) {
 
         ResultsDatabase resDB = null;
@@ -114,8 +124,9 @@ public final class HandleLogs {
             LOGGER.info("No argument have been given to the script. Usage log.sh [profile...]");
         }
         final Runtime rt = Runtime.getRuntime();
-        // Store the date for each sessions.
+        // Stores the date for each sessions in the map.
         final Map<String,Date> dateOfSessions = new HashMap<String,Date>();
+        // Launches the log script, and copy the results into the database.
         for (String arg : args) {
             final Date date = new Date();
             dateOfSessions.put(arg, date);
@@ -133,6 +144,7 @@ public final class HandleLogs {
                 ex.printStackTrace();
             }
         }
+        // Analyses the results of the session compared to the previous one.
         for (String arg : args) {
             final String[] argValue = arg.split("-");
             final String service = argValue[0];
