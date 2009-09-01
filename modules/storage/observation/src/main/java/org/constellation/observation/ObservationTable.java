@@ -29,7 +29,6 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
-import org.constellation.metadata.MetadataTable;
 import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointTable;
 import org.constellation.swe.v101.AnyResultTable;
@@ -124,12 +123,6 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     protected AnyResultTable results;
-    
-    /**
-     * Connexion vers la table des méta-données. Une table par défaut (éventuellement partagée)
-     * sera construite la première fois où elle sera nécessaire.
-     */
-    protected MetadataTable metadata;
     
     /**
      * La station pour laquelle on veut des observations, ou {@code null} pour récupérer les

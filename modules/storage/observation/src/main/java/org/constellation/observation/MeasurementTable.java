@@ -25,7 +25,6 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
-import org.constellation.metadata.MetadataTable;
 import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointTable;
 import org.constellation.swe.v101.CompositePhenomenonTable;
@@ -93,12 +92,6 @@ public class MeasurementTable extends SingletonTable<Measurement> {
      * Une connexion (potentiellement partagée) sera établie la première fois où elle sera nécessaire.
      */
     protected ProcessTable procedures;
-    
-    /**
-     * Connexion vers la table des méta-données. Une table par défaut (éventuellement partagée)
-     * sera construite la première fois où elle sera nécessaire.
-     */
-    protected MetadataTable metadata;
     
     /**
      * Connexion vers la table des {@linkplain Measure measure}.
