@@ -28,4 +28,6 @@ public class Parameters {
     public static final String SUCCESS = "Success";
 
     public static final String SERVICE = "Service";
+
+    private Parameters(){}
 }

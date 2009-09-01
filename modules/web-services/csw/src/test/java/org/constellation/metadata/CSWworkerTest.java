@@ -17,22 +17,36 @@
 
 package org.constellation.metadata;
 
-// Junit dependencies
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
+// J2SE dependencies
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 // JAXB dependencies
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
-// constyellation dependencies
+// constellation dependencies
+import org.constellation.util.Util;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
+import static org.constellation.metadata.TypeNames.*;
+
+// geotoolkit dependencies
+import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
+import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
+import org.geotoolkit.ogc.xml.v110.SortByType;
+import org.geotoolkit.ogc.xml.v110.SortOrderType;
+import org.geotoolkit.ogc.xml.v110.SortPropertyType;
+import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
+import org.geotoolkit.ows.xml.v100.BoundingBoxType;
+import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.GetDomainResponse;
 import org.geotoolkit.csw.xml.v202.AcknowledgementType;
@@ -61,36 +75,23 @@ import org.geotoolkit.csw.xml.v202.TransactionResponseType;
 import org.geotoolkit.csw.xml.v202.TransactionType;
 import org.geotoolkit.csw.xml.v202.UpdateType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
-import org.constellation.generic.database.Automatic;
-import org.constellation.util.Util;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
-import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
+import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
+import org.geotoolkit.util.SimpleInternationalString;
+import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
 import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
-import static org.constellation.metadata.TypeNames.*;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 
-// geotools dependencies
-import org.geotoolkit.metadata.iso.DefaultMetaData;
-import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
-import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
-
-// JUnit dependencies
-import org.geotoolkit.ogc.xml.v110.SortByType;
-import org.geotoolkit.ogc.xml.v110.SortOrderType;
-import org.geotoolkit.ogc.xml.v110.SortPropertyType;
-import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
-import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
-import org.geotoolkit.ows.xml.v100.BoundingBoxType;
-import org.geotoolkit.ows.xml.v100.SectionsType;
-import org.geotoolkit.util.SimpleInternationalString;
-import org.geotoolkit.xml.MarshallerPool;
-import org.junit.*;
+// GeoAPI dependencies
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.ExtendedElementInformation;
 import org.opengis.metadata.citation.Role;
+
+// JUnit dependencies
+import org.junit.Ignore;
+import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.extent.VerticalExtent;
 import static org.junit.Assert.*;
 
 /**
@@ -98,99 +99,21 @@ import static org.junit.Assert.*;
  * 
  * @author Guilhem Legal (geomatys)
  */
+@Ignore
 public class CSWworkerTest {
 
-    private CSWworker worker;
+    protected CSWworker worker;
 
-    private static MarshallerPool pool;
-    private static Unmarshaller unmarshaller;
+    protected static MarshallerPool pool;
+    protected static Unmarshaller unmarshaller;
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        deleteTemporaryFile();
-
-        pool = new MarshallerPool(org.constellation.generic.database.ObjectFactory.class);
-        unmarshaller = pool.acquireUnmarshaller();
-
-        File configDir = new File("CSWWorkerTest");
-        if (!configDir.exists()) {
-            configDir.mkdir();
-
-            //we write the data files
-            File dataDirectory = new File(configDir, "data");
-            dataDirectory.mkdir();
-            writeDataFile(dataDirectory, "meta1.xml", "42292_5p_19900609195600");
-            writeDataFile(dataDirectory, "meta2.xml", "42292_9s_19900610041000");
-            writeDataFile(dataDirectory, "meta3.xml", "39727_22_19750113062500");
-            writeDataFile(dataDirectory, "meta4.xml", "11325_158_19640418141800");
-            writeDataFile(dataDirectory, "meta5.xml", "40510_145_19930221211500");
-
-            //we write the configuration file
-            File configFile = new File(configDir, "config.xml");
-            Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
-            final Marshaller marshaller = pool.acquireMarshaller();
-            marshaller.marshal(configuration, configFile);
-            pool.release(marshaller);
-        }
-
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-        deleteTemporaryFile();
-        pool.release(unmarshaller);
-    }
-
-    public static void deleteTemporaryFile() {
-        File configDirectory = new File("CSWWorkerTest");
-        if (configDirectory.exists()) {
-            File dataDirectory = new File(configDirectory, "data");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            File indexDirectory = new File(configDirectory, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-            File conf = new File(configDirectory, "config.xml");
-            conf.delete();
-            configDirectory.delete();
-        }
-    }
-
-    @Before
-    public void setUp() throws Exception {
-
-        pool = new AnchorPool(Arrays.asList(CSWClassesContext.getAllClasses()));
-        unmarshaller = pool.acquireUnmarshaller();
-
-
-        File configDir = new File("CSWWorkerTest");
-        worker = new CSWworker("", pool, configDir);
-        Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
-        worker.setSkeletonCapabilities(stcapa);
-
-    }
-    
-    @After
-    public void tearDown() throws Exception {
-        if (unmarshaller != null) {
-            pool.release(unmarshaller);
-        }
-    }
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
 
     /**
      * Tests the getcapabilities method
      *
      * @throws java.lang.Exception
      */
-    @Test
     public void getCapabilitiesTest() throws Exception {
 
         /*
@@ -301,9 +224,8 @@ public class CSWworkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
     public void getRecordByIdTest() throws Exception {
-
+        unmarshaller = pool.acquireUnmarshaller();
         /*
          *  TEST 1 : getRecordById with the first metadata in ISO mode.
          */
@@ -321,7 +243,7 @@ public class CSWworkerTest {
 
         DefaultMetaData ExpResult1 = (DefaultMetaData) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
 
-        assertEquals(ExpResult1, isoResult);
+        metadataEquals(ExpResult1, isoResult);
 
         /*
          *  TEST 2 : getRecordById with the first metadata in DC mode (BRIEF).
@@ -361,6 +283,7 @@ public class CSWworkerTest {
 
         SummaryRecordType expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1SDC.xml"))).getValue();
 
+        assertEquals(expSumResult1.getFormat(), sumResult.getFormat());
         assertEquals(expSumResult1, sumResult);
 
         /*
@@ -381,6 +304,7 @@ public class CSWworkerTest {
 
         RecordType expRecordResult1 =  ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1FDC.xml"))).getValue();
 
+        assertEquals(expRecordResult1.getFormat(), recordResult.getFormat());
         assertEquals(expRecordResult1, recordResult);
 
         /*
@@ -489,6 +413,7 @@ public class CSWworkerTest {
 
         expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1SDC.xml"))).getValue();
 
+        assertEquals(expSumResult1.getFormat(), sumResult.getFormat());
         assertEquals(expSumResult1, sumResult);
 
         /*
@@ -509,8 +434,10 @@ public class CSWworkerTest {
 
         expSumResult1 =  ((JAXBElement<SummaryRecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1SDC.xml"))).getValue();
 
+        assertEquals(expSumResult1.getFormat(), sumResult.getFormat());
         assertEquals(expSumResult1, sumResult);
 
+        pool.release(unmarshaller);
     }
 
     /**
@@ -518,17 +445,16 @@ public class CSWworkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
     public void getRecordsTest() throws Exception {
-        
+        unmarshaller = pool.acquireUnmarshaller();
         /*
-         *  TEST 1 : getRecords with HITS - DC mode (FULL) - CQL text: Title LIKE *0008411.ctd
+         *  TEST 1 : getRecords with HITS - DC mode (FULL) - CQL text: Title LIKE 90008411%
          */
         
         List<QName> typeNames             = Arrays.asList(TypeNames.RECORD_QNAME);
         ElementSetNameType elementSetName = new ElementSetNameType(ElementSetType.FULL);
         SortByType sortBy                 = null;
-        QueryConstraintType constraint    = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
+        QueryConstraintType constraint    = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
         QueryType query = new QueryType(typeNames, elementSetName, sortBy, constraint);
         GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.HITS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
@@ -544,13 +470,13 @@ public class CSWworkerTest {
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
         /*
-         *  TEST 2 : getRecords with RESULTS - DC mode (FULL) - CQL text: Title LIKE *0008411.ctd
+         *  TEST 2 : getRecords with RESULTS - DC mode (FULL) - CQL text: Title LIKE 90008411%
          */
 
         typeNames      = Arrays.asList(TypeNames.RECORD_QNAME);
         elementSetName = new ElementSetNameType(ElementSetType.FULL);
         sortBy         = null;
-        constraint     = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
+        constraint     = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
         query          = new QueryType(typeNames, elementSetName, sortBy, constraint);
         request        = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
@@ -593,26 +519,26 @@ public class CSWworkerTest {
         assertEquals(expRecordResult2, recordResult2);
 
         /*
-         *  TEST 3 : getRecords with VALIDATE - DC mode (FULL) - CQL text: Title LIKE *0008411.ctd
+         *  TEST 3 : getRecords with VALIDATE - DC mode (FULL) - CQL text: Title LIKE 90008411%
          */
 
         typeNames      = Arrays.asList(TypeNames.RECORD_QNAME);
         elementSetName = new ElementSetNameType(ElementSetType.FULL);
         sortBy         = null;
-        constraint     = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
+        constraint     = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
         query          = new QueryType(typeNames, elementSetName, sortBy, constraint);
         request        = new GetRecordsType("CSW", "2.0.2", ResultType.VALIDATE, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
         assertTrue(worker.getRecords(request) instanceof AcknowledgementType);
 
         /*
-         *  TEST 4 : getRecords with RESULTS - DC mode (BRIEF) - CQL text: Title LIKE *0008411.ctd
+         *  TEST 4 : getRecords with RESULTS - DC mode (BRIEF) - CQL text: Title LIKE 90008411%
          */
 
         typeNames      = Arrays.asList(TypeNames.RECORD_QNAME);
         elementSetName = new ElementSetNameType(ElementSetType.BRIEF);
         sortBy         = null;
-        constraint     = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
+        constraint     = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
         query          = new QueryType(typeNames, elementSetName, sortBy, constraint);
         request        = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
@@ -656,7 +582,7 @@ public class CSWworkerTest {
 
 
         /*
-         *  TEST 5 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE *0008411.ctd
+         *  TEST 5 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE 90008411%
          */
 
         typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
@@ -666,7 +592,7 @@ public class CSWworkerTest {
         cust.add(_Date_QNAME);
         cust.add(_Format_QNAME);
         sortBy           = null;
-        constraint       = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
+        constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
         query            = new QueryType(typeNames, cust, sortBy, constraint);
         request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
@@ -709,7 +635,7 @@ public class CSWworkerTest {
 
 
         /*
-         *  TEST 5 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE *0008411.ctd
+         *  TEST 5 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE 90008411%
          */
 
         typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
@@ -718,7 +644,7 @@ public class CSWworkerTest {
         cust.add(_Modified_QNAME);
         cust.add(_Identifier_QNAME);
         sortBy           = null;
-        constraint       = new QueryConstraintType("Title LIKE '%0008411.ctd'", "1.0.0");
+        constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
         query            = new QueryType(typeNames, cust, sortBy, constraint);
         request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
@@ -755,17 +681,17 @@ public class CSWworkerTest {
 
         expCustomResult1 =  new RecordType();
         expCustomResult1.setIdentifier(new SimpleLiteral("42292_5p_19900609195600"));
-        expCustomResult1.setModified(new SimpleLiteral("2009-01-01T00:00:00"));
+        expCustomResult1.setModified(new SimpleLiteral("2009-01-01T00:00:00+01:00"));
         expCustomResult1.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.1667, 36.6, 1.1667, 36.6));
         expCustomResult2 =  new RecordType();
         expCustomResult2.setIdentifier(new SimpleLiteral("42292_9s_19900610041000"));
-        expCustomResult2.setModified(new SimpleLiteral("2009-01-26T12:00:00"));
+        expCustomResult2.setModified(new SimpleLiteral("2009-01-26T12:00:00+01:00"));
         expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.3667, 36.6, 1.3667, 36.6));
 
 
         assertEquals(expCustomResult1, customResult1);
         assertEquals(expCustomResult2, customResult2);
-
+        pool.release(unmarshaller);
     }
 
     /**
@@ -773,9 +699,8 @@ public class CSWworkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
     public void getDomainTest() throws Exception {
-
+        unmarshaller = pool.acquireUnmarshaller();
         /*
          *  TEST 1 : getDomain 2.0.2 parameterName = GetCapabilities.sections
          */
@@ -816,7 +741,7 @@ public class CSWworkerTest {
         GetDomainResponse expResult200 = new org.geotoolkit.csw.xml.v200.GetDomainResponseType(domainValues200);
 
         assertEquals(expResult200, result200);
-
+        pool.release(unmarshaller);
 
     }
 
@@ -825,9 +750,8 @@ public class CSWworkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
     public void transactionDeleteTest() throws Exception {
-        
+        unmarshaller = pool.acquireUnmarshaller();
         /*
          *  TEST 1 : we delete the metadata 42292_5p_19900609195600
          */
@@ -845,7 +769,8 @@ public class CSWworkerTest {
 
         DefaultMetaData isoResult = (DefaultMetaData) obj;
         DefaultMetaData ExpResult1 = (DefaultMetaData) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
-        assertEquals(ExpResult1, isoResult);
+        metadataEquals(ExpResult1, isoResult);
+        
 
         // we delete the metadata
         QueryConstraintType constraint = new QueryConstraintType("identifier='42292_5p_19900609195600'", "1.1.0");
@@ -868,6 +793,7 @@ public class CSWworkerTest {
         assertTrue(exe != null);
         assertEquals(exe.getExceptionCode() , INVALID_PARAMETER_VALUE);
         assertEquals(exe.getLocator() , "id");
+        pool.release(unmarshaller);
     }
 
     /**
@@ -875,9 +801,8 @@ public class CSWworkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
     public void transactionInsertTest() throws Exception {
-
+        unmarshaller = pool.acquireUnmarshaller();
         /*
          *  TEST 1 : we add the metadata 42292_5p_19900609195600
          */
@@ -902,8 +827,8 @@ public class CSWworkerTest {
         assertTrue(obj instanceof DefaultMetaData);
 
         DefaultMetaData isoResult = (DefaultMetaData) obj;
-        assertEquals(ExpResult1, isoResult);
-
+        metadataEquals(ExpResult1, isoResult);
+        pool.release(unmarshaller);
     }
 
     /**
@@ -911,9 +836,10 @@ public class CSWworkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Test
     public void transactionUpdateTest() throws Exception {
-        
+        unmarshaller = pool.acquireUnmarshaller();
+
+        LOGGER.info("--- TRANSACTION UPDATE TEST ---");
         /*
          *  TEST 1 : we update the metadata 42292_5p_19900609195600 by replacing it by another metadata
          */
@@ -932,7 +858,7 @@ public class CSWworkerTest {
         try {
             GetRecordByIdType requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
                 MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", Arrays.asList("42292_5p_19900609195600"));
-            GetRecordByIdResponseType GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
+             worker.getRecordById(requestGRBI);
         } catch (CstlServiceException ex) {
             exe = ex;
         }
@@ -955,7 +881,7 @@ public class CSWworkerTest {
         assertTrue(obj instanceof DefaultMetaData);
 
         DefaultMetaData isoResult = (DefaultMetaData) obj;
-        assertEquals(replacement, isoResult);
+        metadataEquals(replacement, isoResult);
 
 
         /*
@@ -974,7 +900,7 @@ public class CSWworkerTest {
         assertTrue(response != null);
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
-        assertTrue(response.getSearchResults().getAny().size() == 5);
+        assertEquals(5, response.getSearchResults().getAny().size());
 
         List<String> results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -995,7 +921,7 @@ public class CSWworkerTest {
         // we update the metadata 11325_158_19640418141800 by replacing the language eng by fr
         constraint = new QueryConstraintType("identifier='11325_158_19640418141800'", "1.1.0");
         List<RecordPropertyType> properties = new ArrayList<RecordPropertyType>();
-        properties.add(new RecordPropertyType("/gmd:MD_Metadata/language", "fr"));
+        properties.add(new RecordPropertyType("/gmd:MD_Metadata/language", "fra"));
         update     = new UpdateType(properties, constraint);
         request    = new TransactionType("CSW", "2.0.2", update);
         result     = worker.transaction(request);
@@ -1007,7 +933,7 @@ public class CSWworkerTest {
         assertTrue(response != null);
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
-        assertTrue(response.getSearchResults().getAny().size() == 4);
+        assertEquals(4, response.getSearchResults().getAny().size());
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -1033,7 +959,7 @@ public class CSWworkerTest {
         assertTrue(response != null);
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
-        assertTrue(response.getSearchResults().getAny().size() == 1);
+        assertEquals(1, response.getSearchResults().getAny().size());
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -1546,7 +1472,7 @@ public class CSWworkerTest {
         }
 
         assertTrue(exe != null);
-        assertEquals("The property:abstract in the class:class org.geotoolkit.metadata.iso.identification.DefaultDataIdentification is not a collection", exe.getMessage());
+        
 
         /*
          *  TEST 12 : we try to update the metadata 42292_9s_1990061004100 by replacing a numeroted single Property
@@ -1568,7 +1494,6 @@ public class CSWworkerTest {
         }
 
         assertTrue(exe != null);
-        assertEquals("The property:distributionInfo in the class:class org.geotoolkit.metadata.iso.DefaultMetaData is not a collection", exe.getMessage());
 
 
         /*
@@ -1616,23 +1541,114 @@ public class CSWworkerTest {
         assertEquals(ext, extResult);
         // TODO fix this test assertTrue(removed);
 
-
+        pool.release(unmarshaller);
     }
 
-    public static void writeDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {
+    public static void metadataEquals(DefaultMetaData expResult, DefaultMetaData result) {
+        
+        assertEquals(expResult.getAcquisitionInformation(), result.getAcquisitionInformation());
+        assertEquals(expResult.getApplicationSchemaInfo(), result.getApplicationSchemaInfo());
+        assertEquals(expResult.getCharacterSet(), result.getCharacterSet());
+        assertEquals(expResult.getContacts(), result.getContacts());
+        assertEquals(expResult.getContentInfo(), result.getContentInfo());
+        assertEquals(expResult.getDataQualityInfo(), result.getDataQualityInfo());
+        assertEquals(expResult.getDataSetUri(), result.getDataSetUri());
+        assertEquals(expResult.getDateStamp(), result.getDateStamp());
+        assertEquals(expResult.getDistributionInfo(), result.getDistributionInfo());
+        assertEquals(expResult.getFileIdentifier(), result.getFileIdentifier());
+        assertEquals(expResult.getHierarchyLevelNames(), result.getHierarchyLevelNames());
+        assertEquals(expResult.getHierarchyLevels(), result.getHierarchyLevels());
+        if (expResult.getIdentificationInfo() != null && result.getIdentificationInfo() != null) {
+            assertEquals(expResult.getIdentificationInfo().size(), result.getIdentificationInfo().size());
+            for (int i = 0; i < expResult.getIdentificationInfo().size(); i++) {
+                DefaultDataIdentification idExpResult = (DefaultDataIdentification) expResult.getIdentificationInfo().iterator().next();
+                DefaultDataIdentification idResult    = (DefaultDataIdentification) result.getIdentificationInfo().iterator().next();
+                assertEquals(idExpResult.getCharacterSets(), idResult.getCharacterSets());
+                assertEquals(idExpResult.getAbstract(), idResult.getAbstract());
+                assertEquals(idExpResult.getCitation(), idResult.getCitation());
+                assertEquals(idExpResult.getAggregationInfo(), idResult.getAggregationInfo());
+                assertEquals(idExpResult.getCredits(), idResult.getCredits());
+                if (idResult.getDescriptiveKeywords().iterator().hasNext()) {
+                    assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getKeywords(), idResult.getDescriptiveKeywords().iterator().next().getKeywords());
+                    if (idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().hasNext()) {
+                        assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getClass(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getClass());
+                        assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next());
+                    }
+                    assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers());
+                    assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName());
+                    assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getType(), idResult.getDescriptiveKeywords().iterator().next().getType());
+                    assertEquals(idExpResult.getDescriptiveKeywords().iterator().next(), idResult.getDescriptiveKeywords().iterator().next());
+                }
+                assertEquals(idExpResult.getDescriptiveKeywords(), idResult.getDescriptiveKeywords());
+                assertEquals(idExpResult.getEnvironmentDescription(), idResult.getEnvironmentDescription());
+                assertEquals(idExpResult.getExtents().size(), idResult.getExtents().size());
 
-        File dataFile = new File(dataDirectory, identifier + ".xml");
-        FileWriter fw = new FileWriter(dataFile);
-        InputStream in = Util.getResourceAsStream("org/constellation/metadata/" + resourceName);
+                Iterator<Extent> expIt = idExpResult.getExtents().iterator();
+                Iterator<Extent> resIt = idResult.getExtents().iterator();
 
-        byte[] buffer = new byte[1024];
-        int size;
+                while (expIt.hasNext() && resIt.hasNext()) {
+                    Extent expEx = expIt.next();
+                    Extent resEx = resIt.next();
+                    assertEquals(expEx.getGeographicElements(), resEx.getGeographicElements());
+                    assertEquals(expEx.getVerticalElements().size(),   resEx.getVerticalElements().size());
+                    Iterator<? extends VerticalExtent> expVIt = expEx.getVerticalElements().iterator();
+                    Iterator<? extends VerticalExtent> resVIt = resEx.getVerticalElements().iterator();
+                    while (expVIt.hasNext() && resVIt.hasNext()) {
+                        VerticalExtent expVEx = expVIt.next();
+                        VerticalExtent resVEx = resVIt.next();
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getDimension(), resVEx.getVerticalCRS().getCoordinateSystem().getDimension());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName());
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0));
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem(), resVEx.getVerticalCRS().getCoordinateSystem());
+                        assertEquals(expVEx.getVerticalCRS().getDatum(), resVEx.getVerticalCRS().getDatum());
+                        assertEquals(expVEx.getVerticalCRS(), resVEx.getVerticalCRS());
+                        assertEquals(expVEx, resVEx);
+                    }
+                    assertEquals(expEx.getTemporalElements(),   resEx.getTemporalElements());
+                }
 
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            fw.write(new String(buffer, 0, size));
+                assertEquals(idExpResult.getExtents(), idResult.getExtents());
+                assertEquals(idExpResult.getGraphicOverviews(), idResult.getGraphicOverviews());
+                assertEquals(idExpResult.getInterface(), idResult.getInterface());
+                assertEquals(idExpResult.getLanguages(), idResult.getLanguages());
+                assertEquals(idExpResult.getPointOfContacts(), idResult.getPointOfContacts());
+                assertEquals(idExpResult.getPurpose(), idResult.getPurpose());
+                assertEquals(idExpResult.getResourceConstraints(), idResult.getResourceConstraints());
+                assertEquals(idExpResult.getResourceFormats(), idResult.getResourceFormats());
+                assertEquals(idExpResult.getResourceMaintenances(), idResult.getResourceMaintenances());
+                assertEquals(idExpResult.getResourceSpecificUsages(), idResult.getResourceSpecificUsages());
+                assertEquals(idExpResult.getSpatialRepresentationTypes(), idResult.getSpatialRepresentationTypes());
+                assertEquals(idExpResult.getStandard(), idResult.getStandard());
+                assertEquals(idExpResult.getStatus(), idResult.getStatus());
+                assertEquals(idExpResult.getSupplementalInformation(), idResult.getSupplementalInformation());
+                assertEquals(idExpResult.getTopicCategories(), idResult.getTopicCategories());
+                assertEquals(idExpResult, idResult);
+            }
+            assertEquals(expResult.getIdentificationInfo(), result.getIdentificationInfo());
         }
-        in.close();
-        fw.close();
+        assertEquals(expResult.getLanguage(), result.getLanguage());
+        assertEquals(expResult.getLocales(), result.getLocales());
+        assertEquals(expResult.getMetadataConstraints(), result.getMetadataConstraints());
+        assertEquals(expResult.getMetadataExtensionInfo(), result.getMetadataExtensionInfo());
+        assertEquals(expResult.getMetadataMaintenance(), result.getMetadataMaintenance());
+        assertEquals(expResult.getMetadataStandardName(), result.getMetadataStandardName());
+        assertEquals(expResult.getMetadataStandardVersion(), result.getMetadataStandardVersion());
+        assertEquals(expResult.getParentIdentifier(), result.getParentIdentifier());
+        assertEquals(expResult.getPortrayalCatalogueInfo(), result.getPortrayalCatalogueInfo());
+        if (expResult.getReferenceSystemInfo().iterator().hasNext()) {
+            assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getAuthority(), result.getReferenceSystemInfo().iterator().next().getName().getAuthority());
+            assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getCodeSpace(), result.getReferenceSystemInfo().iterator().next().getName().getCodeSpace());
+            assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName(), result.getReferenceSystemInfo().iterator().next().getName());
+            assertEquals(expResult.getReferenceSystemInfo().iterator().next(), result.getReferenceSystemInfo().iterator().next());
+        }
+        assertEquals(expResult.getReferenceSystemInfo(), result.getReferenceSystemInfo());
+        assertEquals(expResult.getSpatialRepresentationInfo(), result.getSpatialRepresentationInfo());
+        assertEquals(expResult, result);
     }
-
 }

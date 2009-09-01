@@ -917,7 +917,7 @@ public final class Util {
      *           method call resulted in a primitive, the auto-boxing 
      *           equivalent, or null.
      */
-    public static Object invokeMethod(final Method method, final Object object, final Object parameter) {
+    public static Object invokeMethod(final Method method, final Object object, final Object... parameter) {
         Object result = null;
         final String baseMessage = "Unable to invoke the method " + method + ": ";
         try {
@@ -1008,6 +1008,31 @@ public final class Util {
      * @return a setter to this attribute.
      */
     public static Method getMethod(final String propertyName, final Class<?> classe, final Class<?> parameterClass) {
+        Method method = null;
+        try {
+            method = classe.getMethod(propertyName, parameterClass);
+
+        } catch (IllegalArgumentException ex) {
+            LOGGER.severe("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
+        } catch (NoSuchMethodException ex) {
+            LOGGER.severe("The method " + propertyName + " does not exists in the classe " + classe.getName());
+        } catch (SecurityException ex) {
+            LOGGER.severe("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
+        }
+        return method;
+    }
+
+    /**
+      * Return a setter Method for the specified attribute (propertyName) of the type "classe"
+     * in the class rootClass.
+     *
+     * @param propertyName The attribute name.
+     * @param classe       The attribute type.
+     * @param rootClass    The class whitch owe this attribute
+     *
+     * @return a setter to this attribute.
+     */
+    public static Method getMethod(final String propertyName, final Class<?> classe, final Class<?>... parameterClass) {
         Method method = null;
         try {
             method = classe.getMethod(propertyName, parameterClass);
@@ -1116,8 +1141,8 @@ public final class Util {
      * 
      * @return a setter to this attribute.
      */
-    public static Method getSetterFromName(String propertyName, final Class<?> classe, final Class<?> rootClass) {
-        LOGGER.finer("search for a setter in " + rootClass.getName() + " of type :" + classe.getName());
+    public static Method getSetterFromName(String propertyName, final Class<?> paramClass, final Class<?> rootClass) {
+        LOGGER.finer("search for a setter in " + rootClass.getName() + " of type :" + paramClass.getName());
         
         //special case
         if (propertyName.equals("beginPosition")) {
@@ -1131,11 +1156,11 @@ public final class Util {
         
         //TODO look all interfaces
         Class<?> interfacee = null;
-        if (classe.getInterfaces().length != 0) {
-            interfacee = classe.getInterfaces()[0];
+        if (paramClass.getInterfaces().length != 0) {
+            interfacee = paramClass.getInterfaces()[0];
         }
         
-        Class<?> argumentSuperClass     = classe;
+        Class<?> argumentSuperClass     = paramClass;
         Class<?> argumentSuperInterface = null;
         if (argumentSuperClass.getInterfaces().length > 0) {
             argumentSuperInterface = argumentSuperClass.getInterfaces()[0];
@@ -1149,11 +1174,11 @@ public final class Util {
                 switch (occurenceType) {
 
                     case 0: {
-                        setter = rootClass.getMethod(methodName, classe);
+                        setter = rootClass.getMethod(methodName, paramClass);
                         break;
                     }
                     case 1: {
-                        if (classe.equals(Integer.class)) {
+                        if (paramClass.equals(Integer.class)) {
                             setter = rootClass.getMethod(methodName, long.class);
                             break;
                         } else {
@@ -1192,7 +1217,7 @@ public final class Util {
                 switch (occurenceType) {
 
                     case 0: {
-                        LOGGER.finer("The setter " + methodName + "(" + classe.getName() + ") does not exist");
+                        LOGGER.finer("The setter " + methodName + "(" + paramClass.getName() + ") does not exist");
                         occurenceType = 1;
                         break;
                     }
@@ -1209,12 +1234,12 @@ public final class Util {
                         break;
                     }
                     case 3: {
-                        LOGGER.finer("The setter " + methodName + "(Collection<" + classe.getName() + ">) does not exist");
+                        LOGGER.finer("The setter " + methodName + "(Collection<" + paramClass.getName() + ">) does not exist");
                         occurenceType = 4;
                         break;
                     }
                     case 4: {
-                        LOGGER.finer("The setter " + methodName + "s(Collection<" + classe.getName() + ">) does not exist");
+                        LOGGER.finer("The setter " + methodName + "s(Collection<" + paramClass.getName() + ">) does not exist");
                         occurenceType = 5;
                         break;
                     }
@@ -1242,7 +1267,7 @@ public final class Util {
             }
         }
         LOGGER.severe("No setter have been found for attribute " + propertyName +
-                      " of type " + classe.getName() + " in the class " + rootClass.getName());
+                      " of type " + paramClass.getName() + " in the class " + rootClass.getName());
         return null;
     }
     

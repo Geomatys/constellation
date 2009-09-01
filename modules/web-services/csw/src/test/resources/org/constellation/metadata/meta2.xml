@@ -9,7 +9,7 @@
             <gco:CharacterString>42292_9s_19900610041000</gco:CharacterString>
         </gmd:fileIdentifier>
         <gmd:language>
-            <gco:CharacterString>en</gco:CharacterString>
+            <gco:CharacterString>eng</gco:CharacterString>
         </gmd:language>
         <gmd:characterSet>
             <gmd:MD_CharacterSetCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#utf8" codeListValue="utf8"/>
@@ -74,7 +74,7 @@
             </gmd:CI_ResponsibleParty>
         </gmd:contact>
         <gmd:dateStamp>
-            <gco:DateTime>2009-01-26T12:00:00.000+01:00</gco:DateTime>
+            <gco:DateTime>2009-01-26T12:00:00+01:00</gco:DateTime>
         </gmd:dateStamp>
         <gmd:spatialRepresentationInfo>
             <gmd:MD_VectorSpatialRepresentation>
@@ -239,7 +239,7 @@
                 <gmd:citation>
                     <gmd:CI_Citation>
                         <gmd:title>
-                            <gco:CharacterString>90008411.ctd</gco:CharacterString>
+                            <gco:CharacterString>90008411-2.ctd</gco:CharacterString>
                         </gmd:title>
                         <gmd:alternateTitle>
                             <gco:CharacterString>42292_9s_19900610041000</gco:CharacterString>
@@ -518,7 +518,7 @@
                 <gmd:resourceConstraints>
                     <gmd:MD_LegalConstraints>
                         <gmd:accessConstraints>
-                            <gmd:MD_RestrictionCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#licence" codeListValue="licence"/>
+                            <gmd:MD_RestrictionCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#license" codeListValue="license"/>
                         </gmd:accessConstraints>
                     </gmd:MD_LegalConstraints>
                 </gmd:resourceConstraints>
@@ -583,7 +583,7 @@
                     </gmd:MD_AggregateInformation>
                 </gmd:aggregationInfo>
                 <gmd:language>
-                    <gco:CharacterString>en</gco:CharacterString>
+                    <gco:CharacterString>eng</gco:CharacterString>
                 </gmd:language>
                 <gmd:topicCategory>
                     <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>

@@ -82,18 +82,10 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         if (!configDir.exists()) {
             configDir.mkdir();
 
-            // temporary before mdweb
-            File sensorDirectory = new File(configDir, "sensors");
-            sensorDirectory.mkdir();
-            writeDataFile(sensorDirectory, "system.xml",    "urn:ogc:object:sensor:GEOM:1");
-            writeDataFile(sensorDirectory, "component.xml", "urn:ogc:object:sensor:GEOM:2");
-
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic SMLConfiguration = new Automatic();
-            //SMLConfiguration.setDataDirectory("SOSWorkerTest/sensors");
             BDD smBdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url2, "", "");
-            //BDD smBdd = new BDD("org.postgresql.Driver","jdbc:postgresql://localhost:5432/sensorml-mdweb", "guilhem", "brehan");
             SMLConfiguration.setBdd(smBdd);
             SMLConfiguration.setFormat("mdweb");
             
@@ -113,22 +105,6 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
         }
         pool.release(marshaller);
-    }
-
-    public static void writeDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {
-
-        File dataFile = new File(dataDirectory, identifier + ".xml");
-        FileWriter fw = new FileWriter(dataFile);
-        InputStream in = Util.getResourceAsStream("org/constellation/sos/" + resourceName);
-
-        byte[] buffer = new byte[1024];
-        int size;
-
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            fw.write(new String(buffer, 0, size));
-        }
-        in.close();
-        fw.close();
     }
 
     @AfterClass

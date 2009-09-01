@@ -9,7 +9,7 @@
                 <gco:CharacterString>CTDF02</gco:CharacterString>
             </gmd:fileIdentifier>
             <gmd:language>
-                <gco:CharacterString>en</gco:CharacterString>
+                <gco:CharacterString>eng</gco:CharacterString>
             </gmd:language>
             <gmd:characterSet>
                 <gmd:MD_CharacterSetCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#utf8" codeListValue="utf8"/>
@@ -74,7 +74,7 @@
                 </gmd:CI_ResponsibleParty>
             </gmd:contact>
             <gmd:dateStamp>
-                <gco:DateTime>2009-02-10T14:34:03.015+01:00</gco:DateTime>
+                <gco:DateTime>2009-02-10T00:00:00+01:00</gco:DateTime>
             </gmd:dateStamp>
             <gmd:metadataExtensionInfo>
                 <gmd:MD_MetadataExtensionInformation>
@@ -141,7 +141,7 @@
                             <gmd:date>
                                 <gmd:CI_Date>
                                     <gmd:date>
-                                        <gco:DateTime>2008-06-04T18:37:46+02:00</gco:DateTime>
+                                        <gco:DateTime>2008-06-04T00:00:00+02:00</gco:DateTime>
                                     </gmd:date>
                                     <gmd:dateType>
                                         <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#revision" codeListValue="revision"/>
@@ -176,8 +176,7 @@
                                     <gmd:address>
                                         <gmd:CI_Address>
                                             <gmd:deliveryPoint>
-                                                <gco:CharacterString>Centre IFREMER de Brest
-BP 70</gco:CharacterString>
+                                                <gco:CharacterString>Centre IFREMER de Brest BP 70</gco:CharacterString>
                                             </gmd:deliveryPoint>
                                             <gmd:city>
                                                 <gco:CharacterString>PLOUZANE</gco:CharacterString>
@@ -233,8 +232,7 @@ BP 70</gco:CharacterString>
                                     <gmd:address>
                                         <gmd:CI_Address>
                                             <gmd:deliveryPoint>
-                                                <gco:CharacterString>Centre IFREMER de Brest
-BP 70</gco:CharacterString>
+                                                <gco:CharacterString>Centre IFREMER de Brest BP 70</gco:CharacterString>
                                             </gmd:deliveryPoint>
                                             <gmd:city>
                                                 <gco:CharacterString>PLOUZANE</gco:CharacterString>
@@ -286,7 +284,7 @@ BP 70</gco:CharacterString>
                                     <gmd:date>
                                         <gmd:CI_Date>
                                             <gmd:date>
-                                                <gco:DateTime>2008-07-02T01:00:04+02:00</gco:DateTime>
+                                                <gco:DateTime>2008-07-02T00:00:00+02:00</gco:DateTime>
                                             </gmd:date>
                                             <gmd:dateType>
                                                 <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#revision" codeListValue="revision"/>
@@ -326,7 +324,7 @@ BP 70</gco:CharacterString>
                                     <gmd:date>
                                         <gmd:CI_Date>
                                             <gmd:date>
-                                                <gco:DateTime>2008-11-26T02:00:04+01:00</gco:DateTime>
+                                                <gco:DateTime>2008-11-26T00:00:00+01:00</gco:DateTime>
                                             </gmd:date>
                                             <gmd:dateType>
                                                 <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#revision" codeListValue="revision"/>
@@ -390,7 +388,7 @@ BP 70</gco:CharacterString>
                         </gmd:MD_LegalConstraints>
                     </gmd:resourceConstraints>
                     <gmd:language>
-                        <gco:CharacterString>en</gco:CharacterString>
+                        <gco:CharacterString>eng</gco:CharacterString>
                     </gmd:language>
                     <gmd:topicCategory>
                         <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
@@ -405,7 +403,7 @@ BP 70</gco:CharacterString>
                                     <gmd:extent>
                                         <gml:TimePeriod gml:id="extent">
                                             <gml:beginPosition>1971-01-01T00:00:00</gml:beginPosition>
-                                            <gml:endPosition>2009-02-10T14:34:03</gml:endPosition>
+                                            <gml:endPosition>2009-02-10T00:00:00</gml:endPosition>
                                         </gml:TimePeriod>
                                     </gmd:extent>
                                 </gmd:EX_TemporalExtent>

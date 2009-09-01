@@ -84,11 +84,6 @@ public class DefaultObservationWriter implements ObservationWriter {
      */
     private final ObservationOfferingTable offTable;
 
-    /**
-     * A database table for insert and get reference object.
-     */
-    private final ReferenceTable refTable;
-
     private static final String SQL_ERROR_MSG = "The service has throw a SQL Exception:";
 
     private static final String CAT_ERROR_MSG = "The service has throw a Catalog Exception:";
@@ -125,7 +120,6 @@ public class DefaultObservationWriter implements ObservationWriter {
             obsTable  = omDatabase.getTable(ObservationTable.class);
             measTable = omDatabase.getTable(MeasurementTable.class);
             offTable  = omDatabase.getTable(ObservationOfferingTable.class);
-            refTable  = omDatabase.getTable(ReferenceTable.class);
 
         } catch (NoSuchTableException ex) {
             throw new CstlServiceException("NoSuchTable Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -135,6 +129,7 @@ public class DefaultObservationWriter implements ObservationWriter {
 
     }
 
+    @Override
     public String writeObservation(Observation observation) throws CstlServiceException {
         try {
             if (observation instanceof MeasurementEntry && measTable != null) {
@@ -152,6 +147,7 @@ public class DefaultObservationWriter implements ObservationWriter {
         }
     }
 
+    @Override
     public String writeMeasurement(Measurement measurement) throws CstlServiceException {
         try {
             return measTable.getIdentifier(measurement);
@@ -163,6 +159,7 @@ public class DefaultObservationWriter implements ObservationWriter {
         }
     }
 
+    @Override
     public String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException {
         try {
             return offTable.getIdentifier(offering);
@@ -175,6 +172,7 @@ public class DefaultObservationWriter implements ObservationWriter {
         }
     }
 
+    @Override
     public void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno, OfferingSamplingFeatureEntry offSF) throws CstlServiceException {
         try {
             if (offProc != null)
@@ -192,10 +190,12 @@ public class DefaultObservationWriter implements ObservationWriter {
         }
     }
 
+    @Override
     public void updateOfferings() {
         offTable.flush();
     }
 
+    @Override
     public void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException {
         if (position == null || position.getValue().size() < 2)
             return;
@@ -241,10 +241,12 @@ public class DefaultObservationWriter implements ObservationWriter {
         }
     }
 
+    @Override
     public String getInfos() {
         return "Constellation Postgrid O&M Writer 0.4";
     }
 
+    @Override
     public void destroy() {
         try {
             omDatabase.close();

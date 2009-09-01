@@ -54,6 +54,7 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
      *
      * @return      A List of id.
      */
+    @Override
     public String identifierQuery(String id) throws SearchingException {
         try {
             final TermQuery query = new TermQuery(new Term("identifier_sort", id));
@@ -90,6 +91,7 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
 
     private static final class IDFieldSelector implements FieldSelector {
 
+        @Override
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {
                 if (fieldName.equals("id") || fieldName.equals("catalog")) {

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <csw:Record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ows="http://www.opengis.net/ows" xmlns:dct="http://purl.org/dc/terms/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:csw="http://www.opengis.net/cat/csw/2.0.2">
         <dc:identifier>42292_9s_19900610041000</dc:identifier>
-        <dc:subject>oceans</dc:subject>
         <dc:subject>Transmittance and attenuance of the water column</dc:subject>
         <dc:subject>Electrical conductivity of the water column</dc:subject>
         <dc:subject>Dissolved oxygen parameters in the water column</dc:subject>
@@ -15,6 +14,7 @@
         <dc:subject>Visible waveband radiance and irradiance measurements in the water column</dc:subject>
         <dc:subject>CTD profilers</dc:subject>
         <dc:subject>research vessel</dc:subject>
-        <dc:format>MEDATLAS ASCII</dc:format>
-        <dc:date>2009-01-26T12:00:00</dc:date>
+        <dc:subject>oceans</dc:subject>
+        <!--dc:format>MEDATLAS ASCII</dc:format-->
+        <dc:date>2009-01-26T12:00:00+01:00</dc:date>
 </csw:Record>

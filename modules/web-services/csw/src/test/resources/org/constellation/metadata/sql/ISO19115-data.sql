@@ -91,6 +91,7 @@ INSERT INTO "Schemas"."Classes"  VALUES ('EX_BoundingPolygon', 'BoundPoly', 'ISO
 INSERT INTO "Schemas"."Classes"  VALUES ('EX_TemporalExtent', 'TempExtent', 'ISO 19115', 'EX_TemporalExtent', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('TimePeriod', 'TimePeriod', 'ISO 19108', 'TimePeriod', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('TimeInstant', 'TimeInstant', 'ISO 19108', 'TimeInstant', 0, NULL, NULL, ' ');
+INSERT INTO "Schemas"."Classes"  VALUES ('TimePosition', 'TimePosition', 'ISO 19108', 'TimePosition', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('EX_VerticalExtent', 'VertExtent', 'ISO 19115', 'EX_VerticalExtent', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('MD_ScopeDescription', 'ScpDesc', 'ISO 19115', 'MD_ScopeDescription', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('LI_Lineage', 'Lineage', 'ISO 19115', 'LI_Lineage', 0, NULL, NULL, ' ');
@@ -262,6 +263,7 @@ INSERT INTO "Schemas"."CodeListElements"  VALUES ('license', NULL, 'ISO 19115', 
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('intellectualPropertyRight', NULL, 'ISO 19115', NULL, 0, 1, 'MD_RestrictionCode', 'MD_RestrictionCode', 'MD_RestrictionCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 6);
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('restricted', NULL, 'ISO 19115', NULL, 0, 1, 'MD_RestrictionCode', 'MD_RestrictionCode', 'MD_RestrictionCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 7);
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('otherRestrictions', NULL, 'ISO 19115', NULL, 0, 1, 'MD_RestrictionCode', 'MD_RestrictionCode', 'MD_RestrictionCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 8);
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('No access restriction', NULL, 'ISO 19115', NULL, 0, 1, 'MD_RestrictionCode', 'MD_RestrictionCode', 'MD_RestrictionCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 9);
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('crossReference', NULL, 'ISO 19115', NULL, 0, 1, 'DS_AssociationTypeCode', 'DS_AssociationTypeCode', 'DS_AssociationTypeCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 1);
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('largerWorkCitation', NULL, 'ISO 19115', NULL, 0, 1, 'DS_AssociationTypeCode', 'DS_AssociationTypeCode', 'DS_AssociationTypeCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 2);
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('partOfSeamlessDatabase', NULL, 'ISO 19115', NULL, 0, 1, 'DS_AssociationTypeCode', 'DS_AssociationTypeCode', 'DS_AssociationTypeCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 3);
@@ -504,6 +506,7 @@ INSERT INTO "Schemas"."CodeListElements"  VALUES ('theme', NULL, 'ISO 19115', NU
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('parameter', NULL, 'ISO 19115', NULL, 0, 1, 'MD_KeywordTypeCode', 'MD_KeywordTypeCode', 'MD_KeywordTypeCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 6);
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('instrument', NULL, 'ISO 19115', NULL, 0, 1, 'MD_KeywordTypeCode', 'MD_KeywordTypeCode', 'MD_KeywordTypeCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 7);
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('platform_class', NULL, 'ISO 19115', NULL, 0, 1, 'MD_KeywordTypeCode', 'MD_KeywordTypeCode', 'MD_KeywordTypeCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 8);
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('projects', NULL, 'ISO 19115', NULL, 0, 1, 'MD_KeywordTypeCode', 'MD_KeywordTypeCode', 'MD_KeywordTypeCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 9);
 
 
 
@@ -3665,6 +3668,7 @@ INSERT INTO "Schemas"."Properties"  VALUES ('indeterminatePosition', NULL, 'ISO 
 INSERT INTO "Schemas"."Properties"  VALUES ('beginPosition', NULL, 'ISO 19108', NULL, 1, 1, 'TimePeriod', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('endPosition', NULL, 'ISO 19108', NULL, 0, 1, 'TimePeriod', 'UndefinedTime', NULL, 'O', 1, 'ISO 19108', 'ISO 19108', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('position', NULL, 'ISO 19108', NULL, 1, 1, 'TimeInstant', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('position', NULL, 'ISO 19108', NULL, 1, 1, 'TimePosition', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('name', NULL, 'Xlink', NULL, 0, 1, 'SimpleLink', 'CharacterString', NULL, 'O', 0, 'ISO 19103', 'Xlink', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('href', NULL, 'Xlink', NULL, 0, 1, 'SimpleLink', 'CharacterString', NULL, 'O', 1, 'ISO 19103', 'Xlink', 'P');
 INSERT INTO "Schemas"."Properties"  VALUES ('role', NULL, 'Xlink', NULL, 0, 1, 'SimpleLink', 'CharacterString', NULL, 'O', 2, 'ISO 19103', 'Xlink', ' ');

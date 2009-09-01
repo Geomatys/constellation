@@ -163,6 +163,7 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getImageFormat() {
         return formatName;
     }
@@ -170,12 +171,13 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MeasurementRange<Double>[] getSampleValueRanges() {
-        final GridSampleDimension[] bands = getSampleDimensions();
+        final GridSampleDimension[] bandss = getSampleDimensions();
         @SuppressWarnings("unchecked")  // Generic array creation.
-        final MeasurementRange<Double>[] ranges = new MeasurementRange[bands.length];
+        final MeasurementRange<Double>[] ranges = new MeasurementRange[bandss.length];
         for (int i=0; i<ranges.length; i++) {
-            final GridSampleDimension band = bands[i].geophysics(true);
+            final GridSampleDimension band = bandss[i].geophysics(true);
             ranges[i] = MeasurementRange.create(band.getMinimumValue(), band.getMaximumValue(), band.getUnits());
         }
         return ranges;
@@ -184,6 +186,7 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
+    @Override
     public GridSampleDimension[] getSampleDimensions() {
         return getSampleDimensions(null);
     }
@@ -193,7 +196,7 @@ final class FormatEntry extends Entry implements Format {
      * supplied, this method returns only the sample dimensions for supplied source bands list
      * and returns them in the order inferred from the destination bands list.
      */
-    final GridSampleDimension[] getSampleDimensions(final ImageReadParam param) {
+    GridSampleDimension[] getSampleDimensions(final ImageReadParam param) {
         int  bandCount = bands.length;
         int[] srcBands = null;
         int[] dstBands = null;
@@ -221,7 +224,7 @@ final class FormatEntry extends Entry implements Format {
      *
      * @throws IIOException if no suitable image reader provider can been found.
      */
-    final ImageReaderSpi getImageReaderSpi() throws IIOException {
+    ImageReaderSpi getImageReaderSpi() throws IIOException {
         if (provider == null) {
             // We don't synchronize above this point because it is not a big
             // deal if two instances are created.
@@ -284,10 +287,10 @@ final class FormatEntry extends Entry implements Format {
     private void handleSpecialCases(final ImageReader reader) {
         if (reader instanceof NetcdfImageReader) {
             final NetcdfImageReader r = (NetcdfImageReader) reader;
-            final GridSampleDimension[] bands = getSampleDimensions(null);
-            final String[] names = new String[bands.length];
+            final GridSampleDimension[] bandss = getSampleDimensions(null);
+            final String[] names = new String[bandss.length];
             for (int i=0; i<names.length; i++) {
-                names[i] = bands[i].getDescription().toString();
+                names[i] = bandss[i].getDescription().toString();
             }
             r.setVariables(names);
         }
@@ -301,7 +304,7 @@ final class FormatEntry extends Entry implements Format {
      * @return Un bloc de paramètres par défaut. Cette méthode ne retourne jamais {@code null}.
      * @throws IIOException s'il n'y a pas d'objet {@link ImageReader} pour ce format.
      */
-    final ImageReadParam getDefaultReadParam(final Object input) throws IIOException {
+    ImageReadParam getDefaultReadParam(final Object input) throws IIOException {
         assert Thread.holdsLock(this);
         if (contains(MOSAIC_INPUT_TYPES, input.getClass())) {
             return new MosaicImageReadParam();
@@ -392,7 +395,7 @@ final class FormatEntry extends Entry implements Format {
      * @return Image lue, ou {@code null} si la lecture de l'image a été annulée.
      * @throws IOException si une erreur est survenue lors de la lecture.
      */
-    final RenderedImage read(final Object         input,
+    RenderedImage read(final Object         input,
                              final int            imageIndex,
                              final int            numImages,
                              final ImageReadParam param,
@@ -452,12 +455,12 @@ final class FormatEntry extends Entry implements Format {
                 } else {
                     type = DataBuffer.TYPE_BYTE;
                 }
-                final GridSampleDimension[] bands = getSampleDimensions(param);
-                if (bands.length == 0) {
+                final GridSampleDimension[] bandss = getSampleDimensions(param);
+                if (bandss.length == 0) {
                     // We should instead make the code tolerant to images without SampleDimension.
                     throw new IIOException("No Sample Dimension found for format \"" + name + "\".");
                 }
-                final ColorModel  cm = bands[0].getColorModel(0, bands.length, type);
+                final ColorModel  cm = bandss[0].getColorModel(0, bandss.length, type);
                 final SampleModel sm = cm.createCompatibleSampleModel(expected.width, expected.height);
                 inputObject = inputStream = new RawImageInputStream(inputStream,
                         new ImageTypeSpecifier(cm, sm), new long[] {0}, new Dimension[] {expected});
@@ -589,7 +592,7 @@ final class FormatEntry extends Entry implements Format {
      * }
      * </pre></blockquote>
      */
-    final void setReading(final CoverageReference source, final boolean starting) {
+    void setReading(final CoverageReference source, final boolean starting) {
         assert !Thread.holdsLock(this); // The thread must *not* hold the lock.
         if (starting) {
             final boolean waiting;
@@ -612,7 +615,7 @@ final class FormatEntry extends Entry implements Format {
      *
      * @param source Object that called this method.
      */
-    final void abort(final CoverageReference source) {
+    void abort(final CoverageReference source) {
         assert !Thread.holdsLock(this); // The thread must *not* hold the lock.
         final Boolean active;
         synchronized (enqueued) {
@@ -676,6 +679,7 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
+    @Override
     public BufferedImage getLegend(final Dimension dimension) {
         final GridSampleDimension band = getSampleDimensions()[0];
         final ColorRamp legend = new ColorRamp();
@@ -692,6 +696,7 @@ final class FormatEntry extends Entry implements Format {
     /**
      * {@inheritDoc}
      */
+    @Override
     public MutableTreeNode getTree(final Locale locale) {
         final DefaultMutableTreeNode root = new TreeNode(this);
         for (final GridSampleDimension band : bands) {
@@ -709,7 +714,7 @@ final class FormatEntry extends Entry implements Format {
     /**
      * Returns a character string representing this entry.
      */
-    final StringBuilder toString(final StringBuilder buffer) {
+    StringBuilder toString(final StringBuilder buffer) {
         return buffer.append(getName()).append(" (").append(formatName).append(')');
     }
 

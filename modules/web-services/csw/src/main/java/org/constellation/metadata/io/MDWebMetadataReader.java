@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -39,6 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import javax.measure.unit.Unit;
 import javax.xml.namespace.QName;
 
 // Constellation Dependencies
@@ -77,7 +79,9 @@ import org.geotoolkit.csw.xml.v202.ListOfValuesType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
+import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.opengis.util.CodeList;
 
@@ -157,9 +161,10 @@ public class MDWebMetadataReader extends MetadataReader {
         
         final Map<String, String> isoMap = new HashMap<String, String>();
         isoMap.put("identifier",  "ISO 19115:MD_Metadata:fileIdentifier");
-        isoMap.put("type",        "ISO 19115:MD_Metadata:identificationInfo:citation:presentationForm");
+        isoMap.put("type",        "ISO 19115:MD_Metadata:hierarchyLevel");
         isoMap.put("date",        "ISO 19115:MD_Metadata:dateStamp");
         isoMap.put("subject",     "ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
+        isoMap.put("subject2",    "ISO 19115:MD_Metadata:identificationInfo:topicCategory");
         isoMap.put("format",      "ISO 19115:MD_Metadata:identificationInfo:resourceFormat:name");
         isoMap.put("abstract",    "ISO 19115:MD_Metadata:identificationInfo:abstract");
         isoMap.put("boundingBox", "ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2");
@@ -173,15 +178,15 @@ public class MDWebMetadataReader extends MetadataReader {
         ebrimMap.put("type",       "Ebrim v3.0:RegistryObject:objectType");
         ebrimMap.put("abstract",   "Ebrim v3.0:RegistryObject:description:localizedString:value");
         ebrimMap.put("format",     "Ebrim v3.0:ExtrinsicObject:mimeType");
-        //TODO @name = “http://purl.org/dc/elements/1.1/subject”
         ebrimMap.put("subject",    "Ebrim v3.0:RegistryObject:slot:valueList:value");
-        //TODO @slotType =“*:GM_Envelope”
         ebrimMap.put("boudingBox", "Ebrim v3.0:RegistryObject:slot:valueList:value");
-        
-        //ebrimMap.put("creator",    "Ebrim v3:RegistryObject:identificationInfo:credit");
-        //ebrimMap.put("publisher",  "Ebrim v3:RegistryObject:distributionInfo:distributor:distributorContact:organisationName");
-        //ebrimMap.put("language",   "Ebrim v3:RegistryObject:language");
-        //TODO find ebrimMap.put("date",       "Ebrim V3:RegistryObject:dateStamp");
+        /*TODO @name = “http://purl.org/dc/elements/1.1/subject”
+          TODO @slotType =“*:GM_Envelope”
+          ebrimMap.put("creator",    "Ebrim v3:RegistryObject:identificationInfo:credit");
+          ebrimMap.put("publisher",  "Ebrim v3:RegistryObject:distributionInfo:distributor:distributorContact:organisationName");
+          ebrimMap.put("language",   "Ebrim v3:RegistryObject:language");
+          TODO find ebrimMap.put("date",       "Ebrim V3:RegistryObject:dateStamp");
+         */
         DUBLINCORE_PATH_MAP.put(Standard.EBRIM_V3, ebrimMap);
     }
     
@@ -202,7 +207,8 @@ public class MDWebMetadataReader extends MetadataReader {
         }
         try {
             final Connection mdConnection = db.getConnection();
-            this.mdReader           = new Reader20(Standard.ISO_19115,  mdConnection);
+            final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
+            this.mdReader           = new Reader20(Standard.ISO_19115,  mdConnection, isPostgres);
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLException while initializing the MDWeb reader:" +'\n'+
                                            "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -265,7 +271,7 @@ public class MDWebMetadataReader extends MetadataReader {
 
         this.geotoolsPackage    = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
                                                         "org.geotools.service", "org.geotoolkit.naming", "org.geotools.feature.catalog",
-                                                        "org.geotoolkit.metadata.fra");
+                                                        "org.geotoolkit.metadata.fra", "org.geotoolkit.temporal.object");
         this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                         "org.opengis.service", "org.opengis.feature.catalog");
         this.cswPackage         = Util.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
@@ -319,6 +325,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * 
      * @throws java.sql.SQLException
      */
+    @Override
     public Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
         int id;
         String catalogCode = "";
@@ -347,6 +354,7 @@ public class MDWebMetadataReader extends MetadataReader {
 
                 if (result == null) {
                     final Form f = mdReader.getForm(catalog, id);
+                    //System.out.println("formmm:" + f);
                     result = getObjectFromForm(identifier, f);
                 } else {
                     LOGGER.finer("getting from cache: " + identifier);
@@ -456,7 +464,7 @@ public class MDWebMetadataReader extends MetadataReader {
                 final org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList)value.getType();
                 final CodeListElement element = codelist.getElementByCode(code);
                 dataType = element.getName();
-            }
+            } 
             litType = new SimpleLiteral(null, dataType);
         } catch (NumberFormatException ex) {
             LOGGER.severe("Number format exception while trying to get the DC type");
@@ -471,7 +479,31 @@ public class MDWebMetadataReader extends MetadataReader {
                 keywords.add(new SimpleLiteral(null, ((TextValue)v).getValue()));
             }
         }
-        
+
+        // we get the keywords
+        final List<Value> topicCategoriesValues  = form.getValueFromPath(mdReader.getPath(pathMap.get("subject2")));
+        for (Value v: topicCategoriesValues) {
+            if (v instanceof TextValue) {
+                if (v.getType() instanceof org.mdweb.model.schemas.CodeList) {
+                    org.mdweb.model.schemas.CodeList c = (org.mdweb.model.schemas.CodeList) v.getType();
+                    int code = 0;
+                    try {
+                        code = Integer.parseInt(((TextValue)v).getValue());
+                    } catch (NumberFormatException ex) {
+                        LOGGER.severe("unable to parse the codeListelement:" + ((TextValue)v).getValue());
+                    }
+                    CodeListElement element = c.getElementByCode(code);
+                    if (element != null) {
+                        keywords.add(new SimpleLiteral(null, element.getName()));
+                    } else {
+                        LOGGER.severe("no such codeListElement:" + code + " for the codeList:" + c.getName());
+                    }
+                } else {
+                    keywords.add(new SimpleLiteral(null, ((TextValue)v).getValue()));
+                }
+            }
+        }
+        // and the topicCategeoryy
         final List<Value> formatsValues  = form.getValueFromPath(mdReader.getPath(pathMap.get("format")));
         final List<String> formats = new ArrayList<String>();
         for (Value v: formatsValues) {
@@ -479,7 +511,12 @@ public class MDWebMetadataReader extends MetadataReader {
                 formats.add(((TextValue)v).getValue());
             }
         }
-        final SimpleLiteral format = new SimpleLiteral(null, formats);
+        final SimpleLiteral format;
+        if (formats.size() != 0) {
+            format = new SimpleLiteral(null, formats);
+        } else {
+            format = null;
+        }
         
         final List<Value> dateValues  = form.getValueFromPath(mdReader.getPath(pathMap.get("date")));
         final List<String> dates = new ArrayList<String>();
@@ -491,8 +528,7 @@ public class MDWebMetadataReader extends MetadataReader {
         final SimpleLiteral date = new SimpleLiteral(null, dates);
         
         // the last update date
-        final Date lastUp            = form.getUpdateDate();
-        final SimpleLiteral modified = new SimpleLiteral(null, lastUp.toString());
+        final SimpleLiteral modified = new SimpleLiteral(null, dates);
         
         // the descriptions
         final List<Value>   descriptionValues = form.getValueFromPath(mdReader.getPath(pathMap.get("abstract")));
@@ -516,7 +552,12 @@ public class MDWebMetadataReader extends MetadataReader {
                 creators.add(((TextValue)v).getValue());
             }
         }
-        final SimpleLiteral creator = new SimpleLiteral(null, creators);
+        final SimpleLiteral creator;
+        if (creators.size() > 0) {
+            creator = new SimpleLiteral(null, creators);
+        } else {
+            creator = null;
+        }
         
         // the publisher of the data
         final List<Value>   publisherValues = form.getValueFromPath(mdReader.getPath(pathMap.get("publisher")));
@@ -565,14 +606,13 @@ public class MDWebMetadataReader extends MetadataReader {
             for (QName qn : elementName) {
 
                 final String getterName = "get" + StringUtilities.firstToUpper(qn.getLocalPart());
-                final String setterName = "set" + StringUtilities.firstToUpper(qn.getLocalPart());
                 try {
                     final Method getter = Util.getMethod(getterName, RecordType.class);
                     final Object param  = Util.invokeMethod(fullResult, getter);
 
                     Method setter = null;
                     if (param != null) {
-                        setter = Util.getMethod(setterName, RecordType.class, param.getClass());
+                        setter = Util.getSetterFromName(qn.getLocalPart(), param.getClass(), RecordType.class);
                     }
 
                     if (setter != null) {
@@ -641,7 +681,7 @@ public class MDWebMetadataReader extends MetadataReader {
         }
         
         if (eastValue != null && westValue != null && northValue != null && southValue != null) {
-            if (crs != null && crs.indexOf("EPSG:") != -1) {
+            if (crs != null && crs.indexOf("EPSG:") == -1) {
                 crs = "EPSG:" + crs;
             }
             final BoundingBoxType result = new BoundingBoxType(crs,
@@ -667,7 +707,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @return a geotools/constellation object representing the metadata.
      */
     private Object getObjectFromForm(String identifier, Form form) {
-        
+
         if (form != null && form.getTopValue() != null && form.getTopValue().getType() != null) {
             final Value topValue = form.getTopValue();
             final Object result  = getObjectFromValue(form, topValue);
@@ -778,8 +818,6 @@ public class MDWebMetadataReader extends MetadataReader {
         }
         Class classe = null;
         Object result;
-        //debug purpose
-        String temp = "";
         
         try {
             // we get the value's class
@@ -807,20 +845,16 @@ public class MDWebMetadataReader extends MetadataReader {
                     
                         Method method;
                         if (classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) {
-                            method = Util.getMethod("valueOf", classe, String.class);
+                            result = CodeLists.valueOf(classe, element.getName());
+                            
                         } else if (classe.isEnum()) {
-                            temp = "fromValue";
                             method = Util.getMethod("fromValue", classe, String.class);
+                            result = Util.invokeMethod(method, null, classe, element.getName());
                         } else {
                             LOGGER.severe("unknow codelist type");
                             return null;
                         }
-                        if (method != null && element != null) {
-                            result = Util.invokeMethod(method, null, element.getName());
-                        } else {
-                            LOGGER.severe("Unable to invoke the method: " + temp + " on the class : " + classe.getName() + "(#" + textValue + ")");
-                            return null;
-                        }
+                        
                         return result;
                     } catch (NumberFormatException e) {
                         LOGGER.severe("Format NumberException : unable to parse the code: " + textValue + " in the codelist: " + codelist.getName());
@@ -832,7 +866,15 @@ public class MDWebMetadataReader extends MetadataReader {
                 } else if (classe.equals(Date.class)) {
                     return Util.createDate(textValue, dateFormat);
 
-                // else we use a String constructor    
+                } else if (classe.equals(Locale.class)) {
+                    for (Locale candidate : Locale.getAvailableLocales()) {
+                        if (candidate.getISO3Language().equalsIgnoreCase(textValue)) {
+                            return candidate;
+                        }
+                    }
+                     return new Locale(textValue);
+
+                // else we use a String constructor
                 } else {
                     //we execute the constructor
                     result = Util.newInstance(classe, textValue);
@@ -850,7 +892,7 @@ public class MDWebMetadataReader extends MetadataReader {
                 if (tempobj != null) {
                     return tempobj;
                 } else {
-                    return getObjectFromValue(lv.getLinkedForm(), lv.getLinkedValue()); 
+                    return getObjectFromValue(lv.getLinkedForm(), lv.getLinkedValue());
                 }
                 
             // else if the value is a complex object    
@@ -955,13 +997,70 @@ public class MDWebMetadataReader extends MetadataReader {
                 while (tryAgain) {
                     try {
 
-                        LOGGER.finer("PUT " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
+                        //LOGGER.finer("PUT " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
                         if (isMeta) {
                               metaMap.put(attribName, param);
                         } else {
                             final Method setter = Util.getSetterFromName(attribName, param.getClass(), classe);
-                            if (setter != null)
+                            if (setter != null && result != null) {
                                 Util.invokeMethod(setter, result, param);
+                            } else {
+                                // special case
+                                if (attribName.equalsIgnoreCase("identifier")) {
+                                    attribName = "name";
+                                } else if (attribName.equalsIgnoreCase("verticalCSProperty")) {
+                                    attribName = "coordinateSystem";
+                                } else if (attribName.equalsIgnoreCase("verticalDatumProperty")) {
+                                    attribName = "datum";
+                                } else if (attribName.equalsIgnoreCase("axisDirection")) {
+                                    attribName = "direction";
+                                } else if (attribName.equalsIgnoreCase("axisAbbrev")) {
+                                    attribName = "abbreviation";
+                                } else if (attribName.equalsIgnoreCase("uom")) {
+                                    attribName = "unit";
+                                } else if (attribName.equalsIgnoreCase("codeSpace")) {
+                                    attribName = "codespace";
+                                }
+
+                                Field field      = null;
+                                Class tempClasse = classe;
+                                while (field == null && tempClasse != null) {
+                                    try {
+                                        field = tempClasse.getDeclaredField(attribName);
+                                    } catch (NoSuchFieldException ex) {
+                                        field = null;
+                                    }
+                                    tempClasse = tempClasse.getSuperclass();
+                                }
+                                if (field != null && result != null) {
+                                    field.setAccessible(true);
+                                    try {
+                                        if (attribName.equals("axis")) {
+                                            CoordinateSystemAxis[] params = new CoordinateSystemAxis[1];
+                                            params[0] = (CoordinateSystemAxis) param;
+                                            field.set(result, params);
+                                        } else if (field.getType().isArray()) {
+                                          // todo find how to build a typed array
+                                            Object[] params = new Object[1];
+                                            params[0] = param;
+                                            field.set(result, params);
+                                        
+                                        } else if (field.getType().equals(Unit.class)) {
+
+                                            Unit<?> unit = Unit.valueOf((String)param);
+                                            field.set(result, unit);
+                                        } else {
+                                            field.set(result, param);
+                                        }
+                                    } catch (IllegalAccessException ex) {
+                                        LOGGER.severe("error while setting the parameter:" + param + " to the field:" + field + ":" + ex.getMessage());
+                                    } catch (IllegalArgumentException ex) {
+                                        LOGGER.severe("error while setting the parameter:" + param + " to the field:" + field + ":" + ex.getMessage());
+                                    }
+                                } else {
+                                    LOGGER.severe("no field " + attribName);
+                                }
+                            }
                         }
                         tryAgain = false;
                     } catch (IllegalArgumentException e) {
@@ -1074,6 +1173,10 @@ public class MDWebMetadataReader extends MetadataReader {
             className = "CI_OnLineResource";
         } else if (className.equals("CI_Date")) {
             className = "CitationDate";
+        } else if (className.equals("RS_Identifier")) {
+            className = "ReferenceIdentifier";
+        } else if (className.equals("MD_ReferenceSystem")) {
+            className = "ReferenceSystemMetadata";
         }
 
         List<String> packagesName;
@@ -1088,7 +1191,7 @@ public class MDWebMetadataReader extends MetadataReader {
             packagesName = ebrimV25Package;
             
         } else {
-            if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType")) {
+            if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType") && !className.equals("AxisDirection")) {
                 packagesName = geotoolsPackage;
             } else {
                 packagesName = opengisPackage;
@@ -1105,8 +1208,10 @@ public class MDWebMetadataReader extends MetadataReader {
                 packageName = "org.opengis.metadata.maintenance";
             else if (className.equals("SV_ServiceIdentification")) 
                 packageName = "org.geotools.service";
-             else if (className.startsWith("FRA_")) 
+            else if (className.startsWith("FRA_")) 
                 packageName = "org.geotoolkit.metadata.fra";
+            else if (className.equals("ReferenceSystemMetadata"))
+                packageName = "org.geotoolkit.internal.jaxb.metadata";
             
             String name = className;
             int nameType = 0;

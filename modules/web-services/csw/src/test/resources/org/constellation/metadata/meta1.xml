@@ -9,7 +9,7 @@
         <gco:CharacterString>42292_5p_19900609195600</gco:CharacterString>
     </gmd:fileIdentifier>
     <gmd:language>
-        <gco:CharacterString>en</gco:CharacterString>
+        <gco:CharacterString>eng</gco:CharacterString>
     </gmd:language>
     <gmd:characterSet>
         <gmd:MD_CharacterSetCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#utf8" codeListValue="utf8"/>
@@ -92,7 +92,7 @@
             <gmd:referenceSystemIdentifier>
                 <gmd:RS_Identifier>
                     <gmd:code>
-                        <gmx:Anchor xlink:href="SDN:L101:2:4326">World Geodetic System 84</gmx:Anchor>
+                        <gmx:Anchor xlink:href="SDN:L101:2:4326">EPSG:4326</gmx:Anchor>
                     </gmd:code>
                     <gmd:codespace>
                         <gco:CharacterString>L101</gco:CharacterString>
@@ -288,7 +288,7 @@
                             <gmd:date>
                                 <gmd:CI_Date>
                                     <gmd:date>
-                                        <gco:DateTime>2008-11-26T02:00:04+01:00</gco:DateTime>
+                                        <gco:DateTime>2008-11-26T00:00:00+01:00</gco:DateTime>
                                     </gmd:date>
                                     <gmd:dateType>
                                         <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#revision" codeListValue="revision"/>
@@ -312,7 +312,7 @@
             <gmd:resourceConstraints>
                 <gmd:MD_LegalConstraints>
                     <gmd:accessConstraints>
-                        <gmd:MD_RestrictionCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#licence" codeListValue="licence"/>
+                        <gmd:MD_RestrictionCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#license" codeListValue="license"/>
                     </gmd:accessConstraints>
                 </gmd:MD_LegalConstraints>
             </gmd:resourceConstraints>
@@ -347,7 +347,7 @@
                 </gmd:MD_AggregateInformation>
             </gmd:aggregationInfo>
             <gmd:language>
-                <gco:CharacterString>en</gco:CharacterString>
+                <gco:CharacterString>eng</gco:CharacterString>
             </gmd:language>
             <gmd:topicCategory>
                 <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>

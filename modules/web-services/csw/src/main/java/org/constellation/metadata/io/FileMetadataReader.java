@@ -53,7 +53,6 @@ import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 // geoAPI dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
-import org.opengis.metadata.distribution.Distribution;
 import org.opengis.metadata.distribution.Format;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -68,6 +67,8 @@ import org.opengis.util.InternationalString;
 // Geotools dependencies
 import org.geotoolkit.metadata.iso.DefaultMetaData;
 import org.geotoolkit.xml.MarshallerPool;
+import org.opengis.metadata.distribution.Distribution;
+import org.opengis.metadata.distribution.Distributor;
 
 
 /**
@@ -93,7 +94,7 @@ public class FileMetadataReader extends MetadataReader {
     /**
      * A date formatter used to display the Date object for dublin core translation.
      */
-    private DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    private DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     /**
      * Build a new CSW File Reader.
@@ -216,7 +217,7 @@ public class FileMetadataReader extends MetadataReader {
                     for (Extent extent : dataIdentification.getExtents()) {
                         for (GeographicExtent geoExtent :extent.getGeographicElements()) {
                             if (geoExtent instanceof GeographicBoundingBox) {
-                                GeographicBoundingBox bbox = (GeographicBoundingBox) geoExtent;
+                                final GeographicBoundingBox bbox = (GeographicBoundingBox) geoExtent;
                                 // TODO find CRS
                                 bboxes.add(new BoundingBoxType("EPSG:4326",
                                                                 bbox.getWestBoundLongitude(),
@@ -229,7 +230,7 @@ public class FileMetadataReader extends MetadataReader {
                 }
             }
             if (elementName != null && elementName.contains(_BoundingBox_QNAME)) {
-                customRecord.setBoundingBox(bboxes);
+                customRecord.setSimpleBoundingBox(bboxes);
             }
 
             if (type != null && type.equals(ElementSetType.BRIEF))
@@ -250,15 +251,15 @@ public class FileMetadataReader extends MetadataReader {
 
             final List<SimpleLiteral> subjects = new ArrayList<SimpleLiteral>();
             for (Identification identification: metadata.getIdentificationInfo()) {
+                for (Keywords kw :identification.getDescriptiveKeywords()) {
+                    for (InternationalString str : kw.getKeywords()) {
+                        subjects.add(new SimpleLiteral(str.toString()));
+                    }
+                }
                 if (identification instanceof DataIdentification) {
                     final DataIdentification dataIdentification = (DataIdentification) identification;
                     for (TopicCategory tc : dataIdentification.getTopicCategories()) {
                         subjects.add(new SimpleLiteral(tc.identifier()));
-                    }
-                }
-                for (Keywords kw :identification.getDescriptiveKeywords()) {
-                    for (InternationalString str : kw.getKeywords()) {
-                        subjects.add(new SimpleLiteral(str.toString()));
                     }
                 }
             }
@@ -267,24 +268,32 @@ public class FileMetadataReader extends MetadataReader {
             }
 
 
-            final List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
-            final Distribution distribution   = metadata.getDistributionInfo();
-            if (distribution != null) {
-                for (Format f: distribution.getDistributionFormats()) {
+            List<SimpleLiteral> formats = new ArrayList<SimpleLiteral>();
+            for (Identification identification: metadata.getIdentificationInfo()) {
+                for (Format f :identification.getResourceFormats()) {
                     if (f == null || f.getName() == null) {
                         continue;
                     }
                     formats.add(new SimpleLiteral(f.getName().toString()));
                 }
             }
+            if (formats.size() == 0);
+                formats = null;
             if (elementName != null && elementName.contains(_Format_QNAME)) {
                 customRecord.setFormat(formats);
             }
 
-
-            final SimpleLiteral modified = new SimpleLiteral(formatter.format(metadata.getDateStamp()));
-            if (elementName != null && elementName.contains(_Modified_QNAME)) {
-                customRecord.setModified(modified);
+            final SimpleLiteral modified;
+            if (metadata.getDateStamp() != null) {
+                String dateValue = formatter.format(metadata.getDateStamp());
+                dateValue = dateValue.substring(0, dateValue.length() - 2);
+                dateValue = dateValue + ":00";
+                modified = new SimpleLiteral(dateValue);
+                if (elementName != null && elementName.contains(_Modified_QNAME)) {
+                    customRecord.setModified(modified);
+                }
+            } else {
+                modified = null;
             }
 
 
@@ -314,12 +323,15 @@ public class FileMetadataReader extends MetadataReader {
 
             // TODO multiple
             SimpleLiteral distributor = null;
-            for (Identification identification: metadata.getIdentificationInfo()) {
-                for (ResponsibleParty rp :identification.getPointOfContacts()) {
-                    if (Role.PUBLISHER.equals(rp.getRole())) {
-                        distributor = new SimpleLiteral(rp.getOrganisationName().toString());
+            Distribution distribution = metadata.getDistributionInfo();
+            if (distribution != null) {
+                for (Distributor dis :distribution.getDistributors()) {
+                    ResponsibleParty disRP = dis.getDistributorContact();
+                    if (disRP != null) {
+                        if (disRP.getOrganisationName() != null) {
+                            distributor = new SimpleLiteral(disRP.getOrganisationName().toString());
+                        }
                     }
-
                 }
             }
             if (elementName != null && elementName.contains(_Publisher_QNAME)) {
@@ -327,7 +339,7 @@ public class FileMetadataReader extends MetadataReader {
             }
 
 
-            final SimpleLiteral language = new SimpleLiteral(metadata.getLanguage().getLanguage());
+            final SimpleLiteral language = new SimpleLiteral(metadata.getLanguage().getISO3Language());
             if (elementName != null && elementName.contains(_Language_QNAME)) {
                 customRecord.setLanguage(language);
             }
@@ -390,10 +402,10 @@ public class FileMetadataReader extends MetadataReader {
 
     @Override
     public List<String> getAllIdentifiers() throws CstlServiceException {
-        List<String> results = new ArrayList<String>();
+        final List<String> results = new ArrayList<String>();
         for (File f : dataDirectory.listFiles()) {
             if (f.getName().endsWith(".xml")) {
-                String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
+                final String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
                 results.add(identifier);
             } else {
                 throw new CstlServiceException("The metadataFile : " + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);

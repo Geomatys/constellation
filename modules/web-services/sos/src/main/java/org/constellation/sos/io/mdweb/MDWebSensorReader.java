@@ -106,7 +106,7 @@ public class MDWebSensorReader implements SensorReader {
         }
         try {
             sensorMLConnection = db.getConnection();
-            boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
+            final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
             sensorMLReader     = new Reader20(Standard.SENSORML, sensorMLConnection, isPostgres);
             sensorMLCatalog    = sensorMLReader.getCatalog("SMLC");
             xmlWriter          = new Writer(sensorMLReader);
@@ -171,6 +171,7 @@ public class MDWebSensorReader implements SensorReader {
         }
     }
 
+    @Override
     public String getInfos() {
         return "Constellation MDweb Sensor Reader 0.4";
     }

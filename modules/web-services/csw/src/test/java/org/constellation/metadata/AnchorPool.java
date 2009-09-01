@@ -28,12 +28,12 @@ import org.geotoolkit.xml.MarshallerPool;
  *
  * @author Cédric Briançon (Geomatys)
  */
-final class AnchorPool extends MarshallerPool {
-    AnchorPool(final List<Class> classes) throws JAXBException, URISyntaxException {
+public final class AnchorPool extends MarshallerPool {
+    public AnchorPool(final List<Class> classes) throws JAXBException, URISyntaxException {
         super(classes.toArray(new Class[]{}));
         addAnchor("Common Data Index record", new URI("SDN:L231:3:CDI"));
         addAnchor("France", new URI("SDN:C320:2:FR"));
-        addAnchor("World Geodetic System 84", new URI("SDN:L101:2:4326"));
+        addAnchor("EPSG:4326", new URI("SDN:L101:2:4326"));
         addAnchor("2", new URI("SDN:C371:1:2"));
         addAnchor("35", new URI("SDN:C371:1:35"));
         addAnchor("Transmittance and attenuance of the water column", new URI("SDN:P021:35:ATTN"));

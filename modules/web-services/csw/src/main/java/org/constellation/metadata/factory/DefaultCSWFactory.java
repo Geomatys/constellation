@@ -50,7 +50,9 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
     /*public DefaultCSWFactory() {
         super();
     }*/
-    
+
+    private static final String UNKNOW_DATABASE_TYPE = "Unknow database type: ";
+
     /**
      * Return a Metadata reader for the specified database type.
      * 
@@ -67,7 +69,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return new FileMetadataReader(configuration);
             default:
-                throw new IllegalArgumentException("Unknow database type: " + type);
+                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type);
         }
     }
     
@@ -89,7 +91,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return new FileMetadataWriter(configuration, indexer);
             default:
-                throw new IllegalArgumentException("Unknow database type: " + type);
+                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type);
         }
     }
     
@@ -107,7 +109,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return CSWworker.TRANSACTIONAL;
             default:
-                throw new IllegalArgumentException("Unknow database type: " + dbType);
+                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + dbType);
         }
     }
     
@@ -132,7 +134,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return new GenericIndexer(reader, configuration, serviceID);
             default:
-                throw new IllegalArgumentException("Unknow database type: " + type);
+                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type);
         }
     }
     
@@ -144,7 +146,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return new GenericIndexSearcher(configDirectory, serviceID);
             default:
-                throw new IllegalArgumentException("Unknow database type: " + dbType);
+                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + dbType);
         }
     }
 }

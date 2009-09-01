@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
 import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
@@ -51,6 +53,7 @@ import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Path;
+import org.mdweb.model.schemas.PrimitiveType;
 import org.mdweb.model.schemas.Property;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
@@ -124,9 +127,10 @@ public class MDWebMetadataWriter extends MetadataWriter {
         try {
 
             final Connection mdConnection = db.getConnection();
-            mdReader      = new Reader20(Standard.ISO_19115, mdConnection);
+            boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
+            mdReader      = new Reader20(Standard.ISO_19115, mdConnection, isPostgres);
             mdCatalog     = mdReader.getCatalog("CSWCat");
-            this.mdWriter = new Writer20(mdConnection);
+            this.mdWriter = new Writer20(mdConnection, isPostgres);
             if (mdCatalog == null) {
                 mdCatalog = new Catalog("CSWCat", "CSW Data Catalog");
                 mdWriter.writeCatalog(mdCatalog);
@@ -334,11 +338,44 @@ public class MDWebMetadataWriter extends MetadataWriter {
                     // TODO remove when fix in MDweb2
                     if (prop.getName().equals("geographicElement3") ||  prop.getName().equals("geographicElement4"))
                         continue;
-                
-                    final Method getter = Util.getGetterFromName(prop.getName(), object.getClass());
+                    final String propName;
+                    // special case
+                    if (prop.getName().equalsIgnoreCase("referenceSystemIdentifier") ||
+                       (prop.getName().equalsIgnoreCase("identifier") && object.getClass().getSimpleName().equals("DefaultCoordinateSystemAxis")) ||
+                       (prop.getName().equalsIgnoreCase("identifier") && object.getClass().getSimpleName().equals("DefaultVerticalCS")) ||
+                       (prop.getName().equalsIgnoreCase("identifier") && object.getClass().getSimpleName().equals("DefaultVerticalDatum")) ||
+                       (prop.getName().equalsIgnoreCase("identifier") && object.getClass().getSimpleName().equals("DefaultVerticalCRS"))) {
+                        propName = "name";
+                    } else if (prop.getName().equalsIgnoreCase("verticalCSProperty")) {
+                        propName = "coordinateSystem";
+                    } else if (prop.getName().equalsIgnoreCase("verticalDatumProperty")) {
+                        propName = "datum";
+                    } else if (prop.getName().equalsIgnoreCase("axisDirection")) {
+                        propName = "direction";
+                    } else if (prop.getName().equalsIgnoreCase("axisAbbrev")) {
+                        propName = "abbreviation";
+                    } else if (prop.getName().equalsIgnoreCase("uom")) {
+                        propName = "unit";
+                    } else if (prop.getName().equalsIgnoreCase("position") && object.getClass().getSimpleName().equals("DefaultPosition")) {
+                        propName = "date";
+                    } else {
+                        propName = prop.getName();
+                    }
+
+                    final Method getter;
+                    if (propName.equals("axis")) {
+                        getter = Util.getMethod("get" + StringUtilities.firstToUpper(propName), object.getClass(), int.class);
+                    } else {
+                        getter = Util.getGetterFromName(propName, object.getClass());
+                    }
                     if (getter != null) {
                         try {
-                            final Object propertyValue = getter.invoke(object);
+                            final Object propertyValue;
+                            if (propName.equals("axis")) {
+                                propertyValue = getter.invoke(object, 0);
+                            } else {
+                                propertyValue = getter.invoke(object);
+                            }
                             if (propertyValue != null) {
                                 final Path childPath = new Path(path, prop);
                             
@@ -438,7 +475,11 @@ public class MDWebMetadataWriter extends MetadataWriter {
             className = "CI_Date";
         } else if (className.equals("DefaultScope")) {
             className = "DQ_Scope";
-        } 
+        } else if (className.equals("ReferenceSystemMetadata")) {
+            className = "ReferenceSystem";
+        } else if (className.equals("DefaultReferenceIdentifier")) {
+            className = "RS_Identifier";
+        }
         
         //we remove the Impl suffix
         final int i = className.indexOf("Impl");
@@ -457,7 +498,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
                                        && !className.equals("KeywordType")
                                        && !className.equals("FeatureType")
                                        && !className.equals("GeometricObjectType")
-                                       && !className.equals("SpatialRepresentationType")) {
+                                       && !className.equals("SpatialRepresentationType")
+                                       && !className.equals("AssociationType")
+                                       && !className.equals("InitiativeType")) {
             className = className.substring(0, className.length() - 4);
         }
         
@@ -512,12 +555,12 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 
             String name = className;
             int nameType = 0;
-            while (nameType < 11) {
+            while (nameType < 12) {
                 
                 LOGGER.finer("searching: " + standard.getName() + ":" + name);
                 result = mdReader.getClasse(name, standard);
                 if (result != null) {
-                    LOGGER.info("class found:" + standard.getName() + ":" + name);
+                    LOGGER.finer("class found:" + standard.getName() + ":" + name);
                     classBinding.put(object.getClass(), result);
                     return result;
                 } 
@@ -578,23 +621,28 @@ public class MDWebMetadataWriter extends MetadataWriter {
                             name = "LI_" + className;    
                             break;
                         }
-                        //for the code list we add the "code" suffix
+                        //we add the prefix DS_ + the suffix "Code"
                         case 9: {
+                            nameType = 10;
+                            name = "DS_" + className + "Code";
+                            break;
+                        }
+                        //for the temporal element we remove add prefix
+                        case 10: {
+                            name = "Time" + className;
+                            nameType = 11;
+                            break;
+                        }
+                        //for the code list we add the "code" suffix
+                        case 11: {
                             if (name.indexOf("Code") != -1) {
                                 name += "Code";
                             }
-                            nameType = 10;
-                            break;
-                        }
-                         //for the code list we add the "code" suffix
-                        //for the temporal element we remove add prefix
-                        case 10: {
-                            name = "Time" + name;
-                            nameType = 11;
+                            nameType = 12;
                             break;
                         }
                         default:
-                            nameType = 11;
+                            nameType = 12;
                             break;
                     }
 
@@ -602,7 +650,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             }
         
         availableStandardLabel = availableStandardLabel.substring(0, availableStandardLabel.length() - 1);
-        LOGGER.severe("class no found: " + className + " in the following standards: " + availableStandardLabel);
+        LOGGER.severe("class no found: " + className + " in the following standards: " + availableStandardLabel + "\n (" + object.getClass().getName() + ')');
         return null;
     }
     
@@ -614,7 +662,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
      */
     private Classe getPrimitiveTypeFromName(String className) throws SQLException {
         
-        if (className.equals("String") || className.equals("SimpleInternationalString")) {
+        if (className.equals("String") || className.equals("SimpleInternationalString") || className.equals("BaseUnit")) {
             return mdReader.getClasse("CharacterString", Standard.ISO_19103);
         } else if (className.equalsIgnoreCase("Date")) {
             return mdReader.getClasse(className, Standard.ISO_19103);
@@ -646,6 +694,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * @param obj The object to store in the database.
      * @return true if the storage succeed, false else.
      */
+    @Override
     public boolean storeMetadata(Object obj) throws CstlServiceException {
         // profiling operation
         final long start = System.currentTimeMillis();
@@ -804,6 +853,21 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 for (Value v : matchingValues) {
                     LOGGER.info("value:" + v);
                     if (v instanceof TextValue && value instanceof String) {
+                        // TODO verify more Type
+                        if (v.getType().equals(PrimitiveType.DATE)) {
+                            try {
+                                String timeValue = (String)value;
+                                timeValue        = timeValue.replaceAll("T", " ");
+                                if (timeValue.indexOf('+') != -1) {
+                                    timeValue    = timeValue.substring(0, timeValue.indexOf('+'));
+                                }
+                                LOGGER.info(timeValue);
+                                Timestamp.valueOf(timeValue);
+                            } catch(IllegalArgumentException ex) {
+                                throw new CstlServiceException("The type of the replacement value does not match with the value type : Date",
+                                    INVALID_PARAMETER_VALUE);
+                            }
+                        }
                         LOGGER.info("textValue updated");
                         mdWriter.updateTextValue((TextValue) v, (String) value);
                     } else {
@@ -828,6 +892,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
             } catch (IllegalArgumentException ex) {
                 throw new CstlServiceException(ex);
             }
+            indexer.removeDocument(metadataID);
+            indexer.indexDocument(f);
         }
         return true;
     }

@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.StringTokenizer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
@@ -681,7 +682,11 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         } else if (obj instanceof Double) {
             result = obj + "";
         } else if (obj instanceof java.util.Locale) {
-            result = ((java.util.Locale)obj).getISO3Language();
+            try {
+                result = ((java.util.Locale)obj).getISO3Language();
+            } catch (MissingResourceException ex) {
+                result = ((java.util.Locale)obj).getLanguage();
+            }
         } else if (obj instanceof Collection) {
             final StringBuilder sb = new StringBuilder();
             for (Object o : (Collection) obj) {

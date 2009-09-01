@@ -9,7 +9,7 @@
             <gco:CharacterString>11325_158_19640418141800</gco:CharacterString>
         </gmd:fileIdentifier>
         <gmd:language>
-            <gco:CharacterString>en</gco:CharacterString>
+            <gco:CharacterString>eng</gco:CharacterString>
         </gmd:language>
         <gmd:characterSet>
             <gmd:MD_CharacterSetCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#utf8" codeListValue="utf8"/>
@@ -40,8 +40,7 @@
                         <gmd:address>
                             <gmd:CI_Address>
                                 <gmd:deliveryPoint>
-                                    <gco:CharacterString>Centre IFREMER de Brest
-BP 70</gco:CharacterString>
+                                    <gco:CharacterString>Centre IFREMER de Brest BP 70</gco:CharacterString>
                                 </gmd:deliveryPoint>
                                 <gmd:city>
                                     <gco:CharacterString>PLOUZANE</gco:CharacterString>
@@ -275,8 +274,7 @@ BP 70</gco:CharacterString>
                                         <gmd:address>
                                             <gmd:CI_Address>
                                                 <gmd:deliveryPoint>
-                                                    <gco:CharacterString>INSTITUT OCEANOGRAPHIQUE 
-195 Rue Saint Jacques</gco:CharacterString>
+                                                    <gco:CharacterString>INSTITUT OCEANOGRAPHIQUE 195 Rue Saint Jacques</gco:CharacterString>
                                                 </gmd:deliveryPoint>
                                                 <gmd:city>
                                                     <gco:CharacterString>PARIS</gco:CharacterString>
@@ -327,8 +325,7 @@ BP 70</gco:CharacterString>
                                 <gmd:address>
                                     <gmd:CI_Address>
                                         <gmd:deliveryPoint>
-                                            <gco:CharacterString>Centre IFREMER de Brest
-BP 70</gco:CharacterString>
+                                            <gco:CharacterString>Centre IFREMER de Brest BP 70</gco:CharacterString>
                                         </gmd:deliveryPoint>
                                         <gmd:city>
                                             <gco:CharacterString>PLOUZANE</gco:CharacterString>
@@ -564,7 +561,7 @@ BP 70</gco:CharacterString>
                     </gmd:MD_AggregateInformation>
                 </gmd:aggregationInfo>
                 <gmd:language>
-                    <gco:CharacterString>en</gco:CharacterString>
+                    <gco:CharacterString>eng</gco:CharacterString>
                 </gmd:language>
                 <gmd:topicCategory>
                     <gmd:MD_TopicCategoryCode>oceans</gmd:MD_TopicCategoryCode>
@@ -666,8 +663,7 @@ BP 70</gco:CharacterString>
                                         <gmd:address>
                                             <gmd:CI_Address>
                                                 <gmd:deliveryPoint>
-                                                    <gco:CharacterString>Centre IFREMER de Brest
-BP 70</gco:CharacterString>
+                                                    <gco:CharacterString>Centre IFREMER de Brest BP 70</gco:CharacterString>
                                                 </gmd:deliveryPoint>
                                                 <gmd:city>
                                                     <gco:CharacterString>PLOUZANE</gco:CharacterString>

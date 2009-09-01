@@ -112,7 +112,7 @@ public class MDWebSensorWriter implements SensorWriter {
         }
         try {
             smlConnection   = db.getConnection();
-            boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
+            final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
             sensorMLWriter  = new Writer20(smlConnection);
             sensorMLReader  = new Reader20(Standard.SENSORML, smlConnection, isPostgres);
             sensorMLCatalog = sensorMLReader.getCatalog("SMLC");
@@ -133,6 +133,7 @@ public class MDWebSensorWriter implements SensorWriter {
         }
     }
 
+    @Override
      public void writeSensor(String id, AbstractSensorML process) throws CstlServiceException {
         Marshaller marshaller = null;
         try {
@@ -186,6 +187,7 @@ public class MDWebSensorWriter implements SensorWriter {
         }
     }
 
+    @Override
     public void startTransaction() throws CstlServiceException {
         try {
             smlConnection.setAutoCommit(false);
@@ -197,6 +199,7 @@ public class MDWebSensorWriter implements SensorWriter {
         }
     }
 
+    @Override
     public void abortTransaction() throws CstlServiceException {
         try {
             if (currentSavePoint != null)
@@ -210,6 +213,7 @@ public class MDWebSensorWriter implements SensorWriter {
         }
     }
 
+    @Override
     public void endTransaction() throws CstlServiceException {
         try {
             if (currentSavePoint != null)
@@ -243,6 +247,7 @@ public class MDWebSensorWriter implements SensorWriter {
         }
     }
     
+    @Override
     public void destroy() {
         try {
             newSensorIdStmt.close();
@@ -252,6 +257,7 @@ public class MDWebSensorWriter implements SensorWriter {
         }
     }
 
+    @Override
     public String getInfos() {
         return "Constellation MDweb Sensor Writer 0.4";
     }
