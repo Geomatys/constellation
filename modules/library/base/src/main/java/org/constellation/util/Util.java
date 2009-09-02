@@ -734,8 +734,9 @@ public final class Util {
             if (classe == null)
                 return null;
             
-            final Constructor<?> constructor = classe.getConstructor();
-
+            final Constructor<?> constructor = classe.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            
             //we execute the constructor
             return constructor.newInstance();
             
