@@ -384,7 +384,7 @@ public abstract class WebService {
         if (notFound) {
             if (mandatory) {
                 throw new CstlServiceException("The parameter " + parameterName + " must be specified",
-                        MISSING_PARAMETER_VALUE);
+                        MISSING_PARAMETER_VALUE, parameterName.toLowerCase());
             }
             return null;
         } else {

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -37,9 +38,10 @@ import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import javax.xml.bind.JAXBElement;
 
 // apache Lucene dependencies
-import java.util.logging.Level;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -53,16 +55,16 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.util.Util;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.csw.xml.v202.ElementSetType;
-import org.geotoolkit.csw.xml.v202.RecordType;
-import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.lucene.index.AbstractIndexer;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // geotoolkit dependencies
 import org.geotoolkit.metadata.iso.DefaultMetaData;
 import org.geotoolkit.temporal.object.DefaultInstant;
 import org.geotoolkit.temporal.object.DefaultPosition;
+import org.geotoolkit.csw.xml.v202.ElementSetType;
+import org.geotoolkit.csw.xml.v202.RecordType;
+import org.geotoolkit.lucene.IndexingException;
+import org.geotoolkit.lucene.index.AbstractIndexer;
 
 // geoAPI dependencies
 import org.opengis.util.InternationalString;
@@ -139,6 +141,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * 
      * @throws java.sql.SQLException
      */
+    @Override
     public void createIndex() throws IndexingException {
         createIndexLightMemory();
     }
@@ -230,6 +233,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      *
      * @throws java.sql.SQLException
      */
+    @Override
     public void createIndex(List<? extends Object> toIndex) throws IndexingException {
         LOGGER.info("Creating lucene index for Generic database please wait...");
         final long time = System.currentTimeMillis();
@@ -265,6 +269,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param writer A lucene Index Writer.
      * @param meta A geotools Metadata object.
      */
+    @Override
     public void indexDocument(IndexWriter writer, Object meta) {
         try {
             //adding the document in a specific model. in this case we use a MDwebDocument.
@@ -294,6 +299,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      *
      * @param meta A geotools Metadata object.
      */
+    @Override
     public void indexDocument(Object meta) {
         try {
             final IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false,IndexWriter.MaxFieldLength.UNLIMITED);
@@ -329,20 +335,27 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     * @param metadata.
     * @return A Lucene document.
     */
+    @Override
     protected Document createDocument(final Object metadata) throws SQLException {
         
         // make a new, empty document
         final Document doc = new Document();
         CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
 
+        String identifier;
         if (metadata instanceof DefaultMetaData) {
-            doc.add(new Field("id", ((DefaultMetaData)metadata).getFileIdentifier(),  Field.Store.YES, Field.Index.NOT_ANALYZED));
+            identifier = ((DefaultMetaData)metadata).getFileIdentifier();
         } else if (metadata instanceof RecordType) {
-            doc.add(new Field("id", ((RecordType)metadata).getIdentifier().getContent().get(0),  Field.Store.YES, Field.Index.NOT_ANALYZED));
+            identifier = ((RecordType)metadata).getIdentifier().getContent().get(0);
         } else {
-            throw new IllegalArgumentException("unexpected metadata type");
+            String type = "null type";
+            if (metadata != null) {
+                type = metadata.getClass().getSimpleName();
+            }
+            throw new IllegalArgumentException("unexpected metadata type: " + type);
         }
         //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("id", identifier,  Field.Store.YES, Field.Index.NOT_ANALYZED));
 
         final StringBuilder anyText = new StringBuilder();
 
@@ -350,6 +363,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             LOGGER.finer("indexing ISO 19119 MD_Metadata");
             for (final String term : ISO_QUERYABLE.keySet()) {
                  cs.submit(new Callable<TermValue>() {
+                    @Override
                     public TermValue call() {
                         return new TermValue(term, getValues(metadata, ISO_QUERYABLE.get(term)));
                     }
@@ -435,6 +449,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         for (final String term :DUBLIN_CORE_QUERYABLE.keySet()) {
             cs.submit(new Callable<TermValue>() {
 
+                @Override
                 public TermValue call() {
                     return new TermValue(term, getValues(metadata, DUBLIN_CORE_QUERYABLE.get(term)));
                 }
@@ -444,7 +459,17 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         for (int i = 0; i < DUBLIN_CORE_QUERYABLE.size(); i++) {
             try {
                 final TermValue values = cs.take().get();
-                doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
+                if (!values.term.equals("date")) {
+                    doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
+                } else {
+                    // we format the date to lucene format
+                    String value = values.value;
+                    if (value.endsWith("z") || value.endsWith("Z")) {
+                        value = value.substring(0, value.length() - 1);
+                    }
+                    value = value.replace("-", "");
+                    doc.add(new Field(values.term, value, Field.Store.YES, Field.Index.ANALYZED));
+                }
                 doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
                 if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
                     anyText.append(values.value).append(" ");
@@ -500,6 +525,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 
             if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
                 for (int j = 0; j < minx.length; j++)  {
+                    LOGGER.info("added new bbox:" + minx[j] + " " + maxx[j] + " " + miny[j] + " " + maxy[j] + " for identifier:" + identifier);
                     addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
                 }
             } else {
@@ -567,6 +593,10 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         
         if (paths != null) {
             for (String fullPathID: paths) {
+               if ((fullPathID.startsWith("ISO 19115:MD_Metadata:") && !(metadata instanceof DefaultMetaData)) ||
+                   (fullPathID.startsWith("Catalog Web Service:Record:") && !(metadata instanceof RecordType))) {
+                   continue;
+               }
                 String pathID;
                 String conditionalAttribute = null;
                 String conditionalValue     = null;
@@ -635,7 +665,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 String attributeName;
                 if (pathID.indexOf(':') != -1) {
                     attributeName = pathID.substring(0, pathID.indexOf(':'));
-                    pathID = pathID.substring(pathID.indexOf(':') + 1);
+                    pathID        = pathID.substring(pathID.indexOf(':') + 1);
                 } else {
                     attributeName = pathID;
                     pathID = "";
@@ -813,12 +843,28 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      */
     private Object getAttributeValue(Object object, String attributeName) {
         Object result = null;
+        int ordinal   = -1;
+        if (attributeName.indexOf('[') != -1){
+            String tmp    = attributeName.substring(attributeName.indexOf('[') + 1, attributeName.length() - 1);
+            attributeName = attributeName.substring(0, attributeName.indexOf('['));
+            try {
+                ordinal = Integer.parseInt(tmp);
+            } catch (NumberFormatException ex) {
+                LOGGER.severe("Unable to parse the ordinal " + tmp);
+            }
+        }
         if (object != null) {
+            if (object instanceof JAXBElement) {
+               object = ((JAXBElement)object).getValue();
+            }
             final String getterId = object.getClass().getName() + ':' + attributeName;
             Method getter         = getters.get(getterId);
             if (getter != null) {
                 result = Util.invokeMethod(object, getter);
             } else {
+                if (attributeName.equalsIgnoreCase("referenceSystemIdentifier")) {
+                    attributeName = "name";
+                }
                 getter = Util.getGetterFromName(attributeName, object.getClass());
                 if (getter != null) {
                     getters.put(object.getClass().getName() + ':' + attributeName, getter);
@@ -826,9 +872,24 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 }
             }
         }
+        if (result instanceof JAXBElement) {
+            result = ((JAXBElement)result).getValue();
+        }
+        if (ordinal != -1 && result instanceof Collection) {
+            Collection c = (Collection) result;
+            Iterator t   = c.iterator();
+            int i = 0;
+            while (t.hasNext()) {
+                result = t.next();
+                if (i == ordinal) return result;
+                i++;
+            }
+
+        } 
         return result;
     }
 
+    @Override
     public void destroy() {
         if (reader != null)
             reader.destroy();

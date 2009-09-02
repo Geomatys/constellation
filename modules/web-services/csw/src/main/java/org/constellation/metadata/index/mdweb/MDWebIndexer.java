@@ -499,7 +499,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         }
 
         if (paths != null) {
-            for (final String fullPathID: paths) {
+            for (String fullPathID: paths) {
                 final Path path;
                 final String pathID;
                 Path conditionalPath     = null;
@@ -516,9 +516,11 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                                 "conditionalPathID: " + conditionalPathID + '\n' +
                                 "conditionalValue : " + conditionalValue);
                 } else {
+                    if (fullPathID.indexOf('[') != -1) {
+                        fullPathID = fullPathID.substring(0, fullPathID.indexOf('['));
+                    }
                     pathID = fullPathID;
                 }
-
 
                 if (mdWebReader != null) {
                     path = mdWebReader.getPath(pathID);
@@ -545,7 +547,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
                     if (ordinal == -1 || ordinal == tv.getOrdinal()) {
 
-                        //for a codelist value we don't write the code but the codlistElement value.
+                        //for a codelist value we don't write the code but the codelistElement value.
                         if (tv.getType() instanceof CodeList) {
                             final CodeList cl = (CodeList) tv.getType();
 

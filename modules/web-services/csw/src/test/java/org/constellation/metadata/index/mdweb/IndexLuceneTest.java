@@ -37,11 +37,9 @@ import org.apache.lucene.search.Sort;
 // geotools dependencies
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.referencing.CRS;
 
 // MDWeb dependencies
 import org.mdweb.model.schemas.Classe;
@@ -57,7 +55,6 @@ import org.mdweb.model.storage.Value;
 
 // GeoAPI dependencies
 import org.opengis.filter.FilterFactory2;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 /**
@@ -307,11 +304,6 @@ public class IndexLuceneTest {
         /**
          * Test 1 spatial search: BBOX filter
          */
-        double min1[] = {-20, -20};
-        double max1[] = { 20,  20};
-        GeneralEnvelope bbox = new GeneralEnvelope(min1, max1);
-        CoordinateReferenceSystem crs = CRS.decode("EPSG:4326", true);
-        bbox.setCoordinateReferenceSystem(crs);
         LuceneOGCFilter sf          = LuceneOGCFilter.wrap(FF.bbox(LuceneOGCFilter.GEOMETRY_PROPERTY, -20, -20, 20, 20, "EPSG:4326"));
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", sf, SerialChainFilter.AND);
         

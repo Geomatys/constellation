@@ -76,6 +76,10 @@ public class CSWClassesContext {
 
         // Inspire classes
         classeList.add(org.geotoolkit.inspire.xml.ObjectFactory.class);
+
+        // xsd classes classes
+        classeList.add(org.geotoolkit.xsd.xml.v2001.ObjectFactory.class);
+
         //CSW 2.0.2 classes
         classeList.addAll(Arrays.asList(org.geotoolkit.csw.xml.v202.ObjectFactory.class,
                                         ExceptionReport.class,

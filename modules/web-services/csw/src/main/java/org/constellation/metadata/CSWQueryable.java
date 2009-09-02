@@ -376,22 +376,22 @@ public final class CSWQueryable {
          */
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:westBoundLongitude");
-        paths.add("Catalog Web Service:Record:BoundingBox:LowerCorner");
+        paths.add("Catalog Web Service:Record:BoundingBox:LowerCorner[0]");
         DUBLIN_CORE_QUERYABLE.put("WestBoundLongitude",     paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:eastBoundLongitude");
-        paths.add("Catalog Web Service:Record:BoundingBox:UpperCorner");
+        paths.add("Catalog Web Service:Record:BoundingBox:UpperCorner[0]");
         DUBLIN_CORE_QUERYABLE.put("EastBoundLongitude",     paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:northBoundLatitude");
-        paths.add("Catalog Web Service:Record:BoundingBox:UpperCorner");
+        paths.add("Catalog Web Service:Record:BoundingBox:UpperCorner[1]");
         DUBLIN_CORE_QUERYABLE.put("NorthBoundLatitude",     paths);
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2:southBoundLatitude");
-        paths.add("Catalog Web Service:Record:BoundingBox:LowerCorner");
+        paths.add("Catalog Web Service:Record:BoundingBox:LowerCorner[1]");
         DUBLIN_CORE_QUERYABLE.put("SouthBoundLatitude",     paths);
         
         paths = new ArrayList<String>();

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
@@ -35,6 +36,7 @@ import org.apache.lucene.search.Sort;
 
 // geotools dependencies
 import org.constellation.metadata.CSWClassesContext;
+import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.referencing.CRS;
@@ -46,14 +48,11 @@ import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.metadata.iso.DefaultMetaData;
 
 // GeoAPI dependencies
-import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
-import org.geotoolkit.temporal.object.DefaultPeriod;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 //Junit dependencies
 import org.junit.*;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.Expression;
 import static org.junit.Assert.*;
 
 /**
@@ -77,7 +76,7 @@ public class GenericindexTest {
     public static void setUpClass() throws Exception {
         deleteIndex();
         File configDirectory      = new File("GenericIndexTest");
-        List<DefaultMetaData> object = fillTestData();
+        List<Object> object       = fillTestData();
         indexer                   = new GenericIndexer(object, null, configDirectory, "");
         indexSearcher             = new GenericIndexSearcher(configDirectory, "");
         
@@ -156,6 +155,7 @@ public class GenericindexTest {
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("CTDF02");
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         
 
         assertEquals(expectedResult, result);
@@ -359,7 +359,7 @@ public class GenericindexTest {
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("CTDF02");
-
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         assertEquals(expectedResult, result);
 
         /**
@@ -377,6 +377,7 @@ public class GenericindexTest {
         logger.finer("SortedSearch 2:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("CTDF02");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("42292_5p_19900609195600");
@@ -401,6 +402,7 @@ public class GenericindexTest {
         logger.finer("SortedSearch 3:" + '\n' + resultReport);
 
         expectedResult = new ArrayList<String>();
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         expectedResult.add("CTDF02");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("39727_22_19750113062500");
@@ -431,6 +433,7 @@ public class GenericindexTest {
         expectedResult.add("39727_22_19750113062500");
         expectedResult.add("11325_158_19640418141800");
         expectedResult.add("CTDF02");
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
         
         assertEquals(expectedResult, result);
     }
@@ -495,6 +498,7 @@ public class GenericindexTest {
         expectedResult.add("42292_5p_19900609195600");
         expectedResult.add("42292_9s_19900610041000");
         expectedResult.add("40510_145_19930221211500");
+        expectedResult.add("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd");
 
         assertEquals("CRS URN are not working", expectedResult, result);
     }
@@ -574,54 +578,38 @@ public class GenericindexTest {
         assertEquals(expectedResult, result);
     }
 
-    public static List<DefaultMetaData> fillTestData() throws JAXBException {
-        List<DefaultMetaData> result = new ArrayList<DefaultMetaData>();
+    public static List<Object> fillTestData() throws JAXBException {
+        List<Object> result = new ArrayList<Object>();
         final List<Class> classes = CSWClassesContext.FRA_CLASSES;
         classes.add(DefaultMetaData.class);
+        classes.add(AbstractRecordType.class);
         MarshallerPool pool          = new MarshallerPool(classes.toArray(new Class[1]));
         Unmarshaller unmarshaller    = pool.acquireUnmarshaller();
 
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
-        if (obj instanceof DefaultMetaData) {
-            result.add((DefaultMetaData) obj);
-        } else {
-            throw new IllegalArgumentException("resource file must be MetadataImpl");
-        }
+        result.add(obj);
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2.xml"));
-        if (obj instanceof DefaultMetaData) {
-            result.add((DefaultMetaData) obj);
-        } else {
-            throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
-        }
+        result.add(obj);
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta3.xml"));
-        if (obj instanceof DefaultMetaData) {
-            result.add((DefaultMetaData) obj);
-        } else {
-            throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
-        }
+        result.add(obj);
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta4.xml"));
-        if (obj instanceof DefaultMetaData) {
-            result.add((DefaultMetaData) obj);
-        } else {
-            throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
-        }
+        result.add(obj);
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta5.xml"));
-        if (obj instanceof DefaultMetaData) {
-            result.add((DefaultMetaData) obj);
-        } else {
-            throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
-        }
+        result.add(obj);
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
-        if (obj instanceof DefaultMetaData) {
-            result.add((DefaultMetaData) obj);
-        } else {
-            throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
+        result.add(obj);
+
+        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta8.xml"));
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement)obj).getValue();
         }
+        result.add(obj);
+
         pool.release(unmarshaller);
         
         return result;

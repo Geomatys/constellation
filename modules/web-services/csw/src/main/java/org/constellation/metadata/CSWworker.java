@@ -1336,9 +1336,10 @@ public class CSWworker {
         LOGGER.info("DescribeRecords request processing" + '\n');
         final long startTime = System.currentTimeMillis();
         DescribeRecordResponseType response;
+        Unmarshaller unmarshaller;
         try {
-            
             verifyBaseRequest(request);
+            unmarshaller = this.marshallerPool.acquireUnmarshaller();
             
             // we initialize the output format of the response
             initializeOutputFormat(request);
@@ -1360,53 +1361,40 @@ public class CSWworker {
                                               " supported ones are: XMLSCHEMA or http://www.w3.org/XML/Schema",
                                               INVALID_PARAMETER_VALUE, "schemaLanguage"); 
             }
-            
             final List<SchemaComponentType> components   = new ArrayList<SchemaComponentType>();
-            final DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
-            final DocumentBuilder constructor            = documentFactory.newDocumentBuilder();
 
             if (typeNames.contains(RECORD_QNAME)) {
 
-                final InputStream in = Util.getResourceAsStream("org/constellation/metadata/record.xsd");
-                final Document d     = constructor.parse(in);
-                final SchemaComponentType component = new SchemaComponentType(Namespaces.CSW_202, schemaLanguage, d.getDocumentElement());
+                
+                final Object object = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/record.xsd"));
+                final SchemaComponentType component = new SchemaComponentType(Namespaces.CSW_202, schemaLanguage, object);
                 components.add(component);
             }
             
             if (typeNames.contains(METADATA_QNAME)) {
 
-                final InputStream in = Util.getResourceAsStream("org/constellation/metadata/metadata.xsd");
-                final Document d     = constructor.parse(in);
-                final SchemaComponentType component = new SchemaComponentType(Namespaces.GMD, schemaLanguage, d.getDocumentElement());
+                final Object object = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/metadata.xsd"));
+                final SchemaComponentType component = new SchemaComponentType(Namespaces.GMD, schemaLanguage, object);
                 components.add(component);
             }
             
             if (containsOneOfEbrim30(typeNames)) {
-                final InputStream in = Util.getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd");
-                final Document d     = constructor.parse(in);
-                final SchemaComponentType component = new SchemaComponentType("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", schemaLanguage, d.getDocumentElement());
+                final Object object = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd"));
+                final SchemaComponentType component = new SchemaComponentType("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", schemaLanguage, object);
                 components.add(component);
             }
             
             if (containsOneOfEbrim25(typeNames)) {
-                final InputStream in = Util.getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd");
-                final Document d     = constructor.parse(in);
-                final SchemaComponentType component = new SchemaComponentType("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", schemaLanguage, d.getDocumentElement());
+                final Object object = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd"));
+                final SchemaComponentType component = new SchemaComponentType("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", schemaLanguage, object);
                 components.add(component);
             }
                 
                 
             response  = new DescribeRecordResponseType(components);
             
-        } catch (ParserConfigurationException ex) {
-            throw new CstlServiceException("Parser Configuration Exception while creating the DocumentBuilder",
-                                          NO_APPLICABLE_CODE);
-        } catch (IOException ex) {
-            throw new CstlServiceException("IO Exception when trying to access xsd file",
-                                          NO_APPLICABLE_CODE);
-        } catch (SAXException ex) {
-            throw new CstlServiceException("SAX Exception when trying to parse xsd file",
-                                          NO_APPLICABLE_CODE);
+        } catch (JAXBException ex) {
+            throw new CstlServiceException("JAXB Exception when trying to parse xsd file", ex, NO_APPLICABLE_CODE);
         }
         LOGGER.info("DescribeRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         return response;

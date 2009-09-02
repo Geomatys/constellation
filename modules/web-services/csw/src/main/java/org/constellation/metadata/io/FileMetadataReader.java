@@ -17,6 +17,7 @@
 package org.constellation.metadata.io;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -42,8 +43,11 @@ import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWClassesContext;
+import org.constellation.util.StringUtilities;
+import org.constellation.util.Util;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.csw.xml.Record;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -139,6 +143,8 @@ public class FileMetadataReader extends MetadataReader {
         Object obj = getObjectFromFile(identifier);
         if (obj instanceof DefaultMetaData && mode == DUBLINCORE) {
             obj = translateISOtoDC((DefaultMetaData)obj, type, elementName);
+        } else if (obj instanceof RecordType && mode == DUBLINCORE) {
+            obj = applyElementSet((RecordType)obj, type, elementName);
         }
         return obj;
     }
@@ -176,6 +182,63 @@ public class FileMetadataReader extends MetadataReader {
         }
     }
 
+    /**
+     * Apply the elementSet (Brief, Summary or full) or the custom elementSetName on the specified record.
+     * 
+     * @param record
+     * @param type
+     * @param elementName
+     * @return
+     * @throws CstlServiceException If the type and the element name are null.
+     */
+    private AbstractRecordType applyElementSet(RecordType record, ElementSet type, List<QName> elementName) throws CstlServiceException {
+        
+        if (type != null) {
+            if (type.equals(ElementSetType.SUMMARY)) {
+                return record.toSummary();
+            } else if (type.equals(ElementSetType.BRIEF)) {
+                return record.toBrief();
+            } else {
+                return record;
+            }
+        } else if (elementName != null) {
+            final RecordType customRecord = new RecordType();
+            for (QName qn : elementName) {
+                if (qn != null) {
+                    try {
+                        final Method getter = Util.getGetterFromName(qn.getLocalPart(), RecordType.class);
+                        final Object param  = Util.invokeMethod(record, getter);
+
+                        Method setter = null;
+                        if (param != null) {
+                            setter = Util.getSetterFromName(qn.getLocalPart(), param.getClass(), RecordType.class);
+                        }
+
+                        if (setter != null) {
+                            Util.invokeMethod(setter, customRecord, param);
+                        }
+
+                    } catch (IllegalArgumentException ex) {
+                        LOGGER.info("illegal argument exception while invoking the method for attribute" + qn.getLocalPart() + " in the classe RecordType");
+                    }
+                } else {
+                    LOGGER.severe("An elementName was null.");
+                }
+            }
+            return customRecord;
+        } else {
+            throw new CstlServiceException("No ElementSet or Element name specified");
+        }
+    }
+    /**
+     * Translate A ISO 19139 object into a DublinCore representation.
+     * The elementSet (Brief, Summary or full) or the custom elementSetName is applied.
+     *
+     * @param metadata
+     * @param type
+     * @param elementName
+     * @return
+     */
     private AbstractRecordType translateISOtoDC(DefaultMetaData metadata, ElementSet type, List<QName> elementName) {
         if (metadata != null) {
 
