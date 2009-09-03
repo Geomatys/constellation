@@ -162,7 +162,7 @@ public class LuceneObservationFilter implements ObservationFilter {
             luceneRequest.append(OR_OPERATOR);
 
             //case 2 multiple observations containing a matching value
-            luceneRequest.append("(sampling_time_begin[19700000 ").append(position).append("] ").append(" AND sampling_time_end: [").append(position).append("30000000]))");
+            luceneRequest.append("(sampling_time_begin: [19700000 ").append(position).append("] ").append(" AND sampling_time_end: [").append(position).append(" 30000000]))");
 
         } else {
             throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",

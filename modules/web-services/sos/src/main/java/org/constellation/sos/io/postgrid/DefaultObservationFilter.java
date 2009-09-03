@@ -228,7 +228,7 @@ public class DefaultObservationFilter implements ObservationFilter {
             sqlRequest.append("AND (");
 
             // case 1 a single observation
-            sqlRequest.append("(\"sampling_time_begin\"='").append(position).append("' AND \"sampling_time_end\"=NULL)");
+            sqlRequest.append("(\"sampling_time_begin\"='").append(position).append("' AND \"sampling_time_end\" IS NULL)");
             sqlRequest.append(" OR ");
 
             //case 2 multiple observations containing a matching value

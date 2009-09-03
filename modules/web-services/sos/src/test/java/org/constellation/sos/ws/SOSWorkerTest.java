@@ -1562,7 +1562,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, result);
 
         /**
-         *   getObservation with procedure urn:ogc:object:sensor:GEOM:4
+         *   getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *   with resultTemplate mode and time filter TBefore
          */
         List<EventTime> times = new ArrayList<EventTime>();
@@ -1624,6 +1624,162 @@ public class SOSWorkerTest {
         result = worker.getResult(request);
 
         value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@" + '\n';
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + '/' + templateId));
+
+        assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
+        assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
+        assertEquals(expResult.getResult(), result.getResult());
+        assertEquals(expResult, result);
+
+         /**
+         * Test 6:  getResult with Tafter
+         */
+        times = new ArrayList<EventTime>();
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
+        filter = new BinaryTemporalOpType(instant);
+        EventTime after = new EventTime(filter, null, null);
+        times.add(after);
+
+        templateId = "urn:ogc:object:observation:template:GEOM:3-1";
+        request = new GetResult(templateId, times, "1.0.0");
+        result = worker.getResult(request);
+
+        value = "2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@" + '\n';
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + '/' + templateId));
+
+        assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
+        assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
+        assertEquals(expResult.getResult(), result.getResult());
+        assertEquals(expResult, result);
+
+        /**
+         * Test 7:  getResult with Tbefore
+         */
+        times = new ArrayList<EventTime>();
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T04:00:00.0"));
+        filter = new BinaryTemporalOpType(instant);
+        EventTime before2 = new EventTime(null, filter, null);
+        times.add(before2);
+
+        templateId = "urn:ogc:object:observation:template:GEOM:3-1";
+        request = new GetResult(templateId, times, "1.0.0");
+        result = worker.getResult(request);
+
+        value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@" + '\n';
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + '/' + templateId));
+
+        assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
+        assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
+        assertEquals(expResult.getResult(), result.getResult());
+        assertEquals(expResult, result);
+
+        /**
+         * Test 8:  getResult with TEquals
+         */
+        times = new ArrayList<EventTime>();
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T03:59:00.0"));
+        filter = new BinaryTemporalOpType(instant);
+        EventTime equals = new EventTime(filter);
+        times.add(equals);
+
+        templateId = "urn:ogc:object:observation:template:GEOM:3-1";
+        request = new GetResult(templateId, times, "1.0.0");
+        result = worker.getResult(request);
+
+        value = "2007-05-01T03:59:00,6.560@@" + '\n';
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + '/' + templateId));
+
+        assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
+        assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
+        assertEquals(expResult.getResult(), result.getResult());
+        assertEquals(expResult, result);
+
+        /**
+         * Test 9:  getResult with TEquals
+         */
+        times = new ArrayList<EventTime>();
+        period = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T04:00:00.0"));
+        filter = new BinaryTemporalOpType(period);
+        EventTime during = new EventTime(null, null, filter);
+        times.add(during);
+
+        templateId = "urn:ogc:object:observation:template:GEOM:3-1";
+        request = new GetResult(templateId, times, "1.0.0");
+        result = worker.getResult(request);
+
+        value = "2007-05-01T03:59:00,6.560@@" + '\n';
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + '/' + templateId));
+
+        assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
+        assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
+        assertEquals(expResult.getResult(), result.getResult());
+        assertEquals(expResult, result);
+
+
+         /**
+         *   getObservation with procedure urn:ogc:object:sensor:GEOM:3
+         *   with resultTemplate mode and time filter TAfter
+         */
+        times = new ArrayList<EventTime>();
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T19:00:00.0"));
+        filter = new BinaryTemporalOpType(instant);
+        after = new EventTime(filter, null, null);
+        times.add(after);
+        GOrequest  = new GetObservation("1.0.0",
+                                        "offering-allSensor",
+                                        times,
+                                        Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
+                                        null,
+                                        null,
+                                        null,
+                                        "text/xml; subtype=\"om/1.0.0\"",
+                                        Parameters.OBSERVATION_QNAME,
+                                        ResponseModeType.RESULT_TEMPLATE,
+                                        null);
+        obsCollResult = (ObservationCollectionEntry) worker.getObservation(GOrequest);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
+
+        templateExpResult = (ObservationEntry)obj.getValue();
+
+        //for template the sampling time is 1970 to now
+        period = new TimePeriodType(new TimePositionType("2007-05-01T19:00:00.0"));
+        templateExpResult.setSamplingTime(period);
+
+        // and we empty the result object
+        arrayP = (DataArrayPropertyType) templateExpResult.getResult();
+        array = arrayP.getDataArray();
+        array.setElementCount(0);
+        array.setValues("");
+
+        templateExpResult.setName("urn:ogc:object:observation:template:GEOM:3-2");
+
+        assertEquals(obsCollResult.getMember().size(), 1);
+
+        obsResult = (ObservationEntry) obsCollResult.getMember().iterator().next();
+
+        obsR = (DataArrayPropertyType) obsResult.getResult();
+        obsSdr = (SimpleDataRecordEntry) obsR.getDataArray().getElementType();
+        obsSdr.setBlockId(null);
+
+        assertTrue(obsResult != null);
+        assertEquals(templateExpResult.getName(), obsResult.getName());
+        assertEquals(templateExpResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(templateExpResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(templateExpResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(templateExpResult.getResult(), obsResult.getResult());
+        assertEquals(templateExpResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(templateExpResult, obsResult);
+
+        
+        /**
+         * Test 10:  getResult with no TimeFilter
+         */
+        templateId = "urn:ogc:object:observation:template:GEOM:3-2";
+        request = new GetResult(templateId, null, "1.0.0");
+        result = worker.getResult(request);
+
+        value = "2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@" + '\n';
         expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + '/' + templateId));
 
         assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
