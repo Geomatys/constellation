@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+
+// APache Lucene dependencies
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
@@ -37,7 +39,12 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+
+// constellation dependencies
 import org.constellation.sos.io.ObservationResult;
+import static org.constellation.sos.ws.Utils.*;
+
+// geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
@@ -136,14 +143,14 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                     Timestamp begin  = null;
                     Timestamp end    = null;
                     try  {
-                        begin = Timestamp.valueOf(d.get("sampling_time_begin"));
+                        begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
                     } catch(IllegalArgumentException ex) {
-                        LOGGER.finer("unable  to parse the timestamp");
+                        LOGGER.info("unable  to parse the timestamp");
                     }
                     try  {
-                        end = Timestamp.valueOf(d.get("sampling_time_begin"));
+                        end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
                     } catch(IllegalArgumentException ex) {
-                        LOGGER.finer("unable  to parse the timestamp");
+                        LOGGER.info("unable  to parse the timestamp");
                     }
                     final ObservationResult or = new ObservationResult(d.get("id"),
                                                                  begin,
@@ -167,14 +174,14 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                     Timestamp begin  = null;
                     Timestamp end    = null;
                     try  {
-                        begin = Timestamp.valueOf(d.get("sampling_time_begin"));
+                        begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
                     } catch(IllegalArgumentException ex) {
-                        LOGGER.finer("unable  to parse the timestamp");
+                        LOGGER.info("unable  to parse the timestamp");
                     }
                     try  {
-                        end = Timestamp.valueOf(d.get("sampling_time_begin"));
+                        end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
                     } catch(IllegalArgumentException ex) {
-                        LOGGER.finer("unable  to parse the timestamp");
+                        LOGGER.info("unable  to parse the timestamp");
                     }
                     final ObservationResult or = new ObservationResult(d.get("id"),
                                                                  begin,
@@ -186,14 +193,14 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                     Timestamp begin  = null;
                     Timestamp end    = null;
                     try  {
-                        begin = Timestamp.valueOf(d.get("sampling_time_begin"));
+                        begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
                     } catch(IllegalArgumentException ex) {
-                        LOGGER.finer("unable  to parse the timestamp");
+                        LOGGER.info("unable  to parse the timestamp");
                     }
                     try  {
-                        end = Timestamp.valueOf(d.get("sampling_time_begin"));
+                        end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
                     } catch(IllegalArgumentException ex) {
-                        LOGGER.finer("unable  to parse the timestamp");
+                        LOGGER.info("unable  to parse the timestamp");
                     }
                     final ObservationResult or = new ObservationResult(d.get("id"),
                                                                  begin,
@@ -217,14 +224,14 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                     Timestamp begin  = null;
                     Timestamp end    = null;
                     try  {
-                        begin = Timestamp.valueOf(d.get("sampling_time_begin"));
+                        begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
                     } catch(IllegalArgumentException ex) {
-                        LOGGER.finer("unable  to parse the timestamp");
+                        LOGGER.info("unable  to parse the timestamp");
                     }
                     try  {
-                        end = Timestamp.valueOf(d.get("sampling_time_begin"));
+                        end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
                     } catch(IllegalArgumentException ex) {
-                        LOGGER.finer("unable  to parse the timestamp");
+                        LOGGER.info("unable  to parse the timestamp");
                     }
                     final ObservationResult or = new ObservationResult(d.get("id"),
                                                                  begin,
@@ -243,14 +250,14 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                     Timestamp begin  = null;
                     Timestamp end    = null;
                     try  {
-                        begin = Timestamp.valueOf(d.get("sampling_time_begin"));
+                        begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
                     } catch(IllegalArgumentException ex) {
-                        LOGGER.finer("unable  to parse the timestamp");
+                        LOGGER.info("unable  to parse the timestamp");
                     }
                     try  {
-                        end = Timestamp.valueOf(d.get("sampling_time_begin"));
+                        end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
                     } catch(IllegalArgumentException ex) {
-                        LOGGER.finer("unable  to parse the timestamp");
+                        LOGGER.info("unable  to parse the timestamp");
                     }
                     final ObservationResult or = new ObservationResult(d.get("id"),
                                                                  begin,

@@ -217,6 +217,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
          }
 
          final TimePeriodType eventTime = new TimePeriodType(beginPosition, endPosition);
+         eventTime.setId("time-" + idOffering);
 
          getResponseModes().setIdOffering(idOffering);
          final Collection<OfferingResponseModeEntry> entries4 = getResponseModes().getEntries();

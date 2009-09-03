@@ -19,9 +19,6 @@ package org.constellation.sos.ws;
 
 // JUnit dependencies
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;

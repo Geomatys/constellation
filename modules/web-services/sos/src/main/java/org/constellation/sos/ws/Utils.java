@@ -28,7 +28,6 @@ import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
-import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sml.xml.AbstractClassification;
 import org.geotoolkit.sml.xml.AbstractClassifier;
 import org.geotoolkit.sml.xml.AbstractDerivableComponent;
@@ -193,6 +192,23 @@ public final class Utils {
             throw new  CstlServiceException("bad format of time, " + locator + " mustn't be null",
                                               MISSING_PARAMETER_VALUE, "eventTime");
           }
+    }
+
+    public static String unLuceneTimeValue(String luceneTimeValue) {
+        String year     = luceneTimeValue.substring(0, 4);
+        luceneTimeValue = luceneTimeValue.substring(4);
+        String month    = luceneTimeValue.substring(0, 2);
+        luceneTimeValue = luceneTimeValue.substring(2);
+        String day      = luceneTimeValue.substring(0, 2);
+        luceneTimeValue = luceneTimeValue.substring(2);
+        String hour     = luceneTimeValue.substring(0, 2);
+        luceneTimeValue = luceneTimeValue.substring(2);
+        String min      = luceneTimeValue.substring(0, 2);
+        luceneTimeValue = luceneTimeValue.substring(2);
+        String sec      = luceneTimeValue.substring(0, 2);
+        luceneTimeValue = luceneTimeValue.substring(2);
+
+        return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec;
     }
 
     public static String getPeriodDescription(long time) {

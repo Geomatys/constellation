@@ -260,14 +260,17 @@ public class LuceneObservationFilter implements ObservationFilter {
         }
     }
 
+    @Override
     public String getInfos() {
         return "Constellation Lucene O&M Filter 0.4";
     }
 
+    @Override
     public boolean isBoundedObservation() {
         return false;
     }
 
+    @Override
     public void setBoundingBox(EnvelopeEntry e) throws CstlServiceException {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }

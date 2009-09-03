@@ -230,7 +230,11 @@ public class SOSworker {
     /**
      * A date formater used to parse datablock.
      */
-    private final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private final static List<DateFormat> DATE_FORMATS = new ArrayList<DateFormat>();
+    static {
+        DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"));
+        DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+    }
     
     /**
      * The Observation database reader
@@ -1286,12 +1290,18 @@ public class SOSworker {
                     i++;
                     String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
                     samplingTimeValue = samplingTimeValue.replace('T', ' ');
-                    Date d;
-                    try {
-                        synchronized (dateformat) {
-                            d = dateformat.parse(samplingTimeValue);
+                    Date d = null;
+                    for (DateFormat dateformat : DATE_FORMATS) {
+                        try {
+                            synchronized (dateformat) {
+                                d = dateformat.parse(samplingTimeValue);
+                                break;
+                            }
+                        } catch (ParseException ex) {
+                            LOGGER.finer("unable to parse the value: " + samplingTimeValue);
                         }
-                    } catch (ParseException ex) {
+                    }
+                    if (d == null) {
                         LOGGER.severe("unable to parse the value: " + samplingTimeValue);
                         continue;
                     }
@@ -1476,7 +1486,7 @@ public class SOSworker {
             if (obs.getSamplingTime() instanceof TimeInstantType) {
                final TimeInstantType timeInstant = (TimeInstantType) obs.getSamplingTime();
                 try {
-                    final Date d = dateformat.parse(timeInstant.getTimePosition().getValue());
+                    final Date d = DATE_FORMATS.get(0).parse(timeInstant.getTimePosition().getValue());
                     final long t = System.currentTimeMillis() - d.getTime();
                     LOGGER.info("gap between time of reception and time of sampling: " + t + " ms (" + Utils.getPeriodDescription(t) + ')');
                 } catch (ParseException ex) {
@@ -1896,7 +1906,7 @@ public class SOSworker {
      */
     private File getConfigDirectory() {
         final String configUrl = "sos_configuration";
-        final File configDir = new File(WebService.getConfigDirectory(), configUrl);
+        final File configDir   = new File(WebService.getConfigDirectory(), configUrl);
         if (configDir.exists()) {
             LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
             return configDir;

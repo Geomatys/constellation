@@ -75,7 +75,6 @@ import org.geotoolkit.metadata.iso.identification.DefaultKeywords;
 import org.geotoolkit.metadata.iso.spatial.DefaultGeometricObjects;
 import org.geotoolkit.metadata.iso.spatial.DefaultVectorSpatialRepresentation;
 import org.geotoolkit.referencing.DefaultReferenceIdentifier;
-import org.geotoolkit.referencing.NamedIdentifier;
 import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 import org.geotoolkit.referencing.cs.DefaultCoordinateSystemAxis;
 import org.geotoolkit.referencing.cs.DefaultVerticalCS;

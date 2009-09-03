@@ -294,14 +294,15 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
             }
         }
         
-        if(pheno == null) pheno = compoPheno;
+        if(pheno == null) pheno     = compoPheno;
         if(station == null) station =  stationPoint;
-        
-        final Timestamp begin = result.getTimestamp(indexOf(query.samplingTimeBegin));
-        final Timestamp end = result.getTimestamp(indexOf(query.samplingTimeEnd));
+
+        final String name                               = result.getString(indexOf(query.name));
+        final Timestamp begin                           = result.getTimestamp(indexOf(query.samplingTimeBegin));
+        final Timestamp end                             = result.getTimestamp(indexOf(query.samplingTimeEnd));
         AbstractTimeGeometricPrimitiveType samplingTime = null;
-        TimePositionType beginPosition = null;
-        TimePositionType endPosition   = null;
+        TimePositionType beginPosition                  = null;
+        TimePositionType endPosition                    = null;
         if (begin != null) {
             final String normalizedTime = begin.toString().replace(' ', 'T');
             beginPosition = new TimePositionType(normalizedTime);
@@ -320,10 +321,12 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         //this case will normally never append
         } else if (begin == null && end != null) {
             samplingTime =  new TimeInstantType(endPosition);
-        } 
+        }
+        if(samplingTime != null) {
+            samplingTime.setId("samplingTime-" + name);
+        }
         
-        
-        return new ObservationEntry(result.getString(indexOf(query.name)),
+        return new ObservationEntry(name,
                                     result.getString(indexOf(query.description)),
                                     station,
                                     pheno,

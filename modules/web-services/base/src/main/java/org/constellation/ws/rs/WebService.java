@@ -343,13 +343,11 @@ public abstract class WebService {
     @Consumes("text/plain")
     public Response doPOSTPlain(InputStream is) throws JAXBException  {
         LOGGER.severe("request POST plain sending Exception");
-        final Object obj = launchException("The plain text content type is not allowed. Send " +
-        		                     "a message body with key=value pairs in the " +
-        		                     "application/x-www-form-urlencoded MIME type, or " +
-        		                     "an XML file using an application/xml or text/xml " +
-        		                     "MIME type.",
-                                          INVALID_REQUEST.name(), null);
-        return Response.ok(obj, MimeType.TEXT_XML).build();
+        return launchException("The plain text content type is not allowed. Send " +
+        		       "a message body with key=value pairs in the " +
+        		       "application/x-www-form-urlencoded MIME type, or " +
+        		       "an XML file using an application/xml or text/xml " +
+        		       "MIME type.", INVALID_REQUEST.name(), null);
     }
 
 

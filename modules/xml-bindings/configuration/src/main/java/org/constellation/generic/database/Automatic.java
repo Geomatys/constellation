@@ -116,10 +116,14 @@ public class Automatic {
     }
     
     public File getDataDirectory() {
+        File result = null;
         if (dataDirectory != null) {
-            return new File(dataDirectory);
+            result = new File(dataDirectory);
+            if (!result.exists() && configurationDirectory.exists()) {
+                result = new File(configurationDirectory, dataDirectory);
+            }
         }
-        return null;
+        return result;
     }
 
     public void setDataDirectory(String s) {

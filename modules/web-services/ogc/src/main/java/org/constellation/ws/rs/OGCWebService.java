@@ -40,6 +40,7 @@ import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.CstlServiceException;
 
 // Geotools dependencies
+import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.ows.xml.AbstractDCP;
 import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 import org.geotoolkit.ows.xml.AbstractOperation;
@@ -239,12 +240,16 @@ public abstract class OGCWebService extends WebService {
      * @return
      */
     @Override
-    protected Response launchException(final String message, final String codeName, final String locator) throws JAXBException {
+    protected Response launchException(final String message, String codeName, final String locator) throws JAXBException {
         Marshaller marshaller = null;
         try {
             marshaller = marshallerPool.acquireMarshaller();
 
-            final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
+            if (isOWS(actingVersion)) {
+                codeName = codeName.replace("_", "");
+                codeName = codeName.toLowerCase();
+            }
+            final OWSExceptionCode code   = CodeLists.valueOf(OWSExceptionCode.class, codeName);
             final CstlServiceException ex = new CstlServiceException(message, code, locator);
             return processExceptionResponse(ex, marshaller, supportedVersions.get(0));
         } finally {

@@ -51,6 +51,7 @@ import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.constellation.sos.ws.SOSworker;
 import org.constellation.util.Util;
 import org.constellation.ws.MimeType;
+import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -227,8 +228,15 @@ public class SOService extends OGCWebService {
             if (serviceDef == null) {
                 serviceDef = getBestVersion(null);
             }
+            String exceptionCode = ex.getExceptionCode().name();
+            if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
+                exceptionCode = exceptionCode.replace("_", "");
+                exceptionCode = exceptionCode.toLowerCase();
+                org.geotoolkit.ows.xml.OWSExceptionCode code = CodeLists.valueOf(org.geotoolkit.ows.xml.OWSExceptionCode.class, exceptionCode);
+                exceptionCode = code.name();
+            }
             final StringWriter sw = new StringWriter();
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(),
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(),
                                                          serviceDef.exceptionVersion.toString());
             marshaller.marshal(report, sw);
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
