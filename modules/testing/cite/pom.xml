@@ -86,11 +86,11 @@
       <artifactId>cstl-web-wms</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--dependency>
+    <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-sos</artifactId>
       <version>${project.version}</version>
-    </dependency-->
+    </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-csw</artifactId>
@@ -166,6 +166,7 @@
         <configuration>
           <mainClass>org.constellation.ws.embedded.LaunchTests</mainClass>
           <arguments>
+            <argument>sos-1.0.0</argument>
             <argument>csw-2.0.2</argument>
             <argument>wms-1.1.1</argument>
             <argument>wcs-1.0.0</argument>

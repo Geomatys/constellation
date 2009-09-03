@@ -14,16 +14,16 @@ base=engine/scripts
 #find the control file
 ctl=""
 if [ -e $base/$service-$version/ctl/main.xml ]; then
-  ctl=main.xml
+  ctl=$base/$service-$version/ctl
 else 
   if [ -e $base/$service-$version/ctl/main.ctl ]; then
-    ctl=main.ctl
+    ctl=$base/$service-$version/ctl
   else 
     if [ -e $base/$service-$version/ctl/$service.xml ]; then
-      ctl=$service.xml
+      ctl=$base/$service-$version/ctl
     else 
       if [ -e $base/$service-$version/ctl/all.xml ]; then
-       ctl=all.xml
+       ctl=$base/$service-$version/ctl
       fi
     fi
   fi
@@ -33,7 +33,7 @@ if [ "$ctl" = "" ]; then
   echo "Error: could not find control file 'main.xml' or '$service.xml' under 'tests/$service-$version/ctl/'"
   exit -1
 fi
-ctl=$base/$service-$version/ctl/$ctl
+#ctl=$base/$service-$version/ctl/$ctl
 
 mode=test
 if [ "$2" != "" ]; then
