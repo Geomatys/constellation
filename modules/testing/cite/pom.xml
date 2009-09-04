@@ -167,9 +167,9 @@
           <mainClass>org.constellation.ws.embedded.LaunchTests</mainClass>
           <arguments>
             <argument>sos-1.0.0</argument>
-            <!--argument>csw-2.0.2</argument>
             <argument>wms-1.1.1</argument>
-            <argument>wcs-1.0.0</argument-->
+            <argument>wcs-1.0.0</argument>
+            <argument>csw-2.0.2</argument>
           </arguments>
         </configuration>
       </plugin>

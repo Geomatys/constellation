@@ -86,7 +86,7 @@ public final class LaunchTests implements Runnable {
             t.setDaemon(true);
             t.start();
             try {
-                t.join(2*60*1000L);
+                t.join(5*60*1000L);
             } catch (InterruptedException e) {
                 // Ignore. We will kill the process.
             }
