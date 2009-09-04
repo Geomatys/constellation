@@ -526,7 +526,7 @@ public abstract class WebService {
             }
 
         } catch (NamingException ex) {
-            LOGGER.severe(ex.getMessage());
+            LOGGER.fine(ex.getMessage());
         }
         return getSicadeDirectory();
     }

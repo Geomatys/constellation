@@ -61,6 +61,7 @@ import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 
 //Geotools dependencies
+import org.geotoolkit.display2d.service.DefaultPortrayalService;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
@@ -96,6 +97,10 @@ public class WMSService extends OGCWebService {
      */
     protected AbstractWMSWorker worker;
 
+    /**
+     * Defines whether the exceptions should be stored and output in an image or not.
+     */
+    private boolean error_inimage = false;
 
     /**
      * Build a new instance of the webService and initialize the JAXB marshaller.
@@ -223,6 +228,11 @@ public class WMSService extends OGCWebService {
     protected Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
                                                 ServiceDef serviceDef) throws JAXBException
     {
+        if (error_inimage) {
+            final BufferedImage image = DefaultPortrayalService.writeException(ex, new Dimension(600, 400));
+            error_inimage = false;
+            return Response.ok(image, MimeType.IMAGE_PNG).build();
+        }
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
@@ -377,8 +387,12 @@ public class WMSService extends OGCWebService {
      * @throws CstlServiceException
      */
     private GetMap adaptGetMap(final String version, final boolean fromGetMap) throws CstlServiceException {
+        final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
+        if (strExceptions != null && strExceptions.equalsIgnoreCase(MimeType.APP_INIMAGE)) {
+            error_inimage = true;
+        }
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
-        String strCRS          = getParameter((version.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
+        String strCRS                = getParameter((version.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
                                             KEY_CRS_V111 : KEY_CRS_V130, true);
         final String strBBox         = getParameter(KEY_BBOX,            true);
         final String strLayers       = getParameter(KEY_LAYERS,          true);
@@ -391,7 +405,6 @@ public class WMSService extends OGCWebService {
         final String strTransparent  = getParameter(KEY_TRANSPARENT,    false);
         //final String strRemoteOwsType = getParameter(KEY_REMOTE_OWS_TYPE, false);
         final String strRemoteOwsUrl = getParameter(KEY_REMOTE_OWS_URL, false);
-        final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
         final String urlSLD          = getParameter(KEY_SLD,            false);
         final String strAzimuth      = getParameter(KEY_AZIMUTH,        false);
         final String strStyles       = getParameter(KEY_STYLES, ((urlSLD != null)
