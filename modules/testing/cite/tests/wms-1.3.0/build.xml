@@ -1,0 +1,10 @@
+<project default="data" basedir=".">
+  <target name="clean">
+    <delete file="web/data-wms-1.3.0.zip"/>
+  </target>
+
+  <target name="data">
+    <zip destfile="web/data-wms-1.3.0.zip" basedir="data"/>
+  </target>
+</project>
+

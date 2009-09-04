@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>WMS 1.3.0 compliance test suite</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+</head>
+<body>
+<h1>Overview</h1>
+<p>This test suite is based on the following OGC specification:</p>
+<ul>
+  <li>
+    <em>Web Map Server Implementation Specification</em>, version 1.3.0 [OGC 06-042] (
+    <a href="http://portal.opengeospatial.org/files/?artifact_id=14416">PDF version</a>,
+    <a href="http://cite.opengeospatial.org/OGCTestData/wms/1.3.0/spec/wms1_3.html">HTML version</a>)
+  </li>
+</ul>
+
+
+<h2>What is tested</h2>
+<ul>
+  <li><strong>All implementations</strong>
+    <ul>
+      <li>Dataset independent GetCapabilities, GetMap, and GetFeatureInfo requests, as derived from the capabilities.</li>
+    </ul>
+  </li>
+  <li><strong>Basic conformance option</strong>
+    <ul>
+      <li>Adds dataset specific GetMap requests.  This option is required for certification.</li>
+    </ul>
+  </li>
+  <li><strong>Queryable option</strong>
+    <ul>
+      <li>Adds dataset specific GetFeatureInfo requests.</li>
+    </ul>
+  </li>
+  <li><strong>Raster ELEVATION option</strong>
+    <ul>
+      <li>Adds requests involving the ELEVATION dimension over a specific raster terrain dataset.</li>
+    </ul>
+  </li>
+  <li><strong>Vector ELEVATION option</strong>
+    <ul>
+      <li>Adds requests involving the ELEVATION dimension over a specific vector dataset representing features at various elevations.</li>
+    </ul>
+  </li>
+  <li><strong>TIME option</strong>
+    <ul>
+      <li>Adds requests involving the TIME dimension over a specific temporal dataset.</li>
+    </ul>
+  </li>
+  <li><strong>Recomendations option</strong>
+    <ul>
+      <li>Tests functionality which is recommended in the specification.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>What is not tested</h2>
+<ul>
+  <li>Custom dimensions</li>
+  <li>&quot;Automatic&quot; coordinate reference systems (in the AUTO2 namespace)</li>
+</ul>
+
+<h2><a name="requirements">Test requirements</a></h2>
+<p>
+  To ensure all of the tests in the test suite produce correct results, WMS implementations must meet the following requirements:
+</p>
+<ul>
+  <li><strong>Basic conformance option (Required for certification)</strong>
+    <ul>
+      <li>Must support image/png or image/gif for GetMap requests.</li>
+      <li>Must contain the test dataset in layers that are subsetable and resizable and support CRS:84.</li>
+      <li>The CRS:84 support must be precise up to the ten-thousandth of a degree.</li>
+      <li>The default style for the cite:Lakes layer must fill in the polygon with non-white pixels.</li>
+      <li>Servers that don't advertise a maximum image size must be able to generate maps as large as 1024x768.  All servers must be able to generate maps as small as 8x5.</li>
+    </ul>
+    <br/>
+  </li>
+  <li><strong>Queryable option</strong>
+    <ul>
+      <li>GetFeatureInfo requests must be supported.</li>
+      <li>Must contain the test dataset in layers that are subsetable and resizable and support CRS:84.</li>
+      <li>The polygon layers in the test dataset must be queryable.</li>
+    </ul>
+    <br/>
+  </li>
+  <li><strong>Raster ELEVATION option</strong>
+    <ul>
+      <li>
+         Must contain the cite:Terrain layer.  The layer must declare support the elevation dimension as follows:
+         <pre>&lt;Dimension name="elevation" units="CRS:88" unitSymbol="m" multipleValues="true" nearestValue="false"/&gt;0/425/1&lt;/Dimension&gt;</pre>
+         It may also set a default value.
+      </li>
+    </ul>
+    <br/>
+  </li>
+  <li><strong>Vector ELEVATION option</strong>
+    <ul>
+      <li>
+         Must contain the cite:Lakes layer, which must support all three elevations.  The layer must declare support the elevation dimension as follows:
+         <pre>&lt;Dimension name="elevation" units="CRS:88" unitSymbol="m" default="500" multipleValues="false" nearestValue="true"/&gt;500,490,480&lt;/Dimension&gt;</pre>
+      </li>
+    </ul>
+  </li>
+  <li><strong>TIME option</strong>
+    <ul>
+      <li>
+         Must contain the cite:Autos layer.  The layer must declare support the elevation dimension as follows:
+         <pre>&lt;Dimension name="time" units="ISO8601" multipleValues="true" nearestValue="true"/&gt;2000-01-01T00:00:00Z/2000-01-01T00:01:00Z/PT5S&lt;/Dimension&gt;</pre>
+         It may also set a default value and/or set current="true".
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>
+  <img src="images/warning.gif" alt="warning"/>Warning:
+  There are currently slight differences between the schema listed in Annex E.1 and the on-line version Annex E.1 refers to.
+  This test suite uses the on-line version.
+</p>
+
+<h2><a name="dataset">Test Dataset Description</a></h2>
+    <p>
+      <a href="data-wms-1.3.0.zip">Download the test dataset</a>
+    </p>
+    <p>
+      The majority of the dataset is based on the
+      <a href="http://portal.opengeospatial.org/files/?artifact_id=7587&amp;version=2">
+        Conformance Test Guidelines for OpenGIS Simple Features Specification for SQL, Revision 1.0
+      </a>.  This set of features makes up a map of a fictional location called Blue Lake.
+      The features are as described in the Simple Features Specification for SQL document,
+      except they have been converted to WGS84 coordinates and have been reoriented so the
+      area is centered at 0 degrees latitude, 0 degrees longitude.
+      Figure 1 shows an overview map of the area with the prominent features labeled.
+      Figure 2 shows the location of each of the data points.
+    </p>
+    <table>
+      <caption align="bottom">Figure 1:  Overview of Blue Lake vicinity features</caption>
+      <tr><td><img src="images/bluelake_features.gif" alt="overview"/></td></tr>
+    </table>
+    <p/>
+    <table border="1">
+      <caption align="bottom">Figure 2:  Blue Lake vicinity data points</caption>
+      <tr><td><img src="images/bluelake_coordinates.gif" alt="blue lake data"/></td></tr>
+    </table>
+    <p>
+      Additional features have also been defined to test data at a larger scale.
+      These consist of a diamond and two overlapping squares, as shown in figure 3.
+      It does not matter which square appears on top.<br/>
+    </p>
+    <table border="1">
+      <caption align="bottom">Figure 3:  Basic Polygon Features</caption>
+      <tr><td><img src="images/basic_polygons.gif" alt="basic polygons data"/></td></tr>
+    </table>
+    <p>
+      More features have also been defined to test dimensional data.
+      To support testing the elevation dimension using terrain coverage data, a terrain dataset derived from DTED data has been defined.  It has values that range from 0 to 425m that include a "high spot" with values &gt; 325m and a "low spot" with values &lt; 200m.  The remainder of the dataset is filled with values between 200m and 325m, including a few values that are exactly 250m.  It covers a one degree square area, centered at 0,0.
+      To support testing the elevation dimension using vector data, additional polygons representing the edge of the lake at other depths have been defined.
+      To support testing the time dimension, point geometries that represent the locations of automobiles along the roads at 5 second increments during a one minute interval have been defined.
+      <br/>
+      <br/>
+      The features are organized into layers as shown in table below.  The layers may be named
+      in any fashion, but must be titled exactly as shown in the table.<br/>
+    </p>
+      <table border="1">
+        <caption align="bottom">Layer titles and features</caption>
+        <tr><td valign="top"><b>Layer Title</b></td><td valign="top"><b>Type</b></td>
+            <td><b>Features Contained</b></td></tr>
+        <tr><td valign="top">cite:Autos</td><td valign="top">point</td>
+            <td>Contains point features representing automobiles along the roads.  Required only for the time option.</td></tr>
+        <tr><td valign="top">cite:BasicPolygons</td><td valign="top">polygon</td>
+            <td>Contains all the features shown in figure 3.</td></tr>
+        <tr><td valign="top">cite:Bridges</td><td valign="top">point</td>
+            <td>Contains Cam Bridge.</td></tr>
+        <tr><td valign="top">cite:Buildings</td><td valign="top">polygon</td>
+            <td>Contains the two buildings along Main Street.</td></tr>
+        <tr><td valign="top">cite:DividedRoutes</td><td valign="top">line</td>
+            <td>Contains both lanes of Route 75.</td></tr>
+        <tr><td valign="top">cite:Forests</td><td valign="top">polygon</td>
+            <td>Contains the State Forest polygon.</td></tr>
+        <tr><td valign="top">cite:Lakes</td><td valign="top">polygon</td>
+            <td>Contains Blue Lake.  For the vector elevation option, it also contains polygons representing the edge of the lake at other depths.</td></tr>
+        <tr><td valign="top">cite:MapNeatline</td><td valign="top">line</td>
+            <td>Contains the border surrounding the Blue Lake vicinity.</td></tr>
+        <tr><td valign="top">cite:NamedPlaces</td><td valign="top">polygon</td>
+            <td>Contains Ashton and Goose Island.</td></tr>
+        <tr><td valign="top">cite:Ponds</td><td valign="top">polygon</td>
+            <td>Contains both pools of Stock Pond.</td></tr>
+        <tr><td valign="top">cite:RoadSegments</td><td valign="top">line</td>
+            <td>Contains all the sections of Route 5, Main Street, and the dirt road.</td></tr>
+        <tr><td valign="top">cite:Streams</td><td valign="top">line</td>
+            <td>Contains Cam Stream and the unnamed stream south of Blue Lake.</td></tr>
+        <tr><td valign="top">cite:Terrain</td><td valign="top">raster</td>
+            <td>Contains raster terrain data.  Required only for the raster elevation option.</td></tr>
+      </table>
+    <p>
+       Metadata for each of these layers is supplied as XML files that adhere to the <a href="http://standards.iso.org/ittf/PubliclyAvailableStandards/ISO_19139_Schemas/">ISO 19139 schemas</a>.
+    </p>
+
+<h2><a name="ats">Abstract Test Suite</a></h2>
+<p>
+  Detailed information about each of the tests can be found in the
+  <a href="wms-1_3_0-ats.html">abstract test suite</a>, which follows the ISO 19105 model.
+</p>
+
+</body>
+</html>
