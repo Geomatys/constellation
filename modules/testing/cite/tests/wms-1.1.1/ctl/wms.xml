@@ -742,11 +742,14 @@ longitude</td>
                </call-test>
             </xsl:if>
             <xsl:if test="$se_inimage and $readable">
-               <call-test name="wms:wmsops-getmap-params-exceptions-3">
+               <!-- Do not call this test because it will open a popup and ask to the user if the image
+                    really contains the exception, but those tests are designed to be launched on a remote
+                    server, where no popup can be opened. -->
+               <!--call-test name="wms:wmsops-getmap-params-exceptions-3">
                   <with-param name="VAR_WMS_GET_MAP_HTTP_GET_URL" select="$VAR_WMS_GET_MAP_HTTP_GET_URL"/>
                   <with-param name="VAR_WMS_VERSION" select="$VAR_WMS_VERSION"/>
                   <with-param name="VAR_READABLE_IMAGE_FORMAT" select="$VAR_READABLE_IMAGE_FORMAT"/>
-               </call-test>
+               </call-test-->
             </xsl:if>
             <xsl:if test="$stddata and $readable">
                <call-test name="wms:wmsops-getmap-params-layers-4">

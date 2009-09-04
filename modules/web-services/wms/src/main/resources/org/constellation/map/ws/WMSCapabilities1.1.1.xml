@@ -116,7 +116,8 @@
     </GetLegendGraphic>
   </Request>
   <Exception>
-    <Format>XML</Format>
+    <Format>application/vnd.ogc.se_xml</Format>
+    <Format>application/vnd.ogc.se_inimage</Format>
   </Exception>
 <UserDefinedSymbolization SupportSLD="1" UserLayer="1" UserStyle="1" RemoteWFS="1"/>
 </Capability>

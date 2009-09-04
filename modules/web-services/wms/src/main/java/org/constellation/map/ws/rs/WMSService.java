@@ -143,13 +143,19 @@ public class WMSService extends OGCWebService {
 
             //Handle user's requests.
             if (GETMAP.equalsIgnoreCase(request)) {
-                final GetMap requestMap = adaptGetMap(true);
+                final String versionSt = getParameter(KEY_VERSION, true);
+                isVersionSupported(versionSt);
+                version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
+                final GetMap requestMap = adaptGetMap(versionSt, true);
                 version = getVersionFromNumber(requestMap.getVersion().toString());
                 final BufferedImage map = worker.getMap(requestMap);
                 return Response.ok(map, requestMap.getFormat()).build();
             }
             if (GETFEATUREINFO.equalsIgnoreCase(request)) {
-                final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo();
+                final String versionSt = getParameter(KEY_VERSION, true);
+                isVersionSupported(versionSt);
+                version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
+                final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo(versionSt);
                 version = getVersionFromNumber(requestFeatureInfo.getVersion().toString());
                 final String result = worker.getFeatureInfo(requestFeatureInfo);
                 //Need to reset the GML mime format to XML for browsers
@@ -160,7 +166,9 @@ public class WMSService extends OGCWebService {
                 return Response.ok(result, infoFormat).build();
             }
             if (GETCAPABILITIES.equalsIgnoreCase(request)) {
-                final GetCapabilities requestCapab = adaptGetCapabilities();
+                final String versionSt = getParameter(KEY_VERSION, false);
+                version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
+                final GetCapabilities requestCapab = adaptGetCapabilities(versionSt);
                 version = getVersionFromNumber(requestCapab.getVersion().toString());
                 worker.initServletContext(servletContext);
                 worker.initUriContext(uriContext);
@@ -176,13 +184,19 @@ public class WMSService extends OGCWebService {
                 return Response.ok(sw.toString(), requestCapab.getFormat()).build();
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
+                final String versionSt = getParameter(KEY_VERSION, true);
+                isVersionSupported(versionSt);
+                version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final GetLegendGraphic requestLegend = adaptGetLegendGraphic();
                 version = getVersionFromNumber(requestLegend.getVersion().toString());
                 final BufferedImage legend = worker.getLegendGraphic(requestLegend);
                 return Response.ok(legend, requestLegend.getFormat()).build();
             }
             if (DESCRIBELAYER.equalsIgnoreCase(request)) {
-                final DescribeLayer describeLayer = adaptDescribeLayer();
+                final String versionSt = getParameter(KEY_VERSION, true);
+                isVersionSupported(versionSt);
+                version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
+                final DescribeLayer describeLayer = adaptDescribeLayer(versionSt);
                 version = getVersionFromNumber(describeLayer.getVersion().toString());
                 worker.initUriContext(uriContext);
                 final DescribeLayerResponseType response = worker.describeLayer(describeLayer);
@@ -227,7 +241,9 @@ public class WMSService extends OGCWebService {
         }
         StringWriter sw = new StringWriter();
         marshaller.marshal(report, sw);
-        return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.APP_XML).build();
+        final String mimeException = (serviceDef.version.equals(ServiceDef.WMS_1_1_1.version)) ?
+                                                                MimeType.APP_SE_XML : MimeType.TEXT_XML;
+        return Response.ok(Util.cleanSpecialCharacter(sw.toString()), mimeException).build();
     }
 
     /**
@@ -237,8 +253,7 @@ public class WMSService extends OGCWebService {
      * @return The DescribeLayer request.
      * @throws CstlServiceException
      */
-    private DescribeLayer adaptDescribeLayer() throws CstlServiceException {
-        final String version = getParameter(KEY_VERSION, true);
+    private DescribeLayer adaptDescribeLayer(final String version) throws CstlServiceException {
         ServiceDef serviceDef = getVersionFromNumber(version);
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
@@ -256,8 +271,7 @@ public class WMSService extends OGCWebService {
      * @return A GetCapabilities request.
      * @throws CstlServiceException
      */
-    private GetCapabilities adaptGetCapabilities() throws CstlServiceException {
-        final String version = getParameter(KEY_VERSION, false);
+    private GetCapabilities adaptGetCapabilities(final String version) throws CstlServiceException {
         if (version == null) {
             final ServiceDef capsService = getBestVersion(null);
             return new GetCapabilities(capsService.version);
@@ -284,9 +298,8 @@ public class WMSService extends OGCWebService {
      * @return A GetFeatureInfo request.
      * @throws CstlServiceException
      */
-    private GetFeatureInfo adaptGetFeatureInfo() throws CstlServiceException, NumberFormatException {
-        final GetMap getMap  = adaptGetMap(false);
-        final String version = getParameter(KEY_VERSION, true);
+    private GetFeatureInfo adaptGetFeatureInfo(final String version) throws CstlServiceException, NumberFormatException {
+        final GetMap getMap  = adaptGetMap(version, false);
         ServiceDef serviceDef = getVersionFromNumber(version);
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
@@ -363,9 +376,7 @@ public class WMSService extends OGCWebService {
      * @return The GetMap request.
      * @throws CstlServiceException
      */
-    private GetMap adaptGetMap(final boolean fromGetMap) throws CstlServiceException {
-        final String version         = getParameter(KEY_VERSION,         true);
-        isVersionSupported(version);
+    private GetMap adaptGetMap(final String version, final boolean fromGetMap) throws CstlServiceException {
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
         String strCRS          = getParameter((version.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
                                             KEY_CRS_V111 : KEY_CRS_V130, true);
