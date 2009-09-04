@@ -105,6 +105,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             configuration.setPhenomenonIdBase("urn:ogc:def:phenomenon:GEOM:");
             configuration.setProfile("transactional");
             configuration.setObservationTemplateIdBase("urn:ogc:object:observation:template:GEOM:");
+            configuration.setSensorIdBase("urn:ogc:object:sensor:GEOM:");
             marshaller.marshal(configuration, configFile);
 
         }
@@ -258,6 +259,17 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         super.GetResultTest();
     }
 
+    /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void RegisterSensorTest() throws Exception {
+        super.RegisterSensorTest();
+    }
+    
     /**
      * Tests the destroy method
      *

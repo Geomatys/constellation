@@ -113,7 +113,7 @@ public class MDWebSensorWriter implements SensorWriter {
         try {
             smlConnection   = db.getConnection();
             final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
-            sensorMLWriter  = new Writer20(smlConnection);
+            sensorMLWriter  = new Writer20(smlConnection, isPostgres);
             sensorMLReader  = new Reader20(Standard.SENSORML, smlConnection, isPostgres);
             sensorMLCatalog = sensorMLReader.getCatalog("SMLC");
             mainUser        = sensorMLReader.getUser("admin");

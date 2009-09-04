@@ -1,6 +1,6 @@
 <SensorML xmlns="http://www.opengis.net/sensorML/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:swe="http://www.opengis.net/swe/1.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" xsi:schemaLocation="http://www.opengis.net/sensorML/1.0 D:\Guilhem\DIVERS~1\SOSFUL~1\sml\1.0.0\sensorML.xsd">
 	<member xlink:role="urn:x-ogx:def:sensor:OGC:detector">
-		<System>
+		<System gml:id="sensor-system">
 			<gml:description>information about the piezometer</gml:description>
 			<gml:name>Piezometer Test</gml:name>
 			<!-- metadata  -->
@@ -143,12 +143,12 @@
 					<individualName>BLAISE Marion (BRGM)</individualName>
 					<organizationName>BRGM</organizationName>
 					<contactInfo>
-						<!--address MDWeb reader have an issues with this part >
-								<deliveryPoint>SGR LRO-1039 Rue de Pinville-34000 Montpellier</deliveryPoint>
-									<city>MONTPELLIER</city>
-									<electronicMailAddress>m.blaise@brgm.fr</electronicMailAddress>
-						</address-->
-						</contactInfo>
+						<address>
+                                                    <deliveryPoint>SGR LRO-1039 Rue de Pinville-34000 Montpellier</deliveryPoint>
+                                                    <city>MONTPELLIER</city>
+                                                    <electronicMailAddress>m.blaise@brgm.fr</electronicMailAddress>
+						</address>
+					</contactInfo>
 				</ResponsibleParty>
 			</contact>
 			<contact xlink:role="urn:x-ogc:def:role:owner">
@@ -156,15 +156,9 @@
 					<individualName>ASSENS Martine (CG66)</individualName>
 					<organizationName>CONSEIL GENERAL DES PYRENEES ORIENTALES</organizationName>
 					<contactInfo>
-                                                <!-- because it write it on this form -->
-           					<Contact>
-							<address>
-								<Address>
-									<deliveryPoint>Hotel du Departement, B.P. 906, 66 906 Perpignan Cedex</deliveryPoint>
-									<city>PERPIGNAN</city>
-								</Address>
-							</address>
-						</Contact>
+           					<address>
+        						<deliveryPoint>Hotel du Departement, B.P. 906, 66 906 Perpignan Cedex</deliveryPoint>
+						</address>
 					</contactInfo>
 				</ResponsibleParty>
 			</contact>

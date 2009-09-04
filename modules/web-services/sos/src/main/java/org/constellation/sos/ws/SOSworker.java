@@ -1870,7 +1870,7 @@ public class SOSworker {
         try {
             if (dbId != null && physicalID != null) {
                 map.setProperty(physicalID, dbId);
-                final File mappingFile     = new File(WebService.getSicadeDirectory(), "/sos_configuration/mapping.properties");
+                final File mappingFile     = new File(getConfigDirectory(), "mapping.properties");
                 final FileOutputStream out = new FileOutputStream(mappingFile);
                 map.store(out, "");
                 out.close();

@@ -29,6 +29,7 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
+import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
@@ -43,6 +44,7 @@ import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.v100.ComponentPropertyType;
 import org.geotoolkit.sml.xml.v100.ComponentType;
 import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.sml.xml.v100.SystemType;
@@ -50,6 +52,9 @@ import org.geotoolkit.sos.xml.v100.EventTime;
 import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.GetResultResponse;
+import org.geotoolkit.sos.xml.v100.ObservationTemplate;
+import org.geotoolkit.sos.xml.v100.RegisterSensor;
+import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
 import org.geotoolkit.swe.xml.v101.DataArrayEntry;
@@ -1788,8 +1793,217 @@ public class SOSWorkerTest {
         assertEquals(expResult, result);
 
         marshallerPool.release(unmarshaller);
+
+         /**
+         *   getObservation with procedure urn:ogc:object:sensor:GEOM:3
+         *   with resultTemplate mode and time filter TEquals
+         */
+        times = new ArrayList<EventTime>();
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T20:59:00.0"));
+        filter = new BinaryTemporalOpType(instant);
+        equals = new EventTime(filter);
+        times.add(equals);
+        GOrequest  = new GetObservation("1.0.0",
+                                        "offering-allSensor",
+                                        times,
+                                        Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
+                                        null,
+                                        null,
+                                        null,
+                                        "text/xml; subtype=\"om/1.0.0\"",
+                                        Parameters.OBSERVATION_QNAME,
+                                        ResponseModeType.RESULT_TEMPLATE,
+                                        null);
+        obsCollResult = (ObservationCollectionEntry) worker.getObservation(GOrequest);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
+
+        templateExpResult = (ObservationEntry)obj.getValue();
+
+        instant = new TimeInstantType(new TimePositionType("2007-05-01T20:59:00.0"));
+        templateExpResult.setSamplingTime(instant);
+
+        // and we empty the result object
+        arrayP = (DataArrayPropertyType) templateExpResult.getResult();
+        array = arrayP.getDataArray();
+        array.setElementCount(0);
+        array.setValues("");
+
+        templateExpResult.setName("urn:ogc:object:observation:template:GEOM:3-3");
+
+        assertEquals(obsCollResult.getMember().size(), 1);
+
+        obsResult = (ObservationEntry) obsCollResult.getMember().iterator().next();
+
+        obsR = (DataArrayPropertyType) obsResult.getResult();
+        obsSdr = (SimpleDataRecordEntry) obsR.getDataArray().getElementType();
+        obsSdr.setBlockId(null);
+
+        assertTrue(obsResult != null);
+        assertEquals(templateExpResult.getName(), obsResult.getName());
+        assertEquals(templateExpResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(templateExpResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(templateExpResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(templateExpResult.getResult(), obsResult.getResult());
+        assertEquals(templateExpResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(templateExpResult, obsResult);
+
+        /**
+         * Test 11:  getResult with no TimeFilter
+         */
+        templateId = "urn:ogc:object:observation:template:GEOM:3-3";
+        request = new GetResult(templateId, null, "1.0.0");
+        result = worker.getResult(request);
+
+        value = "2007-05-01T20:59:00,6.550@@" + '\n';
+        expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + '/' + templateId));
+
+        assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
+        assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
+        assertEquals(expResult.getResult(), result.getResult());
+        assertEquals(expResult, result);
+
+        marshallerPool.release(unmarshaller);
+
     }
 
+    /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    public void RegisterSensorTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+        /**
+         * Test 1 we register a system sensor
+         */
+        AbstractSensorML sensorDescription = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
+        
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-6.xml"));
+
+        ObservationEntry obsTemplate = (ObservationEntry)obj.getValue();
+
+        RegisterSensor request = new RegisterSensor("1.0.0", sensorDescription, new ObservationTemplate(obsTemplate));
+
+        RegisterSensorResponse response = worker.registerSensor(request);
+
+        assertEquals("urn:ogc:object:sensor:GEOM:6", response.getAssignedSensorId());
+
+        /**
+         * we verify that the sensor is wel registred
+         */
+        DescribeSensor DSrequest  = new DescribeSensor("urn:ogc:object:sensor:GEOM:6", "text/xml;subtype=\"SensorML/1.0.0\"");
+        AbstractSensorML absResult = (AbstractSensorML) worker.describeSensor(DSrequest);
+
+        
+        assertTrue(absResult instanceof SensorML);
+        assertTrue(sensorDescription instanceof SensorML);
+        SensorML result = (SensorML) absResult;
+        SensorML expResult = (SensorML) sensorDescription;
+
+
+        assertEquals(expResult.getCapabilities(), result.getCapabilities());
+        assertEquals(expResult.getCharacteristics(), result.getCharacteristics());
+        assertEquals(expResult.getClassification(), result.getClassification());
+        assertEquals(expResult.getContact(), result.getContact());
+        assertEquals(expResult.getDocumentation(), result.getDocumentation());
+        assertEquals(expResult.getHistory(), result.getHistory());
+        assertEquals(expResult.getIdentification(), result.getIdentification());
+        assertEquals(expResult.getKeywords(), result.getKeywords());
+        assertEquals(expResult.getLegalConstraint(), result.getLegalConstraint());
+        assertEquals(expResult.getSecurityConstraint(), result.getSecurityConstraint());
+        assertEquals(expResult.getValidTime(), result.getValidTime());
+        assertEquals(expResult.getVersion(), result.getVersion());
+
+        assertEquals(expResult.getMember().size(), result.getMember().size());
+        assertEquals(expResult.getMember().size(), 1);
+        SystemType expProcess = (SystemType) expResult.getMember().iterator().next().getProcess().getValue();
+        assertTrue(result.getMember().iterator().next().getProcess().getValue() instanceof SystemType);
+        SystemType resProcess = (SystemType) result.getMember().iterator().next().getProcess().getValue();
+
+        /*
+         * TODO fix this issue for mdweb redaer/writer
+         */
+        EnvelopeEntry nullEnv = null;
+        resProcess.setBoundedBy(nullEnv);
+        expProcess.setBoundedBy(nullEnv);
+        assertEquals(expProcess.getBoundedBy(), resProcess.getBoundedBy());
+
+        assertEquals(expProcess.getCapabilities(), resProcess.getCapabilities());
+
+        assertEquals(expProcess.getClassification().size(), resProcess.getClassification().size());
+        assertEquals(resProcess.getClassification().size(), 1);
+        assertEquals(expProcess.getClassification().get(0).getClassifierList().getClassifier().size(), resProcess.getClassification().get(0).getClassifierList().getClassifier().size());
+        for (int i = 0; i < 10; i++) {
+            assertEquals(expProcess.getClassification().get(0).getClassifierList().getClassifier().get(i), resProcess.getClassification().get(0).getClassifierList().getClassifier().get(i));
+        }
+        assertEquals(expProcess.getClassification().get(0).getClassifierList().getClassifier(), resProcess.getClassification().get(0).getClassifierList().getClassifier());
+        assertEquals(expProcess.getClassification().get(0).getClassifierList(), resProcess.getClassification().get(0).getClassifierList());
+        assertEquals(expProcess.getClassification().get(0), resProcess.getClassification().get(0));
+        assertEquals(expProcess.getClassification(), resProcess.getClassification());
+        assertEquals(expProcess.getConnections(), resProcess.getConnections());
+
+        assertEquals(expProcess.getContact().iterator().next().getResponsibleParty(), resProcess.getContact().iterator().next().getResponsibleParty());
+        assertEquals(expProcess.getContact().iterator().next(), resProcess.getContact().iterator().next());
+        assertEquals(expProcess.getContact(), resProcess.getContact());
+        assertEquals(expProcess.getDescription(), resProcess.getDescription());
+        assertEquals(expProcess.getDescriptionReference(), resProcess.getDescriptionReference());
+        assertEquals(expProcess.getDocumentation(), resProcess.getDocumentation());
+        assertEquals(expProcess.getHistory(), resProcess.getHistory());
+        assertEquals(expProcess.getId(), resProcess.getId());
+        assertEquals(expProcess.getIdentification(), resProcess.getIdentification());
+        assertEquals(expProcess.getInputs(), resProcess.getInputs());
+        assertEquals(expProcess.getInterfaces(), resProcess.getInterfaces());
+        assertEquals(expProcess.getKeywords(), resProcess.getKeywords());
+        assertEquals(expProcess.getLegalConstraint(), resProcess.getLegalConstraint());
+        assertEquals(expProcess.getLocation(), resProcess.getLocation());
+        assertEquals(expProcess.getName(), resProcess.getName());
+        for (int i = 0; i < expProcess.getComponents().getComponentList().getComponent().size(); i++) {
+            ComponentPropertyType expCompo = expProcess.getComponents().getComponentList().getComponent().get(i);
+            ComponentPropertyType resCompo = resProcess.getComponents().getComponentList().getComponent().get(i);
+            assertEquals(expCompo.getHref(), resCompo.getHref());
+            assertEquals(expCompo.getRole(), resCompo.getRole());
+            assertEquals(expCompo.getName(), resCompo.getName());
+            assertEquals(expCompo.getType(), resCompo.getType());
+            assertEquals(expCompo.getTitle(), resCompo.getTitle());
+            assertTrue(expCompo.getProcess() == null);
+            assertTrue(resCompo.getProcess() == null);
+            assertEquals(expCompo, resCompo);
+        }
+        assertEquals(expProcess.getComponents().getComponentList().getComponent(), resProcess.getComponents().getComponentList().getComponent());
+        assertEquals(expProcess.getComponents().getComponentList(), resProcess.getComponents().getComponentList());
+        assertEquals(expProcess.getComponents(), resProcess.getComponents());
+        assertEquals(expProcess.getOutputs(), resProcess.getOutputs());
+        assertEquals(expProcess.getParameters(), resProcess.getParameters());
+        assertEquals(expProcess.getPosition(), resProcess.getPosition());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getVector(), resProcess.getPositions().getPositionList().getPosition().get(0).getVector());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getName(), resProcess.getPositions().getPositionList().getPosition().get(0).getName());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0), resProcess.getPositions().getPositionList().getPosition().get(0));
+        assertEquals(expProcess.getPositions().getPositionList().getPosition(), resProcess.getPositions().getPositionList().getPosition());
+        assertEquals(expProcess.getPositions().getPositionList(), resProcess.getPositions().getPositionList());
+        assertEquals(expProcess.getPositions(), resProcess.getPositions());
+        assertEquals(expProcess.getSMLLocation(), resProcess.getSMLLocation());
+        assertEquals(expProcess.getSpatialReferenceFrame(), resProcess.getSpatialReferenceFrame());
+        assertEquals(expProcess.getSrsName(), resProcess.getSrsName());
+        assertEquals(expProcess.getTemporalReferenceFrame(), resProcess.getTemporalReferenceFrame());
+        assertEquals(expProcess.getTimePosition(), resProcess.getTimePosition());
+        assertEquals(expProcess.getValidTime(), resProcess.getValidTime());
+
+
+
+
+        assertEquals(expResult.getMember().iterator().next().getArcrole(), result.getMember().iterator().next().getArcrole());
+        assertEquals(expResult.getMember().iterator().next(), result.getMember().iterator().next());
+        assertEquals(expResult.getMember(), result.getMember());
+
+
+        assertEquals(expResult, result);
+
+        marshallerPool.release(unmarshaller);
+    }
+    
     /**
      * Tests the destroy method
      *

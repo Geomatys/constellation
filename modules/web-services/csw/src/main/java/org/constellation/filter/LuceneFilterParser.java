@@ -36,7 +36,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // Lucene dependencies
 import org.apache.lucene.search.Filter;
 
-// geotools dependencies
+// geotoolkit dependencies
 import org.geotoolkit.gml.GMLUtilities;
 import org.constellation.metadata.Parameters;
 import org.geotoolkit.csw.xml.QueryConstraint;

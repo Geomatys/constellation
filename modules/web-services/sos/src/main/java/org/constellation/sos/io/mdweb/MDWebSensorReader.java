@@ -146,7 +146,7 @@ public class MDWebSensorReader implements SensorReader {
             //we transform the form into an XML string
             final String xml      = xmlWriter.writeForm(f);
             final StringReader sr = new StringReader(xml);
-            unmarshaller = marshallerPool.acquireUnmarshaller();
+            unmarshaller          = marshallerPool.acquireUnmarshaller();
            
             Object unmarshalled = unmarshaller.unmarshal(sr);
             if (unmarshalled instanceof JAXBElement) {

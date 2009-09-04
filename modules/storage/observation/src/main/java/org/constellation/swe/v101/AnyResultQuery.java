@@ -51,9 +51,9 @@ public class AnyResultQuery extends Query {
         super(database, "any_results", "observation");
         final QueryType[] ssi  = {SELECT, SELECT_BY_NUMBER, INSERT, FILTERED_LIST};
         //final QueryType[] SSIE = {SELECT, SELECT_BY_NUMBER, INSERT, EXISTS};
-        final QueryType[] sse   = {SELECT,SELECT_BY_NUMBER,  EXISTS};
+        final QueryType[] ssie   = {SELECT,SELECT_BY_NUMBER,  INSERT, EXISTS};
 
-        idResult     = addColumn("id_result",  sse);
+        idResult     = addColumn("id_result",  ssie);
         reference    = addColumn("reference",  ssi);
         values       = addColumn("values",     ssi);
         definition   = addColumn("definition", ssi);

@@ -113,7 +113,13 @@ public enum ConfigurationKey {
      * <p>
      * The default value is {@code "UTC"}.
      */
-    TIMEZONE("TimeZone", "UTC");
+    TIMEZONE("TimeZone", "UTC"),
+
+    /**
+     * Key indicating if the database is a postgreSQL one.
+     * The default value is {@code "true"}.
+     */
+    ISPOSTGRES("IsPostgres", "true");
 
     /**
      * Le nom de la clé courante. Chaque clé a un nom unique.

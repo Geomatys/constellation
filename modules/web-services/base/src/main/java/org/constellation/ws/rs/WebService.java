@@ -509,11 +509,11 @@ public abstract class WebService {
     public static File getConfigDirectory() {
         try {
             final String path = getPropertyValue("Constellation", "config_dir");
-            if(path != null){
+            if (path != null) {
                 final File folder = new File(path);
-                if(folder.exists() && folder.canRead() && folder.canWrite()){
+                if (folder.exists() && folder.canRead() && folder.canWrite()) {
                     return folder;
-                }else{
+                } else {
                     try {
                         folder.createNewFile();
                         return folder;
@@ -521,14 +521,13 @@ public abstract class WebService {
                         LOGGER.log(Level.SEVERE,"", ex);
                     }
                 }
-            }else{
+            } else {
                 LOGGER.log(Level.WARNING,"config_dir is not defined in the Constellation JNDI resource.");
             }
 
         } catch (NamingException ex) {
-            LOGGER.log(Level.SEVERE,"", ex);
+            LOGGER.severe(ex.getMessage());
         }
-
         return getSicadeDirectory();
     }
 

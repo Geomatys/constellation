@@ -24,19 +24,20 @@ import java.sql.Statement;
 // constellation dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.sql.DataSource;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.gml.v311.ReferenceTable;
 import org.constellation.observation.MeasurementTable;
 import org.constellation.observation.ObservationTable;
 import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
@@ -84,6 +85,11 @@ public class DefaultObservationWriter implements ObservationWriter {
      */
     private final ObservationOfferingTable offTable;
 
+    /**
+     * A flag indicating if the datasource is a postgreSQL SGBD
+     */
+    private final boolean isPostgres;
+
     private static final String SQL_ERROR_MSG = "The service has throw a SQL Exception:";
 
     private static final String CAT_ERROR_MSG = "The service has throw a Catalog Exception:";
@@ -105,16 +111,26 @@ public class DefaultObservationWriter implements ObservationWriter {
         if (db == null) {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
+        isPostgres = db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver");
         try {
-            final PGSimpleDataSource dataSourceOM = new PGSimpleDataSource();
-            dataSourceOM.setServerName(db.getHostName());
-            dataSourceOM.setPortNumber(db.getPortNumber());
-            dataSourceOM.setDatabaseName(db.getDatabaseName());
-            dataSourceOM.setUser(db.getUser());
-            dataSourceOM.setPassword(db.getPassword());
+            final DataSource dataSourceOM;
+            if (isPostgres) {
+                final PGSimpleDataSource PGdataSourceOM = new PGSimpleDataSource();
+                PGdataSourceOM.setServerName(db.getHostName());
+                PGdataSourceOM.setPortNumber(db.getPortNumber());
+                PGdataSourceOM.setDatabaseName(db.getDatabaseName());
+                PGdataSourceOM.setUser(db.getUser());
+                PGdataSourceOM.setPassword(db.getPassword());
+                dataSourceOM = PGdataSourceOM;
+            } else {
+                dataSourceOM = new DefaultDataSource(db.getConnectURL());
+            }
 
             omDatabase   = new Database(dataSourceOM);
             omDatabase.setProperty(ConfigurationKey.READONLY, "false");
+            if (!isPostgres) {
+                omDatabase.setProperty(ConfigurationKey.ISPOSTGRES, "false");
+            }
             
             //we build the database table frequently used.
             obsTable  = omDatabase.getTable(ObservationTable.class);
@@ -197,7 +213,7 @@ public class DefaultObservationWriter implements ObservationWriter {
 
     @Override
     public void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException {
-        if (position == null || position.getValue().size() < 2)
+        if (position == null || position.getValue().size() < 2 || !isPostgres)
             return;
         try {
             final Statement stmt2    = omDatabase.getConnection().createStatement();
@@ -207,6 +223,12 @@ public class DefaultObservationWriter implements ObservationWriter {
             String srsName = "4326";
             if (position.getSrsName() != null)
                 srsName = position.getSrsName();
+
+            if (srsName.startsWith("urn:ogc:crs:EPSG:")) {
+                srsName = srsName.substring(17);
+            } else if (srsName.startsWith("EPSG:")) {
+                srsName = srsName.substring(5);
+            }
 
             if (srsName.equals("27582")) {
                 request = request + " projected_localisations WHERE id='" + physicalID + "'";

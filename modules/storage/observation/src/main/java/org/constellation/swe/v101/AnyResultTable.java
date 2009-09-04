@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
@@ -70,6 +71,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
     /**
      * Construit une reference pour l'enregistrement courant.
      */
+    @Override
     protected AnyResultEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
          final AnyResultQuery query = (AnyResultQuery) super.query;
          final String idRef = results.getString(indexOf(query.reference));
@@ -102,7 +104,6 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
      */
     public synchronized String getIdentifier(final Object result) throws SQLException, CatalogException {
         final AnyResultQuery query = (AnyResultQuery) super.query;
-        
         boolean success = false;
         transactionBegin();
         try {
@@ -145,6 +146,25 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
         
             final PreparedStatement statement = getStatement(QueryType.INSERT);
 
+            if (this.getDatabase().getProperty(ConfigurationKey.ISPOSTGRES).equals("false")) {
+                final PreparedStatement p = getDatabase().getConnection().prepareStatement("SELECT max(\"id_result\") FROM \"observation\".\"any_results\"" );
+                final ResultSet r         = p.executeQuery();
+                if (r.next()) {
+                    String res = r.getString(1);
+                    try {
+                        int id = Integer.parseInt(res);
+                        statement.setInt(indexOf(query.idResult), id + 1);
+                    } catch (NumberFormatException ex) {
+                        LOGGER.severe("unable to parse the result id:" + res);
+                        statement.setNull(indexOf(query.idResult), java.sql.Types.INTEGER);
+                    }
+                } else {
+                    statement.setNull(indexOf(query.idResult), java.sql.Types.INTEGER);
+                }
+                p.close();
+            } else {
+                statement.setNull(indexOf(query.idResult), java.sql.Types.INTEGER);
+            }
             if (result instanceof AnyResultEntry) {
                 final DataArrayEntry array = ((AnyResultEntry)result).getArray();
                 statement.setString(indexOf(query.values), array.getValues());
@@ -193,7 +213,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
             transactionEnd(success);
         }
         //we get the new id generated
-        final PreparedStatement p = getStatement("SELECT max(id_result) FROM any_results" );
+        final PreparedStatement p = getStatement("SELECT max(\"id_result\") FROM \"observation\".\"any_results\"" );
         final ResultSet r = p.executeQuery();
         if (r.next())
             return r.getString(1);
