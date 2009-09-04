@@ -164,6 +164,8 @@
     <constellation.sensor>org.constellation.sos.ws.rs</constellation.sensor>
     <constellation.services.packages>${constellation.config};${constellation.map};${constellation.metadata};${constellation.provider};${constellation.coverage}</constellation.services.packages>
     <javadb.scope>test</javadb.scope>
+    <!-- Defines the source encoding -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <profiles>
