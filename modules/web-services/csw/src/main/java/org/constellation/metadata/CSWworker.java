@@ -44,11 +44,6 @@ import java.util.logging.Logger;
 // W3C DOM dependecies
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.SAXException;
-import org.w3c.dom.Document;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;

@@ -275,4 +275,12 @@ public class LuceneObservationFilter implements ObservationFilter {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
+    @Override
+    public void refresh() throws CstlServiceException {
+        try {
+            searcher.refresh();
+        } catch (IndexingException ex) {
+            throw new CstlServiceException("Indexing Exception while refreshing the lucene index", ex, NO_APPLICABLE_CODE);
+        }
+    }
 }

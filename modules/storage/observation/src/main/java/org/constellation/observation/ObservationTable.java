@@ -456,7 +456,8 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                     
                     final TimePeriodType sampTime = (TimePeriodType)obs.getSamplingTime();
                     if (sampTime.getBeginPosition()!= null) {
-                        final String s = sampTime.getBeginPosition().getValue();
+                        String s       = sampTime.getBeginPosition().getValue();
+                        s = s.replace("T", " ");
                         final Timestamp date = Timestamp.valueOf(s);
                         statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
                     } else {
@@ -465,7 +466,8 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                     
                     if (sampTime.getEndPosition() != null) {
                        
-                        final String s = sampTime.getEndPosition().getValue();
+                        String s = sampTime.getEndPosition().getValue();
+                        s = s.replace("T", " ");
                         final Timestamp date = Timestamp.valueOf(s);
                         statement.setTimestamp(indexOf(query.samplingTimeEnd),  date);
                    

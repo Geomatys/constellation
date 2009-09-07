@@ -376,11 +376,20 @@ public class DefaultObservationFilter implements ObservationFilter {
         return "Constellation Postgrid O&M Filter 0.4";
     }
 
+    @Override
     public boolean isBoundedObservation() {
         return false;
     }
 
+    @Override
     public void setBoundingBox(EnvelopeEntry e) throws CstlServiceException {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
+
+    @Override
+    public void refresh() {
+        //do nothing
+    }
+
+
 }

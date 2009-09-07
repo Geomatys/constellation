@@ -128,6 +128,11 @@ public interface ObservationFilter {
     String getInfos();
 
     /**
+     * Refresh the index if it need it
+     */
+    void refresh() throws CstlServiceException;
+    
+    /**
      * Return true if each observation has a position
      */
     boolean isBoundedObservation();

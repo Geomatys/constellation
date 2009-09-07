@@ -52,6 +52,7 @@ import org.geotoolkit.sos.xml.v100.EventTime;
 import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.GetResultResponse;
+import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.ObservationTemplate;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
@@ -1865,6 +1866,67 @@ public class SOSWorkerTest {
 
         marshallerPool.release(unmarshaller);
 
+    }
+
+    /**
+     * Tests the InsertObservation method
+     *
+     * @throws java.lang.Exception
+     */
+    public void insertObservationTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-3.xml"));
+
+        ObservationEntry template = (ObservationEntry)obj.getValue();
+
+        TimePeriodType period = new TimePeriodType(new TimePositionType("2007-06-01T01:00:00.0"), new TimePositionType("2007-06-01T03:00:00.0"));
+        template.setSamplingTime(period);
+
+        // and we fill the result object
+        DataArrayPropertyType arrayP = (DataArrayPropertyType) template.getResult();
+        DataArrayEntry array = arrayP.getDataArray();
+        array.setElementCount(3);
+        array.setValues("2007-06-01T01:01:00,6.560@@2007-06-01T02:00:00,6.550@@2007-06-01T03:00:00,6.550@@");
+
+        InsertObservation request = new InsertObservation("1.0.0", "urn:ogc:object:sensor:GEOM:3", template);
+        worker.insertObservation(request);
+
+         /**
+         *   getObservation with procedure urn:ogc:object:sensor:GEOM:4
+         *           with resultTemplate mode
+         */
+        GetObservation GOrequest  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:3"),
+                                      null,
+                                      null,
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.RESULT_TEMPLATE,
+                                      null);
+        ObservationCollectionEntry obsColl = (ObservationCollectionEntry) worker.getObservation(GOrequest);
+
+
+
+        String templateId = "urn:ogc:object:observation:template:GEOM:3-0";
+        GetResult GRrequest = new GetResult(templateId, null, "1.0.0");
+        GetResultResponse result = worker.getResult(GRrequest);
+
+        String value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@2007-05-01T05:59:00,6.560@@2007-05-01T06:59:00,6.560@@" + '\n' +
+                       "2007-05-01T07:59:00,6.560@@2007-05-01T08:59:00,6.560@@2007-05-01T09:59:00,6.560@@2007-05-01T10:59:00,6.560@@2007-05-01T11:59:00,6.560@@" + '\n' +
+                       "2007-05-01T17:59:00,6.560@@2007-05-01T18:59:00,6.550@@2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@" + '\n' +
+                       "2007-06-01T01:01:00,6.560@@2007-06-01T02:00:00,6.550@@2007-06-01T03:00:00,6.550@@" + '\n';
+        GetResultResponse expResult = new GetResultResponse(new GetResultResponse.Result(value, URL + '/' + templateId));
+
+        assertEquals(expResult.getResult().getRS(), result.getResult().getRS());
+        assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
+        assertEquals(expResult.getResult(), result.getResult());
+        assertEquals(expResult, result);
+
+        marshallerPool.release(unmarshaller);
     }
 
     /**

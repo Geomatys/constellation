@@ -1519,6 +1519,7 @@ public class SOSworker {
         }
 
         LOGGER.info("insertObservation processed in " + (System.currentTimeMillis() - start) + "ms");
+        omFilter.refresh();
         return new InsertObservationResponse(id);
     }
     

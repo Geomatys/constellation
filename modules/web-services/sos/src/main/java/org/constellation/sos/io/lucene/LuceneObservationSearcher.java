@@ -116,11 +116,12 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                 parser.setAllowLeadingWildcard(true);
                 BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
             }
-            final Query query = parser.parse(spatialQuery.getQuery());
+            LOGGER.finer("before parse:" + spatialQuery.getQuery());
+            final Query query   = parser.parse(spatialQuery.getQuery());
             final Filter filter = spatialQuery.getSpatialFilter();
-            final int operator = spatialQuery.getLogicalOperator();
-            final Sort sort = spatialQuery.getSort();
-            String sorted = "no Sorted";
+            final int operator  = spatialQuery.getLogicalOperator();
+            final Sort sort     = spatialQuery.getSort();
+            String sorted       = "no Sorted";
             if (sort != null) {
                 sorted = "order by: " + sort.toString();
             }
@@ -293,6 +294,7 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
 
     private static final class IDFieldSelector implements FieldSelector {
 
+        @Override
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {
                 if (fieldName.equals("id")) {

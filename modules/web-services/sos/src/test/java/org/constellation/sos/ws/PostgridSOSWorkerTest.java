@@ -205,6 +205,17 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    public void insertObservationTest() throws Exception {
+        super.insertObservationTest();
+    }
+    
+    /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
     public void RegisterSensorTest() throws Exception {
         super.RegisterSensorTest();
     }
