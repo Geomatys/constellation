@@ -273,7 +273,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     /**
      * Ensures that a valid GetLegendGraphic request returns indeed a {@link BufferedImage}.
      */
-    @Test
+    @Ignore
     public void testWMSGetLegendGraphic() {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
