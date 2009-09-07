@@ -110,6 +110,14 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         deleteDirectory(directory);
         deleteDirectory(directory2);
         deleteDirectory(new File("SOSWorkerTest"));
+        File derbyLog = new File("derby.log");
+        if (derbyLog.exists()) {
+            derbyLog.delete();
+        }
+        File mappingFile = new File("mapping.properties");
+        if (mappingFile.exists()) {
+            mappingFile.delete();
+        }
     }
 
     public static void deleteDirectory(File dir) {

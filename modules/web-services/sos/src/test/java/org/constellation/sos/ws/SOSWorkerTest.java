@@ -2063,6 +2063,39 @@ public class SOSWorkerTest {
 
         assertEquals(expResult, result);
 
+
+        /**
+         * Test 2 we register a system sensor with no Observation template
+         */
+
+        request = new RegisterSensor("1.0.0", sensorDescription, null);
+        boolean exLaunched = false;
+        try {
+            worker.registerSensor(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(),       Parameters.OBSERVATION_TEMPLATE);
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+        }
+
+        assertTrue(exLaunched);
+
+        /**
+         * Test 2 we register a system sensor with an imcomplete Observation template
+         */
+        obsTemplate.setProcedure(null);
+        request = new RegisterSensor("1.0.0", sensorDescription, new ObservationTemplate(obsTemplate));
+        exLaunched = false;
+        try {
+            worker.registerSensor(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(),       Parameters.OBSERVATION_TEMPLATE);
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+
+        assertTrue(exLaunched);
+
         marshallerPool.release(unmarshaller);
     }
     

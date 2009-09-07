@@ -74,6 +74,10 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
     public static void tearDownClass() throws Exception {
         deleteDirectory(directory);
         deleteDirectory(new File("CSWWorkerTest"));
+        File derbyLog = new File("derby.log");
+        if (derbyLog.exists()) {
+            derbyLog.delete();
+        }
     }
 
     public static void deleteDirectory(File dir) {
