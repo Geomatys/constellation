@@ -220,4 +220,33 @@ public class UtilTest {
         assertEquals(expResult, result);
     }
 
+    /**
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void sortStringList() throws Exception {
+        String s1 = "bonjour";
+        String s2 = "banjo";
+        String s3 = "zebre";
+        String s4 = "alabama";
+        String s5 = "horrible";
+        List<String> toSort = new ArrayList<String>();
+        toSort.add(s1);
+        toSort.add(s2);
+        toSort.add(s3);
+        toSort.add(s4);
+        toSort.add(s5);
+
+        List<String> result = StringUtilities.sortStringList(toSort);
+
+        List<String> expResult = new ArrayList<String>();
+        expResult.add(s4);
+        expResult.add(s2);
+        expResult.add(s1);
+        expResult.add(s5);
+        expResult.add(s3);
+
+        assertEquals(expResult, result);
+    }
+
 }

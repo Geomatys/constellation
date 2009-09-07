@@ -54,6 +54,8 @@ import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.csw.xml.v202.BriefRecordType;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.DeleteType;
+import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
+import org.geotoolkit.csw.xml.v202.DescribeRecordType;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ElementSetNameType;
 import org.geotoolkit.csw.xml.v202.ElementSetType;
@@ -78,6 +80,7 @@ import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.xml.Namespaces;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
 import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
@@ -691,6 +694,116 @@ public class CSWworkerTest {
 
         assertEquals(expCustomResult1, customResult1);
         assertEquals(expCustomResult2, customResult2);
+
+        /*
+         * Test 6 : getRecord with bad outputFormat
+         */
+        typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
+        sortBy           = null;
+        constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
+        query            = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "something", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        boolean exLaunched = false;
+        try {
+            worker.getRecords(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(), "outputFormat");
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+
+        /*
+         * Test 7 : getRecord with no typeNames
+         */
+        sortBy           = null;
+        constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
+        query            = new QueryType(null, elementSetName, sortBy, constraint);
+        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        exLaunched = false;
+        try {
+            worker.getRecords(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(), Parameters.TYPENAMES);
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+
+        /*
+         * Test 8 : getRecord with bad typeNames
+         */
+        typeNames        = Arrays.asList(new QName("http://www.badnamespace.com", "something"));
+        sortBy           = null;
+        constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
+        query            = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        exLaunched = false;
+        try {
+            worker.getRecords(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(), Parameters.TYPENAMES);
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+
+         /*
+         * Test 9 : getRecord with bad outputSchema
+         */
+        typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
+        sortBy           = null;
+        constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
+        query            = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/4.5.8", 1, 5, query, null);
+
+        exLaunched = false;
+        try {
+            worker.getRecords(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(), Parameters.OUTPUT_SCHEMA);
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+
+         /*
+         * Test 10 : getRecord with no query
+         */
+        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, null, null);
+
+        exLaunched = false;
+        try {
+            worker.getRecords(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(), "Query");
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+
+         /*
+         * Test 11 : getRecord with bad statrt position
+         */
+        typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
+        sortBy           = null;
+        constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
+        query            = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 0, 5, query, null);
+
+        exLaunched = false;
+        try {
+            worker.getRecords(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(), "startPosition");
+        }
+        assertTrue(exLaunched);
+
+
         pool.release(unmarshaller);
     }
 
@@ -720,7 +833,7 @@ public class CSWworkerTest {
         
         
         /*
-         *  TEST 1 : getDomain 2.0.0 parameterName = GetCapabilities.sections
+         *  TEST 2 : getDomain 2.0.0 parameterName = GetCapabilities.sections
          */
         org.geotoolkit.csw.xml.v200.GetDomainType request200 = new org.geotoolkit.csw.xml.v200.GetDomainType("CSW", "2.0.0", null, "GetCapabilities.sections");
 
@@ -741,8 +854,152 @@ public class CSWworkerTest {
         GetDomainResponse expResult200 = new org.geotoolkit.csw.xml.v200.GetDomainResponseType(domainValues200);
 
         assertEquals(expResult200, result200);
+
+        /*
+         *  TEST 3 : getDomain 2.0.2 propertyName = "Identifier"
+         */
+        request = new GetDomainType("CSW", "2.0.2", "Identifier", null);
+
+        result = worker.getDomain(request);
+
+        assertTrue(result instanceof GetDomainResponseType);
+
+        domainValues = new ArrayList<DomainValues>();
+        list = new ArrayList<String>();
+        list.add("11325_158_19640418141800");
+        list.add("39727_22_19750113062500");
+        list.add("40510_145_19930221211500");
+        list.add("42292_5p_19900609195600");
+        list.add("42292_9s_19900610041000");
+        values = new ListOfValuesType(list);
+        value  = new DomainValuesType(null, "Identifier", values, METADATA_QNAME);
+        domainValues.add(value);
+        expResult = new GetDomainResponseType(domainValues);
+
+        assertEquals(expResult, result);
+
+        /*
+         *  TEST 4 : getDomain 2.0.2 propertyName = "Identifier" and parameterName = GetCapabilities.sections => error
+
+        request = new GetDomainType("CSW", "2.0.2", "Identifier", "GetCapabilities.sections");
+
+        boolean exLaunched = false;
+        try {
+            result = worker.getDomain(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(), Parameters.PARAMETERNAME);
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+         */
+
+        /*
+         *  TEST 5 : getDomain 2.0.2 with no propertyName or parameterName
+         */
+        request = new GetDomainType("CSW", "2.0.2", null, null);
+
+        boolean exLaunched = false;
+        try {
+            result = worker.getDomain(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(), "parameterName, propertyName");
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+
+        /*
+         *  TEST 6 : getDomain 2.0.2 with a bad parameterName (missing '.')
+         */
+        request = new GetDomainType("CSW", "2.0.2", null, "GetCapabilities sections");
+
+        exLaunched = false;
+        try {
+            result = worker.getDomain(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(), Parameters.PARAMETERNAME);
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+
+        /*
+         *  TEST 7 : getDomain 2.0.2 with a bad parameterName (bad parameter)
+         */
+        request = new GetDomainType("CSW", "2.0.2", null, "GetCapabilities.whatever");
+
+        exLaunched = false;
+        try {
+            result = worker.getDomain(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(), Parameters.PARAMETERNAME);
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+
+        /*
+         *  TEST 7 : getDomain 2.0.2 with a bad parameterName (bad request name)
+         */
+        request = new GetDomainType("CSW", "2.0.2", null, "GetCapabilitos.sections");
+
+        exLaunched = false;
+        try {
+            result = worker.getDomain(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(), Parameters.PARAMETERNAME);
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+
         pool.release(unmarshaller);
 
+    }
+
+    /**
+     * Tests the transaction method
+     *
+     * @throws java.lang.Exception
+     */
+    public void DescribeRecordTest() throws Exception {
+
+        /**
+         * Test 1 : bad schema language
+         */
+        DescribeRecordType request = new DescribeRecordType("CSW", "2.0.2", Arrays.asList(RECORD_QNAME), "text/xml", "wathever");
+
+        boolean exLaunched = false;
+        try {
+            worker.describeRecord(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "schemaLanguage");
+        }
+
+        assertTrue(exLaunched);
+
+        /**
+         * Test 2 : good request with no schema language
+         */
+        request = new DescribeRecordType("CSW", "2.0.2", Arrays.asList(RECORD_QNAME, METADATA_QNAME), "text/xml", null);
+        DescribeRecordResponseType result = worker.describeRecord(request);
+
+        assertEquals(result.getSchemaComponent().size(), 2);
+        assertEquals(result.getSchemaComponent().get(0).getTargetNamespace(), Namespaces.CSW_202);
+        assertEquals(result.getSchemaComponent().get(1).getTargetNamespace(), Namespaces.GMD);
+
+        /**
+         * Test 2 : good request with ebrim QNames
+         */
+        request = new DescribeRecordType("CSW", "2.0.2", Arrays.asList(EXTRINSIC_OBJECT_25_QNAME, EXTRINSIC_OBJECT_QNAME), "text/xml", null);
+        result = worker.describeRecord(request);
+
+        assertEquals(result.getSchemaComponent().size(), 2);
+        assertEquals(result.getSchemaComponent().get(0).getTargetNamespace(), "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0");
+        assertEquals(result.getSchemaComponent().get(1).getTargetNamespace(), "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5");
     }
 
     /**

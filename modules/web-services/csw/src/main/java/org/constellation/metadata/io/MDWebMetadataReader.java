@@ -81,8 +81,9 @@ import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
-import org.opengis.referencing.cs.CoordinateSystemAxis;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
 
 

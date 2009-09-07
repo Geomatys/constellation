@@ -28,31 +28,21 @@ import java.util.List;
 import java.util.Map;
 
 // JAXB dependencies
+import java.util.StringTokenizer;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
-import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.ElementSet;
-import org.geotoolkit.csw.xml.v202.AbstractRecordType;
-import org.geotoolkit.csw.xml.v202.BriefRecordType;
-import org.geotoolkit.csw.xml.v202.ElementSetType;
-import org.geotoolkit.csw.xml.v202.RecordType;
-import org.geotoolkit.csw.xml.v202.SummaryRecordType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWClassesContext;
+import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
-import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.csw.xml.Record;
-import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
-import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
-import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
+import static org.constellation.metadata.CSWQueryable.*;
+import static org.constellation.metadata.TypeNames.*;
 
 // geoAPI dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -67,13 +57,27 @@ import org.opengis.metadata.identification.Keywords;
 import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.util.InternationalString;
-
-// Geotools dependencies
-import org.geotoolkit.metadata.iso.DefaultMetaData;
-import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.metadata.distribution.Distribution;
 import org.opengis.metadata.distribution.Distributor;
 
+// Geotoolkit dependencies
+import org.geotoolkit.csw.xml.DomainValues;
+import org.geotoolkit.csw.xml.ElementSet;
+import org.geotoolkit.csw.xml.v202.AbstractRecordType;
+import org.geotoolkit.csw.xml.v202.BriefRecordType;
+import org.geotoolkit.csw.xml.v202.DomainValuesType;
+import org.geotoolkit.csw.xml.v202.ElementSetType;
+import org.geotoolkit.csw.xml.v202.ListOfValuesType;
+import org.geotoolkit.csw.xml.v202.RecordType;
+import org.geotoolkit.csw.xml.v202.SummaryRecordType;
+import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.ows.xml.v100.BoundingBoxType;
+import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
+import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
+import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 
 /**
  * A csw Metadata Reader. This reader does not require a database.
@@ -420,7 +424,55 @@ public class FileMetadataReader extends MetadataReader {
 
     @Override
     public List<DomainValues> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
-        throw new CstlServiceException("GetDomain operation are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
+        final List<DomainValues> responseList = new ArrayList<DomainValues>();
+        final StringTokenizer tokens          = new StringTokenizer(propertyNames, ",");
+
+        while (tokens.hasMoreTokens()) {
+            final String token       = tokens.nextToken().trim();
+            final List<String> paths = ISO_QUERYABLE.get(token);
+            if (paths != null) {
+                if (paths.size() != 0) {
+                    
+                    final List<String> values         = getAllValuesFromPaths(paths);
+                    final ListOfValuesType listValues = new ListOfValuesType(values);
+                    final DomainValuesType value      = new DomainValuesType(null, token, listValues, METADATA_QNAME);
+                    responseList.add(value);
+                    
+                } else {
+                    throw new CstlServiceException("The property " + token + " is not queryable for now",
+                            INVALID_PARAMETER_VALUE, "propertyName");
+                }
+            } else {
+                throw new CstlServiceException("The property " + token + " is not queryable",
+                        INVALID_PARAMETER_VALUE, "propertyName");
+            }
+        }
+        return responseList;
+    }
+
+    private List<String> getAllValuesFromPaths(List<String> paths) throws CstlServiceException {
+        final List<String> result = new ArrayList<String>();
+        Unmarshaller unmarshaller = null;
+        try {
+            for (File metadataFile : dataDirectory.listFiles()) {
+                try {
+                    unmarshaller = marshallerPool.acquireUnmarshaller();
+                    Object metadata = unmarshaller.unmarshal(metadataFile);
+                    if (metadata instanceof JAXBElement) {
+                        metadata = ((JAXBElement) metadata).getValue();
+                    }
+                    result.add(GenericIndexer.getValues(metadata, paths));
+                } catch (JAXBException ex) {
+                    throw new CstlServiceException("The metadataFile : " + metadataFile.getName() + " can not be unmarshalled" + "\n" +
+                            "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
+                }
+            }
+        } finally {
+            if (unmarshaller != null) {
+                marshallerPool.release(unmarshaller);
+            }
+        }
+        return StringUtilities.sortStringList(result);
     }
 
     @Override

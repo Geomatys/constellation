@@ -479,4 +479,24 @@ public final class StringUtilities {
         }
         return str;
     }
+
+    /**
+     * This method sort alphabeticely a list of String
+     * 
+     * @param toSort
+     * @return
+     */
+    public static List<String> sortStringList(List<String> toSort) {
+        int elements = toSort.size();
+        for (int i = (elements - 1); i > 0; i--) {
+            for (int j = 0; j < i; j++) {
+                if (toSort.get(j).compareTo(toSort.get(j + 1)) > 0) {
+                    String inter = toSort.get(j);
+                    toSort.set(j, toSort.get(j + 1));
+                    toSort.set(j + 1,inter);
+                }
+            }
+        }
+        return toSort;
+    }
 }

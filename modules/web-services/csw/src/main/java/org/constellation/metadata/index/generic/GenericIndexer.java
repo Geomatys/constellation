@@ -81,9 +81,9 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      */
     private final MetadataReader reader;
     
-    private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
-    private Map<String, Method> getters = new HashMap<String, Method>();
+    private static final Map<String, Method> GETTERS = new HashMap<String, Method>();
 
     private final Map<String, List<String>> additionalQueryable;
     /**
@@ -588,7 +588,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * 
      * @return A string concataining the differents values correspounding to the specified term, coma separated.
      */
-    private String getValues(Object metadata, List<String> paths) {
+    public static String getValues(Object metadata, List<String> paths) {
         final StringBuilder response  = new StringBuilder("");
         
         if (paths != null) {
@@ -648,7 +648,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param metadata An Object.
      * @return A String value.
      */
-    private String getValuesFromPath(String pathID, Object metadata) {
+    private static String getValuesFromPath(String pathID, Object metadata) {
         String result = "";
         if ((pathID.startsWith("ISO 19115:MD_Metadata:") && metadata instanceof DefaultMetaData) ||
             (pathID.startsWith("Catalog Web Service:Record:") && metadata instanceof RecordType)) {
@@ -700,7 +700,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param obj
      * @return
      */
-    private String getStringValue(Object obj) {
+    private static String getStringValue(Object obj) {
         String result = "";
         if (obj == null) {
             return NULL_VALUE;
@@ -732,19 +732,19 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         
         } else if (obj instanceof DefaultPosition) {
             final DefaultPosition pos = (DefaultPosition) obj;
-            result = dateFormat.format(pos.getDate());
+            result = DATE_FORMAT.format(pos.getDate());
             
         } else if (obj instanceof DefaultInstant) {
             final DefaultInstant inst = (DefaultInstant)obj;
             if (inst.getPosition() != null && inst.getPosition().getDate() != null) {
-                result = dateFormat.format(inst.getPosition().getDate());
+                result = DATE_FORMAT.format(inst.getPosition().getDate());
             } else {
                 result = NULL_VALUE;
             }
             
         } else if (obj instanceof Date) {
-            synchronized (dateFormat){
-                result = dateFormat.format((Date)obj);
+            synchronized (DATE_FORMAT){
+                result = DATE_FORMAT.format((Date)obj);
             }
             
         } else {
@@ -762,7 +762,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param metadata
      * @return
      */
-    private String getConditionalValuesFromPath(String pathID, String conditionalAttribute, String conditionalValue, Object metadata) {
+    private static String getConditionalValuesFromPath(String pathID, String conditionalAttribute, String conditionalValue, Object metadata) {
         String result = "";
         if (pathID.startsWith("ISO 19115:MD_Metadata:")) {
              // we remove the prefix path part 
@@ -826,7 +826,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param conditionalValue
      * @return
      */
-    private boolean matchCondition(Object metadata, String conditionalAttribute, String conditionalValue) {
+    private static boolean matchCondition(Object metadata, String conditionalAttribute, String conditionalValue) {
         final Object conditionalObj = getAttributeValue(metadata, conditionalAttribute);
         LOGGER.finer("contionalObj: "     + getStringValue(conditionalObj) + '\n' +
                      "conditionalValue: " + conditionalValue               + '\n' +
@@ -841,7 +841,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param attributeName The name of the attribute that you want the value.
      * @return
      */
-    private Object getAttributeValue(Object object, String attributeName) {
+    private static Object getAttributeValue(Object object, String attributeName) {
         Object result = null;
         int ordinal   = -1;
         if (attributeName.indexOf('[') != -1){
@@ -858,7 +858,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                object = ((JAXBElement)object).getValue();
             }
             final String getterId = object.getClass().getName() + ':' + attributeName;
-            Method getter         = getters.get(getterId);
+            Method getter         = GETTERS.get(getterId);
             if (getter != null) {
                 result = Util.invokeMethod(object, getter);
             } else {
@@ -867,7 +867,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 }
                 getter = Util.getGetterFromName(attributeName, object.getClass());
                 if (getter != null) {
-                    getters.put(object.getClass().getName() + ':' + attributeName, getter);
+                    GETTERS.put(object.getClass().getName() + ':' + attributeName, getter);
                     result = Util.invokeMethod(object, getter);
                 }
             }
