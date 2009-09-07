@@ -15,6 +15,11 @@
 			</keywords>
 			<identification>
 				<IdentifierList>
+                                         <identifier name="URN">
+                                            <Term definition="urn:ogc:def:identifierType:OGC:uniqueID">
+                                                      <value>urn:ogc:object:sensor:SunSpot:0014.4F01.0000.2626</value>
+                                            </Term>
+                                        </identifier>
 					<identifier name="supervisorCode">
 						<Term definition="urn:x-ogc:def:identifier:OGC:modelNumber">
 							<codeSpace xlink:href="urn:x-brgm:def:sensorSystem:hydras"/>

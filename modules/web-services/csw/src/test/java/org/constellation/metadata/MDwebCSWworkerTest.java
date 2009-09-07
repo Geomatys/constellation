@@ -185,6 +185,17 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
     }
 
     /**
+     * Tests the describeRecord method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void DescribeRecordTest() throws Exception {
+        super.DescribeRecordTest();
+    }
+
+    /**
      * Tests the transaction method
      *
      * @throws java.lang.Exception

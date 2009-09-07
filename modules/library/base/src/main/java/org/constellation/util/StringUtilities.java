@@ -78,6 +78,12 @@ public final class StringUtilities {
         return builder.toString();
     }
 
+    /**
+     * Parse a boolean from a string value.
+     * 
+     * @param strTransparent
+     * @return
+     */
     public static boolean toBoolean(final String strTransparent) {
         if (strTransparent == null) {
             return false;

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <sos:Capabilities xmlns:sos="http://www.opengis.net/sos/1.0" xmlns:ogc="http://www.opengis.net/ogc" xmlns:ns3="http://catalog.seagis.net" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sa="http://www.opengis.net/sa/1.0" xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:ows="http://www.opengis.net/ows/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0.0">
 	<ows:ServiceIdentification>
-		<ows:Title xml:lang="fr">BRGM SOS</ows:Title>
-		<ows:Abstract xml:lang="fr">BRGM SOS Server</ows:Abstract>
+		<ows:Title xml:lang="fr">Constellation SOS</ows:Title>
+		<ows:Abstract xml:lang="fr">Constellation SOS Server</ows:Abstract>
 		<ows:Keywords>
 			<ows:Keyword>SOS</ows:Keyword>
 			<ows:Keyword>Geomatys</ows:Keyword>
-			<ows:Keyword>BRGM</ows:Keyword>
 		</ows:Keywords>
 		<ows:ServiceType codeSpace="http://www.opengeospatial.net">OGC:SOS</ows:ServiceType>
 		<ows:ServiceTypeVersion>1.0.0</ows:ServiceTypeVersion>
@@ -14,7 +13,7 @@
 		<ows:AccessConstraints>NONE</ows:AccessConstraints>
 	</ows:ServiceIdentification>
 	<ows:ServiceProvider>
-		<ows:ProviderName>BRGM</ows:ProviderName>
+		<ows:ProviderName>Geomatys</ows:ProviderName>
 		<ows:ProviderSite xlink:href="http://www.brgm.fr/"/>
 		<ows:ServiceContact>
 			<ows:IndividualName>????</ows:IndividualName>
@@ -25,8 +24,8 @@
 					<ows:Facsimile>??-??-??-??-??</ows:Facsimile>
 				</ows:Phone>
 				<ows:Address>
-					<ows:DeliveryPoint>BRGM</ows:DeliveryPoint>
-					<ows:City>Orleans</ows:City>
+					<ows:DeliveryPoint>Geomatys</ows:DeliveryPoint>
+					<ows:City>Arles</ows:City>
 					<ows:PostalCode>????</ows:PostalCode>
 					<ows:Country>FRANCE</ows:Country>
 				</ows:Address>
@@ -157,7 +156,9 @@
 				</ows:AllowedValues>
 			</ows:Parameter>
 			<ows:Parameter name="resultModel">
-				<ows:AnyValue/>
+				<ows:AllowedValues>
+					<ows:Value>om:Observation</ows:Value>
+				</ows:AllowedValues>
 			</ows:Parameter>
 			<ows:Parameter name="responseMode">
 				<ows:AllowedValues>

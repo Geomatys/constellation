@@ -21,7 +21,9 @@ package org.constellation.util;
 // Junit dependencies
 import java.util.ArrayList;
 import java.util.List;
+import org.geotoolkit.geometry.GeneralEnvelope;
 import org.junit.*;
+import org.opengis.geometry.Envelope;
 import static org.junit.Assert.*;
 
 /**
@@ -224,7 +226,7 @@ public class UtilTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void sortStringList() throws Exception {
+    public void sortStringListTest() throws Exception {
         String s1 = "bonjour";
         String s2 = "banjo";
         String s3 = "zebre";
@@ -248,5 +250,110 @@ public class UtilTest {
 
         assertEquals(expResult, result);
     }
+
+     /**
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void toBboxValueListTest() throws Exception {
+        double[] min = {20.0, 35.0};
+        double[] max = {110.0, 80.0};
+        Envelope envelope = new GeneralEnvelope(min, max);
+
+        String result    = StringUtilities.toBboxValue(envelope);
+        String expResult = "20.0,35.0,110.0,80.0";
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void toBooleanTest() throws Exception {
+
+        assertFalse(StringUtilities.toBoolean(null));
+        assertFalse(StringUtilities.toBoolean("whatever"));
+        assertFalse(StringUtilities.toBoolean("FALSE"));
+        assertFalse(StringUtilities.toBoolean("false"));
+
+        assertTrue(StringUtilities.toBoolean("true"));
+        assertTrue(StringUtilities.toBoolean("TRUE"));
+    }
+
+    /**
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void toCommaSeparatedValuesTest() throws Exception {
+        List<String> l = new ArrayList<String>();
+        l.add("par");
+        l.add("le");
+        l.add("pouvoir");
+        l.add("de");
+        l.add("la");
+        l.add("lune");
+
+        String result    = StringUtilities.toCommaSeparatedValues(l);
+        String expResult = "par,le,pouvoir,de,la,lune";
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void toStringListTest() throws Exception {
+        List<String> result    = StringUtilities.toStringList("par,le,pouvoir,de,la,lune");
+        List<String> expResult = new ArrayList<String>();
+        expResult.add("par");
+        expResult.add("le");
+        expResult.add("pouvoir");
+        expResult.add("de");
+        expResult.add("la");
+        expResult.add("lune");
+        assertEquals(expResult, result);
+    }
+
+    /**
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void ContainsMatchTest() throws Exception {
+        List<String> list = new ArrayList<String>();
+        list.add("par");
+        list.add("le tres grand ");
+        list.add("pouvoir magique ");
+        list.add("de");
+        list.add("la");
+        list.add("super lune");
+
+        assertTrue(StringUtilities.containsMatch(list, "magique"));
+        assertTrue(StringUtilities.containsMatch(list, "super"));
+        assertTrue(StringUtilities.containsMatch(list, "tres grand"));
+        assertFalse(StringUtilities.containsMatch(list, "boulette"));
+        assertFalse(StringUtilities.containsMatch(list, "petit"));
+    }
+    
+    /**
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void ContainsIgnoreCaseTest() throws Exception {
+        List<String> list = new ArrayList<String>();
+        list.add("par");
+        list.add("le tres grand ");
+        list.add("pouvoir magique ");
+        list.add("de");
+        list.add("la");
+        list.add("super lune");
+
+        assertTrue(StringUtilities.containsIgnoreCase(list, "PAR"));
+        assertTrue(StringUtilities.containsIgnoreCase(list, "Le TrEs GrAnD "));
+        assertTrue(StringUtilities.containsIgnoreCase(list, "super lune"));
+        assertFalse(StringUtilities.containsIgnoreCase(list, "pouvoir"));
+        assertFalse(StringUtilities.containsIgnoreCase(list, "petit"));
+        assertFalse(StringUtilities.containsIgnoreCase(list, "GRAND"));
+    }
+
 
 }
