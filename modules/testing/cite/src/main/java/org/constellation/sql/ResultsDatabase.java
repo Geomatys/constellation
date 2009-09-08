@@ -28,10 +28,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 // Geotoolkit dependencies
-import java.util.logging.Logger;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.io.X364;
+import org.geotoolkit.util.logging.Logging;
 
 
 /**
@@ -50,7 +52,7 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
  */
 public final class ResultsDatabase {
     
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.sql");
+    private static final Logger LOGGER = Logging.getLogger("org.constellation.sql");
     /**
      * The pattern for the ouput of a date.
      */
@@ -277,17 +279,25 @@ public final class ResultsDatabase {
     {
         final char endOfLine = '\n';
         final char tab       = '\t';
-        final StringBuilder sb;
+        final StringBuilder sb = new StringBuilder();
+        final boolean x364 = X364.isSupported();
         if (previous == null) {
-            sb = new StringBuilder("This is the first session of tests launched for ");
+            if (x364) sb.append(X364.FOREGROUND_BLUE.sequence());
+            if (x364) sb.append(X364.BOLD.sequence());
+            sb.append("This is the first session of tests launched for ");
             sb.append(service).append(" ").append(version)
               .append(". We can't compare the results with a previous one.");
+            if (x364) sb.append(X364.RESET.sequence());
             LOGGER.info(sb.toString());
             return;
         }
-        sb = new StringBuilder("Results for the session ");
+        if (x364) sb.append(X364.FOREGROUND_MAGENTA.sequence());
+        if (x364) sb.append(X364.BOLD.sequence());
+        sb.append("Results for the session ");
         sb.append(service).append(" ").append(version).append(", executed at ").append(DATE_FORMAT.format(date));
         sb.append(" compared to the one at ").append(previous.toString()).append(endOfLine);
+        if (x364) sb.append(X364.RESET.sequence());
+        if (x364) sb.append(X364.FOREGROUND_GREEN.sequence());
         if (newlyPassedTests.isEmpty()) {
             sb.append(tab).append("No tests have been corrected in the current session.").append(endOfLine);
         } else {
@@ -297,9 +307,14 @@ public final class ResultsDatabase {
             }
         }
 
+        if (x364) sb.append(X364.FOREGROUND_DEFAULT.sequence());
         if (problematicTests.isEmpty()) {
+            if (x364) sb.append(X364.FOREGROUND_GREEN.sequence());
             sb.append(tab).append("No new tests have failed in the current session.").append(endOfLine);
+            if (x364) sb.append(X364.FOREGROUND_DEFAULT.sequence());
         } else {
+            if (x364) sb.append(X364.FOREGROUND_RED.sequence());
+            if (x364) sb.append(X364.BOLD.sequence());
             sb.append(tab).append("/!\\ Some tests are now failing ! You should fix them to restore the build /!\\")
               .append(endOfLine);
             for (Result res : problematicTests) {
@@ -307,11 +322,12 @@ public final class ResultsDatabase {
                 sb.append(tab).append(tab).append(tab).append("==> Directory: ").append(res.getDirectory())
                   .append(endOfLine);
             }
+            if (x364) sb.append(X364.RESET.sequence());
             LOGGER.info(sb.toString());
             throw new RuntimeException("Some tests are now failing, but not in the previous suite. " +
                     "Please fix the service responsible of the failure of these tests !");
         }
-
+        if (x364) sb.append(X364.RESET.sequence());
         LOGGER.info(sb.toString());
     }
 

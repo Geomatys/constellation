@@ -39,6 +39,11 @@ public abstract class WMSQuery extends Query {
     public static final String DESCRIBELAYER    = "DescribeLayer";
     public static final String GETLEGENDGRAPHIC = "GetLegendGraphic";
     public static final String GETORIGFILE      = "GetOrigFile";
+    /**
+     * For backward compatibility with WMS 1.0.0, the request can be done with
+     * a value {@code capabilities}.
+     */
+    public static final String CAPABILITIES     = "Capabilities";
 
     /** Parameter used in getMap, getLegendGraphic, getCapabilities */
     public static final String KEY_FORMAT = "FORMAT";
@@ -104,6 +109,8 @@ public abstract class WMSQuery extends Query {
     public static final String KEY_DIM_RANGE = "DIM_RANGE";
     /** Parameter used in getMap */
     public static final String KEY_AZIMUTH = "AZIMUTH";
+    /** Parameter used in GetCapabilities, for backward compatibility with WMS 1.0.0 */
+    public static final String KEY_WMTVER = "WMTVER";
 
     protected final Version version;
 

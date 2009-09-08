@@ -170,8 +170,13 @@ public class WMSService extends OGCWebService {
                 }
                 return Response.ok(result, infoFormat).build();
             }
-            if (GETCAPABILITIES.equalsIgnoreCase(request)) {
-                final String versionSt = getParameter(KEY_VERSION, false);
+            if (GETCAPABILITIES.equalsIgnoreCase(request) || CAPABILITIES.equalsIgnoreCase(request)) {
+                String versionSt = getParameter(KEY_VERSION, false);
+                if (versionSt == null) {
+                    // For backward compatibility with WMS 1.0.0, we try to find the version number
+                    // from the WMTVER parameter too.
+                    versionSt = getParameter(KEY_WMTVER, false);
+                }
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final GetCapabilities requestCapab = adaptGetCapabilities(versionSt);
                 version = getVersionFromNumber(requestCapab.getVersion().toString());
