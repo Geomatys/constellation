@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
+import org.opengis.util.CodeList;
 
 
 /**
@@ -75,7 +76,7 @@ public final class ServiceExceptionType {
      * @param message The message of the exception.
      * @param code A standard code for exception (OWS).
      */
-    public ServiceExceptionType(final String message, final ExceptionCode code) {
+    public ServiceExceptionType(final String message, final CodeList code) {
         this.message = message;
         this.code    = code.name();
     }
@@ -87,7 +88,7 @@ public final class ServiceExceptionType {
      * @param code A standard code for exception (OWS).
      * @param locator The method where the error occured.
      */
-    public ServiceExceptionType(final String message, final ExceptionCode code, final String locator) {
+    public ServiceExceptionType(final String message, final CodeList code, final String locator) {
         this.message = message;
         this.code    = code.name();
         this.locator = locator;
@@ -103,8 +104,8 @@ public final class ServiceExceptionType {
     /**
      * Returns the exception code, or {@code null} if none.
      */
-    public ExceptionCode getCode() {
-        return ExceptionCode.valueOf(code);
+    public CodeList getCode() {
+        return CodeList.valueOf(CodeList.class, code);
     }
 
     /**

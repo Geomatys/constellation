@@ -3,7 +3,7 @@
 <!-- Service Metadata -->
 <Service>
   <!-- The WMT-defined name for this type of service -->
-  <Name>WMS</Name>
+  <Name>OGC:WMS</Name>
   <!-- Human-readable title for pick lists -->
   <Title>Constellation Map Server</Title>
   <!-- Narrative description providing additional information -->

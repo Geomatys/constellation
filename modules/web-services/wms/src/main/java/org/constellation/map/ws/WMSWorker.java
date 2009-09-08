@@ -461,9 +461,11 @@ public class WMSWorker extends AbstractWMSWorker {
         //we build the general layer and add it to the document
         final AbstractLayer mainLayer = (queryVersion.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
             new org.geotoolkit.wms.xml.v111.Layer("Constellation Web Map Layer",
-                    "description of the service(need to be fill)", crs, null, layers) :
+                    "description of the service(need to be fill)", crs,
+                    new LatLonBoundingBox(-180.0, -90.0, 180.0, 90.0), layers) :
             new org.geotoolkit.wms.xml.v130.Layer("Constellation Web Map Layer",
-                    "description of the service(need to be fill)", crs, null, layers);
+                    "description of the service(need to be fill)", crs,
+                    new EXGeographicBoundingBox(-180.0, -90.0, 180.0, 90.0), layers);
 
         inCapabilities.getCapability().setLayer(mainLayer);
         return inCapabilities;

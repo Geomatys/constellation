@@ -52,7 +52,6 @@ import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.util.Util;
 import org.constellation.util.StringUtilities;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
-import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
@@ -74,7 +73,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import static org.constellation.ws.ExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.query.wms.WMSQuery.*;
 
 
@@ -101,6 +100,11 @@ public class WMSService extends OGCWebService {
      * Defines whether the exceptions should be stored and output in an image or not.
      */
     private boolean error_inimage = false;
+
+    /**
+     * Defines the image format for the exeception in image.
+     */
+    private String exceptionImageFormat = MimeType.IMAGE_PNG;
 
     /**
      * Build a new instance of the webService and initialize the JAXB marshaller.
@@ -233,7 +237,7 @@ public class WMSService extends OGCWebService {
         if (error_inimage) {
             final BufferedImage image = DefaultPortrayalService.writeException(ex, new Dimension(600, 400));
             error_inimage = false;
-            return Response.ok(image, MimeType.IMAGE_PNG).build();
+            return Response.ok(image, exceptionImageFormat).build();
         }
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
@@ -241,8 +245,8 @@ public class WMSService extends OGCWebService {
         final Version version = serviceDef.exceptionVersion;
         final String locator = ex.getLocator();
         final ServiceExceptionReport report = new ServiceExceptionReport(version,
-                (locator == null) ? new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()) :
-                                    new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode(), locator));
+                (locator == null) ? new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode()) :
+                                    new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode(), locator));
         if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                 !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
@@ -295,10 +299,8 @@ public class WMSService extends OGCWebService {
                     INVALID_PARAMETER_VALUE, "service");
         }
         String format = getParameter(KEY_FORMAT, false);
-        if (format == null || !(format.equalsIgnoreCase(MimeType.TEXT_XML) ||
-                format.equalsIgnoreCase(MimeType.APP_WMS_XML) || format.equalsIgnoreCase(MimeType.APP_XML)))
-        {
-            format = MimeType.TEXT_XML;
+        if (format == null || format.isEmpty()) {
+            format = MimeType.APP_WMS_XML;
         }
         return new GetCapabilities(bestVersion.version, format);
     }
@@ -394,6 +396,10 @@ public class WMSService extends OGCWebService {
             error_inimage = true;
         }
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
+        if (strFormat != null && !strFormat.isEmpty()) {
+            exceptionImageFormat     = strFormat;
+        }
+
         String strCRS                = getParameter((version.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
                                             KEY_CRS_V111 : KEY_CRS_V130, true);
         final String strBBox         = getParameter(KEY_BBOX,            true);
