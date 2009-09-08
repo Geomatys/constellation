@@ -22,12 +22,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.List;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 // Constellation dependencies
 import org.constellation.data.PostgridTestCase;
+import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
@@ -50,6 +52,11 @@ import static org.junit.Assume.*;
  * @since 0.3
  */
 public abstract class AbstractGrizzlyServer extends PostgridTestCase {
+    /**
+     * A list of available layers to be requested in WMS.
+     */
+    protected static List<LayerDetails> layers;
+
     /**
      * The grizzly server that will received some HTTP requests.
      */
@@ -162,6 +169,20 @@ public abstract class AbstractGrizzlyServer extends PostgridTestCase {
         return image;
     }
 
+    /**
+     * Returns {@code true} if the {@code SST_tests} layer is found in the list of
+     * available layers. It means the postgrid database, pointed by the postgrid.xml
+     * file in the configuration directory, contains this layer and can then be requested
+     * in WMS.
+     */
+    protected static boolean containsTestLayer() {
+        for (LayerDetails layer : layers) {
+            if (layer.getName().equals(LAYER_TEST)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Thread that launches a Grizzly server in a separate thread.

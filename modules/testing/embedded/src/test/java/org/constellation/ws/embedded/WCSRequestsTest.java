@@ -31,17 +31,18 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
-import org.constellation.provider.LayerDetails;
 import org.constellation.register.RegisterException;
 import org.constellation.test.Commons;
+
+// Geotoolkit dependencies
 import org.geotoolkit.wcs.xml.v100.CoverageDescription;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingType;
 import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
+import org.geotoolkit.xml.MarshallerPool;
 
 // JUnit dependencies
-import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
@@ -56,11 +57,6 @@ import static org.junit.Assume.*;
  * @since 0.3
  */
 public class WCSRequestsTest extends AbstractGrizzlyServer {
-    /**
-     * A list of available layers to be requested in WCS.
-     */
-    private static List<LayerDetails> layers;
-
     private static MarshallerPool pool;
 
     /**
@@ -110,7 +106,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * returned an error report for the user.
      */
     @Test
-    public void testWCSWrongRequest() throws JAXBException {
+    public void testWCSWrongRequest() throws JAXBException, IOException {
         // Creates an intentional wrong url, regarding the WCS version 1.0.0 standard
         final URL wrongUrl;
         try {
@@ -121,18 +117,13 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         }
 
         // Try to get something from the wrong url.
-        final InputStream in;
-        try {
-            in = wrongUrl.openStream();
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final InputStream in = wrongUrl.openStream();
 
         // Try to marshall something from the response returned by the server.
         // The response should be a ServiceExceptionReport.
         final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         final Object obj = unmarshaller.unmarshal(in);
+        in.close();
         pool.release(unmarshaller);
         assertTrue(obj instanceof ExceptionReport);
     }
@@ -141,7 +132,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetCoverage request returns indeed a {@link BufferedImage}.
      */
     @Test
-    public void testWCSGetCoverage() {
+    public void testWCSGetCoverage() throws IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -156,13 +147,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         }
 
         // Try to get the coverage from the url.
-        final BufferedImage image;
-        try {
-            image = getImageFromURL(getCoverageUrl, "image/png");
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final BufferedImage image = getImageFromURL(getCoverageUrl, "image/png");
 
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
@@ -182,9 +167,8 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      *
      * @TODO: do this test when moving of Geotools' version
      */
-    @Test
     @Ignore
-    public void testWCSGetCoverageMatrixFormat() {
+    public void testWCSGetCoverageMatrixFormat() throws IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -198,13 +182,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             return;
         }
 
-        final BufferedImage image;
-        try {
-            image = getImageFromURL(getCovMatrixUrl, "application/matrix");
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final BufferedImage image = getImageFromURL(getCovMatrixUrl, "application/matrix");
         //assertEquals(Commons.checksum(image), ...);
     }
 
@@ -213,7 +191,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * document representing the server capabilities in the WCS version 1.0.0 standard.
      */
     @Test
-    public void testWCSGetCapabilities() throws JAXBException {
+    public void testWCSGetCapabilities() throws JAXBException, IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -228,18 +206,13 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         }
 
         // Try to get the result of this request from the url.
-        final InputStream in;
-        try {
-            in = getCapsUrl.openStream();
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final InputStream in = getCapsUrl.openStream();
 
         // Try to marshall something from the response returned by the server.
         // The response should be a WCSCapabilitiesType.
         final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(in);
+        in.close();
         pool.release(unmarshaller);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
@@ -273,7 +246,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid DescribeCoverage request returns indeed a valid document.
      */
     @Test
-    public void testWCSDescribeCoverage() throws JAXBException {
+    public void testWCSDescribeCoverage() throws JAXBException, IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -288,18 +261,13 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         }
 
         // Try to get the result of the DescribeCoverage request from the url.
-        final InputStream in;
-        try {
-            in = getCapsUrl.openStream();
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final InputStream in = getCapsUrl.openStream();
 
         // Try to marshall something from the response returned by the server.
         // The response should be a WCSCapabilitiesType.
         final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(in);
+        in.close();
         pool.release(unmarshaller);
         if (obj instanceof JAXBElement) {
             obj = ((JAXBElement) obj).getValue();
@@ -321,20 +289,4 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
     public static void finish() {
         layers = null;
     }
-
-    /**
-     * Returns {@code true} if the {@code SST_tests} layer is found in the list of
-     * available layers. It means the postgrid database, pointed by the postgrid.xml
-     * file in the configuration directory, contains this layer and can then be requested
-     * in WCS.
-     */
-    private static boolean containsTestLayer() {
-        for (LayerDetails layer : layers) {
-            if (layer.getName().equals(LAYER_TEST)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 }

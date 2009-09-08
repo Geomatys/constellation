@@ -189,9 +189,6 @@ public class WMSService extends OGCWebService {
                 return Response.ok(sw.toString(), requestCapab.getFormat()).build();
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
-                final String versionSt = getParameter(KEY_VERSION, true);
-                isVersionSupported(versionSt);
-                version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final GetLegendGraphic requestLegend = adaptGetLegendGraphic();
                 version = getVersionFromNumber(requestLegend.getVersion().toString());
                 final BufferedImage legend = worker.getLegendGraphic(requestLegend);

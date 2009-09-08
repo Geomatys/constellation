@@ -26,19 +26,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
-import javax.xml.bind.Unmarshaller;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
-import org.constellation.provider.LayerDetails;
 import org.constellation.register.RegisterException;
 import org.constellation.test.Commons;
 import org.constellation.ws.ServiceExceptionReport;
 
-// Geotools dependencies
-
-// JUnit dependencies
+// Geotoolkit dependencies
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
@@ -46,6 +43,8 @@ import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v111.Layer;
 import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
 import org.geotoolkit.xml.MarshallerPool;
+
+// JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
@@ -60,11 +59,6 @@ import static org.junit.Assume.*;
  * @since 0.3
  */
 public class WMSRequestsTest extends AbstractGrizzlyServer {
-    /**
-     * A list of available layers to be requested in WMS.
-     */
-    private static List<LayerDetails> layers;
-
     private static MarshallerPool pool;
 
     /**
@@ -120,7 +114,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * returned an error report for the user.
      */
     @Test
-    public void testWMSWrongRequest() throws JAXBException {
+    public void testWMSWrongRequest() throws JAXBException, IOException {
         // Creates an intentional wrong url, regarding the WMS version 1.1.1 standard
         final URL wrongUrl;
         try {
@@ -131,18 +125,13 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         }
 
         // Try to get something from the wrong url.
-        final InputStream in;
-        try {
-            in = wrongUrl.openStream();
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final InputStream in = wrongUrl.openStream();
 
         // Try to marshall something from the response returned by the server.
         // The response should be a ServiceExceptionReport.
         final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         final Object obj = unmarshaller.unmarshal(in);
+        in.close();
         pool.release(unmarshaller);
         assertTrue(obj instanceof ServiceExceptionReport);
     }
@@ -151,7 +140,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid GetMap request returns indeed a {@link BufferedImage}.
      */
     @Test
-    public void testWMSGetMap() {
+    public void testWMSGetMap() throws IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -166,13 +155,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         }
 
         // Try to get a map from the url. The test is skipped in this method if it fails.
-        final BufferedImage image;
-        try {
-            image = getImageFromURL(getMapUrl, "image/png");
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
@@ -185,7 +168,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * document representing the server capabilities in the WMS version 1.1.1 standard.
      */
     @Test
-    public void testWMSGetCapabilities() throws JAXBException {
+    public void testWMSGetCapabilities() throws JAXBException, IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -200,18 +183,13 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         }
 
         // Creates a valid GetCapabilities url.
-        final InputStream in;
-        try {
-            in = getCapsUrl.openStream();
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final InputStream in = getCapsUrl.openStream();
 
         // Try to marshall something from the response returned by the server.
         // The response should be a WMT_MS_Capabilities.
         final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         final Object obj = unmarshaller.unmarshal(in);
+        in.close();
         pool.release(unmarshaller);
         assertTrue(obj instanceof WMT_MS_Capabilities);
 
@@ -232,7 +210,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * testing layer produces the whished result.
      */
     @Test
-    public void testWMSGetFeatureInfo() {
+    public void testWMSGetFeatureInfo() throws IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -247,23 +225,20 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         }
 
         String value = null;
-        try {
-            final InputStream inGfi = gfi.openStream();
-            final InputStreamReader isr = new InputStreamReader(inGfi);
-            final BufferedReader reader = new BufferedReader(isr);
-            String line;
-            while ((line = reader.readLine()) != null) {
-                // Verify that the line starts with a number, only the one with the value
-                // should begin like this.
-                if (line.matches("[0-9]+.*")) {
-                    // keep the line with the value
-                    value = line;
-                }
+
+        final InputStream inGfi = gfi.openStream();
+        final InputStreamReader isr = new InputStreamReader(inGfi);
+        final BufferedReader reader = new BufferedReader(isr);
+        String line;
+        while ((line = reader.readLine()) != null) {
+            // Verify that the line starts with a number, only the one with the value
+            // should begin like this.
+            if (line.matches("[0-9]+.*")) {
+                // keep the line with the value
+                value = line;
             }
-            reader.close();
-        } catch (IOException ex) {
-            assumeNoException(ex);
         }
+        reader.close();
 
         // Tests on the returned value
         assertNotNull(value);
@@ -273,8 +248,8 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     /**
      * Ensures that a valid GetLegendGraphic request returns indeed a {@link BufferedImage}.
      */
-    @Ignore
-    public void testWMSGetLegendGraphic() {
+    @Test
+    public void testWMSGetLegendGraphic() throws IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -289,13 +264,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         }
 
         // Try to get a map from the url. The test is skipped in this method if it fails.
-        final BufferedImage image;
-        try {
-            image = getImageFromURL(getLegendUrl, "image/png");
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final BufferedImage image = getImageFromURL(getLegendUrl, "image/png");
 
         // Test on the returned image.
         assertEquals(image.getWidth(), 200);
@@ -307,7 +276,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
      * Ensures that a valid DescribeLayer request produces a valid document.
      */
     @Test
-    public void testWMSDescribeLayer() throws JAXBException {
+    public void testWMSDescribeLayer() throws JAXBException, IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -321,18 +290,13 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             return;
         }
 
-        final InputStream in;
-        try {
-            in = describeUrl.openStream();
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final InputStream in = describeUrl.openStream();
 
         // Try to marshall something from the response returned by the server.
         // The response should be a WMT_MS_Capabilities.
         final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         final Object obj = unmarshaller.unmarshal(in);
+        in.close();
         pool.release(unmarshaller);
         assertTrue(obj instanceof DescribeLayerResponseType);
 
@@ -351,20 +315,5 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
     @AfterClass
     public static void finish() {
         layers = null;
-    }
-
-    /**
-     * Returns {@code true} if the {@code SST_tests} layer is found in the list of
-     * available layers. It means the postgrid database, pointed by the postgrid.xml
-     * file in the configuration directory, contains this layer and can then be requested
-     * in WMS.
-     */
-    private static boolean containsTestLayer() {
-        for (LayerDetails layer : layers) {
-            if (layer.getName().equals(LAYER_TEST)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

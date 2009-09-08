@@ -21,12 +21,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 
 // Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
-import org.constellation.provider.LayerDetails;
 import org.constellation.register.RegisterException;
 import org.constellation.test.Commons;
 
@@ -47,11 +45,6 @@ import static org.junit.Assume.*;
  * @since 0.3
  */
 public class WMSAxesOrderTest extends AbstractGrizzlyServer {
-    /**
-     * A list of available layers to be requested in WMS.
-     */
-    private static List<LayerDetails> layers;
-
     /**
      * URLs which will be tested on the server.
      */
@@ -119,7 +112,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      * in version 1.3.0 on the same CRS.
      */
     @Test
-    public void testGetMap111And130Projected() {
+    public void testGetMap111And130Projected() throws IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -135,14 +128,8 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         }
 
         // Try to get a map from the url. The test is skipped in this method if it fails.
-        final BufferedImage image111, image130;
-        try {
-            image111 = getImageFromURL(getMap111Url, "image/png");
-            image130 = getImageFromURL(getMap130Url, "image/png");
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final BufferedImage image111 = getImageFromURL(getMap111Url, "image/png");
+        final BufferedImage image130 = getImageFromURL(getMap130Url, "image/png");
 
         // Test on the returned image.
         assertEquals(image111.getWidth(), 1024);
@@ -158,9 +145,8 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      * TODO: fix the implementation of the GetMap request concerning the handling of
      *       geographical CRS (not WGS84) and do this test then.
      */
-    @Test
     @Ignore
-    public void testCRSGeographique111() {
+    public void testCRSGeographique111() throws IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -175,13 +161,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         }
 
         // Try to get a map from the url. The test is skipped in this method if it fails.
-        final BufferedImage image;
-        try {
-            image = getImageFromURL(getMapUrl, "image/png");
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
@@ -192,7 +172,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      * Verify the axis order for a GetMap in version 1.1.1 for the {@code WGS84} CRS.
      */
     @Test
-    public void testGetMap111Epsg4326() {
+    public void testGetMap111Epsg4326() throws IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -207,13 +187,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         }
 
         // Try to get a map from the url. The test is skipped in this method if it fails.
-        final BufferedImage image;
-        try {
-            image = getImageFromURL(getMapUrl, "image/png");
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
@@ -228,7 +202,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      *       and do this test then.
      */
     @Test
-    public void testGetMap130Epsg4326() {
+    public void testGetMap130Epsg4326() throws IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -243,13 +217,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         }
 
         // Try to get a map from the url. The test is skipped in this method if it fails.
-        final BufferedImage image;
-        try {
-            image = getImageFromURL(getMapUrl, "image/png");
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
         assertEquals(image.getWidth(), 512);
@@ -265,7 +233,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      * Verify the axis order for a GetMap in version 1.1.1 for the {@code WGS84} CRS.
      */
     @Test
-    public void testGetMap111Crs84() {
+    public void testGetMap111Crs84() throws IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -280,13 +248,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         }
 
         // Try to get a map from the url. The test is skipped in this method if it fails.
-        final BufferedImage image;
-        try {
-            image = getImageFromURL(getMapUrl, "image/png");
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
@@ -301,7 +263,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
      *       and do this test then.
      */
     @Test
-    public void testGetMap130Crs84() {
+    public void testGetMap130Crs84() throws IOException {
         assertNotNull(layers);
         assumeTrue(!(layers.isEmpty()));
         assumeTrue(containsTestLayer());
@@ -316,13 +278,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         }
 
         // Try to get a map from the url. The test is skipped in this method if it fails.
-        final BufferedImage image;
-        try {
-            image = getImageFromURL(getMapUrl, "image/png");
-        } catch (IOException ex) {
-            assumeNoException(ex);
-            return;
-        }
+        final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
@@ -332,20 +288,5 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         // So with that axes order, the image should be the same than the one done in GetMap
         // version 1.1.1 with axes order long,lat.
         assertEquals(Commons.checksum(image), 3640849032L);
-    }
-
-    /**
-     * Returns {@code true} if the {@code SST_tests} layer is found in the list of
-     * available layers. It means the postgrid database, pointed by the postgrid.xml
-     * file in the configuration directory, contains this layer and can then be requested
-     * in WMS.
-     */
-    private static boolean containsTestLayer() {
-        for (LayerDetails layer : layers) {
-            if (layer.getName().equals(LAYER_TEST)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
