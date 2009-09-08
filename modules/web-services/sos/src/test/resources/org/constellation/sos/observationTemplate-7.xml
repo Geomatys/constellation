@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<om:Measurement name="obsTest1" xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sa="http://www.opengis.net/sa/1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <gml:name>urn:ogc:object:observation:template:GEOM:7</gml:name>
+    <om:definition>une observation test</om:definition>
+    <om:procedure xlink:href="urn:ogc:object:sensor:SunSpot:0014.4F01.0000.262B"/>
+    <om:observedProperty>
+        <swe:Phenomenon gml:id="temperature">
+            <gml:name>urn:ogc:def:phenomenon:GEOM:temperature</gml:name>
+            <gml:description>temperature</gml:description>
+        </swe:Phenomenon>
+    </om:observedProperty>
+    <om:featureOfInterest>
+        <sa:SamplingPoint gml:id="station-002">
+            <gml:description>Point d'eau BSSS</gml:description>
+            <gml:name>10972X0137-PLOUF</gml:name>
+            <gml:boundedBy>
+                <gml:Null>not_bounded</gml:Null>
+            </gml:boundedBy>
+            <sa:sampledFeature>urn:-sandre:object:bdrhf:123X</sa:sampledFeature>
+            <sa:position gml:id="STATION-LOCALISATION">
+                <gml:pos srsName="urn:ogc:crs:EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
+            </sa:position>
+        </sa:SamplingPoint>
+    </om:featureOfInterest>
+    <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="om:Measure"/>
+</om:Measurement>

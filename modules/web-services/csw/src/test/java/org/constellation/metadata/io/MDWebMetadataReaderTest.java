@@ -51,7 +51,7 @@ public class MDWebMetadataReaderTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         pool = new AnchorPool(Arrays.asList(CSWClassesContext.getAllClasses()));
-        
+
         directory = new File(System.getProperty("java.io.tmpdir", "/tmp"), "MDwebMetadataReaderTest").getAbsoluteFile();
         String url = "jdbc:derby:" + directory.getPath().replace('\\','/');
         DefaultDataSource ds = new DefaultDataSource(url + ";create=true");

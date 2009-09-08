@@ -332,8 +332,7 @@
                                 <gmd:address>
                                     <gmd:CI_Address>
                                         <gmd:deliveryPoint>
-                                            <gco:CharacterString>Centre IFREMER de Brest
-BP 70</gco:CharacterString>
+                                            <gco:CharacterString>Centre IFREMER de Brest BP 70</gco:CharacterString>
                                         </gmd:deliveryPoint>
                                         <gmd:city>
                                             <gco:CharacterString>PLOUZANE</gco:CharacterString>
@@ -637,7 +636,7 @@ BP 70</gco:CharacterString>
                                     <gml:VerticalCRS gml:id="coordinate-reference-system">
                                         <gml:identifier codeSpace="">idvertCRS</gml:identifier>
                                         <gml:scope/>
-                                        <gml:verticalCSProperty>
+                                        <gml:verticalCS>
                                             <gml:VerticalCS gml:id="coordinate-system">
                                                 <gml:identifier codeSpace="">meters</gml:identifier>
                                                 <gml:axis>
@@ -648,13 +647,13 @@ BP 70</gco:CharacterString>
                                                     </gml:CoordinateSystemAxis>
                                                 </gml:axis>
                                             </gml:VerticalCS>
-                                        </gml:verticalCSProperty>
-                                        <gml:verticalDatumProperty>
+                                        </gml:verticalCS>
+                                        <gml:verticalDatum>
                                             <gml:VerticalDatum gml:id="datum">
                                                 <gml:identifier codeSpace="">D28</gml:identifier>
                                                 <gml:scope/>
                                             </gml:VerticalDatum>
-                                        </gml:verticalDatumProperty>
+                                        </gml:verticalDatum>
                                     </gml:VerticalCRS>
                                 </gmd:verticalCRS>
                             </gmd:EX_VerticalExtent>

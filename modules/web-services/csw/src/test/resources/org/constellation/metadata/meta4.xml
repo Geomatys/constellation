@@ -603,7 +603,7 @@
                                     <gml:VerticalCRS gml:id="coordinate-reference-system">
                                         <gml:identifier codeSpace="">idvertCRS</gml:identifier>
                                         <gml:scope/>
-                                        <gml:verticalCSProperty>
+                                        <gml:verticalCS>
                                             <gml:VerticalCS gml:id="coordinate-system">
                                                 <gml:identifier codeSpace="">meters</gml:identifier>
                                                 <gml:axis>
@@ -614,13 +614,13 @@
                                                     </gml:CoordinateSystemAxis>
                                                 </gml:axis>
                                             </gml:VerticalCS>
-                                        </gml:verticalCSProperty>
-                                        <gml:verticalDatumProperty>
+                                        </gml:verticalCS>
+                                        <gml:verticalDatum>
                                             <gml:VerticalDatum gml:id="datum">
                                                 <gml:identifier codeSpace="">D28</gml:identifier>
                                                 <gml:scope/>
                                             </gml:VerticalDatum>
-                                        </gml:verticalDatumProperty>
+                                        </gml:verticalDatum>
                                     </gml:VerticalCRS>
                                 </gmd:verticalCRS>
                             </gmd:EX_VerticalExtent>

@@ -18,6 +18,7 @@
  INSERT INTO "Schemas"."Classes"  VALUES('Double',NULL,'ISO 19103',NULL,0,NULL,NULL, ' ');
  INSERT INTO "Schemas"."Classes"  VALUES('CharacterString',NULL,'ISO 19103',NULL,0,NULL,NULL, ' ');
  INSERT INTO "Schemas"."Classes"  VALUES('URI',NULL,'ISO 19103',NULL,0,NULL,NULL, ' ');
+ INSERT INTO "Schemas"."Classes"  VALUES('URL',NULL,'ISO 19103',NULL,0,NULL,NULL, ' ');
  INSERT INTO "Schemas"."Classes"  VALUES('ID',NULL,'ISO 19103',NULL,0,NULL,NULL, ' ');
  INSERT INTO "Schemas"."Classes"  VALUES('Boolean',NULL,'ISO 19103',NULL,0,NULL,NULL, ' ');
 

@@ -71,7 +71,7 @@ CREATE TABLE "observation"."data_block_definitions" (
 
 
 CREATE TABLE "observation"."measurements" (
-    "name"                        character varying(40) NOT NULL,
+    "name"                        character varying(50) NOT NULL,
     "description"                 character varying(50),
     "feature_of_interest"         character varying(40),
     "procedure"                   character varying(40),

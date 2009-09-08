@@ -1537,6 +1537,8 @@ public class SOSWorkerTest {
 
         ObservationEntry obsResult = (ObservationEntry) obsCollResult.getMember().iterator().next();
 
+        assertNotNull(obsResult);
+
         DataArrayPropertyType obsR = (DataArrayPropertyType) obsResult.getResult();
         SimpleDataRecordEntry obsSdr = (SimpleDataRecordEntry) obsR.getDataArray().getElementType();
         obsSdr.setBlockId(null);

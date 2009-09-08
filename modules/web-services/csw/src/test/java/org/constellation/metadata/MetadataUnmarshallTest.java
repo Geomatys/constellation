@@ -541,7 +541,7 @@ public class MetadataUnmarshallTest {
         
 
         propCoo.put(DefaultCoordinateSystemAxis.NAME_KEY, new DefaultReferenceIdentifier(null, null, "meters"));
-        propCoo.put(DefaultCoordinateSystemAxis.ALIAS_KEY, DefaultCoordinateSystemAxis.UNDEFINED.getAlias());
+//        propCoo.put(DefaultCoordinateSystemAxis.ALIAS_KEY, "");
         DefaultCoordinateSystemAxis axis = new DefaultCoordinateSystemAxis(propCoo, "meters", AxisDirection.DOWN, Unit.valueOf("m"));
 
         HashMap<String,Object> csProp = new HashMap<String, Object>();

@@ -90,6 +90,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             writeDataFile(observationTemplatesDirectory, "observationTemplate-3.xml", "urn:ogc:object:observation:template:GEOM:3");
             writeDataFile(observationTemplatesDirectory, "observationTemplate-4.xml", "urn:ogc:object:observation:template:GEOM:4");
             writeDataFile(observationTemplatesDirectory, "observationTemplate-5.xml", "urn:ogc:object:observation:template:GEOM:5");
+            writeDataFile(observationTemplatesDirectory, "observationTemplate-7.xml", "urn:ogc:object:observation:template:GEOM:7");
 
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
@@ -210,7 +211,9 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
     @After
     public void tearDown() throws Exception {
-        worker.destroy();
+        if (worker != null) {
+            worker.destroy();
+        }
     }
 
     /**
