@@ -627,7 +627,7 @@ final class FormatEntry extends Entry implements Format {
             }
         }
         if (active != null) {
-            String name = source.getName();
+            final String name = source.getName();
             final LogRecord record = Resources.getResources(null).getLogRecord(Level.FINE,
                         ResourceKeys.ABORT_IMAGE_READING_$2, name,
                         Integer.valueOf(active.booleanValue() ? 1 : 0));

@@ -91,7 +91,7 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
             textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
         }
         
-        AbstractEncodingEntry encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
+        final AbstractEncodingEntry encoding = textBlockEncodings.getEntry(results.getString(indexOf(query.encoding)));
         
         return new DataArrayEntry(idArray,
                                   results.getInt(indexOf(query.elementCount)),
@@ -124,7 +124,7 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
             if (array.getId() != null) {
                 final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.idArray), array.getId());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return array.getId();

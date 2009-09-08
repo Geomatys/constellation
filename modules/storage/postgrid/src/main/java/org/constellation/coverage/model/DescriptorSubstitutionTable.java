@@ -114,7 +114,7 @@ public class DescriptorSubstitutionTable extends Table {
             throw new DuplicatedRecordException(this, results, bySymbol, key);
         }
         if (key.equals(symbol1) || key.equals(symbol2)) {
-            IllegalRecordException e = new IllegalRecordException("Définition récursive d'un gradient temporel.");
+            final IllegalRecordException e = new IllegalRecordException("Définition récursive d'un gradient temporel.");
             e.setMetadata(this, results, bySymbol, key);
             throw e;
         }

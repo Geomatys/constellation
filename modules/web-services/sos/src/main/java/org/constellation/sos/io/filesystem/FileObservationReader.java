@@ -142,7 +142,7 @@ public class FileObservationReader implements ObservationReader {
                 Unmarshaller unmarshaller = null;
                 try {
                     unmarshaller = marshallerPool.acquireUnmarshaller();
-                    Object obj = unmarshaller.unmarshal(offeringFile);
+                    final Object obj = unmarshaller.unmarshal(offeringFile);
                     if (obj instanceof ObservationOfferingEntry) {
                         offerings.add((ObservationOfferingEntry) obj);
                     } else {
@@ -294,7 +294,7 @@ public class FileObservationReader implements ObservationReader {
                 }
                 if (obj instanceof ObservationEntry) {
                     final ObservationEntry obs = (ObservationEntry) obj;
-                    DataArrayPropertyType arrayP = (DataArrayPropertyType) obs.getResult();
+                    final DataArrayPropertyType arrayP = (DataArrayPropertyType) obs.getResult();
                     return new AnyResultEntry(null, arrayP.getDataArray());
                 }
                 throw new CstlServiceException("The file " + anyResultFile + " does not contains an observation Object.", NO_APPLICABLE_CODE);

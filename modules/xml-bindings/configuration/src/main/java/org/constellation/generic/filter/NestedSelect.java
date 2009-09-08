@@ -73,7 +73,7 @@ public class NestedSelect {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[NestedSelect]:").append('\n');
+        final StringBuilder sb = new StringBuilder("[NestedSelect]:").append('\n');
         if (group != null) {
             sb.append("group: ").append(group).append('\n');
         }

@@ -71,7 +71,7 @@ public class Select {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[Select]");
+        final StringBuilder s = new StringBuilder("[Select]");
         s.append("columns: ").append('\n');
         for (Column c: col) {
             s.append(c.toString()).append('\n');

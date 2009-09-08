@@ -70,7 +70,7 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
         final OfferingResponseModeQuery query = (OfferingResponseModeQuery) super.query;
         
         
-        ResponseModeType mode = ResponseModeType.valueOf(results.getString(indexOf(query.mode)));
+        final ResponseModeType mode = ResponseModeType.valueOf(results.getString(indexOf(query.mode)));
         return new OfferingResponseModeEntry(results.getString(indexOf(query.idOffering)),
                                           mode);
     }
@@ -109,16 +109,16 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
         boolean success = false;
         transactionBegin();
         try {
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
+            final PreparedStatement statement = getStatement(QueryType.EXISTS);
             statement.setString(indexOf(query.idOffering), offres.getIdOffering());
             statement.setString(indexOf(query.mode), offres.getMode().name());
-            ResultSet result = statement.executeQuery();
+            final ResultSet result = statement.executeQuery();
             if(result.next()) {
                 success = true;
                 return;
             }
         
-            PreparedStatement insert    = getStatement(QueryType.INSERT);
+            final PreparedStatement insert    = getStatement(QueryType.INSERT);
             insert.setString(indexOf(query.idOffering), offres.getIdOffering());
             insert.setString(indexOf(query.mode), offres.getMode().name() );
             updateSingleton(insert);

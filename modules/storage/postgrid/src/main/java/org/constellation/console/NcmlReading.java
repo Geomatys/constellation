@@ -114,7 +114,7 @@ final class NcmlReading {
                     }
                 }
             } else {
-                List<Element> children = globalAggr.getChildren("netcdf", NETCDFNS);
+                final List<Element> children = globalAggr.getChildren("netcdf", NETCDFNS);
                 for (final Element elem : children) {
                     elements.add(elem);
                 }
@@ -144,7 +144,7 @@ final class NcmlReading {
         if (root.getName().equals("netcdf")) {
             return root;
         } else {
-            Element elemDataset = root.getChild("dataset", root.getNamespace());
+            final Element elemDataset = root.getChild("dataset", root.getNamespace());
             return elemDataset.getChild("netcdf", NETCDFNS);
         }
     }

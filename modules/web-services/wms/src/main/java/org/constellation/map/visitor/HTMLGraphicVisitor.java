@@ -82,7 +82,7 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
      */
     @Override
     public boolean isStopRequested() {
-        Integer count = gfi.getFeatureCount();
+        final Integer count = gfi.getFeatureCount();
         if (count != null) {
             return (index == count);
         } else {
@@ -126,7 +126,7 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
             coverages.put(layerName, strs);
         }
 
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < results.length; i++) {
             final Object value = results[i][0];
             final Unit unit = (Unit) results[i][1];
@@ -204,7 +204,7 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
             } else {
                 final Feature firstFeature = record.get(0);
                 response.append("       <tr class=\"trColumnName\">\n");
-                for (Iterator it = firstFeature.getType().getDescriptors().iterator(); it.hasNext();) {
+                for (final Iterator it = firstFeature.getType().getDescriptors().iterator(); it.hasNext();) {
                     response.append("           <th>")
                         .append(((PropertyDescriptor)it.next()).getName().getLocalPart())
                         .append("           </th>\n");
@@ -212,7 +212,7 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
                 response.append("       </tr>\n");
                 for (Feature feature : record) {
                     response.append("       <tr class=\"trValue\">\n");
-                    for (Iterator it = feature.getProperties().iterator(); it.hasNext();) {
+                    for (final Iterator it = feature.getProperties().iterator(); it.hasNext();) {
                         response.append("           <td>")
                                 .append(((Property)it.next()).getValue().toString())
                                 .append("           </td>\n");

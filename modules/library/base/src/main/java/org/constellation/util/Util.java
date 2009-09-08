@@ -1576,20 +1576,20 @@ public final class Util {
      */
     public static void executeSQLScript(String path, Connection connection) {
         try {
-            InputStream in  = getResourceAsStream(path);
-            StringWriter sw = new StringWriter();
-            byte[] buffer   = new byte[1024];
+            final InputStream in  = getResourceAsStream(path);
+            final StringWriter sw = new StringWriter();
+            final byte[] buffer   = new byte[1024];
             int size;
             while ((size = in.read(buffer, 0, 1024)) > 0) {
                 sw.append(new String(buffer, 0, size));
             }
             in.close();
 
-            Statement stmt  = connection.createStatement();
-            String SQLQuery = sw.toString();
-            int end         = SQLQuery.indexOf(';');
+            final Statement stmt  = connection.createStatement();
+            String SQLQuery       = sw.toString();
+            int end               = SQLQuery.indexOf(';');
             while (end != -1) {
-                String singleQuery = SQLQuery.substring(0, end);
+                final String singleQuery = SQLQuery.substring(0, end);
                 try {
                     stmt.execute(singleQuery);
 

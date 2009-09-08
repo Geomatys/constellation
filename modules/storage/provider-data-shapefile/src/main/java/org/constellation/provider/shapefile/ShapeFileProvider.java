@@ -141,7 +141,7 @@ public class ShapeFileProvider implements LayerProvider {
 
         if(store == null) {
             //datastore is not in the cache, try to load it
-            File f = index.get(key);
+            final File f = index.get(key);
             if (f != null) {
                 //we have this data source in the folder
                 store = loadDataStore(f);
@@ -211,7 +211,7 @@ public class ShapeFileProvider implements LayerProvider {
      */
     private void visit(final File file) {
         if (file.isDirectory()) {
-            File[] list = file.listFiles();
+            final File[] list = file.listFiles();
             if (list != null) {
                 for (int i = 0; i < list.length; i++) {
                     visit(list[i]);
@@ -228,11 +228,11 @@ public class ShapeFileProvider implements LayerProvider {
      * @param candidate Candidate to be a shape file.
      */
     private void test(final File candidate){
-        if(candidate.isFile()){
-            String fullName = candidate.getName();
-            if(fullName.toLowerCase().endsWith(MASK)){
-                String name = fullName.substring(0, fullName.length()-4);
-                if(source.loadAll || source.containsLayer(name)){
+        if (candidate.isFile()){
+            final String fullName = candidate.getName();
+            if (fullName.toLowerCase().endsWith(MASK)){
+                final String name = fullName.substring(0, fullName.length()-4);
+                if (source.loadAll || source.containsLayer(name)){
                     index.put(name, candidate);
                 }
             }

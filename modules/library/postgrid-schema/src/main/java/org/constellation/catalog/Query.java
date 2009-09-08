@@ -281,7 +281,7 @@ public class Query {
             throws SQLException
     {
         final Set<String> columns = new HashSet<String>();
-        ResultSet results = metadata.getColumns(database.catalog, database.schema, table, null);
+        final ResultSet results = metadata.getColumns(database.catalog, database.schema, table, null);
         while (results.next()) {
             columns.add(results.getString("COLUMN_NAME"));
         }
@@ -551,7 +551,7 @@ scan:       while (!tables.isEmpty()) {
         final String quote = metadata.getIdentifierQuoteString().trim();
         String separator = " ORDER BY ";
         for (final Column c : ordering.keySet()) {
-            String ordering = c.getOrdering(type);
+            final String ordering = c.getOrdering(type);
             if (ordering != null) {
                 buffer.append(separator).append(quote).append(c.name).append(quote);
                 if (!ordering.equals("ASC")) {

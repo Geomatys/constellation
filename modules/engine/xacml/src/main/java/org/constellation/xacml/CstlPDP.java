@@ -69,11 +69,11 @@ public class CstlPDP implements PolicyDecisionPoint {
      */
     public CstlPDP(PolicySetType policySet) throws FactoryException {
         
-        XACMLPolicy xpolicySet = PolicyFactory.createPolicySet(policySet);
+        final XACMLPolicy xpolicySet = PolicyFactory.createPolicySet(policySet);
         
-        List<XACMLPolicy> enclosing = new ArrayList<XACMLPolicy>();
+        final List<XACMLPolicy> enclosing = new ArrayList<XACMLPolicy>();
         for (PolicyType p: policySet.getPoliciesChild()) {
-            XACMLPolicy policy = PolicyFactory.createPolicy(p);
+            final XACMLPolicy policy = PolicyFactory.createPolicy(p);
             enclosing.add(policy);
         }
         xpolicySet.setEnclosingPolicies(enclosing);

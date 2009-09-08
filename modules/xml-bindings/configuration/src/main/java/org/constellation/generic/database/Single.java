@@ -53,7 +53,7 @@ public class Single {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[Single]");
+        final StringBuilder s = new StringBuilder("[Single]");
         if (query != null && query.size() != 0) {
             int i = 0;
             for (Query q: query) {

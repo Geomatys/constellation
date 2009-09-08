@@ -43,6 +43,7 @@ public class BoundedCompletionService<V> implements CompletionService<V> {
   private class BoundedFuture extends FutureTask {
         BoundedFuture(Callable<V> c) { super(c); }
         BoundedFuture(Runnable t, V r) { super(t, r); }
+        @Override
         protected void done() {
         	semaphore.release();
         	completionQueue.add(this);
@@ -55,18 +56,21 @@ public class BoundedCompletionService<V> implements CompletionService<V> {
       this.completionQueue = new LinkedBlockingQueue<Future<V>>();
     }
 
+    @Override
     public Future<V> poll() {
       return this.completionQueue.poll();
     }
 
+    @Override
     public Future<V> poll(long timeout, TimeUnit unit) throws InterruptedException {
       return this.completionQueue.poll(timeout, unit);
     }
 
+    @Override
     public Future<V> submit(Callable<V> task)  {
       if (task == null) throw new NullPointerException();
       try {
-        BoundedFuture f = new BoundedFuture(task);
+        final BoundedFuture f = new BoundedFuture(task);
         this.semaphore.acquire(); // waits
         this.executor.execute(f);
 	return f;
@@ -76,10 +80,11 @@ public class BoundedCompletionService<V> implements CompletionService<V> {
       return null;
     }
 
+    @Override
     public Future<V> submit(Runnable task, V result) {
       if (task == null) throw new NullPointerException();
       try {
-        BoundedFuture f = new BoundedFuture(task, result);
+        final BoundedFuture f = new BoundedFuture(task, result);
         this.semaphore.acquire(); // waits
         this.executor.execute(f);
         return f;
@@ -89,6 +94,7 @@ public class BoundedCompletionService<V> implements CompletionService<V> {
       return null;
     }
 
+    @Override
     public Future<V> take() throws InterruptedException {
       return this.completionQueue.take();
     }

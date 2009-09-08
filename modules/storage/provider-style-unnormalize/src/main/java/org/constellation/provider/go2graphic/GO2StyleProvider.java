@@ -101,10 +101,10 @@ public class GO2StyleProvider implements StyleProvider{
     }
     
     private void visit() {
-        MutableStyleFactory sf = (MutableStyleFactory)FactoryFinder.getStyleFactory(
+        final MutableStyleFactory sf = (MutableStyleFactory)FactoryFinder.getStyleFactory(
                             new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
         //TODO : find another way to load special styles.
-        Symbolizer symbol = new VectorFieldSymbolizer();
+        final Symbolizer symbol = new VectorFieldSymbolizer();
 
         index.put("GO2:VectorField", sf.style(symbol));
     }

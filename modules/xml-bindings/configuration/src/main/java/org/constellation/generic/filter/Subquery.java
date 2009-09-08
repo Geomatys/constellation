@@ -144,7 +144,7 @@ public class Subquery {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[SubQuery]:").append('\n');
+        final StringBuilder sb = new StringBuilder("[SubQuery]:").append('\n');
         if (option != null) {
             sb.append(" option: ").append(option);
         }

@@ -70,15 +70,15 @@ final class DomainOfLayerTable extends SingletonTable<DomainOfLayerEntry> {
     protected DomainOfLayerEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
         final DomainOfLayerQuery query = (DomainOfLayerQuery) super.query;
         final Calendar calendar = getCalendar();
-        String name        = results.getString(indexOf(query.layer));
+        final String name        = results.getString(indexOf(query.layer));
         Date   startTime   = results.getTimestamp(indexOf(query.startTime), calendar);
         Date   endTime     = results.getTimestamp(indexOf(query.endTime), calendar);
         double west        = results.getDouble(indexOf(query.west));  if (results.wasNull()) west  = -180;
         double east        = results.getDouble(indexOf(query.east));  if (results.wasNull()) east  = +180;
         double south       = results.getDouble(indexOf(query.south)); if (results.wasNull()) south =  -90;
         double north       = results.getDouble(indexOf(query.north)); if (results.wasNull()) north =  +90;
-        double xResolution = results.getDouble(indexOf(query.xResolution));
-        double yResolution = results.getDouble(indexOf(query.yResolution));
+        final double xResolution = results.getDouble(indexOf(query.xResolution));
+        final double yResolution = results.getDouble(indexOf(query.yResolution));
         // Replace java.sql.Timestamp by java.util.Date.
         if (startTime != null) {
             startTime = new Date(startTime.getTime());

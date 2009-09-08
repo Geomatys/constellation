@@ -390,10 +390,10 @@ public class FileMetadataReader extends MetadataReader {
 
             // TODO multiple
             SimpleLiteral distributor = null;
-            Distribution distribution = metadata.getDistributionInfo();
+            final Distribution distribution = metadata.getDistributionInfo();
             if (distribution != null) {
                 for (Distributor dis :distribution.getDistributors()) {
-                    ResponsibleParty disRP = dis.getDistributorContact();
+                    final ResponsibleParty disRP = dis.getDistributorContact();
                     if (disRP != null) {
                         if (disRP.getOrganisationName() != null) {
                             distributor = new SimpleLiteral(disRP.getOrganisationName().toString());

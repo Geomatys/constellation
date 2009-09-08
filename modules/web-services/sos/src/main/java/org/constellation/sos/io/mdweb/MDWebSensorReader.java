@@ -119,7 +119,7 @@ public class MDWebSensorReader implements SensorReader {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("JAXBException while starting the MDweb Sensor reader", NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("SQLException while starting the MDweb Sensor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }

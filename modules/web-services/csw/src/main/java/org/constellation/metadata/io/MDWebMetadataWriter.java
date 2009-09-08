@@ -127,7 +127,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         try {
 
             final Connection mdConnection = db.getConnection();
-            boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
+            final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
             mdReader      = new Reader20(Standard.ISO_19115, mdConnection, isPostgres);
             mdCatalog     = mdReader.getCatalog("CSWCat");
             this.mdWriter = new Writer20(mdConnection, isPostgres);
@@ -296,7 +296,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 } else if (cle != null) {
                     object = cle.getCode();
                 } else {
-                    StringBuilder values = new StringBuilder();
+                    final StringBuilder values = new StringBuilder();
                     for (Property p: classe.getProperties()) {
                         values.append(p.getName()).append('\n');
                     }

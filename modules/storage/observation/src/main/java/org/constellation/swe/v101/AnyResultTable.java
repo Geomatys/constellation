@@ -150,9 +150,9 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                 final PreparedStatement p = getDatabase().getConnection().prepareStatement("SELECT max(\"id_result\") FROM \"observation\".\"any_results\"" );
                 final ResultSet r         = p.executeQuery();
                 if (r.next()) {
-                    String res = r.getString(1);
+                    final String res = r.getString(1);
                     try {
-                        int id = Integer.parseInt(res);
+                        final int id = Integer.parseInt(res);
                         statement.setInt(indexOf(query.idResult), id + 1);
                     } catch (NumberFormatException ex) {
                         LOGGER.severe("unable to parse the result id:" + res);

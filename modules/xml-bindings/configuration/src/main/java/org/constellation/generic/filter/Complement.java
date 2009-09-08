@@ -72,7 +72,7 @@ public class Complement {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[Complement]:").append('\n');
+        final StringBuilder sb = new StringBuilder("[Complement]:").append('\n');
         if (value != null) {
             sb.append("value: ").append(value).append('\n');
         }

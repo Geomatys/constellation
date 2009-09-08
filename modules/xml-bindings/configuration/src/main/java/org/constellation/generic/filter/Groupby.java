@@ -73,7 +73,7 @@ public class Groupby {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[Grouby]:").append('\n');
+        final StringBuilder sb = new StringBuilder("[Grouby]:").append('\n');
         if (value != null) {
             sb.append("value: ").append(value).append('\n');
         }

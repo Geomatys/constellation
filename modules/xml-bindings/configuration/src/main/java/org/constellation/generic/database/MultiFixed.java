@@ -54,7 +54,7 @@ public class MultiFixed {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[MultiFixed]");
+        final StringBuilder s = new StringBuilder("[MultiFixed]");
         if (query != null && query.size() != 0) {
             int i = 0;
             for (Query q: query) {

@@ -194,18 +194,18 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      */
     private void createIndexLightMemory() throws IndexingException {
         LOGGER.info("(light memory) Creating lucene index for Generic database please wait...");
-        long time = System.currentTimeMillis();
+        final long time = System.currentTimeMillis();
         IndexWriter writer;
         int nbEntries = 0;
         try {
             writer = new IndexWriter(getFileDirectory(), analyzer, true);
 
             // TODO getting the objects list and index avery item in the IndexWriter.
-            List<String> ids = reader.getAllIdentifiers();
+            final List<String> ids = reader.getAllIdentifiers();
             nbEntries = ids.size();
             LOGGER.info( nbEntries + " metadata to index (light memory mode)");
             for (String id : ids) {
-                Object entry = reader.getMetadata(id, MetadataReader.ISO_19115, ElementSetType.FULL, null);
+                final Object entry = reader.getMetadata(id, MetadataReader.ISO_19115, ElementSetType.FULL, null);
                 indexDocument(writer, entry);
             }
             writer.optimize();
@@ -845,7 +845,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         Object result = null;
         int ordinal   = -1;
         if (attributeName.indexOf('[') != -1){
-            String tmp    = attributeName.substring(attributeName.indexOf('[') + 1, attributeName.length() - 1);
+            final String tmp    = attributeName.substring(attributeName.indexOf('[') + 1, attributeName.length() - 1);
             attributeName = attributeName.substring(0, attributeName.indexOf('['));
             try {
                 ordinal = Integer.parseInt(tmp);
@@ -876,8 +876,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             result = ((JAXBElement)result).getValue();
         }
         if (ordinal != -1 && result instanceof Collection) {
-            Collection c = (Collection) result;
-            Iterator t   = c.iterator();
+            final Collection c = (Collection) result;
+            final Iterator t   = c.iterator();
             int i = 0;
             while (t.hasNext()) {
                 result = t.next();

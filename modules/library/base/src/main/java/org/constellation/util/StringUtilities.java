@@ -339,7 +339,7 @@ public final class StringUtilities {
         }
 
         //create the 2/3/4 D BBox ----------------------------------------------
-        String name = "rendering bbox";
+        final String name = "rendering bbox";
         if (verticalCRS != null && temporalCRS != null) {
             final CoordinateReferenceSystem finalCRS = new DefaultCompoundCRS(name,
                     new CoordinateReferenceSystem[]{ horizontalCRS,
@@ -493,11 +493,11 @@ public final class StringUtilities {
      * @return
      */
     public static List<String> sortStringList(List<String> toSort) {
-        int elements = toSort.size();
+        final int elements = toSort.size();
         for (int i = (elements - 1); i > 0; i--) {
             for (int j = 0; j < i; j++) {
                 if (toSort.get(j).compareTo(toSort.get(j + 1)) > 0) {
-                    String inter = toSort.get(j);
+                    final String inter = toSort.get(j);
                     toSort.set(j, toSort.get(j + 1));
                     toSort.set(j + 1,inter);
                 }

@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.sql.Result;
 import org.constellation.sql.ResultsDatabase;
@@ -88,7 +89,7 @@ public final class HandleLogs {
             try {
                 resDB.close();
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
     }
@@ -114,7 +115,7 @@ public final class HandleLogs {
             try {
                 resDB.close();
             } catch (SQLException ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
     }
@@ -141,7 +142,7 @@ public final class HandleLogs {
             try {
                 process.waitFor();
             } catch (InterruptedException ex) {
-                ex.printStackTrace();
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
         // Analyses the results of the session compared to the previous one.

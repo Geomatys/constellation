@@ -113,7 +113,7 @@ public class LinearModelTable extends Table {
         if (terms == null) {
             return null;
         }
-        LinearModelEntry model = new LinearModelEntry(target, terms);
+        final LinearModelEntry model = new LinearModelEntry(target, terms);
         if (substitution == null) {
             // Note: we wraps in new DescriptorSubstitutionTable(...)
             // in order to protect the shared instance from changes.

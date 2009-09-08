@@ -90,7 +90,7 @@ public class From {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[FROM]:").append('\n');
+        final StringBuilder sb = new StringBuilder("[FROM]:").append('\n');
         if (value != null) {
             sb.append("value: ").append(value).append('\n');
         }

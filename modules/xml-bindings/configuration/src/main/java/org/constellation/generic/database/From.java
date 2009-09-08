@@ -99,7 +99,7 @@ public class From {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[From]");
+        final StringBuilder s = new StringBuilder("[From]");
         if (alias != null)
             s.append("alias: ").append(alias).append('\n');
         if (group != null)

@@ -477,10 +477,10 @@ public final class WMSMapDecoration {
         final int width = parseInteger(strWidth, 1);
 
         if(strDashes != null && !strDashes.isEmpty()){
-            String[] parts = strDashes.split(",");
-            if(parts.length > 0){
-                float[] dashes = new float[parts.length];
-                for(int i=0; i<parts.length; i++){
+            final String[] parts = strDashes.split(",");
+            if (parts.length > 0){
+                final float[] dashes = new float[parts.length];
+                for (int i=0; i<parts.length; i++){
                     dashes[i] = parseFloat(parts[i], 5);
                 }
                 return new BasicStroke(width, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,10,dashes,0);

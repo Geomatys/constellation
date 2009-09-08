@@ -93,7 +93,7 @@ public class Orderby {
     
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[Orderby]");
+        final StringBuilder s = new StringBuilder("[Orderby]");
         if (sens != null)
             s.append("sens: ").append(sens).append('\n');
         if (group != null)

@@ -53,7 +53,7 @@ public class Static {
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[Static]");
+        final StringBuilder s = new StringBuilder("[Static]");
         if (query != null && query.size() != 0) {
             int i = 0;
             for (Query q: query) {

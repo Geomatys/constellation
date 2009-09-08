@@ -59,7 +59,7 @@ public final class CSVGraphicVisitor extends TextGraphicVisitor {
      */
     @Override
     public boolean isStopRequested() {
-        Integer count = gfi.getFeatureCount();
+        final Integer count = gfi.getFeatureCount();
         if (count != null) {
             return (index == count);
         } else {
@@ -89,7 +89,7 @@ public final class CSVGraphicVisitor extends TextGraphicVisitor {
             if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
                 builder.append(propName.toString()).append(':').append(prop.getType().getBinding().getSimpleName()).append(';');
             } else {
-                Object value = prop.getValue();
+                final Object value = prop.getValue();
                 builder.append(propName.toString()).append(':').append(value).append(';');
             }
         }
@@ -126,7 +126,7 @@ public final class CSVGraphicVisitor extends TextGraphicVisitor {
             values.put(layerName, strs);
         }
 
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < results.length; i++) {
             final Object value = results[i][0];
             final Unit unit = (Unit) results[i][1];

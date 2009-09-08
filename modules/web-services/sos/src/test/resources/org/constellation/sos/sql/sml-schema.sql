@@ -25,6 +25,13 @@
  INSERT INTO "Schemas"."Classes"  VALUES ('UndefinedTime', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
  INSERT INTO "Schemas"."Properties"  VALUES ('indeterminatePosition', NULL, 'ISO 19108', NULL, 1, 1, 'UndefinedTime', 'CharacterString', NULL, 'O', 0, 'ISO 19103', 'ISO 19108', 'P');
 
+ INSERT INTO "Schemas"."CodeLists"  VALUES ('CI_OnLineFunctionCode', 'OnFunctCd', 'ISO 19115', NULL, 0, 'CodeList', NULL, ' ');
+ INSERT INTO "Schemas"."CodeListElements"  VALUES ('download', NULL, 'ISO 19115', NULL, 0, 1, 'CI_OnLineFunctionCode', 'CI_OnLineFunctionCode', 'CI_OnLineFunctionCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 1);
+ INSERT INTO "Schemas"."CodeListElements"  VALUES ('information', NULL, 'ISO 19115', NULL, 0, 1, 'CI_OnLineFunctionCode', 'CI_OnLineFunctionCode', 'CI_OnLineFunctionCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 2);
+ INSERT INTO "Schemas"."CodeListElements"  VALUES ('offlineAccess', NULL, 'ISO 19115', NULL, 0, 1, 'CI_OnLineFunctionCode', 'CI_OnLineFunctionCode', 'CI_OnLineFunctionCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 3);
+ INSERT INTO "Schemas"."CodeListElements"  VALUES ('order', NULL, 'ISO 19115', NULL, 0, 1, 'CI_OnLineFunctionCode', 'CI_OnLineFunctionCode', 'CI_OnLineFunctionCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 4);
+ INSERT INTO "Schemas"."CodeListElements"  VALUES ('search', NULL, 'ISO 19115', NULL, 0, 1, 'CI_OnLineFunctionCode', 'CI_OnLineFunctionCode', 'CI_OnLineFunctionCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 5);
+
  INSERT INTO "Schemas"."CodeLists"  VALUES ('CI_RoleCode', 'RoleCd', 'ISO 19115', NULL, 0, 'CodeList', NULL, ' ');
  INSERT INTO "Schemas"."CodeListElements"  VALUES ('resourceProvider', NULL, 'ISO 19115', NULL, 0, 1, 'CI_RoleCode', 'CI_RoleCode', 'CI_RoleCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 1);
  INSERT INTO "Schemas"."CodeListElements"  VALUES ('publisher', NULL, 'ISO 19115', NULL, 0, 1, 'CI_RoleCode', 'CI_RoleCode', 'CI_RoleCode', 'C', 0, 'ISO 19115', 'ISO 19115', ' ', 10);

@@ -108,7 +108,7 @@ public class Subselect {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[Select]:").append('\n');
+        final StringBuilder sb = new StringBuilder("[Select]:").append('\n');
         if (value != null) {
             sb.append("value: ").append(value).append('\n');
         }

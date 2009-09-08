@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 // Geotoolkit dependencies
+import java.util.logging.Logger;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 
 
@@ -48,6 +49,8 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
  * @since 0.4
  */
 public final class ResultsDatabase {
+    
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.sql");
     /**
      * The pattern for the ouput of a date.
      */
@@ -279,7 +282,7 @@ public final class ResultsDatabase {
             sb = new StringBuilder("This is the first session of tests launched for ");
             sb.append(service).append(" ").append(version)
               .append(". We can't compare the results with a previous one.");
-            System.out.println(sb.toString());
+            LOGGER.info(sb.toString());
             return;
         }
         sb = new StringBuilder("Results for the session ");
@@ -304,12 +307,12 @@ public final class ResultsDatabase {
                 sb.append(tab).append(tab).append(tab).append("==> Directory: ").append(res.getDirectory())
                   .append(endOfLine);
             }
-            System.out.println(sb.toString());
+            LOGGER.info(sb.toString());
             throw new RuntimeException("Some tests are now failing, but not in the previous suite. " +
                     "Please fix the service responsible of the failure of these tests !");
         }
 
-        System.out.println(sb.toString());
+        LOGGER.info(sb.toString());
     }
 
     /**

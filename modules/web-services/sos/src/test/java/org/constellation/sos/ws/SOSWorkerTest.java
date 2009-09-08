@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
@@ -40,6 +41,7 @@ import org.geotoolkit.gml.xml.v311.TimeIndeterminateValueType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
@@ -1443,6 +1445,36 @@ public class SOSWorkerTest {
         ObservationCollectionEntry collExpResult = new ObservationCollectionEntry("urn:ogc:def:nil:OGC:inapplicable");
         assertEquals(collExpResult, result);
 
+        /**
+         *  Test 28: getObservation with procedure urn:ogc:object:sensor:GEOM:7
+         *           with resultTemplate mode
+         *  => measurement type
+         */
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:7"),
+                                      null,
+                                      new GetObservation.FeatureOfInterest(Arrays.asList("station-002")),
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.MEASUREMENT_QNAME,
+                                      ResponseModeType.RESULT_TEMPLATE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        MeasurementEntry measResult =  (MeasurementEntry) result.getMember().iterator().next();
+        assertTrue(measResult != null);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-7.xml"));
+
+        expResult = (ObservationEntry)obj.getValue();
+
+        period = new TimePeriodType(new TimePositionType("1900-01-01T00:00:00"));
+        expResult.setSamplingTime(period);
+
+        assertEquals(expResult, measResult);
+        
         marshallerPool.release(unmarshaller);
     }
 

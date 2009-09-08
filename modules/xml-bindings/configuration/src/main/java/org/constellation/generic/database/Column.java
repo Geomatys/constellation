@@ -60,7 +60,7 @@ public class Column {
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[Column]");
+        final StringBuilder s = new StringBuilder("[Column]");
         if (getVar() != null)
             s.append("var: ").append(getVar()).append('\n');
         if (getSql() != null)

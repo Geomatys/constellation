@@ -73,7 +73,7 @@ public class ParamSql {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[ParamSql]:").append('\n');
+        final StringBuilder sb = new StringBuilder("[ParamSql]:").append('\n');
         sb.append("name: ").append(name);
         sb.append(" value: ").append(value);
         return sb.toString();

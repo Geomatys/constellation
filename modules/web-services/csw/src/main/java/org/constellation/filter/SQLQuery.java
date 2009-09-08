@@ -58,7 +58,7 @@ public class SQLQuery {
     }
     
     public void createSelect() {
-        StringBuilder select = new StringBuilder("SELECT distinct identifier, catalog FROM \"Forms\" ");
+        final StringBuilder select = new StringBuilder("SELECT distinct identifier, catalog FROM \"Forms\" ");
         for (int i = 1; i <= nbField; i++) {
             select.append(" , \"TextValues\" v").append(i);
         }
@@ -82,7 +82,7 @@ public class SQLQuery {
     
     @Override
     public String toString() {
-        StringBuilder s =new StringBuilder("[SQLquery]").append('\n');
+        final StringBuilder s =new StringBuilder("[SQLquery]").append('\n');
         if (query != null && !query.equals(""))
             s.append("query= ").append(query).append('\n');
         if (spatialFilter != null) {

@@ -24,6 +24,7 @@ INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('of
 INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-003');
 INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-004');
 INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-007');
+INSERT INTO "sos"."offering_procedures" ("id_offering", "procedure") VALUES ('offering-allSensor', 'reference-008');
 
 INSERT INTO "observation"."process" ("name", "description") VALUES ('urn:ogc:object:sensor:GEOM:1', NULL);
 INSERT INTO "observation"."process" ("name", "description") VALUES ('urn:ogc:object:sensor:GEOM:2', NULL);
@@ -47,6 +48,7 @@ INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "h
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-003', '', '', 'urn:ogc:object:sensor:GEOM:3', '', '', '', '', 0);
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-004', '', '', 'urn:ogc:object:sensor:GEOM:4', '', '', '', '', 0);
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-007', '', '', 'urn:ogc:object:sensor:GEOM:5', '', '', '', '', 0);
+INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-008', '', '', 'urn:ogc:object:sensor:GEOM:7', '', '', '', '', 0);
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-005', '', '', 'station-001', '', '', '', '', 0);
 INSERT INTO "observation"."references" ("id_reference", "actuate", "arcrole", "href", "role", "show", "title", "type", "owns") VALUES ('reference-006', '', '', 'station-002', '', '', '', '', 0);
 

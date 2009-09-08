@@ -486,14 +486,14 @@ public class MDWebMetadataReader extends MetadataReader {
         for (Value v: topicCategoriesValues) {
             if (v instanceof TextValue) {
                 if (v.getType() instanceof org.mdweb.model.schemas.CodeList) {
-                    org.mdweb.model.schemas.CodeList c = (org.mdweb.model.schemas.CodeList) v.getType();
+                    final org.mdweb.model.schemas.CodeList c = (org.mdweb.model.schemas.CodeList) v.getType();
                     int code = 0;
                     try {
                         code = Integer.parseInt(((TextValue)v).getValue());
                     } catch (NumberFormatException ex) {
                         LOGGER.severe("unable to parse the codeListelement:" + ((TextValue)v).getValue());
                     }
-                    CodeListElement element = c.getElementByCode(code);
+                    final CodeListElement element = c.getElementByCode(code);
                     if (element != null) {
                         keywords.add(new SimpleLiteral(null, element.getName()));
                     } else {
@@ -1037,18 +1037,18 @@ public class MDWebMetadataReader extends MetadataReader {
                                     field.setAccessible(true);
                                     try {
                                         if (attribName.equals("axis")) {
-                                            CoordinateSystemAxis[] params = new CoordinateSystemAxis[1];
+                                            final CoordinateSystemAxis[] params = new CoordinateSystemAxis[1];
                                             params[0] = (CoordinateSystemAxis) param;
                                             field.set(result, params);
                                         } else if (field.getType().isArray()) {
                                           // todo find how to build a typed array
-                                            Object[] params = new Object[1];
+                                            final Object[] params = new Object[1];
                                             params[0] = param;
                                             field.set(result, params);
                                         
                                         } else if (field.getType().equals(Unit.class)) {
 
-                                            Unit<?> unit = Unit.valueOf((String)param);
+                                            final Unit<?> unit = Unit.valueOf((String)param);
                                             field.set(result, unit);
                                         } else {
                                             field.set(result, param);

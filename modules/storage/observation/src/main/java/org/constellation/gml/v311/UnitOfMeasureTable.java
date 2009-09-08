@@ -74,9 +74,9 @@ public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry> {
         transactionBegin();
         try {
             if (uom.getId() != null) {
-                PreparedStatement statement = getStatement(QueryType.EXISTS);
+                final PreparedStatement statement = getStatement(QueryType.EXISTS);
                 statement.setString(indexOf(query.id), uom.getId());
-                ResultSet result = statement.executeQuery();
+                final ResultSet result = statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     return uom.getId();
@@ -87,7 +87,7 @@ public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry> {
                 id = searchFreeIdentifier("uom");
             }
         
-            PreparedStatement statement = getStatement(QueryType.INSERT);
+            final PreparedStatement statement = getStatement(QueryType.INSERT);
         
             statement.setString(indexOf(query.id),           id);
             statement.setString(indexOf(query.name),         uom.getName());

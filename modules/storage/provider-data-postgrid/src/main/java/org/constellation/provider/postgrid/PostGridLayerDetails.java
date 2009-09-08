@@ -165,7 +165,7 @@ class PostGridLayerDetails implements LayerDetails {
         if(style == null && favorites.size() > 0){
             //no style provided, try to get the favorite one
             //there are some favorites styles
-            String namedStyle = favorites.get(0);
+            final String namedStyle = favorites.get(0);
             style = StyleProviderProxy.getInstance().get(namedStyle);
         }
 
@@ -190,22 +190,22 @@ class PostGridLayerDetails implements LayerDetails {
 
         if(dimRange != null){
             //a dim range is define, it replace any given style.
-            DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
+            final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
             mapLayer.setStyle(STYLE_FACTORY.style(symbol));
         }else{
             mapLayer.setStyle(style);
 
             //search if we need an elevationmodel for style
             search_loop:
-            for(FeatureTypeStyle fts : mapLayer.getStyle().featureTypeStyles()){
-                for(Rule rule : fts.rules()){
-                    for(Symbolizer symbol : rule.symbolizers()){
-                        if(symbol instanceof RasterSymbolizer){
-                            RasterSymbolizer rs = (RasterSymbolizer) symbol;
-                            ShadedRelief sr = rs.getShadedRelief();
-                            if(sr.getReliefFactor().evaluate(null, Float.class) != 0){
-                                ElevationModel model = LayerProviderProxy.getInstance().getElevationModel(elevationModel);
-                                if(model != null){
+            for (FeatureTypeStyle fts : mapLayer.getStyle().featureTypeStyles()){
+                for (Rule rule : fts.rules()){
+                    for (Symbolizer symbol : rule.symbolizers()){
+                        if (symbol instanceof RasterSymbolizer){
+                            final RasterSymbolizer rs = (RasterSymbolizer) symbol;
+                            final ShadedRelief sr     = rs.getShadedRelief();
+                            if (sr.getReliefFactor().evaluate(null, Float.class) != 0){
+                                final ElevationModel model = LayerProviderProxy.getInstance().getElevationModel(elevationModel);
+                                if (model != null){
                                     mapLayer.setElevationModel(model);
                                 }
                                 break search_loop;

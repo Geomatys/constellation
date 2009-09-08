@@ -183,9 +183,9 @@ public class WritableGridCoverageEntry {
              * the path & extension, so we can check if the series have the expected extension.
              */
             final File allFiles = candidate.file("*");
-            String name = allFiles.getName();
-            final int split = name.lastIndexOf('.');
-            final String ext = (split >= 0) ? name.substring(split + 1) : "";
+            final String name   = allFiles.getName();
+            final int split     = name.lastIndexOf('.');
+            final String ext    = (split >= 0) ? name.substring(split + 1) : "";
             if (!extension.equalsIgnoreCase(ext)) {
                 continue;
             }

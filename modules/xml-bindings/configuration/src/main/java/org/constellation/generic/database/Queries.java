@@ -89,7 +89,7 @@ public class Queries {
 
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[Queries]");
+        final StringBuilder s = new StringBuilder("[Queries]");
         s.append("main: ").append(main).append('\n');
         if (parameters != null) {
             s.append("Parameters:\n");

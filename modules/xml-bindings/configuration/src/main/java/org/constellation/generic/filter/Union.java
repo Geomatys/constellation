@@ -73,7 +73,7 @@ public class Union {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("[UNION]:").append('\n');
+        final StringBuilder sb = new StringBuilder("[UNION]:").append('\n');
         if (subquery != null) {
             sb.append("subQuery: ").append(subquery).append('\n');
         }

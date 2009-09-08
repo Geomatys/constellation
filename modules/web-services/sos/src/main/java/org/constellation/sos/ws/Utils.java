@@ -195,17 +195,17 @@ public final class Utils {
     }
 
     public static String unLuceneTimeValue(String luceneTimeValue) {
-        String year     = luceneTimeValue.substring(0, 4);
+        final String year     = luceneTimeValue.substring(0, 4);
         luceneTimeValue = luceneTimeValue.substring(4);
-        String month    = luceneTimeValue.substring(0, 2);
+        final String month    = luceneTimeValue.substring(0, 2);
         luceneTimeValue = luceneTimeValue.substring(2);
-        String day      = luceneTimeValue.substring(0, 2);
+        final String day      = luceneTimeValue.substring(0, 2);
         luceneTimeValue = luceneTimeValue.substring(2);
-        String hour     = luceneTimeValue.substring(0, 2);
+        final String hour     = luceneTimeValue.substring(0, 2);
         luceneTimeValue = luceneTimeValue.substring(2);
-        String min      = luceneTimeValue.substring(0, 2);
+        final String min      = luceneTimeValue.substring(0, 2);
         luceneTimeValue = luceneTimeValue.substring(2);
-        String sec      = luceneTimeValue.substring(0, 2);
+        final String sec      = luceneTimeValue.substring(0, 2);
         luceneTimeValue = luceneTimeValue.substring(2);
 
         return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec;
@@ -213,14 +213,14 @@ public final class Utils {
 
     public static String getPeriodDescription(long time) {
         long temp = time / 1000;
-        long ms   = time - (temp * 1000);
+        final long ms   = time - (temp * 1000);
         time      = time - ms;
 
         // we pass in second
         time      = time / 1000;
 
         temp      = time / 60;
-        long sec  = time - (temp * 60);
+        final long sec  = time - (temp * 60);
         time      = time - sec;
 
         if (time == 0) return sec + "s " + ms + "ms";
@@ -229,10 +229,9 @@ public final class Utils {
         time      = time / 60;
 
         temp      = time / 60;
-        long min  = time - (temp * 60);
+        final long min  = time - (temp * 60);
         time      = time - min;
 
-        System.out.println("time=" + time);
         return min + "min " + sec + "s " + ms + "ms";
     }
 
