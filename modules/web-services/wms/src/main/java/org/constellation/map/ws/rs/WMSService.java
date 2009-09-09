@@ -174,7 +174,7 @@ public class WMSService extends OGCWebService {
                 }
                 return Response.ok(result, infoFormat).build();
             }
-            if (GETCAPABILITIES.equalsIgnoreCase(request) || CAPABILITIES.equalsIgnoreCase(request)) {
+            if (GETCAPABILITIES.equalsIgnoreCase(request)) {
                 String versionSt = getParameter(KEY_VERSION, false);
                 if (versionSt == null) {
                     // For backward compatibility with WMS 1.0.0, we try to find the version number
@@ -191,9 +191,25 @@ public class WMSService extends OGCWebService {
                 //we marshall the response and return the XML String
                 final StringWriter sw = new StringWriter();
                 marshaller.setProperty("com.sun.xml.bind.xmlHeaders",
-                           (requestCapab.getVersion().toString().equals(ServiceDef.WMS_1_1_1.version.toString())) ?
+                           (requestCapab.getVersion().toString().equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
                            "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n" :
                            "");
+                marshaller.marshal(capabilities, sw);
+                return Response.ok(sw.toString(), requestCapab.getFormat()).build();
+            }
+            // For backward compatibility between WMS 1.1.1 and WMS 1.0.0, we handle the "Capabilities" request
+            // as "GetCapabilities" request in version 1.1.1.
+            if (CAPABILITIES.equalsIgnoreCase(request)) {
+                version = ServiceDef.WMS_1_1_1_SLD;
+                final GetCapabilities requestCapab = adaptGetCapabilities(version.version.toString());
+                worker.initServletContext(servletContext);
+                worker.initUriContext(uriContext);
+                final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
+                //workaround because 1.1.1 is defined with a DTD rather than an XSD
+                //we marshall the response and return the XML String
+                final StringWriter sw = new StringWriter();
+                marshaller.setProperty("com.sun.xml.bind.xmlHeaders",
+                           "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n");
                 marshaller.marshal(capabilities, sw);
                 return Response.ok(sw.toString(), requestCapab.getFormat()).build();
             }
@@ -257,7 +273,7 @@ public class WMSService extends OGCWebService {
         }
         StringWriter sw = new StringWriter();
         marshaller.marshal(report, sw);
-        final String mimeException = (serviceDef.version.equals(ServiceDef.WMS_1_1_1.version)) ?
+        final String mimeException = (serviceDef.version.equals(ServiceDef.WMS_1_1_1_SLD.version)) ?
                                                                 MimeType.APP_SE_XML : MimeType.TEXT_XML;
         return Response.ok(Util.cleanSpecialCharacter(sw.toString()), mimeException).build();
     }
@@ -319,8 +335,8 @@ public class WMSService extends OGCWebService {
             serviceDef = getBestVersion(null);
         }
         isVersionSupported(version);
-        final String strX    = getParameter(version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_I_V111 : KEY_I_V130, true);
-        final String strY    = getParameter(version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_J_V111 : KEY_J_V130, true);
+        final String strX    = getParameter(version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_I_V111 : KEY_I_V130, true);
+        final String strY    = getParameter(version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_J_V111 : KEY_J_V130, true);
         final String strQueryLayers = getParameter(KEY_QUERY_LAYERS, true);
         final String infoFormat  = getParameter(KEY_INFO_FORMAT, true);
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
@@ -331,13 +347,13 @@ public class WMSService extends OGCWebService {
             x = StringUtilities.toInt(strX);
         } catch (NumberFormatException ex) {
             throw new CstlServiceException("Integer value waited. " + ex.getMessage(), ex, INVALID_POINT,
-                    version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_I_V111 : KEY_I_V130);
+                    version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_I_V111 : KEY_I_V130);
         }
         try {
             y = StringUtilities.toInt(strY);
         } catch (NumberFormatException ex) {
             throw new CstlServiceException("Integer value waited. " + ex.getMessage(), ex, INVALID_POINT,
-                    version.equals(ServiceDef.WMS_1_1_1.version.toString()) ? KEY_J_V111 : KEY_J_V130);
+                    version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_J_V111 : KEY_J_V130);
         }
         final Integer featureCount;
         if (strFeatureCount == null || strFeatureCount.equals("")) {
@@ -400,7 +416,7 @@ public class WMSService extends OGCWebService {
             exceptionImageFormat     = strFormat;
         }
 
-        String strCRS                = getParameter((version.equals(ServiceDef.WMS_1_1_1.version.toString())) ?
+        String strCRS                = getParameter((version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
                                             KEY_CRS_V111 : KEY_CRS_V130, true);
         final String strBBox         = getParameter(KEY_BBOX,            true);
         final String strLayers       = getParameter(KEY_LAYERS,          true);
@@ -416,11 +432,11 @@ public class WMSService extends OGCWebService {
         final String urlSLD          = getParameter(KEY_SLD,            false);
         final String strAzimuth      = getParameter(KEY_AZIMUTH,        false);
         final String strStyles       = getParameter(KEY_STYLES, ((urlSLD != null)
-                && (version.equals(ServiceDef.WMS_1_1_1.version.toString()))) ? false : fromGetMap);
+                && (version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()))) ? false : fromGetMap);
 
         final CoordinateReferenceSystem crs;
         try {
-            if(version.equals(ServiceDef.WMS_1_1_1.version.toString()) && strCRS.toLowerCase().equals("epsg:4326")){
+            if(version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) && strCRS.toLowerCase().equals("epsg:4326")){
                 //if we are in 1.1.1 that mean EPSG:4326 define a false EPSG:4326
                 //we must replace it by CRS:84 which is the correct match
                 strCRS = "CRS:84";
