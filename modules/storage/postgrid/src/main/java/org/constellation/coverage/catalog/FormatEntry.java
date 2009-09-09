@@ -31,10 +31,12 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URI;
+import java.util.Set;
 import java.util.Map;
 import java.util.List;
 import java.util.Locale;
 import java.util.Arrays;
+import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.IdentityHashMap;
 import java.util.logging.LogRecord;
@@ -46,6 +48,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.IIOException;
 import javax.imageio.ImageReadParam;
 import javax.imageio.ImageTypeSpecifier;
+import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
 import javax.imageio.stream.ImageInputStream;
 import javax.media.jai.JAI;
@@ -173,11 +176,11 @@ final class FormatEntry extends Entry implements Format {
      */
     @Override
     public MeasurementRange<Double>[] getSampleValueRanges() {
-        final GridSampleDimension[] bandss = getSampleDimensions();
-        @SuppressWarnings("unchecked")  // Generic array creation.
-        final MeasurementRange<Double>[] ranges = new MeasurementRange[bandss.length];
+        final GridSampleDimension[] bands = getSampleDimensions();
+        @SuppressWarnings({"unchecked","rawtypes"})  // Generic array creation.
+        final MeasurementRange<Double>[] ranges = new MeasurementRange[bands.length];
         for (int i=0; i<ranges.length; i++) {
-            final GridSampleDimension band = bandss[i].geophysics(true);
+            final GridSampleDimension band = bands[i].geophysics(true);
             ranges[i] = MeasurementRange.create(band.getMinimumValue(), band.getMaximumValue(), band.getUnits());
         }
         return ranges;
@@ -259,15 +262,38 @@ final class FormatEntry extends Entry implements Format {
     private ImageReader getImageReader() throws IIOException {
         assert Thread.holdsLock(this);
         if (reader == null) {
+            final boolean isMIME = formatName.indexOf('/') >= 0;
             final Iterator<ImageReader> readers;
-            if (formatName.indexOf('/') >= 0) {
+            if (isMIME) {
                 readers = ImageIO.getImageReadersByMIMEType(formatName);
             } else {
                 readers = ImageIO.getImageReadersByFormatName(formatName);
             }
             if (!readers.hasNext()) {
-                throw new IIOException(Resources.format(
+                /*
+                 * No decoder found. Gets the list of decodeur. This list will be
+                 * inserted in the error message as an attempt to help debugging.
+                 * We will take only the first format name of each SPI since the
+                 * other are only synonymous and we want to keep the message short.
+                 */
+                final Set<String> formats = new TreeSet<String>();
+                final Iterator<ImageReaderSpi> spi = IIORegistry.getDefaultInstance()
+                        .getServiceProviders(ImageReaderSpi.class, false);
+                while (spi.hasNext()) {
+                    final ImageReaderSpi p = spi.next();
+                    final String[] f = isMIME ? p.getMIMETypes() : p.getFormatNames();
+                    if (f != null && f.length != 0 && f[0].length() != 0) {
+                        formats.add(f[0]);
+                    }
+                }
+                final StringBuilder buffer = new StringBuilder(Resources.format(
                         ResourceKeys.ERROR_NO_IMAGE_DECODER_$1, formatName));
+                String separator = " Available decoders are: "; // TODO: localize
+                for (final String f : formats) {
+                    buffer.append(separator).append(f);
+                    separator = ", ";
+                }
+                throw new IIOException(buffer.toString());
             }
             reader = readers.next();
             if (false && readers.hasNext()) { // Check disabled for now.
