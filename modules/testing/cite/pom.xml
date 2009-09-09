@@ -139,8 +139,7 @@
     <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
-      <scope>${javadb.scope}</scope>
-     </dependency>
+    </dependency>
     <!-- For testing static methods -->
     <dependency>
       <groupId>org.constellation.engine</groupId>

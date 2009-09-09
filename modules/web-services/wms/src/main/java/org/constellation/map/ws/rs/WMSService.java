@@ -315,8 +315,14 @@ public class WMSService extends OGCWebService {
                     INVALID_PARAMETER_VALUE, "service");
         }
         String format = getParameter(KEY_FORMAT, false);
-        if (format == null || format.isEmpty()) {
-            format = MimeType.APP_WMS_XML;
+        // Verify that the format is not null, and is not something totally different from the known
+        // output formats. If it is the case, choose the default output format according to the version.
+        if (format == null || format.isEmpty() ||
+                (!format.equalsIgnoreCase(MimeType.APP_XML) && !format.equalsIgnoreCase(MimeType.APPLICATION_XML)
+              && !format.equalsIgnoreCase(MimeType.TEXT_XML) && !format.equalsIgnoreCase(MimeType.APP_WMS_XML)))
+        {
+            format = (ServiceDef.WMS_1_1_1_SLD.version.toString().equals(version)) ?
+                     MimeType.APP_WMS_XML : MimeType.TEXT_XML;
         }
         return new GetCapabilities(bestVersion.version, format);
     }

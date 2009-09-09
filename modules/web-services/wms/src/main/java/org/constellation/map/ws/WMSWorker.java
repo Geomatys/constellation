@@ -920,7 +920,7 @@ public class WMSWorker extends AbstractWMSWorker {
     }
 
     private List<MutableStyle> getStyles(final List<LayerDetails> layerRefs, final MutableStyledLayerDescriptor sld,
-                                         final List<String> styleNames)
+                                         final List<String> styleNames) throws CstlServiceException
     {
         final List<MutableStyle> styles = new ArrayList<MutableStyle>();
         for (int i=0; i<layerRefs.size(); i++) {
@@ -934,6 +934,9 @@ public class WMSWorker extends AbstractWMSWorker {
                 //a style has been given for this layer, try to use it
                 final String namedStyle = styleNames.get(i);
                 style = StyleProviderProxy.getInstance().get(namedStyle);
+                if (style == null) {
+                    throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
+                }
             } else {
                 //no defined styles, use the favorite one, let the layer get it himself.
                 style = null;

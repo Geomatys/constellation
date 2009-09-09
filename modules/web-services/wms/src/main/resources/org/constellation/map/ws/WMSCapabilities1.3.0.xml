@@ -61,9 +61,7 @@
       <Format>image/gif</Format>
       <Format>image/png</Format>
       <Format>image/jpeg</Format>
-      <Format>JPEG-LOSSLESS</Format>
       <Format>image/bmp</Format>
-      <Format>text/x-matrix</Format>
       <Format>image/x-portable-pixmap</Format>
       <DCPType>
         <HTTP>
