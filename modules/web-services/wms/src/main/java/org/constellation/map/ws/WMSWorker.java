@@ -667,10 +667,18 @@ public class WMSWorker extends AbstractWMSWorker {
         // 4. SHAPE
         //     a
         final int pixelTolerance = 3;
+        final int x = getFI.getX();
+        final int y = getFI.getY();
+        if (x < 0 || x > canvasDimension.width) {
+            throw new CstlServiceException("The requested point has an invalid X coordinate.", INVALID_POINT);
+        }
+        if (y < 0 || y > canvasDimension.height) {
+            throw new CstlServiceException("The requested point has an invalid Y coordinate.", INVALID_POINT);
+        }
         final Rectangle selectionArea = new Rectangle( getFI.getX()-pixelTolerance,
-        		                                      getFI.getY()-pixelTolerance,
-        		                                      pixelTolerance*2,
-        		                                      pixelTolerance*2);
+        		                               getFI.getY()-pixelTolerance,
+        		                               pixelTolerance*2,
+        		                               pixelTolerance*2);
 
         // 5. VISITOR
         String infoFormat = getFI.getInfoFormat();
@@ -695,7 +703,7 @@ public class WMSWorker extends AbstractWMSWorker {
             throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
                     "You have to choose between: "+ MimeType.TEXT_PLAIN +", "+ MimeType.TEXT_HTML +", "+ MimeType.APP_GML +", "+ GML +
                     ", "+ MimeType.APP_XML +", "+ XML+", "+ MimeType.TEXT_XML,
-                    INVALID_PARAMETER_VALUE, "info_format");
+                    INVALID_FORMAT, "info_format");
         }
 
         // We now build the response, according to the format chosen.
@@ -767,7 +775,7 @@ public class WMSWorker extends AbstractWMSWorker {
         for (LayerDetails layer : layerRefs) {
             if (!layer.isQueryable(ServiceType.WMS)) {
                 throw new CstlServiceException("You are not allowed to request the layer \""+
-                        layer.getName() +"\".", INVALID_PARAMETER_VALUE);
+                        layer.getName() +"\".", LAYER_NOT_QUERYABLE);
             }
         }
         //       -- build an equivalent style List
@@ -834,7 +842,7 @@ public class WMSWorker extends AbstractWMSWorker {
 	        if (  version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ) {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD );
 	        } else if ( version.equals("1.3.0") ) {
-	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_3_0 );
+	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_3_0_SLD );
 	        } else {
 	        	throw new CstlServiceException("WMS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);
@@ -856,13 +864,13 @@ public class WMSWorker extends AbstractWMSWorker {
 	        if (  version.equals("1.1.1") ) {
 	        	layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_1_1_SLD, layerNames );
 	        } else if ( version.equals("1.3.0") ) {
-	        	layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_3_0, layerNames );
+	        	layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_3_0_SLD, layerNames );
 	        } else {
 	        	throw new CstlServiceException("WMS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);
 	        }
         } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
+        	throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
         }
         return layerRefs;
     }
@@ -878,7 +886,7 @@ public class WMSWorker extends AbstractWMSWorker {
 	        if (  version.equals("1.1.1") ) {
 	        	layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_1_1_SLD, layerName );
 	        } else if ( version.equals("1.3.0") ) {
-	        	layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_3_0, layerName );
+	        	layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_3_0_SLD, layerName );
 	        } else {
 	        	throw new CstlServiceException("WMS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);
