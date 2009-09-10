@@ -52,6 +52,7 @@ import org.constellation.ServiceDef;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.portrayal.Portrayal;
+import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.register.RegisterException;
 import org.constellation.util.StringUtilities;
@@ -126,6 +127,7 @@ import static org.constellation.query.wcs.WCSQuery.MATRIX;
 import static org.constellation.query.wcs.WCSQuery.NETCDF;
 import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
 import static org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED;
+import static org.constellation.ws.ExceptionCode.LAYER_NOT_QUERYABLE;
 import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
 import static org.constellation.ws.ExceptionCode.NO_APPLICABLE_CODE;
 import static org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED;
@@ -246,20 +248,30 @@ public final class WCSWorker {
 
         //TODO: we should loop over the list
         final LayerDetails layerRef = getLayerReference(request.getCoverage().get(0), ServiceDef.WCS_1_0_0.version.toString());
-        if (!layerRef.isQueryable(ServiceType.WCS)) {
+        if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
+            throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
+                                           LAYER_NOT_DEFINED);
+        }
+        final List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
+        if (!(layerRef instanceof CoverageLayerDetails)) {
+            // Should not occurs, since we have previously verified the type of layer.
+            throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
+                                           LAYER_NOT_DEFINED);
+        }
+        final CoverageLayerDetails coverageRef = (CoverageLayerDetails)layerRef;
+        if (!coverageRef.isQueryable(ServiceType.WCS)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +
-                    layerRef.getName() + "\".", INVALID_PARAMETER_VALUE);
+                    coverageRef.getName() + "\".", LAYER_NOT_QUERYABLE);
         }
 
-        final List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
-        final Set<Series> series = layerRef.getSeries();
+        final Set<Series> series = coverageRef.getSeries();
         if (series == null || series.isEmpty()) {
-            throw new CstlServiceException("The coverage " + layerRef.getName() + " is not defined.",
+            throw new CstlServiceException("The coverage " + coverageRef.getName() + " is not defined.",
                     LAYER_NOT_DEFINED);
         }
         final GeographicBoundingBox inputGeoBox;
         try {
-            inputGeoBox = layerRef.getGeographicBoundingBox();
+            inputGeoBox = coverageRef.getGeographicBoundingBox();
         } catch (CatalogException ex) {
             throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
@@ -268,7 +280,7 @@ public final class WCSWorker {
         if (inputGeoBox != null) {
             final SortedSet<Number> elevations;
             try {
-                elevations = layerRef.getAvailableElevations();
+                elevations = coverageRef.getAvailableElevations();
             } catch (CatalogException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
@@ -290,8 +302,8 @@ public final class WCSWorker {
             throw new CstlServiceException("The geographic bbox for the layer is null !",
                                            NO_APPLICABLE_CODE);
         }
-        final Keywords keywords = new Keywords("WCS", layerRef.getName(),
-                Util.cleanSpecialCharacter(layerRef.getThematic()));
+        final Keywords keywords = new Keywords("WCS", coverageRef.getName(),
+                Util.cleanSpecialCharacter(coverageRef.getThematic()));
 
         //Spatial metadata
         final org.geotoolkit.wcs.xml.v100.SpatialDomainType spatialDomain =
@@ -303,7 +315,7 @@ public final class WCSWorker {
         final List<Object> times = new ArrayList<Object>();
         final SortedSet<Date> dates;
         try {
-            dates = layerRef.getAvailableTimes();
+            dates = coverageRef.getAvailableTimes();
         } catch (CatalogException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
@@ -314,8 +326,8 @@ public final class WCSWorker {
                 new org.geotoolkit.wcs.xml.v100.TimeSequenceType(times);
         final DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
         //TODO complete
-        final RangeSetType rangeSetT = new RangeSetType(null, layerRef.getName(),
-                layerRef.getName(), null, null, null,null);
+        final RangeSetType rangeSetT = new RangeSetType(null, coverageRef.getName(),
+                coverageRef.getName(), null, null, null,null);
         final RangeSet rangeSet = new RangeSet(rangeSetT);
         //supported CRS
         final SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
@@ -328,7 +340,7 @@ public final class WCSWorker {
         formats.add(new CodeListType("gif"));
         formats.add(new CodeListType("bmp"));
         String nativeFormat = "unknow";
-        final Iterator<Series> it = layerRef.getSeries().iterator();
+        final Iterator<Series> it = coverageRef.getSeries().iterator();
         if (it.hasNext()) {
             final Series s = it.next();
             nativeFormat = s.getFormat().getImageFormat();
@@ -346,8 +358,8 @@ public final class WCSWorker {
                 org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
 
         //we build the coverage offering for this layer/coverage
-        final CoverageOfferingType coverage = new CoverageOfferingType(null, layerRef.getName(),
-                layerRef.getName(), Util.cleanSpecialCharacter(layerRef.getRemarks()), llenvelope,
+        final CoverageOfferingType coverage = new CoverageOfferingType(null, coverageRef.getName(),
+                coverageRef.getName(), Util.cleanSpecialCharacter(coverageRef.getRemarks()), llenvelope,
                 keywords, domainSet, rangeSet, supCRS, supForm, supInt);
         coverages.add(coverage);
         return new CoverageDescription(coverages, ServiceDef.WCS_1_0_0.version.toString());
@@ -373,22 +385,36 @@ public final class WCSWorker {
         }
 
         //TODO: we should loop over the list
-        final LayerDetails layer = getLayerReference(request.getIdentifier().get(0), ServiceDef.WCS_1_1_1.version.toString());
-
-        if (!layer.isQueryable(ServiceType.WCS)) {
+        final LayerDetails layerRef = getLayerReference(request.getIdentifier().get(0), ServiceDef.WCS_1_1_1.version.toString());
+        if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
+            throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
+                                           LAYER_NOT_DEFINED);
+        }
+        final List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
+        if (!(layerRef instanceof CoverageLayerDetails)) {
+            // Should not occurs, since we have previously verified the type of layer.
+            throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
+                                           LAYER_NOT_DEFINED);
+        }
+        final CoverageLayerDetails coverageRef = (CoverageLayerDetails)layerRef;
+        if (!coverageRef.isQueryable(ServiceType.WCS)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +
-                    layer.getName() + "\".", INVALID_PARAMETER_VALUE);
+                    coverageRef.getName() + "\".", LAYER_NOT_QUERYABLE);
+        }
+
+        if (!coverageRef.isQueryable(ServiceType.WCS)) {
+            throw new CstlServiceException("You are not allowed to request the layer \"" +
+                    coverageRef.getName() + "\".", INVALID_PARAMETER_VALUE);
         }
         final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory =
                 new org.geotoolkit.ows.xml.v110.ObjectFactory();
-        final List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
-        if (layer.getSeries().size() == 0) {
-            throw new CstlServiceException("the coverage " + layer.getName() +
+        if (coverageRef.getSeries().size() == 0) {
+            throw new CstlServiceException("the coverage " + coverageRef.getName() +
                     " is not defined", LAYER_NOT_DEFINED);
         }
         final GeographicBoundingBox inputGeoBox;
         try {
-            inputGeoBox = layer.getGeographicBoundingBox();
+            inputGeoBox = coverageRef.getGeographicBoundingBox();
         } catch (CatalogException ex) {
             throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
@@ -414,12 +440,12 @@ public final class WCSWorker {
 
         //general metadata
         final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
-        title.add(new LanguageStringType(layer.getName()));
+        title.add(new LanguageStringType(coverageRef.getName()));
         final List<LanguageStringType> abstractt = new ArrayList<LanguageStringType>();
-        abstractt.add(new LanguageStringType(Util.cleanSpecialCharacter(layer.getRemarks())));
+        abstractt.add(new LanguageStringType(Util.cleanSpecialCharacter(coverageRef.getRemarks())));
         final List<KeywordsType> keywords = new ArrayList<KeywordsType>();
         keywords.add(new KeywordsType(new LanguageStringType("WCS"),
-                new LanguageStringType(layer.getName())));
+                new LanguageStringType(coverageRef.getName())));
 
         // spatial metadata
         final org.geotoolkit.wcs.xml.v111.SpatialDomainType spatial =
@@ -431,7 +457,7 @@ public final class WCSWorker {
         final List<Object> times = new ArrayList<Object>();
         final SortedSet<Date> dates;
         try {
-            dates = layer.getAvailableTimes();
+            dates = coverageRef.getAvailableTimes();
         } catch (CatalogException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
@@ -453,7 +479,7 @@ public final class WCSWorker {
                 org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
         final InterpolationMethods interpolations = new InterpolationMethods(
                 intList, org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
-        final RangeType range = new RangeType(new FieldType(Util.cleanSpecialCharacter(layer.getThematic()),
+        final RangeType range = new RangeType(new FieldType(Util.cleanSpecialCharacter(coverageRef.getThematic()),
                 null, new org.geotoolkit.ows.xml.v110.CodeType("0.0"), interpolations));
 
         //supported CRS
@@ -469,7 +495,7 @@ public final class WCSWorker {
         supportedFormat.add(MimeType.IMAGE_GIF);
 
         final CoverageDescriptionType coverage = new CoverageDescriptionType(title, abstractt,
-                keywords, layer.getName(), domain, range, supportedCRS, supportedFormat);
+                keywords, coverageRef.getName(), domain, range, supportedCRS, supportedFormat);
         coverages.add(coverage);
         return new CoverageDescriptions(coverages);
     }
@@ -596,6 +622,9 @@ public final class WCSWorker {
         final List<LayerDetails> layerRefs = getAllLayerReferences(ServiceDef.WCS_1_0_0.version.toString());
         try {
             for (LayerDetails layer : layerRefs) {
+                if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
+                    continue;
+                }
                 if (!layer.isQueryable(ServiceType.WCS)) {
                     continue;
                 }
@@ -724,17 +753,21 @@ public final class WCSWorker {
         final List<LayerDetails> layerRefs = getAllLayerReferences(ServiceDef.WCS_1_1_1.version.toString());
         try {
             for (LayerDetails layer : layerRefs) {
-                if (!layer.isQueryable(ServiceType.WCS)) {
-                   continue;
+                if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
+                    continue;
                 }
+                if (!layer.isQueryable(ServiceType.WCS)) {
+                    continue;
+                }
+                final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
                 final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
-                title.add(new LanguageStringType(layer.getName()));
+                title.add(new LanguageStringType(coverageLayer.getName()));
                 final List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
-                remark.add(new LanguageStringType(Util.cleanSpecialCharacter(layer.getRemarks())));
+                remark.add(new LanguageStringType(Util.cleanSpecialCharacter(coverageLayer.getRemarks())));
 
                 final CoverageSummaryType cs = new CoverageSummaryType(title, remark);
 
-                final GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
+                final GeographicBoundingBox inputGeoBox = coverageLayer.getGeographicBoundingBox();
 
                 if (inputGeoBox != null) {
                     //final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
@@ -745,7 +778,7 @@ public final class WCSWorker {
                             inputGeoBox.getNorthBoundLatitude());
                     cs.addRest(owsFactory.createWGS84BoundingBox(outputBBox));
                 }
-                cs.addRest(wcs111Factory.createIdentifier(layer.getName()));
+                cs.addRest(wcs111Factory.createIdentifier(coverageLayer.getName()));
                 summary.add(cs);
             }
 
@@ -799,6 +832,12 @@ public final class WCSWorker {
                     " date is compliant with the ISO-8601 standard.", ex);
         }
 
+        final LayerDetails layerRef = getLayerReference(abstractRequest.getCoverage(), inputVersion);
+        if (!layerRef.isQueryable(ServiceType.WCS) || layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
+            throw new CstlServiceException("You are not allowed to request the layer \"" +
+                    layerRef.getName() + "\".", INVALID_PARAMETER_VALUE);
+        }
+
         /*
          * Generating the response.
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
@@ -806,11 +845,6 @@ public final class WCSWorker {
         if ( abstractRequest.getFormat().equalsIgnoreCase(MATRIX) ) {
 
             //NOTE ADRIAN HACKED HERE
-            final LayerDetails layerRef = getLayerReference(abstractRequest.getCoverage(), inputVersion);
-            if (!layerRef.isQueryable(ServiceType.WCS)) {
-                throw new CstlServiceException("You are not allowed to request the layer \"" +
-                        layerRef.getName() + "\".", INVALID_PARAMETER_VALUE);
-            }
             final Envelope envelope;
             try {
                 envelope = abstractRequest.getEnvelope();
@@ -852,11 +886,6 @@ public final class WCSWorker {
             //NOTE: ADRIAN HACKED HERE
 
             // SCENE
-            final LayerDetails layerRef = getLayerReference(abstractRequest.getCoverage(), inputVersion);
-            if (!layerRef.isQueryable(ServiceType.WCS)) {
-                throw new CstlServiceException("You are not allowed to request the layer \"" +
-                        layerRef.getName() + "\".", INVALID_PARAMETER_VALUE);
-            }
             final Map<String, Object> renderParameters = new HashMap<String, Object>();
             final Envelope envelope;
             try {

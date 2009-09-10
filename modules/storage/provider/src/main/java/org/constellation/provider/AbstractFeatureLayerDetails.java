@@ -26,14 +26,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.constellation.catalog.CatalogException;
-import org.constellation.coverage.catalog.Series;
 import org.constellation.ws.ServiceType;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -298,24 +296,6 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public String getRemarks() {
-        //TODO we should get this from metadata associated to the layer.
-        return "Vector datas";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getThematic() {
-        //TODO we should get this from metadata associated to the layer.
-        return "Vector datas";
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public BufferedImage getLegendGraphic(final Dimension dimension) {
         final MutableStyle style = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
         return DefaultGlyphService.create(style, dimension);
@@ -341,16 +321,6 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
         return TYPE.FEATURE;
     }
 
-    /**
-     * Should not have been called in this implementation.
-     *
-     * @todo the super class should probably not define this method as abstract.
-     */
-    @Override
-    public Set<Series> getSeries() {
-        throw new UnsupportedOperationException();
-    }
-    
     protected Query createQuery(final Date date, final Number elevation){
         final DefaultQuery query = new DefaultQuery();
         final StringBuilder builder = new StringBuilder();

@@ -37,7 +37,7 @@ import org.constellation.coverage.catalog.Series;
 import org.constellation.ws.ServiceType;
 import org.constellation.map.PostGridMapLayer;
 import org.constellation.map.PostGridReader;
-import org.constellation.provider.LayerDetails;
+import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 
@@ -70,7 +70,7 @@ import org.opengis.style.Symbolizer;
  * @version $Id$
  * @author Cédric Briançon
  */
-class PostGridLayerDetails implements LayerDetails {
+class PostGridLayerDetails implements CoverageLayerDetails {
     private final PostGridReader reader;
 
     /**

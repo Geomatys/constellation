@@ -22,12 +22,10 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
-import org.constellation.coverage.catalog.Series;
 import org.constellation.ws.ServiceType;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -128,24 +126,9 @@ public interface LayerDetails {
     String getName();
 
     /**
-     * @see Layer#getSeries
-     */
-    Set<Series> getSeries();
-
-    /**
-     * @see Layer#getRemarks
-     */
-    String getRemarks();
-
-    /**
      * @see Layer#getSampleValueRanges
      */
     MeasurementRange<?>[] getSampleValueRanges();
-
-    /**
-     * @see Layer#getThematic
-     */
-    String getThematic();
 
     /**
      * Returns {@code true} if the layer is queryable by the specified service.

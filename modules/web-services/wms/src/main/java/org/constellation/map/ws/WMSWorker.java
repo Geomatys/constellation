@@ -54,6 +54,7 @@ import org.constellation.map.visitor.GMLGraphicVisitor;
 import org.constellation.map.visitor.HTMLGraphicVisitor;
 import org.constellation.map.visitor.TextGraphicVisitor;
 import org.constellation.portrayal.Portrayal;
+import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ConfigDirectory;
@@ -399,15 +400,23 @@ public class WMSWorker extends AbstractWMSWorker {
                     styles.add(style);
                 }
 
-                //we build the complete layer object
-                outputLayer = new org.geotoolkit.wms.xml.v111.Layer(layerName,
-                        Util.cleanSpecialCharacter(layer.getRemarks()),
-                        Util.cleanSpecialCharacter(layer.getThematic()), crs,
-                        new LatLonBoundingBox(inputGeoBox.getWestBoundLongitude(),
-                                              inputGeoBox.getSouthBoundLatitude(),
-                                              inputGeoBox.getEastBoundLongitude(),
-                                              inputGeoBox.getNorthBoundLatitude()),
-                        outputBBox, queryable, dimensions, styles);
+                final LatLonBoundingBox bbox = new LatLonBoundingBox(
+                        inputGeoBox.getWestBoundLongitude(),
+                        inputGeoBox.getSouthBoundLatitude(),
+                        inputGeoBox.getEastBoundLongitude(),
+                        inputGeoBox.getNorthBoundLatitude());
+                if (layer instanceof CoverageLayerDetails) {
+                    final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
+                    outputLayer = new org.geotoolkit.wms.xml.v111.Layer(layerName,
+                            Util.cleanSpecialCharacter(coverageLayer.getRemarks()),
+                            Util.cleanSpecialCharacter(coverageLayer.getThematic()), crs,
+                            bbox, outputBBox, queryable, dimensions, styles);
+                } else {
+                    outputLayer = new org.geotoolkit.wms.xml.v111.Layer(layerName,
+                            Util.cleanSpecialCharacter("Vector data"),
+                            Util.cleanSpecialCharacter("Vector data"), crs, bbox,
+                            outputBBox, queryable, dimensions, styles);
+                }
             } else {
                 /*
                  * TODO
@@ -445,15 +454,23 @@ public class WMSWorker extends AbstractWMSWorker {
                         "Style1", "default Style", null, null, null, legendURL1, legendURL2);
                     styles.add(style);
                 }
-
-                outputLayer = new org.geotoolkit.wms.xml.v130.Layer(layerName,
-                        Util.cleanSpecialCharacter(layer.getRemarks()),
-                        Util.cleanSpecialCharacter(layer.getThematic()), crs,
-                        new EXGeographicBoundingBox(inputGeoBox.getWestBoundLongitude(),
-                                                    inputGeoBox.getSouthBoundLatitude(),
-                                                    inputGeoBox.getEastBoundLongitude(),
-                                                    inputGeoBox.getNorthBoundLatitude()),
-                        outputBBox, queryable, dimensions, styles);
+                final EXGeographicBoundingBox bbox = new EXGeographicBoundingBox(
+                        inputGeoBox.getWestBoundLongitude(),
+                        inputGeoBox.getSouthBoundLatitude(),
+                        inputGeoBox.getEastBoundLongitude(),
+                        inputGeoBox.getNorthBoundLatitude());
+                if (layer instanceof CoverageLayerDetails) {
+                    final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
+                    outputLayer = new org.geotoolkit.wms.xml.v130.Layer(layerName,
+                            Util.cleanSpecialCharacter(coverageLayer.getRemarks()),
+                            Util.cleanSpecialCharacter(coverageLayer.getThematic()), crs,
+                            bbox, outputBBox, queryable, dimensions, styles);
+                } else {
+                    outputLayer = new org.geotoolkit.wms.xml.v130.Layer(layerName,
+                            Util.cleanSpecialCharacter("Vector data"),
+                            Util.cleanSpecialCharacter("Vector data"), crs, bbox,
+                            outputBBox, queryable, dimensions, styles);
+                }
             }
             layers.add(outputLayer);
         }
@@ -580,7 +597,7 @@ public class WMSWorker extends AbstractWMSWorker {
                                                                            final String url)
     {
 
-        if (version.toString().equals("1.3.0")) {
+        if (version.toString().equals(ServiceDef.WMS_1_3_0_SLD.version.toString())) {
             final org.geotoolkit.wms.xml.v130.Request r = (org.geotoolkit.wms.xml.v130.Request) request;
             final List<JAXBElement<OperationType>> extendedOperations = r.getExtendedOperation();
             for(JAXBElement<OperationType> extOp: extendedOperations) {
@@ -841,7 +858,7 @@ public class WMSWorker extends AbstractWMSWorker {
     	try { // WE catch the exception from either service version
 	        if (  version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ) {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD );
-	        } else if ( version.equals("1.3.0") ) {
+	        } else if ( version.equals(ServiceDef.WMS_1_3_0_SLD.version.toString()) ) {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_3_0_SLD );
 	        } else {
 	        	throw new CstlServiceException("WMS acting according to no known version.",
@@ -861,9 +878,9 @@ public class WMSWorker extends AbstractWMSWorker {
 
     	List<LayerDetails> layerRefs;
     	try { // WE catch the exception from either service version
-	        if (  version.equals("1.1.1") ) {
+	        if (  version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ) {
 	        	layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_1_1_SLD, layerNames );
-	        } else if ( version.equals("1.3.0") ) {
+	        } else if ( version.equals(ServiceDef.WMS_1_3_0_SLD.version.toString()) ) {
 	        	layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_3_0_SLD, layerNames );
 	        } else {
 	        	throw new CstlServiceException("WMS acting according to no known version.",
@@ -883,9 +900,9 @@ public class WMSWorker extends AbstractWMSWorker {
 
         LayerDetails layerRef;
     	try { // WE catch the exception from either service version
-	        if (  version.equals("1.1.1") ) {
+	        if (  version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ) {
 	        	layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_1_1_SLD, layerName );
-	        } else if ( version.equals("1.3.0") ) {
+	        } else if ( version.equals(ServiceDef.WMS_1_3_0_SLD.version.toString()) ) {
 	        	layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_3_0_SLD, layerName );
 	        } else {
 	        	throw new CstlServiceException("WMS acting according to no known version.",
