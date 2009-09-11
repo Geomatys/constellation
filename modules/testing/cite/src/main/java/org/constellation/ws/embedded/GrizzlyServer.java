@@ -17,9 +17,11 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
+import java.io.IOException;
 import java.util.Collections;
 
 // Constellation dependencies
+import org.constellation.data.PostgridTestCase;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.StyleProviderProxy;
@@ -27,6 +29,8 @@ import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
+import org.constellation.provider.postgrid.PostGridProvider;
+import org.constellation.provider.postgrid.PostGridProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.provider.sld.SLDProviderService;
@@ -56,7 +60,7 @@ public final class GrizzlyServer {
      * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
      * and defines a PostGrid data provider.
      */
-    public static synchronized void initServer() {
+    public static synchronized void initServer() throws IOException {
         // Protective test in order not to launch a new instance of the grizzly server for
         // each sub classes.
         if (grizzly != null) {
@@ -68,6 +72,33 @@ public final class GrizzlyServer {
          * starting the server.
          */
         grizzly = new GrizzlyThread();
+
+        // Initialises the postgrid testing raster.
+        PostgridTestCase.init();
+
+        // Defines a PostGrid data provider
+        final ProviderSource source = new ProviderSource();
+        source.parameters.put(PostGridProvider.KEY_DATABASE, "jdbc:postgresql://hyperion.geomatys.com/coverages-test");
+        source.parameters.put(PostGridProvider.KEY_DRIVER,   "org.postgresql.Driver");
+        source.parameters.put(PostGridProvider.KEY_PASSWORD, "g3ouser");
+        source.parameters.put(PostGridProvider.KEY_READONLY, "true");
+        final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
+        source.parameters.put(PostGridProvider.KEY_ROOT_DIRECTORY, rootDir);
+        source.parameters.put(PostGridProvider.KEY_USER,     "geouser");
+
+        final ProviderConfig config = new ProviderConfig();
+        config.sources.add(source);
+
+        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
+            // Here we should have the postgrid data provider defined previously
+            if (service instanceof PostGridProviderService) {
+                service.init(config);
+                if (service.getProviders().isEmpty()) {
+                    return;
+                }
+                break;
+            }
+        }
 
         // Defines a Styles data provider
         final ProviderSource sourceStyle = new ProviderSource();

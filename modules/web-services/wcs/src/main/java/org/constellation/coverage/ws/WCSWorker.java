@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -333,20 +332,19 @@ public final class WCSWorker {
         final SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
 
         // supported formats
-        final Set<CodeListType> formats = new LinkedHashSet<CodeListType>();
-        formats.add(new CodeListType("matrix"));
-        formats.add(new CodeListType("jpeg"));
-        formats.add(new CodeListType("png"));
-        formats.add(new CodeListType("gif"));
-        formats.add(new CodeListType("bmp"));
+        final List<CodeListType> supportedFormats = new ArrayList<CodeListType>();
+        supportedFormats.add(new CodeListType("png"));
+        supportedFormats.add(new CodeListType("gif"));
+        supportedFormats.add(new CodeListType("jpeg"));
+        supportedFormats.add(new CodeListType("bmp"));
+        supportedFormats.add(new CodeListType("matrix"));
         String nativeFormat = "unknow";
         final Iterator<Series> it = coverageRef.getSeries().iterator();
         if (it.hasNext()) {
             final Series s = it.next();
             nativeFormat = s.getFormat().getImageFormat();
         }
-        final SupportedFormatsType supForm = new SupportedFormatsType(
-                              nativeFormat, new ArrayList<CodeListType>(formats));
+        final SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, supportedFormats);
 
         //supported interpolations
         final List<org.geotoolkit.wcs.xml.v100.InterpolationMethod> interpolations =
@@ -487,15 +485,15 @@ public final class WCSWorker {
         supportedCRS.add("EPSG:4326");
 
         //supported formats
-        final List<String> supportedFormat = new ArrayList<String>();
-        supportedFormat.add("application/matrix");
-        supportedFormat.add(MimeType.IMAGE_PNG);
-        supportedFormat.add(MimeType.IMAGE_JPEG);
-        supportedFormat.add(MimeType.IMAGE_BMP);
-        supportedFormat.add(MimeType.IMAGE_GIF);
+        final List<String> supportedFormats = new ArrayList<String>();
+        supportedFormats.add(MimeType.IMAGE_PNG);
+        supportedFormats.add(MimeType.IMAGE_GIF);
+        supportedFormats.add(MimeType.IMAGE_JPEG);
+        supportedFormats.add(MimeType.IMAGE_BMP);
+        supportedFormats.add("application/matrix");
 
         final CoverageDescriptionType coverage = new CoverageDescriptionType(title, abstractt,
-                keywords, coverageRef.getName(), domain, range, supportedCRS, supportedFormat);
+                keywords, coverageRef.getName(), domain, range, supportedCRS, supportedFormats);
         coverages.add(coverage);
         return new CoverageDescriptions(coverages);
     }

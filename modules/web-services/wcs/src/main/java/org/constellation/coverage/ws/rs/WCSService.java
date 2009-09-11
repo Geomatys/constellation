@@ -249,6 +249,22 @@ public class WCSService extends OGCWebService {
                 if (format.equalsIgnoreCase(MATRIX)) {
                     format = "application/matrix";
                 }
+                // The describe coverage request in version 1.0.0 does not support the '/' character,
+                // so we have to convert simple output format name into the matching mime-type.
+                if (serviceDef.equals(ServiceDef.WCS_1_0_0)) {
+                    if (format.equalsIgnoreCase("png")) {
+                        format = MimeType.IMAGE_PNG;
+                    }
+                    if (format.equalsIgnoreCase("gif")) {
+                        format = MimeType.IMAGE_GIF;
+                    }
+                    if (format.equalsIgnoreCase("bmp")) {
+                        format = MimeType.IMAGE_BMP;
+                    }
+                    if (format.equalsIgnoreCase("jpeg")) {
+                        format = MimeType.IMAGE_JPEG;
+                    }
+                }
                 return Response.ok(rendered, format).build();
             }
 
@@ -283,7 +299,7 @@ public class WCSService extends OGCWebService {
         // which seems to have been caused by the user.
         if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
+                //!ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         } else {
@@ -293,7 +309,9 @@ public class WCSService extends OGCWebService {
         // SEND THE HTTP RESPONSE
         final Object report;
         if (serviceDef == null) {
-            serviceDef = getBestVersion(null);
+            // TODO: Get the best version for WCS. For the moment, just 1.0.0.
+            serviceDef = ServiceDef.WCS_1_0_0;
+            //serviceDef = getBestVersion(null);
         }
         final String locator = ex.getLocator();
         if (isOWS(serviceDef)) {
@@ -307,7 +325,7 @@ public class WCSService extends OGCWebService {
         final StringWriter sw = new StringWriter();
         marshaller.marshal(report, sw);
 
-        return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.APP_XML).build();
+        return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.APP_SE_XML).build();
     }
 
     /**
@@ -325,18 +343,22 @@ public class WCSService extends OGCWebService {
                     MISSING_PARAMETER_VALUE, "service");
         }
 
-        String inputVersion = getParameter(KEY_VERSION, false);
-        if (inputVersion == null) {
-            inputVersion = getParameter("acceptversions", false);
-            if (inputVersion == null) {
-                inputVersion = getBestVersion(null).version.toString();
-            } else {
-                //we verify that the version is supported
-                isVersionSupported(inputVersion);
-            }
-        }
-        final ServiceDef finalVersion = getBestVersion(inputVersion);
+        // TODO: find the best version when the WCS 1.1.1 will be fully implemented.
+        //       For the moment, the version chosen is always the 1.0.0.
 
+//        String inputVersion = getParameter(KEY_VERSION, false);
+//        if (inputVersion == null) {
+//            inputVersion = getParameter("acceptversions", false);
+//            if (inputVersion == null) {
+//                inputVersion = getBestVersion(null).version.toString();
+//            } else {
+//                //we verify that the version is supported
+//                isVersionSupported(inputVersion);
+//            }
+//        }
+//        final ServiceDef finalVersion = getBestVersion(inputVersion);
+
+        final ServiceDef finalVersion = ServiceDef.WCS_1_0_0;
         if (finalVersion.equals(ServiceDef.WCS_1_0_0)) {
             return new org.geotoolkit.wcs.xml.v100.GetCapabilitiesType(getParameter(KEY_SECTION, false), null);
         } else if (finalVersion.equals(ServiceDef.WCS_1_1_1)) {

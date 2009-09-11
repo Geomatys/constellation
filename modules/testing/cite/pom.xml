@@ -142,10 +142,10 @@
     </dependency>
     <!-- For testing static methods -->
     <dependency>
-      <groupId>org.constellation.engine</groupId>
-      <artifactId>cstl-engine-testing</artifactId>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-postgrid</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
+      <type>test-jar</type>
     </dependency>
   </dependencies>
 
