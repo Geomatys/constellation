@@ -394,10 +394,6 @@ public class WMSWorker extends AbstractWMSWorker {
                                 styleName, styleName, null, null, null, legendURL1, legendURL2);
                         styles.add(style);
                     }
-                } else {
-                    final org.geotoolkit.wms.xml.v111.Style style = new org.geotoolkit.wms.xml.v111.Style(
-                                "Style1", "defaultStyle", null, null, null, legendURL1, legendURL2);
-                    styles.add(style);
                 }
 
                 final LatLonBoundingBox bbox = new LatLonBoundingBox(
@@ -449,11 +445,8 @@ public class WMSWorker extends AbstractWMSWorker {
                         styleName, styleName, null, null, null, legendURL1, legendURL2);
                         styles.add(style);
                     }
-                } else {
-                    final org.geotoolkit.wms.xml.v130.Style style = new org.geotoolkit.wms.xml.v130.Style(
-                        "Style1", "default Style", null, null, null, legendURL1, legendURL2);
-                    styles.add(style);
                 }
+
                 final EXGeographicBoundingBox bbox = new EXGeographicBoundingBox(
                         inputGeoBox.getWestBoundLongitude(),
                         inputGeoBox.getSouthBoundLatitude(),
