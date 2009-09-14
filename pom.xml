@@ -529,7 +529,7 @@
     <repository>
       <id>geomatys</id>
       <name>Builds from Geomatys</name>
-      <url>http://maven.geomatys.fr/repository</url>
+      <url>http://maven.geomatys.com</url>
     </repository>
     <repository>
       <id>geotoolkit</id>
@@ -786,7 +786,7 @@
     <repository>
       <id>geomatys</id>
       <name>Repository maven geomatys</name>
-      <url>dav:http://maven.geomatys.fr/repository</url>
+      <url>dav:http://maven.geomatys.com</url>
       <uniqueVersion>false</uniqueVersion>
     </repository>
   </distributionManagement>
