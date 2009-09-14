@@ -41,6 +41,11 @@ import org.geotoolkit.resources.Errors;
  */
 public final class Reformat extends CommandLine implements FileFilter {
     /**
+     * Extension of referencing files.
+     */
+    private static final String REFERENCING_EXTENSION = "tfw";
+
+    /**
      * The target format, or {@code null} if nothing should be written.
      */
     @Option(/*description="The target format (omitted if nothing should be written)."*/)
@@ -209,8 +214,8 @@ public final class Reformat extends CommandLine implements FileFilter {
      * Copies TFW files, if they exists.
      */
     private static void copyTFW(File source, File target) throws IOException {
-        source = TileBuilder.toTFW(source);
-        target = TileBuilder.toTFW(target);
+        source = toTFW(source);
+        target = toTFW(target);
         if (source.isFile() && !source.equals(target)) {
             final InputStream  in  = new FileInputStream (source);
             final OutputStream out = new FileOutputStream(target);
@@ -225,9 +230,37 @@ public final class Reformat extends CommandLine implements FileFilter {
     }
 
     /**
+     * Returns a file with the same path and extension than the given one, and the extension
+     * replaced by {@value #REFERENCING_EXTENSION}.
+     */
+    private static File toTFW(File file) {
+        if (file != null) {
+            String name = file.getName();
+            final int separator = name.lastIndexOf('.');
+            if (separator >= 0) {
+                final File parent = file.getParentFile();
+                final String basename = name.substring(0, separator + 1);
+                name = basename + REFERENCING_EXTENSION;
+                file = new File(parent, name);
+                final File preferred = file;
+                if (!file.exists()) {
+                    name = basename + REFERENCING_EXTENSION.toUpperCase();
+                    file = new File(parent, name);
+                    if (!file.exists()) {
+                        name = basename + REFERENCING_EXTENSION;
+                        file = preferred;
+                    }
+                }
+            }
+        }
+        return file;
+    }
+
+    /**
      * Returns {@code true} if the following file should be accepted.
      * This is invoked only when scanning a directory content.
      */
+    @Override
     public boolean accept(final File pathname) {
         if (pathname.isDirectory()) {
             return recursive;
@@ -237,6 +270,8 @@ public final class Reformat extends CommandLine implements FileFilter {
 
     /**
      * Runs from the command line.
+     *
+     * @param args The command line arguments.
      */
     public static void main(String[] args) {
         final Reformat worker = new Reformat(args);
