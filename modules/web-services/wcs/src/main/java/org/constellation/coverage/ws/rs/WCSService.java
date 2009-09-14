@@ -47,10 +47,6 @@ import static org.constellation.query.wcs.WCSQuery.KEY_TIME;
 import static org.constellation.query.wcs.WCSQuery.KEY_TIMESEQUENCE;
 import static org.constellation.query.wcs.WCSQuery.KEY_WIDTH;
 import static org.constellation.query.wcs.WCSQuery.MATRIX;
-import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
-import static org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED;
-import static org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED;
 
 // Jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
@@ -77,7 +73,6 @@ import org.constellation.coverage.ws.WCSWorker;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.ExceptionCode;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
@@ -95,6 +90,7 @@ import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.resources.Errors;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCapabilities;
@@ -102,6 +98,8 @@ import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
 import org.geotoolkit.wcs.xml.GetCoverage;
 import org.geotoolkit.wcs.xml.v111.GridCrsType;
 import org.geotoolkit.wcs.xml.v111.RangeSubsetType.FieldSubset;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 
 /**
@@ -149,7 +147,7 @@ public class WCSService extends OGCWebService {
                       "org.geotoolkit.wcs.xml.v100:" +
                       "org.geotoolkit.wcs.xml.v111:" +
                       "org.geotoolkit.gml.xml.v311",
-                      "http://www.opengis.net/wcs");
+                      "");
 
         worker = new WCSWorker(marshallerPool);
         LOGGER.info("WCS service running");
@@ -264,6 +262,12 @@ public class WCSService extends OGCWebService {
                     if (format.equalsIgnoreCase("jpeg")) {
                         format = MimeType.IMAGE_JPEG;
                     }
+                    if (!format.equals(MimeType.IMAGE_PNG) && !format.equals(MimeType.IMAGE_GIF)
+                        && !format.equals(MimeType.IMAGE_BMP) && !format.equals(MimeType.IMAGE_JPEG))
+                    {
+                        throw new CstlServiceException("The request format is not a supported format for this coverage",
+                                INVALID_FORMAT, "format");
+                    }
                 }
                 return Response.ok(rendered, format).build();
             }
@@ -299,7 +303,7 @@ public class WCSService extends OGCWebService {
         // which seems to have been caused by the user.
         if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-                //!ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         } else {
@@ -319,8 +323,8 @@ public class WCSService extends OGCWebService {
             report = new ExceptionReport(ex.getMessage(), code, locator, serviceDef.exceptionVersion.toString());
         } else {
             report = new ServiceExceptionReport(serviceDef.exceptionVersion,
-                         (locator == null) ? new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode()) :
-                                             new ServiceExceptionType(ex.getMessage(), (ExceptionCode) ex.getExceptionCode(), locator));
+                         (locator == null) ? new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode()) :
+                                             new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode(), locator));
         }
         final StringWriter sw = new StringWriter();
         marshaller.marshal(report, sw);
@@ -376,7 +380,7 @@ public class WCSService extends OGCWebService {
                         requestedSections.add(token);
                     } else {
                         throw new CstlServiceException("The section " + token + " does not exist",
-                                INVALID_PARAMETER_VALUE);
+                                INVALID_PARAMETER_VALUE, "sections");
                     }
                 }
             } else {
@@ -472,13 +476,32 @@ public class WCSService extends OGCWebService {
         final String bbox = getParameter(KEY_BBOX, true);
         if (bbox != null) {
             final List<String> bboxValues = StringUtilities.toStringList(bbox);
-            pos.add(new DirectPositionType(StringUtilities.toDouble(bboxValues.get(0)),
-                    StringUtilities.toDouble(bboxValues.get(2))));
-            pos.add(new DirectPositionType(StringUtilities.toDouble(bboxValues.get(1)),
-                    StringUtilities.toDouble(bboxValues.get(3))));
-            if (bboxValues.size() > 4) {
-                pos.add(new DirectPositionType(StringUtilities.toDouble(bboxValues.get(4)),
-                        StringUtilities.toDouble(bboxValues.get(5))));
+            final double minimumLon = StringUtilities.toDouble(bboxValues.get(0));
+            final double maximumLon = StringUtilities.toDouble(bboxValues.get(2));
+            try {
+                if (minimumLon > maximumLon) {
+                    throw new IllegalArgumentException(
+                            Errors.format(Errors.Keys.BAD_RANGE_$2, minimumLon, maximumLon));
+                }
+                final double minimumLat = StringUtilities.toDouble(bboxValues.get(1));
+                final double maximumLat = StringUtilities.toDouble(bboxValues.get(3));
+                if (minimumLat > maximumLat) {
+                    throw new IllegalArgumentException(
+                            Errors.format(Errors.Keys.BAD_RANGE_$2, minimumLat, maximumLat));
+                }
+                pos.add(new DirectPositionType(minimumLon, maximumLon));
+                pos.add(new DirectPositionType(minimumLat, maximumLat));
+                if (bboxValues.size() > 4) {
+                    final double minimumDepth = StringUtilities.toDouble(bboxValues.get(4));
+                    final double maximumDepth = StringUtilities.toDouble(bboxValues.get(5));
+                    if (minimumLat > maximumLat) {
+                        throw new IllegalArgumentException(
+                                Errors.format(Errors.Keys.BAD_RANGE_$2, minimumDepth, maximumDepth));
+                    }
+                    pos.add(new DirectPositionType(minimumDepth, maximumDepth));
+                }
+            } catch (IllegalArgumentException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
         }
         final EnvelopeEntry envelope = new EnvelopeEntry(pos, getParameter(KEY_CRS, true));

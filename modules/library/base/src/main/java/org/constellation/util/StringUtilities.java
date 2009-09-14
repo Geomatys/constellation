@@ -216,23 +216,20 @@ public final class StringUtilities {
         }
 
         final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
-        /*if (envelope == null) {
-            envelope = new GeneralEnvelope((tokens.countTokens() + 1) >> 1);
-            envelope.setCoordinateReferenceSystem(crs);
-            envelope.setToInfinite();
-        }*/
         final double[] coordinates = new double[envelope.getDimension() * 2];
-            int index = 0;
-            while (tokens.hasMoreTokens()) {
+        int index = 0;
+        while (tokens.hasMoreTokens()) {
             final double value = toDouble(tokens.nextToken());
             if (index >= coordinates.length) {
-                    throw new IllegalArgumentException(Errors.format(Errors.Keys.MISMATCHED_DIMENSION_$3));
-                }
+                throw new IllegalArgumentException(
+                        Errors.format(Errors.Keys.ILLEGAL_CS_DIMENSION_$1, coordinates.length));
+            }
             coordinates[index++] = value;
-            }
+        }
         if ((index & 1) != 0) {
-            throw new IllegalArgumentException(Errors.format(Errors.Keys.ODD_ARRAY_LENGTH_$1));
-            }
+            throw new IllegalArgumentException(
+                    Errors.format(Errors.Keys.ODD_ARRAY_LENGTH_$1, index));
+        }
         // Fallthrough in every cases.
         switch (index) {
             default: {
@@ -254,11 +251,12 @@ public final class StringUtilities {
          * avoid a NonInvertibleTransformException at some later stage.
          */
         final int dimension = envelope.getDimension();
-        for (index=0; index<dimension; index++) {
+        for (index = 0; index < dimension; index++) {
             final double minimum = envelope.getMinimum(index);
             final double maximum = envelope.getMaximum(index);
             if (!(minimum < maximum)) {
-                throw new IllegalArgumentException(Errors.format(Errors.Keys.BAD_RANGE_$2));
+                throw new IllegalArgumentException(
+                        Errors.format(Errors.Keys.BAD_RANGE_$2, minimum, maximum));
             }
         }
         return envelope;
@@ -299,13 +297,13 @@ public final class StringUtilities {
             while (tokens.hasMoreTokens()) {
                     values[index] = toDouble(tokens.nextToken());
                 if (index >= 4) {
-                    throw new IllegalArgumentException(Errors.format(Errors.Keys.MISMATCHED_DIMENSION_$3));
+                    throw new IllegalArgumentException(Errors.format(Errors.Keys.INDEX_OUT_OF_BOUNDS_$1, index));
                 }
                 index++;
             }
 
-            if(index != 5){
-                throw new IllegalArgumentException(Errors.format(Errors.Keys.MISMATCHED_DIMENSION_$3));
+            if (index != 5) {
+                throw new IllegalArgumentException(Errors.format(Errors.Keys.ILLEGAL_ARGUMENT_$1, index));
             }
 
             dimX[0] = values[0];

@@ -124,12 +124,7 @@ import static org.constellation.query.Query.KEY_VERSION;
 import static org.constellation.query.wcs.WCSQuery.GEOTIFF;
 import static org.constellation.query.wcs.WCSQuery.MATRIX;
 import static org.constellation.query.wcs.WCSQuery.NETCDF;
-import static org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE;
-import static org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED;
-import static org.constellation.ws.ExceptionCode.LAYER_NOT_QUERYABLE;
-import static org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE;
-import static org.constellation.ws.ExceptionCode.NO_APPLICABLE_CODE;
-import static org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 
 /**
