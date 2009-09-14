@@ -19,11 +19,15 @@
 package org.constellation.sos.ws;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
+import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.observation.xml.v100.ProcessEntry;
 import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.swe.xml.AbstractEncodingProperty;
@@ -31,6 +35,8 @@ import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.DataArrayProperty;
 import org.geotoolkit.swe.xml.DataComponentProperty;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
+import org.geotoolkit.swe.xml.v101.DataArrayEntry;
+import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
 import org.opengis.observation.Observation;
 
@@ -78,13 +84,58 @@ public final class Normalizer {
     }
 
     /**
+     * Regroup the different Observation by sensor.
+     *
+     * @param collection
+     *
+     * @return a collection
+     */
+    public static ObservationCollectionEntry regroupObservation(ObservationCollectionEntry collection){
+        List<Observation> members = collection.getMember();
+        Map<String, ObservationEntry> merged = new HashMap<String, ObservationEntry>();
+        for (Observation obs : members) {
+            ProcessEntry process = (ProcessEntry) obs.getProcedure();
+            if (merged.containsKey(process.getHref())) {
+                ObservationEntry uniqueObs         = merged.get(process.getHref());
+                if (uniqueObs.getResult() instanceof DataArrayPropertyType) {
+                    DataArrayPropertyType mergedArrayP = (DataArrayPropertyType) uniqueObs.getResult();
+                    DataArrayEntry mergedArray         = mergedArrayP.getDataArray();
+
+                    if (obs.getResult() instanceof DataArrayPropertyType) {
+                        DataArrayPropertyType arrayP = (DataArrayPropertyType) obs.getResult();
+                        DataArrayEntry array         = arrayP.getDataArray();
+
+                        //we merge this observation with the map one
+                        mergedArray.setElementCount(mergedArray.getElementCount().getCount().getValue() + array.getElementCount().getCount().getValue());
+                        mergedArray.setValues(mergedArray.getValues() + array.getValues());
+                    } 
+                }
+            } else {
+                ObservationEntry clone;
+                if (obs instanceof MeasurementEntry) {
+                    clone = (MeasurementEntry) obs;
+                } else {
+                    clone = new ObservationEntry((ObservationEntry) obs);
+                }
+                merged.put(process.getHref(), clone);
+            }
+        }
+
+        ObservationCollectionEntry result = new ObservationCollectionEntry();
+        for (ObservationEntry entry: merged.values()) {
+            result.add(entry);
+        }
+        return result;
+    }
+
+    /**
      * Normalize the Observation collection document by replacing the double by reference
      *
-     * @param capa the unnormalized document.
+     * @param collection the unnormalized document.
      *
      * @return a normalized document
      */
-    public static ObservationCollectionEntry normalizeDocument(ObservationCollectionEntry collection){
+    public static ObservationCollectionEntry normalizeDocument(ObservationCollectionEntry collection) {
         //first if the collection is empty
         if (collection.getMember().size() == 0) {
             return new ObservationCollectionEntry("urn:ogc:def:nil:OGC:inapplicable");

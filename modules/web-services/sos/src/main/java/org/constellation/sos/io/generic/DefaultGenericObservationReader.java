@@ -46,6 +46,7 @@ import org.geotoolkit.swe.xml.v101.TimeType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
@@ -234,7 +235,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         final DirectPositionType pos = new DirectPositionType(srsName, srsDimension, coordinates);
         final PointType location     = new PointType(pointID, pos);
 
-        return  new SamplingPointEntry(samplingFeatureId, name, description, sampledFeature, location);
+        return  new SamplingPointEntry(samplingFeatureId, name, description, null, new PointPropertyType(location));
     }
 
     private List<Double> getCoordinates(String samplingFeatureId) throws CstlServiceException {
@@ -325,14 +326,17 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         return new ReferenceEntry(null, href);
     }
 
+    @Override
     public String getInfos() {
         return "Constellation Postgrid Generic O&M Reader 0.4";
     }
 
+    @Override
     public List<ResponseModeType> getResponseModes() throws CstlServiceException {
         return Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
     }
 
+    @Override
     public List<String> getResponseFormats() throws CstlServiceException {
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
     }

@@ -29,6 +29,8 @@ import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.PointType;
+import org.geotoolkit.gml.xml.v311.PointPropertyType;
+import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 
 /**
@@ -70,12 +72,12 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
                                           new DirectPositionType(result.getString(indexOf(query.srsName)),
                                           result.getInt(indexOf(query.srsDimension)),
                                           value));
-                            
+        // TODO result.getString(indexOf(query.sampledFeature)
         return new SamplingPointEntry( result.getString(indexOf(query.identifier)),
                                        result.getString(indexOf(query.name)),
                                        result.getString(indexOf(query.description)),
-                                       result.getString(indexOf(query.sampledFeature)),
-                                       p);
+                                       new FeaturePropertyType(null),
+                                       new PointPropertyType(p));
         
     }
     

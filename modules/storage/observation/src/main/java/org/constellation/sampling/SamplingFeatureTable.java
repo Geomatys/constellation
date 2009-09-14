@@ -26,6 +26,7 @@ import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
+import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 
 /**
  * Connexion vers la table des {@linkplain Station stations}.
@@ -100,10 +101,11 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
      */
     protected SamplingFeatureEntry createEntry(final ResultSet result) throws CatalogException, SQLException {
         final SamplingFeatureQuery query = (SamplingFeatureQuery) super.query;
+        // TODO result.getString(indexOf(query.sampledFeature))
         return new SamplingFeatureEntry(result.getString(indexOf(query.identifier)),
                                         result.getString(indexOf(query.name)),
                                         result.getString(indexOf(query.description)),
-                                        result.getString(indexOf(query.sampledFeature)));
+                                        new FeaturePropertyType(null));
         
     }
 

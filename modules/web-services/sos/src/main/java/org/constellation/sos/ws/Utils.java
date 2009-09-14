@@ -293,6 +293,6 @@ public final class Utils {
             maxy = 90.0;
         }
 
-        return new EnvelopeEntry(null, new DirectPositionType(minx, miny), new DirectPositionType(maxx, maxy), "urn:ogc:crs:espg:4326");
+        return new EnvelopeEntry(null, new DirectPositionType(minx, miny), new DirectPositionType(maxx, maxy), "EPSG:4326");
     }
 }

@@ -1065,6 +1065,8 @@ public class SOSworker {
                     }
                 }
             }
+            ocResponse = regroupObservation(ocResponse);
+            ocResponse.setId("collection-1");
             ocResponse.setBoundedBy(getCollectionBound(ocResponse));
             ocResponse = normalizeDocument(ocResponse);
             response = ocResponse;

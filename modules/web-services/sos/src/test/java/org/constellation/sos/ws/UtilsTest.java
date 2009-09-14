@@ -286,20 +286,20 @@ public class UtilsTest {
 
         EnvelopeEntry result = Utils.getCollectionBound(collection);
 
-        EnvelopeEntry expResult = new EnvelopeEntry(null, new DirectPositionType(-180.0, -90.0), new DirectPositionType(180.0, 90.0), "urn:ogc:crs:espg:4326");
+        EnvelopeEntry expResult = new EnvelopeEntry(null, new DirectPositionType(-180.0, -90.0), new DirectPositionType(180.0, 90.0), "EPSG:4326");
         assertEquals(expResult, result);
 
 
         SamplingPointEntry sp1 = new SamplingPointEntry(null, null, null, null, null);
-        sp1.setBoundedBy(new EnvelopeEntry(null, new DirectPositionType(-10.0, -10.0), new DirectPositionType(10.0, 10.0), "urn:ogc:crs:espg:4326"));
+        sp1.setBoundedBy(new EnvelopeEntry(null, new DirectPositionType(-10.0, -10.0), new DirectPositionType(10.0, 10.0), "EPSG:4326"));
         obs1 = new ObservationEntry(null, null, sp1, pheno, null, this, null);
 
         SamplingPointEntry sp2 = new SamplingPointEntry(null, null, null, null, null);
-        sp2.setBoundedBy(new EnvelopeEntry(null, new DirectPositionType(-5.0, -5.0), new DirectPositionType(15.0, 15.0), "urn:ogc:crs:espg:4326"));
+        sp2.setBoundedBy(new EnvelopeEntry(null, new DirectPositionType(-5.0, -5.0), new DirectPositionType(15.0, 15.0), "EPSG:4326"));
         obs2 = new ObservationEntry(null, null, sp2, pheno, null, this, null);
 
         SamplingPointEntry sp3 = new SamplingPointEntry(null, null, null, null, null);
-        sp3.setBoundedBy(new EnvelopeEntry(null, new DirectPositionType(0.0, -8.0), new DirectPositionType(20.0, 10.0), "urn:ogc:crs:espg:4326"));
+        sp3.setBoundedBy(new EnvelopeEntry(null, new DirectPositionType(0.0, -8.0), new DirectPositionType(20.0, 10.0), "EPSG:4326"));
         obs3 = new ObservationEntry(null, null, sp3, pheno, null, this, null);
 
         collection = new ObservationCollectionEntry();
@@ -309,7 +309,7 @@ public class UtilsTest {
 
         result = Utils.getCollectionBound(collection);
 
-        expResult = new EnvelopeEntry(null, new DirectPositionType(-10.0, -10.0), new DirectPositionType(20.0, 15.0), "urn:ogc:crs:espg:4326");
+        expResult = new EnvelopeEntry(null, new DirectPositionType(-10.0, -10.0), new DirectPositionType(20.0, 15.0), "EPSG:4326");
         assertEquals(expResult, result);
 
     }

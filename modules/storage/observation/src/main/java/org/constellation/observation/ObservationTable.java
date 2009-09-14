@@ -323,7 +323,11 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
             samplingTime =  new TimeInstantType(endPosition);
         }
         if(samplingTime != null) {
-            samplingTime.setId("samplingTime-" + name);
+            String id = name;
+            if (id.lastIndexOf(':') != -1) {
+                id = id.substring(id.lastIndexOf(':') + 1, id.length());
+            }
+            samplingTime.setId("samplingTime-" + id);
         }
         
         return new ObservationEntry(name,

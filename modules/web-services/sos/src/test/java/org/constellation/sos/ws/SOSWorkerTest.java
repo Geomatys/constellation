@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
@@ -66,8 +65,6 @@ import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
 import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
-import org.opengis.observation.Observation;
 
 // JUnit dependencies
 import org.junit.Ignore;
@@ -721,7 +718,11 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
 
-        assertEquals(result.getMember().size(), 3);
+        assertEquals(result.getMember().size(), 1);
+        obsResult =  (ObservationEntry) result.getMember().iterator().next();
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        obsR      = (DataArrayPropertyType) obsResult.getResult();
+        assertEquals(obsR.getDataArray().getElementCount().getCount().getValue(), 15);
 
         /**
          *  Test 7: getObservation with procedure urn:ogc:object:sensor:GEOM:3
@@ -769,17 +770,12 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
 
-        assertEquals(result.getMember().size(), 3);
+        assertEquals(result.getMember().size(), 1);
 
-        Iterator<Observation> i = result.getMember().iterator();
-        List<String> results = new ArrayList<String>();
-        results.add(i.next().getName());
-        results.add(i.next().getName());
-        results.add(i.next().getName());
-
-        assertTrue(results.contains("urn:ogc:object:observation:GEOM:304"));
-        assertTrue(results.contains("urn:ogc:object:observation:GEOM:307"));
-        assertTrue(results.contains("urn:ogc:object:observation:GEOM:305"));
+        obsResult =  (ObservationEntry) result.getMember().iterator().next();
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        obsR      = (DataArrayPropertyType) obsResult.getResult();
+        assertEquals(obsR.getDataArray().getElementCount().getCount().getValue(), 15);
 
         /**
          *  Test 9: getObservation with procedure urn:ogc:object:sensor:GEOM:3
@@ -803,15 +799,12 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
 
-        assertEquals(result.getMember().size(), 2);
+        assertEquals(result.getMember().size(), 1);
 
-        i = result.getMember().iterator();
-        results = new ArrayList<String>();
-        results.add(i.next().getName());
-        results.add(i.next().getName());
-
-        assertTrue(results.contains("urn:ogc:object:observation:GEOM:304"));
-        assertTrue(results.contains("urn:ogc:object:observation:GEOM:305"));
+        obsResult =  (ObservationEntry) result.getMember().iterator().next();
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        obsR      = (DataArrayPropertyType) obsResult.getResult();
+        assertEquals(obsR.getDataArray().getElementCount().getCount().getValue(), 10);
 
         /**
          *  Test 10: getObservation with procedure urn:ogc:object:sensor:GEOM:3
@@ -837,11 +830,10 @@ public class SOSWorkerTest {
 
         assertEquals(result.getMember().size(), 1);
 
-        i = result.getMember().iterator();
-        results = new ArrayList<String>();
-        results.add(i.next().getName());
-
-        assertTrue(results.contains("urn:ogc:object:observation:GEOM:304"));
+        obsResult =  (ObservationEntry) result.getMember().iterator().next();
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        obsR      = (DataArrayPropertyType) obsResult.getResult();
+        assertEquals(obsR.getDataArray().getElementCount().getCount().getValue(), 5);
 
         /**
          *  Test 11: getObservation with procedure urn:ogc:object:sensor:GEOM:3
@@ -1463,6 +1455,8 @@ public class SOSWorkerTest {
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
 
+        assertTrue(result.getMember().iterator().next() instanceof MeasurementEntry);
+        
         MeasurementEntry measResult =  (MeasurementEntry) result.getMember().iterator().next();
         assertTrue(measResult != null);
 
