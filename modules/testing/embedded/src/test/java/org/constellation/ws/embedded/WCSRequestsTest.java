@@ -30,9 +30,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.constellation.register.RegisterException;
 import org.constellation.test.Commons;
+import org.constellation.ws.ServiceExceptionReport;
 
 // Geotoolkit dependencies
 import org.geotoolkit.wcs.xml.v100.CoverageDescription;
@@ -125,7 +125,8 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         final Object obj = unmarshaller.unmarshal(in);
         in.close();
         pool.release(unmarshaller);
-        assertTrue(obj instanceof ExceptionReport);
+        System.out.println(obj.getClass());
+        assertTrue(obj instanceof ServiceExceptionReport);
     }
 
     /**
