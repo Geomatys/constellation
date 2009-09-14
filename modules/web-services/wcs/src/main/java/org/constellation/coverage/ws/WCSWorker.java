@@ -245,122 +245,124 @@ public final class WCSWorker {
                     MISSING_PARAMETER_VALUE, "coverage");
         }
 
-        //TODO: we should loop over the list
-        final LayerDetails layerRef = getLayerReference(request.getCoverage().get(0), ServiceDef.WCS_1_0_0.version.toString());
-        if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
-            throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
-                                           LAYER_NOT_DEFINED);
-        }
-        final List<CoverageOfferingType> coverages = new ArrayList<CoverageOfferingType>();
-        if (!(layerRef instanceof CoverageLayerDetails)) {
-            // Should not occurs, since we have previously verified the type of layer.
-            throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
-                                           LAYER_NOT_DEFINED);
-        }
-        final CoverageLayerDetails coverageRef = (CoverageLayerDetails)layerRef;
-        if (!coverageRef.isQueryable(ServiceType.WCS)) {
-            throw new CstlServiceException("You are not allowed to request the layer \"" +
-                    coverageRef.getName() + "\".", LAYER_NOT_QUERYABLE);
-        }
+        final List<CoverageOfferingType> coverageOfferings = new ArrayList<CoverageOfferingType>();
+        for (String coverage : request.getCoverage()) {
+            final LayerDetails layerRef = getLayerReference(coverage, ServiceDef.WCS_1_0_0.version.toString());
+            if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
+                throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
+                        LAYER_NOT_DEFINED);
+            }
+            if (!(layerRef instanceof CoverageLayerDetails)) {
+                // Should not occurs, since we have previously verified the type of layer.
+                throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
+                        LAYER_NOT_DEFINED);
+            }
+            final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
+            if (!coverageRef.isQueryable(ServiceType.WCS)) {
+                throw new CstlServiceException("You are not allowed to request the layer \"" +
+                        coverageRef.getName() + "\".", LAYER_NOT_QUERYABLE);
+            }
 
-        final Set<Series> series = coverageRef.getSeries();
-        if (series == null || series.isEmpty()) {
-            throw new CstlServiceException("The coverage " + coverageRef.getName() + " is not defined.",
-                    LAYER_NOT_DEFINED);
-        }
-        final GeographicBoundingBox inputGeoBox;
-        try {
-            inputGeoBox = coverageRef.getGeographicBoundingBox();
-        } catch (CatalogException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-        }
-        final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
-        final LonLatEnvelopeType llenvelope;
-        if (inputGeoBox != null) {
-            final SortedSet<Number> elevations;
+            final Set<Series> series = coverageRef.getSeries();
+            if (series == null || series.isEmpty()) {
+                throw new CstlServiceException("The coverage " + coverageRef.getName() + " is not defined.",
+                        LAYER_NOT_DEFINED);
+            }
+            final GeographicBoundingBox inputGeoBox;
             try {
-                elevations = coverageRef.getAvailableElevations();
+                inputGeoBox = coverageRef.getGeographicBoundingBox();
+            } catch (CatalogException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
+            }
+            final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
+            final LonLatEnvelopeType llenvelope;
+            if (inputGeoBox != null) {
+                final SortedSet<Number> elevations;
+                try {
+                    elevations = coverageRef.getAvailableElevations();
+                } catch (CatalogException ex) {
+                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+                }
+                final List<Double> pos1 = new ArrayList<Double>();
+                pos1.add(inputGeoBox.getWestBoundLongitude());
+                pos1.add(inputGeoBox.getSouthBoundLatitude());
+                final List<Double> pos2 = new ArrayList<Double>();
+                pos2.add(inputGeoBox.getEastBoundLongitude());
+                pos2.add(inputGeoBox.getNorthBoundLatitude());
+                if (elevations != null && elevations.size() >= 2) {
+                    pos1.add(elevations.first().doubleValue());
+                    pos2.add(elevations.last().doubleValue());
+                }
+                final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+                pos.add(new DirectPositionType(pos1));
+                pos.add(new DirectPositionType(pos2));
+                llenvelope = new LonLatEnvelopeType(pos, srsName);
+            } else {
+                throw new CstlServiceException("The geographic bbox for the layer is null !",
+                        NO_APPLICABLE_CODE);
+            }
+            final Keywords keywords = new Keywords("WCS", coverageRef.getName(),
+                    Util.cleanSpecialCharacter(coverageRef.getThematic()));
+
+            //Spatial metadata
+            final org.geotoolkit.wcs.xml.v100.SpatialDomainType spatialDomain =
+                    new org.geotoolkit.wcs.xml.v100.SpatialDomainType(llenvelope);
+
+            // temporal metadata
+            final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            final List<Object> times = new ArrayList<Object>();
+            final SortedSet<Date> dates;
+            try {
+                dates = coverageRef.getAvailableTimes();
             } catch (CatalogException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
-            final List<Double> pos1 = new ArrayList<Double>();
-            pos1.add(inputGeoBox.getWestBoundLongitude());
-            pos1.add(inputGeoBox.getSouthBoundLatitude());
-            final List<Double> pos2 = new ArrayList<Double>();
-            pos2.add(inputGeoBox.getEastBoundLongitude());
-            pos2.add(inputGeoBox.getNorthBoundLatitude());
-            if (elevations != null && elevations.size() >= 2) {
-                pos1.add(elevations.first().doubleValue());
-                pos2.add(elevations.last().doubleValue());
+            for (Date d : dates) {
+                times.add(new TimePositionType(df.format(d)));
             }
-            final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
-            pos.add(new DirectPositionType(pos1));
-            pos.add(new DirectPositionType(pos2));
-            llenvelope = new LonLatEnvelopeType(pos, srsName);
-        } else {
-            throw new CstlServiceException("The geographic bbox for the layer is null !",
-                                           NO_APPLICABLE_CODE);
+            final org.geotoolkit.wcs.xml.v100.TimeSequenceType temporalDomain =
+                    new org.geotoolkit.wcs.xml.v100.TimeSequenceType(times);
+            final DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
+            //TODO complete
+            final RangeSetType rangeSetT = new RangeSetType(null, coverageRef.getName(),
+                    coverageRef.getName(), null, null, null, null);
+            final RangeSet rangeSet = new RangeSet(rangeSetT);
+            //supported CRS
+            final SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
+
+            // supported formats
+            final List<CodeListType> supportedFormats = new ArrayList<CodeListType>();
+            supportedFormats.add(new CodeListType("png"));
+            supportedFormats.add(new CodeListType("gif"));
+            supportedFormats.add(new CodeListType("jpeg"));
+            supportedFormats.add(new CodeListType("bmp"));
+            supportedFormats.add(new CodeListType("matrix"));
+            String nativeFormat = "unknow";
+            final Iterator<Series> it = coverageRef.getSeries().iterator();
+            if (it.hasNext()) {
+                final Series s = it.next();
+                nativeFormat = s.getFormat().getImageFormat();
+            }
+            final SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, supportedFormats);
+
+            //supported interpolations
+            final List<org.geotoolkit.wcs.xml.v100.InterpolationMethod> interpolations =
+                    new ArrayList<org.geotoolkit.wcs.xml.v100.InterpolationMethod>();
+            interpolations.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BILINEAR);
+            interpolations.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BICUBIC);
+            interpolations.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR);
+            final SupportedInterpolationsType supInt = new SupportedInterpolationsType(
+                    org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
+
+            //we build the coverage offering for this layer/coverage
+            final CoverageOfferingType coverageOffering = new CoverageOfferingType(null, coverageRef.getName(),
+                    coverageRef.getName(), Util.cleanSpecialCharacter(coverageRef.getRemarks()), llenvelope,
+                    keywords, domainSet, rangeSet, supCRS, supForm, supInt);
+            coverageOfferings.add(coverageOffering);
         }
-        final Keywords keywords = new Keywords("WCS", coverageRef.getName(),
-                Util.cleanSpecialCharacter(coverageRef.getThematic()));
 
-        //Spatial metadata
-        final org.geotoolkit.wcs.xml.v100.SpatialDomainType spatialDomain =
-                new org.geotoolkit.wcs.xml.v100.SpatialDomainType(llenvelope);
-
-        // temporal metadata
-        final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-        df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        final List<Object> times = new ArrayList<Object>();
-        final SortedSet<Date> dates;
-        try {
-            dates = coverageRef.getAvailableTimes();
-        } catch (CatalogException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-        }
-        for (Date d : dates) {
-            times.add(new TimePositionType(df.format(d)));
-        }
-        final org.geotoolkit.wcs.xml.v100.TimeSequenceType temporalDomain =
-                new org.geotoolkit.wcs.xml.v100.TimeSequenceType(times);
-        final DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
-        //TODO complete
-        final RangeSetType rangeSetT = new RangeSetType(null, coverageRef.getName(),
-                coverageRef.getName(), null, null, null,null);
-        final RangeSet rangeSet = new RangeSet(rangeSetT);
-        //supported CRS
-        final SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
-
-        // supported formats
-        final List<CodeListType> supportedFormats = new ArrayList<CodeListType>();
-        supportedFormats.add(new CodeListType("png"));
-        supportedFormats.add(new CodeListType("gif"));
-        supportedFormats.add(new CodeListType("jpeg"));
-        supportedFormats.add(new CodeListType("bmp"));
-        supportedFormats.add(new CodeListType("matrix"));
-        String nativeFormat = "unknow";
-        final Iterator<Series> it = coverageRef.getSeries().iterator();
-        if (it.hasNext()) {
-            final Series s = it.next();
-            nativeFormat = s.getFormat().getImageFormat();
-        }
-        final SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, supportedFormats);
-
-        //supported interpolations
-        final List<org.geotoolkit.wcs.xml.v100.InterpolationMethod> interpolations =
-                new ArrayList<org.geotoolkit.wcs.xml.v100.InterpolationMethod>();
-        interpolations.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BILINEAR);
-        interpolations.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BICUBIC);
-        interpolations.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR);
-        final SupportedInterpolationsType supInt = new SupportedInterpolationsType(
-                org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
-
-        //we build the coverage offering for this layer/coverage
-        final CoverageOfferingType coverage = new CoverageOfferingType(null, coverageRef.getName(),
-                coverageRef.getName(), Util.cleanSpecialCharacter(coverageRef.getRemarks()), llenvelope,
-                keywords, domainSet, rangeSet, supCRS, supForm, supInt);
-        coverages.add(coverage);
-        return new CoverageDescription(coverages, ServiceDef.WCS_1_0_0.version.toString());
+        return new CoverageDescription(coverageOfferings, ServiceDef.WCS_1_0_0.version.toString());
     }
 
     /**
@@ -382,120 +384,122 @@ public final class WCSWorker {
                     MISSING_PARAMETER_VALUE, "identifier");
         }
 
-        //TODO: we should loop over the list
-        final LayerDetails layerRef = getLayerReference(request.getIdentifier().get(0), ServiceDef.WCS_1_1_1.version.toString());
-        if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
-            throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
-                                           LAYER_NOT_DEFINED);
+        final List<CoverageDescriptionType> coverageDescriptions = new ArrayList<CoverageDescriptionType>();
+        for (String coverage : request.getIdentifier()) {
+            final LayerDetails layerRef = getLayerReference(coverage, ServiceDef.WCS_1_1_1.version.toString());
+            if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
+                throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
+                        LAYER_NOT_DEFINED);
+            }
+            if (!(layerRef instanceof CoverageLayerDetails)) {
+                // Should not occurs, since we have previously verified the type of layer.
+                throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
+                        LAYER_NOT_DEFINED);
+            }
+            final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
+            if (!coverageRef.isQueryable(ServiceType.WCS)) {
+                throw new CstlServiceException("You are not allowed to request the layer \"" +
+                        coverageRef.getName() + "\".", LAYER_NOT_QUERYABLE);
+            }
+
+            if (!coverageRef.isQueryable(ServiceType.WCS)) {
+                throw new CstlServiceException("You are not allowed to request the layer \"" +
+                        coverageRef.getName() + "\".", INVALID_PARAMETER_VALUE);
+            }
+            final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory =
+                    new org.geotoolkit.ows.xml.v110.ObjectFactory();
+            if (coverageRef.getSeries().size() == 0) {
+                throw new CstlServiceException("the coverage " + coverageRef.getName() +
+                        " is not defined", LAYER_NOT_DEFINED);
+            }
+            final GeographicBoundingBox inputGeoBox;
+            try {
+                inputGeoBox = coverageRef.getGeographicBoundingBox();
+            } catch (CatalogException ex) {
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
+            }
+            final List<JAXBElement<? extends BoundingBoxType>> bboxs =
+                    new ArrayList<JAXBElement<? extends BoundingBoxType>>();
+            if (inputGeoBox != null) {
+                final WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
+                        inputGeoBox.getWestBoundLongitude(),
+                        inputGeoBox.getSouthBoundLatitude(),
+                        inputGeoBox.getEastBoundLongitude(),
+                        inputGeoBox.getNorthBoundLatitude());
+                bboxs.add(owsFactory.createWGS84BoundingBox(outputBBox));
+
+                final String crs = "EPSG:4326";
+                final BoundingBoxType outputBBox2 = new BoundingBoxType(crs,
+                        inputGeoBox.getWestBoundLongitude(),
+                        inputGeoBox.getSouthBoundLatitude(),
+                        inputGeoBox.getEastBoundLongitude(),
+                        inputGeoBox.getNorthBoundLatitude());
+
+                bboxs.add(owsFactory.createBoundingBox(outputBBox2));
+            }
+
+            //general metadata
+            final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
+            title.add(new LanguageStringType(coverageRef.getName()));
+            final List<LanguageStringType> abstractt = new ArrayList<LanguageStringType>();
+            abstractt.add(new LanguageStringType(Util.cleanSpecialCharacter(coverageRef.getRemarks())));
+            final List<KeywordsType> keywords = new ArrayList<KeywordsType>();
+            keywords.add(new KeywordsType(new LanguageStringType("WCS"),
+                    new LanguageStringType(coverageRef.getName())));
+
+            // spatial metadata
+            final org.geotoolkit.wcs.xml.v111.SpatialDomainType spatial =
+                    new org.geotoolkit.wcs.xml.v111.SpatialDomainType(bboxs);
+
+            // temporal metadata
+            final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            final List<Object> times = new ArrayList<Object>();
+            final SortedSet<Date> dates;
+            try {
+                dates = coverageRef.getAvailableTimes();
+            } catch (CatalogException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            }
+            for (Date d : dates) {
+                times.add(new TimePositionType(df.format(d)));
+            }
+            final org.geotoolkit.wcs.xml.v111.TimeSequenceType temporalDomain =
+                    new org.geotoolkit.wcs.xml.v111.TimeSequenceType(times);
+
+            final CoverageDomainType domain = new CoverageDomainType(spatial, temporalDomain);
+
+            //supported interpolations
+            final List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
+            intList.add(new InterpolationMethodType(
+                    org.geotoolkit.wcs.xml.v111.InterpolationMethod.BILINEAR.value(), null));
+            intList.add(new InterpolationMethodType(
+                    org.geotoolkit.wcs.xml.v111.InterpolationMethod.BICUBIC.value(), null));
+            intList.add(new InterpolationMethodType(
+                    org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
+            final InterpolationMethods interpolations = new InterpolationMethods(
+                    intList, org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
+            final RangeType range = new RangeType(new FieldType(Util.cleanSpecialCharacter(coverageRef.getThematic()),
+                    null, new org.geotoolkit.ows.xml.v110.CodeType("0.0"), interpolations));
+
+            //supported CRS
+            final List<String> supportedCRS = new ArrayList<String>();
+            supportedCRS.add("EPSG:4326");
+
+            //supported formats
+            final List<String> supportedFormats = new ArrayList<String>();
+            supportedFormats.add(MimeType.IMAGE_PNG);
+            supportedFormats.add(MimeType.IMAGE_GIF);
+            supportedFormats.add(MimeType.IMAGE_JPEG);
+            supportedFormats.add(MimeType.IMAGE_BMP);
+            supportedFormats.add("application/matrix");
+
+            final CoverageDescriptionType coverageDescription = new CoverageDescriptionType(title, abstractt,
+                    keywords, coverageRef.getName(), domain, range, supportedCRS, supportedFormats);
+            coverageDescriptions.add(coverageDescription);
         }
-        final List<CoverageDescriptionType> coverages = new ArrayList<CoverageDescriptionType>();
-        if (!(layerRef instanceof CoverageLayerDetails)) {
-            // Should not occurs, since we have previously verified the type of layer.
-            throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
-                                           LAYER_NOT_DEFINED);
-        }
-        final CoverageLayerDetails coverageRef = (CoverageLayerDetails)layerRef;
-        if (!coverageRef.isQueryable(ServiceType.WCS)) {
-            throw new CstlServiceException("You are not allowed to request the layer \"" +
-                    coverageRef.getName() + "\".", LAYER_NOT_QUERYABLE);
-        }
-
-        if (!coverageRef.isQueryable(ServiceType.WCS)) {
-            throw new CstlServiceException("You are not allowed to request the layer \"" +
-                    coverageRef.getName() + "\".", INVALID_PARAMETER_VALUE);
-        }
-        final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory =
-                new org.geotoolkit.ows.xml.v110.ObjectFactory();
-        if (coverageRef.getSeries().size() == 0) {
-            throw new CstlServiceException("the coverage " + coverageRef.getName() +
-                    " is not defined", LAYER_NOT_DEFINED);
-        }
-        final GeographicBoundingBox inputGeoBox;
-        try {
-            inputGeoBox = coverageRef.getGeographicBoundingBox();
-        } catch (CatalogException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-        }
-        final List<JAXBElement<? extends BoundingBoxType>> bboxs =
-                new ArrayList<JAXBElement<? extends BoundingBoxType>>();
-        if (inputGeoBox != null) {
-            final WGS84BoundingBoxType outputBBox = new WGS84BoundingBoxType(
-                    inputGeoBox.getWestBoundLongitude(),
-                    inputGeoBox.getSouthBoundLatitude(),
-                    inputGeoBox.getEastBoundLongitude(),
-                    inputGeoBox.getNorthBoundLatitude());
-            bboxs.add(owsFactory.createWGS84BoundingBox(outputBBox));
-
-            final String crs = "EPSG:4326";
-            final BoundingBoxType outputBBox2 = new BoundingBoxType(crs,
-                    inputGeoBox.getWestBoundLongitude(),
-                    inputGeoBox.getSouthBoundLatitude(),
-                    inputGeoBox.getEastBoundLongitude(),
-                    inputGeoBox.getNorthBoundLatitude());
-
-            bboxs.add(owsFactory.createBoundingBox(outputBBox2));
-        }
-
-        //general metadata
-        final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
-        title.add(new LanguageStringType(coverageRef.getName()));
-        final List<LanguageStringType> abstractt = new ArrayList<LanguageStringType>();
-        abstractt.add(new LanguageStringType(Util.cleanSpecialCharacter(coverageRef.getRemarks())));
-        final List<KeywordsType> keywords = new ArrayList<KeywordsType>();
-        keywords.add(new KeywordsType(new LanguageStringType("WCS"),
-                new LanguageStringType(coverageRef.getName())));
-
-        // spatial metadata
-        final org.geotoolkit.wcs.xml.v111.SpatialDomainType spatial =
-                new org.geotoolkit.wcs.xml.v111.SpatialDomainType(bboxs);
-
-        // temporal metadata
-        final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-        df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        final List<Object> times = new ArrayList<Object>();
-        final SortedSet<Date> dates;
-        try {
-            dates = coverageRef.getAvailableTimes();
-        } catch (CatalogException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-        }
-        for (Date d : dates) {
-            times.add(new TimePositionType(df.format(d)));
-        }
-        final org.geotoolkit.wcs.xml.v111.TimeSequenceType temporalDomain =
-                new org.geotoolkit.wcs.xml.v111.TimeSequenceType(times);
-
-        final CoverageDomainType domain = new CoverageDomainType(spatial, temporalDomain);
-
-        //supported interpolations
-        final List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
-        intList.add(new InterpolationMethodType(
-                org.geotoolkit.wcs.xml.v111.InterpolationMethod.BILINEAR.value(), null));
-        intList.add(new InterpolationMethodType(
-                org.geotoolkit.wcs.xml.v111.InterpolationMethod.BICUBIC.value(), null));
-        intList.add(new InterpolationMethodType(
-                org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
-        final InterpolationMethods interpolations = new InterpolationMethods(
-                intList, org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
-        final RangeType range = new RangeType(new FieldType(Util.cleanSpecialCharacter(coverageRef.getThematic()),
-                null, new org.geotoolkit.ows.xml.v110.CodeType("0.0"), interpolations));
-
-        //supported CRS
-        final List<String> supportedCRS = new ArrayList<String>();
-        supportedCRS.add("EPSG:4326");
-
-        //supported formats
-        final List<String> supportedFormats = new ArrayList<String>();
-        supportedFormats.add(MimeType.IMAGE_PNG);
-        supportedFormats.add(MimeType.IMAGE_GIF);
-        supportedFormats.add(MimeType.IMAGE_JPEG);
-        supportedFormats.add(MimeType.IMAGE_BMP);
-        supportedFormats.add("application/matrix");
-
-        final CoverageDescriptionType coverage = new CoverageDescriptionType(title, abstractt,
-                keywords, coverageRef.getName(), domain, range, supportedCRS, supportedFormats);
-        coverages.add(coverage);
-        return new CoverageDescriptions(coverages);
+        
+        return new CoverageDescriptions(coverageDescriptions);
     }
 
     /**
