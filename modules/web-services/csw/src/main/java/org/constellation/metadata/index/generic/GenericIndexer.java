@@ -165,7 +165,14 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             LOGGER.info("all entries read in " + (System.currentTimeMillis() - time) + " ms.");
             nbEntries = ids.size();
             for (Object entry : ids) {
-                indexDocument(writer, entry);
+                if (!stopIndexing) {
+                    indexDocument(writer, entry);
+                } else {
+                    LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms");
+                    writer.optimize();
+                    writer.close();
+                    return;
+                }
             }
             writer.optimize();
             writer.close();
@@ -205,8 +212,15 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             nbEntries = ids.size();
             LOGGER.info( nbEntries + " metadata to index (light memory mode)");
             for (String id : ids) {
-                final Object entry = reader.getMetadata(id, MetadataReader.ISO_19115, ElementSetType.FULL, null);
-                indexDocument(writer, entry);
+                if (!stopIndexing) {
+                    final Object entry = reader.getMetadata(id, MetadataReader.ISO_19115, ElementSetType.FULL, null);
+                    indexDocument(writer, entry);
+                } else {
+                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms");
+                     writer.optimize();
+                     writer.close();
+                     return;
+                }
             }
             writer.optimize();
             writer.close();

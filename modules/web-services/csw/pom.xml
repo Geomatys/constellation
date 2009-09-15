@@ -61,10 +61,23 @@
     in the JARs' list that maven will put in the directory "target/binaries".
   -->
   <dependencies>
+    <!-- MDweb model -->
     <dependency>
       <groupId>org.mdweb</groupId>
       <artifactId>mdweb-model</artifactId>
     </dependency>
+    <!-- Constellation dependencies -->
+    <dependency>
+      <groupId>org.constellation.xml-bindings</groupId>
+      <artifactId>cstl-xml-configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-ogc</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Geotoolkit dependencies -->
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-temporal</artifactId>
@@ -86,11 +99,6 @@
       <artifactId>geotk-xml-ebrim</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-configuration</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-csw</artifactId>
     </dependency>
@@ -99,14 +107,17 @@
       <artifactId>geotk-xml-xsd</artifactId>
     </dependency> 
     <dependency>
-      <groupId>org.constellation.web-services</groupId>
-      <artifactId>cstl-web-ogc</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-service</artifactId>
     </dependency>
     <dependency>
-        <groupId>org.geotoolkit</groupId>
-        <artifactId>geotk-epsg</artifactId>
-        <scope>test</scope>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-feature-catalogue</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-epsg</artifactId>
+      <scope>test</scope>
     </dependency>
     <!-- Mailing API -->
     <dependency>
@@ -114,6 +125,7 @@
       <artifactId>mail</artifactId>
       <version>1.4.1</version>
     </dependency>    
+    <!-- database driver -->
     <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derby</artifactId>

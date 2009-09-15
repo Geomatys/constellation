@@ -17,7 +17,6 @@
 
 package org.constellation.filter;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -42,39 +41,28 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.filter.text.cql2.CQLException;
 
 // MDWeb dependencies
-import org.geotoolkit.geometry.jts.SRIDGenerator;
-import org.geotoolkit.geometry.jts.SRIDGenerator.Version;
-import org.geotoolkit.gml.GMLUtilities;
-import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
-import org.geotoolkit.gml.xml.v311.LineStringType;
-import org.geotoolkit.gml.xml.v311.PointType;
-import org.geotoolkit.lucene.filter.LuceneOGCFilter;
+
 import org.geotoolkit.lucene.filter.SerialChainFilter;
-import org.geotoolkit.lucene.filter.SpatialFilterType;
+
 import org.geotoolkit.ogc.xml.v110.AbstractIdType;
-import org.geotoolkit.ogc.xml.v110.BBOXType;
+
 import org.geotoolkit.ogc.xml.v110.BinaryComparisonOpType;
 import org.geotoolkit.ogc.xml.v110.BinaryLogicOpType;
-import org.geotoolkit.ogc.xml.v110.BinarySpatialOpType;
+
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
-import org.geotoolkit.ogc.xml.v110.DistanceBufferType;
+
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsNullType;
-import org.geotoolkit.ogc.xml.v110.PropertyNameType;
+
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 import org.mdweb.model.schemas.Standard;
 
-// GeoAPI dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-
-import static org.geotoolkit.lucene.filter.LuceneOGCFilter.*;
+;
 
 /**
  * A parser for filter 1.1.0 and CQL 2.0
@@ -512,216 +500,6 @@ public class SQLFilterParser extends FilterParser {
         }
         nbField++;
         return response.toString();
-    }
-    
-    /**
-     * Build a piece of lucene query with the specified Spatial filter.
-     * 
-     * @param JBlogicOps
-     * @return
-     * @throws org.constellation.coverage.web.CstlServiceException
-     */
-    @Override
-    protected Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> jbSpatialOps) throws CstlServiceException {
-        LuceneOGCFilter spatialfilter = null;
-        final SpatialOpsType spatialOps   = jbSpatialOps.getValue();
-        
-        if (spatialOps instanceof BBOXType) {
-            final BBOXType bbox       = (BBOXType) spatialOps;
-            final String propertyName = bbox.getPropertyName();
-            final String crsName      = bbox.getSRS();
-            
-            //we verify that all the parameters are specified
-            if (propertyName == null) {
-                throw new CstlServiceException("An operator BBOX must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            } else if (!propertyName.contains("BoundingBox")) {
-                throw new CstlServiceException("An operator the propertyName BBOX must be geometry valued. The property :" + propertyName + " is not.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
-            if (bbox.getEnvelope() == null && bbox.getEnvelopeWithTimePeriod() == null) {
-                throw new CstlServiceException("An operator BBOX must specified an envelope.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
-            if (crsName == null) {
-                throw new CstlServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
-            
-            //we transform the EnvelopeEntry in GeneralEnvelope
-            spatialfilter = wrap(FF.bbox(GEOMETRY_PROPERTY, bbox.getMinX(), bbox.getMinY(),bbox.getMaxX(),bbox.getMaxY(),crsName));
-            
-        } else if (spatialOps instanceof DistanceBufferType) {
-            
-            final DistanceBufferType dist = (DistanceBufferType) spatialOps;
-            final double distance         = dist.getDistance();
-            final String units            = dist.getDistanceUnits();
-            final JAXBElement jbGeom      = dist.getAbstractGeometry();
-            final String operator         = jbSpatialOps.getName().getLocalPart();
-           
-            //we verify that all the parameters are specified
-            if (dist.getPropertyName() == null) {
-                 throw new CstlServiceException("An distanceBuffer operator must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
-            if (units == null) {
-                 throw new CstlServiceException("An distanceBuffer operator must specified the ditance units.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
-            if (jbGeom == null || jbGeom.getValue() == null) {
-                 throw new CstlServiceException("An distanceBuffer operator must specified a geometric object.",
-                                                  INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
-
-            final Object gml = jbGeom.getValue();
-            Geometry geometry = null;
-            //String propName  = dist.getPropertyName().getPropertyName();
-            String crsName   = null;
-           
-            // we transform the gml geometry in treatable geometry
-            try {
-                if (gml instanceof PointType) {
-                    final PointType gmlPoint = (PointType) gml;
-                    crsName  = gmlPoint.getSrsName();
-                    geometry = GMLUtilities.toJTS(gmlPoint);
-                    
-                } else if (gml instanceof LineStringType) {
-                    final LineStringType gmlLine =  (LineStringType) gml;
-                    crsName  = gmlLine.getSrsName();
-                    geometry = GMLUtilities.toJTS(gmlLine);
-                    
-                } else if (gml instanceof EnvelopeEntry) {
-                    final EnvelopeEntry gmlEnvelope = (EnvelopeEntry) gml;
-                    crsName  = gmlEnvelope.getSrsName();
-                    geometry = GMLUtilities.toJTS(gmlEnvelope);
-                }
-
-                if (operator.equals("DWithin")) {
-                    spatialfilter = wrap(FF.dwithin(GEOMETRY_PROPERTY,FF.literal(geometry),distance, units));
-                } else if (operator.equals("Beyond")) {
-                    spatialfilter = wrap(FF.beyond(GEOMETRY_PROPERTY,FF.literal(geometry),distance, units));
-                } else {
-                    throw new CstlServiceException("Unknow DistanceBuffer operator.",
-                            INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-                }
-               
-            } catch (NoSuchAuthorityCodeException e) {
-                    throw new CstlServiceException(UNKNOW_CRS_ERROR_MSG + crsName,
-                                                     INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            } catch (FactoryException e) {
-                    throw new CstlServiceException(FACTORY_BBOX_ERROR_MSG + e.getMessage(),
-                                                     INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            } catch (IllegalArgumentException e) {
-                    throw new CstlServiceException(INCORRECT_BBOX_DIM_ERROR_MSG+ e.getMessage(),
-                                                      INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
-           
-        } else if (spatialOps instanceof BinarySpatialOpType) {
-            
-            final BinarySpatialOpType binSpatial = (BinarySpatialOpType) spatialOps;
-                        
-            String propertyName = null;
-            String operator     = jbSpatialOps.getName().getLocalPart();
-            operator            = operator.toUpperCase();
-            Object gmlGeometry     = null;
-            
-            // the propertyName
-            if (binSpatial.getPropertyName() != null && binSpatial.getPropertyName().getValue() != null) {
-                final PropertyNameType p = binSpatial.getPropertyName().getValue();
-                propertyName = p.getContent();
-            }
-                
-            // geometric object: envelope    
-            if (binSpatial.getEnvelope() != null && binSpatial.getEnvelope().getValue() != null) {
-                gmlGeometry = binSpatial.getEnvelope().getValue();
-            }
-                
-            
-            if (binSpatial.getAbstractGeometry() != null && binSpatial.getAbstractGeometry().getValue() != null) {
-                final AbstractGeometryType ab =  binSpatial.getAbstractGeometry().getValue();
-                
-                // geometric object: point
-                if (ab instanceof PointType) {
-                    gmlGeometry     = (PointType) ab;
-                 
-                // geometric object: Line    
-                } else if (ab instanceof LineStringType) {
-                    gmlGeometry     = (LineStringType) ab;
-                
-                } else if (ab == null) {
-                   throw new IllegalArgumentException("null value in BinarySpatialOp type");
-                
-                } else {
-                    throw new IllegalArgumentException("unknow BinarySpatialOp type:" + ab.getClass().getSimpleName());
-                }
-            }
-            
-            if (propertyName == null && gmlGeometry == null) {
-                throw new CstlServiceException("An Binarary spatial operator must specified a propertyName and a geometry.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
-            SpatialFilterType filterType = null;
-            try {
-                filterType = SpatialFilterType.valueOf(operator);
-            } catch (IllegalArgumentException ex) {
-                LOGGER.severe("unknow spatial filter Type");
-            }
-            if (filterType == null) {
-                throw new CstlServiceException("Unknow FilterType: " + operator,
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
-            
-            String crsName = "undefined CRS";
-            try {
-                Geometry filterGeometry = null;
-                if (gmlGeometry instanceof EnvelopeEntry) {
-
-                    //we transform the EnvelopeEntry in GeneralEnvelope
-                    final EnvelopeEntry gmlEnvelope = (EnvelopeEntry)gmlGeometry;
-                    crsName                   = gmlEnvelope.getSrsName();
-                    filterGeometry            = GMLUtilities.toJTS(gmlEnvelope);
-
-                } else if (gmlGeometry instanceof PointType) {
-                    final PointType gmlPoint  = (PointType) gmlGeometry;
-                    crsName                   = gmlPoint.getSrsName();
-                    filterGeometry            = GMLUtilities.toJTS(gmlPoint);
-
-                } else if (gmlGeometry instanceof LineStringType) {
-                    final LineStringType gmlLine =  (LineStringType) gmlGeometry;
-                    crsName                = gmlLine.getSrsName();
-                    filterGeometry         = GMLUtilities.toJTS(gmlLine);
-                }
-
-                final int srid = SRIDGenerator.toSRID(crsName, Version.V1);
-                filterGeometry.setSRID(srid);
-
-                switch (filterType) {
-                    case CONTAINS   : spatialfilter = wrap(FF.contains(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
-                    case CROSSES    : spatialfilter = wrap(FF.crosses(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
-                    case DISJOINT   : spatialfilter = wrap(FF.disjoint(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
-                    case EQUALS     : spatialfilter = wrap(FF.equal(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
-                    case INTERSECTS : spatialfilter = wrap(FF.intersects(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
-                    case OVERLAPS   : spatialfilter = wrap(FF.overlaps(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
-                    case TOUCHES    : spatialfilter = wrap(FF.touches(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
-                    case WITHIN     : spatialfilter = wrap(FF.within(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
-                    default         : LOGGER.info("using default filter within");
-                                      spatialfilter = wrap(FF.within(GEOMETRY_PROPERTY, FF.literal(filterGeometry))); break;
-                }
-
-            } catch (NoSuchAuthorityCodeException e) {
-                throw new CstlServiceException(UNKNOW_CRS_ERROR_MSG + crsName,
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            } catch (FactoryException e) {
-                throw new CstlServiceException(FACTORY_BBOX_ERROR_MSG + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            } catch (IllegalArgumentException e) {
-                throw new CstlServiceException(INCORRECT_BBOX_DIM_ERROR_MSG + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
-            
-        }
-        
-        return spatialfilter;
     }
     
     private String treatIDOperator(final List<JAXBElement<? extends AbstractIdType>> jbIdsOps) {

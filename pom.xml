@@ -471,7 +471,17 @@
         <artifactId>geotk-xml-wmts</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-service</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-feature-catalogue</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+   
 
 
       <!-- database driver -->

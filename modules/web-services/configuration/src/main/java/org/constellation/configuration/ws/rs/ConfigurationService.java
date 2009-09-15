@@ -63,6 +63,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // Geotools dependencies
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.factory.FactoryNotFoundException;
+import org.geotoolkit.lucene.index.AbstractIndexer;
 
 /**
  * Web service for administration and configuration operations.
@@ -92,6 +93,8 @@ public class ConfigurationService extends WebService  {
     private static FactoryRegistry factory = new FactoryRegistry(AbstractConfigurerFactory.class);
     
     private boolean cswFunctionEnabled;
+
+    public static boolean isIndexing;
     
     public static final Map<String, File> SERVCE_DIRECTORY = new HashMap<String, File>();
     static {
@@ -105,6 +108,7 @@ public class ConfigurationService extends WebService  {
      */
     public ConfigurationService() {
         super();
+        isIndexing = false;
         try {
             setXMLContext("org.geotoolkit.ows.xml.v110:org.constellation.configuration:org.geotoolkit.skos.xml", "");
             final AbstractConfigurerFactory configurerfactory = factory.getServiceProvider(AbstractConfigurerFactory.class, null, null, null);
@@ -145,7 +149,8 @@ public class ConfigurationService extends WebService  {
             }
 
             if ("Restart".equalsIgnoreCase(request)) {
-                marshaller.marshal(restartService(), sw);
+                final boolean force = Boolean.parseBoolean(getParameter("FORCED", false));
+                marshaller.marshal(restartService(force), sw);
                 return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             
@@ -174,8 +179,14 @@ public class ConfigurationService extends WebService  {
                     final boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
                     final String service     = getParameter("SERVICE", false);
                     final String id          = getParameter("ID", false);
-                
-                    marshaller.marshal(cswConfigurer.refreshIndex(asynchrone, service, id), sw);
+                    isIndexing               = true;
+                    AcknowlegementType ack;
+                    try {
+                        ack = cswConfigurer.refreshIndex(asynchrone, service, id);
+                    } finally {
+                        isIndexing          = false;
+                    }
+                    marshaller.marshal(ack, sw);
                     return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
                 } else {
                      throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
@@ -287,11 +298,19 @@ public class ConfigurationService extends WebService  {
      * 
      * @return an Acknowlegement if the restart succeed.
      */
-    private AcknowlegementType restartService() {
+    private AcknowlegementType restartService(boolean forced) {
         LOGGER.info("\n restart requested \n");
         if (cn != null) {
-            cn.reload();
-            return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
+            if (!isIndexing) {
+                cn.reload();
+                return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
+            } else if (!forced) {
+                return new AcknowlegementType("failed", "There is an indexation running use the parameter FORCED=true to bypass it.");
+            } else {
+                AbstractIndexer.stopIndexation();
+                cn.reload();
+                return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted (previous indexation was stopped)");
+            }
         } else {
             return new AcknowlegementType("failed", "The services can not be restarted (ContainerNotifier is null)");
         }
