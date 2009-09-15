@@ -119,6 +119,8 @@ import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 
 import static org.constellation.query.Query.KEY_VERSION;
 import static org.constellation.query.wcs.WCSQuery.GEOTIFF;
@@ -191,30 +193,29 @@ public final class WCSWorker {
      * Capabilities document with supplementary information.
      * </p>
      *
-     * @param abstractRequest A {@linkplain AbstractDescribeCoverage request}
-     *                        with the parameters of the user message.
-     * @return An XML document giving the full description of the requested 
-     *           coverages.
+     * @param request A {@linkplain AbstractDescribeCoverage request} with the
+     *                parameters of the user message.
+     * @return An XML document giving the full description of the requested coverages.
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    public DescribeCoverageResponse describeCoverage(final DescribeCoverage abstractRequest)
-                                                  throws JAXBException, CstlServiceException
+    public DescribeCoverageResponse describeCoverage(final DescribeCoverage request)
+                                          throws JAXBException, CstlServiceException
     {
-        final String version = abstractRequest.getVersion().toString();
+        final String version = request.getVersion().toString();
         if (version == null) {
             throw new CstlServiceException("The parameter SERVICE must be specified.",
                            MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
         }
 
         if (version.equals(ServiceDef.WCS_1_0_0.version.toString()) &&
-            abstractRequest instanceof org.geotoolkit.wcs.xml.v100.DescribeCoverageType)
+            request instanceof org.geotoolkit.wcs.xml.v100.DescribeCoverageType)
         {
-            return describeCoverage100((org.geotoolkit.wcs.xml.v100.DescribeCoverageType) abstractRequest);
+            return describeCoverage100((org.geotoolkit.wcs.xml.v100.DescribeCoverageType) request);
         } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString()) &&
-                   abstractRequest instanceof org.geotoolkit.wcs.xml.v111.DescribeCoverageType)
+                   request instanceof org.geotoolkit.wcs.xml.v111.DescribeCoverageType)
         {
-            return describeCoverage111((org.geotoolkit.wcs.xml.v111.DescribeCoverageType) abstractRequest);
+            return describeCoverage111((org.geotoolkit.wcs.xml.v111.DescribeCoverageType) request);
         } else {
             throw new CstlServiceException("The version number specified for this GetCoverage request " +
                     "is not handled.", NO_APPLICABLE_CODE, KEY_VERSION.toLowerCase());
@@ -500,17 +501,17 @@ public final class WCSWorker {
     /**
      * Describe the capabilities and the layers available for the WCS service.
      *
-     * @param abstractRequest The request done by the user.
+     * @param request The request done by the user.
      * @return a WCSCapabilities XML document describing the capabilities of this service.
      *
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    public GetCapabilitiesResponse getCapabilities(GetCapabilities abstractRequest)
+    public GetCapabilitiesResponse getCapabilities(GetCapabilities request)
                                   throws JAXBException, CstlServiceException
     {
         //we begin by extract the base attribute
-        String version = abstractRequest.getVersion().toString();
+        String version = request.getVersion().toString();
         if (version == null) {
             // For the moment the only version that we really support is this one.
             version = "1.0.0";
@@ -520,15 +521,15 @@ public final class WCSWorker {
         final String format;
 
         if (version.equals(ServiceDef.WCS_1_0_0.version.toString()) &&
-            abstractRequest instanceof org.geotoolkit.wcs.xml.v100.GetCapabilitiesType)
+            request instanceof org.geotoolkit.wcs.xml.v100.GetCapabilitiesType)
         {
-            return getCapabilities100((org.geotoolkit.wcs.xml.v100.GetCapabilitiesType) abstractRequest);
+            return getCapabilities100((org.geotoolkit.wcs.xml.v100.GetCapabilitiesType) request);
         } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString()) &&
-                   abstractRequest instanceof org.geotoolkit.wcs.xml.v111.GetCapabilitiesType)
+                   request instanceof org.geotoolkit.wcs.xml.v111.GetCapabilitiesType)
         {
             // if the user have specified one format accepted (only one for now != spec)
             final AcceptFormatsType formats =
-                    ((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType)abstractRequest).getAcceptFormats();
+                    ((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType)request).getAcceptFormats();
             if (formats == null || formats.getOutputFormat().size() == 0) {
                 format = MimeType.TEXT_XML;
             } else {
@@ -539,7 +540,7 @@ public final class WCSWorker {
                 }
             }
 
-            return getCapabilities111((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType) abstractRequest);
+            return getCapabilities111((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType) request);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", NO_APPLICABLE_CODE, KEY_VERSION.toLowerCase());
@@ -693,11 +694,13 @@ public final class WCSWorker {
      * @throws CstlServiceException
      * @throws JAXBException when unmarshalling the default GetCapabilities file.
      */
-    private Capabilities getCapabilities111(final org.geotoolkit.wcs.xml.v111.GetCapabilitiesType request)
-                                                           throws CstlServiceException, JAXBException
+    private Capabilities getCapabilities111(
+            final org.geotoolkit.wcs.xml.v111.GetCapabilitiesType request)
+                                throws CstlServiceException, JAXBException
     {
         // First we try to extract only the requested section.
-        List<String> requestedSections = SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString());
+        List<String> requestedSections =
+                SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString());
 
         if (request.getSections() != null && request.getSections().getSection().size() > 0) {
             requestedSections = request.getSections().getSection();
@@ -805,31 +808,30 @@ public final class WCSWorker {
      * According to the output format chosen, the response could be an
      * {@linkplain RenderedImage image} or data representation.
      *
-     * @param abstractRequest The request done by the user.
+     * @param request The request done by the user.
      * @return An {@linkplain RenderedImage image}, or a data representation.
      *
      * @throws JAXBException
      * @throws CstlServiceException
      */
-    public RenderedImage getCoverage(final GetCoverage abstractRequest) throws JAXBException,
-                                                                         CstlServiceException
+    public RenderedImage getCoverage(final GetCoverage request)
+                     throws JAXBException, CstlServiceException
     {
-        final String inputVersion = abstractRequest.getVersion().toString();
-        if(inputVersion == null) {
+        final String inputVersion = request.getVersion().toString();
+        if (inputVersion == null) {
             throw new CstlServiceException("The parameter version must be specified",
                            MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
         }
-        //this.actingVersion = new ServiceVersion(ServiceType.WCS, inputVersion);
 
         Date date = null;
         try {
-            date = StringUtilities.toDate(abstractRequest.getTime());
+            date = StringUtilities.toDate(request.getTime());
         } catch (ParseException ex) {
             LOGGER.log(Level.INFO, "Parsing of the date failed. Please verify that the specified" +
                     " date is compliant with the ISO-8601 standard.", ex);
         }
 
-        final LayerDetails layerRef = getLayerReference(abstractRequest.getCoverage(), inputVersion);
+        final LayerDetails layerRef = getLayerReference(request.getCoverage(), inputVersion);
         if (!layerRef.isQueryable(ServiceType.WCS) || layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +
                     layerRef.getName() + "\".", INVALID_PARAMETER_VALUE);
@@ -839,20 +841,20 @@ public final class WCSWorker {
          * Generating the response.
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
          */
-        if ( abstractRequest.getFormat().equalsIgnoreCase(MATRIX) ) {
+        if ( request.getFormat().equalsIgnoreCase(MATRIX) ) {
 
             //NOTE ADRIAN HACKED HERE
             final Envelope envelope;
             try {
-                envelope = abstractRequest.getEnvelope();
+                envelope = request.getEnvelope();
             } catch (FactoryException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
             final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
             final RenderedImage image;
             try {
-                final GridCoverage2D gridCov = layerRef.getCoverage(abstractRequest.getEnvelope(),
-                        abstractRequest.getSize(), elevation, date);
+                final GridCoverage2D gridCov = layerRef.getCoverage(request.getEnvelope(),
+                        request.getSize(), elevation, date);
                 image = gridCov.getRenderedImage();
             } catch (IOException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
@@ -864,13 +866,13 @@ public final class WCSWorker {
 
             return image;
 
-        } else if( abstractRequest.getFormat().equalsIgnoreCase(NETCDF) ){
+        } else if( request.getFormat().equalsIgnoreCase(NETCDF) ){
 
             throw new CstlServiceException(new IllegalArgumentException(
                                                "Constellation does not support netcdf writing."),
                                            NO_APPLICABLE_CODE);
 
-        } else if( abstractRequest.getFormat().equalsIgnoreCase(GEOTIFF) ){
+        } else if( request.getFormat().equalsIgnoreCase(GEOTIFF) ){
 
             throw new CstlServiceException(new IllegalArgumentException(
                                                "Constellation does not support geotiff writing."),
@@ -886,7 +888,7 @@ public final class WCSWorker {
             final Map<String, Object> renderParameters = new HashMap<String, Object>();
             final Envelope envelope;
             try {
-                envelope = abstractRequest.getEnvelope();
+                envelope = request.getEnvelope();
             } catch (FactoryException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
@@ -898,22 +900,23 @@ public final class WCSWorker {
             // VIEW
             final JTSEnvelope2D refEnvel;
             try {
-                if (envelope.getDimension() > 2) {
-                    refEnvel = new JTSEnvelope2D(
-                            envelope.getMinimum(0), envelope.getMaximum(0),
-                            envelope.getMinimum(1), envelope.getMaximum(1),
-                            CRS.getHorizontalCRS(abstractRequest.getCRS()));
+                final CoordinateReferenceSystem responseCRS = request.getResponseCRS();
+                if (responseCRS != null && !CRS.equalsIgnoreMetadata(responseCRS, request.getCRS())) {
+                    final Envelope responseEnv = CRS.transform(envelope, responseCRS);
+                    refEnvel = new JTSEnvelope2D(responseEnv);
                 } else {
                     refEnvel = new JTSEnvelope2D(envelope);
                 }
             } catch (FactoryException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
+            } catch (TransformException ex) {
+                throw new CstlServiceException(ex, INVALID_CRS, "response_crs");
             }
             final Double azimuth =  0.0; //HARD CODED SINCE PROTOCOL DOES NOT ALLOW
             final Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnvel, azimuth);
 
             // CANVAS
-            final Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(abstractRequest.getSize(), null);
+            final Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(request.getSize(), null);
 
             // IMAGE
             final BufferedImage img;

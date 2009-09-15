@@ -265,7 +265,7 @@ public class WCSService extends OGCWebService {
                     if (!format.equals(MimeType.IMAGE_PNG) && !format.equals(MimeType.IMAGE_GIF)
                         && !format.equals(MimeType.IMAGE_BMP) && !format.equals(MimeType.IMAGE_JPEG))
                     {
-                        throw new CstlServiceException("The request format is not a supported format for this coverage",
+                        throw new CstlServiceException("The requested format is not supported for this coverage",
                                 INVALID_FORMAT, "format");
                     }
                 }
@@ -457,7 +457,6 @@ public class WCSService extends OGCWebService {
 
         final String resx   = getParameter(KEY_RESX,   false);
         final String resy   = getParameter(KEY_RESY,   false);
-        @SuppressWarnings("unused")
         final String resz   = getParameter(KEY_RESZ,   false);
 
         // temporal subset
@@ -506,8 +505,12 @@ public class WCSService extends OGCWebService {
         }
         final EnvelopeEntry envelope = new EnvelopeEntry(pos, getParameter(KEY_CRS, true));
 
-        if ((width == null || height == null) && (resx == null || resy == null)) {
-            throw new CstlServiceException("The parameters WIDTH and HEIGHT or RESX and RESY have to be specified",
+        if (width == null && resx == null) {
+            throw new CstlServiceException("One of the parameters WIDTH or RESX have to be specified.",
+                    INVALID_PARAMETER_VALUE);
+        }
+        if (height == null && resy == null) {
+            throw new CstlServiceException("One of the parameters HEIGHT or RESY have to be specified.",
                     INVALID_PARAMETER_VALUE);
         }
 
@@ -518,12 +521,14 @@ public class WCSService extends OGCWebService {
         low.add(BigInteger.ZERO);
         low.add(BigInteger.ZERO);
         final List<BigInteger> high = new ArrayList<BigInteger>();
-        high.add(new BigInteger(width));
-        high.add(new BigInteger(height));
-        if (depth != null) {
+
+        high.add(new BigInteger((width != null) ? width : resx));
+        high.add(new BigInteger((height != null) ? height : resy));
+
+        if (depth != null || resz != null) {
             axis.add("depth");
             low.add(BigInteger.ZERO);
-            high.add(new BigInteger(depth));
+            high.add(new BigInteger((depth != null) ? depth : resz));
         }
         final GridLimitsType limits = new GridLimitsType(low, high);
         final GridType grid = new GridType(limits, axis);
