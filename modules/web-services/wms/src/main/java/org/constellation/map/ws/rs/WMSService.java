@@ -69,6 +69,7 @@ import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
 
 //Geoapi dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -272,7 +273,19 @@ public class WMSService extends OGCWebService {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
         }
         StringWriter sw = new StringWriter();
-        marshaller.marshal(report, sw);
+        if (serviceDef.equals(ServiceDef.WMS_1_1_1_SLD)) {
+            final MarshallerPool poolException = new MarshallerPool("org.constellation.ws");
+            final Marshaller marsh = poolException.acquireMarshaller();
+            try {
+                marsh.setProperty("com.sun.xml.bind.xmlHeaders",
+                        "<!DOCTYPE ServiceExceptionReport SYSTEM \"http://schemas.opengis.net/wms/1.1.0/exception_1_1_0.dtd\">\n");
+                marsh.marshal(report, sw);
+            } finally {
+                poolException.release(marsh);
+            }
+        } else {
+            marshaller.marshal(report, sw);
+        }
         final String mimeException = (serviceDef.version.equals(ServiceDef.WMS_1_1_1_SLD.version)) ?
                                                                 MimeType.APP_SE_XML : MimeType.TEXT_XML;
         return Response.ok(Util.cleanSpecialCharacter(sw.toString()), mimeException).build();
@@ -419,7 +432,15 @@ public class WMSService extends OGCWebService {
         }
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
         if (strFormat != null && !strFormat.isEmpty()) {
-            exceptionImageFormat     = strFormat;
+            // Ensures that the format specified is known, to use it as the format of the
+            // image which will contain the exception.
+            if (strFormat.equalsIgnoreCase(MimeType.IMAGE_BMP) ||
+                strFormat.equalsIgnoreCase(MimeType.IMAGE_GIF) ||
+                strFormat.equalsIgnoreCase(MimeType.IMAGE_JPEG)||
+                strFormat.equalsIgnoreCase(MimeType.IMAGE_PNG))
+            {
+                exceptionImageFormat = strFormat;
+            }
         }
 
         String strCRS                = getParameter((version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
