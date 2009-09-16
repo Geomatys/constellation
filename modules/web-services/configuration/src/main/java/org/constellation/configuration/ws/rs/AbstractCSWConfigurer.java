@@ -57,7 +57,6 @@ import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.xml.MarshallerPool;
-import org.mdweb.utils.GlobalUtils;
 
 /**
  * The base for The CSW configurer.
@@ -240,23 +239,14 @@ public abstract class AbstractCSWConfigurer {
         LOGGER.info("refresh index requested");
         String msg;
 
-        // MDWeb Search indexation
-        if (service != null && service.equalsIgnoreCase("MDSEARCH")) {
-            GlobalUtils.resetLuceneIndex();
-            msg = "MDWeb search index succefully deleted";
-
-        // CSW indexation
+        final File cswConfigDir = getConfigurationDirectory();
+        if (!asynchrone) {
+            synchroneIndexRefresh(cswConfigDir, id);
         } else {
-            
-            final File cswConfigDir = getConfigurationDirectory();
-            if (!asynchrone) {
-                synchroneIndexRefresh(cswConfigDir, id);
-            } else {
-                asynchroneIndexRefresh(cswConfigDir, id);
-            }
-            
-            msg = "CSW index succefully recreated";
+            asynchroneIndexRefresh(cswConfigDir, id);
         }
+
+        msg = "CSW index succefully recreated";
         return new AcknowlegementType("success", msg);
     }
 
