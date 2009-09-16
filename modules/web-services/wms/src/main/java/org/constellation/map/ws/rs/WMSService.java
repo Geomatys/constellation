@@ -51,7 +51,7 @@ import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.util.Util;
 import org.constellation.util.StringUtilities;
-import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
+import org.constellation.writer.CapabilitiesFilterWriter;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
@@ -67,9 +67,10 @@ import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
+import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
+import org.geotoolkit.xml.MarshallerPool;
 
 //Geoapi dependencies
-import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -175,15 +176,25 @@ public class WMSService extends OGCWebService {
                 }
                 return Response.ok(result, infoFormat).build();
             }
-            if (GETCAPABILITIES.equalsIgnoreCase(request)) {
-                String versionSt = getParameter(KEY_VERSION, false);
-                if (versionSt == null) {
-                    // For backward compatibility with WMS 1.0.0, we try to find the version number
-                    // from the WMTVER parameter too.
-                    versionSt = getParameter(KEY_WMTVER, false);
+            // For backward compatibility between WMS 1.1.1 and WMS 1.0.0, we handle the "Capabilities" request
+            // as "GetCapabilities" request in version 1.1.1.
+            if (GETCAPABILITIES.equalsIgnoreCase(request) || CAPABILITIES.equalsIgnoreCase(request)) {
+                /*
+                 * If the request is "Capabilities" then we set the version to 1.1.1, since it is
+                 * the one which tries to stay compatible with the 1.0.0.
+                 */
+                if (CAPABILITIES.equalsIgnoreCase(request)) {
+                    version = ServiceDef.WMS_1_1_1_SLD;
+                } else {
+                    String versionSt = getParameter(KEY_VERSION, false);
+                    if (versionSt == null) {
+                        // For backward compatibility with WMS 1.0.0, we try to find the version number
+                        // from the WMTVER parameter too.
+                        versionSt = getParameter(KEY_WMTVER, false);
+                    }
+                    version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 }
-                version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
-                final GetCapabilities requestCapab = adaptGetCapabilities(versionSt);
+                final GetCapabilities requestCapab = adaptGetCapabilities(version.version.toString());
                 version = getVersionFromNumber(requestCapab.getVersion().toString());
                 worker.initServletContext(servletContext);
                 worker.initUriContext(uriContext);
@@ -191,27 +202,14 @@ public class WMSService extends OGCWebService {
                 //workaround because 1.1.1 is defined with a DTD rather than an XSD
                 //we marshall the response and return the XML String
                 final StringWriter sw = new StringWriter();
-                marshaller.setProperty("com.sun.xml.bind.xmlHeaders",
-                           (requestCapab.getVersion().toString().equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
-                           "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n" :
-                           "");
-                marshaller.marshal(capabilities, sw);
-                return Response.ok(sw.toString(), requestCapab.getFormat()).build();
-            }
-            // For backward compatibility between WMS 1.1.1 and WMS 1.0.0, we handle the "Capabilities" request
-            // as "GetCapabilities" request in version 1.1.1.
-            if (CAPABILITIES.equalsIgnoreCase(request)) {
-                version = ServiceDef.WMS_1_1_1_SLD;
-                final GetCapabilities requestCapab = adaptGetCapabilities(version.version.toString());
-                worker.initServletContext(servletContext);
-                worker.initUriContext(uriContext);
-                final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
-                //workaround because 1.1.1 is defined with a DTD rather than an XSD
-                //we marshall the response and return the XML String
-                final StringWriter sw = new StringWriter();
-                marshaller.setProperty("com.sun.xml.bind.xmlHeaders",
-                           "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n");
-                marshaller.marshal(capabilities, sw);
+                if (version.equals(ServiceDef.WMS_1_1_1_SLD)) {
+                    final CapabilitiesFilterWriter swCaps = new CapabilitiesFilterWriter(sw);
+                    marshaller.setProperty("com.sun.xml.bind.xmlHeaders",
+                            "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n");
+                    marshaller.marshal(capabilities, swCaps);
+                } else {
+                    marshaller.marshal(capabilities, sw);
+                }
                 return Response.ok(sw.toString(), requestCapab.getFormat()).build();
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
@@ -273,6 +271,12 @@ public class WMSService extends OGCWebService {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
         }
         StringWriter sw = new StringWriter();
+        /*
+         * For WMS 1.1.1, we need to define another marshalling pool, with just the service exception
+         * packages. Actually that package does not contain any reference to namespace, consequently
+         * the service exception marshalled file will not contain namespaces definitions.
+         * This is what we want since the service exception report already owns a DTD.
+         */
         if (serviceDef.equals(ServiceDef.WMS_1_1_1_SLD)) {
             final MarshallerPool poolException = new MarshallerPool("org.constellation.ws");
             final Marshaller marsh = poolException.acquireMarshaller();
