@@ -223,7 +223,7 @@ public class MDWebMetadataReader extends MetadataReader {
                 final Connection tConnection       = thesaurusDB.getConnection();
                 final LocalReaderThesaurus tReader = new LocalReaderThesaurus(tConnection);
                 final List<Word> words             = tReader.getWords();
-                
+                tReader.close();
                 for (Word word : words) {
                     try {
                         final URI uri = new URI(word.getUriConcept());
