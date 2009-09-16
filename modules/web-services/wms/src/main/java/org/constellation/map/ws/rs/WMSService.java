@@ -183,19 +183,22 @@ public class WMSService extends OGCWebService {
                  * If the request is "Capabilities" then we set the version to 1.1.1, since it is
                  * the one which tries to stay compatible with the 1.0.0.
                  */
+                String versionSt;
                 if (CAPABILITIES.equalsIgnoreCase(request)) {
                     version = ServiceDef.WMS_1_1_1_SLD;
+                    versionSt = version.version.toString();
                 } else {
-                    String versionSt = getParameter(KEY_VERSION, false);
+                    versionSt = getParameter(KEY_VERSION, false);
                     if (versionSt == null) {
                         // For backward compatibility with WMS 1.0.0, we try to find the version number
                         // from the WMTVER parameter too.
                         versionSt = getParameter(KEY_WMTVER, false);
                     }
-                    version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 }
-                final GetCapabilities requestCapab = adaptGetCapabilities(version.version.toString());
-                version = getVersionFromNumber(requestCapab.getVersion().toString());
+                final GetCapabilities requestCapab = adaptGetCapabilities(versionSt);
+                if (version == null) {
+                    version = getVersionFromNumber(requestCapab.getVersion().toString());
+                }
                 worker.initServletContext(servletContext);
                 worker.initUriContext(uriContext);
                 final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
