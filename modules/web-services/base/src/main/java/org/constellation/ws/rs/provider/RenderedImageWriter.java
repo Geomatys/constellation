@@ -18,54 +18,34 @@
 
 package org.constellation.ws.rs.provider;
 
-import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.constellation.util.Util;
+
+import org.geotoolkit.util.ImageIOUtilities;
 
 @Provider
-public class RenderedImageWriter implements MessageBodyWriter<RenderedImage> {
+public class RenderedImageWriter<T extends RenderedImage> implements MessageBodyWriter<T> {
 
-    public long getSize(RenderedImage r, Class<?> c, Type t, Annotation[] as, MediaType mt) {
+    @Override
+    public long getSize(T r, Class<?> c, Type t, Annotation[] as, MediaType mt) {
         return -1;
     }
 
-    public void writeTo(RenderedImage r, Class<?> c, Type t, Annotation[] as, MediaType mt,
+    @Override
+    public void writeTo(T r, Class<?> c, Type t, Annotation[] as, MediaType mt,
             MultivaluedMap<String, Object> h, OutputStream out) throws IOException, WebApplicationException {
-        writeImage(r, mt.toString(), out);
+        ImageIOUtilities.writeImage(r, mt.toString(), out);
     }
 
-    public long getSize(RenderedImage t) {
-        return -1;
-    }
-
-    /**
-     * Write an {@linkplain BufferedImage image} into an output stream, using
-     * the mime type specified.
-     * 
-     * @param image
-     *            The image to write into an output stream.
-     * @param mime
-     *            Mime-type of the output
-     * @param output
-     *            Output stream containing the image.
-     * @throws java.io.IOException
-     *             if a writing error occurs.
-     */
-    private static void writeImage(final RenderedImage image, final String mime, Object output)
-            throws IOException {
-        Util.writeImage(image, mime, output);
-    }
-
+    @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return RenderedImage.class.isAssignableFrom(type);
     }

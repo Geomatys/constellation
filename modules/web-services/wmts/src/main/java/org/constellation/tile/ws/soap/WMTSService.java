@@ -29,6 +29,7 @@ import org.constellation.tile.ws.WMTSWorker;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
+import org.geotoolkit.util.ImageIOUtilities;
 import org.geotoolkit.wmts.xml.v100.BinaryPayload;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
@@ -127,7 +128,7 @@ public class WMTSService {
             final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
             final BufferedImage buffered = worker.getTile(requestTile);
             final String mimeType = Util.fileExtensionToMimeType(requestTile.getFormat());
-            Util.writeImage(buffered, mimeType, byteOut);
+            ImageIOUtilities.writeImage(buffered, mimeType, byteOut);
             final BinaryPayload binaryPayLoad = new BinaryPayload();
             binaryPayLoad.setPayloadContent(byteOut.toByteArray());
             binaryPayLoad.setFormat(requestTile.getFormat());

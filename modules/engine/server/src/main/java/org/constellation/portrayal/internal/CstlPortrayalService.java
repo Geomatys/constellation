@@ -77,7 +77,7 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
     }
         
     private CstlPortrayalService(){}
-    
+
     /**
      * Portray a set of Layers over a given geographic extent with a given 
      * resolution yielding a {@code BufferedImage} of the scene.

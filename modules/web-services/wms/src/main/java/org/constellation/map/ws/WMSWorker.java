@@ -759,7 +759,7 @@ public class WMSWorker extends AbstractWMSWorker {
      * @throws CstlServiceException
      */
     @Override
-    public synchronized BufferedImage getMap(final GetMap getMap) throws CstlServiceException {
+    public BufferedImage getMap(final GetMap getMap) throws CstlServiceException {
 
     	//
     	// Note this is almost the same logic as in getFeatureInfo
@@ -888,8 +888,7 @@ public class WMSWorker extends AbstractWMSWorker {
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
     public static LayerDetails getLayerReference(final String layerName, final String version)
-                                                             throws CstlServiceException
-    {
+                                                             throws CstlServiceException {
 
         LayerDetails layerRef;
     	try { // WE catch the exception from either service version
@@ -909,7 +908,7 @@ public class WMSWorker extends AbstractWMSWorker {
 
 
 
-    private MutableStyle extractStyle(final String layerName, final MutableStyledLayerDescriptor sld){
+    private static MutableStyle extractStyle(final String layerName, final MutableStyledLayerDescriptor sld){
         if(sld == null){
             throw new NullPointerException("SLD should not be null");
         }
@@ -937,9 +936,8 @@ public class WMSWorker extends AbstractWMSWorker {
         return null;
     }
 
-    private List<MutableStyle> getStyles(final List<LayerDetails> layerRefs, final MutableStyledLayerDescriptor sld,
-                                         final List<String> styleNames) throws CstlServiceException
-    {
+    private static List<MutableStyle> getStyles(final List<LayerDetails> layerRefs, final MutableStyledLayerDescriptor sld,
+                                         final List<String> styleNames) throws CstlServiceException {
         final List<MutableStyle> styles = new ArrayList<MutableStyle>();
         for (int i=0; i<layerRefs.size(); i++) {
 

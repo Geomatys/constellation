@@ -59,7 +59,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 
-//Geotools dependencies
+//GeotoolKit dependencies
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
@@ -96,7 +96,7 @@ public class WMSService extends OGCWebService {
     /**
      * The worker which will perform the core logic for this service.
      */
-    protected AbstractWMSWorker worker;
+    private final AbstractWMSWorker worker;
 
     /**
      * Defines whether the exceptions should be stored and output in an image or not.

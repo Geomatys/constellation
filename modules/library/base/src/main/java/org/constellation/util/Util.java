@@ -1371,41 +1371,6 @@ public final class Util {
             out.close();
         }
     }
-    
-    /**
-     * Write an {@linkplain RenderedImage image} into an output stream, using the mime
-     * type specified.
-     *
-     * @param image The image to write into an output stream.
-     * @param mime Mime-type of the output
-     * @param output Output stream containing the image.
-     * @throws IOException if a writing error occurs.
-     */
-    public static synchronized void writeImage(final RenderedImage image,
-            final String mime, Object output) throws IOException
-    {
-        if(image == null) throw new IllegalArgumentException("Image can not be null");
-        final Iterator<ImageWriter> writers = ImageIO.getImageWritersByMIMEType(mime);
-        while (writers.hasNext()) {
-            final ImageWriter writer = writers.next();
-            final ImageWriterSpi spi = writer.getOriginatingProvider();
-            if (spi.canEncodeImage(image)) {
-                ImageOutputStream stream = null;
-                if (!isValidType(spi.getOutputTypes(), output)) {
-                    stream = ImageIO.createImageOutputStream(output);
-                    output = stream;
-                }
-                writer.setOutput(output);
-                writer.write(image);
-                writer.dispose();
-                if (stream != null) {
-                    stream.close();
-                }
-                return;
-            }
-        }
-        throw new IOException("Unknowed image type");
-    }
 
     /**
      * Returns the mime type matching the extension of an image file.
@@ -1483,20 +1448,6 @@ public final class Util {
             }
         }
         throw new IIOException("No available image reader able to handle the mime type specified: "+ mimeType);
-    }
-
-    /**
-     * Check if the provided object is an instance of one of the given classes.
-     */
-    private static synchronized boolean isValidType(final Class<?>[] validTypes,
-                                                    final Object type)
-    {
-        for (final Class<?> t : validTypes) {
-            if (t.isInstance(type)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

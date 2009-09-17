@@ -74,7 +74,7 @@ import static org.constellation.ws.ExceptionCode.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public abstract class OGCWebService extends WebService {
+public abstract class OGCWebService extends AbstractWebService {
 	
     /**
      * The supported supportedVersions supported by this web serviceType.

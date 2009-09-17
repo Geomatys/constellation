@@ -50,7 +50,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
 
 // Constellation dependencies
-import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.ws.CstlServiceException;
 
 import org.constellation.ws.MimeType;
@@ -138,11 +137,6 @@ public abstract class WebService {
     private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
 
     /**
-     * A pool of JAXB unmarshaller used to create Java objects from XML files.
-     */
-    protected MarshallerPool marshallerPool;
-
-    /**
      * Provides access to the URI used in the method call, for instance, to
      * obtain the Key-Value Pairs in the request. The field is injected, thanks
      * to the annotation, when a request arrives.
@@ -182,7 +176,7 @@ public abstract class WebService {
      * If this flag is set the method logParameters() will path the entire request in the logs
      * instead of the parameters map.
      */
-    private boolean fullRequestLog   = false;
+    private boolean fullRequestLog = false;
 
     /**
      * Initialize the basic attribute of a web service.
@@ -219,33 +213,13 @@ public abstract class WebService {
      */
     protected abstract Response launchException(String message, String codeName, String locator) throws JAXBException;
 
-
     /**
-     * Initialize the JAXB context and build the unmarshaller/marshaller
-     *
-     * @param packagesName A list of package containing JAXB annoted classes.
-     * @param rootNamespace The main namespace for all the document.
-     *
-     * @throws JAXBException
+     * Provide the marshaller pool.
+     * Live it's instanciation to implementations.
      */
-    protected void setXMLContext(final String packagesName, final String rootNamespace) throws JAXBException {
-        LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
-                    " packages: " + packagesName);
-       marshallerPool = new AnchoredMarshallerPool(rootNamespace, packagesName);
-    }
+    protected abstract MarshallerPool getMarshallerPool();
 
-    /**
-     * Initialize the JAXB context and build the unmarshaller/marshaller
-     *
-     * @param classesName A list of JAXB annoted classes.
-     * @param rootNamespace The main namespace for all the document.
-     *
-     * @throws JAXBException
-     */
-    protected void setXMLContext(final String rootNamespace, final Class<?>... classes) throws JAXBException {
-        LOGGER.finer("SETTING XML CONTEXT: classes version");
-        marshallerPool = new AnchoredMarshallerPool(rootNamespace, classes);
-    }
+    
 
     /**
      * Treat the incoming GET request.
@@ -290,6 +264,7 @@ public abstract class WebService {
     @POST
     @Consumes("*/xml")
     public Response doPOSTXml(InputStream is) throws JAXBException  {
+        final MarshallerPool marshallerPool = getMarshallerPool();
         if (marshallerPool != null) {
             Object request = null;
             Unmarshaller unmarshaller = null;
@@ -441,6 +416,7 @@ public abstract class WebService {
                                                                   throws CstlServiceException
     {
 
+        final MarshallerPool marshallerPool = getMarshallerPool();
         Unmarshaller unmarshaller = null;
         try {
             unmarshaller = marshallerPool.acquireUnmarshaller();

@@ -56,6 +56,7 @@ import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.constellation.ws.rs.AbstractWebService;
 import org.constellation.ws.rs.WebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -80,7 +81,7 @@ import org.geotoolkit.lucene.index.AbstractIndexer;
  */
 @Path("configuration")
 @Singleton
-public class ConfigurationService extends WebService  {
+public class ConfigurationService extends AbstractWebService  {
 
     /**
      * A container notifier allowing to dynamically reload all the active service.
