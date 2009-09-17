@@ -660,10 +660,8 @@ public class WMSWorker extends AbstractWMSWorker {
         //       -- create the rendering parameter Map
         final Double elevation                 = getFI.getElevation();
         final Date time                        = getFI.getTime();
-        final MeasurementRange<?> dimRange     = getFI.getDimRange();
         final Map<String, Object> params       = new HashMap<String, Object>();
         params.put(WMSQuery.KEY_ELEVATION, elevation);
-        params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, time);
         final Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params);
 
