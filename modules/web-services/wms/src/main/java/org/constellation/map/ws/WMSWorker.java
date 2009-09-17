@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -146,6 +147,12 @@ public class WMSWorker extends AbstractWMSWorker {
      * Decoration extension for map queries.
      */
     private PortrayalExtension extension = null;
+
+    /**
+     * Size of the legend graphic.
+     */
+    private static final int LEGEND_WIDTH = 140;
+    private static final int LEGEND_HEIGHT = 15;
 
     public WMSWorker(final MarshallerPool marshallerPool) {
         this.marshallerPool = marshallerPool;
@@ -380,11 +387,13 @@ public class WMSWorker extends AbstractWMSWorker {
                 org.geotoolkit.wms.xml.v111.OnlineResource or =
                         new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlPng);
                 final org.geotoolkit.wms.xml.v111.LegendURL legendURL1 =
-                        new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_PNG, or);
+                        new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_PNG, or,
+                        BigInteger.valueOf(LEGEND_WIDTH), BigInteger.valueOf(LEGEND_HEIGHT));
 
                 or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlGif);
                 final org.geotoolkit.wms.xml.v111.LegendURL legendURL2 =
-                        new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_GIF, or);
+                        new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_GIF, or,
+                        BigInteger.valueOf(LEGEND_WIDTH), BigInteger.valueOf(LEGEND_HEIGHT));
 
                 final List<String> stylesName = layer.getFavoriteStyles();
                 final List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
@@ -431,11 +440,13 @@ public class WMSWorker extends AbstractWMSWorker {
                 org.geotoolkit.wms.xml.v130.OnlineResource or =
                         new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlPng);
                 final org.geotoolkit.wms.xml.v130.LegendURL legendURL1 =
-                        new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_PNG, or);
+                        new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_PNG, or,
+                        BigInteger.valueOf(LEGEND_WIDTH), BigInteger.valueOf(LEGEND_HEIGHT));
 
                 or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlGif);
                 final org.geotoolkit.wms.xml.v130.LegendURL legendURL2 =
-                        new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_GIF, or);
+                        new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_GIF, or,
+                        BigInteger.valueOf(LEGEND_WIDTH), BigInteger.valueOf(LEGEND_HEIGHT));
 
                 final List<String> stylesName = layer.getFavoriteStyles();
                 final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
@@ -745,8 +756,8 @@ public class WMSWorker extends AbstractWMSWorker {
         }
         final Integer width  = getLegend.getWidth();
         final Integer height = getLegend.getHeight();
-        final Dimension dims = new Dimension((width == null) ? 140 : width,
-                                             (height == null) ? 15 : height);
+        final Dimension dims = new Dimension((width == null) ? LEGEND_WIDTH : width,
+                                             (height == null) ? LEGEND_HEIGHT : height);
         return layer.getLegendGraphic(dims);
     }
 

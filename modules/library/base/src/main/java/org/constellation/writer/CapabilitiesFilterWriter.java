@@ -120,4 +120,18 @@ public class CapabilitiesFilterWriter extends FilterWriter {
         }
         return line;
     }
+
+    @Override
+    public void flush() throws IOException {
+        out.write(buffer.toString());
+        buffer.setLength(0);
+        super.flush();
+    }
+
+    @Override
+    public void close() throws IOException {
+        out.write(buffer.toString());
+        buffer.setLength(0);
+        super.close();
+    }
 }

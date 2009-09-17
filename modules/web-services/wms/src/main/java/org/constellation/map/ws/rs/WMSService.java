@@ -26,6 +26,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
@@ -207,8 +208,13 @@ public class WMSService extends OGCWebService {
                 final StringWriter sw = new StringWriter();
                 if (version.equals(ServiceDef.WMS_1_1_1_SLD)) {
                     final CapabilitiesFilterWriter swCaps = new CapabilitiesFilterWriter(sw);
-                    marshaller.setProperty("com.sun.xml.bind.xmlHeaders",
-                            "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n");
+                    try {
+                        swCaps.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
+                        swCaps.write("<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n");
+                    } catch (IOException ex) {
+                        throw new JAXBException(ex);
+                    }
+                    marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
                     marshaller.marshal(capabilities, swCaps);
                 } else {
                     marshaller.marshal(capabilities, sw);
