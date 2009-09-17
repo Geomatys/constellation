@@ -59,6 +59,7 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.ServiceType;
+import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.rs.WebService;
 
 // Geotoolkit dependencies
@@ -68,9 +69,6 @@ import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.xml.v311.CodeListType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.ows.xml.AbstractDCP;
-import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
-import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.KeywordsType;
@@ -734,7 +732,7 @@ public final class WCSWorker {
         if (requestedSections.contains("OperationsMetadata") || requestedSections.contains("All")) {
             om = staticCapabilities.getOperationsMetadata();
             //we update the url in the static part.
-            updateOWSURL(om.getOperation(), uriContext.getBaseUri().toString(), "WCS");
+            OGCWebService.updateOWSURL(om.getOperation(), uriContext.getBaseUri().toString(), "WCS");
         }
         final Capabilities responsev111 = new Capabilities(si, sp, om, ServiceDef.WCS_1_1_1.version.toString(), null, null);
 
@@ -1066,24 +1064,6 @@ public final class WCSWorker {
         	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
         }
         return layerRef;
-    }
-
-    /**
-     * Update all the url in a OWS capabilities document.
-     *
-     * @param operations A list of OWS operation.
-     * @param url The url of the web application.
-     * @param serviceType the initials of the web serviceType (WMS, SOS, WCS, CSW, ...).
-     *        This string is the resource name in lower case.
-     */
-    private void updateOWSURL(List<? extends AbstractOperation> operations, String url, String service) {
-        for (AbstractOperation op:operations) {
-            for (AbstractDCP dcp: op.getDCP()) {
-                for (AbstractOnlineResourceType method:dcp.getHTTP().getGetOrPost()) {
-                    method.setHref(url + service.toLowerCase() + "?");
-                }
-            }
-       }
     }
 
     /**

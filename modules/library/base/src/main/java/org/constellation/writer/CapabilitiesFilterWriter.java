@@ -102,19 +102,21 @@ public class CapabilitiesFilterWriter extends FilterWriter {
     }
 
     /**
-     * Return the root "WMT_MS_Capabilities" tag with just the version defined.
-     * If there are any namespaces defined for this tag, then they are removed.
-     * Returns the line unchanged if it is not the root tag of a WMS 1.1.1
-     * GetCapabilities.
+     * In general, returns the line unchanged.
+     * If the line is the root tag WMT_MS_Capabilities, then it justs returns the root tag
+     * with only the version number. Consequently it will remove all namespace definitions
+     * if there are some.
+     * If the line is a OnlineResource tag, then add the xml namespace xlink url.
      *
      * @param buffer Contains a whole line.
-     * @return The line unchanged if it is not the root tag of a WMS 1.1.1
-     *         Getcapabilities, the tag with just the version if it is.
      */
     protected String filterLine(final StringBuilder buffer) {
         String line = buffer.toString();
-        if (line.startsWith("<WMT_MS_Capabilities")) {
+        if (line.trim().startsWith("<WMT_MS_Capabilities")) {
             line = "<WMT_MS_Capabilities version=\"1.1.1\">";
+        }
+        if (line.trim().startsWith("<OnlineResource")) {
+            line = line.replaceAll("/>", " xmlns:xlink=\"http://www.w3.org/1999/xlink\"/>");
         }
         return line;
     }
