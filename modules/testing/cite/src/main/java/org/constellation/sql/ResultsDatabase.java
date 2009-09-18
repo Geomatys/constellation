@@ -126,10 +126,12 @@ public final class ResultsDatabase {
      * @param date    The execution date of the tests.
      * @param service The service name.
      * @param version The service version.
+     * @return {@code True} if there is no test that fails for this session and succeed
+     *         for the previous one. {@code False} if there is one or more new problems.
      * @throws SQLException
      */
-    public void compareResults(final Date date, final String service, final String version)
-                               throws SQLException
+    public boolean compareResults(final Date date, final String service, final String version)
+                                  throws SQLException
     {
         // Contains all tests that have failed for the current session.
         final List<Result> currentTestsFailed  = getTestsFailed(date);
@@ -155,7 +157,8 @@ public final class ResultsDatabase {
                 }
             }
         }
-        displayComparaisonResults(problematicTests, newlyPassedTests, date, previousSuite, service, version);
+        displayComparisonResults(problematicTests, newlyPassedTests, date, previousSuite, service, version);
+        return problematicTests.isEmpty();
     }
 
     /**
@@ -272,7 +275,7 @@ public final class ResultsDatabase {
      * @param service          The service name.
      * @param version          The service version.
      */
-    private void displayComparaisonResults(final List<Result> problematicTests,
+    private void displayComparisonResults(final List<Result> problematicTests,
                                            final List<Result> newlyPassedTests,
                                            final Date date, final Date previous,
                                            final String service, final String version)
@@ -324,8 +327,7 @@ public final class ResultsDatabase {
             }
             if (x364) sb.append(X364.RESET.sequence());
             LOGGER.info(sb.toString());
-            throw new RuntimeException("Some tests are now failing, but not in the previous suite. " +
-                    "Please fix the service responsible of the failure of these tests !");
+            return;
         }
         if (x364) sb.append(X364.RESET.sequence());
         LOGGER.info(sb.toString());

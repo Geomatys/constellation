@@ -100,17 +100,20 @@ public final class HandleLogs {
      * @param date    The execution date of the current {@code Cite tests} session.
      * @param service The service name.
      * @param version The service version.
+     * @return {@code True} if there is no test that fails for this session and succeed
+     *         for the previous one. {@code False} if there is one or more new problems.
      */
-    private static void analyseResult(final Date date, final String service, final String version) {
+    private static boolean analyseResult(final Date date, final String service, final String version) {
 
         ResultsDatabase resDB = null;
         try {
             resDB = new ResultsDatabase();
-            resDB.compareResults(date, service, version);
+            return resDB.compareResults(date, service, version);
         } catch (SQLException ex) {
             // May be normal if we killed the process. Prints only
             // a summary of the exception, not the full stack trace.
             System.err.println(ex);
+            return true;
         } finally {
             try {
                 resDB.close();
@@ -145,14 +148,26 @@ public final class HandleLogs {
                 LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             }
         }
-        // Analyses the results of the session compared to the previous one.
+
+        /*
+         * Analyses the results of the session compared to the previous one. If one session
+         * contains new errors, then an exception will be thrown in the end.
+         */
+        boolean successResults = true;
         for (String arg : args) {
             final String[] argValue = arg.split("-");
             final String service = argValue[0];
             final String version = argValue[1];
-            analyseResult(dateOfSessions.get(arg), service, version);
+            if (analyseResult(dateOfSessions.get(arg), service, version) == false) {
+                successResults = false;
+            }
         }
 
+        if (successResults == false) {
+            LOGGER.severe("Some tests are now failing, but not in the previous suite.\n" +
+                          "Please fix the service responsible of the failure of these tests !");
+            System.exit(1);
+        }
         System.exit(0);
     }
 }
