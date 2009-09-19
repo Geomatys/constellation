@@ -60,7 +60,7 @@ import org.geotoolkit.lucene.filter.SpatialFilterType;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.ogc.xml.v110.DistanceBufferType;
-import org.geotoolkit.ogc.xml.v110.BinarySpatialOpType;;
+import org.geotoolkit.ogc.xml.v110.BinarySpatialOpType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
