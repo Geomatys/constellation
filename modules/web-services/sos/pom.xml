@@ -63,7 +63,7 @@
   <dependencies>
     <dependency>
       <groupId>org.mdweb</groupId>
-      <artifactId>mdweb-model</artifactId>
+      <artifactId>lib-mdweb-model</artifactId>
     </dependency>
     <dependency>
      <groupId>org.geotoolkit.pending</groupId>
