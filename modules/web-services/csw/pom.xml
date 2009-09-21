@@ -61,10 +61,10 @@
     in the JARs' list that maven will put in the directory "target/binaries".
   -->
   <dependencies>
-    <!-- MDweb model -->
+    <!-- MDweb model (via thesaurus)-->
     <dependency>
       <groupId>org.mdweb</groupId>
-      <artifactId>lib-thesaurus</artifactId>
+      <artifactId>mdweb-lib-thesaurus</artifactId>
     </dependency>
     <!-- Constellation dependencies -->
     <dependency>
