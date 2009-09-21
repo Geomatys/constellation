@@ -197,13 +197,13 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             final List<Catalog> cats = mdWebReader.getCatalogs();
             nbCatalogs = cats.size();
             final List<Form> results = mdWebReader.getAllForm(cats);
-            LOGGER.info("all form read in " + (System.currentTimeMillis() - time) + " ms.");
-            nbForms = results.size();
+            LOGGER.info(results.size() + " forms read in " + (System.currentTimeMillis() - time) + " ms.");
             for (Form form : results) {
                 if ((form.getType() == null || !form.getType().equals("templateForm")) && form.isPublished()) {
                     indexDocument(writer, form);
+                    nbForms++;
                 } else {
-                     LOGGER.info("The form " + form.getId() + "is a context (or is not published) so we don't index it");
+                     LOGGER.info("The form " + form.getId() + " is a context (or is not published) so we don't index it");
                 }
             }
             writer.optimize();

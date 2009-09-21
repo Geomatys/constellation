@@ -64,7 +64,7 @@ import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.sql.Reader;
 import org.mdweb.sql.v20.Reader20;
 import org.mdweb.model.thesaurus.Word;
-import org.mdweb.sql.LocalReaderThesaurus;
+import org.mdweb.io.sql.LocalReaderThesaurus;
 
 // geotoolkit/GeoAPI dependencies
 import org.geotoolkit.metadata.iso.MetadataEntity;

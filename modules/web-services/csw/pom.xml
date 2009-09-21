@@ -64,7 +64,7 @@
     <!-- MDweb model -->
     <dependency>
       <groupId>org.mdweb</groupId>
-      <artifactId>lib-mdweb-model</artifactId>
+      <artifactId>lib-thesaurus</artifactId>
     </dependency>
     <!-- Constellation dependencies -->
     <dependency>
