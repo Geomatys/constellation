@@ -26,8 +26,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.maven.plugin.MojoFailureException;
+
 import org.constellation.sql.Result;
 import org.constellation.sql.ResultsDatabase;
+
 import org.geotoolkit.util.logging.Logging;
 
 
@@ -123,7 +127,17 @@ public final class HandleLogs {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    /**
+     * From the logs of a Cite Tests session, extracts various information and
+     * store them into a database. Those data will be used to compare the rate
+     * of success between the current session and the previous one.
+     *
+     * @param args The session to execute. Each parameters should respect the
+     *             syntax "service-version".
+     * @throws IOException if the execution of the script fails.
+     * @throws MojoFailureException if a regression is detected.
+     */
+    public static void main(String[] args) throws IOException, MojoFailureException {
         if (args.length == 0) {
             LOGGER.info("No argument have been given to the script. Usage log.sh [profile...]");
         }
@@ -140,7 +154,7 @@ public final class HandleLogs {
             final String[] argValue = arg.split("-");
             final String service = argValue[0];
             final String version = argValue[1];
-            final Process process = rt.exec(new String[]{"./log.sh", arg});
+            final Process process = rt.exec(new String[]{"../cite/log.sh", arg});
             copyResult(process.getInputStream(), service, version, date);
             try {
                 process.waitFor();
@@ -164,9 +178,11 @@ public final class HandleLogs {
         }
 
         if (successResults == false) {
-            LOGGER.severe("Some tests are now failing, but not in the previous suite.\n" +
+            /*
+             * A regression is detected, a mojo exception is thrown to make the build fail.
+             */
+            throw new MojoFailureException("Some tests are now failing, but not in the previous suite.\n" +
                           "Please fix the service responsible of the failure of these tests !");
-            System.exit(1);
         }
         System.exit(0);
     }

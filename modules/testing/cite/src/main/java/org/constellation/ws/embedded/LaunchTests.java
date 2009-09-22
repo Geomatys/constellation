@@ -20,6 +20,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Logger;
+
+import org.apache.maven.plugin.MojoFailureException;
+
 import org.geotoolkit.util.logging.Logging;
 
 
@@ -71,7 +74,15 @@ public final class LaunchTests implements Runnable {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    /**
+     * Launch the Cite Tests, and the analysis phase.
+     *
+     * @param args The session to execute. Each parameters should respect the
+     *             syntax "service-version".
+     * @throws IOException if the execution of the script fails.
+     * @throws MojoFailureException if a regression is detected.
+     */
+    public static void main(String[] args) throws IOException, MojoFailureException {
         // Launch the server.
         GrizzlyServer.initServer();
 
@@ -81,7 +92,7 @@ public final class LaunchTests implements Runnable {
         }
         final Runtime rt = Runtime.getRuntime();
         for (String arg : args) {
-            final Process process = rt.exec(new String[]{"./run.sh", arg});
+            final Process process = rt.exec(new String[]{"../cite/run.sh", arg});
             final Thread t = new Thread(new LaunchTests(process));
             t.setDaemon(true);
             t.start();

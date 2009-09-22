@@ -1,0 +1,73 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2009, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+package org.constellation.plugin;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
+
+import org.constellation.ws.embedded.LaunchTests;
+import org.geotoolkit.util.logging.Logging;
+
+
+/**
+ * A mojo plugin whose goal is to execute {@code Cite Tests} on different
+ * web services, and compare the results with the previous session.
+ *
+ * @version $Id$
+ * @author Cédric Briançon (Geomatys)
+ *
+ * @since 0.4
+ *
+ * @phase test
+ * @goal cite
+ */
+public class CiteTests extends AbstractMojo {
+    /**
+     * The default logger of exceptions.
+     */
+    private static final Logger LOGGER = Logging.getLogger(CiteTests.class);
+
+    /**
+     * The different services that will be tested.
+     *
+     * @parameter
+     */
+    private String[] services;
+
+    /**
+     * Launch the Cite Tests on the various Constellation services. An analysis
+     * phase will be done in the end, and the build will fail if a regression
+     * is found.
+     *
+     * @throws MojoExecutionException 
+     * @throws MojoFailureException if some new tests are failing.
+     */
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        try {
+            LaunchTests.main(services);
+        } catch (IOException ex) {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+        }
+    }
+
+}

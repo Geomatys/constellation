@@ -18,7 +18,6 @@
 
 package org.constellation.util;
 
-import java.awt.image.RenderedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -64,12 +63,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.imageio.IIOException;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.imageio.stream.ImageOutputStream;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -406,7 +401,17 @@ public final class Util {
                 return f;
             }
         } else if (scheme.equals("jar") || scheme.equals("zip")) {
-            LOGGER.info("we don't scan jar or zip files");
+            final File f = new File(System.getProperty("java.io.tmpdir") + "/Constellation");
+            if (f != null && f.exists()) {
+                final File fConfig = new File(f, filePackageName);
+                if (fConfig.exists() && fConfig.isDirectory()) {
+                    return fConfig;
+                } else {
+                    LOGGER.info("The configuration directory was not found in the temporary folder.");
+                }
+            } else {
+                LOGGER.info("The Constellation directory was not present in the temporary folder.");
+            }
         }
         return null;
     }
@@ -634,7 +639,7 @@ public final class Util {
         if (directory.isDirectory()) {
             for (File f : directory.listFiles()) {
                 if (f.isDirectory()) {
-                    deleteDirectory(directory);
+                    deleteDirectory(f);
                 } else {
                     final boolean deleted = f.delete();
                     if (!deleted) {

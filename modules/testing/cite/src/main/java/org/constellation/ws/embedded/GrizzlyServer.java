@@ -17,10 +17,14 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 
 // Constellation dependencies
+import java.util.logging.Logger;
 import org.constellation.data.PostgridTestCase;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
@@ -33,7 +37,11 @@ import org.constellation.provider.postgrid.PostGridProvider;
 import org.constellation.provider.postgrid.PostGridProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
+import org.constellation.provider.sld.SLDProvider;
 import org.constellation.provider.sld.SLDProviderService;
+import org.constellation.util.Util;
+import org.geotoolkit.internal.io.IOUtilities;
+import org.geotoolkit.util.logging.Logging;
 
 
 /**
@@ -46,6 +54,11 @@ import org.constellation.provider.sld.SLDProviderService;
  * @since 0.4
  */
 public final class GrizzlyServer {
+    /**
+     * The default logger for this server.
+     */
+    private static final Logger LOGGER = Logging.getLogger(GrizzlyServer.class);
+
     /**
      * The grizzly server that will received some HTTP requests.
      */
@@ -100,11 +113,14 @@ public final class GrizzlyServer {
             }
         }
 
+        // Extracts the zip data into a temporary folder
+        final File outputDir = initDataDirectory();
+
         // Defines a Styles data provider
         final ProviderSource sourceStyle = new ProviderSource();
         sourceStyle.loadAll = true;
-        sourceStyle.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH,
-                GrizzlyServer.class.getResource("wms111/styles").getFile());
+        sourceStyle.parameters.put(SLDProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
+                "/org/constellation/ws/embedded/wms111/styles");
 
         final ProviderConfig configStyle = new ProviderConfig();
         configStyle.sources.add(sourceStyle);
@@ -123,8 +139,8 @@ public final class GrizzlyServer {
         // Defines a ShapeFile data provider
         final ProviderSource sourceShape = new ProviderSource();
         sourceShape.loadAll = true;
-        sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH,
-                GrizzlyServer.class.getResource("wms111/shapefiles").getFile());
+        sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
+                "/org/constellation/ws/embedded/wms111/shapefiles");
         sourceShape.layers.add(new ProviderLayer("BasicPolygons", Collections.singletonList("cite_style_BasicPolygons"),
                                null, null, null, null, false, null));
         sourceShape.layers.add(new ProviderLayer("Bridges", Collections.singletonList("cite_style_Bridges"),
@@ -178,12 +194,58 @@ public final class GrizzlyServer {
     }
 
     /**
-     * Stop the grizzly server, if it is still alive.
+     * Initialises the data directory in unzipping the jar containing the resources
+     * into a temporary directory.
+     *
+     * @return The root output directory where the data are unzipped.
+     * @throws IOException
+     */
+    private static File initDataDirectory() throws IOException {
+        String styleResource = GrizzlyServer.class.getResource("wms111/styles").getFile();
+        styleResource = styleResource.substring(0, styleResource.indexOf('!'));
+        if (styleResource.startsWith("file:")) {
+            styleResource = styleResource.substring(5);
+        }
+        final File styleJar = new File(styleResource);
+        if (styleJar == null || !styleJar.exists()) {
+            throw new IOException("Unable to find the style folder: "+ styleJar);
+        }
+        final InputStream in = new FileInputStream(styleJar);
+        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        final File outputDir = new File(tmpDir, "Constellation");
+        if (!outputDir.exists()) {
+            outputDir.mkdir();
+        }
+        IOUtilities.unzip(in, outputDir);
+        in.close();
+        return outputDir;
+    }
+
+    /**
+     * Delete the data directory at the end of the process.
+     */
+    private static void deleteDataDirectory() {
+        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        final File outputDir = new File(tmpDir, "Constellation");
+        if (outputDir != null && outputDir.exists()) {
+            if (outputDir.canWrite()) {
+                if (!Util.deleteDirectory(outputDir)) {
+                    LOGGER.info("Unable to delete folder "+ outputDir.getAbsolutePath());
+                }
+            } else {
+                LOGGER.info("No write permission for "+ outputDir.getAbsolutePath());
+            }
+        }
+    }
+
+    /**
+     * Stop the grizzly server if it is still alive and delete the temporary data directory.
      */
     public static synchronized void finish() {
         if (grizzly != null && grizzly.isAlive()) {
             grizzly.interrupt();
         }
+        deleteDataDirectory();
     }
 
     /**
