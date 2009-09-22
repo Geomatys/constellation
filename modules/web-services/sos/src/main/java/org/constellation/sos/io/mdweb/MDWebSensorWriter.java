@@ -50,8 +50,8 @@ import org.mdweb.model.storage.Form;
 import org.mdweb.model.users.User;
 import org.mdweb.io.sql.v20.Reader20;
 import org.mdweb.io.sql.v20.Writer20;
-import org.mdweb.xml.MalFormedDocumentException;
-import org.mdweb.xml.Reader;
+import org.mdweb.io.xml.MalFormedDocumentException;
+import org.mdweb.io.xml.Reader;
 
 /**
  *

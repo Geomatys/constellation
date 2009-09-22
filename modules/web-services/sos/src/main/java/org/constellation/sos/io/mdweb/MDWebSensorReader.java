@@ -43,7 +43,7 @@ import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
 import org.mdweb.io.sql.v20.Reader20;
-import org.mdweb.xml.Writer;
+import org.mdweb.io.xml.Writer;
 
 /**
  *
