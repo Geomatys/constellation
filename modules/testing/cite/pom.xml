@@ -137,13 +137,11 @@
     <dependency>
       <groupId>org.geotoolkit.project</groupId>
       <artifactId>geotk-test</artifactId>
-      <version>SNAPSHOT</version>
     </dependency>
     <!--  For the embedded service. -->
     <dependency>
       <groupId>com.sun.grizzly</groupId>
       <artifactId>grizzly-servlet-webserver</artifactId>
-      <version>1.8.6.3</version>
     </dependency>
     <dependency>
       <groupId>postgresql</groupId>
@@ -184,7 +182,7 @@
             <id>pre</id>
             <phase>process-sources</phase>
             <configuration>
-              <tasks> 
+              <tasks>
                 <typedef resource="net/sf/antcontrib/antlib.xml">
                   <classpath refid="maven.dependency.classpath"/>
                 </typedef>
@@ -248,7 +246,7 @@
                 <!-- launch the ant task to build the teamengine jar, and the components -->
                 <ant dir="${basedir}/engine" target="jar.engine"/>
                 <ant dir="${basedir}/engine" target="jar.components"/>
-              </tasks> 
+              </tasks>
             </configuration>
             <goals>
               <goal>run</goal>
@@ -291,7 +289,7 @@
     </profile>
     <profile>
       <id>windows</id>
-      <activation>   
+      <activation>
         <os>
           <family>windows</family>
         </os>

@@ -89,6 +89,11 @@
       <artifactId>geotk-spatial-lucene</artifactId>
     </dependency>
     <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
       <scope>test</scope>

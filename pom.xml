@@ -215,6 +215,11 @@
         <version>2.1.5</version>
       </dependency>
       <dependency>
+        <groupId>com.sun.grizzly</groupId>
+        <artifactId>grizzly-servlet-webserver</artifactId>
+        <version>1.8.6.3</version>
+      </dependency>
+      <dependency>
         <groupId>commons-collections</groupId>
         <artifactId>commons-collections</artifactId>
         <version>3.2</version>
@@ -329,6 +334,13 @@
         <groupId>org.geotoolkit</groupId>
         <artifactId>geotk-epsg</artifactId>
         <version>${geotoolkit.version}</version>
+        <scope>runtime</scope>  <!-- Required only when creating the embedded EPSG database -->
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-epsg-javadb</artifactId>
+        <version>${geotoolkit.version}</version>
+        <scope>${javadb.scope}</scope> <!-- "runtime" for Tomcat build, "test" otherwise -->
       </dependency>
       <dependency>
         <groupId>org.geotoolkit</groupId>
@@ -353,6 +365,11 @@
       <dependency>
         <groupId>org.geotoolkit</groupId>
         <artifactId>geotk-widgets-swing</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.project</groupId>
+        <artifactId>geotk-test</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
 
@@ -477,29 +494,38 @@
         <artifactId>geotk-xml-feature-catalogue</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
-   
 
 
-      <!-- database driver -->
+
+      <!--
+        Database drivers. They are needed only for execution, not compilation.
+        If a driver is required for testing purpose only, <scope>test</scope>
+        must be explicit. If the JavaDB driver is needed for the sole purpose
+        of the EPSG database, use the geotk-epsg-javadb dependency instead.
+      -->
       <dependency>
         <groupId>postgresql</groupId>
         <artifactId>postgresql</artifactId>
         <version>8.3-603.jdbc4</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.postgis</groupId>
         <artifactId>postgis-driver</artifactId>
         <version>1.0</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derby</artifactId>
         <version>10.4.2.0</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.derby</groupId>
         <artifactId>derbyLocale_fr</artifactId>
         <version>10.4.2.0</version>
+        <scope>runtime</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
