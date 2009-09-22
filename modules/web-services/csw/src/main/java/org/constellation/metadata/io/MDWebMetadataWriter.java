@@ -62,9 +62,9 @@ import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.users.User;
-import org.mdweb.sql.Reader;
-import org.mdweb.sql.v20.Reader20;
-import org.mdweb.sql.v20.Writer20;
+import org.mdweb.io.Reader;
+import org.mdweb.io.sql.v20.Reader20;
+import org.mdweb.io.sql.v20.Writer20;
 
 
 /**
