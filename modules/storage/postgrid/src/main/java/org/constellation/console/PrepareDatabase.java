@@ -76,6 +76,18 @@ public class PrepareDatabase extends CommandLine {
     private String description;
 
     /**
+     * Minimum value for this layer.
+     */
+    @Option
+    private Double minimum;
+
+    /**
+     * Maximum value for this layer.
+     */
+    @Option
+    private Double maximum;
+
+    /**
      * Identifier for the serie.
      */
     @Option(/*description="Serie identifier."*/)
@@ -201,7 +213,11 @@ public class PrepareDatabase extends CommandLine {
     private void processLayer() throws SQLException {
         final StringBuilder sql = new StringBuilder(
                 "INSERT INTO \"Layers\" (name, thematic, procedure, period, " +
-                "description) VALUES (");
+                "description");
+        if (minimum != null && !Double.isNaN(minimum) && maximum != null && !Double.isNaN(maximum)) {
+            sql.append(", minimum, maximum");
+        }
+        sql.append(") VALUES (");
         sql.append(escapeString(layerName)); sql.append(", ");
         sql.append(escapeString(thematic));  sql.append(", ");
         sql.append(escapeString(procedure)); sql.append(", ");
@@ -212,6 +228,9 @@ public class PrepareDatabase extends CommandLine {
         }
         sql.append(", ");
         sql.append(escapeString(description));
+        if (minimum != null && !Double.isNaN(minimum) && maximum != null && !Double.isNaN(maximum)) {
+            sql.append(", ").append(minimum).append(", ").append(maximum);
+        }
         sql.append(");");
 
         Statement stmt = null;
