@@ -174,10 +174,17 @@ class PostGridLayerDetails implements CoverageLayerDetails {
             style = RANDOM_FACTORY.createRasterStyle();
         }
         
-        final MeasurementRange dimRange = (MeasurementRange) params.get(KEY_DIM_RANGE);
+        MeasurementRange dimRange = null;
 
         if (params != null) {
-            mapLayer.setDimRange((MeasurementRange) params.get(KEY_DIM_RANGE));
+            dimRange = (MeasurementRange) params.get(KEY_DIM_RANGE);
+            if (dimRange == null) {
+                final MeasurementRange<?>[] postgridRange = getSampleValueRanges();
+                if (postgridRange.length > 0) {
+                    dimRange = postgridRange[0];
+                }
+            }
+            mapLayer.setDimRange(dimRange);
             final Double elevation = (Double) params.get(KEY_ELEVATION);
             if (elevation != null) {
                 mapLayer.setElevation(elevation);

@@ -120,7 +120,7 @@ public interface Layer extends Element {
      * Returns the ranges of valid sample values for each band.
      * The ranges are always expressed in <cite>geophysics</cite> values.
      *
-     * @return The range of valis sample values.
+     * @return The range of valid sample values.
      */
     MeasurementRange<?>[] getSampleValueRanges();
 

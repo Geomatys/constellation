@@ -34,6 +34,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import javax.measure.unit.Unit;
 import org.opengis.coverage.Coverage;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -86,6 +87,16 @@ final class LayerEntry extends Entry implements Layer {
      * May be {@code null} if not applicable.
      */
     private DomainOfLayerEntry domain;
+
+    /**
+     * Minimum value for this layer.
+     */
+    private final double minimum;
+
+    /**
+     * Maximum value for this layer.
+     */
+    private final double maximum;
 
     /**
      * If this layer is the result of some numerical model, the model. Other wise, {@code null}.
@@ -143,14 +154,19 @@ final class LayerEntry extends Entry implements Layer {
      * @param procedure    Procedure applied for this layer (e.g. Gradients, etc.).
      * @param timeInterval Typical time interval (in days) between images, or {@link Double#NaN} if unknown.
      * @param remarks      Optional remarks, or {@code null}.
+     * @param minimum      Minimum value for this layer, or {@link Double#NaN} if unknown.
+     * @param maximum      Maximum value for this layer, or {@link Double#NaN} if unknown.
      */
     protected LayerEntry(final String name, final String thematic, final String procedure,
-                         final double timeInterval, final String remarks)
+                         final double timeInterval, final String remarks,
+                         final double minimum, final double maximum)
     {
         super(name, remarks);
         this.thematic     = thematic;
         this.procedure    = procedure;
         this.timeInterval = timeInterval;
+        this.minimum      = minimum;
+        this.maximum      = maximum;
     }
 
     /**
@@ -271,6 +287,15 @@ final class LayerEntry extends Entry implements Layer {
             final Format format = series.getFormat();
             if (format != null) {
                 final MeasurementRange<Double>[] candidates = format.getSampleValueRanges();
+                /*
+                 * If a minimum and maximum values have already been defined, we just take the
+                 * unit from the format from the first candidates, since they should all have
+                 * the same unit.
+                 */
+                if (!Double.isNaN(minimum) && !Double.isNaN(maximum)) {
+                    final Unit unit = (candidates[0] != null) ? candidates[0].getUnits() : null;
+                    return new MeasurementRange[]{MeasurementRange.create(minimum, maximum, unit)};
+                }
                 if (ranges == null) {
                     ranges = candidates;
                 } else {
@@ -532,7 +557,11 @@ final class LayerEntry extends Entry implements Layer {
             return Utilities.equals(this.thematic,  that.thematic ) &&
                    Utilities.equals(this.procedure, that.procedure) &&
                    Double.doubleToLongBits(this.timeInterval) ==
-                   Double.doubleToLongBits(that.timeInterval);
+                   Double.doubleToLongBits(that.timeInterval)       &&
+                   Double.doubleToLongBits(this.minimum)      ==
+                   Double.doubleToLongBits(that.minimum)            &&
+                   Double.doubleToLongBits(this.maximum)      ==
+                   Double.doubleToLongBits(that.maximum);
             /*
              * On ne teste pas 'fallback' car la méthode 'equals' doit fonctionner dès que la
              * construction de l'entrée est complétée, alors que 'fallback' est définit un peu

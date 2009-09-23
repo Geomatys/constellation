@@ -308,6 +308,7 @@ public class WMSService extends OGCWebService {
      * Converts a DescribeLayer request composed of string values, to a container
      * of real java objects.
      *
+     * @param version The version of the web service detected.
      * @return The DescribeLayer request.
      * @throws CstlServiceException
      */
@@ -326,6 +327,7 @@ public class WMSService extends OGCWebService {
      * Converts a GetCapabilities request composed of string values, to a container
      * of real java objects.
      *
+     * @param version The version of the web service detected.
      * @return A GetCapabilities request.
      * @throws CstlServiceException
      */
@@ -357,6 +359,7 @@ public class WMSService extends OGCWebService {
      * Converts a GetFeatureInfo request composed of string values, to a container
      * of real java objects.
      *
+     * @param version The version of the web service detected.
      * @return A GetFeatureInfo request.
      * @throws CstlServiceException
      */
@@ -433,6 +436,7 @@ public class WMSService extends OGCWebService {
      * Converts a GetMap request composed of string values, to a container of real
      * java objects.
      *
+     * @param version    The version of the web service detected.
      * @param fromGetMap {@code true} if the request is done for a GetMap, {@code false}
      *                   otherwise (in the case of a GetFeatureInfo for example).
      * @return The GetMap request.
