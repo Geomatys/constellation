@@ -63,6 +63,7 @@ import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.users.User;
 import org.mdweb.io.Reader;
+import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Reader20;
 import org.mdweb.io.sql.v20.Writer20;
 
@@ -137,6 +138,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
             }
             this.user     = mdReader.getUser("admin");
 
+        } catch (MD_IOException ex) {
+            throw new CstlServiceException("MD_IOException while initializing the MDWeb writer:" +'\n'+
+                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLException while initializing the MDWeb writer:" +'\n'+
                                            "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -152,7 +156,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * @param object The object to transform in form.
      * @return an MDWeb form representing the metadata object.
      */
-    private Form getFormFromObject(Object object) throws SQLException {
+    private Form getFormFromObject(Object object) throws MD_IOException {
         
         if (object != null) {
             //we try to find a title for the from
@@ -220,7 +224,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * @param form The created form.
      * 
      */
-    private List<Value> addValueFromObject(Form form, Object object, Path path, Value parentValue) throws SQLException {
+    private List<Value> addValueFromObject(Form form, Object object, Path path, Value parentValue) throws MD_IOException {
 
         final List<Value> result = new ArrayList<Value>();
 
@@ -408,7 +412,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
     /**
      * Ask to the mdweb reader an available title for a form.
      */
-    private String getAvailableTitle() throws SQLException {
+    private String getAvailableTitle() throws MD_IOException {
         
         return mdReader.getAvailableTitle();
     }
@@ -440,7 +444,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
      *
      * @throws java.sql.SQLException
      */
-    private Classe getClasseFromObject(Object object) throws SQLException {
+    private Classe getClasseFromObject(Object object) throws MD_IOException {
         
         String className;
         String packageName;
@@ -660,7 +664,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * @param className the standard name of a class. 
      * @return a primitive class.
      */
-    private Classe getPrimitiveTypeFromName(String className) throws SQLException {
+    private Classe getPrimitiveTypeFromName(String className) throws MD_IOException {
         
         if (className.equals("String") || className.equals("SimpleInternationalString") || className.equals("BaseUnit")) {
             return mdReader.getClasse("CharacterString", Standard.ISO_19103);
@@ -715,7 +719,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         } catch (IllegalArgumentException e) {
              throw new CstlServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
                                            "cause: " + e.getMessage(),NO_APPLICABLE_CODE);
-        } catch (SQLException e) {
+        } catch (MD_IOException e) {
              throw new CstlServiceException("The service has throw an SQLException while writing the metadata: " + e.getMessage(),
                                             NO_APPLICABLE_CODE);
         }
@@ -730,7 +734,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 //TODO restore catching at this point
                 throw e;
                 //return false;*/
-            } catch (SQLException e) {
+            } catch (MD_IOException e) {
                 throw new CstlServiceException("The service has throw an SQLException while writing the metadata: " + e.getMessage(),
                         NO_APPLICABLE_CODE);
             }
@@ -758,7 +762,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             classBinding.clear();
             alreadyWrite.clear();
             
-        } catch (SQLException ex) {
+        } catch (MD_IOException ex) {
             LOGGER.info("SQL Exception while destroying Metadata writer");
         }
     }
@@ -796,7 +800,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             final Form f          = mdReader.getForm(catalog, id);
 
             mdWriter.deleteForm(f.getId());
-        } catch (SQLException ex) {
+        } catch (MD_IOException ex) {
             throw new CstlServiceException("The service has throw an SQLException while deleting the metadata: " + ex.getMessage(),
                         NO_APPLICABLE_CODE);
         }
@@ -834,7 +838,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             final Catalog catalog = mdReader.getCatalog(catalogCode);
             f                     = mdReader.getForm(catalog, id);
 
-        } catch (SQLException ex) {
+        } catch (MD_IOException ex) {
             throw new CstlServiceException("The service has throw an SQLException while updating the metadata: " + ex.getMessage(),
                         NO_APPLICABLE_CODE);
         }
@@ -887,7 +891,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
                         }
                     }
                 }
-            } catch (SQLException ex) {
+            } catch (MD_IOException ex) {
                 throw new CstlServiceException(ex);
             } catch (IllegalArgumentException ex) {
                 throw new CstlServiceException(ex);
@@ -907,7 +911,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * @throws java.sql.SQLException
      * @throws org.constellation.ws.CstlServiceException
      */
-    private MixedPath getMDWPathFromXPath(String xpath) throws SQLException, CstlServiceException {
+    private MixedPath getMDWPathFromXPath(String xpath) throws MD_IOException, CstlServiceException {
         String idValue = "";
         //we remove the first '/'
         if (xpath.startsWith("/")) {
@@ -994,7 +998,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         return new MixedPath(p, idValue);
     }
 
-    private Property getProperty(final Classe type, String propertyName) throws SQLException, CstlServiceException {
+    private Property getProperty(final Classe type, String propertyName) throws MD_IOException, CstlServiceException {
         // Special case for a bug in MDWeb
         if (propertyName.equals("geographicElement")) {
             propertyName = "geographicElement2";

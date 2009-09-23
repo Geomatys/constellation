@@ -20,7 +20,6 @@ package org.constellation.sos.io.lucene;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
@@ -204,9 +203,6 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
             writer.addDocument(createDocument(observation));
             LOGGER.finer("Observation: " + observation.getName() + " indexed");
 
-        } catch (SQLException ex) {
-            LOGGER.severe("SQLException " + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (CorruptIndexException ex) {
             LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -228,9 +224,6 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
             writer.optimize();
             writer.close();
 
-        } catch (SQLException ex) {
-            LOGGER.severe("SQLException " + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (CorruptIndexException ex) {
             LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -241,7 +234,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
     }
 
     @Override
-    protected Document createDocument(ObservationEntry observation) throws SQLException {
+    protected Document createDocument(ObservationEntry observation) {
         // make a new, empty document
         final Document doc = new Document();
 

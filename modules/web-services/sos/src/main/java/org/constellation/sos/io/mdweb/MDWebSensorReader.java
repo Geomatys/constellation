@@ -36,6 +36,7 @@ import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.xml.MarshallerPool;
+import org.mdweb.io.MD_IOException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb dependencies
@@ -121,6 +122,9 @@ public class MDWebSensorReader implements SensorReader {
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("SQLException while starting the MDweb Sensor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
+        } catch (MD_IOException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new CstlServiceException("MD_IOException while starting the MDweb Sensor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
 
@@ -157,7 +161,7 @@ public class MDWebSensorReader implements SensorReader {
             else
               throw new CstlServiceException("The form unmarshalled is not a sensor", NO_APPLICABLE_CODE);
 
-        } catch (SQLException ex) {
+        } catch (MD_IOException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                          NO_APPLICABLE_CODE);
@@ -182,6 +186,8 @@ public class MDWebSensorReader implements SensorReader {
             sensorMLConnection.close();
             sensorMLReader.dispose();
 
+        } catch (MD_IOException ex) {
+            LOGGER.severe("MD_IOException while closing SOSWorker");
         } catch (SQLException ex) {
             LOGGER.severe("SQLException while closing SOSWorker");
         }

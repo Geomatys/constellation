@@ -62,6 +62,7 @@ import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.io.Reader;
+import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Reader20;
 import org.mdweb.model.thesaurus.Word;
 import org.mdweb.io.sql.LocalReaderThesaurus;
@@ -252,12 +253,7 @@ public class MDWebMetadataReader extends MetadataReader {
      */
     protected MDWebMetadataReader(Connection mdConnection) throws CstlServiceException {
         super(true, false);
-        try  {
-            this.mdReader           = new Reader20(Standard.ISO_19115,  mdConnection);
-        } catch (SQLException ex) {
-            throw new CstlServiceException("SQLException while initializing the MDWeb reader:" +'\n'+
-                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
-        }
+        this.mdReader           = new Reader20(Standard.ISO_19115,  mdConnection);
         initPackage();
         this.dateFormat         = new SimpleDateFormat("yyyy-MM-dd");
         this.classBinding       = new HashMap<String, Class>();
@@ -324,7 +320,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @param elementName A list of QName describing the requested fields. (implies type == null)
      * @return A metadata Object (dublin core Record / geotools metadata / ebrim registry object)
      * 
-     * @throws java.sql.SQLException
+     * @throws java.sql.CstlServiceException
      */
     @Override
     public Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
@@ -388,7 +384,7 @@ public class MDWebMetadataReader extends MetadataReader {
             }
             return result;
 
-        } catch (SQLException e) {
+        } catch (MD_IOException e) {
              throw new CstlServiceException("SQL exception while reading the metadata: " + identifier, NO_APPLICABLE_CODE, "id");
         }
     }
@@ -399,7 +395,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @param form the MDWeb formular.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType getRecordFromForm(String identifier, Form form, ElementSet type, List<QName> elementName) throws SQLException {
+    private AbstractRecordType getRecordFromForm(String identifier, Form form, ElementSet type, List<QName> elementName) throws MD_IOException {
         final Value top                   = form.getTopValue();
         final Standard  recordStandard    = top.getType().getStandard();
         
@@ -428,7 +424,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @param form the MDWeb formular.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType transformMDFormInRecord(Form form, ElementSet type, List<QName> elementName) throws SQLException {
+    private AbstractRecordType transformMDFormInRecord(Form form, ElementSet type, List<QName> elementName) throws MD_IOException {
         
         final Value top                   = form.getTopValue();
         final Standard  recordStandard    = top.getType().getStandard();
@@ -631,7 +627,7 @@ public class MDWebMetadataReader extends MetadataReader {
     /**
      * Create a bounding box from a geographiqueElement Value
      */
-    private BoundingBoxType createBoundingBoxFromValue(int ordinal, Form f) throws SQLException {
+    private BoundingBoxType createBoundingBoxFromValue(int ordinal, Form f) throws MD_IOException {
         Double  southValue  = null;
         Double eastValue    = null;
         Double  westValue   = null;
@@ -1298,13 +1294,12 @@ public class MDWebMetadataReader extends MetadataReader {
             if (paths != null) {
                 if (paths.size() != 0) {
                     try {
-                        final List<String> values = mdReader.getDomainOfValuesFromPaths(paths);
+                        final List<String> values         = mdReader.getDomainOfValuesFromPaths(paths);
                         final ListOfValuesType listValues = new ListOfValuesType(values);
-                        final DomainValuesType value = new DomainValuesType(null, token, listValues, METADATA_QNAME);
+                        final DomainValuesType value      = new DomainValuesType(null, token, listValues, METADATA_QNAME);
                         responseList.add(value);
-                        if (false) throw new SQLException();
 
-                    } catch (SQLException e) {
+                    } catch (MD_IOException e) {
                         throw new CstlServiceException("The service has launch an SQL exeption:" + e.getMessage(),
                                 NO_APPLICABLE_CODE);
                     }
@@ -1324,7 +1319,7 @@ public class MDWebMetadataReader extends MetadataReader {
     public List<String> executeEbrimSQLQuery(String sqlQuery) throws CstlServiceException {
         try {
             return mdReader.executeFilterQuery(sqlQuery);
-        } catch (SQLException ex) {
+        } catch (MD_IOException ex) {
            throw new CstlServiceException("The service has throw an SQL exception while making eberim request:" + '\n' +
                                          "Cause: " + ex.getMessage(), NO_APPLICABLE_CODE);
         }
@@ -1336,7 +1331,7 @@ public class MDWebMetadataReader extends MetadataReader {
             mdReader.close();
             classBinding.clear();
             alreadyRead.clear();
-        } catch (SQLException ex) {
+        } catch (MD_IOException ex) {
             LOGGER.severe("SQL Exception while destroying MDWeb MetadataReader");
         }
     }
@@ -1350,7 +1345,7 @@ public class MDWebMetadataReader extends MetadataReader {
             for (Form f: forms) {
                 results.add(getObjectFromForm("no cache", f));
             }
-        } catch (SQLException ex) {
+        } catch (MD_IOException ex) {
             throw new CstlServiceException("SQL Exception while getting all the entries: " +ex.getMessage(), NO_APPLICABLE_CODE);
         }
         return results;
@@ -1415,7 +1410,7 @@ public class MDWebMetadataReader extends MetadataReader {
 
                 mdReader.removeFormFromCache(catalog, id);
 
-            } catch (SQLException ex) {
+            } catch (MD_IOException ex) {
                 LOGGER.severe("SQLException while removing " + identifier + " from the cache");
                 return;
             } catch (NumberFormatException e) {

@@ -41,6 +41,7 @@ import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.xml.MarshallerPool;
+import org.mdweb.io.MD_IOException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb dependencies
@@ -129,7 +130,10 @@ public class MDWebSensorWriter implements SensorWriter {
             throw new CstlServiceException("JAXBException while starting the MDweb Sensor writer", NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("SQ1LException while starting the MDweb Sensor writer: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new CstlServiceException("SQLException while starting the MDweb Sensor writer: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
+        } catch (MD_IOException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new CstlServiceException("MD_IOException while starting the MDweb Sensor writer: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
 
@@ -164,7 +168,7 @@ public class MDWebSensorWriter implements SensorWriter {
             LOGGER.severe("MalFormedDocumentException:" + ex.getMessage());
             throw new CstlServiceException("The SensorML Document is Malformed:" + ex.getMessage(),
                                           INVALID_PARAMETER_VALUE, "sensorDescription");
-        } catch (SQLException e) {
+        } catch (MD_IOException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(),
                                              NO_APPLICABLE_CODE);
@@ -254,6 +258,8 @@ public class MDWebSensorWriter implements SensorWriter {
             sensorMLWriter.dispose();
         } catch (SQLException ex) {
             LOGGER.severe("SQLException while closing SOSWorker");
+        } catch (MD_IOException ex) {
+            LOGGER.severe("MD_IOException while closing SOSWorker");
         }
     }
 

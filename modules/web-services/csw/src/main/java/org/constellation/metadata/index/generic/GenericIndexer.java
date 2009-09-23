@@ -295,8 +295,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             } else {
                 LOGGER.finer("Unexpected metadata type");
             }
-        } catch (SQLException ex) {
-            LOGGER.severe("SQLException " + ex.getMessage());
+        } catch (IndexingException ex) {
+            LOGGER.severe("indexingException " + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (CorruptIndexException ex) {
             LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
@@ -331,8 +331,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             writer.optimize();
             writer.close();
 
-        } catch (SQLException ex) {
-            LOGGER.severe("SQLException " + ex.getMessage());
+        } catch (IndexingException ex) {
+            LOGGER.severe("IndexingException " + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (CorruptIndexException ex) {
             LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
@@ -350,7 +350,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     * @return A Lucene document.
     */
     @Override
-    protected Document createDocument(final Object metadata) throws SQLException {
+    protected Document createDocument(final Object metadata) throws IndexingException {
         
         // make a new, empty document
         final Document doc = new Document();
@@ -457,7 +457,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 }
             }
         }
-            
+
          // All metadata types must be compatible with dublinCore.
         cs = new BoundedCompletionService<TermValue>(this.pool, 5);
         for (final String term :DUBLIN_CORE_QUERYABLE.keySet()) {
@@ -488,14 +488,14 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
                     anyText.append(values.value).append(" ");
                 }
-                
+
             } catch (InterruptedException ex) {
                LOGGER.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
                LOGGER.severe("ExecutionException in parralele create document:" + '\n' + ex.getMessage());
             }
         }
-            
+
         //we add the geometry parts
         String coord = NULL_VALUE;
         try {
@@ -507,7 +507,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 minx[i] = Double.parseDouble(tokens.nextToken());
                 i++;
             }
-                
+
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("EastBoundLongitude"));
             tokens = new StringTokenizer(coord, ",;");
             final double[] maxx = new double[tokens.countTokens()];
@@ -516,7 +516,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 maxx[i] = Double.parseDouble(tokens.nextToken());
                 i++;
             }
-            
+
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("NorthBoundLatitude"));
             tokens = new StringTokenizer(coord, ",;");
             final double[] maxy = new double[tokens.countTokens()];
@@ -525,7 +525,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 maxy[i] = Double.parseDouble(tokens.nextToken());
                 i++;
             }
-            
+
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("SouthBoundLatitude"));
             tokens = new StringTokenizer(coord, ",;");
             final double[] miny = new double[tokens.countTokens()];
@@ -534,9 +534,9 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 miny[i] = Double.parseDouble(tokens.nextToken());
                 i++;
             }
-                
+
             // String crs = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("CRS"));
-                
+
             if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
                 for (int j = 0; j < minx.length; j++)  {
                     LOGGER.info("added new bbox:" + minx[j] + " " + maxx[j] + " " + miny[j] + " " + maxy[j] + " for identifier:" + identifier);
@@ -553,7 +553,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     LOGGER.finer("Unexpected metadata type");
                 }
             }
-            
+
         } catch (NumberFormatException e) {
             if (!coord.equals(NULL_VALUE)) {
                 if (metadata instanceof DefaultMetaData) {
@@ -585,9 +585,9 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             }
         }
 
-        // add a default meta field to make searching all documents easy 
+        // add a default meta field to make searching all documents easy
         doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
-        
+
         //we add the anyText values
         doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
 

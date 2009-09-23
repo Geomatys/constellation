@@ -24,13 +24,23 @@ import org.geotoolkit.xml.MarshallerPool;
  *
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractWebService extends WebService{
+public abstract class AbstractWebService extends WebService {
 
 
     /**
      * A pool of JAXB unmarshaller used to create Java objects from XML files.
      */
     protected MarshallerPool marshallerPool;
+
+    /**
+     * The xsd schema location for exception report.
+     */
+    protected String exceptionSchemaLocation = null;
+
+    /**
+     * The xsd schema location for all the returned xml.
+     */
+    protected String schemaLocation = null;
 
     /**
      * {@inheritDoc }
@@ -45,13 +55,46 @@ public abstract class AbstractWebService extends WebService{
      *
      * @param packagesName A list of package containing JAXB annoted classes.
      * @param rootNamespace The main namespace for all the document.
+     * @param schemaLocation The main xsd schema location for all the returned xml.
+     * @param exceptionSchemaLocation The xsd schema location for exception report.
+     *
+     * @throws JAXBException
+     */
+    protected void setXMLContext(final String packagesName, final String rootNamespace, final String schemaLocation, final String exceptionSchemaLocation) throws JAXBException {
+        LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
+                    " packages: " + packagesName);
+        this.exceptionSchemaLocation = exceptionSchemaLocation;
+        this.schemaLocation          = schemaLocation;
+        marshallerPool               = new AnchoredMarshallerPool(rootNamespace, packagesName, schemaLocation);
+    }
+
+    /**
+     * Initialize the JAXB context and build the unmarshaller/marshaller
+     *
+     * @param packagesName A list of package containing JAXB annoted classes.
+     * @param rootNamespace The main namespace for all the document.
      *
      * @throws JAXBException
      */
     protected void setXMLContext(final String packagesName, final String rootNamespace) throws JAXBException {
-        LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
-                    " packages: " + packagesName);
-       marshallerPool = new AnchoredMarshallerPool(rootNamespace, packagesName);
+        setXMLContext(packagesName, rootNamespace, schemaLocation, exceptionSchemaLocation);
+    }
+
+    /**
+     * Initialize the JAXB context and build the unmarshaller/marshaller
+     *
+     * @param classesName A list of JAXB annoted classes.
+     * @param schemaLocation The main xsd schema location for all the returned xml.
+     * @param exceptionSchemaLocation The xsd schema location for exception report.
+     * @param rootNamespace The main namespace for all the document.
+     *
+     * @throws JAXBException
+     */
+    protected void setXMLContext(final String rootNamespace, final String schemaLocation, final String exceptionSchemaLocation, final Class<?>... classes) throws JAXBException {
+        LOGGER.finer("SETTING XML CONTEXT: classes version");
+        this.exceptionSchemaLocation = exceptionSchemaLocation;
+        this.schemaLocation          = schemaLocation;
+        marshallerPool = new AnchoredMarshallerPool(rootNamespace, schemaLocation, classes);
     }
 
     /**
@@ -64,7 +107,7 @@ public abstract class AbstractWebService extends WebService{
      */
     protected void setXMLContext(final String rootNamespace, final Class<?>... classes) throws JAXBException {
         LOGGER.finer("SETTING XML CONTEXT: classes version");
-        marshallerPool = new AnchoredMarshallerPool(rootNamespace, classes);
+        setXMLContext(rootNamespace, null, null, classes);
     }
 
 
