@@ -217,10 +217,6 @@
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-epsg</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.geotoolkit</groupId>
-      <artifactId>geotk-epsg-javadb</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>javax.faces</groupId>

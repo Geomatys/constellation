@@ -111,10 +111,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.opengis</groupId>
-      <artifactId>geoapi-pending</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.constellation.library</groupId>
       <artifactId>cstl-lib-base</artifactId>
       <version>${project.version}</version>
@@ -123,11 +119,6 @@
       <groupId>org.constellation.engine</groupId>
       <artifactId>cstl-engine-server</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.derby</groupId>
-      <artifactId>derby</artifactId>
-      <scope>${javadb.scope}</scope>
     </dependency>
   </dependencies>
 

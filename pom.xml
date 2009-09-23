@@ -103,32 +103,20 @@
 
 
   <!--
-    External dependencies inherited by all modules. We declare the dependency
-    "Java Advanced Imaging" (JAI) without condition, because this library provides
-    some services of great value for image operations. Therefore this dependency is
-    declared as "provided" because we guess that the final user will have used the
-    installer of JAI in order to obtain native accelerations for his platform.
+    External dependencies inherited by all modules. The following dependencies are NOT
+    declared here; they must be installed together with their native libraries, using
+    the installer provided by their respective project, before any attempt to build
+    constellation.
+
+      - jai_core     from  javax.media
+      - jai_codec    from  javax.media
+      - jai_imageio  from  javax.media
+
+    The JDBC drivers are declared with the 'test' scope. They should NOT be bundled in
+    the WAR file to be created, except for a few modules like the one running the CITE
+    tests. See http://jira.geotoolkit.org/browse/GEOTK-35 for more information.
   -->
   <dependencies>
-    <!--dependency>
-      <groupId>javax.media</groupId>
-      <artifactId>jai_core</artifactId>
-      <version>1.1.3</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.media</groupId>
-      <artifactId>jai_codec</artifactId>
-      <version>1.1.3</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.media</groupId>
-      <artifactId>jai_imageio</artifactId>
-      <version>1.1</version>
-      <scope>provided</scope>
-    </dependency-->
-
     <dependency>
       <groupId>org.opengis</groupId>
       <artifactId>geoapi-pending</artifactId>
@@ -138,6 +126,26 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.7</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.postgis</groupId>
+      <artifactId>postgis-driver</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derbyLocale_fr</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -159,7 +167,6 @@
     <constellation.coverage>org.constellation.coverage.ws.rs</constellation.coverage>
     <constellation.sensor>org.constellation.sos.ws.rs</constellation.sensor>
     <constellation.services.packages>${constellation.config};${constellation.map};${constellation.metadata};${constellation.provider};${constellation.coverage}</constellation.services.packages>
-    <javadb.scope>test</javadb.scope>
     <!-- Defines the source encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -187,12 +194,6 @@
       <id>csw</id>
       <properties>
         <constellation.services.packages>${constellation.config};${constellation.metadata};${constellation.provider}</constellation.services.packages>
-      </properties>
-    </profile>
-    <profile>
-      <id>tomcat</id>
-      <properties>
-        <javadb.scope>runtime</javadb.scope>
       </properties>
     </profile>
   </profiles>
@@ -335,12 +336,6 @@
         <artifactId>geotk-epsg</artifactId>
         <version>${geotoolkit.version}</version>
         <scope>runtime</scope>  <!-- Required only when creating the embedded EPSG database -->
-      </dependency>
-      <dependency>
-        <groupId>org.geotoolkit</groupId>
-        <artifactId>geotk-epsg-javadb</artifactId>
-        <version>${geotoolkit.version}</version>
-        <scope>${javadb.scope}</scope> <!-- "runtime" for Tomcat build, "test" otherwise -->
       </dependency>
       <dependency>
         <groupId>org.geotoolkit</groupId>
@@ -498,10 +493,12 @@
 
 
       <!--
-        Database drivers. They are needed only for execution, not compilation.
-        If a driver is required for testing purpose only, <scope>test</scope>
-        must be explicit. If the JavaDB driver is needed for the sole purpose
-        of the EPSG database, use the geotk-epsg-javadb dependency instead.
+        Database drivers. They are usually needed only for testing purpose (see
+        http://jira.geotoolkit.org/browse/GEOTK-35 for an explanation about why
+        those dependencies should not be in the WAR), so they are declared with
+        the 'test' scope in the dependencies section. If a module still declare
+        a dependency to a JDBC driver, this is usually not for compilation, so
+        the 'runtime' scope is appropriate.
       -->
       <dependency>
         <groupId>postgresql</groupId>
@@ -566,7 +563,7 @@
     <repository>
       <id>geotoolkit</id>
       <name>GeoToolkit repository</name>
-      <url>http://maven.geotoolkit.org/</url>
+      <url>http://maven.geotoolkit.org</url>
     </repository>
     <repository>
       <id>apache</id>
@@ -595,7 +592,7 @@
     </pluginRepository>
     <pluginRepository>
        <id>maven2-repository.dev.java.net</id>
-       <url>http://download.java.net/maven/2/</url>
+       <url>http://download.java.net/maven/2</url>
     </pluginRepository>
   </pluginRepositories>
 

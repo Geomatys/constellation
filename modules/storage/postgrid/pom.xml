@@ -90,10 +90,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.opengis</groupId>
-      <artifactId>geoapi-pending</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-coverageio-pending</artifactId>
     </dependency>
@@ -126,15 +122,13 @@
     <dependency>
       <groupId>postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.postgis</groupId>
       <artifactId>postgis-driver</artifactId>
-      <scope>runtime</scope>
     </dependency>
-    
-    
+
+
     <!-- For TESTING -->
     <dependency>
       <groupId>org.constellation.library</groupId>
@@ -143,7 +137,7 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    
+
   </dependencies>
 
 

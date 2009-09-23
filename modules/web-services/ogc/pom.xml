@@ -22,7 +22,7 @@
   <packaging>jar</packaging>
   <name>Web service base for OGC web services</name>
   <description>
-    The geospatial web services standardized by the Open Geospatial Consortium 
+    The geospatial web services standardized by the Open Geospatial Consortium
     (OGC), including CSW, SOS, WMS, and WCS.
   </description>
 
@@ -107,7 +107,7 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-sld</artifactId>
     </dependency>
-    
+
   </dependencies>
 
 </project>
