@@ -109,23 +109,12 @@
       <groupId>org.jdom</groupId>
       <artifactId>jdom</artifactId>
     </dependency>
-
-
-    <!--
-      Repositories where to find dependencies. A directory http://*.maven.org/
-      is implicit. One can find the necessary dependencies for Maven itself, and
-      some usual dependencies as the JDBC driver for PostgreSQL. The directory
-      "Geotools" contains JARs of Geotools as well as some needed dependencies
-      for Geotools but not published on the Maven repository, for example the
-      UCAR library for the reading of NetCDF files.
-    -->
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-    </dependency>
+    <!-- Do not declare the postgresql driver - it must be provided by the container.
+         The case of postgis is less an issue because it doesn't declare any service. -->
     <dependency>
       <groupId>org.postgis</groupId>
       <artifactId>postgis-driver</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
 
