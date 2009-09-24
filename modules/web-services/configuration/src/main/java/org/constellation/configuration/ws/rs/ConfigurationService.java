@@ -57,7 +57,6 @@ import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.AbstractWebService;
-import org.constellation.ws.rs.WebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -214,6 +213,19 @@ public class ConfigurationService extends AbstractWebService  {
                                                   OPERATION_NOT_SUPPORTED, Parameters.REQUEST);
                 }
             }
+
+            if ("stopIndex".equalsIgnoreCase(request)) {
+                if (cswFunctionEnabled) {
+                    String service     = getParameter("SERVICE", false);
+
+                    AcknowlegementType ack= stopIndexation();
+                    marshaller.marshal(ack, sw);
+                    return Response.ok(sw.toString(), "text/xml").build();
+                } else {
+                     throw new CstlServiceException("This specific CSW operation " + request + " is not activated",
+                                                  OPERATION_NOT_SUPPORTED, "Request");
+                }
+            }
             
             if ("RefreshCascadedServers".equalsIgnoreCase(request) || objectRequest instanceof CSWCascadingType) {
                 final CSWCascadingType refreshCS = (CSWCascadingType) objectRequest;
@@ -316,6 +328,21 @@ public class ConfigurationService extends AbstractWebService  {
             return new AcknowlegementType("failed", "The services can not be restarted (ContainerNotifier is null)");
         }
         
+    }
+
+    /**
+     * Stopt all the indexation going on.
+     *
+     * @return an Acknowlegement.
+     */
+    private AcknowlegementType stopIndexation() {
+        LOGGER.info("\n stop indexation requested \n");
+        if (!isIndexing) {
+            return new AcknowlegementType("Success", "There is no indexation to stop");
+        } else {
+            AbstractIndexer.stopIndexation();
+            return new AcknowlegementType("Success", "All indexations have been stopped");
+        }
     }
     
     /**

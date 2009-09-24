@@ -171,6 +171,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms");
                     writer.optimize();
                     writer.close();
+                    Util.deleteDirectory(getFileDirectory());
                     return;
                 }
             }
@@ -219,6 +220,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                      LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms");
                      writer.optimize();
                      writer.close();
+                     Util.deleteDirectory(getFileDirectory());
                      return;
                 }
             }
@@ -257,7 +259,15 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             writer = new IndexWriter(getFileDirectory(), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
             nbEntries = toIndex.size();
             for (Object entry : toIndex) {
-                indexDocument(writer, entry);
+                if (!stopIndexing) {
+                    indexDocument(writer, entry);
+                } else {
+                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms");
+                     writer.optimize();
+                     writer.close();
+                     Util.deleteDirectory(getFileDirectory());
+                     return;
+                }
             }
             writer.optimize();
             writer.close();
