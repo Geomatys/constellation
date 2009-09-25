@@ -362,11 +362,6 @@
         <artifactId>geotk-widgets-swing</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
-      <dependency>
-        <groupId>org.geotoolkit.project</groupId>
-        <artifactId>geotk-test</artifactId>
-        <version>${geotoolkit.version}</version>
-      </dependency>
 
       <!-- Geotoolkit pending version -->
       <dependency>

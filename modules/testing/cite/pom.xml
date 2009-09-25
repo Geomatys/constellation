@@ -134,10 +134,6 @@
       <artifactId>cstl-test-embedded</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.project</groupId>
-      <artifactId>geotk-test</artifactId>
-    </dependency>
     <!--  For the embedded service. -->
     <dependency>
       <groupId>com.sun.grizzly</groupId>
