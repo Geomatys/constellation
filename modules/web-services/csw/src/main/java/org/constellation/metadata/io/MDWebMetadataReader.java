@@ -173,6 +173,7 @@ public class MDWebMetadataReader extends MetadataReader {
         isoMap.put("creator",     "ISO 19115:MD_Metadata:identificationInfo:credit");
         isoMap.put("publisher",   "ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:organisationName");
         isoMap.put("language",    "ISO 19115:MD_Metadata:language");
+        isoMap.put("rights",      "ISO 19115:MD_Metadata:identificationInfo:resourceConstraint:useLimitation");
         DUBLINCORE_PATH_MAP.put(Standard.ISO_19115, isoMap);
         
         final Map<String, String> ebrimMap = new HashMap<String, String>();
@@ -568,8 +569,23 @@ public class MDWebMetadataReader extends MetadataReader {
         
         // TODO the contributors
         // TODO the source of the data
-        // TODO The rights
+
+        // The rights
+        final List<Value>   rightValues = form.getValueFromPath(mdReader.getPath(pathMap.get("rights")));
+        final List<String>  rights      = new ArrayList<String>();
+        for (Value v: rightValues) {
+            if (v instanceof TextValue) {
+                rights.add(((TextValue)v).getValue());
+            }
+        }
         
+        final SimpleLiteral right;
+        if (rights.size() >  0) {
+            right = new SimpleLiteral(null, rights);
+        } else {
+            right = null;
+        }
+
         // the language
         final List<Value>   languageValues = form.getValueFromPath(mdReader.getPath(pathMap.get("language")));
         final List<String>  languages      = new ArrayList<String>();
@@ -582,6 +598,10 @@ public class MDWebMetadataReader extends MetadataReader {
         
         final RecordType fullResult = new RecordType(identifier, title, litType , keywords, format, modified, date, description, bboxes,
                         creator, publisher, language, null, null);
+        if (right != null) {
+            fullResult.setRights(right);
+        }
+
         
         // for an ElementSetName mode
         if (elementName == null || elementName.size() == 0) {
