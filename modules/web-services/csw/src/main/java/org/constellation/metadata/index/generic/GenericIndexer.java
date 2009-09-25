@@ -158,6 +158,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         IndexWriter writer;
         int nbEntries = 0;
         try {
+            String serviceID = getServiceID();
             writer = new IndexWriter(getFileDirectory(), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
 
             // TODO getting the objects list and index avery item in the IndexWriter.
@@ -165,13 +166,19 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             LOGGER.info("all entries read in " + (System.currentTimeMillis() - time) + " ms.");
             nbEntries = ids.size();
             for (Object entry : ids) {
-                if (!stopIndexing) {
+                if (!stopIndexing && !indexationToStop.contains(serviceID)) {
                     indexDocument(writer, entry);
                 } else {
-                    LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms");
+                    LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
                     writer.optimize();
                     writer.close();
                     Util.deleteDirectory(getFileDirectory());
+                    if (indexationToStop.contains(serviceID)) {
+                        indexationToStop.remove(serviceID);
+                    }
+                    if (indexationToStop.size() == 0) {
+                        stopIndexing = false;
+                    }
                     return;
                 }
             }
@@ -207,20 +214,27 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         int nbEntries = 0;
         try {
             writer = new IndexWriter(getFileDirectory(), analyzer, true);
-
+            String serviceID = getServiceID();
+            
             // TODO getting the objects list and index avery item in the IndexWriter.
             final List<String> ids = reader.getAllIdentifiers();
             nbEntries = ids.size();
             LOGGER.info( nbEntries + " metadata to index (light memory mode)");
             for (String id : ids) {
-                if (!stopIndexing) {
+                if (!stopIndexing && !indexationToStop.contains(serviceID)) {
                     final Object entry = reader.getMetadata(id, MetadataReader.ISO_19115, ElementSetType.FULL, null);
                     indexDocument(writer, entry);
                 } else {
-                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms");
+                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
                      writer.optimize();
                      writer.close();
                      Util.deleteDirectory(getFileDirectory());
+                     if (indexationToStop.contains(serviceID)) {
+                        indexationToStop.remove(serviceID);
+                    }
+                    if (indexationToStop.size() == 0) {
+                        stopIndexing = false;
+                    }
                      return;
                 }
             }
@@ -257,15 +271,23 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         int nbEntries = 0;
         try {
             writer = new IndexWriter(getFileDirectory(), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
+            String serviceID = getServiceID();
+            
             nbEntries = toIndex.size();
             for (Object entry : toIndex) {
-                if (!stopIndexing) {
+                if (!stopIndexing && !indexationToStop.contains(serviceID)) {
                     indexDocument(writer, entry);
                 } else {
-                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms");
+                     LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
                      writer.optimize();
                      writer.close();
                      Util.deleteDirectory(getFileDirectory());
+                     if (indexationToStop.contains(serviceID)) {
+                        indexationToStop.remove(serviceID);
+                     }
+                     if (indexationToStop.size() == 0) {
+                        stopIndexing = false;
+                     }
                      return;
                 }
             }

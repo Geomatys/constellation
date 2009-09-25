@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -182,13 +181,45 @@ public abstract class AbstractCSWConfigurer {
 
     /**
      * Return all the founded CSW service identifiers.
-     * 
+     *
      * @return all the founded CSW service identifiers.
      */
-    public Set<String> getAllServiceIDs() {
-        return serviceConfiguration.keySet();
+    public List<String> getAllServiceIDs() {
+        final List<String> result = new ArrayList<String>();
+        for (String id : serviceConfiguration.keySet()) {
+            result.add(id);
+        }
+        return result;
     }
 
+    private void refreshServiceConfiguration() throws ConfigurationException {
+        serviceConfiguration = new HashMap<String, Automatic>();
+
+        File cswConfigDir = getConfigurationDirectory();
+        if (cswConfigDir == null || (cswConfigDir != null && !cswConfigDir.isDirectory())) {
+            throw new ConfigurationException("No configuration directory have been found");
+        }
+        try {
+            final MarshallerPool pool = new MarshallerPool("org.constellation.generic.database");
+            final Unmarshaller configUnmarshaller = pool.acquireUnmarshaller();
+
+            for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(null))) {
+                //we get the csw ID (if single mode return "")
+                String id = getConfigID(configFile);
+                // we get the CSW configuration file
+                Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
+                config.setConfigurationDirectory(cswConfigDir);
+                serviceConfiguration.put(id, config);
+            }
+            pool.release(configUnmarshaller);
+
+        } catch (JAXBException ex) {
+            throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service", ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            throw new ConfigurationException("IllegalArgumentException: " + ex.getMessage());
+        }
+    }
+    
     /**
      * Refresh the properties file used by the CSW service to store federated catalogues.
      * 
@@ -237,8 +268,12 @@ public abstract class AbstractCSWConfigurer {
      */
     public AcknowlegementType refreshIndex(boolean asynchrone, String service, String id) throws CstlServiceException {
         LOGGER.info("refresh index requested");
+        try {
+            refreshServiceConfiguration();
+        } catch (ConfigurationException ex) {
+            throw new CstlServiceException(ex);
+        }
         String msg;
-
         final File cswConfigDir = getConfigurationDirectory();
         if (!asynchrone) {
             synchroneIndexRefresh(cswConfigDir, id);

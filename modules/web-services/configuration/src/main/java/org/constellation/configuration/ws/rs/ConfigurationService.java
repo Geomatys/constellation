@@ -38,6 +38,7 @@ import javax.ws.rs.core.Response;
 import com.sun.jersey.spi.resource.Singleton;
 
 // JAXB dependencies
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
@@ -95,6 +96,8 @@ public class ConfigurationService extends AbstractWebService  {
     private boolean cswFunctionEnabled;
 
     public static boolean isIndexing;
+
+    public static final List<String> serviceIndexing = new ArrayList<String>();
     
     public static final Map<String, File> SERVCE_DIRECTORY = new HashMap<String, File>();
     static {
@@ -179,12 +182,22 @@ public class ConfigurationService extends AbstractWebService  {
                     final boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
                     final String service     = getParameter("SERVICE", false);
                     final String id          = getParameter("ID", false);
-                    isIndexing               = true;
+                    boolean forced           = Boolean.parseBoolean((String) getParameter("FORCED", false));
+
+                    if (isIndexing(id) && !forced) {
+                        AcknowlegementType refused = new AcknowlegementType("Failure", "An indexation is already started for this service:" + id);
+                        marshaller.marshal(refused, sw);
+                        return Response.ok(sw.toString(), "text/xml").build();
+                    } else if (isIndexing && forced) {
+                        AbstractIndexer.stopIndexation(Arrays.asList(id));
+                    }
+                    
+                    startIndexation(id);
                     AcknowlegementType ack;
                     try {
                         ack = cswConfigurer.refreshIndex(asynchrone, service, id);
                     } finally {
-                        isIndexing          = false;
+                        endIndexation(id);
                     }
                     marshaller.marshal(ack, sw);
                     return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
@@ -217,8 +230,9 @@ public class ConfigurationService extends AbstractWebService  {
             if ("stopIndex".equalsIgnoreCase(request)) {
                 if (cswFunctionEnabled) {
                     String service     = getParameter("SERVICE", false);
+                    String id          = getParameter("ID", false);
 
-                    AcknowlegementType ack= stopIndexation();
+                    AcknowlegementType ack= stopIndexation(id);
                     marshaller.marshal(ack, sw);
                     return Response.ok(sw.toString(), "text/xml").build();
                 } else {
@@ -279,6 +293,25 @@ public class ConfigurationService extends AbstractWebService  {
         
     }
 
+    private boolean isIndexing(String id) {
+        return isIndexing & serviceIndexing.contains(id);
+    }
+
+    private void startIndexation(String id) {
+        isIndexing  = true;
+        if (id != null) {
+            serviceIndexing.add(id);
+        }
+    }
+
+    private void endIndexation(String id) {
+        isIndexing = false;
+        if (id != null) {
+            serviceIndexing.remove(id);
+        }
+    }
+
+    
     /**
      * Build a service ExceptionReport
      *
@@ -331,17 +364,17 @@ public class ConfigurationService extends AbstractWebService  {
     }
 
     /**
-     * Stopt all the indexation going on.
+     * Stop all the indexation going on.
      *
      * @return an Acknowlegement.
      */
-    private AcknowlegementType stopIndexation() {
+    private AcknowlegementType stopIndexation(String id) {
         LOGGER.info("\n stop indexation requested \n");
-        if (!isIndexing) {
+        if (!isIndexing(id)) {
             return new AcknowlegementType("Success", "There is no indexation to stop");
         } else {
-            AbstractIndexer.stopIndexation();
-            return new AcknowlegementType("Success", "All indexations have been stopped");
+            AbstractIndexer.stopIndexation(Arrays.asList(id));
+            return new AcknowlegementType("Success", "The indexation have been stopped");
         }
     }
     
