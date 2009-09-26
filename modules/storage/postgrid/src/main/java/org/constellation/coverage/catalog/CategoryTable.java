@@ -126,7 +126,7 @@ final class CategoryTable extends Table {
              * (deuxième cas), ou quantitative et logarithmique (troisième cas).
              */
             Category category;
-            final NumberRange range = NumberRange.create(lower, upper);
+            final NumberRange<?> range = NumberRange.create(lower, upper);
             if (!isQuantifiable) {
                 // Catégorie qualitative.
                 if (colors == null) {

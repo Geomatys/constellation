@@ -565,7 +565,7 @@ loop:   for (final CoverageReference newReference : entries) {
             }
             availableCentroids = gridGeometryTable.identifiersToAltitudes(centroids);
             Set<Date> keySet = availableCentroids.keySet();
-            if (!(keySet instanceof SortedSet)) {
+            if (!(keySet instanceof SortedSet<?>)) {
                 keySet = new TreeSet<Date>(keySet);
                 // This is a hack for Java 5 (Java 6 returns directly an instance of SortedSet).
                 // TODO: remove this hack when we will be allowed to target Java 6, and invoke
@@ -655,6 +655,7 @@ loop:   for (final CoverageReference newReference : entries) {
      * @throws CatalogException if an illegal record was found.
      * @throws SQLException if an error occured while reading the database.
      */
+    @Override
     protected CoverageReference createEntry(final ResultSet results) throws CatalogException, SQLException {
         assert Thread.holdsLock(this);
         final Calendar calendar = getCalendar();
@@ -683,7 +684,7 @@ loop:   for (final CoverageReference newReference : entries) {
             gridGeometryTable = getDatabase().getTable(GridGeometryTable.class);
         }
         final GridGeometryEntry geometry = gridGeometryTable.getEntry(extent);
-        final NumberRange verticalRange = getVerticalRange();
+        final NumberRange<?> verticalRange = getVerticalRange();
         final double z = 0.5*(verticalRange.getMinimum() + verticalRange.getMaximum());
         final GridCoverageEntry entry = new GridCoverageEntry(this, series, filename, index,
                 startTime, endTime, geometry, geometry.getAltitudeIndex(z), null);

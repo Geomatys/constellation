@@ -313,10 +313,23 @@ final class FormatEntry extends Entry implements Format {
     private void handleSpecialCases(final ImageReader reader) {
         if (reader instanceof NetcdfImageReader) {
             final NetcdfImageReader r = (NetcdfImageReader) reader;
-            final GridSampleDimension[] bandss = getSampleDimensions(null);
-            final String[] names = new String[bandss.length];
+            final GridSampleDimension[] bandes = getSampleDimensions(null);
+            final String[] names = new String[bandes.length];
             for (int i=0; i<names.length; i++) {
-                names[i] = bandss[i].getDescription().toString();
+                String name = bandes[i].getDescription().toString().trim();
+                /*
+                 * Trim the name at the first invalid identifier character. This is a hack for
+                 * allowing different NetCDF variables in the Categories table (e.g. "depth",
+                 * "depth (Gascogne)", etc.)
+                 */
+                final int length = name.length();
+                for (int j=0; j<length; j++) {
+                    if (!Character.isJavaIdentifierPart(name.charAt(j))) {
+                        name = name.substring(0, j);
+                        break;
+                    }
+                }
+                names[i] = name;
             }
             r.setVariables(names);
         }
@@ -813,7 +826,7 @@ final class FormatEntry extends Entry implements Format {
         public TreeNode(final Category category, final Locale locale) {
             super(category, false);
             final StringBuilder buffer = new StringBuilder();
-            final NumberRange range = category.geophysics(false).getRange();
+            final NumberRange<?> range = category.geophysics(false).getRange();
             buffer.append('[');  append(buffer, range.getMinValue());
             buffer.append(".."); append(buffer, range.getMaxValue()); // Inclusive
             buffer.append("] ").append(category.getName());
@@ -823,7 +836,7 @@ final class FormatEntry extends Entry implements Format {
         /**
          * Add a whole number using at least 3 digits (for example 007).
          */
-        private static void append(final StringBuilder buffer, final Comparable value) {
+        private static void append(final StringBuilder buffer, final Comparable<?> value) {
             final String number = String.valueOf(value);
             for (int i=3-number.length(); --i>=0;) {
                 buffer.append('0');

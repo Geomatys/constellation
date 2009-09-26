@@ -172,6 +172,7 @@ final class SeriesEntry extends Entry implements Series {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Layer getLayer() {
         return layer;
     }
@@ -179,6 +180,7 @@ final class SeriesEntry extends Entry implements Series {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Format getFormat() {
         return format;
     }
@@ -186,6 +188,7 @@ final class SeriesEntry extends Entry implements Series {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getProtocol() {
         return protocol;
     }
@@ -193,6 +196,7 @@ final class SeriesEntry extends Entry implements Series {
     /**
      * {@inheritDoc}
      */
+    @Override
     public File file(String filename) {
         if (extension != null && extension.length() != 0) {
             filename = filename + '.' + extension;
@@ -203,6 +207,7 @@ final class SeriesEntry extends Entry implements Series {
     /**
      * {@inheritDoc}
      */
+    @Override
     public URI uri(final String filename) throws URISyntaxException {
         if (host == null) {
             return file(filename).toURI();
@@ -234,6 +239,7 @@ final class SeriesEntry extends Entry implements Series {
      *
      * @param service The web service requesting the series (WMS or WCS)
      */
+    @Override
     public boolean isQueryable(ServiceType service) {
         return (permission == null) || permission.isAccessibleService(service);
     }

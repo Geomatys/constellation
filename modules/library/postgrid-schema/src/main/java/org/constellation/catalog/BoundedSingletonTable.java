@@ -216,7 +216,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
             return envelope.clone();
         }
         final GeographicBoundingBox box = getGeographicBoundingBox();
-        final NumberRange      altitude = getVerticalRange();
+        final NumberRange<?>   altitude = getVerticalRange();
         final DateRange            time = getTimeRange();
         final CRS               crsType = getDatabase().crsType;
         GeneralEnvelope envelope = new GeneralEnvelope(crsType.getCoordinateReferenceSystem());
@@ -356,7 +356,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * @see #getEnvelope
      * @see #trimEnvelope
      */
-    public synchronized NumberRange getVerticalRange() {
+    public synchronized NumberRange<Double> getVerticalRange() {
         return NumberRange.create(zMin, zMax);
     }
 
@@ -368,7 +368,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
      * @return {@code true} if the vertical range changed as a result of this call, or
      *         {@code false} if the specified range is equals to the one already set.
      */
-    public final boolean setVerticalRange(final NumberRange range) {
+    public final boolean setVerticalRange(final NumberRange<?> range) {
         final double minimum, maximum;
         if (range != null) {
             minimum = range.getMinimum(true);

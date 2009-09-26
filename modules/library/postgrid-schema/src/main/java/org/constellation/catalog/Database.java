@@ -941,7 +941,7 @@ public class Database {
         String version;
         try {
             version = String.valueOf(Class.forName("javax.media.jai.JAI")
-                    .getMethod("getBuildVersion", (Class[]) null).invoke(null, (Object[]) null));
+                    .getMethod("getBuildVersion", (Class<?>[]) null).invoke(null, (Object[]) null));
         } catch (Exception e) {
             version = e.toString();
         }

@@ -264,6 +264,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Series getSeries() {
         return series;
     }
@@ -271,6 +272,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
+    @Override
     public File getFile() {
         final File file = series.file(filename);
         return file.isAbsolute() ? file : null;
@@ -279,6 +281,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
+    @Override
     public URI getURI() {
         try {
             return series.uri(filename);
@@ -309,6 +312,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
+    @Override
     public CoordinateReferenceSystem getCoordinateReferenceSystem() {
         return geometry.getCoordinateReferenceSystem(true);
     }
@@ -316,6 +320,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Envelope getEnvelope() {
         return getGridGeometry().getEnvelope();
     }
@@ -330,6 +335,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      *
      * @todo Revisit now that we are 4D.
      */
+    @Override
     public NumberRange<Double> getZRange() {
         final DefaultTemporalCRS temporalCRS = settings.getTemporalCRS();
         return NumberRange.create(temporalCRS.toValue(new Date(startTime)),
@@ -339,6 +345,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
+    @Override
     public DateRange getTimeRange() {
         return new DateRange((startTime!=Long.MIN_VALUE) ? new Date(startTime) : null, true,
                                (endTime!=Long.MAX_VALUE) ? new Date(  endTime) : null, false);
@@ -349,6 +356,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      *
      * @todo L'implémentation actuelle suppose que le CRS de la table est toujours WGS84.
      */
+    @Override
     public GeographicBoundingBox getGeographicBoundingBox() {
         try {
             assert CRS.equalsIgnoreMetadata(DefaultGeographicCRS.WGS84, CRSUtilities.getCRS2D(settings.tableCRS));
@@ -361,6 +369,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
+    @Override
     public synchronized GridGeometryIO getGridGeometry() {
         if (gridGeometry == null) {
             final Rectangle clipPixels  = new Rectangle();
@@ -400,6 +409,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SampleDimension[] getSampleDimensions() {
         final GridSampleDimension[] bands = series.getFormat().getSampleDimensions();
         for (int i=0; i<bands.length; i++) {
@@ -605,6 +615,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      *
      * @todo Current implementation requires a {@link FormatEntry} implementation.
      */
+    @Override
     public GridCoverage2D getCoverage(final IIOListeners listeners) throws IOException {
         /*
          * NOTE SUR LES SYNCHRONISATIONS: Cette méthode est synchronisée à plusieurs niveau:
@@ -694,7 +705,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
          * La lecture est terminée et n'a pas été annulée. On construit maintenant l'objet
          * GridCoverage2D, on le conserve dans une cache interne puis on le retourne.
          */
-        final Map properties = Collections.singletonMap(REFERENCE_KEY, this);
+        final Map<String,?> properties = Collections.singletonMap(REFERENCE_KEY, this);
         final GridCoverageFactory factory = GridCoveragePool.DEFAULT.factory;
         GridCoverage2D coverage;
         if (bands != null && bands.length != 0) {
@@ -740,7 +751,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
      * be collected.
      */
     final synchronized void clearSoftReference() {
-        if (gridCoverage instanceof SoftReference) {
+        if (gridCoverage instanceof SoftReference<?>) {
             final GridCoverage2D coverage = gridCoverage.get();
             gridCoverage = (coverage!=null) ? new WeakReference<GridCoverage2D>(coverage) : null;
         }
@@ -749,6 +760,7 @@ final class GridCoverageEntry extends Entry implements CoverageReference {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void abort() {
         final Format format = series.getFormat();
         if (format instanceof FormatEntry) {
