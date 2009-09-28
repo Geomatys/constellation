@@ -54,7 +54,7 @@ import org.constellation.map.visitor.CSVGraphicVisitor;
 import org.constellation.map.visitor.GMLGraphicVisitor;
 import org.constellation.map.visitor.HTMLGraphicVisitor;
 import org.constellation.map.visitor.TextGraphicVisitor;
-import org.constellation.portrayal.Portrayal;
+import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.StyleProviderProxy;
@@ -86,8 +86,13 @@ import org.constellation.ws.rs.WebService;
 
 //Geotools dependencies
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.PortrayalExtension;
+import org.geotoolkit.display2d.service.SceneDef;
+import org.geotoolkit.display2d.service.ViewDef;
+import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
+import org.geotoolkit.map.MapContext;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
 import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
@@ -663,17 +668,23 @@ public class WMSWorker extends AbstractWMSWorker {
         final Map<String, Object> params       = new HashMap<String, Object>();
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_TIME, time);
-        final Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params);
-
+        final SceneDef sdef = new SceneDef();
+        
+        try {
+            final MapContext context = PortrayalUtil.createContext(layerRefs, styles, params);
+            sdef.setContext(context);
+        } catch (PortrayalException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
 
         // 2. VIEW
         final JTSEnvelope2D refEnv             = new JTSEnvelope2D(getFI.getEnvelope());
         final double azimuth                   = getFI.getAzimuth();
-        final Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnv,azimuth);
+        final ViewDef vdef = new ViewDef(refEnv,azimuth);
 
 
         // 3. CANVAS
-        final Dimension canvasDimension        = getFI.getSize();
+        final Dimension canvasDimension = getFI.getSize();
         final Color background;
         if (getFI.getTransparent()) {
             background = null;
@@ -681,7 +692,7 @@ public class WMSWorker extends AbstractWMSWorker {
             final Color color = getFI.getBackground();
             background = (color == null) ? Color.WHITE : color;
         }
-        final Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(canvasDimension,background);
+        final CanvasDef cdef = new CanvasDef(canvasDimension,background);
 
         // 4. SHAPE
         //     a
@@ -725,9 +736,14 @@ public class WMSWorker extends AbstractWMSWorker {
                     INVALID_FORMAT, "info_format");
         }
 
+        final VisitDef visitDef = new VisitDef();
+        visitDef.setArea(selectionArea);
+        visitDef.setVisitor(visitor);
+
+
         // We now build the response, according to the format chosen.
         try {
-        	Cstl.getPortrayalService().visit(sdef,vdef,cdef,selectionArea,visitor);
+        	Cstl.getPortrayalService().visit(sdef,vdef,cdef,visitDef);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
@@ -811,17 +827,27 @@ public class WMSWorker extends AbstractWMSWorker {
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
         params.put(WMSQuery.KEY_TIME, time);
-        final List<PortrayalExtension> exts = new ArrayList<PortrayalExtension>();
+        final SceneDef sdef = new SceneDef();
         if (extension != null) {
-            exts.add(extension);
+            sdef.extensions().add(extension);
         }
-        final Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRefs,styles,params,exts);
+
+        try {
+            final MapContext context = PortrayalUtil.createContext(layerRefs, styles, params);
+            sdef.setContext(context);
+        } catch (PortrayalException ex) {
+            if (errorInImage) {
+                return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize() );
+            } else {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            }
+        }
 
 
         // 2. VIEW
         final JTSEnvelope2D refEnv             = new JTSEnvelope2D(getMap.getEnvelope());
         final double azimuth                   = getMap.getAzimuth();
-        final Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnv,azimuth);
+        final ViewDef vdef = new ViewDef(refEnv,azimuth);
 
 
         // 3. CANVAS
@@ -833,7 +859,7 @@ public class WMSWorker extends AbstractWMSWorker {
             final Color color = getMap.getBackground();
             background = (color == null) ? Color.WHITE : color;
         }
-        final Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(canvasDimension,background);
+        final CanvasDef cdef = new CanvasDef(canvasDimension,background);
 
         // 4. IMAGE
         BufferedImage image;

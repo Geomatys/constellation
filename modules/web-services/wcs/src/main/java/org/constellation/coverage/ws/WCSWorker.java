@@ -50,7 +50,7 @@ import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.portrayal.Portrayal;
+import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.register.RegisterException;
@@ -65,10 +65,14 @@ import org.constellation.ws.rs.WebService;
 // Geotoolkit dependencies
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display2d.service.CanvasDef;
+import org.geotoolkit.display2d.service.SceneDef;
+import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.xml.v311.CodeListType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.map.MapContext;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.KeywordsType;
@@ -893,7 +897,15 @@ public final class WCSWorker {
             final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
             renderParameters.put("TIME", date);
             renderParameters.put("ELEVATION", elevation);
-            final Portrayal.SceneDef sdef = new Portrayal.SceneDef(layerRef, null, renderParameters);
+            final SceneDef sdef = new SceneDef();
+            
+            try {
+                final MapContext context = PortrayalUtil.createContext(layerRef, null, renderParameters);
+                sdef.setContext(context);
+            } catch (PortrayalException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            }
+
 
             // VIEW
             final JTSEnvelope2D refEnvel;
@@ -911,10 +923,10 @@ public final class WCSWorker {
                 throw new CstlServiceException(ex, INVALID_CRS, "response_crs");
             }
             final Double azimuth =  0.0; //HARD CODED SINCE PROTOCOL DOES NOT ALLOW
-            final Portrayal.ViewDef vdef = new Portrayal.ViewDef(refEnvel, azimuth);
+            final ViewDef vdef = new ViewDef(refEnvel, azimuth);
 
             // CANVAS
-            final Portrayal.CanvasDef cdef = new Portrayal.CanvasDef(request.getSize(), null);
+            final CanvasDef cdef = new CanvasDef(request.getSize(), null);
 
             // IMAGE
             final BufferedImage img;

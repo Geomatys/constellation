@@ -19,22 +19,17 @@ package org.constellation.portrayal.internal;
 import java.awt.Dimension;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
-import java.util.logging.Level;
 
-import org.constellation.portrayal.Portrayal;
 import org.constellation.portrayal.PortrayalServiceIF;
-import org.constellation.provider.LayerDetails;
 
-import org.geotoolkit.display.canvas.GraphicVisitor;
-import org.geotoolkit.display.canvas.control.FailOnErrorMonitor;
+import org.geotoolkit.display.canvas.control.StopOnErrorMonitor;
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display2d.canvas.AbstractGraphicVisitor;
+import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
-import org.geotoolkit.display2d.service.PortrayalExtension;
-import org.geotoolkit.map.MapBuilder;
-import org.geotoolkit.map.MapContext;
-import org.geotoolkit.map.MapLayer;
-import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
-import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.display2d.service.SceneDef;
+import org.geotoolkit.display2d.service.ViewDef;
+import org.geotoolkit.display2d.service.VisitDef;
 
 
 /**
@@ -52,28 +47,13 @@ import org.geotoolkit.style.MutableStyle;
  */
 public final class CstlPortrayalService implements PortrayalServiceIF {
 
-    /**
-     * This generates a new instance for each thread (i.e. each service request) 
-     * but still allows us to have a statically accessible reference with the 
-     * {@link #getInstance()} method.
-     */
-    private static final ThreadLocal<CstlPortrayalService> INSTANCES = new ThreadLocal<CstlPortrayalService>() {
-        @Override
-        protected CstlPortrayalService initialValue() {
-            return new CstlPortrayalService();
-        }
-    };
+    private static final CstlPortrayalService INSTANCE = new CstlPortrayalService();
     
     /**
-     * An internal method which provides the instance for the thread in which 
-     * the caller is running.
-     * <p>
-     * In this design, each CstlPortrayalService instance runs in its own thread, 
-     * </p>
-     * @return
+     * @return a singleton of cstlPortralyalService
      */
-    public static CstlPortrayalService internalGetInstance(){
-        return INSTANCES.get();
+    public static CstlPortrayalService getInstance(){
+        return INSTANCE;
     }
         
     private CstlPortrayalService(){}
@@ -90,27 +70,16 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
      * @throws PortrayalException For errors during portrayal, TODO: common examples?
      */
     @Override
-    public BufferedImage portray( final Portrayal.SceneDef sdef,
-                                  final Portrayal.ViewDef vdef,
-                                  final Portrayal.CanvasDef cdef) 
+    public BufferedImage portray( final SceneDef sdef,
+                                  final ViewDef vdef,
+                                  final CanvasDef cdef) 
     		throws PortrayalException {
     	
-    	final MapContext context = createContext(sdef);
-        final ReportMonitor monitor = new ReportMonitor();
+        final StopOnErrorMonitor monitor = new StopOnErrorMonitor();
+        vdef.setMonitor(monitor);
 
         try {
-            final BufferedImage buffer = DefaultPortrayalService.portray(
-                    context,
-                    vdef.envelope,
-                    null,null,
-                    cdef.dimension,
-                    true,
-                    (float)vdef.azimuth,
-                    monitor,
-                    cdef.background,
-                    null,
-                    sdef.extensions.toArray(new PortrayalExtension[sdef.extensions.size()])
-                    );
+            final BufferedImage buffer = DefaultPortrayalService.portray(cdef,sdef,vdef);
 
             final Exception exp = monitor.getLastException();
             if(exp != null){
@@ -126,7 +95,7 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
                 throw new PortrayalException(ex);
             }
         } finally {
-            context.layers().clear();
+            sdef.getContext().layers().clear();
         }
 
     }
@@ -145,24 +114,14 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
      * @see AbstractGraphicVisitor
      */
     @Override
-    public void visit( final Portrayal.SceneDef sdef,
-                       final Portrayal.ViewDef vdef,
-                       final Portrayal.CanvasDef cdef,
-                       Shape selectedArea, 
-                       GraphicVisitor visitor)
+    public void visit( final SceneDef sdef,
+                       final ViewDef vdef,
+                       final CanvasDef cdef,
+                       final VisitDef visitDef)
             throws PortrayalException {
 
-        final MapContext context = createContext(sdef);
-
         try{
-            DefaultPortrayalService.visit(
-                    context,
-                    vdef.envelope,
-                    cdef.dimension,
-                    true,
-                    null,
-                    selectedArea,
-                    visitor);
+            DefaultPortrayalService.visit(cdef,sdef,vdef,visitDef);
         }catch(Exception ex){
             if (ex instanceof PortrayalException) {
                 throw (PortrayalException)ex;
@@ -170,8 +129,8 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
                 throw new PortrayalException(ex);
             }
         }finally{
-            visitor.endVisit();
-            context.layers().clear();
+            visitDef.getVisitor().endVisit();
+            sdef.getContext().layers().clear();
         }
 
     }
@@ -183,57 +142,5 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
     public BufferedImage writeInImage(Exception e, Dimension dim){
         return DefaultPortrayalService.writeException(e, dim);
     }
-    
-    private MapContext createContext( final Portrayal.SceneDef sdef ) throws PortrayalException {
-
-    	assert ( sdef.layerRefs.size() == sdef.styleRefs.size() );
-        final MapContext context = MapBuilder.createContext(DefaultGeographicCRS.WGS84);
-        context.layers().clear();
-
-        for (int i = 0; i < sdef.layerRefs.size(); i++){
-
-        	final LayerDetails layerRef = sdef.layerRefs.get(i);
-        	final MutableStyle style = sdef.styleRefs.get(i);
-
-        	assert ( null != layerRef );
-        	//style can be null
-
-            final MapLayer mapLayer = layerRef.getMapLayer(style, sdef.renderingParameters);
-            if (mapLayer == null) {
-                throw new PortrayalException("Could not create a mapLayer for layer: " + layerRef.getName());
-            }
-            mapLayer.setSelectable(true);
-            mapLayer.setVisible(true);
-            context.layers().add(mapLayer);
-        }
-
-        return context;
-    }
         
-    /*
-     * TODO: document me, pretty please.
-     */
-    private class ReportMonitor extends FailOnErrorMonitor{
-
-        private Exception lastError = null;
-        
-        public Exception getLastException(){
-            return lastError;
-        }
-        
-        @Override
-        public void renderingStarted() {
-            lastError = null;
-            super.renderingStarted();
-        }
-
-        @Override
-        public void exceptionOccured(Exception ex, Level level) {
-            lastError = ex;
-            //request stop rendering
-            stopRendering();
-        }
-        
-    }
-    
 }

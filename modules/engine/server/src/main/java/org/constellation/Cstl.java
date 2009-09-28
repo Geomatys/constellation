@@ -14,7 +14,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation;
 
 import org.constellation.portrayal.PortrayalServiceIF;
@@ -35,30 +34,30 @@ import org.constellation.register.internal.PrimitiveRegister;
  *
  */
 public final class Cstl {
-	
-	//We don't want any instances of this class.
-	private Cstl(){}
-	
-	/**
-	 * Provides access to the interface through which to interact with the 
-	 * local register; the interface is currently experimental.
-	 * 
-	 * @return An implementation of the primitive {@link PrimitiveRegisterIF 
-	 *           Register Interface}.
-	 */
-	public static PrimitiveRegisterIF getRegister() {
-		return PrimitiveRegister.internalGetInstance();
-	}
-	
-	/**
-	 * Provides access to the portrayal service through which internal resources 
-	 * can be rendered onto a two dimensional image.
-	 * 
-	 * @return An implementation of the {@link PortrayalSerivceIF Portrayal 
-	 *           Service Interface}.
-	 */
-	public static PortrayalServiceIF getPortrayalService() {
-		return CstlPortrayalService.internalGetInstance();
-	}
-	
+
+    //We don't want any instances of this class.
+    private Cstl() {
+    }
+
+    /**
+     * Provides access to the interface through which to interact with the
+     * local register; the interface is currently experimental.
+     *
+     * @return An implementation of the primitive {@link PrimitiveRegisterIF
+     *           Register Interface}.
+     */
+    public static PrimitiveRegisterIF getRegister() {
+        return PrimitiveRegister.internalGetInstance();
+    }
+
+    /**
+     * Provides access to the portrayal service through which internal resources
+     * can be rendered onto a two dimensional image.
+     *
+     * @return An implementation of the {@link PortrayalSerivceIF Portrayal
+     *           Service Interface}.
+     */
+    public static PortrayalServiceIF getPortrayalService() {
+        return CstlPortrayalService.getInstance();
+    }
 }

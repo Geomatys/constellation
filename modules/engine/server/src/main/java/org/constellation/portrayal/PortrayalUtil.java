@@ -17,9 +17,17 @@
 package org.constellation.portrayal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.constellation.provider.LayerDetails;
+
+import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.map.MapContext;
+import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.sld.MutableLayer;
 import org.geotoolkit.sld.MutableLayerStyle;
 import org.geotoolkit.sld.MutableNamedLayer;
@@ -40,6 +48,40 @@ import org.geotoolkit.style.MutableStyle;
  *
  */
 public final class PortrayalUtil {
+
+
+    public static MapContext createContext(LayerDetails layerRef, MutableStyle styleRef,
+            Map<String,Object> renderingParameters) throws PortrayalException{
+        return createContext(Collections.singletonList(layerRef),
+                 Collections.singletonList(styleRef),
+                 renderingParameters);
+
+    }
+
+    public static MapContext createContext(List<LayerDetails> layerRefs, List<MutableStyle> styleRefs,
+            Map<String,Object> renderingParameters ) throws PortrayalException {
+
+    	assert ( layerRefs.size() == styleRefs.size() );
+        final MapContext context = MapBuilder.createContext(DefaultGeographicCRS.WGS84);
+
+        for (int i = 0; i < layerRefs.size(); i++) {
+            final LayerDetails layerRef = layerRefs.get(i);
+            final MutableStyle style = styleRefs.get(i);
+
+            assert (null != layerRef);
+            //style can be null
+
+            final MapLayer mapLayer = layerRef.getMapLayer(style, renderingParameters);
+            if (mapLayer == null) {
+                throw new PortrayalException("Could not create a mapLayer for layer: " + layerRef.getName());
+            }
+            mapLayer.setSelectable(true);
+            mapLayer.setVisible(true);
+            context.layers().add(mapLayer);
+        }
+
+        return context;
+    }
 
     public static Object getStyleForLayer(final LayerDetails layerRef,
             final String styleName,

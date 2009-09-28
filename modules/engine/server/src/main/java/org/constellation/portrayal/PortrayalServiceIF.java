@@ -22,6 +22,10 @@ import java.awt.image.BufferedImage;
 
 import org.geotoolkit.display.canvas.GraphicVisitor;
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display2d.service.CanvasDef;
+import org.geotoolkit.display2d.service.SceneDef;
+import org.geotoolkit.display2d.service.ViewDef;
+import org.geotoolkit.display2d.service.VisitDef;
 
 /**
  * The interface for portrayal methods provided by Constellation.
@@ -48,9 +52,9 @@ public interface PortrayalServiceIF {
      *           given canvas.
      * @throws PortrayalException For errors during portrayal, TODO: common examples?
      */
-    BufferedImage portray(final Portrayal.SceneDef sdef,
-            final Portrayal.ViewDef vdef,
-            final Portrayal.CanvasDef cdef)
+    BufferedImage portray(final SceneDef sdef,
+            final ViewDef vdef,
+            final CanvasDef cdef)
             throws PortrayalException;
 
     /**
@@ -66,11 +70,10 @@ public interface PortrayalServiceIF {
      *
      * @see AbstractGraphicVisitor
      */
-    void visit(final Portrayal.SceneDef sdef,
-            final Portrayal.ViewDef vdef,
-            final Portrayal.CanvasDef cdef,
-            Shape selectedArea,
-            GraphicVisitor visitor)
+    void visit(final SceneDef sdef,
+            final ViewDef vdef,
+            final CanvasDef cdef,
+            final VisitDef visitDef)
             throws PortrayalException;
 
     /**
