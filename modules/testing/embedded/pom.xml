@@ -124,11 +124,6 @@
       <groupId>org.apache.derby</groupId>
       <artifactId>derby</artifactId>
      </dependency>
-    <dependency>
-      <groupId>fr.ifremer.seagrid</groupId>
-      <artifactId>imageio</artifactId>
-      <version>1.2-SNAPSHOT</version>
-    </dependency>
     <!-- For testing static methods -->
     <dependency>
       <groupId>org.constellation.engine</groupId>
@@ -157,16 +152,6 @@
               <mainClass>org.constellation.ws.embedded.CstlEmbeddedService</mainClass>
             </manifest>
           </archive>
-        </configuration>
-      </plugin>
-      <!-- Skip the tests, waiting to be fixed to reactivate them.
-           @TODO: fix them !
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
         </configuration>
       </plugin>
     </plugins>
