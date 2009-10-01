@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.constellation</groupId>
     <artifactId>constellation-sdi</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.5-SNAPSHOT</version>
   </parent>
 
 
