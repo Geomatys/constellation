@@ -35,7 +35,7 @@ final class LayerQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    final Column name, thematic, procedure, period, fallback, remarks, minimum, maximum;
+    final Column name, thematic, procedure, period, fallback, remarks;
 
     /**
      * Parameter to appear after the {@code "FROM"} clause.
@@ -57,8 +57,6 @@ final class LayerQuery extends Query {
         period    = addColumn("period",         1, sl  );
         fallback  = addColumn("fallback",    null, sl  );
         remarks   = addColumn("description", null, sl  );
-        minimum   = addColumn("minimum",     null, sl  );
-        maximum   = addColumn("maximum",     null, sl  );
         byName    = addParameter(name, SELECT, EXISTS);
     }
 }

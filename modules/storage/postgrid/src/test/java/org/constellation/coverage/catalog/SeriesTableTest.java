@@ -56,7 +56,7 @@ public class SeriesTableTest extends TableTest {
 
         // Ask only for series in a given layer.
         assertNull(table.getLayer());
-        table.setLayer(new LayerEntry(LayerTableTest.SAMPLE_NAME, null, null, 1, null, Double.NaN, Double.NaN));
+        table.setLayer(new LayerEntry(LayerTableTest.SAMPLE_NAME, null, null, 1, null));
         assertNotSame("Should be assigned to a Layer", entry, table.getEntry(SAMPLE_NAME));
         assertEquals(name, table.getEntry(SAMPLE_NAME).getName());
 

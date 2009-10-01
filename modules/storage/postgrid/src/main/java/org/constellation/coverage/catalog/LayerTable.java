@@ -145,16 +145,7 @@ public class LayerTable extends BoundedSingletonTable<Layer> {
         }
         final String fallback  = results.getString(indexOf(query.fallback));
         final String remarks   = results.getString(indexOf(query.remarks ));
-        double       minimum   = results.getDouble(indexOf(query.minimum ));
-        if (results.wasNull()) {
-            minimum = Double.NaN;
-        }
-        double       maximum   = results.getDouble(indexOf(query.maximum ));
-        if (results.wasNull()) {
-            maximum = Double.NaN;
-        }
-        final LayerEntry entry = new LayerEntry(name, thematic, procedure, period, remarks,
-                                                minimum, maximum);
+        final LayerEntry entry = new LayerEntry(name, thematic, procedure, period, remarks);
         entry.fallback = fallback; // Will be replaced by a Layer in postCreateEntry.
         return entry;
     }
