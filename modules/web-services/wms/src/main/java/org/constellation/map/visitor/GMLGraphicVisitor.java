@@ -16,8 +16,6 @@
  */
 package org.constellation.map.visitor;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 import java.awt.Dimension;
 import java.awt.Shape;
 import java.io.IOException;
@@ -25,14 +23,11 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.measure.unit.Unit;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.provider.LayerDetails;
@@ -44,14 +39,10 @@ import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
-import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.metadata.iso.citation.Citations;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.MeasurementRange;
 
-import org.opengis.feature.Feature;
-import org.opengis.feature.Property;
-import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -66,7 +57,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public final class GMLGraphicVisitor extends TextGraphicVisitor {
 
     private final LayerProviderProxy dp = LayerProviderProxy.getInstance();
-    private final Map<String, List<String>> values = new HashMap<String, List<String>>();
+
     private int index = 0;
 
     public GMLGraphicVisitor(GetFeatureInfo gfi) {
@@ -91,41 +82,9 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
      */
     @Override
     public void visit(ProjectedFeature graphic, Shape queryArea) {
+        super.visit(graphic, queryArea);
         index++;
-        final StringBuilder builder = new StringBuilder();
-        final FeatureMapLayer layer = graphic.getFeatureLayer();
-        final Feature feature = graphic.getFeature();
-
-        for (final Property prop : feature.getProperties()) {
-            if (prop == null) {
-                continue;
-            }
-            final Name propName = prop.getName();
-            if (propName == null) {
-                continue;
-            }
-
-            if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
-                builder.append(propName.toString()).append(':').append(prop.getType().getBinding().getSimpleName()).append(';');
-            } else {
-                final Object value = prop.getValue();
-                builder.append(propName.toString()).append(':').append(value).append(';');
-            }
-        }
-
-        final String result = builder.toString();
-        if (builder.length() > 0 && result.endsWith(";")) {
-            final String layerName = layer.getName();
-            List<String> strs = values.get(layerName);
-            if (strs == null) {
-                strs = new ArrayList<String>();
-                values.put(layerName, strs);
-            }
-            strs.add(result.substring(0, result.length() - 1));
-        }
-
         //TODO handle features as real GML features here
-
     }
 
     /**
