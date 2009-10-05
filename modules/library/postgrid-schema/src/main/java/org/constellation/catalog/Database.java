@@ -237,6 +237,17 @@ public class Database {
     }
 
     /**
+     * Opens a new connection using the provided data source and configuration properties.
+     *
+     * @param  source The data source, or {@code null} if none.
+     * @param  properties The configuration properties, like the driver used or the root
+     *         directory for images.
+     */
+    public Database(final DataSource source, final Properties properties) throws IOException {
+        this(source, properties, null);
+    }
+
+    /**
      * Uses an existing connection and configuration properties. The properties are the same
      * ones than the ones usually read from a configuration file, with the same {@linkplain
      * ConfigurationKey configuration keys}. The configuration file will not be read at all.

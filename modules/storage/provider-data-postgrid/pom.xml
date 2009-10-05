@@ -60,6 +60,12 @@
         <artifactId>geotk-go2-style-extension</artifactId>
     </dependency>
 
+    <dependency>
+        <groupId>postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <scope>compile</scope>
+    </dependency>
+
   </dependencies>
 
 </project>

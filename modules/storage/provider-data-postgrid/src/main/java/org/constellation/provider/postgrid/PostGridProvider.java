@@ -27,7 +27,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.sql.DataSource;
 import org.constellation.catalog.CatalogException;
+import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.NoSuchTableException;
 import org.constellation.coverage.catalog.GridCoverageTable;
@@ -41,7 +43,9 @@ import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.sql.WrappedDataSource;
 import org.geotoolkit.util.logging.Logging;
+import org.postgresql.ds.PGConnectionPoolDataSource;
 
 
 /**
@@ -77,7 +81,31 @@ public class PostGridProvider implements LayerProvider{
             properties.put(key, source.parameters.get(key));
         }
 
-        database = new Database(null,properties);
+        String server = (properties.getProperty(ConfigurationKey.SERVER.getKey()));
+        String portTxt = (properties.getProperty(ConfigurationKey.PORT.getKey()));
+        if(server == null || server.trim().isEmpty()){
+            server = "localhost";
+        }
+        int port;
+        try{
+            port = Integer.parseInt(portTxt);
+        }catch(Exception nf){
+            //catch numberformat and nullpointer
+            LOGGER.log(Level.WARNING,"Port value for postgrid is not valid : "+ portTxt);
+            port = 5432;
+        }
+
+        
+        final PGConnectionPoolDataSource pool = new PGConnectionPoolDataSource();
+        pool.setServerName(server);
+        pool.setPortNumber(port);
+        pool.setDatabaseName(properties.getProperty(ConfigurationKey.DATABASE.getKey()));
+        pool.setUser(properties.getProperty(ConfigurationKey.USER.getKey()));
+        pool.setPassword(properties.getProperty(ConfigurationKey.PASSWORD.getKey()));
+        pool.setLoginTimeout(5);
+
+        final DataSource dataSource = new WrappedDataSource(pool);
+        database = new Database(dataSource,properties);
 
         GridCoverageTable gridTable = null;
         try {

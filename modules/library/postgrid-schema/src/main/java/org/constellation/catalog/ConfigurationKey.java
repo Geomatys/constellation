@@ -31,6 +31,17 @@ package org.constellation.catalog;
  * @see org.constellation.gui.swing.ConfigurationEditor
  */
 public enum ConfigurationKey {
+
+    /**
+     * The database server to use, default value is localhost.
+     */
+    SERVER("Server", "localhost"),
+
+    /**
+     * The database port. usualy 5432 for postgresql.
+     */
+    PORT("Port", "5432"),
+
     /**
      * Key for the local data directory root. The value may be {@code null} if data are not accessible
      * locally. In such case, data may be accessible remotely from the {@link #ROOT_URL}.
