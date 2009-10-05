@@ -18,6 +18,7 @@
 package org.constellation.jaxb;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.bind.JAXBException;
@@ -52,7 +53,7 @@ public class AnchoredMarshallerPool extends MarshallerPool {
      * @throws JAXBException    If the JAXB context can not be created.
      */
     public AnchoredMarshallerPool(final String rootNamespace, final Class<?>... classesToBeBound) throws JAXBException {
-        super(rootNamespace, classesToBeBound);
+        super(Collections.singletonMap(ROOT_NAMESPACE_KEY, rootNamespace), classesToBeBound);
     }
 
     /**
@@ -87,7 +88,7 @@ public class AnchoredMarshallerPool extends MarshallerPool {
      * @throws JAXBException    If the JAXB context can not be created.
      */
     public AnchoredMarshallerPool(final String rootNamespace, final String packages) throws JAXBException {
-        super(rootNamespace, packages);
+        super(Collections.singletonMap(ROOT_NAMESPACE_KEY, rootNamespace), packages);
     }
 
     /**

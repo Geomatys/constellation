@@ -27,6 +27,7 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 
 // JAXB dependencies
+import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
@@ -123,7 +124,8 @@ public class MDWebSensorWriter implements SensorWriter {
             newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Storage\".\"Forms\" WHERE \"title\" LIKE '%" + sensorIdBase + "%' ");
 
             //we initialize the marshaller
-            marshallerPool = new MarshallerPool("http://www.opengis.net/sensorML/1.0", "org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
+            marshallerPool = new MarshallerPool(Collections.singletonMap(MarshallerPool.ROOT_NAMESPACE_KEY, "http://www.opengis.net/sensorML/1.0"),
+                    "org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
 
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);

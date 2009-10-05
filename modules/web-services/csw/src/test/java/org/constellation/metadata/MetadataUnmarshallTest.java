@@ -197,7 +197,7 @@ public class MetadataUnmarshallTest {
         contact.setAddress(add);
         DefaultOnLineResource o = new DefaultOnLineResource(new URI("http://www.ifremer.fr/sismer/"));
         o.setProtocol("http");
-        contact.setOnLineResource(o);
+        contact.setOnlineResource(o);
         author.setContactInfo(contact);
         set = new HashSet();
         set.add(author);
@@ -327,7 +327,7 @@ public class MetadataUnmarshallTest {
         add.setElectronicMailAddresses(set);
         contact.setAddress(add);
         o = new DefaultOnLineResource(new URI("http://www.com.univ-mrs.fr/LOB/"));
-        contact.setOnLineResource(o);
+        contact.setOnlineResource(o);
         o.setProtocol("http");
         originator.setContactInfo(contact);
         originators.add(originator);
@@ -362,7 +362,7 @@ public class MetadataUnmarshallTest {
         contact.setAddress(add);
         o = new DefaultOnLineResource(new URI("http://www.ifremer.fr/sismer/"));
         o.setProtocol("http");
-        contact.setOnLineResource(o);
+        contact.setOnlineResource(o);
         custodian.setContactInfo(contact);
         set = new HashSet();
         set.add(custodian);
@@ -604,7 +604,7 @@ public class MetadataUnmarshallTest {
         contact.setAddress(add);
         o = new DefaultOnLineResource(new URI("http://www.ifremer.fr/sismer/"));
         o.setProtocol("http");
-        contact.setOnLineResource(o);
+        contact.setOnlineResource(o);
         distributorContact.setContactInfo(contact);
 
         distributor.setDistributorContact(distributorContact);
@@ -1017,7 +1017,7 @@ public class MetadataUnmarshallTest {
         contact.setAddress(add);
         DefaultOnLineResource o = new DefaultOnLineResource(new URI("http://www.ifremer.fr/sismer/"));
         o.setProtocol("http");
-        contact.setOnLineResource(o);
+        contact.setOnlineResource(o);
         author.setContactInfo(contact);
         set = new HashSet();
         set.add(author);
@@ -1148,7 +1148,7 @@ public class MetadataUnmarshallTest {
         contact.setAddress(add);
         o = new DefaultOnLineResource(new URI("http://www.com.univ-mrs.fr/LOB/"));
         o.setProtocol("http");
-        contact.setOnLineResource(o);
+        contact.setOnlineResource(o);
         originator.setContactInfo(contact);
         originators.add(originator);
         citation.setCitedResponsibleParties(originators);
@@ -1182,7 +1182,7 @@ public class MetadataUnmarshallTest {
         contact.setAddress(add);
         o = new DefaultOnLineResource(new URI("http://www.ifremer.fr/sismer/"));
         o.setProtocol("http");
-        contact.setOnLineResource(o);
+        contact.setOnlineResource(o);
         custodian.setContactInfo(contact);
         set = new HashSet();
         set.add(custodian);
@@ -1413,7 +1413,7 @@ public class MetadataUnmarshallTest {
         contact.setAddress(add);
         o = new DefaultOnLineResource(new URI("http://www.ifremer.fr/sismer/"));
         o.setProtocol("http");
-        contact.setOnLineResource(o);
+        contact.setOnlineResource(o);
         distributorContact.setContactInfo(contact);
 
         distributor.setDistributorContact(distributorContact);
