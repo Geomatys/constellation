@@ -81,25 +81,50 @@ public class PostGridProvider implements LayerProvider{
             properties.put(key, source.parameters.get(key));
         }
 
-        String server = (properties.getProperty(ConfigurationKey.SERVER.getKey()));
-        String portTxt = (properties.getProperty(ConfigurationKey.PORT.getKey()));
-        if(server == null || server.trim().isEmpty()){
-            server = "localhost";
-        }
-        int port;
-        try{
-            port = Integer.parseInt(portTxt);
-        }catch(Exception nf){
-            //catch numberformat and nullpointer
-            LOGGER.log(Level.WARNING,"Port value for postgrid is not valid : "+ portTxt);
-            port = 5432;
+        String server ="localhost";
+        int port = 5432;
+        String dbName = "";
+
+        //parse string if old format : exemple jdbc:postgresql://server/database
+        String oldDataBase = properties.getProperty(ConfigurationKey.DATABASE.getKey());
+        if(oldDataBase.contains("/")){
+            int index = oldDataBase.lastIndexOf("/");
+            dbName = oldDataBase.substring(index+1, oldDataBase.length());
+            oldDataBase = oldDataBase.substring(0, index);
+            index = oldDataBase.lastIndexOf("/");
+            server = oldDataBase.substring(index+1, oldDataBase.length());
+
+            if(server.contains(":")){
+                final String[] split = server.split(":");
+                server = split[0];
+                port = Integer.valueOf(split[1]);
+
+            }else{
+                port = 5432;
+            }
+
+
+        }else{
+            server = (properties.getProperty(ConfigurationKey.SERVER.getKey()));
+            String portTxt = (properties.getProperty(ConfigurationKey.PORT.getKey()));
+            if(server == null || server.trim().isEmpty()){
+                server = "localhost";
+            }
+            try{
+                port = Integer.parseInt(portTxt);
+            }catch(Exception nf){
+                //catch numberformat and nullpointer
+                LOGGER.log(Level.WARNING,"Port value for postgrid is not valid : "+ portTxt);
+                port = 5432;
+            }
+            dbName = properties.getProperty(ConfigurationKey.DATABASE.getKey());
         }
 
         
         final PGConnectionPoolDataSource pool = new PGConnectionPoolDataSource();
         pool.setServerName(server);
         pool.setPortNumber(port);
-        pool.setDatabaseName(properties.getProperty(ConfigurationKey.DATABASE.getKey()));
+        pool.setDatabaseName(dbName);
         pool.setUser(properties.getProperty(ConfigurationKey.USER.getKey()));
         pool.setPassword(properties.getProperty(ConfigurationKey.PASSWORD.getKey()));
         pool.setLoginTimeout(5);
