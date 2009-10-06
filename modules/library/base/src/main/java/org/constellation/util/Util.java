@@ -1075,8 +1075,6 @@ public final class Util {
                 return null;
             else
                 propertyName = "ending";
-        } else if (propertyName.equals("onlineResource")) {
-            propertyName = "onLineResource";
         } else if (propertyName.equals("dataSetURI")) {
             propertyName = "dataSetUri";
         } else if (propertyName.equals("extentTypeCode")) {
