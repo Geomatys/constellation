@@ -19,6 +19,7 @@ package org.constellation.provider.shapefile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -244,7 +245,7 @@ public class ShapeFileProvider implements LayerProvider {
             return null;
         }
 
-        final Map<String,Object> params = new HashMap<String,Object>();
+        final Map<String,Serializable> params = new HashMap<String,Serializable>();
         try {
             params.put("url", f.toURI().toURL());
             return DataStoreFinder.getDataStore(params);
