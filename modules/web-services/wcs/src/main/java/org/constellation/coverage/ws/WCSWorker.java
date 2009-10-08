@@ -83,6 +83,7 @@ import org.geotoolkit.ows.xml.v110.ServiceIdentification;
 import org.geotoolkit.ows.xml.v110.ServiceProvider;
 import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.resources.Errors;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCoverage;
@@ -122,6 +123,7 @@ import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.TransformException;
 
 import static org.constellation.query.Query.KEY_VERSION;
@@ -894,6 +896,23 @@ public final class WCSWorker {
             } catch (FactoryException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
+            // Ensures the bbox specified is inside the range of the CRS.
+            final CoordinateReferenceSystem objectiveCrs;
+            try {
+                objectiveCrs = request.getCRS();
+            } catch (FactoryException ex) {
+                throw new CstlServiceException(ex, INVALID_CRS, "crs");
+            }
+            for (int i=0; i<objectiveCrs.getCoordinateSystem().getDimension(); i++) {
+                final CoordinateSystemAxis axis = objectiveCrs.getCoordinateSystem().getAxis(i);
+                if (envelope.getMinimum(i) < axis.getMinimumValue() ||
+                    envelope.getMaximum(i) > axis.getMaximumValue())
+                {
+                    throw new CstlServiceException(Errors.format(Errors.Keys.BAD_RANGE_$2,
+                            envelope.getMinimum(i), envelope.getMaximum(i)),
+                            INVALID_DIMENSION_VALUE);
+                }
+            }
             final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
             renderParameters.put("TIME", date);
             renderParameters.put("ELEVATION", elevation);
@@ -911,14 +930,14 @@ public final class WCSWorker {
             final JTSEnvelope2D refEnvel;
             try {
                 final CoordinateReferenceSystem responseCRS = request.getResponseCRS();
-                if (responseCRS != null && !CRS.equalsIgnoreMetadata(responseCRS, request.getCRS())) {
+                if (responseCRS != null && !CRS.equalsIgnoreMetadata(responseCRS, objectiveCrs)) {
                     final Envelope responseEnv = CRS.transform(envelope, responseCRS);
                     refEnvel = new JTSEnvelope2D(responseEnv);
                 } else {
                     refEnvel = new JTSEnvelope2D(envelope);
                 }
             } catch (FactoryException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
+                throw new CstlServiceException(ex, INVALID_CRS, "crs");
             } catch (TransformException ex) {
                 throw new CstlServiceException(ex, INVALID_CRS, "response_crs");
             }
