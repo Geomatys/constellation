@@ -14,6 +14,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-@javax.xml.bind.annotation.XmlSchema(/*namespace = "http://www.opengis.net/ogc",*/
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.opengis.net/ogc",
         elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.constellation.ws;

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,13 +14,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.metadata;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.constellation.configuration.HarvestTasks;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
@@ -36,9 +34,7 @@ import org.geotoolkit.wrs.xml.v100.ExtrinsicObjectType;
  * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
-public class CSWClassesContext {
-
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
+public final class CSWClassesContext {
 
     private CSWClassesContext() {}
     

@@ -20,44 +20,37 @@ import java.io.Writer;
 
 
 /**
- * Filter for WMS 1.1.1 Capabilities files, which removes the namespaces declaration
- * in the root capabilities tag.
+ * Filter for WMS 1.1.1 Exception files, which removes the namespaces declaration
+ * in the root exception tag.
  *
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
- * @author Martin Desruisseaux (Geomatys)
  *
- * @since 0.4
+ * @since 0.5
  */
-public final class CapabilitiesFilterWriter extends AbstractFilterWriter {
+public final class ExceptionFilterWriter extends AbstractFilterWriter {
     /**
-     * Create a new filtered writer for WMS 1.1.1 Capabilities.
+     * Create a new filtered writer for WMS 1.1.1 Exception.
      *
      * @param out  a Writer object to provide the underlying stream.
      * @throws NullPointerException if <code>out</code> is <code>null</code>
      */
-    public CapabilitiesFilterWriter(Writer out) {
+    public ExceptionFilterWriter(Writer out) {
         super(out);
     }
 
     /**
-     * In general, returns the line unchanged.
-     * If the line is the root tag WMT_MS_Capabilities, then it justs returns the root tag
-     * with only the version number. Consequently it will remove all namespace definitions
-     * if there are some.
-     * If the line is a OnlineResource tag, then add the xml namespace xlink url.
+     * Remove the namespaces declaration from the ServiceExceptionReport tag.
      *
-     * @param buffer Contains a whole line.
+     * @param buffer A line to filter.
      */
     @Override
     protected String filterLine(final StringBuilder buffer) {
         String line = buffer.toString();
-        if (line.trim().startsWith("<WMT_MS_Capabilities")) {
-            line = "<WMT_MS_Capabilities version=\"1.1.1\">";
-        }
-        if (line.trim().startsWith("<OnlineResource")) {
-            line = line.replaceAll("/>", " xmlns:xlink=\"http://www.w3.org/1999/xlink\"/>");
+        if (line.trim().startsWith("<ServiceExceptionReport")) {
+            line = "<ServiceExceptionReport version=\"1.1.0\">";
         }
         return line;
     }
+
 }

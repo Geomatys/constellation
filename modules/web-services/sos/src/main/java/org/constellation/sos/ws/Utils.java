@@ -171,8 +171,8 @@ public final class Utils {
                 value = value.substring(0, value.indexOf('.'));
             }
             try {
-                //here t is not used but it allow to verify the syntax of the timestamp
-                final Timestamp t = Timestamp.valueOf(value);
+                // verify the syntax of the timestamp
+                Timestamp.valueOf(value);
 
             } catch(IllegalArgumentException e) {
                throw new CstlServiceException("Unable to parse the value: " + value + '\n' +

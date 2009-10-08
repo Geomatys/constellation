@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,7 +19,6 @@ package org.constellation.map;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.CoverageReader;
@@ -32,7 +31,6 @@ import org.geotoolkit.map.CoverageMapLayer;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.style.MutableStyleFactory;
-import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.feature.DefaultName;
 
 import org.opengis.feature.type.Name;
@@ -49,11 +47,6 @@ import org.opengis.style.RasterSymbolizer;
  * @author Cédric Briançon (Geomatys)
  */
 public class PostGridMapLayer extends AbstractMapLayer implements CoverageMapLayer {
-    
-    /**
-     * Default logger.
-     */
-    private static final Logger LOGGER = Logging.getLogger(PostGridMapLayer.class);
 
     /**
      * The requested elevation.

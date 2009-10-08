@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.text.ParseException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -53,6 +54,7 @@ import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.util.Util;
 import org.constellation.util.StringUtilities;
 import org.constellation.writer.CapabilitiesFilterWriter;
+import org.constellation.writer.ExceptionFilterWriter;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
@@ -102,7 +104,7 @@ public class WMSService extends OGCWebService {
     /**
      * Defines whether the exceptions should be stored and output in an image or not.
      */
-    private boolean error_inimage = false;
+    private boolean errorInimage = false;
 
     /**
      * Defines the image format for the exeception in image.
@@ -206,7 +208,7 @@ public class WMSService extends OGCWebService {
                 //workaround because 1.1.1 is defined with a DTD rather than an XSD
                 //we marshall the response and return the XML String
                 final StringWriter sw = new StringWriter();
-                if (version.equals(ServiceDef.WMS_1_1_1_SLD)) {
+                if (version.equals(ServiceDef.WMS_1_1_1_SLD) || version.equals(ServiceDef.WMS_1_1_1)) {
                     final CapabilitiesFilterWriter swCaps = new CapabilitiesFilterWriter(sw);
                     try {
                         swCaps.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
@@ -258,9 +260,9 @@ public class WMSService extends OGCWebService {
     protected Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
                                                 ServiceDef serviceDef) throws JAXBException
     {
-        if (error_inimage) {
+        if (errorInimage) {
             final BufferedImage image = DefaultPortrayalService.writeException(ex, new Dimension(600, 400));
-            error_inimage = false;
+            errorInimage = false;
             return Response.ok(image, exceptionImageFormat).build();
         }
         if (serviceDef == null) {
@@ -286,18 +288,30 @@ public class WMSService extends OGCWebService {
          * the service exception marshalled file will not contain namespaces definitions.
          * This is what we want since the service exception report already owns a DTD.
          */
-        if (serviceDef.equals(ServiceDef.WMS_1_1_1_SLD)) {
-            final MarshallerPool poolException = new MarshallerPool("org.constellation.ws");
-            final Marshaller marsh = poolException.acquireMarshaller();
-            try {
-                marsh.setProperty("com.sun.xml.bind.xmlHeaders",
-                        "<!DOCTYPE ServiceExceptionReport SYSTEM \"http://schemas.opengis.net/wms/1.1.0/exception_1_1_0.dtd\">\n");
+        final MarshallerPool poolException = new MarshallerPool(
+                Collections.singletonMap(MarshallerPool.ROOT_NAMESPACE_KEY, "http://www.opengis.net/ogc"),
+                "org.constellation.ws");
+        final Marshaller marsh = poolException.acquireMarshaller();
+        try {
+            if (serviceDef.equals(ServiceDef.WMS_1_1_1_SLD) || serviceDef.equals(ServiceDef.WMS_1_1_1)) {
+                final ExceptionFilterWriter swException = new ExceptionFilterWriter(sw);
+                try {
+                    swException.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
+                    swException.write("<!DOCTYPE ServiceExceptionReport SYSTEM \"http://schemas.opengis.net/wms/1.1.0/exception_1_1_0.dtd\">\n");
+                } catch (IOException io) {
+                    throw new JAXBException(io);
+                }
+                marsh.setProperty(Marshaller.JAXB_FRAGMENT, true);
+                marsh.marshal(report, swException);
+            } else {
+                marsh.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+                        "http://www.opengis.net/ogc http://schemas.opengis.net/wms/1.3.0/exceptions_1_3_0.xsd");
                 marsh.marshal(report, sw);
-            } finally {
+            }
+        } finally {
+            if (marsh != null) {
                 poolException.release(marsh);
             }
-        } else {
-            marshaller.marshal(report, sw);
         }
         final String mimeException = (serviceDef.version.equals(ServiceDef.WMS_1_1_1_SLD.version)) ?
                                                                 MimeType.APP_SE_XML : MimeType.TEXT_XML;
@@ -445,7 +459,7 @@ public class WMSService extends OGCWebService {
     private GetMap adaptGetMap(final String version, final boolean fromGetMap) throws CstlServiceException {
         final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
         if (strExceptions != null && strExceptions.equalsIgnoreCase(MimeType.APP_INIMAGE)) {
-            error_inimage = true;
+            errorInimage = true;
         }
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
         if (strFormat != null && !strFormat.isEmpty()) {
