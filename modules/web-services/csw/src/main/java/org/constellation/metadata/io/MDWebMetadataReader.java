@@ -252,7 +252,7 @@ public class MDWebMetadataReader extends MetadataReader {
      *
      * @param MDReader a reader to the MDWeb database.
      */
-    protected MDWebMetadataReader(Connection mdConnection) throws CstlServiceException {
+    protected MDWebMetadataReader(Connection mdConnection) {
         super(true, false);
         this.mdReader           = new Reader20(Standard.ISO_19115,  mdConnection);
         initPackage();
