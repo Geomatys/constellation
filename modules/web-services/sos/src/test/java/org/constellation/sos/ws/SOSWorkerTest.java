@@ -1466,7 +1466,10 @@ public class SOSWorkerTest {
 
         period = new TimePeriodType(new TimePositionType("1900-01-01T00:00:00"));
         expResult.setSamplingTime(period);
+        expResult.setName("urn:ogc:object:observation:template:GEOM:7-0");
 
+        assertEquals(expResult.getName(), measResult.getName());
+        assertEquals(expResult.getResult(), measResult.getResult());
         assertEquals(expResult, measResult);
         
         marshallerPool.release(unmarshaller);

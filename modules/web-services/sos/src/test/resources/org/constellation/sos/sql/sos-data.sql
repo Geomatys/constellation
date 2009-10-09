@@ -83,7 +83,7 @@ INSERT INTO "observation"."any_results" ("id_result", "reference", "values", "de
 INSERT INTO "observation"."any_results" ("id_result", "reference", "values", "definition") VALUES (7, NULL, '2007-05-01T17:59:00,6.560@@2007-05-01T18:59:00,6.550@@2007-05-01T19:59:00,6.550@@2007-05-01T20:59:00,6.550@@2007-05-01T21:59:00,6.550@@', 'dataArray-2');
 INSERT INTO "observation"."any_results" ("id_result", "reference", "values", "definition") VALUES (8, NULL, '2007-05-01T12:59:00,6.560@@2007-05-01T13:59:00,6.560@@2007-05-01T14:59:00,6.560@@2007-05-01T15:59:00,6.560@@2007-05-01T16:59:00,6.560@@', 'dataArray-2');
 
-INSERT INTO "observation"."unit_of_measures" ("id", "name", "quantity_type", "unit_system") VALUES ('degrees', 'degree celcius', NULL, '°C');
+INSERT INTO "observation"."unit_of_measures" ("id", "name", "quantity_type", "unit_system") VALUES ('degrees', 'degree celcius', NULL, 'C');
 INSERT INTO "observation"."measures" ("name", "uom", "value") VALUES ('measure-001', 'degrees', NULL);
 
 INSERT INTO "observation"."observations" ("name", "description", "feature_of_interest", "procedure", "sampling_time_begin", "sampling_time_end", "result_definition", "observed_property", "result", "distribution", "feature_of_interest_point", "observed_property_composite") VALUES ('urn:ogc:object:observation:template:GEOM:3', NULL, NULL, 'urn:ogc:object:sensor:GEOM:3', NULL, NULL, NULL, 'depth', 1, 'normale', 'station-001', NULL);
