@@ -587,7 +587,8 @@ public class CSWworkerTest {
         /*
          *  TEST 5 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE 90008411%
          */
-
+        LOGGER.info("TEST - 5 begin");
+        
         typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
         List<QName> cust = new ArrayList<QName>();
         cust.add(_Identifier_QNAME);
@@ -636,9 +637,10 @@ public class CSWworkerTest {
         assertEquals(expCustomResult1, customResult1);
         assertEquals(expCustomResult2, customResult2);
 
+        LOGGER.info("TEST - 5 end");
 
         /*
-         *  TEST 5 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE 90008411%
+         *  TEST 6 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE 90008411%
          */
 
         typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
@@ -696,7 +698,7 @@ public class CSWworkerTest {
         assertEquals(expCustomResult2, customResult2);
 
         /*
-         * Test 6 : getRecord with bad outputFormat
+         * Test 7 : getRecord with bad outputFormat
          */
         typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
         sortBy           = null;
@@ -715,7 +717,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
         /*
-         * Test 7 : getRecord with no typeNames
+         * Test 8 : getRecord with no typeNames
          */
         sortBy           = null;
         constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
@@ -733,7 +735,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
         /*
-         * Test 8 : getRecord with bad typeNames
+         * Test 9 : getRecord with bad typeNames
          */
         typeNames        = Arrays.asList(new QName("http://www.badnamespace.com", "something"));
         sortBy           = null;
@@ -752,7 +754,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
          /*
-         * Test 9 : getRecord with bad outputSchema
+         * Test 10 : getRecord with bad outputSchema
          */
         typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
         sortBy           = null;
@@ -771,7 +773,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
          /*
-         * Test 10 : getRecord with no query
+         * Test 11 : getRecord with no query
          */
         request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, null, null);
 
@@ -786,7 +788,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
          /*
-         * Test 11 : getRecord with bad statrt position
+         * Test 12 : getRecord with bad statrt position
          */
         typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
         sortBy           = null;

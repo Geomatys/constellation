@@ -352,7 +352,6 @@ public class MDWebMetadataReader extends MetadataReader {
 
                 if (result == null) {
                     final Form f = mdReader.getForm(catalog, id);
-                    //System.out.println("formmm:" + f);
                     result = getObjectFromForm(identifier, f);
                 } else {
                     LOGGER.finer("getting from cache: " + identifier);
@@ -622,9 +621,8 @@ public class MDWebMetadataReader extends MetadataReader {
             final RecordType result = new RecordType();
             for (QName qn : elementName) {
 
-                final String getterName = "get" + StringUtilities.firstToUpper(qn.getLocalPart());
                 try {
-                    final Method getter = Util.getMethod(getterName, RecordType.class);
+                    final Method getter = Util.getGetterFromName(qn.getLocalPart(), RecordType.class);
                     final Object param  = Util.invokeMethod(fullResult, getter);
 
                     Method setter = null;
@@ -637,7 +635,7 @@ public class MDWebMetadataReader extends MetadataReader {
                     }
 
                 } catch (IllegalArgumentException ex) {
-                    LOGGER.info("illegal argument exception while invoking the method " + getterName + " in the classe RecordType");
+                    LOGGER.info("illegal argument exception while invoking the method get" + StringUtilities.firstToUpper(qn.getLocalPart()) + " in the RecordType class");
                 }
             }
             return result;
@@ -785,29 +783,27 @@ public class MDWebMetadataReader extends MetadataReader {
             final Object filtredResult = Util.newInstance(recordClass);
 
             for (QName qn : elementName) {
-
-                final String getterName  = "get" + StringUtilities.firstToUpper(qn.getLocalPart());
-                final String setterName  = "set" + StringUtilities.firstToUpper(qn.getLocalPart());
-                String currentMethodName = getterName + "()";
+                String currentMethodType = "";
                 try {
-                    final Method getter = Util.getMethod(getterName, recordClass);
-                    final Object param = Util.invokeMethod(result, getter);
+                    currentMethodType   = "get";
+                    final Method getter = Util.getGetterFromName(qn.getLocalPart(), recordClass);
+                    final Object param  = Util.invokeMethod(result, getter);
 
                     Method setter = null;
                     if (param != null) {
-                        currentMethodName = setterName + "(" + param.getClass() + ")";
+                        currentMethodType   = "set";
                         Class paramClass = param.getClass();
                         if (paramClass.equals(ArrayList.class)) {
                             paramClass = List.class;
                         }
-                        setter = Util.getMethod(setterName, recordClass, paramClass);
+                        setter = Util.getSetterFromName(qn.getLocalPart(), paramClass, recordClass);
                     }
                     if (setter != null) {
                         Util.invokeMethod(setter, filtredResult, param);
                     }
 
                 } catch (IllegalArgumentException ex) {
-                    LOGGER.severe("illegal argument exception while invoking the method " + currentMethodName + " in the classe RecordType!");
+                    LOGGER.severe("illegal argument exception while invoking the method " + currentMethodType + StringUtilities.firstToUpper(qn.getLocalPart()) + " in the classe RecordType!");
                 }
             }
             return filtredResult;
