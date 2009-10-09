@@ -28,7 +28,7 @@
         <om:name>measure-001</om:name>
         <om:uom id="degrees">
             <gml:name>degree celcius</gml:name>
-            <gml:unitsSystem>C</gml:unitsSystem>
+            <gml:unitsSystem>°C</gml:unitsSystem>
         </om:uom>
         <om:value>0.0</om:value>
     </om:result>
