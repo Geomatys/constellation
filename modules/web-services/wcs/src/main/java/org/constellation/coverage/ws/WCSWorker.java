@@ -841,6 +841,29 @@ public final class WCSWorker {
                     layerRef.getName() + "\".", INVALID_PARAMETER_VALUE);
         }
 
+        final Envelope envelope;
+        try {
+            envelope = request.getEnvelope();
+        } catch (FactoryException ex) {
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
+        }
+        // Ensures the bbox specified is inside the range of the CRS.
+        final CoordinateReferenceSystem objectiveCrs;
+        try {
+            objectiveCrs = request.getCRS();
+        } catch (FactoryException ex) {
+            throw new CstlServiceException(ex, INVALID_CRS, "crs");
+        }
+        for (int i = 0; i < objectiveCrs.getCoordinateSystem().getDimension(); i++) {
+            final CoordinateSystemAxis axis = objectiveCrs.getCoordinateSystem().getAxis(i);
+            if (envelope.getMinimum(i) < axis.getMinimumValue() ||
+                    envelope.getMaximum(i) > axis.getMaximumValue()) {
+                throw new CstlServiceException(Errors.format(Errors.Keys.BAD_RANGE_$2,
+                        envelope.getMinimum(i), envelope.getMaximum(i)),
+                        INVALID_DIMENSION_VALUE);
+            }
+        }
+
         /*
          * Generating the response.
          * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
@@ -848,12 +871,6 @@ public final class WCSWorker {
         if ( request.getFormat().equalsIgnoreCase(MATRIX) ) {
 
             //NOTE ADRIAN HACKED HERE
-            final Envelope envelope;
-            try {
-                envelope = request.getEnvelope();
-            } catch (FactoryException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-            }
             final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
             final RenderedImage image;
             try {
@@ -890,29 +907,6 @@ public final class WCSWorker {
 
             // SCENE
             final Map<String, Object> renderParameters = new HashMap<String, Object>();
-            final Envelope envelope;
-            try {
-                envelope = request.getEnvelope();
-            } catch (FactoryException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
-            }
-            // Ensures the bbox specified is inside the range of the CRS.
-            final CoordinateReferenceSystem objectiveCrs;
-            try {
-                objectiveCrs = request.getCRS();
-            } catch (FactoryException ex) {
-                throw new CstlServiceException(ex, INVALID_CRS, "crs");
-            }
-            for (int i=0; i<objectiveCrs.getCoordinateSystem().getDimension(); i++) {
-                final CoordinateSystemAxis axis = objectiveCrs.getCoordinateSystem().getAxis(i);
-                if (envelope.getMinimum(i) < axis.getMinimumValue() ||
-                    envelope.getMaximum(i) > axis.getMaximumValue())
-                {
-                    throw new CstlServiceException(Errors.format(Errors.Keys.BAD_RANGE_$2,
-                            envelope.getMinimum(i), envelope.getMaximum(i)),
-                            INVALID_DIMENSION_VALUE);
-                }
-            }
             final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
             renderParameters.put("TIME", date);
             renderParameters.put("ELEVATION", elevation);
