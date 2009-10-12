@@ -17,7 +17,6 @@
 package org.constellation.filter;
 
 // J2SE dependencies
-import com.vividsolutions.jts.geom.Geometry;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,42 +36,26 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.apache.lucene.search.Filter;
 
 // geotoolkit dependencies
-import org.geotoolkit.gml.GMLUtilities;
 import org.constellation.metadata.Parameters;
 import org.geotoolkit.csw.xml.QueryConstraint;
 import org.geotoolkit.filter.text.cql2.CQLException;
-import org.geotoolkit.geometry.jts.SRIDGenerator;
-import org.geotoolkit.geometry.jts.SRIDGenerator.Version;
-import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
-import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
-import org.geotoolkit.gml.xml.v311.LineStringType;
-import org.geotoolkit.gml.xml.v311.PointType;
-import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
-import org.geotoolkit.lucene.filter.SpatialFilterType;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.ogc.xml.v110.AbstractIdType;
-import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.BinaryComparisonOpType;
 import org.geotoolkit.ogc.xml.v110.BinaryLogicOpType;
-import org.geotoolkit.ogc.xml.v110.BinarySpatialOpType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
-import org.geotoolkit.ogc.xml.v110.DistanceBufferType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsNullType;
-import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 
 // GeoAPI dependencies
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
 
-import static org.geotoolkit.lucene.filter.LuceneOGCFilter.*;
 
 /**
  * A parser for filter 1.1.0 and CQL 2.0

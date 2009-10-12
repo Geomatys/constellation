@@ -1131,7 +1131,7 @@ public final class Util {
                 occurenceType++;
             }
         }
-        LOGGER.severe("No getter have been found for attribute " + propertyName + " in the class " + rootClass.getName());
+        LOGGER.warning("No getter have been found for attribute " + propertyName + " in the class " + rootClass.getName());
         return null;
     }
     

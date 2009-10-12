@@ -42,16 +42,11 @@ import org.junit.*;
  */
 public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
-    private static File directory;
-
-    private static File directory2;
-    
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        directory2 = new File(System.getProperty("java.io.tmpdir", "/tmp"), "MDPostgridSOSWorkerTest").getAbsoluteFile();
-        String url2 = "jdbc:derby:" + directory2.getPath().replace('\\','/');
-        DefaultDataSource ds2 = new DefaultDataSource(url2 + ";create=true");
+        final String url2 = "jdbc:derby:memory:Test2;create=true";
+        final DefaultDataSource ds2 = new DefaultDataSource(url2);
 
         Connection con2 = ds2.getConnection();
 
@@ -59,9 +54,8 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         Util.executeSQLScript("org/constellation/sos/sql/sml-schema.sql", con2);
         Util.executeSQLScript("org/constellation/sos/sql/sml-data.sql", con2);
 
-        directory = new File(System.getProperty("java.io.tmpdir", "/tmp"), "PostgridSOSWorkerTest").getAbsoluteFile();
-        String url = "jdbc:derby:" + directory.getPath().replace('\\','/');
-        DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
+        final String url = "jdbc:derby:memory:Test1;create=true";
+        final DefaultDataSource ds = new DefaultDataSource(url);
 
         Connection con = ds.getConnection();
 
@@ -107,8 +101,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        deleteDirectory(directory);
-        deleteDirectory(directory2);
+
         deleteDirectory(new File("SOSWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {

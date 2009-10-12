@@ -150,7 +150,8 @@ public class MDWebMetadataReader extends MetadataReader {
     private List<String> classeNotFound;
 
     /**
-     *
+     * A map of label - concept URI loaded from a Thesaurus.
+     * They are used to make Anchor mark in the xml export.
      */
     private Map<String, URI> conceptMap;
 
@@ -1416,7 +1417,7 @@ public class MDWebMetadataReader extends MetadataReader {
             try {
                 if (identifier.indexOf(':') != -1) {
                     catalogCode = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
-                    identifier = identifier.substring(0, identifier.indexOf(':'));
+                    identifier  = identifier.substring(0, identifier.indexOf(':'));
                     id = Integer.parseInt(identifier);
                 } else {
                     throw new NumberFormatException();
