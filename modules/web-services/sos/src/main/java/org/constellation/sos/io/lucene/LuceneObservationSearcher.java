@@ -140,22 +140,7 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                     docs = searcher.search(query, filter, maxRecords);
                 }
                 for (ScoreDoc doc : docs.scoreDocs) {
-                    final Document d = searcher.doc(doc.doc);
-                    Timestamp begin  = null;
-                    Timestamp end    = null;
-                    try  {
-                        begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
-                    } catch(IllegalArgumentException ex) {
-                        LOGGER.info("unable  to parse the timestamp");
-                    }
-                    try  {
-                        end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
-                    } catch(IllegalArgumentException ex) {
-                        LOGGER.info("unable  to parse the timestamp");
-                    }
-                    final ObservationResult or = new ObservationResult(d.get("id"),
-                                                                 begin,
-                                                                 end);
+                    final ObservationResult or = getObservationResult(searcher.doc(doc.doc));
                     results.add(or);
                 }
 
@@ -171,41 +156,11 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                     hits2 = searcher.search(simpleQuery, spatialQuery.getSpatialFilter(), maxRecords);
                 }
                 for (ScoreDoc doc : hits1.scoreDocs) {
-                    final Document d = searcher.doc(doc.doc);
-                    Timestamp begin  = null;
-                    Timestamp end    = null;
-                    try  {
-                        begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
-                    } catch(IllegalArgumentException ex) {
-                        LOGGER.info("unable  to parse the timestamp");
-                    }
-                    try  {
-                        end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
-                    } catch(IllegalArgumentException ex) {
-                        LOGGER.info("unable  to parse the timestamp");
-                    }
-                    final ObservationResult or = new ObservationResult(d.get("id"),
-                                                                 begin,
-                                                                 end);
+                    final ObservationResult or = getObservationResult(searcher.doc(doc.doc));
                     results.add(or);
                 }
                 for (ScoreDoc doc : hits2.scoreDocs) {
-                    final Document d = searcher.doc(doc.doc);
-                    Timestamp begin  = null;
-                    Timestamp end    = null;
-                    try  {
-                        begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
-                    } catch(IllegalArgumentException ex) {
-                        LOGGER.info("unable  to parse the timestamp");
-                    }
-                    try  {
-                        end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
-                    } catch(IllegalArgumentException ex) {
-                        LOGGER.info("unable  to parse the timestamp");
-                    }
-                    final ObservationResult or = new ObservationResult(d.get("id"),
-                                                                 begin,
-                                                                 end);
+                    final ObservationResult or = getObservationResult(searcher.doc(doc.doc));
                     if (!results.contains(or)) {
                         results.add(or);
                     }
@@ -221,22 +176,7 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                 }
                 final List<ObservationResult> unWanteds = new ArrayList<ObservationResult>();
                 for (ScoreDoc doc : hits1.scoreDocs) {
-                    final Document d = searcher.doc(doc.doc);
-                    Timestamp begin  = null;
-                    Timestamp end    = null;
-                    try  {
-                        begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
-                    } catch(IllegalArgumentException ex) {
-                        LOGGER.info("unable  to parse the timestamp");
-                    }
-                    try  {
-                        end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
-                    } catch(IllegalArgumentException ex) {
-                        LOGGER.info("unable  to parse the timestamp");
-                    }
-                    final ObservationResult or = new ObservationResult(d.get("id"),
-                                                                 begin,
-                                                                 end);
+                    final ObservationResult or = getObservationResult(searcher.doc(doc.doc));
                     unWanteds.add(or);
                 }
 
@@ -247,22 +187,7 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                     hits2 = searcher.search(simpleQuery, maxRecords);
                 }
                 for (ScoreDoc doc : hits2.scoreDocs) {
-                    final Document d = searcher.doc(doc.doc);
-                    Timestamp begin  = null;
-                    Timestamp end    = null;
-                    try  {
-                        begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
-                    } catch(IllegalArgumentException ex) {
-                        LOGGER.info("unable  to parse the timestamp");
-                    }
-                    try  {
-                        end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
-                    } catch(IllegalArgumentException ex) {
-                        LOGGER.info("unable  to parse the timestamp");
-                    }
-                    final ObservationResult or = new ObservationResult(d.get("id"),
-                                                                 begin,
-                                                                 end);
+                    final ObservationResult or = getObservationResult(searcher.doc(doc.doc));
                     if (!unWanteds.contains(or)) {
                         results.add(or);
                     }
@@ -291,6 +216,28 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
            throw new SearchingException("IO Exception while performing lucene request", ex);
         }
     }
+
+    /**
+     *
+     * @param d
+     * @return
+     */
+    private ObservationResult getObservationResult(final Document d) {
+        Timestamp begin = null;
+        Timestamp end   = null;
+        try {
+            begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
+        } catch (IllegalArgumentException ex) {
+            LOGGER.info("unable  to parse the timestamp");
+        }
+        try {
+            end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
+        } catch (IllegalArgumentException ex) {
+            LOGGER.info("unable  to parse the timestamp");
+        }
+        return new ObservationResult(d.get("id"), begin, end);
+    }
+
 
     private static final class IDFieldSelector implements FieldSelector {
 
