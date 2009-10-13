@@ -686,7 +686,7 @@ public class CSWworkerTest {
 
         expCustomResult1 =  new RecordType();
         expCustomResult1.setIdentifier(new SimpleLiteral("42292_5p_19900609195600"));
-        expCustomResult1.setModified(new SimpleLiteral("2009-01-01T00:00:00+01:00"));
+        expCustomResult1.setModified(new SimpleLiteral("2009-01-01T06:00:00+01:00"));
         expCustomResult1.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.1667, 36.6, 1.1667, 36.6));
         expCustomResult2 =  new RecordType();
         expCustomResult2.setIdentifier(new SimpleLiteral("42292_9s_19900610041000"));

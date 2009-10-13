@@ -21,22 +21,26 @@ package org.constellation.metadata.io;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
 // constellation dependencies
+import org.constellation.ws.CstlServiceException;
+
+//geotools dependencies
 import org.geotoolkit.csw.xml.Record;
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.dublincore.xml.AbstractSimpleLiteral;
 import org.geotoolkit.ebrim.xml.EbrimInternationalString;
 import org.geotoolkit.ebrim.xml.RegistryObject;
-import org.constellation.ws.CstlServiceException;
-
-//geotools dependencies
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.metadata.iso.DefaultMetaData;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // geotools dependencies
 import org.opengis.metadata.identification.Identification;
@@ -55,7 +59,7 @@ public abstract class MetadataWriter {
     /**
      * Record the date format in the metadata.
      */
-    protected final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    protected final List<DateFormat> dateFormat = new ArrayList<DateFormat>();
     
     /**
      * An indexer lucene to add object into the index.
@@ -73,6 +77,8 @@ public abstract class MetadataWriter {
      */
     public MetadataWriter(AbstractIndexer indexer) throws CstlServiceException {
         this.indexer        = indexer;
+        dateFormat.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
+        dateFormat.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
     }
 
     /**
@@ -287,6 +293,42 @@ public abstract class MetadataWriter {
                 LOGGER.severe("unknow type: " + obj.getClass().getName() + " unable to find an identifier");
         }
         return identifier;
+    }
+
+    /**
+     * Try to parse a date in a string.
+     * If the string can not be parsed a CstlServiceException will be throw.
+     * 
+     * @param dateValue the string representation of the date.
+     * @return a Date object.
+     *
+     * @throws CstlServiceException if the string can not be parsed.
+     */
+    protected Date parseDate(String dateValue) throws CstlServiceException {
+        // in the case of a timezone expressed like this +01:00 we must transform it in +0100
+        if (dateValue.indexOf('.') != -1) {
+            String msNtz = dateValue.substring(dateValue.indexOf('.'));
+            if (msNtz.indexOf(':') != -1) {
+                msNtz = msNtz.replace(":", "");
+                dateValue = dateValue.substring(0, dateValue.indexOf('.'));
+                dateValue = dateValue + msNtz;
+            }
+        }
+        Date result = null;
+        boolean success = true;
+        try {
+            result = dateFormat.get(0).parse((String) dateValue);
+        } catch (ParseException ex) {
+            success = false;
+        }
+        if (!success) {
+            try {
+               result = dateFormat.get(1).parse((String) dateValue);
+            } catch (ParseException ex) {
+                throw new CstlServiceException("There service was unable to parse the date:" + dateValue, INVALID_PARAMETER_VALUE);
+            }
+        }
+        return result;
     }
     
     /**

@@ -28,9 +28,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -107,11 +105,6 @@ public class MDWebMetadataReader extends MetadataReader {
      * A map containing the mapping beetween the MDWeb className and java typeName
      */
     private Map<String, Class> classBinding;
-    
-    /**
-     * Record the date format in the metadata.
-     */
-    private DateFormat dateFormat; 
     
     /**
      * A list of package containing the ISO 19115 interfaces (and the codelist classes)
@@ -242,7 +235,6 @@ public class MDWebMetadataReader extends MetadataReader {
             }
         }
         initPackage();
-        this.dateFormat         = new SimpleDateFormat("yyyy-MM-dd");
         this.classBinding       = initClassBinding(configuration.getConfigurationDirectory());
         this.alreadyRead        = new HashMap<Value, Object>();
         this.classeNotFound     = new ArrayList<String>();
@@ -257,7 +249,6 @@ public class MDWebMetadataReader extends MetadataReader {
         super(true, false);
         this.mdReader           = new Reader20(Standard.ISO_19115,  mdConnection);
         initPackage();
-        this.dateFormat         = new SimpleDateFormat("yyyy-MM-dd");
         this.classBinding       = new HashMap<String, Class>();
         this.alreadyRead        = new HashMap<Value, Object>();
         this.classeNotFound     = new ArrayList<String>();
@@ -878,7 +869,7 @@ public class MDWebMetadataReader extends MetadataReader {
                 // if the value is a date we call the static method parse 
                 // instead of a constructor (temporary patch: createDate method)  
                 } else if (classe.equals(Date.class)) {
-                    return Util.createDate(textValue, dateFormat);
+                    return Util.createDate(textValue, formatter);
 
                 } else if (classe.equals(Locale.class)) {
                     for (Locale candidate : Locale.getAvailableLocales()) {

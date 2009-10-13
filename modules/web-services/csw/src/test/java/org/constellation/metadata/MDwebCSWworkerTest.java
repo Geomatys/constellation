@@ -36,6 +36,8 @@ import org.junit.*;
  */
 public class MDwebCSWworkerTest extends CSWworkerTest {
 
+    private static DefaultDataSource ds;
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
 
@@ -45,8 +47,8 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         File configDir = new File("CSWWorkerTest");
         if (!configDir.exists()) {
             configDir.mkdir();
-            final String url           = "jdbc:derby:memory:Test;create=true";
-            final DefaultDataSource ds = new DefaultDataSource(url);
+            final String url = "jdbc:derby:memory:Test;create=true";
+            ds               = new DefaultDataSource(url);
 
             Connection con = ds.getConnection();
 
@@ -68,6 +70,9 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        if (ds != null) {
+            ds.shutdown();
+        }
         deleteDirectory(new File("CSWWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {

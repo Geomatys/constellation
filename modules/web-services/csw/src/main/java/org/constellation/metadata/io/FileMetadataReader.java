@@ -100,11 +100,6 @@ public class FileMetadataReader extends MetadataReader {
     private final MarshallerPool marshallerPool;
 
     /**
-     * A date formatter used to display the Date object for dublin core translation.
-     */
-    private DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-
-    /**
      * Build a new CSW File Reader.
      *
      * @param configuration A generic configuration object containing a directory path

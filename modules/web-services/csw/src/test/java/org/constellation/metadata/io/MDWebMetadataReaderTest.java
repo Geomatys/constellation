@@ -40,21 +40,21 @@ import static org.junit.Assert.*;
  */
 public class MDWebMetadataReaderTest {
 
-    private static File directory;
 
     private static Automatic configuration;
 
     private MDWebMetadataReader reader;
 
     private static MarshallerPool pool;
-    
+
+    private static DefaultDataSource ds;
+
     @BeforeClass
     public static void setUpClass() throws Exception {
         pool = new AnchorPool(Arrays.asList(CSWClassesContext.getAllClasses()));
 
-        directory = new File(System.getProperty("java.io.tmpdir", "/tmp"), "MDwebMetadataReaderTest").getAbsoluteFile();
-        String url = "jdbc:derby:" + directory.getPath().replace('\\','/');
-        DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
+        final String url = "jdbc:derby:memory:MMRTest;create=true";
+        ds               = new DefaultDataSource(url);
 
         Connection con = ds.getConnection();
 
@@ -70,23 +70,8 @@ public class MDWebMetadataReaderTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        deleteDirectory(directory);
-    }
-
-    public static void deleteDirectory(File dir) {
-         if (dir.exists()) {
-            if (dir.isDirectory()) {
-                for (File f : dir.listFiles()) {
-                    if (f.isDirectory()) {
-                        deleteDirectory(f);
-                    } else {
-                        f.delete();
-                    }
-                }
-                dir.delete();
-            } else {
-                dir.delete();
-            }
+        if (ds != null) {
+            ds.shutdown();
         }
     }
 
@@ -109,7 +94,7 @@ public class MDWebMetadataReaderTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void getCapabilitiesTest() throws Exception {
+    public void getMetadataTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object result = reader.getMetadata("2:CSWCat", MetadataReader.ISO_19115, null, null);

@@ -206,7 +206,7 @@ public class MetadataUnmarshallTest {
         /*
          * creation date
          */
-        expResult.setDateStamp(df.parse("2009-01-01T00:00:00"));
+        expResult.setDateStamp(df.parse("2009-01-01T06:00:00"));
 
         /*
          * Spatial representation info
@@ -1026,7 +1026,7 @@ public class MetadataUnmarshallTest {
         /*
          * creation date
          */
-        metadata.setDateStamp(df.parse("2009-01-01T00:00:00"));
+        metadata.setDateStamp(df.parse("2009-01-01T06:00:00"));
 
         /*
          * Spatial representation info

@@ -325,11 +325,7 @@ public class FileMetadataWriter extends MetadataWriter {
         //Special case for dateStamp
         if (propertyName.contains("date") && parameterType.equals(String.class)) {
             parameterType = Date.class;
-            try {
-                value = dateFormat.parse((String) value);
-            } catch (ParseException ex) {
-                throw new CstlServiceException("There service was unable to parse the date:" + value, INVALID_PARAMETER_VALUE);
-            }
+            value = parseDate((String) value);
         }
 
         if (parent instanceof Collection) {

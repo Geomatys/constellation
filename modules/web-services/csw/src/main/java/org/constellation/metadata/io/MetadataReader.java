@@ -19,6 +19,8 @@
 package org.constellation.metadata.io;
 
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +59,12 @@ public abstract class MetadataReader {
      * A map containing the metadata already extract from the database.
      */
     private final Map<String, Object> metadatas = new HashMap<String, Object>();
-    
+
+    /**
+     * A date formatter used to display the Date object for dublin core translation.
+     */
+    protected DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+
     public MetadataReader(boolean isCacheEnabled, boolean isThreadEnabled) {
         this.isCacheEnabled  = isCacheEnabled;
         this.isThreadEnabled = isThreadEnabled;
