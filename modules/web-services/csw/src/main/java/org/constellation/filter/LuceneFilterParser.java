@@ -23,9 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 // JAXB dependencies
-import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
@@ -38,7 +36,6 @@ import org.apache.lucene.search.Filter;
 // geotoolkit dependencies
 import org.constellation.metadata.Parameters;
 import org.geotoolkit.csw.xml.QueryConstraint;
-import org.geotoolkit.filter.text.cql2.CQLException;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.ogc.xml.v110.AbstractIdType;
@@ -78,32 +75,8 @@ public class LuceneFilterParser extends FilterParser {
         if (constraint == null)  {
             final Filter nullFilter = null;
             return new SpatialQuery(defaultField, nullFilter, SerialChainFilter.AND);
-            
-        } else if (constraint.getCqlText() != null && constraint.getFilter() != null) {
-            throw new CstlServiceException("The query constraint must be in Filter or CQL but not both.",
-                                          INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-        } else if (constraint.getCqlText() == null && constraint.getFilter() == null) {
-            throw new CstlServiceException("The query constraint must contain a Filter or a CQL query.",
-                                         INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-        }
-        
-        if (constraint.getCqlText() != null) {
-            try {
-                filter = cqlToFilter(constraint.getCqlText());
-                 
-            } catch (JAXBException ex) {
-                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-                throw new CstlServiceException("JAXBException while parsing CQL query: " + ex.getMessage(),
-                                             NO_APPLICABLE_CODE, Parameters.QUERY_CONSTRAINT);
-            } catch (CQLException ex) {
-                throw new CstlServiceException("The CQL query is malformed: " + ex.getMessage() + '\n' 
-                                                 + "syntax Error: " + ex.getSyntaxError(),
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
-            
-        } else if (constraint.getFilter() != null) {
-            filter = constraint.getFilter();
-            
+        } else {
+            filter = getFilterFromConstraint(constraint);
         }
         return getLuceneQuery(filter);
     }
@@ -236,47 +209,26 @@ public class LuceneFilterParser extends FilterParser {
                 if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.equals(defaultField)) ||
                     (sq.getLogicalOperator() == SerialChainFilter.NOT)) {
                     subQueries.add(sq);
-                   
-                  } else {
-                        
-                        if (!subQuery.equals("")) {
-                            queryBuilder.append(subQuery);
-                        }
-                        if (subFilter != null)
-                            filters.add(sq.getSpatialFilter());
-                  }
+
+                } else {
+
+                    if (!subQuery.equals("")) {
+                        queryBuilder.append(subQuery);
+                    }
+                    if (subFilter != null) {
+                        filters.add(sq.getSpatialFilter());
+                    }
+                }
             }
         }
         
-        int logicalOperand = SerialChainFilter.valueOf(operator);
-        
-        Filter spatialFilter = null;
         String query = queryBuilder.toString();
-        if (query.equals("()"))
+        if (query.equals("()")) {
             query = "";
-       
-        if (filters.size() == 1) {
-            
-            if (logicalOperand == SerialChainFilter.NOT) {
-                final int[] filterType = {SerialChainFilter.NOT};
-                spatialFilter = new SerialChainFilter(filters, filterType);
-                if (query.equals("")) {
-                    logicalOperand = SerialChainFilter.AND;
-                } 
-            } else {
-                spatialFilter = filters.get(0);
-            }
-        
-        } else if (filters.size() > 1) {
-            
-            final int[] filterType = new int[filters.size() - 1];
-            for (int i = 0; i < filterType.length; i++) {
-                filterType[i] = logicalOperand;
-            }
-            spatialFilter = new SerialChainFilter(filters, filterType);
         }
-        
-            
+
+        final int logicalOperand    = SerialChainFilter.valueOf(operator);
+        final Filter spatialFilter  = getSpatialFilterFromList(logicalOperand, filters, query);
         final SpatialQuery response = new SpatialQuery(query, spatialFilter, logicalOperand);
         response.setSubQueries(subQueries);
         return response;

@@ -23,12 +23,10 @@ import java.util.Map;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import java.text.ParseException;
 
 // Apache Lucene dependencies
-import java.util.logging.Level;
 import org.apache.lucene.search.Filter;
 
 // constellation dependencies
@@ -38,7 +36,6 @@ import org.geotoolkit.csw.xml.QueryConstraint;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotools dependencies
-import org.geotoolkit.filter.text.cql2.CQLException;
 
 // MDWeb dependencies
 
@@ -98,32 +95,8 @@ public class SQLFilterParser extends FilterParser {
         //if the constraint is null we make a null filter
         if (constraint == null)  {
             return new SQLQuery("Select identifier, catalog from Form where catalog != 'MDATA");
-            
-        } else if (constraint.getCqlText() != null && constraint.getFilter() != null) {
-            throw new CstlServiceException("The query constraint must be in Filter or CQL but not both.",
-                                             INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-        } else if (constraint.getCqlText() == null && constraint.getFilter() == null) {
-            throw new CstlServiceException("The query constraint must contain a Filter or a CQL query.",
-                                             INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-        }
-        
-        if (constraint.getCqlText() != null) {
-            try {
-                filter = cqlToFilter(constraint.getCqlText());
-
-            } catch (JAXBException ex) {
-                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-                throw new CstlServiceException("JAXBException while parsing CQL query: " + ex.getMessage(),
-                                                 NO_APPLICABLE_CODE, Parameters.QUERY_CONSTRAINT);
-            } catch (CQLException ex) {
-                throw new CstlServiceException("The CQL query is malformed: " + ex.getMessage() + '\n' 
-                                                 + "syntax Error: " + ex.getSyntaxError(),
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
-            }
-            
-        } else if (constraint.getFilter() != null) {
-            filter = constraint.getFilter();
-            
+        } else {
+            filter = getFilterFromConstraint(constraint);
         }
         return getSqlQuery(filter);
     }
@@ -295,40 +268,17 @@ public class SQLFilterParser extends FilterParser {
                 if (subFilter != null) {
                     filters.add(sq.getSpatialFilter());
                 }
-                  //}
             }
         }
         
-        int logicalOperand = SerialChainFilter.valueOf(operator);
-        
-        Filter spatialFilter = null;
         String query = queryBuilder.toString();
-        if (query.equals("()"))
+        if (query.equals("()")) {
             query = "";
-       
-        if (filters.size() == 1) {
-            
-            if (logicalOperand == SerialChainFilter.NOT) {
-                final int[] filterType = {SerialChainFilter.NOT};
-                spatialFilter = new SerialChainFilter(filters, filterType);
-                if (query.equals("")) {
-                    logicalOperand = SerialChainFilter.AND;
-                } 
-            } else {
-                spatialFilter = filters.get(0);
-            }
-        
-        } else if (filters.size() > 1) {
-            
-            final int[] filterType = new int[filters.size() - 1];
-            for (int i = 0; i < filterType.length; i++) {
-                filterType[i] = logicalOperand;
-            }
-            spatialFilter = new SerialChainFilter(filters, filterType);
         }
-        
-            
-        final SQLQuery response = new SQLQuery(query, spatialFilter);
+
+        final int logicalOperand   = SerialChainFilter.valueOf(operator);
+        final Filter spatialFilter = getSpatialFilterFromList(logicalOperand, filters, query);
+        final SQLQuery response    = new SQLQuery(query, spatialFilter);
         response.setSubQueries(subQueries);
         return response;
     }

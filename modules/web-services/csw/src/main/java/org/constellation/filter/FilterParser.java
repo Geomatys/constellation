@@ -76,6 +76,8 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Geometry;
+import java.util.logging.Level;
+import org.geotoolkit.lucene.filter.SerialChainFilter;
 
 /**
  *
@@ -280,6 +282,7 @@ public abstract class FilterParser {
      * 
      * @return a formated date (example 2002 -> 01-01-2002,  2004-03-04 -> 04-03-2004, ...) 
      */
+    @Deprecated
     protected String createDate(String date) throws ParseException {
         
         final Map<String, String> monthPOOL = new HashMap<String, String>();
@@ -426,7 +429,83 @@ public abstract class FilterParser {
     protected abstract Object treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws CstlServiceException;
     
     protected abstract Object treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> jbComparisonOps) throws CstlServiceException;
-    
+
+    /**
+     * Extract a OCG filter from the query constraint of the received request.
+     * 
+     * @param constraint
+     * @return
+     * @throws CstlServiceException
+     */
+    protected FilterType getFilterFromConstraint(final QueryConstraint constraint) throws CstlServiceException {
+        
+        //The null case must be trreated before calling this method
+        if (constraint == null)  {
+            throw new IllegalArgumentException("The null case must be already treated!");
+
+        // both constraint type are filled we throw an exception
+        } else if (constraint.getCqlText() != null && constraint.getFilter() != null) {
+            throw new CstlServiceException("The query constraint must be in Filter or CQL but not both.",
+                    INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+        
+        // none constraint type are filled we throw an exception
+        } else if (constraint.getCqlText() == null && constraint.getFilter() == null) {
+            throw new CstlServiceException("The query constraint must contain a Filter or a CQL query.",
+                    INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+        
+        // for a CQL request we transform it in Filter
+        } else if (constraint.getCqlText() != null) {
+            try {
+                return cqlToFilter(constraint.getCqlText());
+
+            } catch (JAXBException ex) {
+                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                throw new CstlServiceException("JAXBException while parsing CQL query: " + ex.getMessage(), NO_APPLICABLE_CODE, Parameters.QUERY_CONSTRAINT);
+            } catch (CQLException ex) {
+                throw new CstlServiceException("The CQL query is malformed: " + ex.getMessage() + '\n'
+                                                 + "syntax Error: " + ex.getSyntaxError(),
+                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+            }
+            
+        // for a filter we return directly it
+        } else {
+            return constraint.getFilter();
+        }
+    }
+
+    /**
+     * 
+     * @param operator
+     * @param filters
+     * @param query
+     * @return
+     */
+    protected Filter getSpatialFilterFromList(int logicalOperand, final List<Filter> filters, String query) {
+
+        Filter spatialFilter = null;
+        if (filters.size() == 1) {
+
+            if (logicalOperand == SerialChainFilter.NOT) {
+                final int[] filterType = {SerialChainFilter.NOT};
+                spatialFilter = new SerialChainFilter(filters, filterType);
+                if (query.equals("")) {
+                    logicalOperand = SerialChainFilter.AND;
+                }
+            } else {
+                spatialFilter = filters.get(0);
+            }
+
+        } else if (filters.size() > 1) {
+
+            final int[] filterType = new int[filters.size() - 1];
+            for (int i = 0; i < filterType.length; i++) {
+                filterType[i] = logicalOperand;
+            }
+            spatialFilter = new SerialChainFilter(filters, filterType);
+        }
+        return spatialFilter;
+    }
+
     /**
      * Build a piece of lucene query with the specified Spatial filter.
      *
