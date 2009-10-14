@@ -18,23 +18,9 @@ package org.constellation.map.ws;
 
 //J2SE dependencies
 import com.sun.jersey.api.core.HttpContext;
-import java.awt.image.BufferedImage;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
-
-//Constellation dependencies
-import org.constellation.query.wms.DescribeLayer;
-import org.constellation.query.wms.GetCapabilities;
-import org.constellation.query.wms.GetFeatureInfo;
-import org.constellation.query.wms.GetLegendGraphic;
-import org.constellation.query.wms.GetMap;
-import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
-import org.constellation.ws.CstlServiceException;
-
-//Geotools dependencies
-import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
-
 
 /**
  * Abstract definition of a {@code Web Map Service} worker called by a facade
@@ -43,96 +29,75 @@ import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
  * @version $Id$
  * 
  * @author Cédric Briançon (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractWMSWorker {
+public abstract class AbstractWMSWorker implements WMSWorker {
 
     /**
      * Contains information about the HTTP exchange of the request, for instance, 
      * the HTTP headers.
      */
-    protected HttpContext httpContext = null;
+    private HttpContext httpContext = null;
     /**
      * Contains authentication information related to the requesting principal.
      */
-    protected SecurityContext securityContext = null;
+    private SecurityContext securityContext = null;
     /**
      * Defines a set of methods that a servlet uses to communicate with its servlet container,
      * for example, to get the MIME type of a file, dispatch requests, or write to a log file.
      */
-    protected ServletContext servletContext = null;
+    private ServletContext servletContext = null;
     /**
      * Contains the request URI and therefore any  KVP parameters it may contain.
      */
-    protected UriInfo uriContext = null;
-
-    
-    
+    private UriInfo uriContext = null;
     
     /**
-     * Initialize the {@see #uriContext} information.
+     * {@inheritDoc }
      */
-    public void initUriContext(final UriInfo uriInfo){
+    @Override
+    public synchronized void initUriContext(final UriInfo uriInfo){
         uriContext = uriInfo;
     }
 
     /**
-     * Initialize the {@see #httpContext} value.
+     * {@inheritDoc }
      */
-    public void initHTTPContext(final HttpContext httpCtxt){
+    @Override
+    public synchronized void initHTTPContext(final HttpContext httpCtxt){
         httpContext = httpCtxt;
     }
 
     /**
-     * Initialize the {@see #servletContext} value.
+     * {@inheritDoc }
      */
-    public void initServletContext(final ServletContext servCtxt){
+    @Override
+    public synchronized void initServletContext(final ServletContext servCtxt){
         servletContext = servCtxt;
     }
 
     /**
-     * Initialize the {@see #servletContext} value.
+     * {@inheritDoc }
      */
-    public void initSecurityContext(final SecurityContext secCtxt){
+    @Override
+    public synchronized void initSecurityContext(final SecurityContext secCtxt){
         securityContext = secCtxt;
     }
 
-    /**
-     * Returns a description of the requested layer.
-     *
-     * @param descLayer The {@linkplain DescribeLayer describe layer} request done on this service.
-     * @throws CstlServiceException
-     */
-    public abstract DescribeLayerResponseType describeLayer(final DescribeLayer descLayer)           throws CstlServiceException;
+    protected synchronized HttpContext getHttpContext(){
+        return httpContext;
+    }
 
-    /**
-     * Returns an unmarshalled {@linkplain AbstractWMSCapabilities get capabilities} object.
-     *
-     * @param getCapabilities The {@linkplain GetCapabilities get capabilities} request done on this service.
-     * @throws CstlServiceException
-     */
-    public abstract AbstractWMSCapabilities   getCapabilities(final GetCapabilities getCapabilities) throws CstlServiceException;
+    protected synchronized SecurityContext getSecurityContext(){
+        return securityContext;
+    }
 
-    /**
-     * Returns a string, which will contain the result of a {@code GetFeatureInfo} request.
-     *
-     * @param getFeatureInfo The {@linkplain GetFeatureInfo get feature info} request done on this service.
-     * @throws CstlServiceException
-     */
-    public abstract String                    getFeatureInfo(final GetFeatureInfo getFeatureInfo)    throws CstlServiceException;
+    protected synchronized ServletContext getServletContext(){
+        return servletContext;
+    }
 
-    /**
-     * Returns a {@link BufferedImage}, which is the result of a {@code GetLegendGraphic} request.
-     *
-     * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request done on this service.
-     * @throws CstlServiceException
-     */
-    public abstract BufferedImage             getLegendGraphic(final GetLegendGraphic getLegend)     throws CstlServiceException;
+    protected synchronized UriInfo getUriContext(){
+        return uriContext;
+    }
 
-    /**
-     * Returns a {@link BufferedImage}, which is the result of a {@code GetMap} request.
-     *
-     * @param getMap The {@linkplain GetMap get map} request done on this service.
-     * @throws CstlServiceException
-     */
-    public abstract BufferedImage             getMap(final GetMap getMap)                            throws CstlServiceException;
 }

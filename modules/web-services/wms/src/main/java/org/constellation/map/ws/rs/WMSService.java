@@ -34,6 +34,7 @@ import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
@@ -44,7 +45,7 @@ import javax.xml.bind.Marshaller;
 //Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.map.ws.AbstractWMSWorker;
-import org.constellation.map.ws.WMSWorker;
+import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.query.QueryAdapter;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetMap;
@@ -124,7 +125,7 @@ public class WMSService extends OGCWebService {
                       "org.geotoolkit.sld.xml.v110",
                       "");
 
-        worker = new WMSWorker(marshallerPool);
+        worker = new DefaultWMSWorker(marshallerPool);
         setFullRequestLog(true);
         LOGGER.info("WMS service running");
     }
@@ -251,6 +252,7 @@ public class WMSService extends OGCWebService {
                 marshallerPool.release(marshaller);
             }
         }
+
     }
 
     /**
@@ -596,3 +598,4 @@ public class WMSService extends OGCWebService {
         LOGGER.info("Shutting down the REST WMS service facade.");
     }
 }
+

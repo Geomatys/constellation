@@ -19,15 +19,18 @@ package org.constellation.query.wms;
 import org.constellation.ServiceDef;
 import org.constellation.query.QueryRequest;
 import org.constellation.ws.MimeType;
+import org.geotoolkit.lang.Immutable;
 
 
 /**
  * Representation of a {@code WMS GetLegendGraphic} request, with its parameters.
  *
  * @version $Id$
- * @author Cédric Briançon
+ * @author Cédric Briançon (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
-public class GetLegendGraphic extends WMSQuery {
+ @Immutable
+public final class GetLegendGraphic extends WMSQuery {
     /**
      * Layer to consider.
      */
@@ -103,7 +106,7 @@ public class GetLegendGraphic extends WMSQuery {
      */
     @Override
     public QueryRequest getRequest() {
-        return WMSQueryRequest.GET_LEGEND_GRAPHIC;
+        return GET_LEGEND_GRAPHIC;
     }
 
     /**

@@ -24,17 +24,21 @@ import java.util.List;
 import org.constellation.query.QueryRequest;
 import org.constellation.util.StringUtilities;
 import org.constellation.ws.MimeType;
-import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.geometry.ImmutableEnvelope;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
+import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.opengis.geometry.Envelope;
+import org.opengis.sld.StyledLayerDescriptor;
 
 
 /**
  * Representation of a {@code WMS GetMap} request, with its parameters.
+ * This class is nearly immutable exept the StyleLayerDescriptor which might be mutable.
  *
  * @version $Id$
- * @author Cédric Briançon
+ * @author Cédric Briançon (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
 public class GetMap extends WMSQuery {
     /**
@@ -90,7 +94,7 @@ public class GetMap extends WMSQuery {
     /**
      * SLD definition to apply as a style for this layer.
      */
-    private final MutableStyledLayerDescriptor sld;
+    private final StyledLayerDescriptor sld;
 
     /**
      * Azimuth, map orientation.
@@ -145,15 +149,15 @@ public class GetMap extends WMSQuery {
      */
     public GetMap(final Envelope envelope, final Version version, final String format,
                   final List<String> layers, final List<String> styles,
-                  final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
+                  final StyledLayerDescriptor sld, final Double elevation, final Date date,
                   final MeasurementRange dimRange, final Dimension size, final Color background,
                   final Boolean transparent, double azimuth, final String exceptions)
     {
         super(version);
-        this.envelope = envelope;
+        this.envelope = new ImmutableEnvelope(envelope);
         this.format = format;
-        this.layers = layers;
-        this.styles = styles;
+        this.layers = UnmodifiableArrayList.wrap(layers.toArray(new String[layers.size()]));
+        this.styles = UnmodifiableArrayList.wrap(styles.toArray(new String[styles.size()]));
         this.sld = sld;
         this.elevation = elevation;
         this.time = date;
@@ -167,7 +171,7 @@ public class GetMap extends WMSQuery {
 
     public GetMap(final GetMap getMap, final Boolean transparent) {
         this(   getMap.envelope,
-                getMap.version,
+                getMap.getVersion(),
                 getMap.format,
                 getMap.layers,
                 getMap.styles,
@@ -192,7 +196,7 @@ public class GetMap extends WMSQuery {
      */
     public GetMap(final GetMap getMap, final String layer) {
         this(   getMap.envelope,
-                getMap.version,
+                getMap.getVersion(),
                 getMap.format,
                 Collections.singletonList(layer),
                 getMap.styles,
@@ -218,7 +222,7 @@ public class GetMap extends WMSQuery {
      */
     public GetMap(final GetMap getMap, final List<String> layers) {
         this(   getMap.envelope,
-                getMap.version,
+                getMap.getVersion(),
                 getMap.format,
                 layers,
                 getMap.styles,
@@ -238,7 +242,7 @@ public class GetMap extends WMSQuery {
      */
     protected GetMap(final GetMap getMap) {
         this(   getMap.envelope,
-                getMap.version,
+                getMap.getVersion(),
                 getMap.format,
                 getMap.layers,
                 getMap.styles,
@@ -321,7 +325,7 @@ public class GetMap extends WMSQuery {
     /**
      * Returns the SLD definition to apply as a style for this layer, or {@code null} if not defined.
      */
-    public MutableStyledLayerDescriptor getSld() {
+    public StyledLayerDescriptor getSld() {
         return sld;
     }
 
@@ -357,7 +361,7 @@ public class GetMap extends WMSQuery {
      */
     @Override
     public QueryRequest getRequest() {
-        return WMSQueryRequest.GET_MAP;
+        return GET_MAP;
     }
 
     /**
@@ -366,6 +370,7 @@ public class GetMap extends WMSQuery {
     @Override
     public String toKvp() {
         final StringBuilder kvp = new StringBuilder();
+        final Version version = getVersion();
         //Obligatory Parameters
         kvp            .append(KEY_REQUEST ).append('=').append(GETMAP)
            .append('&').append(KEY_BBOX    ).append('=').append(StringUtilities.toBboxValue(envelope))

@@ -20,27 +20,31 @@ import java.util.List;
 import org.constellation.query.QueryRequest;
 import org.constellation.util.StringUtilities;
 import org.constellation.ws.MimeType;
+import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.util.Version;
+import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
 
 /**
  * Representation of a {@code WMS DescribeLayer} request, with its parameters.
  *
  * @version $Id$
- * @author Cédric Briançon
+ * @author Cédric Briançon (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
-public class DescribeLayer extends WMSQuery {
+ @Immutable
+public final class DescribeLayer extends WMSQuery {
     /**
      * List of layers to request.
      */
-    private final List<String> layers;
+    private final UnmodifiableArrayList<String> layers;
 
     /**
      * Builds a {@code DescribeLayer} request, using the layer and mime-type specified.
      */
     public DescribeLayer(final List<String> layers, final Version version) {
         super(version);
-        this.layers = layers;
+        this.layers = UnmodifiableArrayList.wrap(layers.toArray(new String[layers.size()]));
     }
 
     /**
@@ -56,11 +60,11 @@ public class DescribeLayer extends WMSQuery {
      */
     @Override
     public QueryRequest getRequest() {
-        return WMSQueryRequest.DESCRIBE_LAYER;
+        return DESCRIBE_LAYER;
     }
 
     /**
-     * Returns a list of layers.
+     * Returns an immutable list of layers.
      */
     public List<String> getLayers() {
         return layers;
@@ -73,10 +77,11 @@ public class DescribeLayer extends WMSQuery {
     public String toKvp() {
         final StringBuilder kvp = new StringBuilder();
         //Obligatory Parameters
-        kvp            .append(KEY_REQUEST).append('=').append(DESCRIBELAYER)
-           .append('&').append(KEY_LAYERS ).append('=').append(StringUtilities.toCommaSeparatedValues(layers));
+        kvp.append(KEY_REQUEST).append('=').append(DESCRIBELAYER).append('&')
+           .append(KEY_LAYERS ).append('=').append(StringUtilities.toCommaSeparatedValues(layers));
 
         //Optional Parameters
+        final Version version = getVersion();
         if (version != null) {
             kvp.append('&').append(KEY_VERSION).append('=').append(version);
         }

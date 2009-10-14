@@ -180,7 +180,7 @@ public class LayerProviderProxy implements LayerProvider{
 
     }
 
-    public static synchronized void init(final String configPath){
+    private static synchronized void init(final String configPath){
         if(configPath == null){
             throw new NullPointerException("Configuration path can not be null.");
         }

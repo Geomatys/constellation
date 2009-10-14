@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import javax.measure.unit.Unit;
 
-import org.constellation.map.ws.WMSWorker;
+import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerDetails.TYPE;
 import org.constellation.query.wms.GetFeatureInfo;
@@ -64,7 +64,7 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
         for (String key : gfi.getQueryLayers()) {
             final LayerDetails layerDetails;
             try {
-                layerDetails = WMSWorker.getLayerReference(key, gfi.getVersion().toString());
+                layerDetails = DefaultWMSWorker.getLayerReference(key, gfi.getVersion().toString());
             } catch (CstlServiceException ex) {
                 // Should not occur since it has already been gotten previously.
                 throw new AssertionError(ex);

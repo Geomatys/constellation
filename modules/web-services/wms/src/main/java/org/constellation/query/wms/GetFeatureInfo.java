@@ -20,10 +20,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.Date;
 import java.util.List;
+import org.constellation.query.QueryRequest;
 import org.constellation.util.StringUtilities;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
+import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.opengis.geometry.Envelope;
 
 
@@ -33,10 +35,11 @@ import org.opengis.geometry.Envelope;
  *
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
+ * @author Johann Sorel (Geomatys)
  *
  * @see GetMap
  */
-public class GetFeatureInfo extends GetMap {
+public final class GetFeatureInfo extends GetMap {
     /**
      * X coordinate to request.
      */
@@ -50,7 +53,7 @@ public class GetFeatureInfo extends GetMap {
     /**
      * Layers to request.
      */
-    private final List<String> queryLayers;
+    private final UnmodifiableArrayList<String> queryLayers;
 
     /**
      * Format of the returned information.
@@ -67,8 +70,10 @@ public class GetFeatureInfo extends GetMap {
                           final Integer featureCount)
     {
         super(getMap);
-        this.x = x;     this.queryLayers = queryLayers;
-        this.y = y;     this.infoFormat  = infoFormat;
+        this.x = x;     
+        this.y = y;
+        this.queryLayers = UnmodifiableArrayList.wrap(queryLayers.toArray(new String[queryLayers.size()]));
+        this.infoFormat  = infoFormat;
         this.featureCount = featureCount;
     }
 
@@ -81,9 +86,19 @@ public class GetFeatureInfo extends GetMap {
     {
         super(envelope, version, format, layers, styles, sld, elevation, date, dimRange, size,
                 background, transparent, 0,exceptions);
-        this.x = x;     this.queryLayers = queryLayers;
-        this.y = y;     this.infoFormat  = infoFormat;
+        this.x = x;     
+        this.y = y;
+        this.queryLayers = UnmodifiableArrayList.wrap(queryLayers.toArray(new String[queryLayers.size()]));
+        this.infoFormat  = infoFormat;
         this.featureCount = featureCount;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public QueryRequest getRequest() {
+        return GET_FEATURE_INFO;
     }
 
     /**
@@ -101,7 +116,7 @@ public class GetFeatureInfo extends GetMap {
     }
 
     /**
-     * Returns a list of layers to request.
+     * Returns an immutable list of layers to request.
      */
     public List<String> getQueryLayers() {
         return queryLayers;
@@ -128,6 +143,7 @@ public class GetFeatureInfo extends GetMap {
     public String toKvp() {
         final String getMapKvp = super.toKvp();
         final StringBuilder kvp = new StringBuilder(getMapKvp);
+        final Version version = getVersion();
         //Obligatory Parameters
         kvp.append('&').append(KEY_QUERY_LAYERS).append('=').append(StringUtilities.toCommaSeparatedValues(queryLayers))
            .append('&').append(KEY_INFO_FORMAT ).append('=').append(infoFormat)

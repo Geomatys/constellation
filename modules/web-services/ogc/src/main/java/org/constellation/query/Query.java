@@ -28,7 +28,7 @@ import org.geotoolkit.util.Version;
  * @author Johann Sorel (Geomayts)
  * @author Cédric Briançon (Geomatys)
  */
-public abstract class Query {
+public interface Query {
     /**
      * Parameters for all requests.
      */
@@ -56,20 +56,20 @@ public abstract class Query {
     /**
      * Returns the request type specified for this query.
      */
-    public abstract QueryRequest getRequest();
+    QueryRequest getRequest();
 
     /**
      * Returns the service name. Never {@code null}.
      */
-    public abstract QueryService getService();
+    QueryService getService();
 
     /**
      * Returns the version of the service chosen, or {@code null} if not specified.
      */
-    public abstract Version getVersion();
+    Version getVersion();
 
     /**
      * Returns the exception format. Never {@code null}.
      */
-    public abstract String getExceptionFormat();
+    String getExceptionFormat();
 }

@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
+import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
@@ -37,11 +38,12 @@ import org.geotoolkit.util.Version;
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-public class QueryAdapter {
+@Immutable
+public final class QueryAdapter {
     /**
      * The default logger.
      */
-    public static final Logger LOGGER = Logger.getLogger("org.constellation.query");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.query");
 
     private QueryAdapter() {}
     

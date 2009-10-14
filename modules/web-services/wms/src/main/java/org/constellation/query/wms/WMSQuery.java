@@ -18,6 +18,10 @@ package org.constellation.query.wms;
 
 import org.constellation.query.Query;
 import org.constellation.query.QueryService;
+import org.constellation.query.DefaultQueryService;
+import org.constellation.query.DefaultQueryRequest;
+import org.constellation.query.QueryRequest;
+import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.util.Version;
 
 
@@ -29,7 +33,9 @@ import org.geotoolkit.util.Version;
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-public abstract class WMSQuery extends Query {
+@Immutable
+public abstract class WMSQuery implements Query {
+
     /**
      * Request parameters.
      */
@@ -39,6 +45,42 @@ public abstract class WMSQuery extends Query {
     public static final String DESCRIBELAYER    = "DescribeLayer";
     public static final String GETLEGENDGRAPHIC = "GetLegendGraphic";
     public static final String GETORIGFILE      = "GetOrigFile";
+
+    /**
+     * WMS Query service
+     */
+    public static final QueryService WMS_SERVICE = new DefaultQueryService("WMS");
+
+    /**
+     * Key for the {@code DescribeLayer} request.
+     */
+    public static final QueryRequest DESCRIBE_LAYER = new DefaultQueryRequest(DESCRIBELAYER);
+
+    /**
+     * Key for the {@code GetCapabilities} request.
+     */
+    public static final QueryRequest GET_CAPABILITIES = new DefaultQueryRequest(GETCAPABILITIES);
+
+    /**
+     * Key for the {@code GetFeatureInfo} request.
+     */
+    public static final QueryRequest GET_FEATURE_INFO = new DefaultQueryRequest(GETFEATUREINFO);
+
+    /**
+     * Key for the {@code GetLegendGraphic} request.
+     */
+    public static final QueryRequest GET_LEGEND_GRAPHIC = new DefaultQueryRequest(GETLEGENDGRAPHIC);
+
+    /**
+     * Key for the {@code GetMap} request.
+     */
+    public static final QueryRequest GET_MAP = new DefaultQueryRequest(GETMAP);
+
+    /**
+     * Key for the {@code GetOrigFile} request.
+     */
+    public static final QueryRequest GET_ORIG_FILE = new DefaultQueryRequest(GETORIGFILE);
+
     /**
      * For backward compatibility with WMS 1.0.0, the request can be done with
      * a value {@code capabilities}.
@@ -112,21 +154,22 @@ public abstract class WMSQuery extends Query {
     /** Parameter used in GetCapabilities, for backward compatibility with WMS 1.0.0 */
     public static final String KEY_WMTVER = "WMTVER";
 
-    protected final Version version;
+    private final Version version;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final QueryService getService() {
-        return new QueryService.WMS();
-    }
 
     protected WMSQuery(final Version version) {
         if (version == null) {
             throw new NullPointerException("Version should not be null !");
         }
         this.version = version;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final QueryService getService() {
+        return WMS_SERVICE;
     }
 
     /**

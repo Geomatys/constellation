@@ -23,13 +23,11 @@ package org.constellation.query;
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
  */
-public abstract class QueryRequest {
-    /**
-     * The key of the request parameter.
-     */
-    public final String key;
+public interface QueryRequest {
 
-    protected QueryRequest(final String key) {
-        this.key = key;
-    }
+    /**
+     * @return name of the request
+     */
+    String getName();
+    
 }

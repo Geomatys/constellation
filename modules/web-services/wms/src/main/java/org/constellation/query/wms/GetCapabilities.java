@@ -18,6 +18,7 @@ package org.constellation.query.wms;
 
 import org.constellation.query.QueryRequest;
 import org.constellation.ws.MimeType;
+import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.util.Version;
 
 
@@ -26,16 +27,15 @@ import org.geotoolkit.util.Version;
  *
  * @version $Id$
  * @author Cédric Briançon (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
-public class GetCapabilities extends WMSQuery {
+@Immutable
+public final class GetCapabilities extends WMSQuery {
     /**
      * The output format for this request.
      */
     private final String format;
 
-    /**
-     * 
-     */
     public GetCapabilities(final Version version) {
         this(version, null);
     }
@@ -58,7 +58,7 @@ public class GetCapabilities extends WMSQuery {
      */
     @Override
     public QueryRequest getRequest() {
-        return WMSQueryRequest.GET_CAPABILITIES;
+        return GET_CAPABILITIES;
     }
 
     public String getFormat() {
@@ -72,10 +72,11 @@ public class GetCapabilities extends WMSQuery {
     public String toKvp() {
         final StringBuilder kvp = new StringBuilder();
         //Obligatory Parameters
-        kvp            .append(KEY_REQUEST).append('=').append(GETCAPABILITIES)
-           .append('&').append(KEY_SERVICE).append('=').append(getService().key);
+        kvp.append(KEY_REQUEST).append('=').append(GETCAPABILITIES).append('&')
+           .append(KEY_SERVICE).append('=').append(getService().getName());
 
         //Optional Parameters
+        final Version version = getVersion();
         if (version != null) {
             kvp.append('&').append(KEY_VERSION).append('=').append(version);
         }

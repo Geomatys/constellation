@@ -16,6 +16,7 @@
  */
 package org.constellation.query.wcs;
 
+import org.constellation.query.DefaultQueryService;
 import org.constellation.query.Query;
 import org.constellation.query.QueryService;
 import org.geotoolkit.util.Version;
@@ -29,7 +30,13 @@ import org.geotoolkit.util.Version;
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-public abstract class WCSQuery extends Query {
+public abstract class WCSQuery implements Query {
+
+    /**
+     * WCS Query service
+     */
+    public static final QueryService WCS_SERVICE = new DefaultQueryService("WCS");
+
     /**
      * Request parameters.
      */
@@ -123,7 +130,7 @@ public abstract class WCSQuery extends Query {
      */
     @Override
     public final QueryService getService() {
-        return new QueryService.WCS();
+        return WCS_SERVICE;
     }
 
     /**

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,17 +14,31 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.constellation.query;
 
+import org.geotoolkit.lang.Immutable;
 
 /**
- * Stores the different possibilities of service type available for this webservice.
- *
- * @version $Id$
- * @author Cédric Briançon
+ * Default Implementation of a QueryService.
+ * @author Johann Sorel (Geomatys)
  */
-public interface QueryService {
+@Immutable
+public final class DefaultQueryService implements QueryService{
 
-    String getName();
+    private final String name;
+
+    public DefaultQueryService(String name) {
+        if(name == null) throw new NullPointerException("Service name can not be null");
+        this.name = name;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public String getName() {
+        return name;
+    }
 
 }

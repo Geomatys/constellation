@@ -41,6 +41,7 @@ import javax.swing.SwingConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.canvas.J2DCanvas;
 import org.geotoolkit.display2d.ext.BackgroundTemplate;
@@ -65,6 +66,7 @@ import org.geotoolkit.display2d.ext.text.DefaultTextTemplate;
 import org.geotoolkit.display2d.ext.text.GraphicTextJ2D;
 import org.geotoolkit.display2d.ext.text.TextTemplate;
 import org.geotoolkit.display2d.service.PortrayalExtension;
+import org.geotoolkit.lang.ThreadSafe;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.Converters;
 import org.geotoolkit.util.logging.Logging;
@@ -76,9 +78,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- *
+ * Utility class to parse a wms decoration extension configuration file as a
+ * portrayal extension.
  * @author Johann Sorel (Geomatys)
  */
+@ThreadSafe(concurrent=false)
 public final class WMSMapDecoration {
 
     private static final Logger LOGGER = Logging.getLogger(WMSMapDecoration.class);
@@ -135,9 +139,47 @@ public final class WMSMapDecoration {
     private static final String POSTION_CENTER      = "center";
 
 
-
-
+    /**
+     * Decoration extension for map queries.
+     */
+    private static PortrayalExtension EXTENSION = null;
+    
     private WMSMapDecoration(){}
+
+    /**
+     * First call to this method will parse the configuration file if there is one.
+     * 
+     * @return PortrayalExtension, never null
+     */
+    public static synchronized PortrayalExtension getExtension() {
+
+        if(EXTENSION != null) return EXTENSION;
+
+        //load the portrayal extension
+        final String path = ConfigDirectory.getConfigDirectory().getPath() + File.separator + "WMSPortrayal.xml";
+
+        final File f = new File(path);
+        if(f.exists()){
+            try {
+                EXTENSION = read(f);
+            } catch (ParserConfigurationException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            } catch (SAXException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            }
+        }
+
+        //no configuration available, make an empty
+        if(EXTENSION == null){
+            LOGGER.log(Level.INFO, "No WMS portrayal extension found, will create an empty extension");
+            EXTENSION = new DecorationExtension();
+        }
+
+
+        return EXTENSION;
+    }
 
     public static PortrayalExtension read(File configFile)
             throws ParserConfigurationException, SAXException, IOException{
@@ -491,7 +533,7 @@ public final class WMSMapDecoration {
 
     }
 
-    public static class DecorationExtension implements PortrayalExtension{
+    private static final class DecorationExtension implements PortrayalExtension{
 
         private final List<Map<String,Object>> decorations = new ArrayList<Map<String,Object>>();
 

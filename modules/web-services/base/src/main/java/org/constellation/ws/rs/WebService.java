@@ -122,7 +122,7 @@ public abstract class WebService {
     /**
      * Specifies if the process is running on a Glassfish application server.
      */
-    private static Boolean runningOnGlassfish = null;
+    private static final boolean RUNNING_ON_GLASSFISH;
 
     /**
      * The user directory where configuration files are stored on Unix platforms.
@@ -135,6 +135,10 @@ public abstract class WebService {
      * The user directory where configuration files are stored on Windows platforms.
      */
     private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
+
+    static{
+        RUNNING_ON_GLASSFISH = (System.getProperty("domain.name") != null) ? true : false;
+    }
 
     /**
      * Provides access to the URI used in the method call, for instance, to
@@ -182,7 +186,7 @@ public abstract class WebService {
      * Initialize the basic attribute of a web service.
      */
     public WebService() {
-        serviceURL    = null;
+        serviceURL = null;
     }
 
 
@@ -537,10 +541,8 @@ public abstract class WebService {
      */
     public static String getPropertyValue(final String propGroup, final String propName) throws NamingException {
         final InitialContext ctx = new InitialContext();
-        if (runningOnGlassfish == null) {
-            runningOnGlassfish = (System.getProperty("domain.name") != null) ? true : false;
-        }
-        if (runningOnGlassfish) {
+        
+        if (RUNNING_ON_GLASSFISH) {
             if (propGroup == null) {
                 throw new NamingException("The coverage property group is not specified.");
             }
