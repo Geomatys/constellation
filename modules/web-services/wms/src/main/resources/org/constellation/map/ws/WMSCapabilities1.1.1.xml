@@ -57,6 +57,7 @@
       <Format>image/png</Format>
       <Format>image/jpeg</Format>
       <Format>image/bmp</Format>
+      <Format>image/tiff</Format>
       <Format>image/x-portable-pixmap</Format>
       <DCPType>
         <HTTP>
@@ -101,6 +102,7 @@
         <Format>image/png</Format>
         <Format>image/jpeg</Format>
         <Format>image/gif</Format>
+        <Format>image/tiff</Format>
 	<DCPType>
 	   <HTTP>
 	     <Get>

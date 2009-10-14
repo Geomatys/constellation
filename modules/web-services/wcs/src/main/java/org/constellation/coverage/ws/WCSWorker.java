@@ -337,6 +337,7 @@ public final class WCSWorker {
             supportedFormats.add(new CodeListType("gif"));
             supportedFormats.add(new CodeListType("jpeg"));
             supportedFormats.add(new CodeListType("bmp"));
+            supportedFormats.add(new CodeListType("tiff"));
             supportedFormats.add(new CodeListType("matrix"));
             String nativeFormat = "unknown";
             final Iterator<Series> it = coverageRef.getSeries().iterator();
