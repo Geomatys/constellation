@@ -127,9 +127,17 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.TransformException;
 
 import static org.constellation.query.Query.KEY_VERSION;
+import static org.constellation.query.wcs.WCSQuery.BMP;
 import static org.constellation.query.wcs.WCSQuery.GEOTIFF;
+import static org.constellation.query.wcs.WCSQuery.GIF;
+import static org.constellation.query.wcs.WCSQuery.IMAGE_BMP;
+import static org.constellation.query.wcs.WCSQuery.IMAGE_GIF;
+import static org.constellation.query.wcs.WCSQuery.IMAGE_JPEG;
+import static org.constellation.query.wcs.WCSQuery.IMAGE_PNG;
+import static org.constellation.query.wcs.WCSQuery.JPEG;
 import static org.constellation.query.wcs.WCSQuery.MATRIX;
 import static org.constellation.query.wcs.WCSQuery.NETCDF;
+import static org.constellation.query.wcs.WCSQuery.PNG;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 
@@ -338,11 +346,15 @@ public final class WCSWorker {
             supportedFormats.add(new CodeListType("jpeg"));
             supportedFormats.add(new CodeListType("bmp"));
             supportedFormats.add(new CodeListType("matrix"));
-            String nativeFormat = "unknow";
+            String nativeFormat = "unknown";
             final Iterator<Series> it = coverageRef.getSeries().iterator();
             if (it.hasNext()) {
                 final Series s = it.next();
                 nativeFormat = s.getFormat().getImageFormat();
+//                if (nativeFormat.startsWith("image/")) {
+//                    // remove the "image/" part in the case of an image format
+//                    nativeFormat = nativeFormat.substring(6);
+//                }
             }
             final SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, supportedFormats);
 
@@ -866,9 +878,10 @@ public final class WCSWorker {
 
         /*
          * Generating the response.
-         * It can be a text one (format MATRIX) or an image one (image/png, image/gif ...).
+         * It can be a text one (format MATRIX) or an image one (png, gif ...).
          */
-        if ( request.getFormat().equalsIgnoreCase(MATRIX) ) {
+        final String format = request.getFormat();
+        if ( format.equalsIgnoreCase(MATRIX) ) {
 
             //NOTE ADRIAN HACKED HERE
             final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
@@ -887,22 +900,24 @@ public final class WCSWorker {
 
             return image;
 
-        } else if( request.getFormat().equalsIgnoreCase(NETCDF) ){
+        } else if( format.equalsIgnoreCase(NETCDF) ){
 
             throw new CstlServiceException(new IllegalArgumentException(
                                                "Constellation does not support netcdf writing."),
                                            NO_APPLICABLE_CODE);
 
-        } else if( request.getFormat().equalsIgnoreCase(GEOTIFF) ){
+        } else if( format.equalsIgnoreCase(GEOTIFF) ){
 
             throw new CstlServiceException(new IllegalArgumentException(
                                                "Constellation does not support geotiff writing."),
                                            NO_APPLICABLE_CODE);
 
-        } else {
+        } else if ( format.equalsIgnoreCase(PNG)  || format.equalsIgnoreCase(IMAGE_PNG)  ||
+                    format.equalsIgnoreCase(GIF)  || format.equalsIgnoreCase(IMAGE_GIF)  ||
+                    format.equalsIgnoreCase(JPEG) || format.equalsIgnoreCase(IMAGE_JPEG) ||
+                    format.equalsIgnoreCase(BMP)  || format.equalsIgnoreCase(IMAGE_BMP)   )
+        {
             // We are in the case of an image format requested.
-        	// TODO: This should be the fall through, add formats.
-
             //NOTE: ADRIAN HACKED HERE
 
             // SCENE
@@ -918,7 +933,6 @@ public final class WCSWorker {
             } catch (PortrayalException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
-
 
             // VIEW
             final JTSEnvelope2D refEnvel;
@@ -959,6 +973,9 @@ public final class WCSWorker {
             }
 
             return img;
+        } else {
+            throw new CstlServiceException("The format specified is not recognized. Please choose a known format " +
+                    "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT, format);
         }
     }
 

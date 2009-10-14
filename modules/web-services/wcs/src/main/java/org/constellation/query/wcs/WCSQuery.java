@@ -94,6 +94,22 @@ public abstract class WCSQuery extends Query {
     public static final String GEOTIFF    = "GEOTIFF";
     /** Format value used in getCoverage */
     public static final String NETCDF     = "NETCDF";
+    /** Format value used in getCoverage */
+    public static final String PNG        = "PNG";
+    /** Format value used in getCoverage */
+    public static final String IMAGE_PNG  = "IMAGE/PNG";
+    /** Format value used in getCoverage */
+    public static final String GIF        = "GIF";
+    /** Format value used in getCoverage */
+    public static final String IMAGE_GIF  = "IMAGE/GIF";
+    /** Format value used in getCoverage */
+    public static final String JPEG       = "JPEG";
+    /** Format value used in getCoverage */
+    public static final String IMAGE_JPEG = "IMAGE/JPEG";
+    /** Format value used in getCoverage */
+    public static final String BMP        = "BMP";
+    /** Format value used in getCoverage */
+    public static final String IMAGE_BMP  = "IMAGE/BMP";
 
     protected final Version version;
 
