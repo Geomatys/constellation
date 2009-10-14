@@ -15,14 +15,15 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.ws;
+
 
 /**
  *
+ * @version $Id$
  * @author Guilhem Legal (Geomatys)
  */
-public class MimeType {
+public final class MimeType {
 
     private MimeType() {}
 
@@ -42,6 +43,8 @@ public class MimeType {
 
     public static final String IMAGE_BMP       = "image/bmp";
 
+    public static final String IMAGE_TIFF      = "image/tiff";
+
     public static final String APP_WMS_XML     = "application/vnd.ogc.wms_xml";
 
     public static final String APP_INIMAGE     = "application/vnd.ogc.se_inimage";
@@ -51,6 +54,5 @@ public class MimeType {
     public static final String APP_GML         = "application/vnd.ogc.gml";
 
     public static final String APP_SE_XML      = "application/vnd.ogc.se_xml";
-
 
 }

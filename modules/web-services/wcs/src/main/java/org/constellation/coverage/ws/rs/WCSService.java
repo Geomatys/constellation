@@ -246,6 +246,8 @@ public class WCSService extends OGCWebService {
                 if (!format.equalsIgnoreCase(MimeType.IMAGE_BMP)  && !format.equalsIgnoreCase(WCSQuery.BMP)  &&
                     !format.equalsIgnoreCase(MimeType.IMAGE_GIF)  && !format.equalsIgnoreCase(WCSQuery.GIF)  &&
                     !format.equalsIgnoreCase(MimeType.IMAGE_JPEG) && !format.equalsIgnoreCase(WCSQuery.JPEG) &&
+                    !format.equalsIgnoreCase(WCSQuery.JPG)        && !format.equalsIgnoreCase(WCSQuery.TIF)  &&
+                    !format.equalsIgnoreCase(MimeType.IMAGE_TIFF) && !format.equalsIgnoreCase(WCSQuery.TIFF) &&
                     !format.equalsIgnoreCase(MimeType.IMAGE_PNG)  && !format.equalsIgnoreCase(WCSQuery.PNG)  &&
                     !format.equalsIgnoreCase(WCSQuery.GEOTIFF)    && !format.equalsIgnoreCase(WCSQuery.NETCDF))
                 {
@@ -256,21 +258,21 @@ public class WCSService extends OGCWebService {
                 if (format.equalsIgnoreCase(MATRIX)) {
                     format = "application/matrix";
                 }
-                // The describe coverage request in version 1.0.0 does not support the '/' character,
-                // so we have to convert simple output format name into the matching mime-type.
-                if (serviceDef.equals(ServiceDef.WCS_1_0_0)) {
-                    if (format.equalsIgnoreCase(WCSQuery.PNG)) {
-                        format = MimeType.IMAGE_PNG;
-                    }
-                    if (format.equalsIgnoreCase(WCSQuery.GIF)) {
-                        format = MimeType.IMAGE_GIF;
-                    }
-                    if (format.equalsIgnoreCase(WCSQuery.BMP)) {
-                        format = MimeType.IMAGE_BMP;
-                    }
-                    if (format.equalsIgnoreCase(WCSQuery.JPEG)) {
-                        format = MimeType.IMAGE_JPEG;
-                    }
+                // Convert the supported image type into known mime-type.
+                if (format.equalsIgnoreCase(WCSQuery.PNG)) {
+                    format = MimeType.IMAGE_PNG;
+                }
+                if (format.equalsIgnoreCase(WCSQuery.GIF)) {
+                    format = MimeType.IMAGE_GIF;
+                }
+                if (format.equalsIgnoreCase(WCSQuery.BMP)) {
+                    format = MimeType.IMAGE_BMP;
+                }
+                if (format.equalsIgnoreCase(WCSQuery.JPEG) || format.equalsIgnoreCase(WCSQuery.JPG)) {
+                    format = MimeType.IMAGE_JPEG;
+                }
+                if (format.equalsIgnoreCase(WCSQuery.TIF) || format.equalsIgnoreCase(WCSQuery.TIFF)) {
+                    format = MimeType.IMAGE_TIFF;
                 }
                 return Response.ok(rendered, format).build();
             }

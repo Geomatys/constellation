@@ -468,7 +468,8 @@ public class WMSService extends OGCWebService {
             if (strFormat.equalsIgnoreCase(MimeType.IMAGE_BMP) ||
                 strFormat.equalsIgnoreCase(MimeType.IMAGE_GIF) ||
                 strFormat.equalsIgnoreCase(MimeType.IMAGE_JPEG)||
-                strFormat.equalsIgnoreCase(MimeType.IMAGE_PNG))
+                strFormat.equalsIgnoreCase(MimeType.IMAGE_PNG) ||
+                strFormat.equalsIgnoreCase(MimeType.IMAGE_TIFF))
             {
                 exceptionImageFormat = strFormat;
             }
@@ -514,7 +515,7 @@ public class WMSService extends OGCWebService {
         try {
             format = StringUtilities.toFormat(strFormat);
         } catch (IllegalArgumentException i) {
-            throw new CstlServiceException(i, INVALID_FORMAT);
+            throw new CstlServiceException(i, INVALID_FORMAT, "format");
         }
         final List<String> layers  = StringUtilities.toStringList(strLayers);
         final List<String> styles = StringUtilities.toStringList(strStyles);
@@ -523,14 +524,14 @@ public class WMSService extends OGCWebService {
         try {
             elevation = (strElevation != null) ? StringUtilities.toDouble(strElevation) : null;
         } catch (NumberFormatException n) {
-            throw new CstlServiceException(n, INVALID_PARAMETER_VALUE);
+            throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, "elevation");
         }
         final MeasurementRange dimRange = QueryAdapter.toMeasurementRange(strDimRange);
         final Date date;
         try {
             date = StringUtilities.toDate(strTime);
         } catch (ParseException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, "date");
         }
         final int width;
         final int height;
@@ -578,7 +579,7 @@ public class WMSService extends OGCWebService {
         try {
             azimuth = (strAzimuth == null) ? 0.0 : StringUtilities.toDouble(strAzimuth);
         } catch(NumberFormatException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, "azimuth");
         }
 
         // Builds the request.

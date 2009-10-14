@@ -99,9 +99,15 @@ public abstract class WCSQuery extends Query {
     /** Format value used in getCoverage */
     public static final String GIF        = "GIF";
     /** Format value used in getCoverage */
+    public static final String JPG        = "JPG";
+    /** Format value used in getCoverage */
     public static final String JPEG       = "JPEG";
     /** Format value used in getCoverage */
     public static final String BMP        = "BMP";
+    /** Format value used in getCoverage */
+    public static final String TIF        = "TIF";
+    /** Format value used in getCoverage */
+    public static final String TIFF       = "TIFF";
 
     protected final Version version;
 
