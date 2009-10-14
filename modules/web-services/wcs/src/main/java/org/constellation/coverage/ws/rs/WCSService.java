@@ -70,6 +70,7 @@ import javax.xml.bind.Marshaller;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.coverage.ws.WCSWorker;
+import org.constellation.query.wcs.WCSQuery;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
@@ -125,7 +126,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 @Path("wcs")
 @Singleton
 public class WCSService extends OGCWebService {
-	
     /**
      * The worker which will perform the core logic for this service.
      */
@@ -242,31 +242,34 @@ public class WCSService extends OGCWebService {
                     getcov = adaptKvpGetCoverageRequest();
                 }
                 serviceDef = getVersionFromNumber(getcov.getVersion().toString());
-                final RenderedImage rendered = worker.getCoverage(getcov);
                 String format = getcov.getFormat();
+                if (!format.equalsIgnoreCase(MimeType.IMAGE_BMP)  && !format.equalsIgnoreCase(WCSQuery.BMP)  &&
+                    !format.equalsIgnoreCase(MimeType.IMAGE_GIF)  && !format.equalsIgnoreCase(WCSQuery.GIF)  &&
+                    !format.equalsIgnoreCase(MimeType.IMAGE_JPEG) && !format.equalsIgnoreCase(WCSQuery.JPEG) &&
+                    !format.equalsIgnoreCase(MimeType.IMAGE_PNG)  && !format.equalsIgnoreCase(WCSQuery.PNG)  &&
+                    !format.equalsIgnoreCase(WCSQuery.GEOTIFF)    && !format.equalsIgnoreCase(WCSQuery.NETCDF))
+                {
+                    throw new CstlServiceException("The format specified is not recognized. Please choose a known format " +
+                        "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT, format);
+                }
+                final RenderedImage rendered = worker.getCoverage(getcov);
                 if (format.equalsIgnoreCase(MATRIX)) {
                     format = "application/matrix";
                 }
                 // The describe coverage request in version 1.0.0 does not support the '/' character,
                 // so we have to convert simple output format name into the matching mime-type.
                 if (serviceDef.equals(ServiceDef.WCS_1_0_0)) {
-                    if (format.equalsIgnoreCase("png")) {
+                    if (format.equalsIgnoreCase(WCSQuery.PNG)) {
                         format = MimeType.IMAGE_PNG;
                     }
-                    if (format.equalsIgnoreCase("gif")) {
+                    if (format.equalsIgnoreCase(WCSQuery.GIF)) {
                         format = MimeType.IMAGE_GIF;
                     }
-                    if (format.equalsIgnoreCase("bmp")) {
+                    if (format.equalsIgnoreCase(WCSQuery.BMP)) {
                         format = MimeType.IMAGE_BMP;
                     }
-                    if (format.equalsIgnoreCase("jpeg")) {
+                    if (format.equalsIgnoreCase(WCSQuery.JPEG)) {
                         format = MimeType.IMAGE_JPEG;
-                    }
-                    if (!format.equals(MimeType.IMAGE_PNG) && !format.equals(MimeType.IMAGE_GIF)
-                        && !format.equals(MimeType.IMAGE_BMP) && !format.equals(MimeType.IMAGE_JPEG))
-                    {
-                        throw new CstlServiceException("The requested format is not supported for this coverage",
-                                INVALID_FORMAT, "format");
                     }
                 }
                 return Response.ok(rendered, format).build();

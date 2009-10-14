@@ -127,17 +127,9 @@ import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.TransformException;
 
 import static org.constellation.query.Query.KEY_VERSION;
-import static org.constellation.query.wcs.WCSQuery.BMP;
 import static org.constellation.query.wcs.WCSQuery.GEOTIFF;
-import static org.constellation.query.wcs.WCSQuery.GIF;
-import static org.constellation.query.wcs.WCSQuery.IMAGE_BMP;
-import static org.constellation.query.wcs.WCSQuery.IMAGE_GIF;
-import static org.constellation.query.wcs.WCSQuery.IMAGE_JPEG;
-import static org.constellation.query.wcs.WCSQuery.IMAGE_PNG;
-import static org.constellation.query.wcs.WCSQuery.JPEG;
 import static org.constellation.query.wcs.WCSQuery.MATRIX;
 import static org.constellation.query.wcs.WCSQuery.NETCDF;
-import static org.constellation.query.wcs.WCSQuery.PNG;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 
@@ -351,10 +343,6 @@ public final class WCSWorker {
             if (it.hasNext()) {
                 final Series s = it.next();
                 nativeFormat = s.getFormat().getImageFormat();
-//                if (nativeFormat.startsWith("image/")) {
-//                    // remove the "image/" part in the case of an image format
-//                    nativeFormat = nativeFormat.substring(6);
-//                }
             }
             final SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, supportedFormats);
 
@@ -912,11 +900,7 @@ public final class WCSWorker {
                                                "Constellation does not support geotiff writing."),
                                            NO_APPLICABLE_CODE);
 
-        } else if ( format.equalsIgnoreCase(PNG)  || format.equalsIgnoreCase(IMAGE_PNG)  ||
-                    format.equalsIgnoreCase(GIF)  || format.equalsIgnoreCase(IMAGE_GIF)  ||
-                    format.equalsIgnoreCase(JPEG) || format.equalsIgnoreCase(IMAGE_JPEG) ||
-                    format.equalsIgnoreCase(BMP)  || format.equalsIgnoreCase(IMAGE_BMP)   )
-        {
+        } else {
             // We are in the case of an image format requested.
             //NOTE: ADRIAN HACKED HERE
 
@@ -973,9 +957,6 @@ public final class WCSWorker {
             }
 
             return img;
-        } else {
-            throw new CstlServiceException("The format specified is not recognized. Please choose a known format " +
-                    "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT, format);
         }
     }
 
