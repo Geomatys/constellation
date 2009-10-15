@@ -54,6 +54,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
 
             Util.executeSQLScript("org/constellation/metadata/sql/structure-mdweb.sql", con);
             Util.executeSQLScript("org/constellation/metadata/sql/ISO19115-data.sql", con);
+            Util.executeSQLScript("org/constellation/metadata/sql/DC-data.sql", con);
             Util.executeSQLScript("org/constellation/metadata/sql/csw-data.sql", con);
 
             //we write the configuration file
@@ -73,7 +74,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         if (ds != null) {
             ds.shutdown();
         }
-        deleteDirectory(new File("CSWWorkerTest"));
+        //deleteDirectory(new File("CSWWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();

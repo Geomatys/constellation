@@ -431,9 +431,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                     LOGGER.finer("put " + term + " values: " + values);
                     anyText.append(values).append(" ");
                 }
-                if (term.equals("date") || term.equals("modified")) {
-                    values = values.replaceAll("-","");
-                }
+    
                 doc.add(new Field(term, values,   Field.Store.YES, Field.Index.ANALYZED));
                 doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
             }
@@ -542,9 +540,9 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                             form.getConditionalValueFromPath(path, conditionalPath, conditionalValue));
                 }
 
-                for(final Value v: values) {
+                for (final Value v: values) {
                     //only handle textvalue
-                    if(!(v instanceof TextValue)) continue;
+                    if (!(v instanceof TextValue)) continue;
                     final TextValue tv = (TextValue) v;
 
                     if (ordinal == -1 || ordinal == tv.getOrdinal()) {
@@ -582,6 +580,10 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                             String value = tv.getValue();
                             if (value != null) {
                                 value = value.replaceAll("-", "");
+                            }
+                            // TODO use time
+                            if (value.indexOf('T') != -1) {
+                                value = value.substring(0, value.indexOf('T'));
                             }
                             response.append(value).append(',');
                         // else we write the text value.

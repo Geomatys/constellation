@@ -20,7 +20,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import javax.xml.bind.JAXBException;
-import org.geotoolkit.xml.MarshallerPool;
+import org.constellation.jaxb.AnchoredMarshallerPool;
 
 /**
  *
@@ -28,7 +28,7 @@ import org.geotoolkit.xml.MarshallerPool;
  *
  * @author Cédric Briançon (Geomatys)
  */
-public final class AnchorPool extends MarshallerPool {
+public final class AnchorPool extends AnchoredMarshallerPool {
     public AnchorPool(final List<Class> classes) throws JAXBException, URISyntaxException {
         super(classes.toArray(new Class[]{}));
         addAnchor("Common Data Index record", new URI("SDN:L231:3:CDI"));

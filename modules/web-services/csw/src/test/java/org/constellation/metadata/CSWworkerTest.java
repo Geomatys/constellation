@@ -1061,6 +1061,9 @@ public class CSWworkerTest {
      * @throws java.lang.Exception
      */
     public void transactionInsertTest() throws Exception {
+
+        LOGGER.info("--- TRANSACTION INSERT TEST ---");
+
         unmarshaller = pool.acquireUnmarshaller();
         /*
          *  TEST 1 : we add the metadata 42292_5p_19900609195600
@@ -1087,6 +1090,32 @@ public class CSWworkerTest {
 
         DefaultMetaData isoResult = (DefaultMetaData) obj;
         metadataEquals(ExpResult1, isoResult);
+
+        /*
+         *  TEST 2 : we add the metadata urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd (DC Record)
+         */
+        RecordType ExpResult2 = ((JAXBElement<RecordType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta8.xml"))).getValue();
+
+        insert  = new InsertType(ExpResult2);
+        request = new TransactionType("CSW", "2.0.2", insert);
+        result  = worker.transaction(request);
+
+        assertEquals(result.getTransactionSummary().getTotalInserted(), 1);
+
+
+        // then we must be sure that the metadata is present
+        requestGRBI = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", Arrays.asList("urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd"));
+        GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
+
+        assertTrue(GRresult != null);
+        assertTrue(GRresult.getAbstractRecord().size() == 1);
+        assertTrue(GRresult.getAny().size() == 0);
+        obj = GRresult.getAbstractRecord().get(0);
+        assertTrue(obj instanceof RecordType);
+
+        RecordType dcResult =  (RecordType) obj;
+        assertEquals(ExpResult2, dcResult);
         pool.release(unmarshaller);
     }
 
