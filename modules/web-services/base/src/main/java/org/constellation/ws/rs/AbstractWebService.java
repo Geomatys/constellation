@@ -26,46 +26,39 @@ import org.geotoolkit.xml.MarshallerPool;
  */
 public abstract class AbstractWebService extends WebService {
 
+    /**
+     * A flag indicating if the JAXBContext is properly build.
+     */
+    private boolean workingContext = false;
 
     /**
      * A pool of JAXB unmarshaller used to create Java objects from XML files.
      */
-    protected MarshallerPool marshallerPool;
+    private MarshallerPool marshallerPool;
 
     /**
      * The xsd schema location for exception report.
      */
-    protected String exceptionSchemaLocation = null;
+    private String exceptionSchemaLocation = null;
 
     /**
      * The xsd schema location for all the returned xml.
      */
-    protected String schemaLocation = null;
+    private String schemaLocation = null;
 
     /**
      * {@inheritDoc }
      */
     @Override
-    protected MarshallerPool getMarshallerPool() {
+    protected synchronized MarshallerPool getMarshallerPool() {
         return marshallerPool;
     }
 
     /**
-     * Initialize the JAXB context and build the unmarshaller/marshaller
-     *
-     * @param packagesName A list of package containing JAXB annoted classes.
-     * @param rootNamespace The main namespace for all the document.
-     * @param schemaLocation The main xsd schema location for all the returned xml.
-     * @param exceptionSchemaLocation The xsd schema location for exception report.
-     *
-     * @throws JAXBException
+     *  A flag indicating if the JAXBContext is properly build.
      */
-    protected void setXMLContext(final String packagesName, final String rootNamespace, final String schemaLocation, final String exceptionSchemaLocation) throws JAXBException {
-        LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
-                    " packages: " + packagesName);
-        this.exceptionSchemaLocation = exceptionSchemaLocation;
-        this.schemaLocation          = schemaLocation;
-        marshallerPool               = new AnchoredMarshallerPool(rootNamespace, packagesName, schemaLocation);
+    protected synchronized boolean isJaxBContextValid(){
+        return workingContext;
     }
 
     /**
@@ -76,7 +69,7 @@ public abstract class AbstractWebService extends WebService {
      *
      * @throws JAXBException
      */
-    protected void setXMLContext(final String packagesName, final String rootNamespace) throws JAXBException {
+    protected synchronized void setXMLContext(final String packagesName, final String rootNamespace) throws JAXBException {
         setXMLContext(packagesName, rootNamespace, schemaLocation, exceptionSchemaLocation);
     }
 
@@ -84,31 +77,60 @@ public abstract class AbstractWebService extends WebService {
      * Initialize the JAXB context and build the unmarshaller/marshaller
      *
      * @param classesName A list of JAXB annoted classes.
-     * @param schemaLocation The main xsd schema location for all the returned xml.
-     * @param exceptionSchemaLocation The xsd schema location for exception report.
      * @param rootNamespace The main namespace for all the document.
      *
      * @throws JAXBException
      */
-    protected void setXMLContext(final String rootNamespace, final String schemaLocation, final String exceptionSchemaLocation, final Class<?>... classes) throws JAXBException {
-        LOGGER.finer("SETTING XML CONTEXT: classes version");
+    protected synchronized void setXMLContext(final String rootNamespace, final Class<?>... classes) throws JAXBException {
+        setXMLContext(rootNamespace, null, null, classes);
+    }
+
+    /**
+     * Initialize the JAXB context and build the unmarshaller/marshaller
+     *
+     * @param packagesName A list of package containing JAXB annoted classes.
+     * @param rootNamespace The main namespace for all the document.
+     * @param schemaLocation The main xsd schema location for all the returned xml.
+     * @param exceptionSchemaLocation The xsd schema location for exception report.
+     *
+     * @throws JAXBException
+     */
+    protected synchronized void setXMLContext(final String packagesName, final String rootNamespace, final String schemaLocation, final String exceptionSchemaLocation) throws JAXBException {
+        LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
+                    " packages: " + packagesName);
         this.exceptionSchemaLocation = exceptionSchemaLocation;
-        this.schemaLocation          = schemaLocation;
-        marshallerPool = new AnchoredMarshallerPool(rootNamespace, schemaLocation, classes);
+        this.schemaLocation = schemaLocation;
+        try{
+            marshallerPool = new AnchoredMarshallerPool(rootNamespace, packagesName, schemaLocation);
+            workingContext = true;
+        }catch(JAXBException ex){
+            workingContext = false;
+            throw ex;
+        }
     }
 
     /**
      * Initialize the JAXB context and build the unmarshaller/marshaller
      *
      * @param classesName A list of JAXB annoted classes.
+     * @param schemaLocation The main xsd schema location for all the returned xml.
+     * @param exceptionSchemaLocation The xsd schema location for exception report.
      * @param rootNamespace The main namespace for all the document.
      *
      * @throws JAXBException
      */
-    protected void setXMLContext(final String rootNamespace, final Class<?>... classes) throws JAXBException {
+    protected synchronized void setXMLContext(final String rootNamespace, final String schemaLocation, final String exceptionSchemaLocation, final Class<?>... classes) throws JAXBException {
         LOGGER.finer("SETTING XML CONTEXT: classes version");
-        setXMLContext(rootNamespace, null, null, classes);
+        this.exceptionSchemaLocation = exceptionSchemaLocation;
+        this.schemaLocation = schemaLocation;
+        
+        try{
+            marshallerPool = new AnchoredMarshallerPool(rootNamespace, schemaLocation, classes);
+            workingContext = true;
+        }catch(JAXBException ex){
+            workingContext = false;
+            throw ex;
+        }
     }
-
 
 }

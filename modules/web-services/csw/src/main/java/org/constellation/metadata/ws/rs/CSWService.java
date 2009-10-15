@@ -109,7 +109,7 @@ public class CSWService extends OGCWebService {
         this.serviceID = serviceID;
         try {
             setXMLContext("", CSWClassesContext.getAllClasses());
-            worker = new CSWworker(serviceID, marshallerPool);
+            worker = new CSWworker(serviceID, getMarshallerPool());
 
         } catch (JAXBException ex){
             LOGGER.severe("The CSW service is not running."       + '\n' +
@@ -134,7 +134,7 @@ public class CSWService extends OGCWebService {
         Marshaller marshaller = null;
         ServiceDef serviceDef = null;
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            marshaller = getMarshallerPool().acquireMarshaller();
 
             if (worker != null) {
             
@@ -303,7 +303,7 @@ public class CSWService extends OGCWebService {
 
         } finally {
             if (marshaller != null) {
-                marshallerPool.release(marshaller);
+                getMarshallerPool().release(marshaller);
             }
         }
     }
@@ -328,7 +328,7 @@ public class CSWService extends OGCWebService {
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
-        if (workingContext) {
+        if (isJaxBContextValid()) {
             if (serviceDef == null) {
                 serviceDef = getBestVersion(null);
             }

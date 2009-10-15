@@ -23,20 +23,17 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-
-// Constellation dependencies
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
+// Constellation dependencies
 import org.constellation.ServiceDef;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.CstlServiceException;
 
 // Geotools dependencies
@@ -46,6 +43,7 @@ import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.Version;
+import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
 import static org.constellation.ws.ExceptionCode.*;
 
@@ -78,17 +76,14 @@ public abstract class OGCWebService extends AbstractWebService {
 	
     /**
      * The supported supportedVersions supported by this web serviceType.
+     * avoid modification after instanciation.
      */
-    private final List<ServiceDef> supportedVersions = new ArrayList<ServiceDef>();
+    private final UnmodifiableArrayList<ServiceDef> supportedVersions;
     /**
      * The version of the WMS specification for this request.
      */
     @Deprecated
     private ServiceDef actingVersion;
-    /**
-     * The version of the SLD profile for the WMS web serviceType. fixed a 1.1.0 for now.
-     */
-    private final ServiceVersion sldVersion = new ServiceVersion(ServiceType.WMS, "1.1.0");
     /**
      * The name of the serviceType (WMS, WCS,...)
      */
@@ -96,13 +91,13 @@ public abstract class OGCWebService extends AbstractWebService {
     /**
      * A map containing the Capabilities Object already load from file.
      */
-    private Map<String,Object> capabilities = new HashMap<String,Object>();
+    private final Map<String,Object> capabilities = new HashMap<String,Object>();
     /**
      * The time of the last update of the cached capabilities map, represented
      * as the number of milliseconds since the Unix Epoch (i.e. useful as a
      * parameter to the Date constructor).
      */
-    private long lastUpdateTime;
+    private long lastUpdateTime = 0;
     
     
     /**
@@ -113,62 +108,24 @@ public abstract class OGCWebService extends AbstractWebService {
      *                          The first version specified <strong>MUST</strong> be the highest
      *                          one, the best one.
      */
-    public OGCWebService(ServiceDef... supportedVersions) {
+    public OGCWebService(final ServiceDef... supportedVersions) {
         super();
 
-        for (final ServiceDef element : supportedVersions) {
-            this.supportedVersions.add(element);
-        }
-        if (this.supportedVersions.size() == 0) {
+        if(supportedVersions == null || supportedVersions.length == 0 || 
+                (supportedVersions.length == 1 && supportedVersions[0] == null)){
             throw new IllegalArgumentException("It is compulsory for a web service to have " +
                     "at least one version specified.");
         }
+        
+        //guarantee it will not be modified
+        this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
+
         final ServiceDef firstDef = this.supportedVersions.get(0);
         this.serviceType = firstDef.specification.toString();
         // We set that the current version is probably the highest one, the best one, which should
         // be the first in the list of supported version.
         this.actingVersion = firstDef;
     }
-
-    /**
-     * Verify the base parameter or each request.
-     *
-     * @param sld case 0: no sld.
-     *            case 1: VERSION parameter for WMS version and SLD_VERSION for sld version.
-     *            case 2: VERSION parameter for sld version.
-     *
-     * @throws org.constellation.coverage.web.CstlServiceException
-     */
-//    protected void verifyBaseParameter(int sld) throws CstlServiceException {
-//        if (sld == 2) {
-//            if (!getParameter("VERSION", true).equals(sldVersion.toString())) {
-//                throw new CstlServiceException("The parameter VERSION=" + sldVersion + " must be specified",
-//                               MISSING_PARAMETER_VALUE);
-//            } else {
-//                return;
-//            }
-//        }
-//        // if the version is not accepted we send an exception
-//        String inputVersion = getParameter("VERSION", true);
-//        if (getVersionFromNumber(inputVersion) == null) {
-//
-//            String message = "The parameter ";
-//            for (ServiceDef vers : supportedVersions) {
-//                message += "VERSION=" + vers.version.toString() + " OR ";
-//            }
-//            message = message.substring(0, message.length()-3);
-//            message += " must be specified";
-//            throw new CstlServiceException(message, VERSION_NEGOTIATION_FAILED);
-//        } else {
-//            setActingVersion(inputVersion);
-//        }
-//        if (sld == 1) {
-//            if (!getParameter("SLD_VERSION", true).equals(sldVersion.toString())) {
-//                throw new CstlServiceException("The parameter SLD_VERSION=" + sldVersion + " must be specified",
-//                               VERSION_NEGOTIATION_FAILED);
-//            }
-//        }
-//    }
 
     /**
      * Verify if the version is supported by this serviceType.
@@ -182,9 +139,9 @@ public abstract class OGCWebService extends AbstractWebService {
             for (ServiceDef vers : supportedVersions) {
                 messageb.append("VERSION=").append(vers.version.toString()).append(" OR ");
             }
-            String message = messageb.substring(0, messageb.length()-3);
-            message += " must be specified";
-            throw new CstlServiceException(message, VERSION_NEGOTIATION_FAILED);
+            messageb.delete(messageb.length()-4, messageb.length()-1);
+            messageb.append(" must be specified");
+            throw new CstlServiceException(messageb.toString(), VERSION_NEGOTIATION_FAILED);
         }
     }
 
@@ -202,13 +159,6 @@ public abstract class OGCWebService extends AbstractWebService {
     @Deprecated
     protected void setActingVersion(String versionNumber) {
         actingVersion = getVersionFromNumber(versionNumber);
-    }
-
-    /**
-     * Return the SLD version.
-     */
-    protected ServiceVersion getSldVersion() {
-        return this.sldVersion;
     }
 
     /**
@@ -243,7 +193,7 @@ public abstract class OGCWebService extends AbstractWebService {
     protected Response launchException(final String message, String codeName, final String locator) throws JAXBException {
         Marshaller marshaller = null;
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            marshaller = getMarshallerPool().acquireMarshaller();
 
             if (isOWS(actingVersion)) {
                 codeName = codeName.replace("_", "");
@@ -254,7 +204,7 @@ public abstract class OGCWebService extends AbstractWebService {
             return processExceptionResponse(ex, marshaller, supportedVersions.get(0));
         } finally {
             if (marshaller != null) {
-                marshallerPool.release(marshaller);
+                getMarshallerPool().release(marshaller);
             }
         }
     }
@@ -273,9 +223,13 @@ public abstract class OGCWebService extends AbstractWebService {
      * Returns the file where to read the capabilities document for each serviceType.
      * If no such file is found, then this method returns {@code null}.
      *
+     * TODO the data providers should send events when data changes, which should result
+     * in a capability update. the capabilities should not be updated only with the presence
+     * of a "change.properties" file.
+     *
      * @return The capabilities Object, or {@code null} if none.
      */
-    public Object getStaticCapabilitiesObject(final Version version) throws JAXBException {
+    private Object getStaticCapabilitiesObject(final Version version) throws JAXBException {
         final String fileName = this.serviceType + "Capabilities" + version.toString() + ".xml";
         final File changeFile = getFile("change.properties");
         final Properties p    = new Properties();
@@ -307,7 +261,7 @@ public abstract class OGCWebService extends AbstractWebService {
            final File f = getFile(fileName);
            Unmarshaller unmarshaller = null;
            try {
-               unmarshaller = marshallerPool.acquireUnmarshaller();
+               unmarshaller = getMarshallerPool().acquireUnmarshaller();
                if (f == null || !f.exists()) {
                    final InputStream in = getClass().getResourceAsStream(fileName);
                    response = unmarshaller.unmarshal(in);
@@ -319,12 +273,12 @@ public abstract class OGCWebService extends AbstractWebService {
                LOGGER.info("Unable to close the skeleton capabilities input stream.");
            } finally {
                if (unmarshaller != null) {
-                   marshallerPool.release(unmarshaller);
+                   getMarshallerPool().release(unmarshaller);
                }
            }
            if (response != null) {
                capabilities.put(fileName, response);
-               this.setLastUpdateTIme(System.currentTimeMillis());
+               lastUpdateTime = System.currentTimeMillis();
                p.put("update", "false");
            }
 
@@ -427,12 +381,4 @@ public abstract class OGCWebService extends AbstractWebService {
         return lastUpdateTime;
     }
 
-    /**
-     * set the last time that the capabilities have been updated (not yet really used)
-     *
-     * @param lastUpdateSequence A Date.
-     */
-    public void setLastUpdateTIme(long lastUpdateTime) {
-        this.lastUpdateTime = lastUpdateTime;
-    }
 }

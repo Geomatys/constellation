@@ -854,18 +854,18 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
     //TODO: harmonize with the method getLayerReference().
     private static List<LayerDetails> getAllLayerReferences(final String version) throws CstlServiceException {
 
-    	List<LayerDetails> layerRefs;
-    	try { // WE catch the exception from either service version
-	        if (  version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ) {
-	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD );
-	        } else if ( version.equals(ServiceDef.WMS_1_3_0_SLD.version.toString()) ) {
-	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_3_0_SLD );
-	        } else {
-	        	throw new CstlServiceException("WMS acting according to no known version.",
+        List<LayerDetails> layerRefs;
+        try { // WE catch the exception from either service version
+            if (version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
+                layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_1_1_SLD);
+            } else if (version.equals(ServiceDef.WMS_1_3_0_SLD.version.toString())) {
+                layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_3_0_SLD);
+            } else {
+                throw new CstlServiceException("WMS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);
-	        }
-        } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
+            }
+        } catch (RegisterException regex) {
+            throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
         }
         return layerRefs;
     }
@@ -873,21 +873,19 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
     private static List<LayerDetails> getLayerReferences(final List<String> layerNames, final String version)
-                                                                           throws CstlServiceException
-    {
-
-    	List<LayerDetails> layerRefs;
-    	try { // WE catch the exception from either service version
-	        if (  version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ) {
-	        	layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_1_1_SLD, layerNames );
-	        } else if ( version.equals(ServiceDef.WMS_1_3_0_SLD.version.toString()) ) {
-	        	layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_3_0_SLD, layerNames );
-	        } else {
-	        	throw new CstlServiceException("WMS acting according to no known version.",
+            throws CstlServiceException {
+        List<LayerDetails> layerRefs;
+        try { // WE catch the exception from either service version
+            if (version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
+                layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_1_1_SLD, layerNames);
+            } else if (version.equals(ServiceDef.WMS_1_3_0_SLD.version.toString())) {
+                layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_3_0_SLD, layerNames);
+            } else {
+                throw new CstlServiceException("WMS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);
-	        }
-        } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
+            }
+        } catch (RegisterException regex) {
+            throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
         }
         return layerRefs;
     }
@@ -895,20 +893,20 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
     public static LayerDetails getLayerReference(final String layerName, final String version)
-                                                             throws CstlServiceException {
+            throws CstlServiceException {
 
         LayerDetails layerRef;
-    	try { // WE catch the exception from either service version
-	        if (  version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ) {
-	        	layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_1_1_SLD, layerName );
-	        } else if ( version.equals(ServiceDef.WMS_1_3_0_SLD.version.toString()) ) {
-	        	layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_3_0_SLD, layerName );
-	        } else {
-	        	throw new CstlServiceException("WMS acting according to no known version.",
+        try { // WE catch the exception from either service version
+            if (version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
+                layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_1_1_SLD, layerName);
+            } else if (version.equals(ServiceDef.WMS_1_3_0_SLD.version.toString())) {
+                layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_3_0_SLD, layerName);
+            } else {
+                throw new CstlServiceException("WMS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED);
-	        }
-        } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
+            }
+        } catch (RegisterException regex) {
+            throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
         }
         return layerRef;
     }

@@ -80,7 +80,7 @@ public class SOService extends OGCWebService {
         Marshaller marshaller = null;
         ServiceDef serviceDef = null;
         try {
-             marshaller = marshallerPool.acquireMarshaller();
+             marshaller = getMarshallerPool().acquireMarshaller();
              worker.setServiceURL(getServiceURL());
              logParameters();
              String request = "";
@@ -200,7 +200,7 @@ public class SOService extends OGCWebService {
 
         } finally {
             if (marshaller != null) {
-                marshallerPool.release(marshaller);
+                getMarshallerPool().release(marshaller);
             }
         }
     }
@@ -224,7 +224,7 @@ public class SOService extends OGCWebService {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
 
-        if (workingContext) {
+        if (isJaxBContextValid()) {
             if (serviceDef == null) {
                 serviceDef = getBestVersion(null);
             }

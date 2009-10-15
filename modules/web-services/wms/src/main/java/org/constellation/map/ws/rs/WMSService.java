@@ -34,18 +34,19 @@ import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 //Constellation dependencies
 import org.constellation.ServiceDef;
-import org.constellation.map.ws.AbstractWMSWorker;
 import org.constellation.map.ws.DefaultWMSWorker;
+import org.constellation.map.ws.QueryContext;
+import org.constellation.map.ws.WMSWorker;
 import org.constellation.query.QueryAdapter;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetMap;
@@ -100,17 +101,7 @@ public class WMSService extends OGCWebService {
     /**
      * The worker which will perform the core logic for this service.
      */
-    private final AbstractWMSWorker worker;
-
-    /**
-     * Defines whether the exceptions should be stored and output in an image or not.
-     */
-    private boolean errorInimage = false;
-
-    /**
-     * Defines the image format for the exeception in image.
-     */
-    private String exceptionImageFormat = MimeType.IMAGE_PNG;
+    private final WMSWorker worker;
 
     /**
      * Build a new instance of the webService and initialize the JAXB marshaller.
@@ -125,7 +116,7 @@ public class WMSService extends OGCWebService {
                       "org.geotoolkit.sld.xml.v110",
                       "");
 
-        worker = new DefaultWMSWorker(marshallerPool);
+        worker = new DefaultWMSWorker(getMarshallerPool());
         setFullRequestLog(true);
         LOGGER.info("WMS service running");
     }
@@ -149,10 +140,13 @@ public class WMSService extends OGCWebService {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+        final UriInfo uriContext = getUriContext();
+        final QueryContext queryContext = new QueryContext();
+
         Marshaller marshaller = null;
         ServiceDef version = null;
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            marshaller = getMarshallerPool().acquireMarshaller();
             final String request = (String) getParameter(KEY_REQUEST, true);
             logParameters();
 
@@ -161,7 +155,7 @@ public class WMSService extends OGCWebService {
                 final String versionSt = getParameter(KEY_VERSION, true);
                 isVersionSupported(versionSt);
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
-                final GetMap requestMap = adaptGetMap(versionSt, true);
+                final GetMap requestMap = adaptGetMap(versionSt, true, queryContext);
                 version = getVersionFromNumber(requestMap.getVersion().toString());
                 final BufferedImage map = worker.getMap(requestMap);
                 return Response.ok(map, requestMap.getFormat()).build();
@@ -170,7 +164,7 @@ public class WMSService extends OGCWebService {
                 final String versionSt = getParameter(KEY_VERSION, true);
                 isVersionSupported(versionSt);
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
-                final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo(versionSt);
+                final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo(versionSt, queryContext);
                 version = getVersionFromNumber(requestFeatureInfo.getVersion().toString());
                 final String result = worker.getFeatureInfo(requestFeatureInfo);
                 //Need to reset the GML mime format to XML for browsers
@@ -203,7 +197,7 @@ public class WMSService extends OGCWebService {
                 if (version == null) {
                     version = getVersionFromNumber(requestCapab.getVersion().toString());
                 }
-                worker.initServletContext(servletContext);
+                worker.initServletContext(getServletContext());
                 worker.initUriContext(uriContext);
                 final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
                 //workaround because 1.1.1 is defined with a DTD rather than an XSD
@@ -246,27 +240,37 @@ public class WMSService extends OGCWebService {
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                            OPERATION_NOT_SUPPORTED, "request");
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, marshaller, version);
+            return processExceptionResponse(queryContext, ex, marshaller, version);
         } finally {
             if (marshaller != null) {
-                marshallerPool.release(marshaller);
+                getMarshallerPool().release(marshaller);
             }
         }
 
     }
 
     /**
+     * Generate an error response in image if query asks it.
+     * Otherwise this call will fallback on normal xml error.
+     */
+    private Response processExceptionResponse(final QueryContext queryContext, final CstlServiceException ex, final Marshaller marshaller,
+                                                ServiceDef serviceDef) throws JAXBException {
+        if(queryContext.isErrorInimage()) {
+            final BufferedImage image = DefaultPortrayalService.writeException(ex, new Dimension(600, 400));
+            return Response.ok(image, queryContext.getExceptionImageFormat()).build();
+        }else{
+            return processExceptionResponse(ex, marshaller, serviceDef);
+        }
+    }
+
+
+    /**
      * {@inheritDoc}
      */
     @Override
     protected Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
-                                                ServiceDef serviceDef) throws JAXBException
-    {
-        if (errorInimage) {
-            final BufferedImage image = DefaultPortrayalService.writeException(ex, new Dimension(600, 400));
-            errorInimage = false;
-            return Response.ok(image, exceptionImageFormat).build();
-        }
+                                                ServiceDef serviceDef) throws JAXBException{
+
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
@@ -379,8 +383,8 @@ public class WMSService extends OGCWebService {
      * @return A GetFeatureInfo request.
      * @throws CstlServiceException
      */
-    private GetFeatureInfo adaptGetFeatureInfo(final String version) throws CstlServiceException, NumberFormatException {
-        final GetMap getMap  = adaptGetMap(version, false);
+    private GetFeatureInfo adaptGetFeatureInfo(final String version, final QueryContext queryContext) throws CstlServiceException, NumberFormatException {
+        final GetMap getMap  = adaptGetMap(version, false, queryContext);
         ServiceDef serviceDef = getVersionFromNumber(version);
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
@@ -458,10 +462,10 @@ public class WMSService extends OGCWebService {
      * @return The GetMap request.
      * @throws CstlServiceException
      */
-    private GetMap adaptGetMap(final String version, final boolean fromGetMap) throws CstlServiceException {
+    private GetMap adaptGetMap(final String version, final boolean fromGetMap, final QueryContext queryContext) throws CstlServiceException {
         final String strExceptions   = getParameter(KEY_EXCEPTIONS,     false);
         if (strExceptions != null && strExceptions.equalsIgnoreCase(MimeType.APP_INIMAGE)) {
-            errorInimage = true;
+            queryContext.setErrorInimage(true);
         }
         final String strFormat       = getParameter(KEY_FORMAT,    fromGetMap);
         if (strFormat != null && !strFormat.isEmpty()) {
@@ -473,7 +477,7 @@ public class WMSService extends OGCWebService {
                 strFormat.equalsIgnoreCase(MimeType.IMAGE_PNG) ||
                 strFormat.equalsIgnoreCase(MimeType.IMAGE_TIFF))
             {
-                exceptionImageFormat = strFormat;
+                queryContext.setExceptionImageFormat(strFormat);
             }
         }
 

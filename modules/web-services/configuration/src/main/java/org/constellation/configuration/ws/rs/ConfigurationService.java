@@ -118,7 +118,6 @@ public class ConfigurationService extends AbstractWebService  {
             cswConfigurer      = configurerfactory.getCSWConfigurer(cn);
             cswFunctionEnabled = true;
         } catch (JAXBException ex) {
-            workingContext = false;
             LOGGER.severe("JAXBException while setting the JAXB context for configuration service:" + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             cswFunctionEnabled = false;
@@ -139,7 +138,7 @@ public class ConfigurationService extends AbstractWebService  {
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         Marshaller marshaller = null;
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            marshaller = getMarshallerPool().acquireMarshaller();
             String request  = "";
             final StringWriter sw = new StringWriter();
 
@@ -287,7 +286,7 @@ public class ConfigurationService extends AbstractWebService  {
             
         } finally {
             if (marshaller != null) {
-                marshallerPool.release(marshaller);
+                getMarshallerPool().release(marshaller);
             }
         }
         
@@ -323,7 +322,7 @@ public class ConfigurationService extends AbstractWebService  {
     protected Response launchException(final String message, final String codeName, final String locator) throws JAXBException {
         Marshaller marshaller = null;
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            marshaller = getMarshallerPool().acquireMarshaller();
 
             final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
             final ExceptionReport report = new ExceptionReport(message, code.name(), locator,
@@ -334,7 +333,7 @@ public class ConfigurationService extends AbstractWebService  {
             
         } finally {
             if (marshaller != null) {
-                marshallerPool.release(marshaller);
+                getMarshallerPool().release(marshaller);
             }
         }
     }
@@ -477,14 +476,14 @@ public class ConfigurationService extends AbstractWebService  {
 
         Marshaller marshaller = null;
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            marshaller = getMarshallerPool().acquireMarshaller();
             marshaller.marshal(newContent, configFile);
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXBException while trying to store the properties files.",
                                           NO_APPLICABLE_CODE);
         } finally {
             if (marshaller != null) {
-                marshallerPool.release(marshaller);
+                getMarshallerPool().release(marshaller);
             }
         }
 

@@ -62,6 +62,7 @@ import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -149,7 +150,7 @@ public class WCSService extends OGCWebService {
                       "org.geotoolkit.gml.xml.v311",
                       "");
 
-        worker = new WCSWorker(marshallerPool);
+        worker = new WCSWorker(getMarshallerPool());
         LOGGER.info("WCS service running");
     }
 
@@ -165,12 +166,13 @@ public class WCSService extends OGCWebService {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+        final UriInfo uriContext = getUriContext();
 
         Marshaller marshaller = null;
         ServiceDef serviceDef = null;
         try {
 
-            marshaller = marshallerPool.acquireMarshaller();
+            marshaller = getMarshallerPool().acquireMarshaller();
         	// Handle an empty request by sending a basic web page.
         	if (  ( null == objectRequest )  &&  ( 0 == uriContext.getQueryParameters().size() )  ) {
         		return Response.ok(getIndexPage(), MimeType.TEXT_HTML).build();
@@ -198,7 +200,7 @@ public class WCSService extends OGCWebService {
                 }
                 serviceDef = getVersionFromNumber(getcaps.getVersion().toString());
                 //TODO: is this necessary?
-                worker.internalInitServletContext(servletContext);
+                worker.internalInitServletContext(getServletContext());
                 worker.internalInitUriContext(uriContext);
                 
                 final GetCapabilitiesResponse capsResponse = worker.getCapabilities(getcaps);
@@ -291,7 +293,7 @@ public class WCSService extends OGCWebService {
             
         } finally {
             if (marshaller != null) {
-                marshallerPool.release(marshaller);
+                getMarshallerPool().release(marshaller);
             }
         }
     }
@@ -703,7 +705,7 @@ public class WCSService extends OGCWebService {
     		"      In order to access this service, you must form a valid request.\n" +
     		"    </p\n" + 
     		"    <p>\n" +
-    		"      Try using a <a href=\"" + uriContext.getBaseUri() + "wcs" 
+    		"      Try using a <a href=\"" + getUriContext().getBaseUri() + "wcs"
     		                             + "?service=WCS&version=1.0.0&request=GetCapabilities&version=1.0.0\""
     		                             + ">Get Capabilities</a> request to obtain the 'Capabilities'<br>\n" +
     		"      document which describes the resources available on this server.\n" +

@@ -84,7 +84,6 @@ public class WMTSService extends OGCWebService {
             worker = new WMTSWorker();
 
         } catch (JAXBException ex){
-            workingContext = false;
             LOGGER.severe("The WMTS service is not running."       + '\n' +
                           " cause  : Error creating XML context." + '\n' +
                           " error  : " + ex.getMessage()          + '\n' +
@@ -111,7 +110,7 @@ public class WMTSService extends OGCWebService {
                 throw new CstlServiceException(NOT_WORKING,
                                               NO_APPLICABLE_CODE);
             }
-            marshaller = marshallerPool.acquireMarshaller();
+            marshaller = getMarshallerPool().acquireMarshaller();
             logParameters();
             String request = "";
 
@@ -175,7 +174,7 @@ public class WMTSService extends OGCWebService {
             return processExceptionResponse(ex, marshaller, serviceDef);
         } finally {
             if (marshaller != null) {
-                marshallerPool.release(marshaller);
+                getMarshallerPool().release(marshaller);
             }
         }
     }
@@ -354,7 +353,7 @@ public class WMTSService extends OGCWebService {
         Marshaller marshaller = null;
         ServiceDef serviceDef = null;
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            marshaller = getMarshallerPool().acquireMarshaller();
             if (worker == null) {
                 throw new CstlServiceException(NOT_WORKING,
                                               NO_APPLICABLE_CODE);
@@ -370,7 +369,7 @@ public class WMTSService extends OGCWebService {
 
         } finally {
             if (marshaller != null) {
-                marshallerPool.release(marshaller);
+                getMarshallerPool().release(marshaller);
             }
         }
     }
@@ -415,11 +414,11 @@ public class WMTSService extends OGCWebService {
         } catch (CstlServiceException ex) {
             Marshaller marshaller = null;
             try {
-                marshaller = marshallerPool.acquireMarshaller();
+                marshaller = getMarshallerPool().acquireMarshaller();
                 return processExceptionResponse(ex, marshaller, null);
             } finally {
                 if (marshaller != null) {
-                    marshallerPool.release(marshaller);
+                    getMarshallerPool().release(marshaller);
                 }
             }
         }
@@ -458,7 +457,7 @@ public class WMTSService extends OGCWebService {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
 
-        if (workingContext) {
+        if (isJaxBContextValid()) {
             if (serviceDef == null) {
                 serviceDef = getBestVersion(null);
             }

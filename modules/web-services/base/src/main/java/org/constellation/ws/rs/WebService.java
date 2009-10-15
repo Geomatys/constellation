@@ -21,9 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +28,9 @@ import javax.servlet.ServletContext;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
@@ -51,8 +51,8 @@ import javax.xml.bind.UnmarshalException;
 
 // Constellation dependencies
 import org.constellation.ws.CstlServiceException;
-
 import org.constellation.ws.MimeType;
+
 import org.geotoolkit.util.Versioned;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.ws.ExceptionCode.*;
@@ -141,40 +141,34 @@ public abstract class WebService {
     }
 
     /**
+     * Automaticly set by Jersey.
+     *
      * Provides access to the URI used in the method call, for instance, to
      * obtain the Key-Value Pairs in the request. The field is injected, thanks
      * to the annotation, when a request arrives.
      */
     @Context
-    protected UriInfo uriContext;
+    private volatile UriInfo uriContext;
 
     /**
+     * Automaticly set by Jersey.
+     * 
      * Used to communicate with the servlet container, for example, to obtain
      * the MIME type of a file, to dispatch requests or to write to a log file.
      * The field is injected, thanks to the annotation, when a request arrives.
      */
     @Context
-    protected ServletContext servletContext;
+    private volatile ServletContext servletContext;
 
     /**
+     * Automaticly set by Jersey.
+     * 
      * The HTTP context used to get information about the client which sent the
      * request. The field is injected, thanks to the annotation, when a request
      * arrives.
      */
     @Context
-    protected HttpContext httpContext;
-
-    /**
-     * A cached copy of the web service URL, something like:
-     *   http://localhost:8080/constellation/WS
-     */
-    private String serviceURL;
-
-
-    /**
-     * A flag indicating if the JAXBContext is properly build.
-     */
-    protected boolean workingContext = true;
+    private volatile HttpContext httpContext;
 
     /**
      * If this flag is set the method logParameters() will path the entire request in the logs
@@ -186,9 +180,19 @@ public abstract class WebService {
      * Initialize the basic attribute of a web service.
      */
     public WebService() {
-        serviceURL = null;
     }
 
+    protected final UriInfo getUriContext(){
+        return uriContext;
+    }
+
+    protected final ServletContext getServletContext(){
+        return servletContext;
+    }
+
+    protected final HttpContext getHttpContext(){
+        return httpContext;
+    }
 
     /**
      * Treat the incoming request and call the right function.
@@ -253,7 +257,7 @@ public abstract class WebService {
             final String paramName  = token.substring(0, token.indexOf('='));
             final String paramValue = token.substring(token.indexOf('=')+ 1);
             log.append("put: ").append(paramName).append("=").append(paramValue).append('\n');
-            uriContext.getQueryParameters().add(paramName, paramValue);
+            getUriContext().getQueryParameters().add(paramName, paramValue);
         }
         LOGGER.info("request POST kvp: " + request + '\n' + log.toString());
         return treatIncomingRequest(null);
@@ -296,7 +300,7 @@ public abstract class WebService {
             if (request instanceof Versioned) {
                 final Versioned ar = (Versioned) request;
                 if (ar.getVersion() != null)
-                    uriContext.getQueryParameters().add("VERSION", ar.getVersion().toString());
+                    getUriContext().getQueryParameters().add("VERSION", ar.getVersion().toString());
             } if (request != null) {
                 String type = "";
                 if (request instanceof JAXBElement) {
@@ -329,7 +333,6 @@ public abstract class WebService {
         		       "MIME type.", INVALID_REQUEST.name(), null);
     }
 
-
     /**
      * Extracts the value, for a parameter specified, from a query.
      * If it is a mandatory one, and if it is {@code null}, it throws an exception.
@@ -342,30 +345,29 @@ public abstract class WebService {
      * @throw CstlServiceException
      */
     protected String getParameter(final String parameterName, final boolean mandatory)
-                                                           throws CstlServiceException
-    {
+                                                           throws CstlServiceException{
+
         final MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
-        final Set<String> keySet = parameters.keySet();
-        final Iterator<String> it = keySet.iterator();
+        List<String> values = parameters.get(parameterName);
 
-        boolean notFound = true;
-        String s = null;
-
-        while (notFound && it.hasNext()) {
-            s = it.next();
-            if (parameterName.equalsIgnoreCase(s)) {
-                notFound = false;
-                break;
+        //maybe the parameterName is case sensitive.
+        if(values == null){
+            for(final String key : parameters.keySet()){
+                if(key.equalsIgnoreCase(parameterName)){
+                    values = parameters.get(key);
+                    break;
+                }
             }
         }
-        if (notFound) {
-            if (mandatory) {
+
+        if(values == null){
+            if(mandatory){
                 throw new CstlServiceException("The parameter " + parameterName + " must be specified",
                         MISSING_PARAMETER_VALUE, parameterName.toLowerCase());
             }
             return null;
-        } else {
-            final String value = (String) ((LinkedList<String>) parameters.get(s)).get(0);
+        }else{
+            final String value = values.get(0);
             if ((value == null || value.equals("")) && mandatory) {
                 /* For the STYLE/STYLES parameters, they are mandatory in the GetMap request.
                  * Nevertheless we do not know what to put in for raster, that's why for these
@@ -391,16 +393,15 @@ public abstract class WebService {
     /**
      * Extract all The parameters from the query and write it in the console.
      * It is a debug method.
-     *
      */
-    protected void logParameters() throws CstlServiceException {
-        final MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
+    protected void logParameters() throws CstlServiceException {        
         if (!fullRequestLog) {
+            final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
             if (!parameters.isEmpty())
                 LOGGER.info(parameters.toString());
         } else {
-            if (uriContext.getRequestUri() != null) {
-                LOGGER.info(uriContext.getRequestUri().toString());
+            if (getUriContext().getRequestUri() != null) {
+                LOGGER.info(getUriContext().getRequestUri().toString());
             }
         }
     }
@@ -424,17 +425,16 @@ public abstract class WebService {
         Unmarshaller unmarshaller = null;
         try {
             unmarshaller = marshallerPool.acquireUnmarshaller();
-            final MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
-            LinkedList<String> list = (LinkedList<String>) parameters.get(parameterName);
+            final MultivaluedMap<String,String> parameters = getUriContext().getQueryParameters();
+            List<String> list = parameters.get(parameterName);
             if (list == null) {
-                list = (LinkedList<String>) parameters.get(parameterName.toLowerCase());
+                list = parameters.get(parameterName.toLowerCase());
                 if (list == null) {
                     if (!mandatory) {
                         return null;
                     } else {
                         throw new CstlServiceException("The parameter " + parameterName + " must be specified",
                                        MISSING_PARAMETER_VALUE);
-
                     }
                 }
             }
@@ -464,7 +464,7 @@ public abstract class WebService {
          File path;
 
          //we try to get the deployed "WEB-INF" directory
-         final String home = servletContext.getRealPath("WEB-INF");
+         final String home = getServletContext().getRealPath("WEB-INF");
 
          if (home == null || !(path = new File(home)).isDirectory()) {
             path = getSicadeDirectory();
@@ -476,14 +476,12 @@ public abstract class WebService {
 
     /**
      * Return the service url obtain by the first request made.
+     * something like : http://localhost:8080/constellation/WS
      *
      * @return the service url.
      */
     protected String getServiceURL() {
-        if (serviceURL == null) {
-            serviceURL = uriContext.getBaseUri().toString();
-        }
-        return serviceURL;
+        return getUriContext().getBaseUri().toString();
     }
 
     public static File getConfigDirectory() {
@@ -515,8 +513,10 @@ public abstract class WebService {
      * Return the ".sicade" directory.
      *
      * @return The ".sicade" directory containing.
+     * @deprecated This directory should not be used
      */
-    public static File getSicadeDirectory() {
+    @Deprecated
+    public static final File getSicadeDirectory() {
         final File sicadeDirectory;
         final String home = System.getProperty("user.home");
 
@@ -569,14 +569,12 @@ public abstract class WebService {
      * @param context The context which to consider.
      */
     private static Object getContextProperty(final String key, final javax.naming.Context context) {
-        Object value = null;
         try {
-            value = context.lookup(key);
+            return context.lookup(key);
         } catch (NamingException n) {
             // Do nothing, the key is not found in the context and the value is still null.
         }
-
-        return value;
+        return null;
     }
 
     /**
