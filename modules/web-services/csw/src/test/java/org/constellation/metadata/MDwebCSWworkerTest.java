@@ -74,7 +74,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         if (ds != null) {
             ds.shutdown();
         }
-        //deleteDirectory(new File("CSWWorkerTest"));
+        deleteDirectory(new File("CSWWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();
