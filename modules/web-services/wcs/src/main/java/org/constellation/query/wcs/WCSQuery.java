@@ -19,7 +19,6 @@ package org.constellation.query.wcs;
 import org.constellation.query.DefaultQueryService;
 import org.constellation.query.Query;
 import org.constellation.query.QueryService;
-import org.geotoolkit.util.Version;
 
 
 /**
@@ -30,7 +29,7 @@ import org.geotoolkit.util.Version;
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-public abstract class WCSQuery implements Query {
+public interface WCSQuery extends Query {
 
     /**
      * WCS Query service
@@ -116,28 +115,4 @@ public abstract class WCSQuery implements Query {
     /** Format value used in getCoverage */
     public static final String TIFF       = "TIFF";
 
-    protected final Version version;
-
-    protected WCSQuery(final Version version) {
-        if (version == null) {
-            throw new NullPointerException("Version should not be null !");
-        }
-        this.version = version;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final QueryService getService() {
-        return WCS_SERVICE;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final Version getVersion() {
-        return version;
-    }
 }

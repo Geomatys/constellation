@@ -17,37 +17,6 @@
  */
 package org.constellation.coverage.ws.rs;
 
-import static org.constellation.query.Query.KEY_REQUEST;
-import static org.constellation.query.Query.KEY_SERVICE;
-import static org.constellation.query.Query.KEY_VERSION;
-import static org.constellation.query.wcs.WCSQuery.DESCRIBECOVERAGE;
-import static org.constellation.query.wcs.WCSQuery.GETCAPABILITIES;
-import static org.constellation.query.wcs.WCSQuery.GETCOVERAGE;
-import static org.constellation.query.wcs.WCSQuery.KEY_BBOX;
-import static org.constellation.query.wcs.WCSQuery.KEY_BOUNDINGBOX;
-import static org.constellation.query.wcs.WCSQuery.KEY_COVERAGE;
-import static org.constellation.query.wcs.WCSQuery.KEY_CRS;
-import static org.constellation.query.wcs.WCSQuery.KEY_DEPTH;
-import static org.constellation.query.wcs.WCSQuery.KEY_FORMAT;
-import static org.constellation.query.wcs.WCSQuery.KEY_GRIDBASECRS;
-import static org.constellation.query.wcs.WCSQuery.KEY_GRIDCS;
-import static org.constellation.query.wcs.WCSQuery.KEY_GRIDOFFSETS;
-import static org.constellation.query.wcs.WCSQuery.KEY_GRIDORIGIN;
-import static org.constellation.query.wcs.WCSQuery.KEY_GRIDTYPE;
-import static org.constellation.query.wcs.WCSQuery.KEY_HEIGHT;
-import static org.constellation.query.wcs.WCSQuery.KEY_IDENTIFIER;
-import static org.constellation.query.wcs.WCSQuery.KEY_INTERPOLATION;
-import static org.constellation.query.wcs.WCSQuery.KEY_RANGESUBSET;
-import static org.constellation.query.wcs.WCSQuery.KEY_RESPONSE_CRS;
-import static org.constellation.query.wcs.WCSQuery.KEY_RESX;
-import static org.constellation.query.wcs.WCSQuery.KEY_RESY;
-import static org.constellation.query.wcs.WCSQuery.KEY_RESZ;
-import static org.constellation.query.wcs.WCSQuery.KEY_SECTION;
-import static org.constellation.query.wcs.WCSQuery.KEY_TIME;
-import static org.constellation.query.wcs.WCSQuery.KEY_TIMESEQUENCE;
-import static org.constellation.query.wcs.WCSQuery.KEY_WIDTH;
-import static org.constellation.query.wcs.WCSQuery.MATRIX;
-
 // Jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
 
@@ -71,7 +40,6 @@ import javax.xml.bind.Marshaller;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.coverage.ws.WCSWorker;
-import org.constellation.query.wcs.WCSQuery;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
@@ -79,6 +47,7 @@ import org.constellation.ws.MimeType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.rs.OGCWebService;
+import static org.constellation.query.wcs.WCSQuery.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.v311.CodeType;
@@ -138,7 +107,6 @@ public class WCSService extends OGCWebService {
      * @throws JAXBException if the initialization of the {@link JAXBContext} fails.
      */
     public WCSService() throws JAXBException {
-
         super(ServiceDef.WCS_1_1_1, ServiceDef.WCS_1_0_0);
 
         setFullRequestLog(true);
@@ -185,7 +153,7 @@ public class WCSService extends OGCWebService {
 
             // if the request is not an xml request we fill the request parameter.
             if (objectRequest == null) {
-                request = (String) getParameter(KEY_REQUEST, true);
+                request = getParameter(KEY_REQUEST, true);
             }
 
             //TODO: fix logging of request, which may be in the objectRequest 
@@ -245,13 +213,13 @@ public class WCSService extends OGCWebService {
                 }
                 serviceDef = getVersionFromNumber(getcov.getVersion().toString());
                 String format = getcov.getFormat();
-                if (!format.equalsIgnoreCase(MimeType.IMAGE_BMP)  && !format.equalsIgnoreCase(WCSQuery.BMP)  &&
-                    !format.equalsIgnoreCase(MimeType.IMAGE_GIF)  && !format.equalsIgnoreCase(WCSQuery.GIF)  &&
-                    !format.equalsIgnoreCase(MimeType.IMAGE_JPEG) && !format.equalsIgnoreCase(WCSQuery.JPEG) &&
-                    !format.equalsIgnoreCase(WCSQuery.JPG)        && !format.equalsIgnoreCase(WCSQuery.TIF)  &&
-                    !format.equalsIgnoreCase(MimeType.IMAGE_TIFF) && !format.equalsIgnoreCase(WCSQuery.TIFF) &&
-                    !format.equalsIgnoreCase(MimeType.IMAGE_PNG)  && !format.equalsIgnoreCase(WCSQuery.PNG)  &&
-                    !format.equalsIgnoreCase(WCSQuery.GEOTIFF)    && !format.equalsIgnoreCase(WCSQuery.NETCDF))
+                if (!format.equalsIgnoreCase(MimeType.IMAGE_BMP)  && !format.equalsIgnoreCase(BMP)  &&
+                    !format.equalsIgnoreCase(MimeType.IMAGE_GIF)  && !format.equalsIgnoreCase(GIF)  &&
+                    !format.equalsIgnoreCase(MimeType.IMAGE_JPEG) && !format.equalsIgnoreCase(JPEG) &&
+                    !format.equalsIgnoreCase(JPG)        && !format.equalsIgnoreCase(TIF)  &&
+                    !format.equalsIgnoreCase(MimeType.IMAGE_TIFF) && !format.equalsIgnoreCase(TIFF) &&
+                    !format.equalsIgnoreCase(MimeType.IMAGE_PNG)  && !format.equalsIgnoreCase(PNG)  &&
+                    !format.equalsIgnoreCase(GEOTIFF)    && !format.equalsIgnoreCase(NETCDF))
                 {
                     throw new CstlServiceException("The format specified is not recognized. Please choose a known format " +
                         "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT, format);
@@ -261,19 +229,19 @@ public class WCSService extends OGCWebService {
                     format = "application/matrix";
                 }
                 // Convert the supported image type into known mime-type.
-                if (format.equalsIgnoreCase(WCSQuery.PNG)) {
+                if (format.equalsIgnoreCase(PNG)) {
                     format = MimeType.IMAGE_PNG;
                 }
-                if (format.equalsIgnoreCase(WCSQuery.GIF)) {
+                if (format.equalsIgnoreCase(GIF)) {
                     format = MimeType.IMAGE_GIF;
                 }
-                if (format.equalsIgnoreCase(WCSQuery.BMP)) {
+                if (format.equalsIgnoreCase(BMP)) {
                     format = MimeType.IMAGE_BMP;
                 }
-                if (format.equalsIgnoreCase(WCSQuery.JPEG) || format.equalsIgnoreCase(WCSQuery.JPG)) {
+                if (format.equalsIgnoreCase(JPEG) || format.equalsIgnoreCase(JPG)) {
                     format = MimeType.IMAGE_JPEG;
                 }
-                if (format.equalsIgnoreCase(WCSQuery.TIF) || format.equalsIgnoreCase(WCSQuery.TIFF)) {
+                if (format.equalsIgnoreCase(TIF) || format.equalsIgnoreCase(TIFF)) {
                     format = MimeType.IMAGE_TIFF;
                 }
                 return Response.ok(rendered, format).build();
@@ -309,9 +277,9 @@ public class WCSService extends OGCWebService {
         // We do not want to log the full stack trace if this is an error
         // which seems to have been caused by the user.
         if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+            !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
+            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
+            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
@@ -378,8 +346,9 @@ public class WCSService extends OGCWebService {
             //We transform the String of sections in a list.
             //In the same time we verify that the requested sections are valid.
             final String section = getParameter("Sections", false);
-            List<String> requestedSections = new ArrayList<String>();
+            final List<String> requestedSections;
             if (section != null) {
+                requestedSections = new ArrayList<String>();
                 final StringTokenizer tokens = new StringTokenizer(section, ",;");
                 while (tokens.hasMoreTokens()) {
                     final String token = tokens.nextToken().trim();

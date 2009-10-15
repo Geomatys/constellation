@@ -126,10 +126,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.TransformException;
 
-import static org.constellation.query.Query.KEY_VERSION;
-import static org.constellation.query.wcs.WCSQuery.GEOTIFF;
-import static org.constellation.query.wcs.WCSQuery.MATRIX;
-import static org.constellation.query.wcs.WCSQuery.NETCDF;
+import static org.constellation.query.wcs.WCSQuery.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 
