@@ -101,7 +101,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         try {
             final Connection mdConnection = db.getConnection();
             boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
-            mdWebReader   = new Reader20(Standard.ISO_19115,  mdConnection, isPostgres);
+            mdWebReader   = new Reader20(mdConnection, isPostgres);
             pathMap       = null;
             classeMap     = null;
             if (create)

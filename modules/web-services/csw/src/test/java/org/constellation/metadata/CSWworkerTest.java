@@ -108,7 +108,6 @@ public class CSWworkerTest {
     protected CSWworker worker;
 
     protected static MarshallerPool pool;
-    protected static Unmarshaller unmarshaller;
 
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
 
@@ -228,7 +227,7 @@ public class CSWworkerTest {
      * @throws java.lang.Exception
      */
     public void getRecordByIdTest() throws Exception {
-        unmarshaller = pool.acquireUnmarshaller();
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         /*
          *  TEST 1 : getRecordById with the first metadata in ISO mode.
          */
@@ -449,7 +448,7 @@ public class CSWworkerTest {
      * @throws java.lang.Exception
      */
     public void getRecordsTest() throws Exception {
-        unmarshaller = pool.acquireUnmarshaller();
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         /*
          *  TEST 1 : getRecords with HITS - DC mode (FULL) - CQL text: Title LIKE 90008411%
          */
@@ -815,7 +814,7 @@ public class CSWworkerTest {
      * @throws java.lang.Exception
      */
     public void getDomainTest() throws Exception {
-        unmarshaller = pool.acquireUnmarshaller();
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         /*
          *  TEST 1 : getDomain 2.0.2 parameterName = GetCapabilities.sections
          */
@@ -1010,7 +1009,7 @@ public class CSWworkerTest {
      * @throws java.lang.Exception
      */
     public void transactionDeleteTest() throws Exception {
-        unmarshaller = pool.acquireUnmarshaller();
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         /*
          *  TEST 1 : we delete the metadata 42292_5p_19900609195600
          */
@@ -1064,7 +1063,7 @@ public class CSWworkerTest {
 
         LOGGER.info("--- TRANSACTION INSERT TEST ---");
 
-        unmarshaller = pool.acquireUnmarshaller();
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         /*
          *  TEST 1 : we add the metadata 42292_5p_19900609195600
          */
@@ -1125,7 +1124,7 @@ public class CSWworkerTest {
      * @throws java.lang.Exception
      */
     public void transactionUpdateTest() throws Exception {
-        unmarshaller = pool.acquireUnmarshaller();
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
         LOGGER.info("--- TRANSACTION UPDATE TEST ---");
         /*

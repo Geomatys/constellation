@@ -22,6 +22,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.Arrays;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
@@ -42,7 +43,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
     public static void setUpClass() throws Exception {
 
         pool = new MarshallerPool(org.constellation.generic.database.ObjectFactory.class);
-        unmarshaller = pool.acquireUnmarshaller();
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
         dbDirectory    = new File("CSWWorkerTestDatabase");
         File configDir = new File("CSWWorkerTest");
@@ -67,6 +68,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             pool.release(marshaller);
         }
         pool.release(unmarshaller);
+        pool = new AnchorPool(Arrays.asList(CSWClassesContext.getAllClasses()));
 
     }
 
@@ -99,23 +101,18 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
 
     @Before
     public void setUp() throws Exception {
-
-        pool = new AnchorPool(Arrays.asList(CSWClassesContext.getAllClasses()));
-        unmarshaller = pool.acquireUnmarshaller();
-
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
         File configDir = new File("CSWWorkerTest");
         worker = new CSWworker("", pool, configDir);
         Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
         worker.setSkeletonCapabilities(stcapa);
 
+        pool.release(unmarshaller);
     }
 
     @After
     public void tearDown() throws Exception {
-        if (unmarshaller != null) {
-            pool.release(unmarshaller);
-        }
         if (worker != null) {
             worker.destroy();
         }

@@ -108,9 +108,9 @@ public class MDWebSensorReader implements SensorReader {
         try {
             sensorMLConnection = db.getConnection();
             final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
-            sensorMLReader     = new Reader20(Standard.SENSORML, sensorMLConnection, isPostgres);
+            sensorMLReader     = new Reader20(sensorMLConnection, isPostgres);
             sensorMLCatalog    = sensorMLReader.getCatalog("SMLC");
-            xmlWriter          = new Writer(sensorMLReader);
+            xmlWriter          = new Writer(sensorMLReader, Standard.SENSORML);
             this.map           = map;
 
             //we initialize the unmarshaller

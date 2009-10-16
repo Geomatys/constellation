@@ -116,7 +116,7 @@ public class MDWebSensorWriter implements SensorWriter {
             smlConnection   = db.getConnection();
             final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
             sensorMLWriter  = new Writer20(smlConnection, isPostgres);
-            sensorMLReader  = new Reader20(Standard.SENSORML, smlConnection, isPostgres);
+            sensorMLReader  = new Reader20(smlConnection, isPostgres);
             sensorMLCatalog = sensorMLReader.getCatalog("SMLC");
             mainUser        = sensorMLReader.getUser("admin");
 
@@ -150,7 +150,7 @@ public class MDWebSensorWriter implements SensorWriter {
             marshaller.marshal(process, sensorFile);
 
             //we parse the temporay xmlFile
-            final Reader xmlReader = new Reader(sensorMLReader, sensorFile, sensorMLWriter);
+            final Reader xmlReader = new Reader(sensorMLReader, sensorFile, sensorMLWriter, Standard.SENSORML);
 
             //and we write it in the sensorML Database
 

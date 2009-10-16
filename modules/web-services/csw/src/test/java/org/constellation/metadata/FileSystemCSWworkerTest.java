@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.v202.Capabilities;
@@ -41,7 +42,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         deleteTemporaryFile();
 
         pool = new MarshallerPool(org.constellation.generic.database.ObjectFactory.class);
-        unmarshaller = pool.acquireUnmarshaller();
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
         File configDir = new File("CSWWorkerTest");
         if (!configDir.exists()) {
@@ -63,13 +64,14 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             marshaller.marshal(configuration, configFile);
             pool.release(marshaller);
         }
+        pool.release(unmarshaller);
+        pool = new AnchorPool(Arrays.asList(CSWClassesContext.getAllClasses()));
 
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
         deleteTemporaryFile();
-        pool.release(unmarshaller);
     }
 
     public static void deleteTemporaryFile() {
@@ -98,22 +100,19 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
     @Before
     public void setUp() throws Exception {
 
-        pool = new AnchorPool(Arrays.asList(CSWClassesContext.getAllClasses()));
-        unmarshaller = pool.acquireUnmarshaller();
+        
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
 
         File configDir = new File("CSWWorkerTest");
         worker = new CSWworker("", pool, configDir);
         Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
         worker.setSkeletonCapabilities(stcapa);
-
+        pool.release(unmarshaller);
     }
 
     @After
     public void tearDown() throws Exception {
-        if (unmarshaller != null) {
-            pool.release(unmarshaller);
-        }
         if (worker != null) {
             worker.destroy();
         }

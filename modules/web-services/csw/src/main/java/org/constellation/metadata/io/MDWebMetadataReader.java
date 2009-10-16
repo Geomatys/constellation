@@ -205,7 +205,7 @@ public class MDWebMetadataReader extends MetadataReader {
         try {
             final Connection mdConnection = db.getConnection();
             final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
-            this.mdReader           = new Reader20(Standard.ISO_19115,  mdConnection, isPostgres);
+            this.mdReader           = new Reader20(mdConnection, isPostgres);
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLException while initializing the MDWeb reader:" +'\n'+
                                            "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -247,7 +247,7 @@ public class MDWebMetadataReader extends MetadataReader {
      */
     protected MDWebMetadataReader(Connection mdConnection) {
         super(true, false);
-        this.mdReader           = new Reader20(Standard.ISO_19115,  mdConnection);
+        this.mdReader           = new Reader20(mdConnection);
         initPackage();
         this.classBinding       = new HashMap<String, Class>();
         this.alreadyRead        = new HashMap<Value, Object>();
