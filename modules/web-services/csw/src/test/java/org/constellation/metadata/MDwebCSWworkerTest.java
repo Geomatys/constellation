@@ -36,7 +36,7 @@ import org.junit.*;
  */
 public class MDwebCSWworkerTest extends CSWworkerTest {
 
-    private static DefaultDataSource ds;
+    private static File dbDirectory;
     
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -44,11 +44,12 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         pool = new MarshallerPool(org.constellation.generic.database.ObjectFactory.class);
         unmarshaller = pool.acquireUnmarshaller();
 
+        dbDirectory    = new File("CSWWorkerTestDatabase");
         File configDir = new File("CSWWorkerTest");
         if (!configDir.exists()) {
             configDir.mkdir();
-            final String url = "jdbc:derby:memory:Test;create=true";
-            ds               = new DefaultDataSource(url);
+            final String url = "jdbc:derby:" + dbDirectory.getPath().replace('\\','/');
+            DefaultDataSource ds = new DefaultDataSource(url + ";create=true");
 
             Connection con = ds.getConnection();
 
@@ -71,9 +72,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        if (ds != null) {
-            ds.shutdown();
-        }
+        deleteDirectory(dbDirectory);
         deleteDirectory(new File("CSWWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
