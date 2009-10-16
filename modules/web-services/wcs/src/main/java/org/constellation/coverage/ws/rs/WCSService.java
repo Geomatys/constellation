@@ -141,10 +141,10 @@ public class WCSService extends OGCWebService {
         try {
 
             marshaller = getMarshallerPool().acquireMarshaller();
-        	// Handle an empty request by sending a basic web page.
-        	if (  ( null == objectRequest )  &&  ( 0 == uriContext.getQueryParameters().size() )  ) {
-        		return Response.ok(getIndexPage(), MimeType.TEXT_HTML).build();
-        	}
+            // Handle an empty request by sending a basic web page.
+            if ((null == objectRequest) && (0 == uriContext.getQueryParameters().size())) {
+                return Response.ok(getIndexPage(), MimeType.TEXT_HTML).build();
+            }
 
             String request = "";
             if (objectRequest instanceof JAXBElement) {
@@ -216,10 +216,10 @@ public class WCSService extends OGCWebService {
                 if (!format.equalsIgnoreCase(MimeType.IMAGE_BMP)  && !format.equalsIgnoreCase(BMP)  &&
                     !format.equalsIgnoreCase(MimeType.IMAGE_GIF)  && !format.equalsIgnoreCase(GIF)  &&
                     !format.equalsIgnoreCase(MimeType.IMAGE_JPEG) && !format.equalsIgnoreCase(JPEG) &&
-                    !format.equalsIgnoreCase(JPG)        && !format.equalsIgnoreCase(TIF)  &&
+                    !format.equalsIgnoreCase(JPG)                 && !format.equalsIgnoreCase(TIF)  &&
                     !format.equalsIgnoreCase(MimeType.IMAGE_TIFF) && !format.equalsIgnoreCase(TIFF) &&
                     !format.equalsIgnoreCase(MimeType.IMAGE_PNG)  && !format.equalsIgnoreCase(PNG)  &&
-                    !format.equalsIgnoreCase(GEOTIFF)    && !format.equalsIgnoreCase(NETCDF))
+                    !format.equalsIgnoreCase(GEOTIFF)             && !format.equalsIgnoreCase(NETCDF))
                 {
                     throw new CstlServiceException("The format specified is not recognized. Please choose a known format " +
                         "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT, format);
@@ -276,10 +276,11 @@ public class WCSService extends OGCWebService {
         // LOG THE EXCEPTION
         // We do not want to log the full stack trace if this is an error
         // which seems to have been caused by the user.
-        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    &&
             !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
-            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)    &&
+            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED))
+        {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
@@ -481,30 +482,28 @@ public class WCSService extends OGCWebService {
         }
         final EnvelopeEntry envelope = new EnvelopeEntry(pos, getParameter(KEY_CRS, true));
 
-        if (width == null && resx == null) {
-            throw new CstlServiceException("One of the parameters WIDTH or RESX have to be specified.",
-                    INVALID_PARAMETER_VALUE);
-        }
-        if (height == null && resy == null) {
-            throw new CstlServiceException("One of the parameters HEIGHT or RESY have to be specified.",
+        if (width == null && height == null && resx == null && resy == null) {
+            throw new CstlServiceException("You should specify either width/height or resx/resy.",
                     INVALID_PARAMETER_VALUE);
         }
 
         final List<String> axis = new ArrayList<String>();
         axis.add("width");
         axis.add("height");
-        final List<BigInteger> low = new ArrayList<BigInteger>();
-        low.add(BigInteger.ZERO);
-        low.add(BigInteger.ZERO);
-        final List<BigInteger> high = new ArrayList<BigInteger>();
-
-        high.add(new BigInteger((width != null) ? width : resx));
-        high.add(new BigInteger((height != null) ? height : resy));
-
-        if (depth != null || resz != null) {
-            axis.add("depth");
+        List<BigInteger> low = null;
+        List<BigInteger> high = null;
+        if (width != null && height != null) {
+            low = new ArrayList<BigInteger>();
+            high = new ArrayList<BigInteger>();
             low.add(BigInteger.ZERO);
-            high.add(new BigInteger((depth != null) ? depth : resz));
+            low.add(BigInteger.ZERO);
+            high.add(new BigInteger(width));
+            high.add(new BigInteger(height));
+            if (depth != null) {
+                axis.add("depth");
+                low.add(BigInteger.ZERO);
+                high.add(new BigInteger(depth));
+            }
         }
         final GridLimitsType limits = new GridLimitsType(low, high);
         final GridType grid = new GridType(limits, axis);
@@ -525,9 +524,21 @@ public class WCSService extends OGCWebService {
                 org.geotoolkit.wcs.xml.v100.InterpolationMethod.fromValue(getParameter(KEY_INTERPOLATION, false));
 
         //output
+        final List<Double> resolutions;
+        if (resx != null && resy != null) {
+            resolutions = new ArrayList<Double>();
+            resolutions.add(Double.valueOf(resx));
+            resolutions.add(Double.valueOf(resy));
+            if (resz != null) {
+                resolutions.add(Double.valueOf(resz));
+            }
+        } else {
+            resolutions = null;
+        }
         final org.geotoolkit.wcs.xml.v100.OutputType output =
                 new org.geotoolkit.wcs.xml.v100.OutputType(getParameter(KEY_FORMAT, true),
-                                                          getParameter(KEY_RESPONSE_CRS, false));
+                                                           getParameter(KEY_RESPONSE_CRS, false),
+                                                           resolutions);
 
         return new org.geotoolkit.wcs.xml.v100.GetCoverageType(
                 getParameter(KEY_COVERAGE, true), domain, range, interpolation, output);

@@ -17,6 +17,7 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -855,7 +856,8 @@ public final class WCSWorker {
         for (int i = 0; i < objectiveCrs.getCoordinateSystem().getDimension(); i++) {
             final CoordinateSystemAxis axis = objectiveCrs.getCoordinateSystem().getAxis(i);
             if (envelope.getMinimum(i) < axis.getMinimumValue() ||
-                    envelope.getMaximum(i) > axis.getMaximumValue()) {
+                envelope.getMaximum(i) > axis.getMaximumValue())
+            {
                 throw new CstlServiceException(Errors.format(Errors.Keys.BAD_RANGE_$2,
                         envelope.getMinimum(i), envelope.getMaximum(i)),
                         INVALID_DIMENSION_VALUE);
@@ -935,7 +937,24 @@ public final class WCSWorker {
             final ViewDef vdef = new ViewDef(refEnvel, azimuth);
 
             // CANVAS
-            final CanvasDef cdef = new CanvasDef(request.getSize(), null);
+            Dimension size = request.getSize();
+            if (size == null) {
+                // Try with resx/resy, those parameters should be filled.
+                final List<Double> resolutions = request.getResolutions();
+                if (resolutions == null || resolutions.isEmpty()) {
+                    // Should not occurs since it is already tested
+                    throw new CstlServiceException("If width/height are not specified, you have to give resx/resy");
+                }
+                final double resx      = resolutions.get(0);
+                final double resy      = resolutions.get(1);
+                final double envWidth  = refEnvel.getSpan(0);
+                final double envHeight = refEnvel.getSpan(1);
+                //Assume res is in px per unit -> px/unit * units -> px
+                final int newWidth  = (int) Math.round(resx * envWidth);
+                final int newHeight = (int) Math.round(resy * envHeight);
+                size = new Dimension(newWidth, newHeight);
+            }
+            final CanvasDef cdef = new CanvasDef(size, null);
 
             // IMAGE
             final BufferedImage img;
