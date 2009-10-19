@@ -62,9 +62,7 @@ import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.users.User;
-import org.mdweb.io.Reader;
 import org.mdweb.io.MD_IOException;
-import org.mdweb.io.sql.v20.Reader20;
 import org.mdweb.io.sql.v20.Writer20;
 
 
@@ -83,11 +81,6 @@ public class MDWebMetadataWriter extends MetadataWriter {
      * The MDWeb user who owe the inserted form.
      */
     private final User user;
-    
-    /**
-     * A reader to the MDWeb database.
-     */
-    private Reader mdReader;
     
     /**
      * A writer to the MDWeb database.
@@ -113,7 +106,6 @@ public class MDWebMetadataWriter extends MetadataWriter {
     /**
      * Build a new metadata writer.
      * 
-     * @param MDReader an MDWeb database reader.
      */
     public MDWebMetadataWriter(Automatic configuration, AbstractIndexer index) throws CstlServiceException {
         super(index);
@@ -129,14 +121,13 @@ public class MDWebMetadataWriter extends MetadataWriter {
 
             final Connection mdConnection = db.getConnection();
             final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
-            mdReader      = new Reader20(mdConnection, isPostgres);
-            mdCatalog     = mdReader.getCatalog("CSWCat");
-            this.mdWriter = new Writer20(mdConnection, isPostgres);
+            mdWriter  = new Writer20(mdConnection, isPostgres);
+            mdCatalog = mdWriter.getCatalog("CSWCat");
             if (mdCatalog == null) {
                 mdCatalog = new Catalog("CSWCat", "CSW Data Catalog");
                 mdWriter.writeCatalog(mdCatalog);
             }
-            this.user     = mdReader.getUser("admin");
+            this.user     = mdWriter.getUser("admin");
 
         } catch (MD_IOException ex) {
             throw new CstlServiceException("MD_IOException while initializing the MDWeb writer:" +'\n'+
@@ -162,7 +153,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             //we try to find a title for the from
             String title = findTitle(object);
             if (title.equals("unknow title")) {
-                title = getAvailableTitle();
+                title = mdWriter.getAvailableTitle();
             }
             
             final Date creationDate = new Date(System.currentTimeMillis());
@@ -198,7 +189,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             
             Profile defaultProfile = null;
             if  (className.equals("DefaultMetaData")) {
-                defaultProfile = mdReader.getProfile("ISO_19115");
+                defaultProfile = mdWriter.getProfile("ISO_19115");
             }
             final Form form = new Form(-1, mdCatalog, title, user, null, defaultProfile, creationDate, false, false, "normalForm");
             
@@ -229,7 +220,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         final List<Value> result = new ArrayList<Value>();
 
         //if the path is not already in the database we write it
-        if (mdReader.getPath(path.getId()) == null) {
+        if (mdWriter.getPath(path.getId()) == null) {
            mdWriter.writePath(path);
         } 
         if (object == null) {
@@ -384,7 +375,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
                                 final Path childPath = new Path(path, prop);
                             
                                 //if the path is not already in the database we write it
-                                if (mdReader.getPath(childPath.getId()) == null) {
+                                if (mdWriter.getPath(childPath.getId()) == null) {
                                     mdWriter.writePath(childPath);
                                 }
                                 result.addAll(addValueFromObject(form, propertyValue, childPath, value));
@@ -407,14 +398,6 @@ public class MDWebMetadataWriter extends MetadataWriter {
             } while (classe != null);
         }
         return result;
-    }
-    
-    /**
-     * Ask to the mdweb reader an available title for a form.
-     */
-    private String getAvailableTitle() throws MD_IOException {
-        
-        return mdReader.getAvailableTitle();
     }
     
     /**
@@ -516,8 +499,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
             availableStandards.add(mainStandard);
             availableStandards.add(Standard.ISO_19108);
             availableStandards.add(Standard.ISO_19103);
-            availableStandards.add(mdReader.getStandard("ISO 19119"));
-            availableStandards.add(mdReader.getStandard("ISO 19110"));
+            availableStandards.add(mdWriter.getStandard("ISO 19119"));
+            availableStandards.add(mdWriter.getStandard("ISO 19110"));
         
         // CSW standard    
         } else if (Standard.CSW.equals(mainStandard)) {
@@ -552,7 +535,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
              * we affect the standard in some special case
              */
             if (packageName.equals("org.geotools.service")) {
-                standard = mdReader.getStandard("ISO 19119");
+                standard = mdWriter.getStandard("ISO 19119");
             } else if (packageName.equals("org.constellation.metadata.fra")) {
                 standard = Standard.ISO_19115_FRA;
             }
@@ -562,7 +545,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             while (nameType < 12) {
                 
                 LOGGER.finer("searching: " + standard.getName() + ":" + name);
-                result = mdReader.getClasse(name, standard);
+                result = mdWriter.getClasse(name, standard);
                 if (result != null) {
                     LOGGER.finer("class found:" + standard.getName() + ":" + name);
                     classBinding.put(object.getClass(), result);
@@ -667,25 +650,25 @@ public class MDWebMetadataWriter extends MetadataWriter {
     private Classe getPrimitiveTypeFromName(String className) throws MD_IOException {
         
         if (className.equals("String") || className.equals("SimpleInternationalString") || className.equals("BaseUnit")) {
-            return mdReader.getClasse("CharacterString", Standard.ISO_19103);
+            return mdWriter.getClasse("CharacterString", Standard.ISO_19103);
         } else if (className.equalsIgnoreCase("Date")) {
-            return mdReader.getClasse(className, Standard.ISO_19103);
+            return mdWriter.getClasse(className, Standard.ISO_19103);
         }  else if (className.equalsIgnoreCase("Integer")) {
-            return mdReader.getClasse(className, Standard.ISO_19103);
+            return mdWriter.getClasse(className, Standard.ISO_19103);
         }  else if (className.equalsIgnoreCase("Long")) {
-            return mdReader.getClasse("Integer", Standard.ISO_19103);
+            return mdWriter.getClasse("Integer", Standard.ISO_19103);
         } else if (className.equalsIgnoreCase("Boolean")) {
-            return mdReader.getClasse(className, Standard.ISO_19103);
+            return mdWriter.getClasse(className, Standard.ISO_19103);
         }  else if (className.equalsIgnoreCase("URL")) {
-            return mdReader.getClasse(className, Standard.ISO_19115);
+            return mdWriter.getClasse(className, Standard.ISO_19115);
         //special case for locale codeList.
         } else if (className.equals("Locale")) {
-            return mdReader.getClasse("LanguageCode", Standard.ISO_19115);
+            return mdWriter.getClasse("LanguageCode", Standard.ISO_19115);
         //special case for Role codeList.
         } else if (className.equals("Role")) {
-            return mdReader.getClasse("CI_RoleCode", Standard.ISO_19115);
+            return mdWriter.getClasse("CI_RoleCode", Standard.ISO_19115);
         } else if (className.equals("Double")) {
-            return mdReader.getClasse("Real", Standard.ISO_19103);
+            return mdWriter.getClasse("Real", Standard.ISO_19103);
         } else {
             return null;
         }
@@ -755,8 +738,6 @@ public class MDWebMetadataWriter extends MetadataWriter {
         super.destroy();
         classBinding.clear();
         try {
-            if (mdReader != null)
-                mdReader.close();
             if (mdWriter != null)
                 mdWriter.close();
             classBinding.clear();
@@ -796,8 +777,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
              throw new CstlServiceException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id");
         }
         try {
-            final Catalog catalog = mdReader.getCatalog(catalogCode);
-            final Form f          = mdReader.getForm(catalog, id);
+            final Catalog catalog = mdWriter.getCatalog(catalogCode);
+            final Form f          = mdWriter.getForm(catalog, id);
 
             mdWriter.deleteForm(f.getId());
         } catch (MD_IOException ex) {
@@ -835,8 +816,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
              throw new CstlServiceException("Unable to parse: " + metadataID, NO_APPLICABLE_CODE, "id");
         }
         try {
-            final Catalog catalog = mdReader.getCatalog(catalogCode);
-            f                     = mdReader.getForm(catalog, id);
+            final Catalog catalog = mdWriter.getCatalog(catalogCode);
+            f                     = mdWriter.getForm(catalog, id);
 
         } catch (MD_IOException ex) {
             throw new CstlServiceException("The service has throw an SQLException while updating the metadata: " + ex.getMessage(),
@@ -928,10 +909,10 @@ public class MDWebMetadataWriter extends MetadataWriter {
         // we look for a know metadata type
         if (typeName.equals("MD_Metadata")) {
             mainStandard = Standard.ISO_19115;
-            type = mdReader.getClasse("MD_Metadata", mainStandard);
+            type = mdWriter.getClasse("MD_Metadata", mainStandard);
         } else if (typeName.equals("Record")) {
             mainStandard = Standard.CSW;
-            type = mdReader.getClasse("Record", mainStandard);
+            type = mdWriter.getClasse("Record", mainStandard);
         } else {
             throw new CstlServiceException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
         }
@@ -1006,7 +987,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         Property property = type.getPropertyByName(propertyName);
         if (property == null) {
             // if the property is null we search in the sub-classes
-            final List<Classe> subclasses = mdReader.getSubClasses(type);
+            final List<Classe> subclasses = mdWriter.getSubClasses(type);
             for (Classe subClasse : subclasses) {
                 property = subClasse.getPropertyByName(propertyName);
                 if (property != null) {

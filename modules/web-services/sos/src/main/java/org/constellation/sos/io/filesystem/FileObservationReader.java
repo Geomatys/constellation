@@ -331,7 +331,7 @@ public class FileObservationReader implements ObservationReader {
 
     @Override
     public String getInfos() {
-        return "Constellation Filesystem O&M Reader 0.4";
+        return "Constellation Filesystem O&M Reader 0.5";
     }
 
     @Override

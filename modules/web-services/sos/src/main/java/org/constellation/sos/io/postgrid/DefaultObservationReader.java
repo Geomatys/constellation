@@ -515,7 +515,7 @@ public class DefaultObservationReader implements ObservationReader {
 
     @Override
     public String getInfos() {
-        return "Constellation Postgrid O&M Reader 0.4";
+        return "Constellation Postgrid O&M Reader 0.5";
     }
 
     @Override

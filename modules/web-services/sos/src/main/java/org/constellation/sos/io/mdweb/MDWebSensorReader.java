@@ -88,13 +88,11 @@ public class MDWebSensorReader implements SensorReader {
     private MarshallerPool marshallerPool;
 
     /**
-     *
-     * @param dataSourceSML
-     * @param sensorIdBase
+     * Build a new Sensor reader for a MDweb database.
+     * 
+     * @param configuration
      * @param map
-     * @throws java.io.IOException
-     * @throws org.constellation.catalog.NoSuchTableException
-     * @throws java.sql.SQLException
+     * @throws org.constellation.ws.CstlServiceException
      */
     public MDWebSensorReader(Automatic configuration, Properties map) throws CstlServiceException  {
         if (configuration == null) {
@@ -128,6 +126,16 @@ public class MDWebSensorReader implements SensorReader {
         }
     }
 
+    /**
+     *
+     * @param sensorId The identifiers of the sensor.
+     *
+     * @return A SensorML sensor description
+     * 
+     * @throws CstlServiceException If the sensor is not registred in the database,
+     *                              if the specified record in the database is not a sensorML object,
+     *                              or if an IO Exception occurs.
+     */
     @Override
     public AbstractSensorML getSensor(String sensorId) throws CstlServiceException {
         Unmarshaller unmarshaller = null;
@@ -175,9 +183,13 @@ public class MDWebSensorReader implements SensorReader {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getInfos() {
-        return "Constellation MDweb Sensor Reader 0.4";
+        return "Constellation MDweb Sensor Reader 0.5";
     }
 
     @Override
