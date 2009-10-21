@@ -84,6 +84,7 @@ import org.geotoolkit.ows.xml.v110.ServiceIdentification;
 import org.geotoolkit.ows.xml.v110.ServiceProvider;
 import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.resources.Errors;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
@@ -840,7 +841,7 @@ public final class WCSWorker {
                     layerRef.getName() + "\".", INVALID_PARAMETER_VALUE);
         }
 
-        final Envelope envelope;
+        Envelope envelope;
         try {
             envelope = request.getEnvelope();
         } catch (FactoryException ex) {
@@ -853,15 +854,45 @@ public final class WCSWorker {
         } catch (FactoryException ex) {
             throw new CstlServiceException(ex, INVALID_CRS, "crs");
         }
-        for (int i = 0; i < objectiveCrs.getCoordinateSystem().getDimension(); i++) {
-            final CoordinateSystemAxis axis = objectiveCrs.getCoordinateSystem().getAxis(i);
-            if (envelope.getMinimum(i) < axis.getMinimumValue() ||
-                envelope.getMaximum(i) > axis.getMaximumValue())
-            {
-                throw new CstlServiceException(Errors.format(Errors.Keys.BAD_RANGE_$2,
-                        envelope.getMinimum(i), envelope.getMaximum(i)),
-                        INVALID_DIMENSION_VALUE);
+        /*
+         * Here the envelope can be null, if we have specified a TIME parameter. In this case we
+         * do not have to test whether the bbox parameter are into the CRS axes definition.
+         */
+        if (envelope != null) {
+            for (int i = 0; i < objectiveCrs.getCoordinateSystem().getDimension(); i++) {
+                final CoordinateSystemAxis axis = objectiveCrs.getCoordinateSystem().getAxis(i);
+                if (envelope.getMinimum(i) < axis.getMinimumValue() ||
+                    envelope.getMaximum(i) > axis.getMaximumValue())
+                {
+                    throw new CstlServiceException(Errors.format(Errors.Keys.BAD_RANGE_$2,
+                            envelope.getMinimum(i), envelope.getMaximum(i)),
+                            INVALID_DIMENSION_VALUE);
+                }
             }
+        } else {
+            // We take the envelope from the data provider. That envelope can be a little bit imprecise.
+            try {
+                final GeographicBoundingBox geoBbox = layerRef.getGeographicBoundingBox();
+                envelope = new JTSEnvelope2D(geoBbox.getWestBoundLongitude(), geoBbox.getEastBoundLongitude(),
+                                             geoBbox.getSouthBoundLatitude(), geoBbox.getNorthBoundLatitude(),
+                                             DefaultGeographicCRS.WGS84);
+            } catch (CatalogException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            }
+        }
+        final JTSEnvelope2D refEnvel;
+        try {
+            final CoordinateReferenceSystem responseCRS = request.getResponseCRS();
+            if (responseCRS != null && !CRS.equalsIgnoreMetadata(responseCRS, envelope.getCoordinateReferenceSystem())) {
+                final Envelope responseEnv = CRS.transform(envelope, responseCRS);
+                refEnvel = new JTSEnvelope2D(responseEnv);
+            } else {
+                refEnvel = new JTSEnvelope2D(envelope);
+            }
+        } catch (FactoryException ex) {
+            throw new CstlServiceException(ex, INVALID_CRS, "crs");
+        } catch (TransformException ex) {
+            throw new CstlServiceException(ex, INVALID_CRS, "response_crs");
         }
 
         /*
@@ -875,14 +906,12 @@ public final class WCSWorker {
             final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
             final RenderedImage image;
             try {
-                final GridCoverage2D gridCov = layerRef.getCoverage(request.getEnvelope(),
+                final GridCoverage2D gridCov = layerRef.getCoverage(refEnvel,
                         request.getSize(), elevation, date);
                 image = gridCov.getRenderedImage();
             } catch (IOException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             } catch (CatalogException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            } catch (FactoryException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
 
@@ -919,20 +948,6 @@ public final class WCSWorker {
             }
 
             // VIEW
-            final JTSEnvelope2D refEnvel;
-            try {
-                final CoordinateReferenceSystem responseCRS = request.getResponseCRS();
-                if (responseCRS != null && !CRS.equalsIgnoreMetadata(responseCRS, objectiveCrs)) {
-                    final Envelope responseEnv = CRS.transform(envelope, responseCRS);
-                    refEnvel = new JTSEnvelope2D(responseEnv);
-                } else {
-                    refEnvel = new JTSEnvelope2D(envelope);
-                }
-            } catch (FactoryException ex) {
-                throw new CstlServiceException(ex, INVALID_CRS, "crs");
-            } catch (TransformException ex) {
-                throw new CstlServiceException(ex, INVALID_CRS, "response_crs");
-            }
             final Double azimuth =  0.0; //HARD CODED SINCE PROTOCOL DOES NOT ALLOW
             final ViewDef vdef = new ViewDef(refEnvel, azimuth);
 

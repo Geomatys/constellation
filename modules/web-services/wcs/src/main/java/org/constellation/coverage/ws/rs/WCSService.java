@@ -438,19 +438,24 @@ public class WCSService extends OGCWebService {
 
         // temporal subset
         org.geotoolkit.wcs.xml.v100.TimeSequenceType temporal = null;
-        final String timeParameter = getParameter(KEY_TIME, false);
-        if (timeParameter != null) {
-            final TimePositionType time = new TimePositionType(timeParameter);
-            temporal = new org.geotoolkit.wcs.xml.v100.TimeSequenceType(time);
+        final String time = getParameter(KEY_TIME, false);
+        if (time != null) {
+            final TimePositionType timePosition = new TimePositionType(time);
+            temporal = new org.geotoolkit.wcs.xml.v100.TimeSequenceType(timePosition);
         }
 
         /*
          * spatial subset
          */
         // the boundingBox/envelope
-        final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
-        final String bbox = getParameter(KEY_BBOX, true);
+        final String bbox = getParameter(KEY_BBOX, false);
+        if (bbox == null && time == null) {
+            throw new CstlServiceException("Either BBOX or TIME parameter must be specified",
+                                           MISSING_PARAMETER_VALUE);
+        }
+        List<DirectPositionType> pos = null;
         if (bbox != null) {
+            pos = new ArrayList<DirectPositionType>();
             final List<String> bboxValues = StringUtilities.toStringList(bbox);
             final double minimumLon = StringUtilities.toDouble(bboxValues.get(0));
             final double maximumLon = StringUtilities.toDouble(bboxValues.get(2));
