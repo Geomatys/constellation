@@ -38,7 +38,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.UriInfo;
@@ -831,8 +830,8 @@ public final class WCSWorker {
         try {
             date = StringUtilities.toDate(request.getTime());
         } catch (ParseException ex) {
-            LOGGER.log(Level.INFO, "Parsing of the date failed. Please verify that the specified" +
-                    " date is compliant with the ISO-8601 standard.", ex);
+            throw new CstlServiceException("Parsing of the date failed. Please verify that the specified" +
+                    " date is compliant with the ISO-8601 standard.", ex, INVALID_PARAMETER_VALUE, "time");
         }
 
         final LayerDetails layerRef = getLayerReference(request.getCoverage(), inputVersion);
@@ -861,8 +860,8 @@ public final class WCSWorker {
         if (envelope != null) {
             for (int i = 0; i < objectiveCrs.getCoordinateSystem().getDimension(); i++) {
                 final CoordinateSystemAxis axis = objectiveCrs.getCoordinateSystem().getAxis(i);
-                if (envelope.getMinimum(i) < axis.getMinimumValue() ||
-                    envelope.getMaximum(i) > axis.getMaximumValue())
+                if (envelope.getMaximum(i) < axis.getMinimumValue() ||
+                    envelope.getMinimum(i) > axis.getMaximumValue())
                 {
                     throw new CstlServiceException(Errors.format(Errors.Keys.BAD_RANGE_$2,
                             envelope.getMinimum(i), envelope.getMaximum(i)),
