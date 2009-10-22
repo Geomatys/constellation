@@ -42,11 +42,15 @@ import org.junit.*;
  */
 public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
+    private static DefaultDataSource ds2 = null;
+
+    private static DefaultDataSource ds = null;
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
 
         final String url2 = "jdbc:derby:memory:Test2;create=true";
-        final DefaultDataSource ds2 = new DefaultDataSource(url2);
+        ds2 = new DefaultDataSource(url2);
 
         Connection con2 = ds2.getConnection();
 
@@ -55,7 +59,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         Util.executeSQLScript("org/constellation/sos/sql/sml-data.sql", con2);
 
         final String url = "jdbc:derby:memory:Test1;create=true";
-        final DefaultDataSource ds = new DefaultDataSource(url);
+        ds = new DefaultDataSource(url);
 
         Connection con = ds.getConnection();
 
@@ -110,6 +114,12 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         File mappingFile = new File("mapping.properties");
         if (mappingFile.exists()) {
             mappingFile.delete();
+        }
+        if (ds != null) {
+            ds.shutdown();
+        }
+        if (ds2 != null) {
+            ds2.shutdown();
         }
     }
 

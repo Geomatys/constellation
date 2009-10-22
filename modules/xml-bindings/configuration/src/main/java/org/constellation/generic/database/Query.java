@@ -187,7 +187,10 @@ public class Query {
         mainQuery = mainQuery.deleteCharAt(mainQuery.length() - 1);
 
         if (from != null && from.size() > 0) {
-            mainQuery.append(" FROM ").append(from.get(0).getvalue());
+            String sql = from.get(0).getvalue();
+            sql = sql.replace("':$'", "?");
+            sql = sql.replace(":$", "?");
+            mainQuery.append(" FROM ").append(sql);
         } else {
             throw new IllegalArgumentException("The query :" + name + " is malformed, FROM part missing");
         }
