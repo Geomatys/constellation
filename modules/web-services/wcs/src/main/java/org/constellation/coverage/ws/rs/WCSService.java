@@ -222,7 +222,8 @@ public class WCSService extends OGCWebService {
                     !format.equalsIgnoreCase(GEOTIFF)             && !format.equalsIgnoreCase(NETCDF))
                 {
                     throw new CstlServiceException("The format specified is not recognized. Please choose a known format " +
-                        "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT, format);
+                        "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT,
+                        KEY_FORMAT.toLowerCase());
                 }
                 final RenderedImage rendered = worker.getCoverage(getcov);
                 if (format.equalsIgnoreCase(MATRIX)) {
@@ -248,7 +249,7 @@ public class WCSService extends OGCWebService {
             }
 
             throw new CstlServiceException("This service can not handle the requested operation: " + request + ".",
-                                           OPERATION_NOT_SUPPORTED, "request");
+                                           OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
             
         } catch (CstlServiceException ex) {
         	/* 
@@ -320,7 +321,7 @@ public class WCSService extends OGCWebService {
 
         if (!getParameter(KEY_SERVICE, true).equalsIgnoreCase("WCS")) {
             throw new CstlServiceException("The parameter SERVICE must be specified as WCS",
-                    MISSING_PARAMETER_VALUE, "service");
+                    MISSING_PARAMETER_VALUE, KEY_SERVICE.toLowerCase());
         }
 
         // TODO: find the best version when the WCS 1.1.1 will be fully implemented.
@@ -357,7 +358,7 @@ public class WCSService extends OGCWebService {
                         requestedSections.add(token);
                     } else {
                         throw new CstlServiceException("The section " + token + " does not exist",
-                                INVALID_PARAMETER_VALUE, "sections");
+                                INVALID_PARAMETER_VALUE, KEY_SECTION.toLowerCase());
                     }
                 }
             } else {
@@ -369,7 +370,7 @@ public class WCSService extends OGCWebService {
             return (GetCapabilities) new org.geotoolkit.wcs.xml.v111.GetCapabilitiesType(versions, sections, formats, null);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", VERSION_NEGOTIATION_FAILED, "version");
+                    "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
     }
 
@@ -391,7 +392,7 @@ public class WCSService extends OGCWebService {
             return new org.geotoolkit.wcs.xml.v111.DescribeCoverageType(getParameter(KEY_IDENTIFIER, true));
         } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", VERSION_NEGOTIATION_FAILED, "version");
+                    "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
     }
     
@@ -413,7 +414,7 @@ public class WCSService extends OGCWebService {
             return adaptKvpGetCoverageRequest111();
          } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", VERSION_NEGOTIATION_FAILED, "version");
+                    "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
          }
     }
     
@@ -489,7 +490,7 @@ public class WCSService extends OGCWebService {
 
         if (width == null && height == null && resx == null && resy == null) {
             throw new CstlServiceException("You should specify either width/height or resx/resy.",
-                    INVALID_PARAMETER_VALUE);
+                    INVALID_DIMENSION_VALUE);
         }
 
         final List<String> axis = new ArrayList<String>();
@@ -584,7 +585,7 @@ public class WCSService extends OGCWebService {
         } else {
             throw new CstlServiceException("The correct pattern for BoundingBox parameter are" +
                                            " crs,minX,minY,maxX,maxY,CRS",
-                                           INVALID_PARAMETER_VALUE, "boundingbox");
+                                           INVALID_PARAMETER_VALUE, KEY_BOUNDINGBOX.toLowerCase());
         }
         BoundingBoxType envelope = null;
 
@@ -599,7 +600,7 @@ public class WCSService extends OGCWebService {
             if (i < 4) {
                 throw new CstlServiceException("The correct pattern for BoundingBox parameter are" +
                                                " crs,minX,minY,maxX,maxY,CRS",
-                                               INVALID_PARAMETER_VALUE, "boundingbox");
+                                               INVALID_PARAMETER_VALUE, KEY_BOUNDINGBOX.toLowerCase());
             }
             envelope = new BoundingBoxType(crs, coordinates[0], coordinates[1], coordinates[2], coordinates[3]);
         }

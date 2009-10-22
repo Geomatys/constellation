@@ -238,7 +238,7 @@ public class WMSService extends OGCWebService {
                 return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                                           OPERATION_NOT_SUPPORTED, "request");
+                                           OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
         } catch (CstlServiceException ex) {
             return processExceptionResponse(queryContext, ex, marshaller, version);
         } finally {
@@ -360,7 +360,7 @@ public class WMSService extends OGCWebService {
         final String service = getParameter(KEY_SERVICE, true);
         if (!ServiceType.WMS.toString().equalsIgnoreCase(service)) {
             throw new CstlServiceException("Invalid service specified. Should be WMS.",
-                    INVALID_PARAMETER_VALUE, "service");
+                    INVALID_PARAMETER_VALUE, KEY_SERVICE.toLowerCase());
         }
         String format = getParameter(KEY_FORMAT, false);
         // Verify that the format is not null, and is not something totally different from the known
@@ -521,7 +521,7 @@ public class WMSService extends OGCWebService {
         try {
             format = StringUtilities.toFormat(strFormat);
         } catch (IllegalArgumentException i) {
-            throw new CstlServiceException(i, INVALID_FORMAT, "format");
+            throw new CstlServiceException(i, INVALID_FORMAT, KEY_FORMAT.toLowerCase());
         }
         final List<String> layers  = StringUtilities.toStringList(strLayers);
         final List<String> styles = StringUtilities.toStringList(strStyles);
@@ -530,14 +530,14 @@ public class WMSService extends OGCWebService {
         try {
             elevation = (strElevation != null) ? StringUtilities.toDouble(strElevation) : null;
         } catch (NumberFormatException n) {
-            throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, "elevation");
+            throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, KEY_ELEVATION.toLowerCase());
         }
         final MeasurementRange dimRange = QueryAdapter.toMeasurementRange(strDimRange);
         final Date date;
         try {
             date = StringUtilities.toDate(strTime);
         } catch (ParseException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, "date");
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, KEY_TIME.toLowerCase());
         }
         final int width;
         final int height;
@@ -545,7 +545,7 @@ public class WMSService extends OGCWebService {
             width  = StringUtilities.toInt(strWidth);
             height = StringUtilities.toInt(strHeight);
         } catch (NumberFormatException n) {
-            throw new CstlServiceException(n, INVALID_PARAMETER_VALUE);
+            throw new CstlServiceException(n, INVALID_DIMENSION_VALUE);
         }
         final Dimension size = new Dimension(width, height);
         final Color background = StringUtilities.toColor(strBGColor);
@@ -585,7 +585,7 @@ public class WMSService extends OGCWebService {
         try {
             azimuth = (strAzimuth == null) ? 0.0 : StringUtilities.toDouble(strAzimuth);
         } catch(NumberFormatException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, "azimuth");
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, KEY_AZIMUTH.toLowerCase());
         }
 
         // Builds the request.

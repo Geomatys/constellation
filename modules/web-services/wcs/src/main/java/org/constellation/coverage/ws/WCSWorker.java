@@ -240,7 +240,7 @@ public final class WCSWorker {
     {
         if (request.getCoverage().size() == 0) {
             throw new CstlServiceException("The parameter COVERAGE must be specified.",
-                    MISSING_PARAMETER_VALUE, "coverage");
+                    MISSING_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
         }
 
         final List<CoverageOfferingType> coverageOfferings = new ArrayList<CoverageOfferingType>();
@@ -248,23 +248,23 @@ public final class WCSWorker {
             final LayerDetails layerRef = getLayerReference(coverage, ServiceDef.WCS_1_0_0.version.toString());
             if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
                 throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
-                        LAYER_NOT_DEFINED);
+                        LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
             }
             if (!(layerRef instanceof CoverageLayerDetails)) {
                 // Should not occurs, since we have previously verified the type of layer.
                 throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
-                        LAYER_NOT_DEFINED);
+                        LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
             }
             final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
             if (!coverageRef.isQueryable(ServiceType.WCS)) {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
-                        coverageRef.getName() + "\".", LAYER_NOT_QUERYABLE);
+                        coverageRef.getName() + "\".", LAYER_NOT_QUERYABLE, KEY_COVERAGE.toLowerCase());
             }
 
             final Set<Series> series = coverageRef.getSeries();
             if (series == null || series.isEmpty()) {
                 throw new CstlServiceException("The coverage " + coverageRef.getName() + " is not defined.",
-                        LAYER_NOT_DEFINED);
+                        LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
             }
             final GeographicBoundingBox inputGeoBox;
             try {
@@ -380,7 +380,7 @@ public final class WCSWorker {
     {
         if (request.getIdentifier().size() == 0) {
             throw new CstlServiceException("The parameter IDENTIFIER must be specified",
-                    MISSING_PARAMETER_VALUE, "identifier");
+                    MISSING_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
         }
 
         final List<CoverageDescriptionType> coverageDescriptions = new ArrayList<CoverageDescriptionType>();
@@ -388,34 +388,29 @@ public final class WCSWorker {
             final LayerDetails layerRef = getLayerReference(coverage, ServiceDef.WCS_1_1_1.version.toString());
             if (layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
                 throw new CstlServiceException("The requested layer is vectorial. WCS is not able to handle it.",
-                        LAYER_NOT_DEFINED);
+                        LAYER_NOT_DEFINED, KEY_IDENTIFIER.toLowerCase());
             }
             if (!(layerRef instanceof CoverageLayerDetails)) {
                 // Should not occurs, since we have previously verified the type of layer.
                 throw new CstlServiceException("The requested layer is not a coverage. WCS is not able to handle it.",
-                        LAYER_NOT_DEFINED);
+                        LAYER_NOT_DEFINED, KEY_IDENTIFIER.toLowerCase());
             }
             final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
             if (!coverageRef.isQueryable(ServiceType.WCS)) {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
-                        coverageRef.getName() + "\".", LAYER_NOT_QUERYABLE);
-            }
-
-            if (!coverageRef.isQueryable(ServiceType.WCS)) {
-                throw new CstlServiceException("You are not allowed to request the layer \"" +
-                        coverageRef.getName() + "\".", INVALID_PARAMETER_VALUE);
+                        coverageRef.getName() + "\".", INVALID_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
             }
             final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory =
                     new org.geotoolkit.ows.xml.v110.ObjectFactory();
             if (coverageRef.getSeries().size() == 0) {
                 throw new CstlServiceException("the coverage " + coverageRef.getName() +
-                        " is not defined", LAYER_NOT_DEFINED);
+                        " is not defined", LAYER_NOT_DEFINED, KEY_IDENTIFIER.toLowerCase());
             }
             final GeographicBoundingBox inputGeoBox;
             try {
                 inputGeoBox = coverageRef.getGeographicBoundingBox();
             } catch (CatalogException ex) {
-                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, KEY_BOUNDINGBOX.toLowerCase());
             }
             final List<JAXBElement<? extends BoundingBoxType>> bboxs =
                     new ArrayList<JAXBElement<? extends BoundingBoxType>>();
@@ -539,14 +534,14 @@ public final class WCSWorker {
                 format = formats.getOutputFormat().get(0);
                 if (!format.equals(MimeType.TEXT_XML) && !format.equals(MimeType.APP_XML)) {
                     throw new CstlServiceException("This format " + format + " is not allowed",
-                            INVALID_PARAMETER_VALUE, "format");
+                            INVALID_FORMAT, KEY_FORMAT.toLowerCase());
                 }
             }
 
             return getCapabilities111((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType) request);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
-                    "is not handled.", NO_APPLICABLE_CODE, KEY_VERSION.toLowerCase());
+                    "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
     }
 
@@ -576,7 +571,7 @@ public final class WCSWorker {
                 requestedSection = section;
             } else {
                 throw new CstlServiceException("The section " + section + " does not exist",
-                        INVALID_PARAMETER_VALUE);
+                        INVALID_PARAMETER_VALUE, KEY_SECTION.toLowerCase());
             }
             contentMeta = requestedSection.equals("/WCS_Capabilities/ContentMetadata");
         }
@@ -610,7 +605,7 @@ public final class WCSWorker {
                 return new WCSCapabilitiesType(staticCapabilities.getService());
             } else {
                 throw new CstlServiceException("Not a valid section requested: "+ requestedSection,
-                        NO_APPLICABLE_CODE);
+                        INVALID_PARAMETER_VALUE, KEY_SECTION.toLowerCase());
             }
         }
 
@@ -710,7 +705,7 @@ public final class WCSWorker {
             for (String sec : requestedSections) {
                 if (!SectionsType.getExistingSections(ServiceDef.WCS_1_1_1.version.toString()).contains(sec)) {
                     throw new CstlServiceException("This sections " + sec + " is not allowed",
-                            INVALID_PARAMETER_VALUE);
+                            INVALID_PARAMETER_VALUE, KEY_SECTION.toLowerCase());
                 }
             }
         }
@@ -831,27 +826,28 @@ public final class WCSWorker {
             date = StringUtilities.toDate(request.getTime());
         } catch (ParseException ex) {
             throw new CstlServiceException("Parsing of the date failed. Please verify that the specified" +
-                    " date is compliant with the ISO-8601 standard.", ex, INVALID_PARAMETER_VALUE, "time");
+                    " date is compliant with the ISO-8601 standard.", ex, INVALID_PARAMETER_VALUE,
+                    KEY_TIME.toLowerCase());
         }
 
         final LayerDetails layerRef = getLayerReference(request.getCoverage(), inputVersion);
         if (!layerRef.isQueryable(ServiceType.WCS) || layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +
-                    layerRef.getName() + "\".", INVALID_PARAMETER_VALUE);
+                    layerRef.getName() + "\".", INVALID_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
         }
 
         Envelope envelope;
         try {
             envelope = request.getEnvelope();
         } catch (FactoryException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, KEY_BBOX.toLowerCase());
         }
         // Ensures the bbox specified is inside the range of the CRS.
         final CoordinateReferenceSystem objectiveCrs;
         try {
             objectiveCrs = request.getCRS();
         } catch (FactoryException ex) {
-            throw new CstlServiceException(ex, INVALID_CRS, "crs");
+            throw new CstlServiceException(ex, INVALID_CRS, KEY_CRS.toLowerCase());
         }
         /*
          * Here the envelope can be null, if we have specified a TIME parameter. In this case we
@@ -865,7 +861,7 @@ public final class WCSWorker {
                 {
                     throw new CstlServiceException(Errors.format(Errors.Keys.BAD_RANGE_$2,
                             envelope.getMinimum(i), envelope.getMaximum(i)),
-                            INVALID_DIMENSION_VALUE);
+                            INVALID_DIMENSION_VALUE, KEY_BBOX.toLowerCase());
                 }
             }
         } else {
@@ -876,7 +872,7 @@ public final class WCSWorker {
                                              geoBbox.getSouthBoundLatitude(), geoBbox.getNorthBoundLatitude(),
                                              DefaultGeographicCRS.WGS84);
             } catch (CatalogException ex) {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, KEY_BBOX.toLowerCase());
             }
         }
         final JTSEnvelope2D refEnvel;
@@ -889,9 +885,9 @@ public final class WCSWorker {
                 refEnvel = new JTSEnvelope2D(envelope);
             }
         } catch (FactoryException ex) {
-            throw new CstlServiceException(ex, INVALID_CRS, "crs");
+            throw new CstlServiceException(ex, INVALID_CRS, KEY_CRS.toLowerCase());
         } catch (TransformException ex) {
-            throw new CstlServiceException(ex, INVALID_CRS, "response_crs");
+            throw new CstlServiceException(ex, INVALID_CRS, KEY_RESPONSE_CRS.toLowerCase());
         }
 
         /*
@@ -920,13 +916,13 @@ public final class WCSWorker {
 
             throw new CstlServiceException(new IllegalArgumentException(
                                                "Constellation does not support netcdf writing."),
-                                           NO_APPLICABLE_CODE);
+                                           INVALID_FORMAT, KEY_FORMAT.toLowerCase());
 
         } else if( format.equalsIgnoreCase(GEOTIFF) ){
 
             throw new CstlServiceException(new IllegalArgumentException(
                                                "Constellation does not support geotiff writing."),
-                                           NO_APPLICABLE_CODE);
+                                           INVALID_FORMAT, KEY_FORMAT.toLowerCase());
 
         } else {
             // We are in the case of an image format requested.
@@ -935,7 +931,7 @@ public final class WCSWorker {
             // SCENE
             final Map<String, Object> renderParameters = new HashMap<String, Object>();
             final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
-            renderParameters.put("TIME", date);
+            renderParameters.put(KEY_TIME, date);
             renderParameters.put("ELEVATION", elevation);
             final SceneDef sdef = new SceneDef();
             
@@ -1087,10 +1083,10 @@ public final class WCSWorker {
 	        	layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WCS_1_1_2 );
 	        } else {
 	        	throw new CstlServiceException("WCS acting according to no known version.",
-                        VERSION_NEGOTIATION_FAILED);
+                        VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
 	        }
         } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
+        	throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
         }
         return layerRefs;
     }
@@ -1112,10 +1108,10 @@ public final class WCSWorker {
         		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_1_2, layerName);
         	} else {
         		throw new CstlServiceException("WCS acting according to no known version.",
-                        VERSION_NEGOTIATION_FAILED);
+                        VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         	}
         } catch (RegisterException regex ){
-        	throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
+        	throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
         }
         return layerRef;
     }

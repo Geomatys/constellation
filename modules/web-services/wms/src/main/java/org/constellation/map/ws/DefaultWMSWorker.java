@@ -627,7 +627,7 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
         for (LayerDetails layer : layerRefs) {
             if (!layer.isQueryable(ServiceType.GETINFO)) {
                 throw new CstlServiceException("You are not allowed to request the layer \""+
-                        layer.getName() +"\".", INVALID_PARAMETER_VALUE);
+                        layer.getName() +"\".", LAYER_NOT_QUERYABLE, KEY_LAYERS.toLowerCase());
             }
         }
         //       -- build an equivalent style List
@@ -707,7 +707,7 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
             throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
                     "You have to choose between: "+ MimeType.TEXT_PLAIN +", "+ MimeType.TEXT_HTML +", "+ MimeType.APP_GML +", "+ GML +
                     ", "+ MimeType.APP_XML +", "+ XML+", "+ MimeType.TEXT_XML,
-                    INVALID_FORMAT, "info_format");
+                    INVALID_FORMAT, KEY_INFO_FORMAT.toLowerCase());
         }
 
         final VisitDef visitDef = new VisitDef();
@@ -740,7 +740,7 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
         final LayerDetails layer = getLayerReference(getLegend.getLayer(), getLegend.getVersion().toString());
         if (!layer.isQueryable(ServiceType.WMS)) {
             throw new CstlServiceException("You are not allowed to request the layer \""+
-                    layer.getName() +"\".", INVALID_PARAMETER_VALUE);
+                    layer.getName() +"\".", LAYER_NOT_QUERYABLE, KEY_LAYER.toLowerCase());
         }
         final Integer width  = getLegend.getWidth();
         final Integer height = getLegend.getHeight();
@@ -778,13 +778,13 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
             if (errorInImage) {
                 return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize());
             } else {
-                throw new CstlServiceException(ex, LAYER_NOT_DEFINED);
+                throw new CstlServiceException(ex, LAYER_NOT_DEFINED, KEY_LAYERS.toLowerCase());
             }
         }
         for (LayerDetails layer : layerRefs) {
             if (!layer.isQueryable(ServiceType.WMS)) {
                 throw new CstlServiceException("You are not allowed to request the layer \""+
-                        layer.getName() +"\".", LAYER_NOT_QUERYABLE);
+                        layer.getName() +"\".", LAYER_NOT_QUERYABLE, KEY_LAYERS.toLowerCase());
             }
         }
         //       -- build an equivalent style List
@@ -862,10 +862,10 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
                 layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMS_1_3_0_SLD);
             } else {
                 throw new CstlServiceException("WMS acting according to no known version.",
-                        VERSION_NEGOTIATION_FAILED);
+                        VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
             }
         } catch (RegisterException regex) {
-            throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
+            throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
         }
         return layerRefs;
     }
@@ -882,7 +882,7 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
                 layerRefs = Cstl.getRegister().getLayerReferences(ServiceDef.WMS_1_3_0_SLD, layerNames);
             } else {
                 throw new CstlServiceException("WMS acting according to no known version.",
-                        VERSION_NEGOTIATION_FAILED);
+                        VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
             }
         } catch (RegisterException regex) {
             throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
@@ -903,10 +903,10 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
                 layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMS_1_3_0_SLD, layerName);
             } else {
                 throw new CstlServiceException("WMS acting according to no known version.",
-                        VERSION_NEGOTIATION_FAILED);
+                        VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
             }
         } catch (RegisterException regex) {
-            throw new CstlServiceException(regex, INVALID_PARAMETER_VALUE);
+            throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
         }
         return layerRef;
     }
