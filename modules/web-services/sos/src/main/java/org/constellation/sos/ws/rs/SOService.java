@@ -53,6 +53,7 @@ import org.constellation.util.Util;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.sml.xml.AbstractSensorML;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -72,7 +73,9 @@ public class SOService extends OGCWebService {
         super(ServiceDef.SOS_1_0_0);
         worker = new SOSworker(null);
         setXMLContext("org.geotoolkit.sos.xml.v100:org.geotoolkit.gml.xml.v311:org.geotoolkit.swe.xml.v100:org.geotoolkit.swe.xml.v101:" +
-                "org.geotoolkit.observation.xml.v100:org.geotoolkit.sampling.xml.v100:org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101", "");
+                "org.geotoolkit.observation.xml.v100:org.geotoolkit.sampling.xml.v100:org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101", "",
+                "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd",
+                "http://www.opengis.net/ows/1.1 http://schemas.opengis.net/ows/1.1.0/owsExceptionReport.xsd");
     }
 
     @Override
@@ -123,8 +126,22 @@ public class SOService extends OGCWebService {
                 }
                 serviceDef = getVersionFromNumber(ds.getVersion());
                 final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.describeSensor(ds), sw);
 
+                AbstractSensorML sensor = worker.describeSensor(ds);
+                // for sensorML file we need to change the schema localtion
+                if (sensor != null && sensor.getVersion().equals("1.0.1")) {
+                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://schemas.opengis.net/sensorML/1.0.1/sensorML.xsd");
+                } else {
+                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://schemas.opengis.net/sensorML/1.0.0/sensorML.xsd");
+                }
+
+                marshaller.marshal(sensor, sw);
+
+                // we restore the main schema location
+                if (schemaLocation != null) {
+                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
+                }
+                
                 return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
 
              }
@@ -238,7 +255,14 @@ public class SOService extends OGCWebService {
             final StringWriter sw = new StringWriter();
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(),
                                                          serviceDef.exceptionVersion.toString());
+            if (exceptionSchemaLocation != null) {
+                marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, exceptionSchemaLocation);
+            }
             marshaller.marshal(report, sw);
+            // we restore the main schema location
+            if (schemaLocation != null) {
+                marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
+            }
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
         } else {
             return Response.ok("The SOS server is not running cause: unable to create JAXB context!", MimeType.TEXT_PLAIN).build();

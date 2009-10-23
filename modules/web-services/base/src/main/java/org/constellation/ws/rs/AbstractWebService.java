@@ -39,12 +39,12 @@ public abstract class AbstractWebService extends WebService {
     /**
      * The xsd schema location for exception report.
      */
-    private String exceptionSchemaLocation = null;
+    protected String exceptionSchemaLocation = null;
 
     /**
      * The xsd schema location for all the returned xml.
      */
-    private String schemaLocation = null;
+    protected String schemaLocation = null;
 
     /**
      * {@inheritDoc }
