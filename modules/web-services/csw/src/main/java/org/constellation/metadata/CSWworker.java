@@ -88,9 +88,8 @@ import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
 import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
 import org.geotoolkit.metadata.iso.DefaultMetaData;
 import org.geotoolkit.csw.xml.AbstractCswRequest;
-import org.geotoolkit.csw.xml.AbstractResultType;
 import org.geotoolkit.csw.xml.CswXmlFactory;
-import org.geotoolkit.csw.xml.ElementSet;
+import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.ElementSetName;
 import org.geotoolkit.csw.xml.GetDomain;
 import org.geotoolkit.csw.xml.GetRecordById;
@@ -103,18 +102,17 @@ import org.geotoolkit.csw.xml.Transaction;
 import org.geotoolkit.csw.xml.DescribeRecord;
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.GetDomainResponse;
+import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.csw.xml.v202.AcknowledgementType;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.DeleteType;
 import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
-import org.geotoolkit.csw.xml.v202.ElementSetType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.csw.xml.v202.HarvestResponseType;
 import org.geotoolkit.csw.xml.v202.InsertType;
 import org.geotoolkit.csw.xml.v202.QueryType;
-import org.geotoolkit.csw.xml.v202.ResultType;
 import org.geotoolkit.csw.xml.v202.SearchResultsType;
 import org.geotoolkit.csw.xml.v202.TransactionResponseType;
 import org.geotoolkit.csw.xml.v202.TransactionSummaryType;
@@ -809,10 +807,12 @@ public class CSWworker {
     }
     
     /**
-     * Web service operation which permits to search the catalogue.
+     * Web service operation which permits to search the catalogue to find records.
      * 
      * @param request
-     * @return
+     *
+     * @return A GetRecordsResponseType containing the result of the request or
+     *         an AcknowledgementType if the resultType is set to VALIDATE.
      */
     public Object getRecords(final GetRecordsRequest request) throws CstlServiceException {
         LOGGER.info("GetRecords request processing" + '\n');
@@ -843,7 +843,7 @@ public class CSWworker {
         }
         
         //We get the resultType
-        AbstractResultType resultType = ResultType.HITS;
+        ResultType resultType = ResultType.HITS;
         if (request.getResultType() != null) {
             resultType = request.getResultType();
         }
@@ -908,7 +908,7 @@ public class CSWworker {
         
         // we get the element set type (BRIEF, SUMMARY OR FULL) or the custom elementName
         final ElementSetName setName  = query.getElementSetName();
-        ElementSet set                = ElementSetType.SUMMARY;
+        ElementSetType set            = ElementSetType.SUMMARY;
         final List<QName> elementName = query.getElementName();
         if (setName != null) {
             set = setName.getValue();
@@ -1114,7 +1114,8 @@ public class CSWworker {
      * web service operation return one or more records specified by there identifier.
      * 
      * @param request
-     * @return
+     *
+     * @return A GetRecordByIdResponse containing a list of records.
      */
     public GetRecordByIdResponse getRecordById(final GetRecordById request) throws CstlServiceException {
         LOGGER.info("GetRecordById request processing" + '\n');
@@ -1126,7 +1127,7 @@ public class CSWworker {
         
         
         // we get the level of the record to return (Brief, summary, full)
-        ElementSet set = ElementSetType.SUMMARY;
+        ElementSetType set = ElementSetType.SUMMARY;
         if (request.getElementSetName() != null && request.getElementSetName().getValue() != null) {
             set = request.getElementSetName().getValue();
         }

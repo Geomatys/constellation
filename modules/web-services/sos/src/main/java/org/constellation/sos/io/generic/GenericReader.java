@@ -483,12 +483,24 @@ public abstract class GenericReader  {
      * @param parameters
      */
     private void fillStatement(PreparedStatement stmt, List<String> parameters) throws SQLException {
-        if (parameters == null)
+        if (parameters == null) {
             parameters = new ArrayList<String>();
-        final ParameterMetaData meta = stmt.getParameterMetaData();
-        final int nbParam = meta.getParameterCount();
-        if (nbParam != parameters.size())
+        }
+        ParameterMetaData meta = stmt.getParameterMetaData();
+        int nbParam            = meta.getParameterCount();
+
+        if (nbParam != parameters.size() && parameters.size() != 1) {
             throw new IllegalArgumentException("There is not the good number of parameters specified for this statement: stmt:" + nbParam + " parameters:" + parameters.size());
+        } else if (nbParam != parameters.size() && parameters.size() == 1) {
+            /*
+             * PATCH: if we have only one parameters submit and more parameters expected we fill all the ? with the same parameter.
+             */
+            final String uniqueParam = parameters.get(0);
+            parameters = new ArrayList<String>();
+            for (int j = 0; j < nbParam; j++) {
+                parameters.add(uniqueParam);
+            }
+        }
         
         int i = 1;
         while (i < nbParam + 1) {

@@ -105,7 +105,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
         return new SamplingFeatureEntry(result.getString(indexOf(query.identifier)),
                                         result.getString(indexOf(query.name)),
                                         result.getString(indexOf(query.description)),
-                                        new FeaturePropertyType(null));
+                                        new FeaturePropertyType(result.getString(indexOf(query.sampledFeature))));
         
     }
 

@@ -36,12 +36,17 @@ import javax.xml.bind.Unmarshaller;
 
 
 // constellation dependencies
+import org.constellation.ws.CstlServiceException;
+import org.constellation.metadata.CSWworker;
+
+//geotoolkit dependencies
+import org.geotoolkit.csw.xml.ElementSetType;
+import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
 import org.geotoolkit.csw.xml.v202.DescribeRecordType;
 import org.geotoolkit.csw.xml.v202.DistributedSearchType;
 import org.geotoolkit.csw.xml.v202.ElementSetNameType;
-import org.geotoolkit.csw.xml.v202.ElementSetType;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.geotoolkit.csw.xml.v202.GetDomainResponseType;
 import org.geotoolkit.csw.xml.v202.GetDomainType;
@@ -53,14 +58,9 @@ import org.geotoolkit.csw.xml.v202.HarvestResponseType;
 import org.geotoolkit.csw.xml.v202.HarvestType;
 import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.csw.xml.v202.QueryType;
-import org.geotoolkit.csw.xml.v202.ResultType;
 import org.geotoolkit.csw.xml.v202.TransactionResponseType;
 import org.geotoolkit.csw.xml.v202.TransactionType;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.metadata.CSWworker;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
-
-//geotools dependencies
 import org.geotoolkit.metadata.iso.DefaultMetaData;
 import org.geotoolkit.xml.MarshallerPool;
 

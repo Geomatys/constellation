@@ -61,7 +61,7 @@ import static org.constellation.metadata.CSWQueryable.*;
 import org.geotoolkit.metadata.iso.DefaultMetaData;
 import org.geotoolkit.temporal.object.DefaultInstant;
 import org.geotoolkit.temporal.object.DefaultPosition;
-import org.geotoolkit.csw.xml.v202.ElementSetType;
+import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;

@@ -46,9 +46,8 @@ import javax.xml.namespace.QName;
 
 // constellation dependencies
 import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.ElementSet;
+import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
-import org.geotoolkit.csw.xml.v202.ElementSetType;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.generic.database.Automatic;
@@ -433,7 +432,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    private void loadData(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
+    private void loadData(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
         LOGGER.finer("loading data for " + identifier);
         singleValue.clear();
         multipleValue.clear();
@@ -670,7 +669,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @throws java.sql.SQLException
      * @throws CstlServiceException
      */
-    public Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
         Object result = null;
         
         //TODO we verify that the identifier exists
@@ -696,7 +695,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @param elementName
      * @return
      */
-    protected abstract AbstractRecordType getDublinCore(String identifier, ElementSet type, List<QName> elementName);
+    protected abstract AbstractRecordType getDublinCore(String identifier, ElementSetType type, List<QName> elementName);
     
     /**
      * return a metadata in ISO representation.
@@ -710,7 +709,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * Return a list of variables name used for the dublicore representation.
      * @return
      */
-    protected abstract List<String> getVariablesForDublinCore(ElementSet type, List<QName> elementName);
+    protected abstract List<String> getVariablesForDublinCore(ElementSetType type, List<QName> elementName);
        
     /**
      * Return a list of contact id used in this database.

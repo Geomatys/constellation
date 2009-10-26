@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.ElementSet;
+import org.geotoolkit.csw.xml.ElementSetType;
 import org.constellation.ws.CstlServiceException;
 
 /**
@@ -81,7 +81,7 @@ public abstract class MetadataReader {
      * @return A marshallable metadata object.
      * @throws java.sql.SQLException
      */
-    public abstract Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException;
+    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException;
     
     /**
      * Return a list of values for each specific fields specified as a coma separated String.

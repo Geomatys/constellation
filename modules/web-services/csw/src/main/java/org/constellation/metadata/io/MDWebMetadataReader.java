@@ -68,12 +68,11 @@ import org.mdweb.io.sql.LocalReaderThesaurus;
 // geotoolkit/GeoAPI dependencies
 import org.geotoolkit.metadata.iso.MetadataEntity;
 import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.ElementSet;
+import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.Settable;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.csw.xml.v202.BriefRecordType;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
-import org.geotoolkit.csw.xml.v202.ElementSetType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
 import org.geotoolkit.csw.xml.v202.RecordType;
@@ -316,7 +315,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @throws java.sql.CstlServiceException
      */
     @Override
-    public Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
         int id;
         String catalogCode = "";
         
@@ -387,7 +386,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @param form the MDWeb formular.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType getRecordFromForm(String identifier, Form form, ElementSet type, List<QName> elementName) throws MD_IOException {
+    private AbstractRecordType getRecordFromForm(String identifier, Form form, ElementSetType type, List<QName> elementName) throws MD_IOException {
         final Value top                   = form.getTopValue();
         final Standard  recordStandard    = top.getType().getStandard();
         
@@ -416,7 +415,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @param form the MDWeb formular.
      * @return a CSW object representing the metadata.
      */
-    private AbstractRecordType transformMDFormInRecord(Form form, ElementSet type, List<QName> elementName) throws MD_IOException {
+    private AbstractRecordType transformMDFormInRecord(Form form, ElementSetType type, List<QName> elementName) throws MD_IOException {
         
         final Value top                   = form.getTopValue();
         final Standard  recordStandard    = top.getType().getStandard();
@@ -738,7 +737,7 @@ public class MDWebMetadataReader extends MetadataReader {
         }
     }
     
-    private Object applyElementSet(Object result, ElementSet type, List<QName> elementName) {
+    private Object applyElementSet(Object result, ElementSetType type, List<QName> elementName) {
 
          if (type == null)
             type = ElementSetType.FULL;

@@ -40,20 +40,24 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
+import org.constellation.metadata.io.MetadataWriter;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.util.Util;
+import org.constellation.ws.MimeType;
+
+// Geotoolkit dependencies
+import org.geotoolkit.csw.xml.ResultType;
+import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.GetRecordsRequest;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.ElementSetNameType;
-import org.geotoolkit.csw.xml.v202.ElementSetType;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordsType;
 import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.csw.xml.v202.QueryType;
-import org.geotoolkit.csw.xml.v202.ResultType;
 import org.geotoolkit.csw.xml.v202.SearchResultsType;
-import org.constellation.metadata.io.MetadataWriter;
-import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.CapabilitiesBaseType;
@@ -65,8 +69,6 @@ import org.geotoolkit.ows.xml.v100.Operation;
 import org.geotoolkit.ows.xml.v100.OperationsMetadata;
 import org.geotoolkit.ows.xml.v100.RequestMethodType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
-import org.constellation.util.Util;
-import org.constellation.ws.MimeType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.NotType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
@@ -191,9 +193,9 @@ public class CatalogueHarvester {
         List<QName> typeNames2 = new ArrayList<QName>();
         typeNames2.add(DATASET_QNAME);
         org.geotoolkit.csw.xml.v200.QueryType query2 = new org.geotoolkit.csw.xml.v200.QueryType(typeNames2,
-                                                                                         new org.geotoolkit.csw.xml.v200.ElementSetNameType(org.geotoolkit.csw.xml.v200.ElementSetType.FULL),
+                                                                                         new org.geotoolkit.csw.xml.v200.ElementSetNameType(ElementSetType.FULL),
                                                                                          constraint2); 
-        fullGetRecordsRequestv200 = new org.geotoolkit.csw.xml.v200.GetRecordsType(Parameters.CSW, "2.0.0", org.geotoolkit.csw.xml.v200.ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw", 1, 20, query2, null);
+        fullGetRecordsRequestv200 = new org.geotoolkit.csw.xml.v200.GetRecordsType(Parameters.CSW, "2.0.0", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw", 1, 20, query2, null);
         
         
         //we build the special request to harvest unstandardized CSW service (2.0.0)
@@ -201,9 +203,9 @@ public class CatalogueHarvester {
         typeNames2         = new ArrayList<QName>();
         typeNames2.add(DATASET_QNAME);
         query2             = new org.geotoolkit.csw.xml.v200.QueryType(typeNames2,
-                                                                   new org.geotoolkit.csw.xml.v200.ElementSetNameType(org.geotoolkit.csw.xml.v200.ElementSetType.FULL),
+                                                                   new org.geotoolkit.csw.xml.v200.ElementSetNameType(ElementSetType.FULL),
                                                                    constraint2); 
-        fullGetRecordsRequestv200Special1 = new org.geotoolkit.csw.xml.v200.GetRecordsType(Parameters.CSW, "2.0.0", org.geotoolkit.csw.xml.v200.ResultType.RESULTS, null, MimeType.APPLICATION_XML, null, 1, 20, query2, null);
+        fullGetRecordsRequestv200Special1 = new org.geotoolkit.csw.xml.v200.GetRecordsType(Parameters.CSW, "2.0.0", ResultType.RESULTS, null, MimeType.APPLICATION_XML, null, 1, 20, query2, null);
         
         
         //we build the base request to get the capabilities of anoter CSW service (2.0.2)

@@ -62,11 +62,10 @@ import org.opengis.metadata.distribution.Distributor;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.ElementSet;
+import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.csw.xml.v202.BriefRecordType;
 import org.geotoolkit.csw.xml.v202.DomainValuesType;
-import org.geotoolkit.csw.xml.v202.ElementSetType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
@@ -132,13 +131,13 @@ public class FileMetadataReader extends MetadataReader {
      * 
      * @param identifier The metadata identifier.
      * @param mode An output schema mode: EBRIM, ISO_19115 and DUBLINCORE supported.
-     * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
+     * @param type An ElementSetType: FULL, SUMMARY and BRIEF. (implies elementName == null)
      * @param elementName A list of QName describing the requested fields. (implies type == null)
      * 
      * @return A marshallable metadata object.
      */
     @Override
-    public Object getMetadata(String identifier, int mode, ElementSet type, List<QName> elementName) throws CstlServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
         Object obj = getObjectFromFile(identifier);
         if (obj instanceof DefaultMetaData && mode == DUBLINCORE) {
             obj = translateISOtoDC((DefaultMetaData)obj, type, elementName);
@@ -190,7 +189,7 @@ public class FileMetadataReader extends MetadataReader {
      * @return
      * @throws CstlServiceException If the type and the element name are null.
      */
-    private AbstractRecordType applyElementSet(RecordType record, ElementSet type, List<QName> elementName) throws CstlServiceException {
+    private AbstractRecordType applyElementSet(RecordType record, ElementSetType type, List<QName> elementName) throws CstlServiceException {
         
         if (type != null) {
             if (type.equals(ElementSetType.SUMMARY)) {
@@ -238,7 +237,7 @@ public class FileMetadataReader extends MetadataReader {
      * @param elementName
      * @return
      */
-    private AbstractRecordType translateISOtoDC(DefaultMetaData metadata, ElementSet type, List<QName> elementName) {
+    private AbstractRecordType translateISOtoDC(DefaultMetaData metadata, ElementSetType type, List<QName> elementName) {
         if (metadata != null) {
 
             final RecordType customRecord = new RecordType();

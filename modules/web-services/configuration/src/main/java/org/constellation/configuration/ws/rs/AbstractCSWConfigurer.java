@@ -33,7 +33,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
-import org.geotoolkit.csw.xml.v202.ElementSetType;
+import org.geotoolkit.csw.xml.ElementSetType;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.exception.ConfigurationException;
