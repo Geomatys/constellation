@@ -51,13 +51,13 @@ import org.constellation.util.Util;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
 import org.geotoolkit.internal.referencing.VerticalDatumTypes;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.DefaultMetadataExtensionInformation;
 import org.geotoolkit.metadata.iso.citation.DefaultAddress;
 import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
 import org.geotoolkit.metadata.iso.citation.DefaultCitation;
 import org.geotoolkit.metadata.iso.citation.DefaultContact;
-import org.geotoolkit.metadata.iso.citation.DefaultOnLineResource;
+import org.geotoolkit.metadata.iso.citation.DefaultOnlineResource;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.geotoolkit.metadata.iso.citation.DefaultTelephone;
 import org.geotoolkit.metadata.iso.constraint.DefaultLegalConstraints;
@@ -125,7 +125,7 @@ public class MetadataUnmarshallTest {
     @BeforeClass
     public static void setUp() throws JAXBException, URISyntaxException {
         final List<Class> classes = CSWClassesContext.FRA_CLASSES;
-        classes.add(DefaultMetaData.class);
+        classes.add(DefaultMetadata.class);
         testPool = new AnchorPool(classes);
     }
 
@@ -153,10 +153,10 @@ public class MetadataUnmarshallTest {
         unmarshaller = testPool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
 
-        assertTrue(obj instanceof DefaultMetaData);
-        DefaultMetaData result = (DefaultMetaData) obj;
+        assertTrue(obj instanceof DefaultMetadata);
+        DefaultMetadata result = (DefaultMetadata) obj;
 
-        DefaultMetaData expResult = new DefaultMetaData();
+        DefaultMetadata expResult = new DefaultMetadata();
 
         /*
          * static part
@@ -195,7 +195,7 @@ public class MetadataUnmarshallTest {
         set.add("sismer@ifremer.fr");
         add.setElectronicMailAddresses(set);
         contact.setAddress(add);
-        DefaultOnLineResource o = new DefaultOnLineResource(new URI("http://www.ifremer.fr/sismer/"));
+        DefaultOnlineResource o = new DefaultOnlineResource(new URI("http://www.ifremer.fr/sismer/"));
         o.setProtocol("http");
         contact.setOnlineResource(o);
         author.setContactInfo(contact);
@@ -326,7 +326,7 @@ public class MetadataUnmarshallTest {
         set = new HashSet();
         add.setElectronicMailAddresses(set);
         contact.setAddress(add);
-        o = new DefaultOnLineResource(new URI("http://www.com.univ-mrs.fr/LOB/"));
+        o = new DefaultOnlineResource(new URI("http://www.com.univ-mrs.fr/LOB/"));
         contact.setOnlineResource(o);
         o.setProtocol("http");
         originator.setContactInfo(contact);
@@ -360,7 +360,7 @@ public class MetadataUnmarshallTest {
         set.add("sismer@ifremer.fr");
         add.setElectronicMailAddresses(set);
         contact.setAddress(add);
-        o = new DefaultOnLineResource(new URI("http://www.ifremer.fr/sismer/"));
+        o = new DefaultOnlineResource(new URI("http://www.ifremer.fr/sismer/"));
         o.setProtocol("http");
         contact.setOnlineResource(o);
         custodian.setContactInfo(contact);
@@ -602,7 +602,7 @@ public class MetadataUnmarshallTest {
         set.add("sismer@ifremer.fr");
         add.setElectronicMailAddresses(set);
         contact.setAddress(add);
-        o = new DefaultOnLineResource(new URI("http://www.ifremer.fr/sismer/"));
+        o = new DefaultOnlineResource(new URI("http://www.ifremer.fr/sismer/"));
         o.setProtocol("http");
         contact.setOnlineResource(o);
         distributorContact.setContactInfo(contact);
@@ -628,7 +628,7 @@ public class MetadataUnmarshallTest {
 
         digiTrans.setTransferSize(2.431640625);
 
-        DefaultOnLineResource onlines = new DefaultOnLineResource();
+        DefaultOnlineResource onlines = new DefaultOnlineResource();
 
         String uri = "http://www.ifremer.fr/sismerData/jsp/visualisationMetadata3.jsp?langue=EN&pageOrigine=CS&cle1=42292_1&cle2=CTDF02";
         if (uri != null) {
@@ -856,8 +856,8 @@ public class MetadataUnmarshallTest {
         StringReader sr = new StringReader(xml);
         obj = unmarshaller.unmarshal(sr);
 
-        assertTrue(obj instanceof DefaultMetaData);
-        DefaultMetaData meta = (DefaultMetaData) obj;
+        assertTrue(obj instanceof DefaultMetadata);
+        DefaultMetadata meta = (DefaultMetadata) obj;
 
         assertTrue(meta.getIdentificationInfo().size() == 1);
         Identification ident = meta.getIdentificationInfo().iterator().next();
@@ -878,8 +878,8 @@ public class MetadataUnmarshallTest {
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta7.xml"));
 
-        assertTrue(obj instanceof DefaultMetaData);
-        result = (DefaultMetaData) obj;
+        assertTrue(obj instanceof DefaultMetadata);
+        result = (DefaultMetadata) obj;
 
     }
 
@@ -976,7 +976,7 @@ public class MetadataUnmarshallTest {
     @Test
     public void marshallTest() throws Exception {
 
-        DefaultMetaData metadata     = new DefaultMetaData();
+        DefaultMetadata metadata     = new DefaultMetadata();
 
         /*
          * static part
@@ -1015,7 +1015,7 @@ public class MetadataUnmarshallTest {
         set.add("sismer@ifremer.fr");
         add.setElectronicMailAddresses(set);
         contact.setAddress(add);
-        DefaultOnLineResource o = new DefaultOnLineResource(new URI("http://www.ifremer.fr/sismer/"));
+        DefaultOnlineResource o = new DefaultOnlineResource(new URI("http://www.ifremer.fr/sismer/"));
         o.setProtocol("http");
         contact.setOnlineResource(o);
         author.setContactInfo(contact);
@@ -1146,7 +1146,7 @@ public class MetadataUnmarshallTest {
         set = new HashSet();
         add.setElectronicMailAddresses(set);
         contact.setAddress(add);
-        o = new DefaultOnLineResource(new URI("http://www.com.univ-mrs.fr/LOB/"));
+        o = new DefaultOnlineResource(new URI("http://www.com.univ-mrs.fr/LOB/"));
         o.setProtocol("http");
         contact.setOnlineResource(o);
         originator.setContactInfo(contact);
@@ -1180,7 +1180,7 @@ public class MetadataUnmarshallTest {
         set.add("sismer@ifremer.fr");
         add.setElectronicMailAddresses(set);
         contact.setAddress(add);
-        o = new DefaultOnLineResource(new URI("http://www.ifremer.fr/sismer/"));
+        o = new DefaultOnlineResource(new URI("http://www.ifremer.fr/sismer/"));
         o.setProtocol("http");
         contact.setOnlineResource(o);
         custodian.setContactInfo(contact);
@@ -1411,7 +1411,7 @@ public class MetadataUnmarshallTest {
         set.add("sismer@ifremer.fr");
         add.setElectronicMailAddresses(set);
         contact.setAddress(add);
-        o = new DefaultOnLineResource(new URI("http://www.ifremer.fr/sismer/"));
+        o = new DefaultOnlineResource(new URI("http://www.ifremer.fr/sismer/"));
         o.setProtocol("http");
         contact.setOnlineResource(o);
         distributorContact.setContactInfo(contact);
@@ -1437,7 +1437,7 @@ public class MetadataUnmarshallTest {
 
         digiTrans.setTransferSize(2.431640625);
 
-        DefaultOnLineResource onlines = new DefaultOnLineResource();
+        DefaultOnlineResource onlines = new DefaultOnlineResource();
 
         String uri = "http://www.ifremer.fr/sismerData/jsp/visualisationMetadata3.jsp?langue=EN&pageOrigine=CS&cle1=42292_1&cle2=CTDF02";
         if (uri != null) {

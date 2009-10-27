@@ -66,7 +66,7 @@ import org.geotoolkit.csw.xml.v202.DomainValuesType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
@@ -137,8 +137,8 @@ public class FileMetadataReader extends MetadataReader {
     @Override
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
         Object obj = getObjectFromFile(identifier);
-        if (obj instanceof DefaultMetaData && mode == DUBLINCORE) {
-            obj = translateISOtoDC((DefaultMetaData)obj, type, elementName);
+        if (obj instanceof DefaultMetadata && mode == DUBLINCORE) {
+            obj = translateISOtoDC((DefaultMetadata)obj, type, elementName);
         } else if (obj instanceof RecordType && mode == DUBLINCORE) {
             obj = applyElementSet((RecordType)obj, type, elementName);
         }
@@ -235,7 +235,7 @@ public class FileMetadataReader extends MetadataReader {
      * @param elementName
      * @return
      */
-    private AbstractRecordType translateISOtoDC(DefaultMetaData metadata, ElementSetType type, List<QName> elementName) {
+    private AbstractRecordType translateISOtoDC(DefaultMetadata metadata, ElementSetType type, List<QName> elementName) {
         if (metadata != null) {
 
             final RecordType customRecord = new RecordType();

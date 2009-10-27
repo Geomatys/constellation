@@ -35,7 +35,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
 // geotoolkit dependencies
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
@@ -239,11 +239,11 @@ public class CSWworkerTest {
         assertTrue(result.getAbstractRecord().size() == 0);
         assertTrue(result.getAny().size() == 1);
         Object obj = result.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetaData);
+        assertTrue(obj instanceof DefaultMetadata);
 
-        DefaultMetaData isoResult = (DefaultMetaData) obj;
+        DefaultMetadata isoResult = (DefaultMetadata) obj;
 
-        DefaultMetaData ExpResult1 = (DefaultMetaData) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
 
         metadataEquals(ExpResult1, isoResult);
 
@@ -1023,10 +1023,10 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().size() == 0);
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetaData);
+        assertTrue(obj instanceof DefaultMetadata);
 
-        DefaultMetaData isoResult = (DefaultMetaData) obj;
-        DefaultMetaData ExpResult1 = (DefaultMetaData) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        DefaultMetadata isoResult = (DefaultMetadata) obj;
+        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
         metadataEquals(ExpResult1, isoResult);
         
 
@@ -1067,7 +1067,7 @@ public class CSWworkerTest {
         /*
          *  TEST 1 : we add the metadata 42292_5p_19900609195600
          */
-        DefaultMetaData ExpResult1 = (DefaultMetaData) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        DefaultMetadata ExpResult1 = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
 
         InsertType insert       = new InsertType(ExpResult1);
         TransactionType request = new TransactionType("CSW", "2.0.2", insert);
@@ -1085,9 +1085,9 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().size() == 0);
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetaData);
+        assertTrue(obj instanceof DefaultMetadata);
 
-        DefaultMetaData isoResult = (DefaultMetaData) obj;
+        DefaultMetadata isoResult = (DefaultMetadata) obj;
         metadataEquals(ExpResult1, isoResult);
 
         /*
@@ -1131,7 +1131,7 @@ public class CSWworkerTest {
          *  TEST 1 : we update the metadata 42292_5p_19900609195600 by replacing it by another metadata
          */
 
-        DefaultMetaData replacement        = (DefaultMetaData) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
+        DefaultMetadata replacement        = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
         QueryConstraintType constraint  = new QueryConstraintType("identifier='42292_5p_19900609195600'", "1.1.0");
         UpdateType update               = new UpdateType(replacement, constraint);
         TransactionType request         = new TransactionType("CSW", "2.0.2", update);
@@ -1165,9 +1165,9 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().size() == 0);
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetaData);
+        assertTrue(obj instanceof DefaultMetadata);
 
-        DefaultMetaData isoResult = (DefaultMetaData) obj;
+        DefaultMetadata isoResult = (DefaultMetadata) obj;
         metadataEquals(replacement, isoResult);
 
 
@@ -1191,7 +1191,7 @@ public class CSWworkerTest {
 
         List<String> results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1224,7 +1224,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1250,7 +1250,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1277,7 +1277,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1307,7 +1307,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1328,7 +1328,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1365,7 +1365,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1404,7 +1404,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1434,7 +1434,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1471,7 +1471,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1514,7 +1514,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1559,7 +1559,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1587,7 +1587,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1619,7 +1619,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1642,7 +1642,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1669,7 +1669,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1705,7 +1705,7 @@ public class CSWworkerTest {
           TODO FIX this test
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1730,7 +1730,7 @@ public class CSWworkerTest {
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
-            DefaultMetaData meta = (DefaultMetaData) objRec;
+            DefaultMetadata meta = (DefaultMetadata) objRec;
             results.add(meta.getFileIdentifier());
         }
 
@@ -1812,9 +1812,9 @@ public class CSWworkerTest {
         assertTrue(GRresult.getAbstractRecord().size() == 0);
         assertTrue(GRresult.getAny().size() == 1);
         obj = GRresult.getAny().get(0);
-        assertTrue(obj instanceof DefaultMetaData);
+        assertTrue(obj instanceof DefaultMetadata);
 
-        isoResult = (DefaultMetaData) obj;
+        isoResult = (DefaultMetadata) obj;
         DefaultExtendedElementInformation extResult = null;
         boolean removed = true;
         for (ExtendedElementInformation ex : isoResult.getMetadataExtensionInfo().iterator().next().getExtendedElementInformation()) {
@@ -1831,7 +1831,7 @@ public class CSWworkerTest {
         pool.release(unmarshaller);
     }
 
-    public static void metadataEquals(DefaultMetaData expResult, DefaultMetaData result) {
+    public static void metadataEquals(DefaultMetadata expResult, DefaultMetadata result) {
         
         assertEquals(expResult.getAcquisitionInformation(), result.getAcquisitionInformation());
         assertEquals(expResult.getApplicationSchemaInfo(), result.getApplicationSchemaInfo());

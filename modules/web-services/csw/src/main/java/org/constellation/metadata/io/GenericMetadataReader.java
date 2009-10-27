@@ -61,7 +61,7 @@ import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotools dependencies
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
@@ -703,7 +703,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @param identifier
      * @return
      */
-    protected abstract DefaultMetaData getISO(String identifier);
+    protected abstract DefaultMetadata getISO(String identifier);
     
     /**
      * Return a list of variables name used for the dublicore representation.
@@ -943,11 +943,11 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      * @throws java.sql.SQLException
      */
-    public List<DefaultMetaData> getAllEntries() throws CstlServiceException {
-        final List<DefaultMetaData> result = new ArrayList<DefaultMetaData>();
+    public List<DefaultMetadata> getAllEntries() throws CstlServiceException {
+        final List<DefaultMetadata> result = new ArrayList<DefaultMetadata>();
         final List<String> identifiers  = getAllIdentifiers();
         for (String id : identifiers) {
-            result.add((DefaultMetaData) getMetadata(id, ISO_19115, ElementSetType.FULL, null));
+            result.add((DefaultMetadata) getMetadata(id, ISO_19115, ElementSetType.FULL, null));
         }
         return result;
     }

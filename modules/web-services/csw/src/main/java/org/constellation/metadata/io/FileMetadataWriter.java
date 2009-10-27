@@ -37,7 +37,7 @@ import javax.xml.bind.Unmarshaller;
 //geotoolkit dependencies
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.csw.xml.v202.RecordType;
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -178,7 +178,7 @@ public class FileMetadataWriter extends MetadataWriter {
 
                 // we look for a know metadata type
                 if (typeName.equals("MD_Metadata")) {
-                    type = DefaultMetaData.class;
+                    type = DefaultMetadata.class;
                 } else if (typeName.equals("Record")) {
                     type = RecordType.class;
                 } else {

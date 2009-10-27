@@ -39,7 +39,7 @@ import org.geotoolkit.dublincore.xml.AbstractSimpleLiteral;
 import org.geotoolkit.ebrim.xml.EbrimInternationalString;
 import org.geotoolkit.ebrim.xml.RegistryObject;
 import org.geotoolkit.lucene.index.AbstractIndexer;
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // geotools dependencies
@@ -108,8 +108,8 @@ public abstract class MetadataWriter {
                     title = titleSL.getContent().get(0);
             }
                             
-        } else if (obj instanceof DefaultMetaData) {
-            final Collection<Identification> idents = ((DefaultMetaData) obj).getIdentificationInfo();
+        } else if (obj instanceof DefaultMetadata) {
+            final Collection<Identification> idents = ((DefaultMetadata) obj).getIdentificationInfo();
             if (idents.size() != 0) {
                 final Identification ident = idents.iterator().next();
                 if (ident != null && ident.getCitation() != null && ident.getCitation().getTitle() != null) {
@@ -219,8 +219,8 @@ public abstract class MetadataWriter {
                     identifier = identifierSL.getContent().get(0);
             }
 
-        } else if (obj instanceof DefaultMetaData) {
-            identifier = ((DefaultMetaData) obj).getFileIdentifier();
+        } else if (obj instanceof DefaultMetadata) {
+            identifier = ((DefaultMetadata) obj).getFileIdentifier();
 
         } else if (obj instanceof RegistryObject) {
             identifier = ((RegistryObject) obj).getId();

@@ -35,7 +35,7 @@ import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 
 //Junit dependencies
 import org.geotoolkit.referencing.CRS;
@@ -64,7 +64,7 @@ public class StandardAnalyzerTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteIndex();
-        List<DefaultMetaData> object = fillTestData();
+        List<DefaultMetadata> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StandardAnalyzer());
         indexSearcher          = new GenericIndexSearcher(configDirectory, "", new StandardAnalyzer());
     }
@@ -484,49 +484,49 @@ public class StandardAnalyzerTest {
         assertEquals(expectedResult, result);
     }
 
-    public static List<DefaultMetaData> fillTestData() throws JAXBException {
-        List<DefaultMetaData> result = new ArrayList<DefaultMetaData>();
-        MarshallerPool pool          = new MarshallerPool(DefaultMetaData.class);
+    public static List<DefaultMetadata> fillTestData() throws JAXBException {
+        List<DefaultMetadata> result = new ArrayList<DefaultMetadata>();
+        MarshallerPool pool          = new MarshallerPool(DefaultMetadata.class);
         Unmarshaller unmarshaller    = pool.acquireUnmarshaller();
 
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
-        if (obj instanceof DefaultMetaData) {
-            result.add((DefaultMetaData) obj);
+        if (obj instanceof DefaultMetadata) {
+            result.add((DefaultMetadata) obj);
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl");
         }
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2.xml"));
-        if (obj instanceof DefaultMetaData) {
-            result.add((DefaultMetaData) obj);
+        if (obj instanceof DefaultMetadata) {
+            result.add((DefaultMetadata) obj);
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
         }
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta3.xml"));
-        if (obj instanceof DefaultMetaData) {
-            result.add((DefaultMetaData) obj);
+        if (obj instanceof DefaultMetadata) {
+            result.add((DefaultMetadata) obj);
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
         }
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta4.xml"));
-        if (obj instanceof DefaultMetaData) {
-            result.add((DefaultMetaData) obj);
+        if (obj instanceof DefaultMetadata) {
+            result.add((DefaultMetadata) obj);
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
         }
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta5.xml"));
-        if (obj instanceof DefaultMetaData) {
-            result.add((DefaultMetaData) obj);
+        if (obj instanceof DefaultMetadata) {
+            result.add((DefaultMetadata) obj);
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
         }
 
         obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
-        if (obj instanceof DefaultMetaData) {
-            result.add((DefaultMetaData) obj);
+        if (obj instanceof DefaultMetadata) {
+            result.add((DefaultMetadata) obj);
         } else {
             throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
         }

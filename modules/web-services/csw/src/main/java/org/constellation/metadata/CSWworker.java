@@ -85,7 +85,7 @@ import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
 import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.csw.xml.AbstractCswRequest;
 import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.csw.xml.ElementSetType;
@@ -1174,7 +1174,7 @@ public class CSWworker {
             
         //we build ISO 19139 object    
         } else if (outputSchema.equals(Namespaces.GMD)) {
-           final List<DefaultMetaData> records = new ArrayList<DefaultMetaData>();
+           final List<DefaultMetadata> records = new ArrayList<DefaultMetadata>();
            for (String id:request.getId()) {
                
                //we get the form ID and catalog code
@@ -1188,8 +1188,8 @@ public class CSWworker {
                 
                 //we get the metadata object
                 final Object o = mdReader.getMetadata(id, ISO_19115, set, null);
-                if (o instanceof DefaultMetaData) {
-                    records.add((DefaultMetaData)o);
+                if (o instanceof DefaultMetadata) {
+                    records.add((DefaultMetadata)o);
                 } else {
                     LOGGER.severe("the form " + id + " is not a ISO object");
                 }

@@ -61,7 +61,7 @@ import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.csw.xml.v202.TransactionResponseType;
 import org.geotoolkit.csw.xml.v202.TransactionType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.xml.MarshallerPool;
 
 /**
@@ -109,7 +109,7 @@ public class CSWService {
 
        try {
            marshallerPool =
-                   new MarshallerPool(DefaultMetaData.class, Capabilities.class, DescribeRecordType.class
+                   new MarshallerPool(DefaultMetadata.class, Capabilities.class, DescribeRecordType.class
                             ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
                             ,GetCapabilitiesType.class, GetDomainType.class, GetRecordByIdType.class
                             ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class

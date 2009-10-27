@@ -29,7 +29,7 @@ import org.constellation.metadata.CSWClassesContext;
 import org.constellation.metadata.CSWworkerTest;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -99,10 +99,10 @@ public class MDWebMetadataReaderTest {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object result = reader.getMetadata("2:CSWCat", MetadataReader.ISO_19115, null, null);
 
-        DefaultMetaData expResult = (DefaultMetaData) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
+        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
 
-        assertTrue(result instanceof DefaultMetaData);
-        CSWworkerTest.metadataEquals(expResult, (DefaultMetaData)result);
+        assertTrue(result instanceof DefaultMetadata);
+        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
         pool.release(unmarshaller);
     }
 }

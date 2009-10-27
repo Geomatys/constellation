@@ -160,7 +160,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             final String className  = object.getClass().getSimpleName();
             
             // ISO 19115 types
-            if (className.equals("DefaultMetaData")      ||
+            if (className.equals("DefaultMetadata")      ||
             
             // ISO 19110 types        
                 className.equals("FeatureCatalogueImpl") ||
@@ -188,7 +188,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             }
             
             Profile defaultProfile = null;
-            if  (className.equals("DefaultMetaData")) {
+            if  (className.equals("DefaultMetadata")) {
                 defaultProfile = mdWriter.getProfile("ISO_19115");
             }
             final Form form = new Form(-1, mdCatalog, title, user, null, defaultProfile, creationDate, false, false, "normalForm");
@@ -454,9 +454,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
         }
 
         //special case TODO delete when geotools/api will be updated.
-        if (className.equals("DefaultMetaData")) {
+        if (className.equals("DefaultMetadata")) {
             className = "Metadata";
-        } else if (className.equals("DefaultOnLineResource")) {
+        } else if (className.equals("DefaultOnlineResource")) {
             className = "OnlineResource";
         } else if (className.equals("CitationDate") || className.equals("DefaultCitationDate")) {
             className = "CI_Date";

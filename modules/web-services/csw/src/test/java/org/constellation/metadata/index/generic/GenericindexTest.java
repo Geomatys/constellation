@@ -45,7 +45,7 @@ import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 
 // GeoAPI dependencies
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -581,7 +581,7 @@ public class GenericindexTest {
     public static List<Object> fillTestData() throws JAXBException {
         List<Object> result = new ArrayList<Object>();
         final List<Class> classes = CSWClassesContext.FRA_CLASSES;
-        classes.add(DefaultMetaData.class);
+        classes.add(DefaultMetadata.class);
         classes.add(AbstractRecordType.class);
         MarshallerPool pool          = new MarshallerPool(classes.toArray(new Class[1]));
         Unmarshaller unmarshaller    = pool.acquireUnmarshaller();

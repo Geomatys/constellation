@@ -58,7 +58,7 @@ import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // geotoolkit dependencies
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.temporal.object.DefaultInstant;
 import org.geotoolkit.temporal.object.DefaultPosition;
 import org.geotoolkit.csw.xml.ElementSetType;
@@ -255,8 +255,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         try {
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            if (meta instanceof DefaultMetaData) {
-                LOGGER.finer("Metadata: " + ((DefaultMetaData)meta).getFileIdentifier() + " indexed");
+            if (meta instanceof DefaultMetadata) {
+                LOGGER.finer("Metadata: " + ((DefaultMetadata)meta).getFileIdentifier() + " indexed");
             } else if (meta instanceof RecordType) {
                 LOGGER.finer("Metadata: " + ((RecordType)meta).getIdentifier() + " indexed");
             } else {
@@ -287,8 +287,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            if (meta instanceof DefaultMetaData) {
-                LOGGER.finer("Metadata: " + ((DefaultMetaData)meta).getFileIdentifier() + " indexed");
+            if (meta instanceof DefaultMetadata) {
+                LOGGER.finer("Metadata: " + ((DefaultMetadata)meta).getFileIdentifier() + " indexed");
             } else if (meta instanceof RecordType) {
                 LOGGER.finer("Metadata: " + ((RecordType)meta).getIdentifier() + " indexed");
             } else {
@@ -311,7 +311,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     }
 
     /**
-    * Makes a document for a geotools MetaData Object.
+    * Makes a document for a geotoolkit Metadata Object.
     * 
     * @param metadata.
     * @return A Lucene document.
@@ -324,8 +324,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
 
         String identifier;
-        if (metadata instanceof DefaultMetaData) {
-            identifier = ((DefaultMetaData)metadata).getFileIdentifier();
+        if (metadata instanceof DefaultMetadata) {
+            identifier = ((DefaultMetadata)metadata).getFileIdentifier();
         } else if (metadata instanceof RecordType) {
             identifier = ((RecordType)metadata).getIdentifier().getContent().get(0);
         } else {
@@ -340,7 +340,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
         final StringBuilder anyText = new StringBuilder();
 
-        if (metadata instanceof DefaultMetaData) {
+        if (metadata instanceof DefaultMetadata) {
             LOGGER.finer("indexing ISO 19119 MD_Metadata");
             for (final String term : ISO_QUERYABLE.keySet()) {
                  cs.submit(new Callable<TermValue>() {
@@ -413,13 +413,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                         addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
                     }
                 } else {
-                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
                             "cause: missing coordinates.: " + coord);
                 }
 
             } catch (NumberFormatException e) {
                 if (!coord.equals(NULL_VALUE)) {
-                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
                             "cause: unable to parse double: " + coord);
                 }
             }
@@ -510,8 +510,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
                 }
             } else {
-                if (metadata instanceof DefaultMetaData) {
-                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                if (metadata instanceof DefaultMetadata) {
+                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
                         "cause: missing coordinates.: " + coord);
                 } else if (metadata instanceof RecordType) {
                     LOGGER.severe("unable to spatially index form: " + ((RecordType)metadata).getIdentifier() + '\n' +
@@ -523,8 +523,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
         } catch (NumberFormatException e) {
             if (!coord.equals(NULL_VALUE)) {
-                if (metadata instanceof DefaultMetaData) {
-                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetaData)metadata).getFileIdentifier() + '\n' +
+                if (metadata instanceof DefaultMetadata) {
+                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
                         "cause: unable to parse double: " + coord);
                 } else if (metadata instanceof RecordType) {
                     LOGGER.severe("unable to spatially index form: " + ((RecordType)metadata).getIdentifier() + '\n' +
@@ -574,7 +574,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         
         if (paths != null) {
             for (String fullPathID: paths) {
-               if ((fullPathID.startsWith("ISO 19115:MD_Metadata:") && !(metadata instanceof DefaultMetaData)) ||
+               if ((fullPathID.startsWith("ISO 19115:MD_Metadata:") && !(metadata instanceof DefaultMetadata)) ||
                    (fullPathID.startsWith("Catalog Web Service:Record:") && !(metadata instanceof RecordType))) {
                    continue;
                }
@@ -631,7 +631,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      */
     private static String getValuesFromPath(String pathID, Object metadata) {
         String result = "";
-        if ((pathID.startsWith("ISO 19115:MD_Metadata:") && metadata instanceof DefaultMetaData) ||
+        if ((pathID.startsWith("ISO 19115:MD_Metadata:") && metadata instanceof DefaultMetadata) ||
             (pathID.startsWith("Catalog Web Service:Record:") && metadata instanceof RecordType)) {
             
             // we remove the prefix path part

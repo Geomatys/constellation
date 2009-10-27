@@ -26,7 +26,7 @@ import org.constellation.util.Util;
 
 import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.geotoolkit.ebrim.xml.v300.RegistryObjectType;
-import org.geotoolkit.metadata.iso.DefaultMetaData;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.wrs.xml.v100.ExtrinsicObjectType;
 
 /**
@@ -65,7 +65,7 @@ public final class CSWClassesContext {
         classeList.add(HarvestTasks.class);
 
         //ISO 19115 class
-        classeList.add(DefaultMetaData.class);
+        classeList.add(DefaultMetadata.class);
 
         //ISO 19115 French profile class
         classeList.addAll(FRA_CLASSES);

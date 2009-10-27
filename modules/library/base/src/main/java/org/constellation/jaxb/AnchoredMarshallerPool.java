@@ -38,7 +38,7 @@ public class AnchoredMarshallerPool extends MarshallerPool {
     /**
      * Creates a new factory for the given class to be bound, with a default empty namespace.
      *
-     * @param  classesToBeBound The classes to be bound, for example {@code DefaultMetaData.class}.
+     * @param  classesToBeBound The classes to be bound, for example {@code DefaultMetadata.class}.
      * @throws JAXBException    If the JAXB context can not be created.
      */
     public AnchoredMarshallerPool(final Class<?>... classesToBeBound) throws JAXBException {
@@ -49,7 +49,7 @@ public class AnchoredMarshallerPool extends MarshallerPool {
      * Creates a new factory for the given class to be bound.
      *
      * @param  rootNamespace    The root namespace, for example {@code "http://www.isotc211.org/2005/gmd"}.
-     * @param  classesToBeBound The classes to be bound, for example {@code DefaultMetaData.class}.
+     * @param  classesToBeBound The classes to be bound, for example {@code DefaultMetadata.class}.
      * @throws JAXBException    If the JAXB context can not be created.
      */
     public AnchoredMarshallerPool(final String rootNamespace, final Class<?>... classesToBeBound) throws JAXBException {
@@ -60,7 +60,7 @@ public class AnchoredMarshallerPool extends MarshallerPool {
      * Creates a new factory for the given class to be bound.
      *
      * @param  rootNamespace    The root namespace, for example {@code "http://www.isotc211.org/2005/gmd"}.
-     * @param  classesToBeBound The classes to be bound, for example {@code DefaultMetaData.class}.
+     * @param  classesToBeBound The classes to be bound, for example {@code DefaultMetadata.class}.
      * @throws JAXBException    If the JAXB context can not be created.
      */
     public AnchoredMarshallerPool(final String rootNamespace, final String schemaLocation, final Class<?>... classesToBeBound) throws JAXBException {
