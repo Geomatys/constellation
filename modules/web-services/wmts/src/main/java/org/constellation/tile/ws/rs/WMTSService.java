@@ -171,7 +171,7 @@ public class WMTSService extends OGCWebService {
             throw new CstlServiceException("The operation " + request +
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, marshaller, serviceDef);
+            return processExceptionResponse(ex, serviceDef);
         } finally {
             if (marshaller != null) {
                 getMarshallerPool().release(marshaller);
@@ -365,7 +365,7 @@ public class WMTSService extends OGCWebService {
             return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
 
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, marshaller, serviceDef);
+            return processExceptionResponse(ex, serviceDef);
 
         } finally {
             if (marshaller != null) {
@@ -412,15 +412,7 @@ public class WMTSService extends OGCWebService {
             }
             return Response.ok(worker.getTile(gt), mimeType).build();
         } catch (CstlServiceException ex) {
-            Marshaller marshaller = null;
-            try {
-                marshaller = getMarshallerPool().acquireMarshaller();
-                return processExceptionResponse(ex, marshaller, null);
-            } finally {
-                if (marshaller != null) {
-                    getMarshallerPool().release(marshaller);
-                }
-            }
+            return processExceptionResponse(ex, null);
         }
     }
 
@@ -440,9 +432,7 @@ public class WMTSService extends OGCWebService {
      * @throws JAXBException if an error occurs during the marshalling of the exception.
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
-                                                ServiceDef serviceDef) throws JAXBException
-    {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
         /* We don't print the stack trace:
          * - if the user have forget a mandatory parameter.
          * - if the version number is wrong.
@@ -464,7 +454,15 @@ public class WMTSService extends OGCWebService {
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(),
                     ex.getLocator(), serviceDef.exceptionVersion.toString());
             final StringWriter sw = new StringWriter();
-            marshaller.marshal(report, sw);
+            Marshaller marshaller = null;
+            try {
+                marshaller = getMarshallerPool().acquireMarshaller();
+                marshaller.marshal(report, sw);
+            } finally {
+                if (marshaller != null) {
+                    getMarshallerPool().release(marshaller);
+                }
+            }
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
         } else {
             return Response.ok("The WMTS server is not running cause: unable to create JAXB context!", MimeType.TEXT_PLAIN).build();

@@ -300,7 +300,7 @@ public class CSWService extends OGCWebService {
             }
         
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, marshaller, serviceDef);
+            return processExceptionResponse(ex, serviceDef);
 
         } finally {
             if (marshaller != null) {
@@ -313,8 +313,7 @@ public class CSWService extends OGCWebService {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
-                                                ServiceDef serviceDef) throws JAXBException
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException
     {
         /* We don't print the stack trace:
          * - if the user have forget a mandatory parameter.
@@ -336,7 +335,15 @@ public class CSWService extends OGCWebService {
             final String version = serviceDef.exceptionVersion.toString();
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
             final StringWriter sw = new StringWriter();
-            marshaller.marshal(report, sw);
+            Marshaller marshaller = null;
+            try {
+                marshaller = getMarshallerPool().acquireMarshaller();
+                marshaller.marshal(report, sw);
+            } finally {
+                if (marshaller != null) {
+                    getMarshallerPool().release(marshaller);
+                }
+            }
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
         } else {
             return Response.ok("The CSW server is not running cause: unable to create JAXB context!", MimeType.TEXT_PLAIN).build();

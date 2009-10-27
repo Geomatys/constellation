@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Properties;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
@@ -179,8 +178,7 @@ public abstract class OGCWebService extends AbstractWebService {
      *
      * @throws JAXBException if an error occurs during the marshalling of the exception.
      */
-    protected abstract Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
-                                                         final ServiceDef serviceDef) throws JAXBException;
+    protected abstract Response processExceptionResponse(final CstlServiceException ex, final ServiceDef serviceDef) throws JAXBException;
 
     /**
      * The shared method to build a service ExceptionReport.
@@ -191,22 +189,13 @@ public abstract class OGCWebService extends AbstractWebService {
      */
     @Override
     protected Response launchException(final String message, String codeName, final String locator) throws JAXBException {
-        Marshaller marshaller = null;
-        try {
-            marshaller = getMarshallerPool().acquireMarshaller();
-
-            if (isOWS(actingVersion)) {
-                codeName = codeName.replace("_", "");
-                codeName = codeName.toLowerCase();
-            }
-            final OWSExceptionCode code   = CodeLists.valueOf(OWSExceptionCode.class, codeName);
-            final CstlServiceException ex = new CstlServiceException(message, code, locator);
-            return processExceptionResponse(ex, marshaller, supportedVersions.get(0));
-        } finally {
-            if (marshaller != null) {
-                getMarshallerPool().release(marshaller);
-            }
+        if (isOWS(actingVersion)) {
+            codeName = codeName.replace("_", "");
+            codeName = codeName.toLowerCase();
         }
+        final OWSExceptionCode code   = CodeLists.valueOf(OWSExceptionCode.class, codeName);
+        final CstlServiceException ex = new CstlServiceException(message, code, locator);
+        return processExceptionResponse(ex, supportedVersions.get(0));
     }
 
     /**

@@ -74,7 +74,7 @@ public class SOService extends OGCWebService {
         worker = new SOSworker(null);
         setXMLContext("org.geotoolkit.sos.xml.v100:org.geotoolkit.gml.xml.v311:org.geotoolkit.swe.xml.v100:org.geotoolkit.swe.xml.v101:" +
                 "org.geotoolkit.observation.xml.v100:org.geotoolkit.sampling.xml.v100:org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101", "",
-                "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd",
+                "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd",
                 "http://www.opengis.net/ows/1.1 http://schemas.opengis.net/ows/1.1.0/owsExceptionReport.xsd");
     }
 
@@ -130,9 +130,9 @@ public class SOService extends OGCWebService {
                 AbstractSensorML sensor = worker.describeSensor(ds);
                 // for sensorML file we need to change the schema localtion
                 if (sensor != null && sensor.getVersion().equals("1.0.1")) {
-                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://schemas.opengis.net/sensorML/1.0.1/sensorML.xsd");
+                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.opengis.net/sensorML/1.0.1 http://schemas.opengis.net/sensorML/1.0.1/sensorML.xsd");
                 } else {
-                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://schemas.opengis.net/sensorML/1.0.0/sensorML.xsd");
+                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.opengis.net/sensorML/1.0 http://schemas.opengis.net/sensorML/1.0.0/sensorML.xsd");
                 }
 
                 marshaller.marshal(sensor, sw);
@@ -213,7 +213,7 @@ public class SOService extends OGCWebService {
 
 
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, marshaller, serviceDef);
+            return processExceptionResponse(ex, serviceDef);
 
         } finally {
             if (marshaller != null) {
@@ -226,8 +226,7 @@ public class SOService extends OGCWebService {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
-                                                ServiceDef serviceDef) throws JAXBException {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
         /* We don't print the stack trace:
          * - if the user have forget a mandatory parameter.
          * - if the version number is wrong.
@@ -255,13 +254,22 @@ public class SOService extends OGCWebService {
             final StringWriter sw = new StringWriter();
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(),
                                                          serviceDef.exceptionVersion.toString());
-            if (exceptionSchemaLocation != null) {
-                marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, exceptionSchemaLocation);
-            }
-            marshaller.marshal(report, sw);
-            // we restore the main schema location
-            if (schemaLocation != null) {
-                marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
+            Marshaller marshaller = null;
+            try {
+                marshaller = getMarshallerPool().acquireMarshaller();
+
+                if (exceptionSchemaLocation != null) {
+                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, exceptionSchemaLocation);
+                }
+                marshaller.marshal(report, sw);
+                // we restore the main schema location
+                if (schemaLocation != null) {
+                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
+                }
+            } finally {
+                if (marshaller != null) {
+                    getMarshallerPool().release(marshaller);
+                }
             }
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
         } else {

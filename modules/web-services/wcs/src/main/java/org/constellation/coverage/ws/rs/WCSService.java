@@ -258,7 +258,7 @@ public class WCSService extends OGCWebService {
         	 * for the protocol stream which JAXB, in this case, will then 
         	 * marshall and serialize into an XML message HTTP response.
         	 */
-        	return processExceptionResponse(ex, marshaller, serviceDef);
+        	return processExceptionResponse(ex, serviceDef);
             
         } finally {
             if (marshaller != null) {
@@ -271,8 +271,7 @@ public class WCSService extends OGCWebService {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, Marshaller marshaller,
-                                                ServiceDef serviceDef) throws JAXBException
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException
     {
         // LOG THE EXCEPTION
         // We do not want to log the full stack trace if this is an error
@@ -304,7 +303,15 @@ public class WCSService extends OGCWebService {
                                              new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode(), locator));
         }
         final StringWriter sw = new StringWriter();
-        marshaller.marshal(report, sw);
+        Marshaller marshaller = null;
+        try {
+            marshaller = getMarshallerPool().acquireMarshaller();
+            marshaller.marshal(report, sw);
+        } finally {
+            if (marshaller != null) {
+                getMarshallerPool().release(marshaller);
+            }
+        }
 
         return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.APP_SE_XML).build();
     }

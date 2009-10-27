@@ -240,7 +240,7 @@ public class WMSService extends OGCWebService {
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                            OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(queryContext, ex, marshaller, version);
+            return processExceptionResponse(queryContext, ex, version);
         } finally {
             if (marshaller != null) {
                 getMarshallerPool().release(marshaller);
@@ -253,13 +253,12 @@ public class WMSService extends OGCWebService {
      * Generate an error response in image if query asks it.
      * Otherwise this call will fallback on normal xml error.
      */
-    private Response processExceptionResponse(final QueryContext queryContext, final CstlServiceException ex, final Marshaller marshaller,
-                                                ServiceDef serviceDef) throws JAXBException {
-        if(queryContext.isErrorInimage()) {
+    private Response processExceptionResponse(final QueryContext queryContext, final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
+        if (queryContext.isErrorInimage()) {
             final BufferedImage image = DefaultPortrayalService.writeException(ex, new Dimension(600, 400));
             return Response.ok(image, queryContext.getExceptionImageFormat()).build();
-        }else{
-            return processExceptionResponse(ex, marshaller, serviceDef);
+        } else {
+            return processExceptionResponse(ex, serviceDef);
         }
     }
 
@@ -268,8 +267,7 @@ public class WMSService extends OGCWebService {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, final Marshaller marshaller,
-                                                ServiceDef serviceDef) throws JAXBException{
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException{
 
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
