@@ -435,12 +435,12 @@ final class FormatEntry extends Entry implements Format {
      * @throws IOException si une erreur est survenue lors de la lecture.
      */
     RenderedImage read(final Object         input,
-                             final int            imageIndex,
-                             final int            numImages,
-                             final ImageReadParam param,
-                             final IIOListeners   listeners,
-                             final Dimension      expected,
-                             final CoverageReference source) throws IOException
+                       final int            imageIndex,
+                       final int            numImages,
+                       final ImageReadParam param,
+                       final IIOListeners   listeners,
+                       final Dimension      expected,
+                       final CoverageReference source) throws IOException
     {
         assert Thread.holdsLock(this);
         RenderedImage    image       = null;
@@ -511,17 +511,35 @@ final class FormatEntry extends Entry implements Format {
 
 
         // Can this be trashed now?
+        // MD answer: not yet, it still used.
         if (param instanceof RawBinaryImageReadParam) {
             final RawBinaryImageReadParam rawParam = (RawBinaryImageReadParam) param;
             if (rawParam.getStreamImageSize() == null) {
                 rawParam.setStreamImageSize(expected);
             }
-            if (geophysics && rawParam.getDestinationType() == null) {
-                final int dataType = rawParam.getStreamDataType();
-                if (dataType != DataBuffer.TYPE_FLOAT &&
-                    dataType != DataBuffer.TYPE_DOUBLE)
-                {
-                    rawParam.setDestinationType(DataBuffer.TYPE_FLOAT);
+            if (rawParam.getDestinationType() == null) {
+                // Use auto-detection for now as a patch for avoiding modification of
+                // the database, but what we should really do is to add an explicit
+                // column in the Format table.
+                if (geophysics) {
+                    final int dataType = rawParam.getStreamDataType();
+                    if (dataType != DataBuffer.TYPE_FLOAT &&
+                        dataType != DataBuffer.TYPE_DOUBLE)
+                    {
+                        rawParam.setDestinationType(DataBuffer.TYPE_FLOAT);
+                    }
+                } else if (bands != null && bands.length != 0) {
+                    final double lower = bands[0].getMinimumValue();
+                    final double upper = bands[0].getMaximumValue();
+                    if (lower >= 0 && upper <= 0xFF) {
+                        rawParam.setDestinationType(DataBuffer.TYPE_BYTE);
+                    } else if (lower >= 0 && upper <= 0xFFFF) {
+                        rawParam.setDestinationType(DataBuffer.TYPE_USHORT);
+                    } else if (lower >= Short.MIN_VALUE && upper <= Short.MAX_VALUE) {
+                        rawParam.setDestinationType(DataBuffer.TYPE_SHORT);
+                    } else if (lower >= Integer.MIN_VALUE && upper <= Integer.MAX_VALUE) {
+                        rawParam.setDestinationType(DataBuffer.TYPE_INT);
+                    }
                 }
             }
         }
