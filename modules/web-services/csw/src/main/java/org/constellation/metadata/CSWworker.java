@@ -79,7 +79,6 @@ import org.constellation.ws.ServiceVersion;
 
 import static org.constellation.metadata.io.MetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
-import static org.constellation.metadata.TypeNames.*;
 
 //geotoolkit dependencies
 import org.geotoolkit.factory.FactoryNotFoundException;
@@ -140,7 +139,7 @@ import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
+import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // GeoAPI dependencies
 import org.opengis.filter.sort.SortOrder;

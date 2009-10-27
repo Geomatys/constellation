@@ -33,7 +33,6 @@ import javax.xml.namespace.QName;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import static org.constellation.metadata.TypeNames.*;
 
 // geotoolkit dependencies
 import org.geotoolkit.metadata.iso.DefaultMetaData;
@@ -85,6 +84,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
 import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
+import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // GeoAPI dependencies
 import org.opengis.metadata.Datatype;
@@ -453,7 +453,7 @@ public class CSWworkerTest {
          *  TEST 1 : getRecords with HITS - DC mode (FULL) - CQL text: Title LIKE 90008411%
          */
         
-        List<QName> typeNames             = Arrays.asList(TypeNames.RECORD_QNAME);
+        List<QName> typeNames             = Arrays.asList(RECORD_QNAME);
         ElementSetNameType elementSetName = new ElementSetNameType(ElementSetType.FULL);
         SortByType sortBy                 = null;
         QueryConstraintType constraint    = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
@@ -475,7 +475,7 @@ public class CSWworkerTest {
          *  TEST 2 : getRecords with RESULTS - DC mode (FULL) - CQL text: Title LIKE 90008411%
          */
 
-        typeNames      = Arrays.asList(TypeNames.RECORD_QNAME);
+        typeNames      = Arrays.asList(RECORD_QNAME);
         elementSetName = new ElementSetNameType(ElementSetType.FULL);
         sortBy         = null;
         constraint     = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
@@ -524,7 +524,7 @@ public class CSWworkerTest {
          *  TEST 3 : getRecords with VALIDATE - DC mode (FULL) - CQL text: Title LIKE 90008411%
          */
 
-        typeNames      = Arrays.asList(TypeNames.RECORD_QNAME);
+        typeNames      = Arrays.asList(RECORD_QNAME);
         elementSetName = new ElementSetNameType(ElementSetType.FULL);
         sortBy         = null;
         constraint     = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
@@ -537,7 +537,7 @@ public class CSWworkerTest {
          *  TEST 4 : getRecords with RESULTS - DC mode (BRIEF) - CQL text: Title LIKE 90008411%
          */
 
-        typeNames      = Arrays.asList(TypeNames.RECORD_QNAME);
+        typeNames      = Arrays.asList(RECORD_QNAME);
         elementSetName = new ElementSetNameType(ElementSetType.BRIEF);
         sortBy         = null;
         constraint     = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
@@ -588,7 +588,7 @@ public class CSWworkerTest {
          */
         LOGGER.info("TEST - 5 begin");
         
-        typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
+        typeNames        = Arrays.asList(RECORD_QNAME);
         List<QName> cust = new ArrayList<QName>();
         cust.add(_Identifier_QNAME);
         cust.add(_Subject_QNAME);
@@ -642,7 +642,7 @@ public class CSWworkerTest {
          *  TEST 6 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE 90008411%
          */
 
-        typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
+        typeNames        = Arrays.asList(RECORD_QNAME);
         cust             = new ArrayList<QName>();
         cust.add(_BoundingBox_QNAME);
         cust.add(_Modified_QNAME);
@@ -699,7 +699,7 @@ public class CSWworkerTest {
         /*
          * Test 7 : getRecord with bad outputFormat
          */
-        typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
+        typeNames        = Arrays.asList(RECORD_QNAME);
         sortBy           = null;
         constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
         query            = new QueryType(typeNames, elementSetName, sortBy, constraint);
@@ -755,7 +755,7 @@ public class CSWworkerTest {
          /*
          * Test 10 : getRecord with bad outputSchema
          */
-        typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
+        typeNames        = Arrays.asList(RECORD_QNAME);
         sortBy           = null;
         constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
         query            = new QueryType(typeNames, elementSetName, sortBy, constraint);
@@ -789,7 +789,7 @@ public class CSWworkerTest {
          /*
          * Test 12 : getRecord with bad statrt position
          */
-        typeNames        = Arrays.asList(TypeNames.RECORD_QNAME);
+        typeNames        = Arrays.asList(RECORD_QNAME);
         sortBy           = null;
         constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
         query            = new QueryType(typeNames, elementSetName, sortBy, constraint);
@@ -1180,7 +1180,7 @@ public class CSWworkerTest {
         constraint        = new QueryConstraintType("Language = 'eng'", "1.0.0");
         SortPropertyType sp = new SortPropertyType("Identifier", SortOrderType.ASC);
         SortByType sort   = new SortByType(Arrays.asList(sp));
-        QueryType query   = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
+        QueryType query   = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
         GetRecordsType gr = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         GetRecordsResponseType response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -1239,7 +1239,7 @@ public class CSWworkerTest {
 
          // we make a getRecords request with language=fr to verify that the modified metadata is well indexed
         constraint = new QueryConstraintType("Language = 'fra'", "1.0.0");
-        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
         
         response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -1266,7 +1266,7 @@ public class CSWworkerTest {
 
         // first we make a getRecords request to verify that the metadata match the request on the Abstract field
         constraint = new QueryConstraintType("Abstract = 'Donnees CTD ANGOLA CAP 7501 78'", "1.0.0");
-        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -1317,7 +1317,7 @@ public class CSWworkerTest {
 
         // then we verify that the modified metadata is well modified and indexed
         constraint = new QueryConstraintType("Abstract = 'Modified datas by CSW-T'", "1.0.0");
-        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -1354,7 +1354,7 @@ public class CSWworkerTest {
 
         // then we verify that the modified metadata is well modified and indexed
         constraint = new QueryConstraintType("Modified after 2009-03-30T00:00:00Z", "1.0.0");
-        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -1393,7 +1393,7 @@ public class CSWworkerTest {
         
         // then we verify that the modified metadata is well modified and indexed
         constraint = new QueryConstraintType("WestBoundLongitude = '1.1'", "1.0.0");
-        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -1423,7 +1423,7 @@ public class CSWworkerTest {
         constraint = new QueryConstraintType("Language = 'fra'", "1.0.0");
         sp         = new SortPropertyType("Identifier", SortOrderType.ASC);
         sort       = new SortByType(Arrays.asList(sp));
-        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -1503,7 +1503,7 @@ public class CSWworkerTest {
 
         // then we verify that the metadata is not modified
         constraint = new QueryConstraintType("Modified after 2009-03-30T00:00:00Z", "1.0.0");
-        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -1548,7 +1548,7 @@ public class CSWworkerTest {
 
         // then we verify that the metadata is not modified
         constraint = new QueryConstraintType("WestBoundLongitude = '1.1'", "1.0.0");
-        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -1576,7 +1576,7 @@ public class CSWworkerTest {
 
         // first we make a getRecords request to verify that the metadata match the request on the Subject field
         constraint = new QueryConstraintType("Subject = 'research vessel' AND Subject = 'CTD profilers'", "1.0.0");
-        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -1631,7 +1631,7 @@ public class CSWworkerTest {
 
         // then we verify that the modified metadata is well modified and indexed
         constraint = new QueryConstraintType("Subject = 'Modified datas by CSW-T' AND Subject = 'CTD profilers'", "1.0.0");
-        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -1658,7 +1658,7 @@ public class CSWworkerTest {
 
         // first we make a getRecords request to verify that the metadata match the request on the Subject field
         constraint = new QueryConstraintType("Subject = 'Salinity of the water column' AND Subject = 'CTD profilers'", "1.0.0");
-        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), sort, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
@@ -1719,7 +1719,7 @@ public class CSWworkerTest {
 
         // then we verify that the modified metadata is well modified and indexed
         constraint = new QueryConstraintType("Subject = 'something' AND Subject = 'CTD profilers'", "1.0.0");
-        query      = new QueryType(TypeNames.ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        query      = new QueryType(ISO_TYPE_NAMES, new ElementSetNameType(ElementSetType.FULL), null, constraint);
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);

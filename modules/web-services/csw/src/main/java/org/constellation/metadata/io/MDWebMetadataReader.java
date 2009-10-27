@@ -48,7 +48,6 @@ import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
 import org.constellation.util.StringUtilities;
 import static org.constellation.metadata.CSWQueryable.*;
-import static org.constellation.metadata.TypeNames.*;
         
 // MDWeb dependencies
 import org.mdweb.model.schemas.CodeListElement;
@@ -80,6 +79,7 @@ import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.csw.xml.TypeNames.*;
 
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
@@ -1373,7 +1373,7 @@ public class MDWebMetadataReader extends MetadataReader {
         return Arrays.asList(DEGREE_QNAME,
                              ACCESS_CONSTRAINTS_QNAME,
                              OTHER_CONSTRAINTS_QNAME,
-                             CLASSIFICATION_QNAME,
+                             INS_CLASSIFICATION_QNAME,
                              CONDITION_APPLYING_TO_ACCESS_AND_USE_QNAME,
                              METADATA_POINT_OF_CONTACT_QNAME,
                              LINEAGE_QNAME,

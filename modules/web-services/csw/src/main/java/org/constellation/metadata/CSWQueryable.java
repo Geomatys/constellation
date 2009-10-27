@@ -32,7 +32,7 @@ public final class CSWQueryable {
      public static final QName DEGREE_QNAME                               = new QName("http://www.inspire.org", "Degree",                          "ins");
      public static final QName ACCESS_CONSTRAINTS_QNAME                   = new QName("http://www.inspire.org", "AccessConstraints",               "ins");
      public static final QName OTHER_CONSTRAINTS_QNAME                    = new QName("http://www.inspire.org", "OtherCOnstraints",                "ins");
-     public static final QName CLASSIFICATION_QNAME                       = new QName("http://www.inspire.org", "Classification",                  "ins");
+     public static final QName INS_CLASSIFICATION_QNAME                   = new QName("http://www.inspire.org", "Classification",                  "ins");
      public static final QName CONDITION_APPLYING_TO_ACCESS_AND_USE_QNAME = new QName("http://www.inspire.org", "ConditionApplyingToAccessAndUse", "ins");
      public static final QName METADATA_POINT_OF_CONTACT_QNAME            = new QName("http://www.inspire.org", "MetadataPointOfContact",          "ins");
      public static final QName LINEAGE_QNAME                              = new QName("http://www.inspire.org", "Lineage",                         "ins");

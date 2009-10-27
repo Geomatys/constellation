@@ -19,8 +19,6 @@ package org.constellation.metadata.io;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URI;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,7 +40,6 @@ import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
-import static org.constellation.metadata.TypeNames.*;
 
 // geoAPI dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -77,6 +74,7 @@ import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
 import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
+import static org.geotoolkit.csw.xml.TypeNames.*;
 
 /**
  * A csw Metadata Reader. This reader does not require a database.
