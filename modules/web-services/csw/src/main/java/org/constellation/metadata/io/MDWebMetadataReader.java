@@ -1171,11 +1171,7 @@ public class MDWebMetadataReader extends MetadataReader {
         }
 
         //special case TODO delete when geotools/api will be updated.
-        if (className.equals("MD_Metadata")) {
-            className = "MD_MetaData";
-        } else if (className.equals("CI_OnlineResource")) {
-            className = "CI_OnlineResource";
-        } else if (className.equals("CI_Date")) {
+        if (className.equals("CI_Date")) {
             className = "CitationDate";
         } else if (className.equals("RS_Identifier")) {
             className = "ReferenceIdentifier";
