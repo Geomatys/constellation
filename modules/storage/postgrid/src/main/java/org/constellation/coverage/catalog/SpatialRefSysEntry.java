@@ -241,7 +241,7 @@ final class SpatialRefSysEntry {
     public MathTransform2D getHorizontalToGeographicCRS() throws FactoryException {
         // No need to synhronize - this is not a big deal if the transform is searched twice.
         if (toGeographicCRS == null) {
-            toGeographicCRS = (MathTransform2D) CRS.findMathTransform(horizontalCRS, DefaultGeographicCRS.WGS84);
+            toGeographicCRS = (MathTransform2D) CRS.findMathTransform(horizontalCRS, DefaultGeographicCRS.WGS84, true);
         }
         return toGeographicCRS;
     }

@@ -178,7 +178,7 @@ final class GridCoverageSettings implements Serializable {
             sourceCRS = CRSUtilities.getCRS2D(sourceCRS);
             targetCRS = CRSUtilities.getCRS2D(targetCRS);
             if (tableToCoverageCRS == null) try {
-                tableToCoverageCRS = (MathTransform2D) CRS.findMathTransform(sourceCRS, targetCRS);
+                tableToCoverageCRS = (MathTransform2D) CRS.findMathTransform(sourceCRS, targetCRS, true);
             } catch (FactoryException exception) {
                 throw new TransformException(exception.getLocalizedMessage(), exception);
             }
