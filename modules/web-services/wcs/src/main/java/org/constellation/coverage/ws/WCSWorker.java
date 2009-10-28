@@ -85,6 +85,7 @@ import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.resources.Errors;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCoverage;
@@ -132,12 +133,12 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 
 /**
- * Worker for the WCS services in Constellation which services both the REST and 
+ * Worker for the WCS services in Constellation which services both the REST and
  * SOAP facades by issuing appropriate responses.
  * <p>
  * The classes implementing the REST or SOAP facades to this service will have
  * processed the requests sufficiently to ensure that all the information
- * conveyed by the HTTP request is in one of the fields of the object passed 
+ * conveyed by the HTTP request is in one of the fields of the object passed
  * to the worker methods as a parameter.
  * </p>
  *
@@ -147,11 +148,10 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  * @since 0.3
  */
 public final class WCSWorker {
-
     /**
      * The default debugging logger for the WCS service.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.coverage.ws");
+    private static final Logger LOGGER = Logging.getLogger(WCSWorker.class);
 
     /**
      * The date format to match.
@@ -183,15 +183,18 @@ public final class WCSWorker {
      */
     private Map<String,Object> capabilities = new HashMap<String,Object>();
 
+    /**
+     * Initializes the marshaller pool for the WCS.
+     */
     public WCSWorker(final MarshallerPool marshallerPool) {
         this.marshallerPool = marshallerPool;
     }
 
     /**
-     * The DescribeCoverage operation returns an XML file, containing the 
+     * The DescribeCoverage operation returns an XML file, containing the
      * complete description of the specific coverages requested.
      * <p>
-     * This method extends the definition of each coverage given in the 
+     * This method extends the definition of each coverage given in the
      * Capabilities document with supplementary information.
      * </p>
      *
@@ -492,7 +495,7 @@ public final class WCSWorker {
                     keywords, coverageRef.getName(), domain, range, supportedCRS, supportedFormats);
             coverageDescriptions.add(coverageDescription);
         }
-        
+
         return new CoverageDescriptions(coverageDescriptions);
     }
 
@@ -934,7 +937,7 @@ public final class WCSWorker {
             renderParameters.put(KEY_TIME, date);
             renderParameters.put("ELEVATION", elevation);
             final SceneDef sdef = new SceneDef();
-            
+
             try {
                 final MapContext context = PortrayalUtil.createContext(layerRef, null, renderParameters);
                 sdef.setContext(context);
@@ -1132,14 +1135,14 @@ public final class WCSWorker {
            }
         }
     }
-    
+
     /**
      * This method should be considered private.
      */
     public void internalInitServletContext(final ServletContext servletContext) {
         this.servletContext = servletContext;
     }
-    
+
     /**
      * This method should be considered private.
      */

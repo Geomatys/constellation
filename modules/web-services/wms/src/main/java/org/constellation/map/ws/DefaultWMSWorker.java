@@ -100,6 +100,7 @@ import org.geotoolkit.sld.xml.v110.TypeNameType;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 
 //Geoapi dependencies
@@ -130,11 +131,10 @@ import static org.constellation.query.wms.WMSQuery.*;
  * @since 0.3
  */
 public class DefaultWMSWorker extends AbstractWMSWorker {
-
     /**
      * The default debugging logger for the WMS service.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.map.ws");
+    private static final Logger LOGGER = Logging.getLogger(DefaultWMSWorker.class);
 
     /**
      * A map containing the Capabilities Object already loaded from file.
@@ -147,11 +147,14 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
     private final MarshallerPool marshallerPool;
 
     /**
-     * Size of the legend graphic.
+     * Default size of the legend graphic.
      */
     private static final int LEGEND_WIDTH = 140;
     private static final int LEGEND_HEIGHT = 15;
 
+    /**
+     * Initializes the marshaller pool for the WMS.
+     */
     public DefaultWMSWorker(final MarshallerPool marshallerPool) {
         this.marshallerPool = marshallerPool;
     }
@@ -643,7 +646,7 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
         params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_TIME, time);
         final SceneDef sdef = new SceneDef();
-        
+
         try {
             final MapContext context = PortrayalUtil.createContext(layerRefs, styles, params);
             sdef.setContext(context);

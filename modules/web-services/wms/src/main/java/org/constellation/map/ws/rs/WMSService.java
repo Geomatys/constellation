@@ -97,7 +97,6 @@ import static org.constellation.query.wms.WMSQuery.*;
 @Path("wms")
 @Singleton
 public class WMSService extends OGCWebService {
-
     /**
      * The worker which will perform the core logic for this service.
      */
@@ -246,7 +245,6 @@ public class WMSService extends OGCWebService {
                 getMarshallerPool().release(marshaller);
             }
         }
-
     }
 
     /**
@@ -261,7 +259,6 @@ public class WMSService extends OGCWebService {
             return processExceptionResponse(ex, serviceDef);
         }
     }
-
 
     /**
      * {@inheritDoc}
@@ -591,6 +588,7 @@ public class WMSService extends OGCWebService {
                     date, dimRange, size, background, transparent, azimuth, strExceptions);
     }
 
+    
     /**
      * Logs the destruction of the service
      */

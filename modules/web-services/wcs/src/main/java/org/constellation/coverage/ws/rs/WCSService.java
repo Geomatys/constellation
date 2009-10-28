@@ -82,7 +82,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  *   <li>{@code DescribeCoverage(.)}</li>
  *   <li>{@code GetCapabilities(.)}</li>
  * </ul>
- * of the Open Geospatial Consortium (OGC) WCS specifications. As of 
+ * of the Open Geospatial Consortium (OGC) WCS specifications. As of
  * Constellation version 0.3, this Web Coverage Service complies with the
  * specification version 1.0.0 (OGC document 03-065r6) and mostly complies with
  * specification version 1.1.1 (OGC document 06-083r8).
@@ -123,11 +123,11 @@ public class WCSService extends OGCWebService {
     }
 
     /**
-     * Treat the incoming request, contained either in the {@link UriInfo} 
-     * injected context variable or in the parameter, then call the right 
+     * Treat the incoming request, contained either in the {@link UriInfo}
+     * injected context variable or in the parameter, then call the right
      * function in the worker.
      *
-     * @param objectRequest An object holding the request received, if this is 
+     * @param objectRequest An object holding the request received, if this is
      *                        not in the {@code UriInfo} variable.
      * @return The response to the request, either an image or an XML response.
      * @throws JAXBException
@@ -156,10 +156,10 @@ public class WCSService extends OGCWebService {
                 request = getParameter(KEY_REQUEST, true);
             }
 
-            //TODO: fix logging of request, which may be in the objectRequest 
+            //TODO: fix logging of request, which may be in the objectRequest
             //      and not in the parameter.
             logParameters();
-            
+
             if ( GETCAPABILITIES.equalsIgnoreCase(request) || (objectRequest instanceof GetCapabilities) )
             {
                 GetCapabilities getcaps = (GetCapabilities)objectRequest;
@@ -170,17 +170,17 @@ public class WCSService extends OGCWebService {
                 //TODO: is this necessary?
                 worker.internalInitServletContext(getServletContext());
                 worker.internalInitUriContext(uriContext);
-                
+
                 final GetCapabilitiesResponse capsResponse = worker.getCapabilities(getcaps);
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(capsResponse, sw);
                 return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
-            
+
             if ( DESCRIBECOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof DescribeCoverage) )
             {
                 DescribeCoverage desccov = (DescribeCoverage)objectRequest;
-                
+
                 //TODO: move me into the worker.
                 //verifyBaseParameter(0);
                 //TODO: move me into the worker.
@@ -190,7 +190,7 @@ public class WCSService extends OGCWebService {
                     throw new CstlServiceException("The service does not implement the store mechanism.",
                                    NO_APPLICABLE_CODE, "store");
                 }*/
-                
+
                 if (desccov == null) {
                     desccov = adaptKvpDescribeCoverageRequest();
                 }
@@ -201,13 +201,13 @@ public class WCSService extends OGCWebService {
                 marshaller.marshal(describeResponse, sw);
                 return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
             }
-            
+
             if ( GETCOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof GetCoverage) )
             {
                 GetCoverage getcov = (GetCoverage)objectRequest;
                 //TODO: move me into the worker.
                 //verifyBaseParameter(0);
-                
+
                 if (getcov == null) {
                     getcov = adaptKvpGetCoverageRequest();
                 }
@@ -250,16 +250,16 @@ public class WCSService extends OGCWebService {
 
             throw new CstlServiceException("This service can not handle the requested operation: " + request + ".",
                                            OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
-            
+
         } catch (CstlServiceException ex) {
-        	/* 
-        	 * This block handles all the exceptions which have been generated 
-        	 * anywhere in the service and transforms them to a response message 
-        	 * for the protocol stream which JAXB, in this case, will then 
-        	 * marshall and serialize into an XML message HTTP response.
-        	 */
-        	return processExceptionResponse(ex, serviceDef);
-            
+            /*
+             * This block handles all the exceptions which have been generated
+             * anywhere in the service and transforms them to a response message
+             * for the protocol stream which JAXB, in this case, will then
+             * marshall and serialize into an XML message HTTP response.
+             */
+            return processExceptionResponse(ex, serviceDef);
+
         } finally {
             if (marshaller != null) {
                 getMarshallerPool().release(marshaller);
@@ -318,7 +318,7 @@ public class WCSService extends OGCWebService {
 
     /**
      * Build a new {@linkplain AbstractGetCapabilities GetCapabilities} request from
-     * from a request formulated as a Key-Value Pair either in the URL or as a 
+     * from a request formulated as a Key-Value Pair either in the URL or as a
      * plain text message body.
      *
      * @return a marshallable GetCapabilities request.
@@ -382,7 +382,7 @@ public class WCSService extends OGCWebService {
     }
 
     /**
-     * Build a new {@linkplain AbstractDescribeCoverage DescribeCoverage} 
+     * Build a new {@linkplain AbstractDescribeCoverage DescribeCoverage}
      * request from a Key-Value Pair request.
      *
      * @return a marshallable DescribeCoverage request.
@@ -402,10 +402,9 @@ public class WCSService extends OGCWebService {
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
     }
-    
 
     /**
-     * Build a new {@linkplain AbstractGetCoverage GetCoverage} request from a 
+     * Build a new {@linkplain AbstractGetCoverage GetCoverage} request from a
      * Key-Value Pair request.
      *
      * @return a marshallable GetCoverage request.
@@ -424,7 +423,6 @@ public class WCSService extends OGCWebService {
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
          }
     }
-    
 
     /**
      * Generate a marshallable {@linkplain org.geotoolkit.wcs.xml.v100.GetCoverage GetCoverage}
@@ -556,7 +554,6 @@ public class WCSService extends OGCWebService {
         return new org.geotoolkit.wcs.xml.v100.GetCoverageType(
                 getParameter(KEY_COVERAGE, true), domain, range, interpolation, output);
     }
-    
 
     /**
      * Generate a marshallable {@linkplain org.geotoolkit.wcs.xml.v111.GetCoverage GetCoverage}
@@ -696,13 +693,13 @@ public class WCSService extends OGCWebService {
     		"    <h1>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Web Coverage Service</h1>\n" +
     		"    <p>\n" +
     		"      In order to access this service, you must form a valid request.\n" +
-    		"    </p\n" + 
+    		"    </p\n" +
     		"    <p>\n" +
     		"      Try using a <a href=\"" + getUriContext().getBaseUri() + "wcs"
     		                             + "?service=WCS&version=1.0.0&request=GetCapabilities&version=1.0.0\""
     		                             + ">Get Capabilities</a> request to obtain the 'Capabilities'<br>\n" +
     		"      document which describes the resources available on this server.\n" +
-    		"    </p>\n" + 
+    		"    </p>\n" +
     		"  </body>\n" +
     		"</html>\n";
     }
