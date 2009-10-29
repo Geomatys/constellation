@@ -28,9 +28,7 @@ import javax.servlet.ServletContext;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
@@ -53,9 +51,15 @@ import javax.xml.bind.UnmarshalException;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
+// Geotoolkit dependencies
+import org.geotoolkit.factory.Hints;
+import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.util.Versioned;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
+
 import static org.constellation.ws.ExceptionCode.*;
+
 
 /**
  * Abstract parent of all REST facade classes for Constellation web services.
@@ -117,7 +121,7 @@ public abstract class WebService {
     /**
      * The default debugging logger for all web services.
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.ws.rs");
+    protected static final Logger LOGGER = Logging.getLogger(WebService.class);
 
     /**
      * Specifies if the process is running on a Glassfish application server.
@@ -138,6 +142,8 @@ public abstract class WebService {
 
     static{
         RUNNING_ON_GLASSFISH = (System.getProperty("domain.name") != null) ? true : false;
+        Registry.setDefaultCodecPreferences();
+        Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
     }
 
     /**

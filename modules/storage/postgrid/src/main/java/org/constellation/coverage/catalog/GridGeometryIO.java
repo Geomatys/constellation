@@ -144,9 +144,11 @@ final class GridGeometryIO extends GridGeometry2D {
      * which may use a different subsampling than the selected one.
      */
     public GridGeometry2D scaleForSubsampling(final Dimension subsampling) {
-        if (subsampling.width == sx && subsampling.height == sy) {
-            return this;
-        }
+        // Seems bogus: we always want to change the range of GridEnvelope
+        // when the ssubsampling is different than 1.
+//        if (subsampling.width == sx && subsampling.height == sy) {
+//            return this;
+//        }
         final Matrix matrix = MatrixFactory.create(gridToCRS.getTargetDimensions() + 1,
                                                    gridToCRS.getSourceDimensions() + 1);
         matrix.setElement(gridDimensionX, gridDimensionX, subsampling.getWidth()  / sx);

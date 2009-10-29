@@ -34,7 +34,6 @@ import org.geotoolkit.console.Option;
 
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
-import org.geotoolkit.image.jai.Registry;
 
 
 /**
@@ -165,9 +164,8 @@ public class CstlEmbeddedService extends CommandLine {
      * @param providerPackages The packages for providers to start.
      */
     protected CstlEmbeddedService(String[] args, String[] providerPackages) {
-
         super(null, args);
-        Registry.setDefaultCodecPreferences();
+
         final StringBuilder sb = new StringBuilder();
         final int length = providerPackages.length;
         for (int i=0; i<length; i++) {
@@ -278,7 +276,6 @@ public class CstlEmbeddedService extends CommandLine {
     }
 
     public static void main(String[] args) {
-        Registry.setDefaultCodecPreferences();
         new CstlEmbeddedService(args).runREST();
     }
 }
