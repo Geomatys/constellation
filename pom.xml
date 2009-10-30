@@ -431,6 +431,11 @@
       </dependency>
       <dependency>
         <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-wfs</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-xml-ows</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>

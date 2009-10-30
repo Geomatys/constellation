@@ -83,6 +83,7 @@
         <module>wms</module>
         <module>wmts</module>
         <module>wcs</module>
+        <module>wfs</module>
         <module>configuration</module>
       </modules>
     </profile>

@@ -28,26 +28,30 @@ package org.constellation;
  */
 public enum ServiceDef {
     // WMS service definitions
-	WMS_1_0_0(Specification.WMS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0"),
-	WMS_1_1_1(Specification.WMS, Organization.OGC, "1.1.1", Profile.NONE, "1.1.0"),
-	WMS_1_3_0(Specification.WMS, Organization.OGC, "1.3.0", Profile.NONE, "1.3.0"),
+    WMS_1_0_0(Specification.WMS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0"),
+    WMS_1_1_1(Specification.WMS, Organization.OGC, "1.1.1", Profile.NONE, "1.1.0"),
+    WMS_1_3_0(Specification.WMS, Organization.OGC, "1.3.0", Profile.NONE, "1.3.0"),
 
     // WMS with SLD profiles definitions
     WMS_1_0_0_SLD(Specification.WMS, Organization.OGC, "1.0.0", Profile.WMS_SLD, "1.1.0"),
-	WMS_1_1_1_SLD(Specification.WMS, Organization.OGC, "1.1.1", Profile.WMS_SLD, "1.1.0"),
-	WMS_1_3_0_SLD(Specification.WMS, Organization.OGC, "1.3.0", Profile.WMS_SLD, "1.3.0"),
+    WMS_1_1_1_SLD(Specification.WMS, Organization.OGC, "1.1.1", Profile.WMS_SLD, "1.1.0"),
+    WMS_1_3_0_SLD(Specification.WMS, Organization.OGC, "1.3.0", Profile.WMS_SLD, "1.3.0"),
 
     // WMTS service definition
     WMTS_1_0_0(Specification.WMTS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0"),
 
     // WCS service definitions
-	WCS_1_0_0(Specification.WCS, Organization.OGC, "1.0.0", Profile.NONE, "1.2.0"),
-	WCS_1_1_0(Specification.WCS, Organization.OGC, "1.1.0", Profile.NONE, "1.1.0"),
-	WCS_1_1_1(Specification.WCS, Organization.OGC, "1.1.1", Profile.NONE, "1.1.0"),
-	WCS_1_1_2(Specification.WCS, Organization.OGC, "1.1.2", Profile.NONE, "1.1.0"),
+    WCS_1_0_0(Specification.WCS, Organization.OGC, "1.0.0", Profile.NONE, "1.2.0"),
+    WCS_1_1_0(Specification.WCS, Organization.OGC, "1.1.0", Profile.NONE, "1.1.0"),
+    WCS_1_1_1(Specification.WCS, Organization.OGC, "1.1.1", Profile.NONE, "1.1.0"),
+    WCS_1_1_2(Specification.WCS, Organization.OGC, "1.1.2", Profile.NONE, "1.1.0"),
+
+    // WFS service definitions
+    WFS_1_0_0(Specification.WFS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0"),
+    WFS_1_1_0(Specification.WFS, Organization.OGC, "1.1.0", Profile.NONE, "1.1.0"),
 
     // CSW service definition
-	CSW_2_0_2(Specification.CSW, Organization.OGC, "2.0.2", Profile.CSW_ISO, "1.2.0"),
+    CSW_2_0_2(Specification.CSW, Organization.OGC, "2.0.2", Profile.CSW_ISO, "1.2.0"),
 
     // Configuration service definition (custom service of Geomatys)
     CONFIG(Specification.NONE, Organization.NONE, null, Profile.NONE, "1.0"),
@@ -56,11 +60,11 @@ public enum ServiceDef {
     SOS_1_0_0(Specification.SOS, Organization.OGC, "1.0.0", Profile.NONE, "1.1.0"),
 
     // Security services definitions
-	PEP(Specification.PEP, Organization.OASIS, null, Profile.NONE, null),
-	PDP(Specification.PDP, Organization.OASIS, null, Profile.NONE, null),
+    PEP(Specification.PEP, Organization.OASIS, null, Profile.NONE, null),
+    PDP(Specification.PDP, Organization.OASIS, null, Profile.NONE, null),
 
     // MDWeb services definitions
-	MDW(Specification.MDW, Organization.NONE, null, Profile.NONE, null);
+    MDW(Specification.MDW, Organization.NONE, null, Profile.NONE, null);
 	
 
 
