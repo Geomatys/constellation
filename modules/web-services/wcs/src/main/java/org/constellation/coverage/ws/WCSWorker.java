@@ -893,6 +893,23 @@ public final class WCSWorker {
             throw new CstlServiceException(ex, INVALID_CRS, KEY_RESPONSE_CRS.toLowerCase());
         }
 
+        Dimension size = request.getSize();
+        if (size == null) {
+            // Try with resx/resy, those parameters should be filled.
+            final List<Double> resolutions = request.getResolutions();
+            if (resolutions == null || resolutions.isEmpty()) {
+                // Should not occurs since it is already tested
+                throw new CstlServiceException("If width/height are not specified, you have to give resx/resy");
+            }
+            final double resx = resolutions.get(0);
+            final double resy = resolutions.get(1);
+            final double envWidth = refEnvel.getSpan(0);
+            final double envHeight = refEnvel.getSpan(1);
+            //Assume res is in unit per px -> unit / (unit/pixel) -> px
+            final int newWidth  = (int) Math.round(envWidth  / resx);
+            final int newHeight = (int) Math.round(envHeight / resy);
+            size = new Dimension(newWidth, newHeight);
+        }
         /*
          * Generating the response.
          * It can be a text one (format MATRIX) or an image one (png, gif ...).
@@ -904,8 +921,7 @@ public final class WCSWorker {
             final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;
             final RenderedImage image;
             try {
-                final GridCoverage2D gridCov = layerRef.getCoverage(refEnvel,
-                        request.getSize(), elevation, date);
+                final GridCoverage2D gridCov = layerRef.getCoverage(refEnvel, size, elevation, date);
                 image = gridCov.getRenderedImage();
             } catch (IOException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
@@ -950,23 +966,6 @@ public final class WCSWorker {
             final ViewDef vdef = new ViewDef(refEnvel, azimuth);
 
             // CANVAS
-            Dimension size = request.getSize();
-            if (size == null) {
-                // Try with resx/resy, those parameters should be filled.
-                final List<Double> resolutions = request.getResolutions();
-                if (resolutions == null || resolutions.isEmpty()) {
-                    // Should not occurs since it is already tested
-                    throw new CstlServiceException("If width/height are not specified, you have to give resx/resy");
-                }
-                final double resx      = resolutions.get(0);
-                final double resy      = resolutions.get(1);
-                final double envWidth  = refEnvel.getSpan(0);
-                final double envHeight = refEnvel.getSpan(1);
-                //Assume res is in px per unit -> px/unit * units -> px
-                final int newWidth  = (int) Math.round(resx * envWidth);
-                final int newHeight = (int) Math.round(resy * envHeight);
-                size = new Dimension(newWidth, newHeight);
-            }
             final CanvasDef cdef = new CanvasDef(size, null);
 
             // IMAGE
