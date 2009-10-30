@@ -98,6 +98,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
     /**
      * Construit un data record pour l'enregistrement courant.
      */
+    @Override
     protected SimpleDataRecordEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
         final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
         final String idDataBlock = results.getString(indexOf(query.idBlock));

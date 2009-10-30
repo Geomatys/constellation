@@ -623,12 +623,14 @@ public class SOSWorkerTest {
         assertEquals(i1.next(), i2.next());
         //assertEquals(expSdr.getField(), obsSdr.getField());
         assertEquals(expSdr, obsSdr);
-        assertEquals(expR.getDataArray().getElementType(), obsR.getDataArray().getElementType());
-        assertEquals(expR.getDataArray().getEncoding(),    obsR.getDataArray().getEncoding());
-        assertEquals(expR.getDataArray().getValues(),    obsR.getDataArray().getValues());
-        assertEquals(expR.getDataArray().getId(),    obsR.getDataArray().getId());
+        assertEquals(expR.getDataArray().getElementType(),     obsR.getDataArray().getElementType());
+        assertEquals(expR.getDataArray().getEncoding(),        obsR.getDataArray().getEncoding());
+        assertEquals(expR.getDataArray().getValues(),          obsR.getDataArray().getValues());
+        assertEquals(expR.getDataArray().getId(),              obsR.getDataArray().getId());
         assertEquals(expR.getDataArray().getElementCount(),    obsR.getDataArray().getElementCount());
-        assertEquals(expR.getDataArray(),                  obsR.getDataArray());
+        assertEquals(expR.getDataArray().getName(),            obsR.getDataArray().getName());
+        assertEquals(expR.getDataArray().getPropertyElementType(), obsR.getDataArray().getPropertyElementType());
+        assertEquals(expR.getDataArray(),                      obsR.getDataArray());
 
         assertEquals(expResult.getResult(), obsResult.getResult());
         assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
