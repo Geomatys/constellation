@@ -219,7 +219,8 @@ public class WCSService extends OGCWebService {
                     !format.equalsIgnoreCase(JPG)                 && !format.equalsIgnoreCase(TIF)  &&
                     !format.equalsIgnoreCase(MimeType.IMAGE_TIFF) && !format.equalsIgnoreCase(TIFF) &&
                     !format.equalsIgnoreCase(MimeType.IMAGE_PNG)  && !format.equalsIgnoreCase(PNG)  &&
-                    !format.equalsIgnoreCase(GEOTIFF)             && !format.equalsIgnoreCase(NETCDF))
+                    !format.equalsIgnoreCase(GEOTIFF)             && !format.equalsIgnoreCase(NETCDF) &&
+                    !format.equalsIgnoreCase(MATRIX))
                 {
                     throw new CstlServiceException("The format specified is not recognized. Please choose a known format " +
                         "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT,

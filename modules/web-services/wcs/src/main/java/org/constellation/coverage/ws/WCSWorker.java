@@ -905,7 +905,11 @@ public final class WCSWorker {
             final double resy = resolutions.get(1);
             final double envWidth = refEnvel.getSpan(0);
             final double envHeight = refEnvel.getSpan(1);
-            //Assume res is in unit per px -> unit / (unit/pixel) -> px
+            // Assume that the resolution is in unit per px -> unit / (unit/pixel) -> px
+            // For example to obtain an image whose width is 1024 pixels, representing 360 degrees,
+            // the resolution on the x axis is 360 / 1024 = 0,3515625 degrees/pixels.
+            // In our case, we want to know the image width using the size of the envelope and the
+            // given resolution on that axis, so: image_width = envelope_width / resx
             final int newWidth  = (int) Math.round(envWidth  / resx);
             final int newHeight = (int) Math.round(envHeight / resy);
             size = new Dimension(newWidth, newHeight);
