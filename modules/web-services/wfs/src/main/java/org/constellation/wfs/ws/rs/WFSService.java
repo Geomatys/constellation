@@ -89,12 +89,11 @@ public class WFSService extends OGCWebService {
 
         WFSWorker candidate = null;
         try {
-            setXMLContext("org.constellation.wfs.v110" +
-            		  ":org.constellation.ogc:org.constellation.citygml.v100" +
-            		  ":org.constellation.citygml.v100.building" +
-            		  ":org.constellation.citygml.v100.transportation" +
-            		  ":org.constellation.citygml.v100.cityfurniture" +
-            		  ":exp.ows6.utds.v030:org.constellation.xsd.v2001", "");
+            setXMLContext("org.geotoolkit.wfs.xml.v110" +
+            		  ":org.geotoolkit.ogc.xml.v110" +
+            		  ":org.geotoolkit.gml.xml.v311" +
+                          ":org.geotoolkit.xsd.xml.v2001"
+                          , "");
             candidate = new WFSWorker();
 
         } catch (JAXBException ex){

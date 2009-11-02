@@ -66,7 +66,7 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-public abstract class AbstractFeatureLayerDetails implements LayerDetails {
+public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails {
     
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.provider");
     protected static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
@@ -124,7 +124,14 @@ public abstract class AbstractFeatureLayerDetails implements LayerDetails {
         else                            this.elevationEndField = null;
         
     }
-    
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public FeatureSource<SimpleFeatureType,SimpleFeature> getSource(){
+        return fs;
+    }
 
     /**
      * {@inheritDoc}
