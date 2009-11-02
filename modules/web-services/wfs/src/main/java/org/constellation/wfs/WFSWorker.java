@@ -57,7 +57,11 @@ import org.geotoolkit.wfs.xml.v110.LockFeatureType;
 import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
+import org.geotoolkit.xsd.xml.v2001.FormChoice;
+import org.geotoolkit.xsd.xml.v2001.Import;
 import org.geotoolkit.xsd.xml.v2001.Schema;
+import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
+import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
@@ -75,9 +79,14 @@ public class WFSWorker {
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.wfs");
 
+    private static final String CSTL_NAMESPACE = "http://constellation-sdi.org";
+    private static final String CSTL_PREFIX = "cstl";
+
     private final List<String> standardCRS = new ArrayList<String>();
     private final ServiceIdentification serviceIdentification;
     private final ServiceProvider serviceProvider;
+
+
 
     public WFSWorker() throws CstlServiceException {
 
@@ -161,11 +170,72 @@ public class WFSWorker {
         return template;
     }
 
-    public Schema describeFeatureType(DescribeFeatureTypeType dr) throws CstlServiceException {
-        throw new CstlServiceException("Not supported yet.");
+    public Schema describeFeatureType(final DescribeFeatureTypeType dr) throws CstlServiceException {
+        final Schema schema = new Schema();
+        schema.setTargetNamespace("http://constellation-sdi.org");
+        schema.setElementFormDefault(FormChoice.QUALIFIED);
+        schema.setVersion("0.1");
+        
+
+        //todo fill the schema correctly
+        final Import gmlImport = new Import();
+        gmlImport.setNamespace("http://www.opengis.net/gml");
+        gmlImport.setSchemaLocation("../gml/3.1.1/base/gml.xsd");
+        schema.getIncludeOrImportOrRedefine().add(gmlImport);
+
+        final LayerProviderProxy proxy = LayerProviderProxy.getInstance();
+        final List<QName> names = dr.getTypeName();
+
+        if(names.isEmpty()){
+            //search all types
+            for(final String name : proxy.getKeys()){
+                final LayerDetails layer = proxy.get(name);
+                if(layer == null || !(layer instanceof FeatureLayerDetails)) continue;
+
+                final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
+                final SimpleFeatureType sft = fld.getSource().getSchema();
+
+                final TopLevelElement element = new TopLevelElement();
+                element.setName(sft.getTypeName());
+                element.setType(new QName(CSTL_NAMESPACE, sft.getTypeName(), CSTL_PREFIX));
+                element.setSubstitutionGroup(new QName("http://www.opengis.net/gml", "_Feature", "gml"));
+
+                schema.getIncludeOrImportOrRedefine().add(element);
+
+                final TopLevelComplexType type = new TopLevelComplexType();
+                type.setName(sft.getTypeName());
+                //todo implement a utility method to transform a feature type in complex type
+                //schema.getSimpleTypeOrComplexTypeOrGroup().add(...);
+                schema.getSimpleTypeOrComplexTypeOrGroup().add(type);
+            }
+        }else{
+            //search only the given list
+            for(final QName name : names){
+                final LayerDetails layer = proxy.get(name.getLocalPart());
+                if(layer == null || !(layer instanceof FeatureLayerDetails)) continue;
+
+                final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
+                final SimpleFeatureType sft = fld.getSource().getSchema();
+
+                final TopLevelElement element = new TopLevelElement();
+                element.setName(sft.getTypeName());
+                element.setType(new QName(CSTL_NAMESPACE, sft.getTypeName(), CSTL_PREFIX));
+                element.setSubstitutionGroup(new QName("http://www.opengis.net/gml", "_Feature", "gml"));
+
+                schema.getIncludeOrImportOrRedefine().add(element);
+
+                final TopLevelComplexType type = new TopLevelComplexType();
+                type.setName(sft.getTypeName());
+                //todo implement a utility method to transform a feature type in complex type
+                //schema.getSimpleTypeOrComplexTypeOrGroup().add(...);
+                schema.getSimpleTypeOrComplexTypeOrGroup().add(type);
+            }
+        }
+
+        return schema;
     }
 
-    public AbstractFeatureCollectionType getFeature(GetFeatureType gd) throws CstlServiceException {
+    public AbstractFeatureCollectionType getFeature(final GetFeatureType gd) throws CstlServiceException {
         throw new CstlServiceException("Not supported yet.");
     }
 
@@ -203,6 +273,9 @@ public class WFSWorker {
         throw new CstlServiceException(message, code, locator);
     }
 
+    /**
+     * Extract the WGS84 BBOx from a featureSource.
+     */
     private static WGS84BoundingBoxType toBBox(FeatureSource source) throws CstlServiceException{
         try {
             final JTSEnvelope2D env = source.getBounds();
@@ -232,4 +305,5 @@ public class WFSWorker {
             throw new CstlServiceException(ex);
         }
     }
+
 }
