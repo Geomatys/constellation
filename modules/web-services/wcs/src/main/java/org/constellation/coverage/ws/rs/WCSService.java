@@ -493,7 +493,7 @@ public class WCSService extends OGCWebService {
         }
         final EnvelopeEntry envelope = new EnvelopeEntry(pos, getParameter(KEY_CRS, true));
 
-        if (width == null && height == null && resx == null && resy == null) {
+        if ((width == null || height == null) && (resx == null || resy == null)) {
             throw new CstlServiceException("You should specify either width/height or resx/resy.",
                     INVALID_DIMENSION_VALUE);
         }
