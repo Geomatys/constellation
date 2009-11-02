@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
@@ -29,9 +30,13 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.data.FeatureSource;
+import org.geotoolkit.data.collection.FeatureCollection;
+import org.geotoolkit.data.query.DefaultQuery;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.xml.v311.AbstractFeatureCollectionType;
 import org.geotoolkit.gml.xml.v311.AbstractGMLEntry;
+import org.geotoolkit.ogc.xml.v110.FilterType;
+import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ows.xml.v100.AddressType;
 import org.geotoolkit.ows.xml.v100.CodeType;
 import org.geotoolkit.ows.xml.v100.ContactType;
@@ -45,8 +50,10 @@ import org.geotoolkit.ows.xml.v100.ServiceProvider;
 import org.geotoolkit.ows.xml.v100.TelephoneType;
 import org.geotoolkit.ows.xml.v100.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
+import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.FeatureTypeListType;
 import org.geotoolkit.wfs.xml.v110.FeatureTypeType;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
@@ -54,6 +61,7 @@ import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.GetGmlObjectType;
 import org.geotoolkit.wfs.xml.v110.LockFeatureResponseType;
 import org.geotoolkit.wfs.xml.v110.LockFeatureType;
+import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
@@ -62,7 +70,10 @@ import org.geotoolkit.xsd.xml.v2001.Import;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.sort.SortBy;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -170,7 +181,7 @@ public class WFSWorker {
         return template;
     }
 
-    public Schema describeFeatureType(final DescribeFeatureTypeType dr) throws CstlServiceException {
+    public Schema describeFeatureType(final DescribeFeatureTypeType model) throws CstlServiceException {
         final Schema schema = new Schema();
         schema.setTargetNamespace("http://constellation-sdi.org");
         schema.setElementFormDefault(FormChoice.QUALIFIED);
@@ -184,7 +195,7 @@ public class WFSWorker {
         schema.getIncludeOrImportOrRedefine().add(gmlImport);
 
         final LayerProviderProxy proxy = LayerProviderProxy.getInstance();
-        final List<QName> names = dr.getTypeName();
+        final List<QName> names = model.getTypeName();
 
         if(names.isEmpty()){
             //search all types
@@ -235,8 +246,43 @@ public class WFSWorker {
         return schema;
     }
 
-    public AbstractFeatureCollectionType getFeature(final GetFeatureType gd) throws CstlServiceException {
-        throw new CstlServiceException("Not supported yet.");
+    public AbstractFeatureCollectionType getFeature(final GetFeatureType model) throws CstlServiceException {
+        final FeatureCollectionType collection = new FeatureCollectionType();
+
+        final LayerProviderProxy proxy = LayerProviderProxy.getInstance();
+        final XMLUtilities util = new XMLUtilities();
+
+        for(final QueryType query : model.getQuery()){
+            final FilterType jaxbFilter = query.getFilter();
+            final SortByType jaxbSortBy = query.getSortBy();
+            final String srs = query.getSrsName();
+            final String typeName = query.getTypeName().get(0).getLocalPart();
+            final List<Object> properties = query.getPropertyNameOrXlinkPropertyNameOrFunction();
+
+            
+            final Filter filter;
+            final FeatureLayerDetails layer = (FeatureLayerDetails)proxy.get(typeName);
+            try {
+                filter = util.readFilter(jaxbFilter, org.geotoolkit.sld.xml.Specification.Filter.V_1_1_0);
+            } catch (JAXBException ex) {
+                throw new CstlServiceException(ex);
+            }
+
+            //todo use other properties to filter properly
+
+            final DefaultQuery fsQuery = new DefaultQuery();
+            fsQuery.setFilter(filter);
+            try {
+                FeatureCollection<SimpleFeatureType, SimpleFeature> col = layer.getSource().getFeatures(fsQuery);
+            } catch (IOException ex) {
+                throw new CstlServiceException(ex);
+            }
+
+            //todo wait for gml utility class to marshall this collection
+
+        }
+        
+        return collection;
     }
 
     public AbstractGMLEntry getGMLObject(GetGmlObjectType grbi) throws CstlServiceException {
