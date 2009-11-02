@@ -21,8 +21,6 @@ package org.constellation.wfs.ws.rs;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.constellation.ServiceDef;
-import org.constellation.ws.rs.OGCWebService;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
@@ -41,9 +39,12 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
+import org.constellation.ServiceDef;
 import org.constellation.util.Util;
 import org.constellation.wfs.WFSWorker;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.OGCWebService;
+
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.GmlObjectIdType;
 import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
@@ -61,7 +62,9 @@ import org.geotoolkit.wfs.xml.v110.LockType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.constellation.query.wfs.WFSQuery.*;
 
 /**
  *
@@ -71,18 +74,20 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 @Singleton
 public class WFSService extends OGCWebService {
 
-     /**
+    /**
      * use for debugging purpose
      */
-    private Logger logger = Logger.getLogger("org.constellation.security.wfs");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.security.wfs");
     
-    private WFSWorker worker;
+    private final WFSWorker worker;
 
     /**
      * Build a new Restfull WFS service.
      */
     public WFSService() {
         super(ServiceDef.WFS_1_1_0);
+
+        WFSWorker candidate = null;
         try {
             setXMLContext("org.constellation.wfs.v110" +
             		  ":org.constellation.ogc:org.constellation.citygml.v100" +
@@ -90,23 +95,23 @@ public class WFSService extends OGCWebService {
             		  ":org.constellation.citygml.v100.transportation" +
             		  ":org.constellation.citygml.v100.cityfurniture" +
             		  ":exp.ows6.utds.v030:org.constellation.xsd.v2001", "");
-            worker = new WFSWorker();
+            candidate = new WFSWorker();
 
         } catch (JAXBException ex){
             LOGGER.severe("The WFS service is not running."       + '\n' +
                           " cause  : Error creating XML context." + '\n' +
                           " error  : " + ex.getMessage()          + '\n' +
                           " details: " + ex.toString());
-            worker = null;
         } catch (CstlServiceException ex){
             LOGGER.severe("The WFS service is not running."       + '\n' +
                           " cause  : Error connecting the PEP." + '\n' +
                           " error  : " + ex.getMessage()          + '\n' +
                           " details: " + ex.toString());
-            worker = null;
         }
+        this.worker = candidate;
+
         if (worker != null) {
-            logger.info("WFS Service started");
+            LOGGER.info("WFS Service started");
         }
     }
 
@@ -122,141 +127,75 @@ public class WFSService extends OGCWebService {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+
         Marshaller marshaller = null;
-        ServiceDef serviceDef = null;
+        ServiceDef version = null;
         try {
             marshaller = getMarshallerPool().acquireMarshaller();
 
-            if (worker != null) {
-
-                logParameters();
-                String request = "";
-
-                if (objectRequest instanceof JAXBElement) {
-                    objectRequest = ((JAXBElement<?>)objectRequest).getValue();
-                }
-
-                // if the request is not an xml request we fill the request parameter.
-                if (objectRequest == null) {
-                    request = (String) getParameter("REQUEST", true);
-                }
-
-                if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilitiesType)) {
-
-                    GetCapabilitiesType gc = (GetCapabilitiesType)objectRequest;
-
-                    if (gc == null) {
-                         /*
-                          * if the parameters have been send by GET or POST kvp,
-                          * we build a request object with this parameter.
-                          */
-                        gc = createNewGetCapabilitiesRequest();
-                    }
-                    StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.getCapabilities(gc), sw);
-
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-
-                } else if (request.equalsIgnoreCase("DescribeFeatureType") || (objectRequest instanceof DescribeFeatureTypeType)) {
-
-                    DescribeFeatureTypeType gr = (DescribeFeatureTypeType)objectRequest;
-
-                    if (gr == null) {
-                        /*
-                         * if the parameters have been send by GET or POST kvp,
-                         * we build a request object with this parameter.
-                         */
-                        gr = createNewDescribeFeatureTypeRequest();
-                    }
-
-                    StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.describeFeatureType(gr), sw);
-                    
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-
-                } if (request.equalsIgnoreCase("GetFeature") || (objectRequest instanceof GetFeatureType)) {
-
-                    GetFeatureType grbi = (GetFeatureType)objectRequest;
-
-                    if (grbi == null) {
-                        /*
-                         * if the parameters have been send by GET or POST kvp,
-                         * we build a request object with this parameter.
-                         */
-                        grbi = createNewGetFeatureRequest();
-                    }
-                    serviceDef = getVersionFromNumber(grbi.getVersion());
-                    StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.getFeature(grbi), sw);
-
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-
-                } if (request.equalsIgnoreCase("getGMLObject") || (objectRequest instanceof GetGmlObjectType)) {
-
-                    GetGmlObjectType dr = (GetGmlObjectType)objectRequest;
-
-                    if (dr == null) {
-                        /*
-                         * if the parameters have been send by GET or POST kvp,
-                         * we build a request object with this parameter.
-                         */
-                        dr = createNewGetGmlObjectRequest();
-                    }
-
-                    serviceDef = getVersionFromNumber(dr.getVersion());
-                    StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.getGMLObject(dr), sw);
-
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-
-                } if (request.equalsIgnoreCase("lockFeature") || (objectRequest instanceof LockFeatureType)) {
-
-                    LockFeatureType gd = (LockFeatureType)objectRequest;
-
-                    if (gd == null) {
-                        /*
-                         * if the parameters have been send by GET or POST kvp,
-                         * we build a request object with this parameter.
-                         */
-                        gd = createNewLockFeatureRequest();
-                    }
-
-                    serviceDef = getVersionFromNumber(gd.getVersion());
-                    StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.lockFeature(gd), sw);
-
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-
-                } if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof TransactionType)) {
-
-                    TransactionType t = (TransactionType)objectRequest;
-
-                    if (t == null) {
-                         t = createNewTransactionRequest();
-                    }
-
-                    serviceDef = getVersionFromNumber(t.getVersion());
-                    StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.transaction(t), sw);
-
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-
-                } else {
-                    if (request.equals("") && objectRequest != null)
-                        request = objectRequest.getClass().getName();
-                    else if (request.equals("") && objectRequest == null)
-                        request = "undefined request";
-
-                    throw new CstlServiceException("The operation " + request + " is not supported by the service",
-                                                  INVALID_PARAMETER_VALUE, "request");
-                }
-            } else {
-                throw new CstlServiceException("The WFS service is not running",
-                                              NO_APPLICABLE_CODE);
+            if (objectRequest instanceof JAXBElement) {
+                objectRequest = ((JAXBElement<?>)objectRequest).getValue();
             }
 
+            final String request = (objectRequest == null) ? getParameter("REQUEST", true) : null;
+            logParameters();
+
+            if (STR_GETCAPABILITIES.equalsIgnoreCase(request) || (objectRequest instanceof GetCapabilitiesType)) {
+                final GetCapabilitiesType model = adaptGetCapabilities(objectRequest);
+                final StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.getCapabilities(model), sw);
+                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+
+            } else if (STR_DESCRIBEFEATURETYPE.equalsIgnoreCase(request) || (objectRequest instanceof DescribeFeatureTypeType)) {
+                final DescribeFeatureTypeType model = adaptDescripbeFeatureType(objectRequest);
+                final StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.describeFeatureType(model), sw);
+                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+
+            } else if (STR_GETFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof GetFeatureType)) {
+                final GetFeatureType model = adaptGetFeatureType(objectRequest);
+                version = getVersionFromNumber(model.getVersion());
+                final StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.getFeature(model), sw);
+                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+
+            } else if (STR_GETGMLOBJECT.equalsIgnoreCase(request) || (objectRequest instanceof GetGmlObjectType)) {
+                final GetGmlObjectType model = adaptGetGMLObject(objectRequest);
+                version = getVersionFromNumber(model.getVersion());
+                final StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.getGMLObject(model), sw);
+                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+
+            } else if (STR_LOCKFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof LockFeatureType)) {
+                final LockFeatureType model = adaptLockFeature(objectRequest);
+                version = getVersionFromNumber(model.getVersion());
+                final StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.lockFeature(model), sw);
+                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+
+            } else if (STR_TRANSACTION.equalsIgnoreCase(request) || (objectRequest instanceof TransactionType)) {
+                final TransactionType model = adaptTransaction(objectRequest);
+                version = getVersionFromNumber(model.getVersion());
+                final StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.transaction(model), sw);
+                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+            }
+
+            //unvalid request, throw an error
+            final String invalidRequest;
+            if( request == null && objectRequest != null){
+                invalidRequest = objectRequest.getClass().getName();
+            }else if(request == null && objectRequest == null){
+                invalidRequest = "undefined request";
+            }else{
+                invalidRequest = request;
+            }
+
+            throw new CstlServiceException("The operation " + invalidRequest + " is not supported by the service",
+                                          INVALID_PARAMETER_VALUE, "request");
+
         } catch (CstlServiceException ex) {
-            return processExceptionResponse(ex, serviceDef);
+            return processExceptionResponse(ex, version);
         } finally {
             if (marshaller != null) {
                 getMarshallerPool().release(marshaller);
@@ -304,7 +243,68 @@ public class WFSService extends OGCWebService {
         }
     }
 
+    private GetCapabilitiesType adaptGetCapabilities(Object objectRequest) throws CstlServiceException{
+        if(objectRequest instanceof GetCapabilitiesType){
+            return (GetCapabilitiesType)objectRequest;
+        }else{
+            //use a default getCapabilities request
+            return createNewGetCapabilitiesRequest();
+        }
+    }
 
+    private DescribeFeatureTypeType adaptDescripbeFeatureType(Object objectRequest) throws CstlServiceException{
+        if(objectRequest instanceof DescribeFeatureTypeType){
+            return (DescribeFeatureTypeType)objectRequest;
+        }else{
+            //build a simple describe request
+            //todo we must handle the query parameters here
+            return createNewDescribeFeatureTypeRequest();
+        }
+    }
+
+    private GetFeatureType adaptGetFeatureType(Object objectRequest) throws CstlServiceException{
+        if(objectRequest instanceof GetFeatureType){
+            return (GetFeatureType)objectRequest;
+        }else{
+            //build a simple get feature type request
+            //todo we must handle the query parameters here
+            return createNewGetFeatureRequest();
+        }
+    }
+
+    private GetGmlObjectType adaptGetGMLObject(Object objectRequest) throws CstlServiceException{
+        if(objectRequest instanceof GetGmlObjectType){
+            return (GetGmlObjectType)objectRequest;
+        }else{
+            //build a simple get gml object request
+            //todo we must handle the query parameters here
+            return createNewGetGmlObjectRequest();
+        }
+    }
+
+    private LockFeatureType adaptLockFeature(Object objectRequest) throws CstlServiceException{
+        if(objectRequest instanceof LockFeatureType){
+            return (LockFeatureType)objectRequest;
+        }else{
+            //build a simple lock feature request
+            //todo we must handle the query parameters here
+            return createNewLockFeatureRequest();
+        }
+    }
+
+    private TransactionType adaptTransaction(Object objectRequest) throws CstlServiceException{
+        if(objectRequest instanceof TransactionType){
+            return (TransactionType)objectRequest;
+        }else{
+            //build a simple transaction request
+            //todo we must handle the query parameters here
+            return createNewTransactionRequest();
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void destroy() {
         // do something

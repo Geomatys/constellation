@@ -46,20 +46,14 @@ public class WFSWorker {
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.wfs");
 
-    
-
-    /**
-     *
-     */
     public WFSWorker() throws CstlServiceException {
-        
-    }
-
-    public Schema describeFeatureType(DescribeFeatureTypeType dr) throws CstlServiceException {
-        return null;
     }
 
     public WFSCapabilitiesType getCapabilities(GetCapabilitiesType gc) throws CstlServiceException {
+        return null;
+    }
+
+    public Schema describeFeatureType(DescribeFeatureTypeType dr) throws CstlServiceException {
         return null;
     }
 
@@ -68,15 +62,15 @@ public class WFSWorker {
     }
 
     public AbstractGMLEntry getGMLObject(GetGmlObjectType grbi) throws CstlServiceException {
-        return null;
+        throw new CstlServiceException("WFS get GML Object is not supported on this Constellation version.");
     }
 
     public LockFeatureResponseType lockFeature(LockFeatureType gr) throws CstlServiceException {
-        return null;
+        throw new CstlServiceException("WFS Lock is not supported on this Constellation version.");
     }
 
     public TransactionResponseType transaction(TransactionType t) throws CstlServiceException {
-        return null;
+        throw new CstlServiceException("WFS-T is not supported on this Constellation version.");
     }
 
     public String getOutputFormat() {
