@@ -239,18 +239,6 @@ public class WMSService extends OGCWebService {
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                            OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
         } catch (CstlServiceException ex) {
-            // Log the exception, even if the request specify that the exception should be in image.
-            // In that precise case, printing the exception in the logs would allow administrator to
-            // follow the user's error.
-            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED))
-            {
-                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-            } else {
-                LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
-            }
             return processExceptionResponse(queryContext, ex, version);
         } finally {
             if (marshaller != null) {
@@ -264,6 +252,19 @@ public class WMSService extends OGCWebService {
      * Otherwise this call will fallback on normal xml error.
      */
     private Response processExceptionResponse(final QueryContext queryContext, final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
+        // Log the exception, even if the request specify that the exception should be in image.
+        // In that precise case, printing the exception in the logs would allow administrator to
+        // follow the user's error.
+        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+            !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
+            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
+            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED))
+        {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+        } else {
+            LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
+        }
+        // Now handle in image response or exception report.
         if (queryContext.isErrorInimage()) {
             final BufferedImage image = DefaultPortrayalService.writeException(ex, new Dimension(600, 400));
             return Response.ok(image, queryContext.getExceptionImageFormat()).build();
