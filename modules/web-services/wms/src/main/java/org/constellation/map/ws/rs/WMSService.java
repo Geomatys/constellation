@@ -239,6 +239,18 @@ public class WMSService extends OGCWebService {
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                            OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
         } catch (CstlServiceException ex) {
+            // Log the exception, even if the request specify that the exception should be in image.
+            // In that precise case, printing the exception in the logs would allow administrator to
+            // follow the user's error.
+            if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
+                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
+                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED))
+            {
+                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+            } else {
+                LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
+            }
             return processExceptionResponse(queryContext, ex, version);
         } finally {
             if (marshaller != null) {
@@ -274,14 +286,6 @@ public class WMSService extends OGCWebService {
         final ServiceExceptionReport report = new ServiceExceptionReport(version,
                 (locator == null) ? new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode()) :
                                     new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode(), locator));
-        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-        } else {
-            LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
-        }
         StringWriter sw = new StringWriter();
         /*
          * For WMS 1.1.1, we need to define another marshalling pool, with just the service exception
