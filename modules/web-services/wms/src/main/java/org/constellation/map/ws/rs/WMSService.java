@@ -266,7 +266,7 @@ public class WMSService extends OGCWebService {
         }
         // Now handle in image response or exception report.
         if (queryContext.isErrorInimage()) {
-            final BufferedImage image = DefaultPortrayalService.writeException(ex, new Dimension(600, 400));
+            final BufferedImage image = DefaultPortrayalService.writeException(ex, new Dimension(600, 400), queryContext.isOpaque());
             return Response.ok(image, queryContext.getExceptionImageFormat()).build();
         } else {
             return processExceptionResponse(ex, serviceDef);
@@ -550,6 +550,7 @@ public class WMSService extends OGCWebService {
         final Dimension size = new Dimension(width, height);
         final Color background = StringUtilities.toColor(strBGColor);
         final boolean transparent = StringUtilities.toBoolean(strTransparent);
+        queryContext.setOpaque(!transparent);
 
         if (strRemoteOwsUrl != null) {
             InputStream in = null;

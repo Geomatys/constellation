@@ -32,6 +32,8 @@ public final class QueryContext {
      */
     private boolean errorInimage = false;
 
+    private boolean opaque = false;
+
     /**
      * Defines the image format for the exeception in image.
      */
@@ -51,6 +53,14 @@ public final class QueryContext {
 
     public void setExceptionImageFormat(String exceptionImageFormat) {
         this.exceptionImageFormat = exceptionImageFormat;
+    }
+
+    public boolean isOpaque() {
+        return opaque;
+    }
+
+    public void setOpaque(boolean opaque) {
+        this.opaque = opaque;
     }
 
 }
