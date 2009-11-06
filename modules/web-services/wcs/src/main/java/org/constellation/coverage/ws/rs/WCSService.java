@@ -46,7 +46,7 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
-import org.constellation.ws.rs.OGCWebService;
+import org.constellation.ws.rs.GridWebService;
 import static org.constellation.query.wcs.WCSQuery.*;
 
 // Geotoolkit dependencies
@@ -95,7 +95,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  */
 @Path("wcs")
 @Singleton
-public class WCSService extends OGCWebService {
+public class WCSService extends GridWebService {
     /**
      * The worker which will perform the core logic for this service.
      */

@@ -38,7 +38,7 @@ import org.constellation.tile.ws.WMTSWorker;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.rs.OGCWebService;
+import org.constellation.ws.rs.GridWebService;
 
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
@@ -63,7 +63,7 @@ import static org.constellation.query.Query.KEY_VERSION;
  */
 @Path("wmts")
 @Singleton
-public class WMTSService extends OGCWebService {
+public class WMTSService extends GridWebService {
     /**
      * A worker to use in order to do WMTS operations.
      */

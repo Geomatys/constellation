@@ -28,20 +28,18 @@ import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.ExceptionCode;
+import org.geotoolkit.data.DefaultFeatureCollection;
 import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.collection.FeatureCollection;
+import org.geotoolkit.data.collection.FeatureIterator;
 import org.geotoolkit.data.query.DefaultQuery;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
-import org.geotoolkit.gml.xml.v311.AbstractFeatureCollectionType;
 import org.geotoolkit.gml.xml.v311.AbstractGMLEntry;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ows.xml.v100.AddressType;
 import org.geotoolkit.ows.xml.v100.CodeType;
 import org.geotoolkit.ows.xml.v100.ContactType;
-import org.geotoolkit.ows.xml.v100.ExceptionReport;
-import org.geotoolkit.ows.xml.v100.ExceptionType;
 import org.geotoolkit.ows.xml.v100.KeywordsType;
 import org.geotoolkit.ows.xml.v100.OnlineResourceType;
 import org.geotoolkit.ows.xml.v100.ResponsiblePartySubsetType;
@@ -53,7 +51,6 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
-import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.FeatureTypeListType;
 import org.geotoolkit.wfs.xml.v110.FeatureTypeType;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
@@ -73,7 +70,6 @@ import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
-import org.opengis.filter.sort.SortBy;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -143,14 +139,14 @@ public class WFSWorker {
         template.setServiceProvider(serviceProvider);
 
         //types possible, providers gives this list-----------------------------
-        final FeatureTypeListType ftl = new FeatureTypeListType();
+        final FeatureTypeListType ftl     = new FeatureTypeListType();
         final List<FeatureTypeType> types = new ArrayList<FeatureTypeType>();
-        final LayerProviderProxy proxy = LayerProviderProxy.getInstance();
-        for(final String layerName : proxy.getKeys()){
+        final LayerProviderProxy proxy    = LayerProviderProxy.getInstance();
+        for (final String layerName : proxy.getKeys()) {
             final LayerDetails layer = proxy.get(layerName);
-            if(layer instanceof FeatureLayerDetails){
+            if (layer instanceof FeatureLayerDetails){
                 final FeatureLayerDetails fld = (FeatureLayerDetails) layer;
-                final SimpleFeatureType type = fld.getSource().getSchema();
+                final SimpleFeatureType type  = fld.getSource().getSchema();
                 final FeatureTypeType ftt;
                 try {
                     ftt = new FeatureTypeType(
@@ -197,7 +193,7 @@ public class WFSWorker {
         final LayerProviderProxy proxy = LayerProviderProxy.getInstance();
         final List<QName> names = model.getTypeName();
 
-        if(names.isEmpty()){
+        if (names.isEmpty()){
             //search all types
             for(final String name : proxy.getKeys()){
                 final LayerDetails layer = proxy.get(name);
@@ -219,14 +215,14 @@ public class WFSWorker {
                 //schema.getSimpleTypeOrComplexTypeOrGroup().add(...);
                 schema.getSimpleTypeOrComplexTypeOrGroup().add(type);
             }
-        }else{
+        } else {
             //search only the given list
             for(final QName name : names){
                 final LayerDetails layer = proxy.get(name.getLocalPart());
                 if(layer == null || !(layer instanceof FeatureLayerDetails)) continue;
 
                 final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
-                final SimpleFeatureType sft = fld.getSource().getSchema();
+                final SimpleFeatureType sft   = fld.getSource().getSchema();
 
                 final TopLevelElement element = new TopLevelElement();
                 element.setName(sft.getTypeName());
@@ -246,17 +242,18 @@ public class WFSWorker {
         return schema;
     }
 
-    public AbstractFeatureCollectionType getFeature(final GetFeatureType model) throws CstlServiceException {
-        final FeatureCollectionType collection = new FeatureCollectionType();
+    public FeatureCollection getFeature(final GetFeatureType request) throws CstlServiceException {
 
         final LayerProviderProxy proxy = LayerProviderProxy.getInstance();
         final XMLUtilities util = new XMLUtilities();
 
-        for(final QueryType query : model.getQuery()){
-            final FilterType jaxbFilter = query.getFilter();
-            final SortByType jaxbSortBy = query.getSortBy();
-            final String srs = query.getSrsName();
-            final String typeName = query.getTypeName().get(0).getLocalPart();
+        final List<FeatureCollection> collections = new ArrayList<FeatureCollection>();
+        
+        for (final QueryType query : request.getQuery()) {
+            final FilterType jaxbFilter   = query.getFilter();
+            final SortByType jaxbSortBy   = query.getSortBy();
+            final String srs              = query.getSrsName();
+            final String typeName         = query.getTypeName().get(0).getLocalPart();
             final List<Object> properties = query.getPropertyNameOrXlinkPropertyNameOrFunction();
 
             
@@ -273,16 +270,28 @@ public class WFSWorker {
             final DefaultQuery fsQuery = new DefaultQuery();
             fsQuery.setFilter(filter);
             try {
-                FeatureCollection<SimpleFeatureType, SimpleFeature> col = layer.getSource().getFeatures(fsQuery);
+                collections.add(layer.getSource().getFeatures(fsQuery));
             } catch (IOException ex) {
                 throw new CstlServiceException(ex);
             }
 
-            //todo wait for gml utility class to marshall this collection
-
         }
-        
-        return collection;
+
+        /**
+         * 2 possibilité ici :
+         *    1) mergé les collections
+         *    2) retourné une collection de collection.
+         *
+         * result TODO find an id and a member type
+         */
+        FeatureCollection <SimpleFeatureType, SimpleFeature> result = new DefaultFeatureCollection("", null);
+        for (FeatureCollection collection: collections) {
+            FeatureIterator<SimpleFeature> iterator = collection.features();
+            while (iterator.hasNext()) {
+                result.add(iterator.next());
+            }
+        }
+        return result;
     }
 
     public AbstractGMLEntry getGMLObject(GetGmlObjectType grbi) throws CstlServiceException {
@@ -299,24 +308,6 @@ public class WFSWorker {
 
     public String getOutputFormat() {
         return "text/xml";
-    }
-
-    public void relayException(ExceptionReport report) throws CstlServiceException {
-        LOGGER.severe("\nPROXY: The PEP threw an Exception:\n" + report);
-        String message     = "no message";
-        String locator     = null;
-        ExceptionCode code = null;
-        if (report.getException() != null && report.getException().size() > 0) {
-            ExceptionType ex = report.getException().get(0);
-            if (ex.getExceptionCode() != null) {
-                code = ExceptionCode.valueOf(ex.getExceptionCode());
-            }
-            locator = ex.getLocator();
-            if (ex.getExceptionText() != null && ex.getExceptionText().size() > 0) {
-                message = ex.getExceptionText().get(0);
-            }
-        }
-        throw new CstlServiceException(message, code, locator);
     }
 
     /**

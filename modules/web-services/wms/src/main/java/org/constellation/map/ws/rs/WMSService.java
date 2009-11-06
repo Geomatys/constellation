@@ -62,7 +62,7 @@ import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.rs.OGCWebService;
+import org.constellation.ws.rs.GridWebService;
 
 //GeotoolKit dependencies
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
@@ -96,7 +96,7 @@ import static org.constellation.query.wms.WMSQuery.*;
  */
 @Path("wms")
 @Singleton
-public class WMSService extends OGCWebService {
+public class WMSService extends GridWebService {
     /**
      * The worker which will perform the core logic for this service.
      */

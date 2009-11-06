@@ -140,9 +140,8 @@ public abstract class WebService {
      */
     private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
 
-    static{
+    static {
         RUNNING_ON_GLASSFISH = (System.getProperty("domain.name") != null) ? true : false;
-        Registry.setDefaultCodecPreferences();
         Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
     }
 
