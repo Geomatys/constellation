@@ -95,7 +95,7 @@ public class WFSWorker {
 
 
 
-    public WFSWorker() throws CstlServiceException {
+    public WFSWorker() {
 
         standardCRS.add("CRS:84");
         standardCRS.add("EPSG:4326");

@@ -18,12 +18,7 @@
 
 package org.constellation.wfs.ws.rs;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
-
-// jersey dependencies
-import com.sun.jersey.spi.resource.Singleton;
+// J2SE dependencies
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -32,19 +27,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.logging.Logger;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Response;
+
+// JAXB dependencies
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
+
+// jersey dependencies
+import com.sun.jersey.spi.resource.Singleton;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
+
+// constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.util.Util;
 import org.constellation.wfs.WFSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
 
+// Geotoolkit dependencies
+import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.GmlObjectIdType;
 import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
@@ -74,12 +79,9 @@ import static org.constellation.query.wfs.WFSQuery.*;
 @Singleton
 public class WFSService extends OGCWebService {
 
-    /**
-     * use for debugging purpose
-     */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.security.wfs");
-    
     private final WFSWorker worker;
+
+    private final XmlFeatureWriter featureWriter;
 
     /**
      * Build a new Restfull WFS service.
@@ -101,13 +103,9 @@ public class WFSService extends OGCWebService {
                           " cause  : Error creating XML context." + '\n' +
                           " error  : " + ex.getMessage()          + '\n' +
                           " details: " + ex.toString());
-        } catch (CstlServiceException ex){
-            LOGGER.severe("The WFS service is not running."       + '\n' +
-                          " cause  : Error connecting the PEP." + '\n' +
-                          " error  : " + ex.getMessage()          + '\n' +
-                          " details: " + ex.toString());
-        }
-        this.worker = candidate;
+        } 
+        this.worker        = candidate;
+        this.featureWriter = null;
 
         if (worker != null) {
             LOGGER.info("WFS Service started");
@@ -154,9 +152,7 @@ public class WFSService extends OGCWebService {
             } else if (STR_GETFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof GetFeatureType)) {
                 final GetFeatureType model = adaptGetFeatureType(objectRequest);
                 version = getVersionFromNumber(model.getVersion());
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getFeature(model), sw);
-                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                return Response.ok(featureWriter.write(worker.getFeature(model)), worker.getOutputFormat()).build();
 
             } else if (STR_GETGMLOBJECT.equalsIgnoreCase(request) || (objectRequest instanceof GetGmlObjectType)) {
                 final GetGmlObjectType model = adaptGetGMLObject(objectRequest);
@@ -182,11 +178,11 @@ public class WFSService extends OGCWebService {
 
             //unvalid request, throw an error
             final String invalidRequest;
-            if( request == null && objectRequest != null){
+            if ( request == null && objectRequest != null){
                 invalidRequest = objectRequest.getClass().getName();
-            }else if(request == null && objectRequest == null){
+            }else if (request == null && objectRequest == null){
                 invalidRequest = "undefined request";
-            }else{
+            } else {
                 invalidRequest = request;
             }
 
@@ -242,59 +238,59 @@ public class WFSService extends OGCWebService {
         }
     }
 
-    private GetCapabilitiesType adaptGetCapabilities(Object objectRequest) throws CstlServiceException{
-        if(objectRequest instanceof GetCapabilitiesType){
+    private GetCapabilitiesType adaptGetCapabilities(Object objectRequest) throws CstlServiceException {
+        if (objectRequest instanceof GetCapabilitiesType){
             return (GetCapabilitiesType)objectRequest;
-        }else{
+        } else {
             //use a default getCapabilities request
             return createNewGetCapabilitiesRequest();
         }
     }
 
-    private DescribeFeatureTypeType adaptDescripbeFeatureType(Object objectRequest) throws CstlServiceException{
-        if(objectRequest instanceof DescribeFeatureTypeType){
+    private DescribeFeatureTypeType adaptDescripbeFeatureType(Object objectRequest) throws CstlServiceException {
+        if (objectRequest instanceof DescribeFeatureTypeType){
             return (DescribeFeatureTypeType)objectRequest;
-        }else{
+        } else {
             //build a simple describe request
             //todo we must handle the query parameters here
             return createNewDescribeFeatureTypeRequest();
         }
     }
 
-    private GetFeatureType adaptGetFeatureType(Object objectRequest) throws CstlServiceException{
-        if(objectRequest instanceof GetFeatureType){
+    private GetFeatureType adaptGetFeatureType(Object objectRequest) throws CstlServiceException {
+        if (objectRequest instanceof GetFeatureType){
             return (GetFeatureType)objectRequest;
-        }else{
+        } else {
             //build a simple get feature type request
             //todo we must handle the query parameters here
             return createNewGetFeatureRequest();
         }
     }
 
-    private GetGmlObjectType adaptGetGMLObject(Object objectRequest) throws CstlServiceException{
-        if(objectRequest instanceof GetGmlObjectType){
+    private GetGmlObjectType adaptGetGMLObject(Object objectRequest) throws CstlServiceException {
+        if (objectRequest instanceof GetGmlObjectType){
             return (GetGmlObjectType)objectRequest;
-        }else{
+        } else {
             //build a simple get gml object request
             //todo we must handle the query parameters here
             return createNewGetGmlObjectRequest();
         }
     }
 
-    private LockFeatureType adaptLockFeature(Object objectRequest) throws CstlServiceException{
-        if(objectRequest instanceof LockFeatureType){
+    private LockFeatureType adaptLockFeature(Object objectRequest) throws CstlServiceException {
+        if (objectRequest instanceof LockFeatureType){
             return (LockFeatureType)objectRequest;
-        }else{
+        } else {
             //build a simple lock feature request
             //todo we must handle the query parameters here
             return createNewLockFeatureRequest();
         }
     }
 
-    private TransactionType adaptTransaction(Object objectRequest) throws CstlServiceException{
-        if(objectRequest instanceof TransactionType){
+    private TransactionType adaptTransaction(Object objectRequest) throws CstlServiceException {
+        if (objectRequest instanceof TransactionType){
             return (TransactionType)objectRequest;
-        }else{
+        } else {
             //build a simple transaction request
             //todo we must handle the query parameters here
             return createNewTransactionRequest();
