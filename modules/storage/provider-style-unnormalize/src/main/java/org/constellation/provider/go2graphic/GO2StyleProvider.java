@@ -16,16 +16,22 @@
  */
 package org.constellation.provider.go2graphic;
 
+import java.awt.Color;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.constellation.provider.StyleProvider;
+import org.geotoolkit.display2d.ext.rastermask.RasterMaskSymbolizer;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.display2d.ext.vectorfield.VectorFieldSymbolizer;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.Expression;
 import org.opengis.style.Symbolizer;
 
 /**
@@ -103,10 +109,22 @@ public class GO2StyleProvider implements StyleProvider{
     private void visit() {
         final MutableStyleFactory sf = (MutableStyleFactory)FactoryFinder.getStyleFactory(
                             new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
+        final Color TRANSLUCENT = new Color(0f, 0f, 0f, 0f);
+        final FilterFactory ff = FactoryFinder.getFilterFactory(null);
         //TODO : find another way to load special styles.
         final Symbolizer symbol = new VectorFieldSymbolizer();
-
         index.put("GO2:VectorField", sf.style(symbol));
+
+        // Defines intervals for a mask on raster.
+        final Map<Expression, List<Symbolizer>> map = new HashMap<Expression, List<Symbolizer>>();
+        map.put(null, Collections.singletonList((Symbolizer) sf.polygonSymbolizer(sf.stroke(TRANSLUCENT, 0d), sf.fill(Color.BLUE), null)));
+        map.put(ff.literal(20), Collections.singletonList((Symbolizer) sf.polygonSymbolizer(sf.stroke(TRANSLUCENT, 0d), sf.fill(Color.RED), null)));
+        map.put(ff.literal(50), Collections.singletonList((Symbolizer) sf.polygonSymbolizer(sf.stroke(TRANSLUCENT, 0d), sf.fill(Color.PINK), null)));
+        map.put(ff.literal(75), Collections.singletonList((Symbolizer) sf.polygonSymbolizer(sf.stroke(TRANSLUCENT, 2d), sf.fill(Color.ORANGE), null)));
+        map.put(ff.literal(100), Collections.singletonList((Symbolizer) sf.polygonSymbolizer(sf.stroke(TRANSLUCENT, 0d), sf.fill(Color.GRAY), null)));
+        map.put(ff.literal(140), Collections.singletonList((Symbolizer) sf.polygonSymbolizer(sf.stroke(TRANSLUCENT, 0d), sf.fill(Color.GREEN), null)));
+        map.put(ff.literal(180), Collections.singletonList((Symbolizer) sf.polygonSymbolizer(sf.stroke(TRANSLUCENT, 1d), sf.fill(Color.YELLOW), null)));
+        index.put("GO2:RasterMask", sf.style(new RasterMaskSymbolizer(map)));
     }
     
 }

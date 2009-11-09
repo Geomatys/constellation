@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.provider.StyleProvider;
 import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 
@@ -74,9 +75,13 @@ public class GO2StyleProviderService implements StyleProviderService {
         }
 
         init((ProviderConfig)null);
-
-        LOGGER.log(Level.INFO, "[PROVIDER]> GO2 style provider created : " + "GO2:VectorField");
-
+        final StringBuilder sb = new StringBuilder("[PROVIDER]> GO2 style provider created : ");
+        for (StyleProvider sp : getProviders()) {
+            for (String key : sp.getKeys()) {
+                sb.append(key).append(' ');
+            }
+        }
+        LOGGER.log(Level.INFO, sb.toString());
     }
 
     /**
