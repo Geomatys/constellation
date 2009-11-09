@@ -79,6 +79,10 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-xsd</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.sun.xml.parsers</groupId>
+      <artifactId>jaxp-ri</artifactId>
+    </dependency>
   </dependencies>
 
 </project>

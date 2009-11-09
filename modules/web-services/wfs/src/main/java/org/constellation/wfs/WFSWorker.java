@@ -24,10 +24,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+
+// Constellation dependencies
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.ws.CstlServiceException;
+
+// Geotoolkit dependencies
 import org.geotoolkit.data.DefaultFeatureCollection;
 import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.collection.FeatureCollection;
@@ -67,6 +71,8 @@ import org.geotoolkit.xsd.xml.v2001.Import;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
 import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
+
+// GeoAPI dependencies
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -278,9 +284,10 @@ public class WFSWorker {
         }
 
         /**
-         * 2 possibilité ici :
+         * 3 possibilité ici :
          *    1) mergé les collections
          *    2) retourné une collection de collection.
+         *    3) si il n'y a qu'un feature on le retourne (changer le type de retour en object)
          *
          * result TODO find an id and a member type
          */
