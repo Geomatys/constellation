@@ -146,25 +146,22 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
         
             final PreparedStatement statement = getStatement(QueryType.INSERT);
 
-            if (this.getDatabase().getProperty(ConfigurationKey.ISPOSTGRES).equals("false")) {
-                final PreparedStatement p = getDatabase().getConnection().prepareStatement("SELECT max(\"id_result\") FROM \"observation\".\"any_results\"" );
-                final ResultSet r         = p.executeQuery();
-                if (r.next()) {
-                    final String res = r.getString(1);
-                    try {
-                        final int id = Integer.parseInt(res);
-                        statement.setInt(indexOf(query.idResult), id + 1);
-                    } catch (NumberFormatException ex) {
-                        LOGGER.severe("unable to parse the result id:" + res);
-                        statement.setNull(indexOf(query.idResult), java.sql.Types.INTEGER);
-                    }
-                } else {
+            final PreparedStatement p = getDatabase().getConnection().prepareStatement("SELECT max(\"id_result\") FROM \"observation\".\"any_results\"" );
+            final ResultSet r         = p.executeQuery();
+            if (r.next()) {
+                final String res = r.getString(1);
+                try {
+                    final int id = Integer.parseInt(res);
+                    statement.setInt(indexOf(query.idResult), id + 1);
+                } catch (NumberFormatException ex) {
+                    LOGGER.severe("unable to parse the result id:" + res);
                     statement.setNull(indexOf(query.idResult), java.sql.Types.INTEGER);
                 }
-                p.close();
             } else {
                 statement.setNull(indexOf(query.idResult), java.sql.Types.INTEGER);
             }
+            p.close();
+            
             if (result instanceof AnyResultEntry) {
                 final DataArrayEntry array = ((AnyResultEntry)result).getArray();
                 statement.setString(indexOf(query.values), array.getValues());

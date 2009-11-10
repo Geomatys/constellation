@@ -178,7 +178,7 @@ public class JAXPStreamFeatureWriter implements XmlFeatureWriter {
     public static String getStringValue(Object obj) {
         if (obj instanceof String) {
             return (String) obj;
-        } else if (obj instanceof Integer || obj instanceof Long) {
+        } else if (obj instanceof Integer || obj instanceof Long || obj instanceof Double) {
             return obj + "";
 
         } else if (obj != null) {
