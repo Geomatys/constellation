@@ -18,6 +18,7 @@ package org.constellation.query.wms;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -112,7 +113,7 @@ public class GetMap extends WMSQuery {
     public GetMap(final Envelope envelope, final Version version, final String format,
                   final List<String> layers, final Dimension size)
     {
-        this(envelope, version, format, layers, null, size);
+        this(envelope, version, format, layers, new ArrayList<String>(), size);
     }
 
     /**
