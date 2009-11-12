@@ -19,44 +19,30 @@ package org.geotoolkit.feature.xml.jaxp;
 
 import com.sun.xml.internal.stream.events.CharacterEvent;
 import com.sun.xml.internal.stream.events.EndElementEvent;
+import com.sun.xml.internal.stream.events.NamespaceImpl;
 import com.sun.xml.internal.stream.events.StartDocumentEvent;
 import com.sun.xml.internal.stream.events.StartElementEvent;
-import java.io.StringReader;
+import java.io.OutputStream;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.StartElement;
-import javax.xml.stream.events.XMLEvent;
 import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.data.collection.FeatureIterator;
-import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.feature.simple.DefaultSimpleFeature;
-import org.geotoolkit.feature.simple.DefaultSimpleFeatureType;
-import org.geotoolkit.feature.type.DefaultGeometryDescriptor;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.filter.identity.DefaultFeatureId;
 import org.geotoolkit.geometry.isoonjts.JTSUtils;
 import org.geotoolkit.internal.jaxb.ObjectFactory;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.xml.Namespaces;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
-import org.opengis.feature.type.GeometryDescriptor;
-import org.opengis.feature.type.Name;
-import org.opengis.filter.identity.FeatureId;
 import org.opengis.geometry.Geometry;
 
 /**
@@ -86,9 +72,9 @@ public class JAXPEventFeatureWriter implements XmlFeatureWriter {
             XMLEventWriter eventWriter = outputFactory.createXMLEventWriter(sw);
 
             // the XML header
-            eventWriter.add(new StartDocumentEvent("UTF-8"));
+            eventWriter.add(new StartDocumentEvent("UTF-8", "1.0"));
 
-            write(feature, eventWriter);
+            write(feature, eventWriter, true);
 
             // we close the stream
             eventWriter.flush();
@@ -102,16 +88,61 @@ public class JAXPEventFeatureWriter implements XmlFeatureWriter {
         return null;
     }
 
-    public void write(SimpleFeature feature, XMLEventWriter eventWriter) {
+    @Override
+    public void write(SimpleFeature feature, Writer writer) {
+        try {
+            XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+            XMLEventWriter eventWriter = outputFactory.createXMLEventWriter(writer);
+
+            // the XML header
+            eventWriter.add(new StartDocumentEvent("UTF-8", "1.0"));
+
+            write(feature, eventWriter, true);
+
+            // we close the stream
+            eventWriter.flush();
+            eventWriter.close();
+
+        } catch (XMLStreamException ex) {
+            LOGGER.severe("XMl stream exception while writing the feature: " + ex.getMessage());
+        }
+    }
+
+    @Override
+    public void write(SimpleFeature feature, OutputStream out) {
+        try {
+            XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+            XMLEventWriter eventWriter = outputFactory.createXMLEventWriter(out);
+
+            // the XML header
+            eventWriter.add(new StartDocumentEvent("UTF-8", "1.0"));
+
+            write(feature, eventWriter,true);
+
+            // we close the stream
+            eventWriter.flush();
+            eventWriter.close();
+
+        } catch (XMLStreamException ex) {
+            LOGGER.severe("XMl stream exception while writing the feature: " + ex.getMessage());
+        }
+    }
+
+    private void write(SimpleFeature feature, XMLEventWriter eventWriter, boolean root) {
 
         try {
         //the root element of the xml document (type of the feature)
             FeatureType type = feature.getType();
             String namespace = type.getName().getNamespaceURI();
             String localPart = type.getName().getLocalPart();
-            QName root = new QName(namespace, localPart);
-            eventWriter.add(new StartElementEvent(root));
+            String prefix    = Namespaces.getPreferredPrefix(namespace, null);
+            QName rootName   = new QName(namespace, localPart, prefix);
+            eventWriter.add(new StartElementEvent(rootName));
 
+            if (root) {
+                NamespaceImpl namespaceEvent = new NamespaceImpl("gml", "http://www.opengis.net/gml");
+                eventWriter.add(namespaceEvent);
+            }
 
             //the simple nodes (attributes of the feature)
             for (Property a : feature.getProperties()) {
@@ -124,7 +155,7 @@ public class JAXPEventFeatureWriter implements XmlFeatureWriter {
             }
 
             // we add the geometry
-            QName geomQname = new QName("isoGeometry");
+            QName geomQname = new QName("the_geom");
             eventWriter.add(new StartElementEvent(geomQname));
             Geometry isoGeometry = JTSUtils.toISO((com.vividsolutions.jts.geom.Geometry) feature.getDefaultGeometry(), feature.getFeatureType().getCoordinateReferenceSystem());
 
@@ -143,37 +174,80 @@ public class JAXPEventFeatureWriter implements XmlFeatureWriter {
             eventWriter.add(new EndElementEvent(geomQname));
 
 
-            eventWriter.add(new EndElementEvent(root));
+            eventWriter.add(new EndElementEvent(rootName));
         } catch (XMLStreamException ex) {
             LOGGER.log(Level.SEVERE, "XMl stream exception while writing the feature: " + ex.getMessage(), ex);
         }
     }
 
+    @Override
+    public void write(FeatureCollection fc, Writer writer) {
+        try {
+
+            XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+            XMLEventWriter eventWriter     = outputFactory.createXMLEventWriter(writer);
+
+            write(fc, eventWriter);
+
+        } catch (XMLStreamException ex) {
+            LOGGER.log(Level.SEVERE, "XMl stream exception while writing the feature: " + ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    public void write(FeatureCollection fc, OutputStream out) {
+        try {
+
+            XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+            XMLEventWriter eventWriter     = outputFactory.createXMLEventWriter(out);
+
+            write(fc, eventWriter);
+
+        } catch (XMLStreamException ex) {
+            LOGGER.log(Level.SEVERE, "XMl stream exception while writing the feature: " + ex.getMessage(), ex);
+        }
+    }
 
     @Override
     public String write(FeatureCollection featureCollection) {
         try {
-            
+
             XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
             StringWriter sw                = new StringWriter();
             XMLEventWriter eventWriter     = outputFactory.createXMLEventWriter(sw);
+            eventWriter.setDefaultNamespace("");
+            write(featureCollection, eventWriter);
 
+            return sw.toString();
+        } catch (XMLStreamException ex) {
+            LOGGER.log(Level.SEVERE, "XMl stream exception while writing the feature: " + ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    private void write(FeatureCollection featureCollection, XMLEventWriter eventWriter) {
+        try {
+            
             // the XML header
-            eventWriter.add(new StartDocumentEvent("UTF-8"));
+            eventWriter.add(new StartDocumentEvent("UTF-8", "1.0"));
+
             
             // the root Element
-            QName root = new QName("http://www.opengis.net/gml", "FeatureCollection");
-            eventWriter.add(new StartElementEvent(root));
+            QName root = new QName("http://www.opengis.net/gml", "FeatureCollection", "gml");
+            StartElementEvent ste = new StartElementEvent(root);
+            eventWriter.add(ste);
 
+            NamespaceImpl namespace = new NamespaceImpl("gml", "http://www.opengis.net/gml");
+            eventWriter.add(namespace);
 
             // we write each feature member of the collection
-            QName memberName = new QName("http://www.opengis.net/gml", "featureMember");
+            QName memberName = new QName("http://www.opengis.net/gml", "featureMember", "gml");
             FeatureIterator iterator =featureCollection.features();
             while (iterator.hasNext()) {
                 final SimpleFeature f = (SimpleFeature) iterator.next();
 
                 eventWriter.add(new StartElementEvent(memberName));
-                write(f, eventWriter);
+                write(f, eventWriter, false);
                 eventWriter.add(new EndElementEvent(memberName));
             }
 
@@ -182,69 +256,10 @@ public class JAXPEventFeatureWriter implements XmlFeatureWriter {
             eventWriter.flush();
             eventWriter.close();
             
-            return sw.toString();
-        
         } catch (XMLStreamException ex) {
             LOGGER.log(Level.SEVERE, "XMl stream exception while writing the feature: " + ex.getMessage(), ex);
         }
-        return null;
     }
-
-
-
-    
-    public SimpleFeature read(String xml) throws XMLStreamException, JAXBException {
-
-        XMLInputFactory XMLfactory = XMLInputFactory.newInstance();
-        XMLfactory.setProperty("http://java.sun.com/xml/stream/properties/report-cdata-event", Boolean.TRUE);
-
-        XMLEventReader eventReader = XMLfactory.createXMLEventReader(new StringReader(xml));
-
-        boolean searchRoot      = true;
-        Name name               = null;
-        int nbAttribute         = 0;
-        List<Object> values     = new ArrayList<Object>();
-        GeometryDescriptor geom = null;
-
-        while(eventReader.hasNext()) {
-            XMLEvent event = eventReader.nextEvent();
-            LOGGER.info(event + "");
-            
-            //we are looking for the root mark
-            if (event.isStartElement() && searchRoot) {
-                StartElement startEvent = event.asStartElement();
-                QName q                 = startEvent.getName();
-                name                    = new DefaultName(q);
-                searchRoot              = false;
-            
-            // then we extract each attribute
-            } else if (event.isStartElement()) {
-                nbAttribute++;
-                StartElement startEvent = event.asStartElement();
-                QName q                 = startEvent.getName();
-
-                if (!q.getLocalPart().equals("isoGeometry")) {
-                    XMLEvent content = eventReader.nextEvent();
-                    LOGGER.info("find value:" + content.toString() + " for attribute :" + q.getLocalPart());
-                } else {
-                    eventReader.next();
-                    Unmarshaller un  = pool.acquireUnmarshaller();
-                    Geometry isoGeom = (Geometry) ((JAXBElement)un.unmarshal(eventReader)).getValue();
-                    // TODO iso => JTS
-                    geom = new DefaultGeometryDescriptor(null, name, nbAttribute, nbAttribute, searchRoot, isoGeom);
-                }
-
-            }
-        }
-
-        
-        SimpleFeatureType type = new DefaultSimpleFeatureType(name, null, null, false, null, null, null);
-        FeatureId id           = new DefaultFeatureId("");
-        DefaultSimpleFeature SimpleFeature = new DefaultSimpleFeature(values, type, id);
-
-        return null;
-    }
-
 
     /**
      * Return a String representation of an Object.

@@ -80,6 +80,14 @@
       <artifactId>geotk-xml-xsd</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-jdbc-postgis</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-shapefile</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.sun.xml.parsers</groupId>
       <artifactId>jaxp-ri</artifactId>
     </dependency>

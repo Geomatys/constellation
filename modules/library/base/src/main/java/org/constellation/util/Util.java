@@ -417,6 +417,69 @@ public final class Util {
     }
 
     /**
+     * Searches in the Context ClassLoader for the named file and returns it.
+     *
+     * @param packagee The name of package.
+     *
+     * @return A directory if it exist.
+     */
+    public static File getFileFromResource(String packagee) {
+        File result = null;
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+
+        try {
+            final String extension = packagee.substring(packagee.lastIndexOf('.'), packagee.length());
+            packagee               = packagee.substring(0, packagee.lastIndexOf('.'));
+            final String fileP = packagee.replace('.', '/') + extension;
+            final Enumeration<URL> urls = classloader.getResources(fileP);
+            while (urls.hasMoreElements()) {
+                final URL url = urls.nextElement();
+                try {
+                    final URI uri = url.toURI();
+                    result  = scanFile(uri, fileP);
+                } catch (URISyntaxException e) {
+                    LOGGER.severe("URL, " + url + "cannot be converted to a URI");
+                }
+            }
+        } catch (IOException ex) {
+            LOGGER.severe("The resources for the package" + packagee + ", could not be obtained");
+        }
+
+
+        return result;
+    }
+
+    /**
+     * Scan a resource file (a JAR or a directory) and return it as a File.
+     *
+     * @param u The URI of the file.
+     * @param filePackageName The package to scan.
+     *
+     * @return a list of package names.
+     * @throws java.io.IOException
+     */
+    public static File scanFile(final URI u, final String filePackageName) throws IOException {
+        final String scheme = u.getScheme();
+        if (scheme.equals("file")) {
+            final File f = new File(u.getPath());
+            return f;
+        } else if (scheme.equals("jar") || scheme.equals("zip")) {
+            final File f = new File(System.getProperty("java.io.tmpdir") + "/Constellation");
+            if (f != null && f.exists()) {
+                final File fConfig = new File(f, filePackageName);
+                if (fConfig.exists() && fConfig.isDirectory()) {
+                    return fConfig;
+                } else {
+                    LOGGER.info("The configuration directory was not found in the temporary folder.");
+                }
+            } else {
+                LOGGER.info("The Constellation directory was not present in the temporary folder.");
+            }
+        }
+        return null;
+    }
+
+    /**
      * Searches in the Context ClassLoader for the named files and returns a
      * {@code List<String>} with, for each named package,
      *

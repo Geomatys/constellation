@@ -1,0 +1,117 @@
+/*
+ *    Constellation - An open source and standard compliant SDI
+ *    http://www.constellation-sdi.org
+ *
+ *    (C) 2007 - 2009, Geomatys
+ *
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ */
+
+
+package org.constellation.wfs.utils;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.DataStoreFinder;
+import org.geotoolkit.data.FeatureSource;
+import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
+import org.geotoolkit.data.collection.FeatureCollection;
+
+import org.opengis.feature.simple.SimpleFeature;
+
+/**
+ *
+ * @author Guilhem Legal (Geomatys)
+ */
+public class PostgisUtils {
+
+    private static final Logger LOGGER = Logger.getLogger("org.mdweb.utils");
+
+    private PostgisUtils() {}
+
+    public static FeatureSource createPostGISLayer(String host, int port, String schema, String databaseName, String user, String pass, String featureSource) throws IOException{
+
+       final Map params = new HashMap<String, Object>();
+
+       params.put("dbtype", "postgisng");
+       params.put(PostgisNGDataStoreFactory.HOST.getName().toString(),     host);
+       params.put(PostgisNGDataStoreFactory.PORT.getName().toString(),     port);
+       params.put(PostgisNGDataStoreFactory.SCHEMA.getName().toString(),   schema);
+       params.put(PostgisNGDataStoreFactory.DATABASE.getName().toString(), databaseName);
+       params.put(PostgisNGDataStoreFactory.USER.getName().toString(),     user);
+       params.put(PostgisNGDataStoreFactory.PASSWD.getName().toString(),   pass);
+
+       final DataStore store = DataStoreFinder.getDataStore(params);
+       return store.getFeatureSource(featureSource);
+   }
+
+   public static SimpleFeature createPostGISFeature(String host, int port, String schema, String databaseName, String user, String pass, String featureSource, String toponyme) throws IOException{
+
+       final Map params = new HashMap<String, Object>();
+
+       params.put("dbtype", "postgisng");
+       params.put(PostgisNGDataStoreFactory.HOST.getName().toString(),     host);
+       params.put(PostgisNGDataStoreFactory.PORT.getName().toString(),     port);
+       params.put(PostgisNGDataStoreFactory.SCHEMA.getName().toString(),   schema);
+       params.put(PostgisNGDataStoreFactory.DATABASE.getName().toString(), databaseName);
+       params.put(PostgisNGDataStoreFactory.USER.getName().toString(),     user);
+       params.put(PostgisNGDataStoreFactory.PASSWD.getName().toString(),   pass);
+
+       final DataStore store = DataStoreFinder.getDataStore(params);
+
+       final FeatureSource fs = store.getFeatureSource(featureSource);
+
+
+
+       //fs.getBounds();
+       final FeatureCollection coll = fs.getFeatures();
+       final org.geotoolkit.data.collection.FeatureIterator ite = coll.features();
+       try{
+           while(ite.hasNext()) {
+               final SimpleFeature f = (SimpleFeature) ite.next();
+
+               final String identifier = (String) f.getAttribute(featureSource);
+               if (identifier.equals(toponyme)) {
+                   return f;
+               }
+           }
+       } catch(Exception ex) {
+           LOGGER.log(Level.SEVERE, pass, ex);
+       } finally {
+           ite.close();
+       }
+       return null;
+   }
+
+   public static FeatureCollection createShapeLayer(File file) throws MalformedURLException, IOException {
+        Map<String,Serializable> params = new HashMap<String,Serializable>();
+        if (!file.exists()) {
+            System.out.println("the file does not exist");
+        }
+
+       params.put("url", file.toURI().toURL());
+       DataStore store = DataStoreFinder.getDataStore(params);
+       if (store != null) {
+           FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
+           return fs.getFeatures();
+       } else {
+           System.out.println("datastore null");
+       }
+       return null;
+   }
+}
