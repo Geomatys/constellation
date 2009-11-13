@@ -88,8 +88,8 @@
       <artifactId>geotk-shapefile</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.sun.xml.parsers</groupId>
-      <artifactId>jaxp-ri</artifactId>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-jaxp-gml</artifactId>
     </dependency>
   </dependencies>
 

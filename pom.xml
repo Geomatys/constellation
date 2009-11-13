@@ -202,11 +202,6 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>com.sun.xml.parsers</groupId>
-	<artifactId>jaxp-ri</artifactId>
-	<version>1.4.2</version>
-      </dependency>
-      <dependency>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-server</artifactId>
         <version>1.1.4</version>
@@ -493,6 +488,11 @@
       <dependency>
         <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-xml-feature-catalogue</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-jaxp-gml</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
 

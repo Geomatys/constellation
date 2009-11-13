@@ -74,7 +74,7 @@ public class FeatureXmlBindingTest {
      * test the feature marshall
      *
      */
-    @Test
+    @Ignore
     public void featureMarshallTest() throws Exception {
         FeatureIterator ite = fcoll.features();
         SimpleFeature feature = null;
@@ -98,7 +98,7 @@ public class FeatureXmlBindingTest {
      * test the featureCollection marshall
      *
      */
-    @Test
+    @Ignore
     public void featureCollectionMarshallTest() throws Exception {
         String result = featureWriter.write(fcoll);
 
@@ -113,10 +113,10 @@ public class FeatureXmlBindingTest {
     }
 
     /**
-     * test the feature marshall
+     * test the feature unmarshall
      *
      */
-    @Test
+    @Ignore
     public void featureUnMarshallTest() throws Exception {
         
         FeatureIterator ite = fcoll.features();
@@ -129,16 +129,13 @@ public class FeatureXmlBindingTest {
         InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/adminCommune_feature.xml");
         SimpleFeature result = (SimpleFeature) featureReader.read(stream);
 
-        System.out.println("result");
-
-
         assertEquals(expResult.getIdentifier(), result.getIdentifier());
         assertEquals(expResult.getID(), result.getID());
 
 
         assertEquals(expResult.getFeatureType(), result.getFeatureType());
         assertEquals(expResult.getAttributeCount(), result.getAttributeCount());
-      //  assertEquals(expResult.getAttributes(), result.getAttributes());
+      
         for (int j = 0; j < expResult.getAttributeCount(); j++) {
             if (expResult.getAttributes().get(j) instanceof Geometry) {
                 assertTrue(((Geometry) expResult.getAttributes().get(j)).equals((Geometry) result.getAttributes().get(j)));
@@ -147,5 +144,17 @@ public class FeatureXmlBindingTest {
             }
         }
         assertEquals(expResult, result);
+    }
+
+    /**
+     * test the feature marshall
+     *
+     */
+    @Test
+    public void featureCollectionUnMarshallTest() throws Exception {
+        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/adminCommune_Collection.xml");
+        FeatureCollection result = (FeatureCollection) featureReader.read(stream);
+
+        assertEquals(fcoll, result);
     }
 }
