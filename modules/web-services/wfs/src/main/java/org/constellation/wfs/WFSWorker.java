@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
@@ -40,6 +41,7 @@ import org.geotoolkit.data.query.DefaultQuery;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.xml.v311.AbstractGMLEntry;
 import org.geotoolkit.ogc.xml.v110.FilterType;
+import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ows.xml.v100.AddressType;
 import org.geotoolkit.ows.xml.v100.CodeType;
@@ -52,6 +54,7 @@ import org.geotoolkit.ows.xml.v100.ServiceProvider;
 import org.geotoolkit.ows.xml.v100.TelephoneType;
 import org.geotoolkit.ows.xml.v100.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
@@ -76,8 +79,11 @@ import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.filter.expression.PropertyName;
+import org.opengis.filter.sort.SortBy;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 
@@ -264,17 +270,60 @@ public class WFSWorker {
 
             
             final Filter filter;
-            final FeatureLayerDetails layer = (FeatureLayerDetails)proxy.get(typeName);
-            try {
-                filter = util.readFilter(jaxbFilter, org.geotoolkit.sld.xml.Specification.Filter.V_1_1_0);
-            } catch (JAXBException ex) {
-                throw new CstlServiceException(ex);
+            final CoordinateReferenceSystem crs;
+            final List<String> propNames = new ArrayList<String>();
+            final List<SortBy> sortBys = new ArrayList<SortBy>();
+
+            //decode filter-----------------------------------------------------
+            if(jaxbFilter != null){
+                filter = util.getTransformer110().visitFilter(jaxbFilter);
+            }else{
+                filter = Filter.INCLUDE;
             }
 
-            //todo use other properties to filter properly
+            //decode crs--------------------------------------------------------
+            if(srs != null){
+                try {
+                    crs = CRS.decode(srs, true);
+                    //todo use other properties to filter properly
+                } catch (NoSuchAuthorityCodeException ex) {
+                    throw new CstlServiceException(ex);
+                } catch (FactoryException ex) {
+                    throw new CstlServiceException(ex);
+                }
+            }else{
+                crs = null;
+            }
+
+            //decode property names---------------------------------------------
+            for(Object obj : properties){
+                if(obj instanceof JAXBElement){
+                    obj = ((JAXBElement)obj).getValue();
+                }
+
+                if(obj instanceof PropertyNameType){
+                    final PropertyName pn = util.getTransformer110().visitPropertyName((PropertyNameType) obj);
+                    propNames.add(pn.getPropertyName());
+                }
+            }
+
+            //decode sort by----------------------------------------------------
+            if (jaxbSortBy != null) {
+                sortBys.addAll(util.getTransformer110().visitSortBy(jaxbSortBy));
+            }
 
             final DefaultQuery fsQuery = new DefaultQuery();
             fsQuery.setFilter(filter);
+            fsQuery.setCoordinateSystem(crs);
+            fsQuery.setCoordinateSystemReproject(crs);
+            if(!propNames.isEmpty()){
+                fsQuery.setPropertyNames(propNames);
+            }
+            if(!sortBys.isEmpty()){
+                fsQuery.setSortBy(sortBys.toArray(new SortBy[sortBys.size()]));
+            }
+
+            final FeatureLayerDetails layer = (FeatureLayerDetails)proxy.get(typeName);
             try {
                 collections.add(layer.getSource().getFeatures(fsQuery));
             } catch (IOException ex) {
@@ -291,11 +340,15 @@ public class WFSWorker {
          *
          * result TODO find an id and a member type
          */
-        FeatureCollection <SimpleFeatureType, SimpleFeature> result = new DefaultFeatureCollection("", null);
-        for (FeatureCollection collection: collections) {
-            FeatureIterator<SimpleFeature> iterator = collection.features();
-            while (iterator.hasNext()) {
-                result.add(iterator.next());
+        final FeatureCollection <SimpleFeatureType, SimpleFeature> result = new DefaultFeatureCollection("", null);
+        for (final FeatureCollection collection: collections) {
+            final FeatureIterator<SimpleFeature> iterator = collection.features();
+            try{
+                while (iterator.hasNext()) {
+                    result.add(iterator.next());
+                }
+            }finally{
+                iterator.close();
             }
         }
         return result;
