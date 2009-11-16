@@ -19,19 +19,25 @@ package org.constellation.wfs;
 
 import com.vividsolutions.jts.geom.Geometry;
 import java.io.InputStream;
+
 import org.constellation.util.Util;
 import org.constellation.wfs.utils.PostgisUtils;
+
 import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.data.collection.FeatureIterator;
 import org.geotoolkit.feature.xml.XmlFeatureReader;
+import org.geotoolkit.feature.xml.XmlFeatureTypeReader;
+import org.geotoolkit.feature.xml.XmlFeatureTypeWriter;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureReader;
+import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
+import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureWriter;
-import org.junit.*;
-import org.opengis.feature.simple.SimpleFeature;
 
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.FeatureType;
-import org.opengis.filter.sort.SortBy;
+
+import org.junit.*;
 import static org.junit.Assert.*;
 
 /**
@@ -45,6 +51,10 @@ public class FeatureXmlBindingTest {
     private XmlFeatureWriter featureWriter;
 
     private XmlFeatureReader featureReader;
+
+    private XmlFeatureTypeReader featureTypeReader;
+
+    private XmlFeatureTypeWriter featureTypeWriter;
 
     private static FeatureType featureType;
 
@@ -62,8 +72,10 @@ public class FeatureXmlBindingTest {
 
     @Before
     public void setUp() throws Exception {
-        featureWriter = new JAXPEventFeatureWriter();
-        featureReader = new JAXPEventFeatureReader(featureType);
+        featureWriter     = new JAXPEventFeatureWriter();
+        featureReader     = new JAXPEventFeatureReader(featureType);
+        featureTypeReader = new JAXBFeatureTypeReader();
+        featureTypeWriter = new JAXBFeatureTypeWriter();
     }
 
     @After
@@ -172,6 +184,35 @@ public class FeatureXmlBindingTest {
 
     }
 
+    /**
+     * test the feature unmarshall
+     *
+     */
+    @Test
+    public void featuretypeUnMarshallTest() throws Exception {
+        
+        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xsd/admin_commune.xsd");
+        FeatureType result  = featureTypeReader.read(stream, "ADMIN_COMMUNE");
+
+//        assertEquals(featureType, result);
+        
+    }
+
+     /**
+     * test the feature unmarshall
+     *
+     */
+    @Test
+    public void featuretypeMarshallTest() throws Exception {
+        String expResult = Util.stringFromFile(Util.getFileFromResource("org/constellation/wfs/xsd/admin_commune.xsd"));
+        String result    = featureTypeWriter.write(featureType);
+
+        expResult = removeXmlns(expResult);
+        result    = removeXmlns(result);
+        assertEquals(expResult, result);
+    }
+    
+
     public void featureEquals(SimpleFeature expResult, SimpleFeature result) {
         assertEquals(expResult.getIdentifier(), result.getIdentifier());
         assertEquals(expResult.getID(), result.getID());
@@ -188,5 +229,20 @@ public class FeatureXmlBindingTest {
             }
         }
         assertEquals(expResult, result);
+    }
+
+    public String removeXmlns(String xml) {
+
+        String s = xml;
+        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
+
+        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
+
+        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
+
+        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
+
+
+        return s;
     }
 }
