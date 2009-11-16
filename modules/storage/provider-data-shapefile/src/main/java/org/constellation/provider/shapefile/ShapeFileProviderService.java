@@ -42,6 +42,7 @@ public class ShapeFileProviderService extends AbstractProviderService<String,Lay
      */
     private static final Logger LOGGER = Logger.getLogger(ShapeFileProviderService.class.getName());
     private static final String NAME = "shapefile";
+    private static final String ERROR_MSG = "[PROVIDER]> Invalid shapefile provider config";
 
     private static final Collection<ShapeFileProvider> PROVIDERS = new ArrayList<ShapeFileProvider>();
     private static final Collection<ShapeFileProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
@@ -64,8 +65,10 @@ public class ShapeFileProviderService extends AbstractProviderService<String,Lay
                 ShapeFileProvider provider = new ShapeFileProvider(ps);
                 PROVIDERS.add(provider);
                 LOGGER.log(Level.INFO, "[PROVIDER]> shapefile provider created : " + provider.getSource().parameters.get(KEY_FOLDER_PATH));
-            } catch (IllegalArgumentException ex) {
-                LOGGER.log(Level.WARNING, "Invalide shapefile provider config", ex);
+            } catch (Exception ex) {
+                // we should not catch exception, but here it's better to start all source we can
+                // rather than letting a potential exception block the provider proxy
+                LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
             }
         }
 

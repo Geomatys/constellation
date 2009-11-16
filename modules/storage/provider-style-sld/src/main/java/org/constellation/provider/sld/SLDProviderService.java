@@ -45,6 +45,7 @@ public class SLDProviderService extends AbstractProviderService<String,MutableSt
      */
     private static final Logger LOGGER = Logger.getLogger(SLDProviderService.class.getName());
     private static final String NAME = "sld";
+    private static final String ERROR_MSG = "[PROVIDER]> Invalid SLD provider config";
 
     private static final Collection<SLDProvider> PROVIDERS = new ArrayList<SLDProvider>();
     private static final Collection<SLDProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
@@ -67,8 +68,10 @@ public class SLDProviderService extends AbstractProviderService<String,MutableSt
                 SLDProvider provider = new SLDProvider(ps);
                 PROVIDERS.add(provider);
                 LOGGER.log(Level.INFO, "[PROVIDER]> SLD provider created : " + provider.getSource().parameters.get(KEY_FOLDER_PATH));
-            } catch (IllegalArgumentException ex) {
-                LOGGER.log(Level.WARNING, "Invalide SLD provider config", ex);
+            } catch (Exception ex) {
+                // we should not catch exception, but here it's better to start all source we can
+                // rather than letting a potential exception block the provider proxy
+                LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
             }
         }
 

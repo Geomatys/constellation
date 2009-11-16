@@ -43,6 +43,7 @@ public class PostGisProviderService extends AbstractProviderService<String,Layer
      */
     private static final Logger LOGGER = Logger.getLogger(PostGisProviderService.class.getName());
     private static final String NAME = "postgis";
+    private static final String ERROR_MSG = "[PROVIDER]> Invalid postgis provider config";
 
     private static final Collection<PostGisProvider> PROVIDERS = new ArrayList<PostGisProvider>();
     private static final Collection<PostGisProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
@@ -67,10 +68,10 @@ public class PostGisProviderService extends AbstractProviderService<String,Layer
                 LOGGER.log(Level.INFO, "[PROVIDER]> postgis provider created : " 
                         + provider.getSource().parameters.get(KEY_HOST) + " > "
                         + provider.getSource().parameters.get(KEY_DATABASE));
-            } catch (IllegalArgumentException ex) {
-                LOGGER.log(Level.WARNING, "Invalide postgis provider config", ex);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, "Invalide postgis provider config", ex);
+            } catch (Exception ex) {
+                // we should not catch exception, but here it's better to start all source we can
+                // rather than letting a potential exception block the provider proxy
+                LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
             }
         }
 
