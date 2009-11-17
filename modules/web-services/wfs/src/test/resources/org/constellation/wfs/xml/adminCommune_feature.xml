@@ -1,5 +1,5 @@
 <?xml version='1.0'?>
-<gml:ADMIN_COMMUNE xmlns:gml="http://www.opengis.net/gml">
+<gml:ADMIN_COMMUNE gml:id="ADMIN_COMMUNE.1" xmlns:gml="http://www.opengis.net/gml">
     <C_L_REGION>marseille</C_L_REGION>
     <NOM_REGION>provence-alpes-côte-d'azur</NOM_REGION>
     <C_L_DEPT>toulon</C_L_DEPT>

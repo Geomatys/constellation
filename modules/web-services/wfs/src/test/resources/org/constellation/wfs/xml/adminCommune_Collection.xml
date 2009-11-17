@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <gml:FeatureCollection xmlns:gml="http://www.opengis.net/gml">
     <gml:featureMember>
-        <gml:ADMIN_COMMUNE>
+        <gml:ADMIN_COMMUNE gml:id="ADMIN_COMMUNE.1">
             <C_L_REGION>marseille</C_L_REGION>
             <NOM_REGION>provence-alpes-côte-d'azur</NOM_REGION>
             <C_L_DEPT>toulon</C_L_DEPT>
@@ -392,7 +392,7 @@
         </gml:ADMIN_COMMUNE>
     </gml:featureMember>
     <gml:featureMember>
-        <gml:ADMIN_COMMUNE>
+        <gml:ADMIN_COMMUNE gml:id="ADMIN_COMMUNE.2">
             <C_L_REGION>marseille</C_L_REGION>
             <NOM_REGION>provence-alpes-côte-d'azur</NOM_REGION>
             <C_L_DEPT>toulon</C_L_DEPT>
@@ -544,7 +544,7 @@
         </gml:ADMIN_COMMUNE>
     </gml:featureMember>
     <gml:featureMember>
-        <gml:ADMIN_COMMUNE>
+        <gml:ADMIN_COMMUNE gml:id="ADMIN_COMMUNE.3">
             <C_L_REGION>marseille</C_L_REGION>
             <NOM_REGION>provence-alpes-côte-d'azur</NOM_REGION>
             <C_L_DEPT>toulon</C_L_DEPT>
@@ -598,7 +598,7 @@
         </gml:ADMIN_COMMUNE>
     </gml:featureMember>
     <gml:featureMember>
-        <gml:ADMIN_COMMUNE>
+        <gml:ADMIN_COMMUNE gml:id="ADMIN_COMMUNE.4">
             <C_L_REGION>marseille</C_L_REGION>
             <NOM_REGION>provence-alpes-côte-d'azur</NOM_REGION>
             <C_L_DEPT>toulon</C_L_DEPT>
@@ -640,7 +640,7 @@
         </gml:ADMIN_COMMUNE>
     </gml:featureMember>
     <gml:featureMember>
-        <gml:ADMIN_COMMUNE>
+        <gml:ADMIN_COMMUNE gml:id="ADMIN_COMMUNE.5">
             <C_L_REGION>marseille</C_L_REGION>
             <NOM_REGION>provence-alpes-côte-d'azur</NOM_REGION>
             <C_L_DEPT>toulon</C_L_DEPT>
@@ -1319,7 +1319,7 @@
         </gml:ADMIN_COMMUNE>
     </gml:featureMember>
     <gml:featureMember>
-        <gml:ADMIN_COMMUNE>
+        <gml:ADMIN_COMMUNE gml:id="ADMIN_COMMUNE.6">
             <C_L_REGION>marseille</C_L_REGION>
             <NOM_REGION>provence-alpes-côte-d'azur</NOM_REGION>
             <C_L_DEPT>toulon</C_L_DEPT>
@@ -1805,7 +1805,7 @@
         </gml:ADMIN_COMMUNE>
     </gml:featureMember>
     <gml:featureMember>
-        <gml:ADMIN_COMMUNE>
+        <gml:ADMIN_COMMUNE gml:id="ADMIN_COMMUNE.7">
             <C_L_REGION>marseille</C_L_REGION>
             <NOM_REGION>provence-alpes-côte-d'azur</NOM_REGION>
             <C_L_DEPT>toulon</C_L_DEPT>
@@ -2004,7 +2004,7 @@
         </gml:ADMIN_COMMUNE>
     </gml:featureMember>
     <gml:featureMember>
-        <gml:ADMIN_COMMUNE>
+        <gml:ADMIN_COMMUNE gml:id="ADMIN_COMMUNE.8">
             <C_L_REGION>marseille</C_L_REGION>
             <NOM_REGION>provence-alpes-côte-d'azur</NOM_REGION>
             <C_L_DEPT>toulon</C_L_DEPT>
@@ -2913,7 +2913,7 @@
         </gml:ADMIN_COMMUNE>
     </gml:featureMember>
     <gml:featureMember>
-        <gml:ADMIN_COMMUNE>
+        <gml:ADMIN_COMMUNE gml:id="ADMIN_COMMUNE.9">
             <C_L_REGION>marseille</C_L_REGION>
             <NOM_REGION>provence-alpes-côte-d'azur</NOM_REGION>
             <C_L_DEPT>toulon</C_L_DEPT>
@@ -3409,7 +3409,7 @@
         </gml:ADMIN_COMMUNE>
     </gml:featureMember>
     <gml:featureMember>
-        <gml:ADMIN_COMMUNE>
+        <gml:ADMIN_COMMUNE gml:id="ADMIN_COMMUNE.10">
             <C_L_REGION>marseille</C_L_REGION>
             <NOM_REGION>provence-alpes-côte-d'azur</NOM_REGION>
             <C_L_DEPT>toulon</C_L_DEPT>
