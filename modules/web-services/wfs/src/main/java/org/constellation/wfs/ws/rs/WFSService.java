@@ -50,6 +50,7 @@ import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
+import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.GmlObjectIdType;
@@ -99,7 +100,7 @@ public class WFSService extends OGCWebService {
                           ":org.geotoolkit.xsd.xml.v2001"
                           , "");
             candidate       = new WFSWorker();
-            writerCandidate = new JAXPStreamFeatureWriter();
+            writerCandidate = new JAXPEventFeatureWriter();
 
         } catch (JAXBException ex){
             LOGGER.severe("The WFS service is not running."       + '\n' +

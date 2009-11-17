@@ -38,6 +38,7 @@ import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.data.collection.FeatureIterator;
 import org.geotoolkit.data.query.DefaultQuery;
+import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.xml.v311.AbstractGMLEntry;
 import org.geotoolkit.ogc.xml.v110.FilterType;
@@ -54,7 +55,6 @@ import org.geotoolkit.ows.xml.v100.ServiceProvider;
 import org.geotoolkit.ows.xml.v100.TelephoneType;
 import org.geotoolkit.ows.xml.v100.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
@@ -69,15 +69,12 @@ import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
-import org.geotoolkit.xsd.xml.v2001.FormChoice;
-import org.geotoolkit.xsd.xml.v2001.Import;
 import org.geotoolkit.xsd.xml.v2001.Schema;
-import org.geotoolkit.xsd.xml.v2001.TopLevelComplexType;
-import org.geotoolkit.xsd.xml.v2001.TopLevelElement;
 
 // GeoAPI dependencies
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.sort.SortBy;
@@ -190,20 +187,16 @@ public class WFSWorker {
     }
 
     public Schema describeFeatureType(final DescribeFeatureTypeType model) throws CstlServiceException {
-        final Schema schema = new Schema();
-        schema.setTargetNamespace("http://constellation-sdi.org");
-        schema.setElementFormDefault(FormChoice.QUALIFIED);
-        schema.setVersion("0.1");
-        
 
-        //todo fill the schema correctly
-        final Import gmlImport = new Import();
-        gmlImport.setNamespace("http://www.opengis.net/gml");
-        gmlImport.setSchemaLocation("../gml/3.1.1/base/gml.xsd");
-        schema.getIncludeOrImportOrRedefine().add(gmlImport);
-
+        final JAXBFeatureTypeWriter writer;
+        try {
+            writer = new JAXBFeatureTypeWriter();
+        } catch (JAXBException ex) {
+            throw new CstlServiceException(ex);
+        }
         final LayerProviderProxy proxy = LayerProviderProxy.getInstance();
         final List<QName> names = model.getTypeName();
+        final List<FeatureType> types = new ArrayList<FeatureType>();
 
         if (names.isEmpty()){
             //search all types
@@ -213,19 +206,7 @@ public class WFSWorker {
 
                 final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
                 final SimpleFeatureType sft = fld.getSource().getSchema();
-
-                final TopLevelElement element = new TopLevelElement();
-                element.setName(sft.getTypeName());
-                element.setType(new QName(CSTL_NAMESPACE, sft.getTypeName(), CSTL_PREFIX));
-                element.setSubstitutionGroup(new QName("http://www.opengis.net/gml", "_Feature", "gml"));
-
-                schema.getIncludeOrImportOrRedefine().add(element);
-
-                final TopLevelComplexType type = new TopLevelComplexType();
-                type.setName(sft.getTypeName());
-                //todo implement a utility method to transform a feature type in complex type
-                //schema.getSimpleTypeOrComplexTypeOrGroup().add(...);
-                schema.getSimpleTypeOrComplexTypeOrGroup().add(type);
+                types.add(sft);
             }
         } else {
             //search only the given list
@@ -235,29 +216,18 @@ public class WFSWorker {
 
                 final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
                 final SimpleFeatureType sft   = fld.getSource().getSchema();
-
-                final TopLevelElement element = new TopLevelElement();
-                element.setName(sft.getTypeName());
-                element.setType(new QName(CSTL_NAMESPACE, sft.getTypeName(), CSTL_PREFIX));
-                element.setSubstitutionGroup(new QName("http://www.opengis.net/gml", "_Feature", "gml"));
-
-                schema.getIncludeOrImportOrRedefine().add(element);
-
-                final TopLevelComplexType type = new TopLevelComplexType();
-                type.setName(sft.getTypeName());
-                //todo implement a utility method to transform a feature type in complex type
-                //schema.getSimpleTypeOrComplexTypeOrGroup().add(...);
-                schema.getSimpleTypeOrComplexTypeOrGroup().add(type);
+                types.add(sft);
             }
         }
 
-        return schema;
+        return writer.getSchemaFromFeatureType(types);
     }
 
     public FeatureCollection getFeature(final GetFeatureType request) throws CstlServiceException {
 
         final LayerProviderProxy proxy = LayerProviderProxy.getInstance();
         final XMLUtilities util = new XMLUtilities();
+        final Integer maxFeatures = request.getMaxFeatures();
 
         final List<FeatureCollection> collections = new ArrayList<FeatureCollection>();
         
@@ -267,7 +237,6 @@ public class WFSWorker {
             final String srs              = query.getSrsName();
             final String typeName         = query.getTypeName().get(0).getLocalPart();
             final List<Object> properties = query.getPropertyNameOrXlinkPropertyNameOrFunction();
-
             
             final Filter filter;
             final CoordinateReferenceSystem crs;
@@ -322,6 +291,9 @@ public class WFSWorker {
             if(!sortBys.isEmpty()){
                 fsQuery.setSortBy(sortBys.toArray(new SortBy[sortBys.size()]));
             }
+            if(maxFeatures != null){
+                fsQuery.setMaxFeatures(maxFeatures);
+            }
 
             final FeatureLayerDetails layer = (FeatureLayerDetails)proxy.get(typeName);
             try {
@@ -372,33 +344,45 @@ public class WFSWorker {
 
     /**
      * Extract the WGS84 BBOx from a featureSource.
+     * what ? may not be wgs84 exactly ? why is there a crs attribut on a wgs84 bbox ?
      */
     private static WGS84BoundingBoxType toBBox(FeatureSource source) throws CstlServiceException{
         try {
             final JTSEnvelope2D env = source.getBounds();
 
-            final CoordinateReferenceSystem EPSG4326 = CRS.decode("EPSG:4326");
-
-            if(CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), EPSG4326)){
-               Envelope enveloppe = CRS.transform(env, EPSG4326);
-               return new WGS84BoundingBoxType(
-                       enveloppe.getMinimum(0),
-                       enveloppe.getMinimum(1),
-                       enveloppe.getMaximum(0),
-                       enveloppe.getMaximum(1));
-            }else{
-                return new WGS84BoundingBoxType(
+            WGS84BoundingBoxType bbox =  new WGS84BoundingBoxType(
                        env.getMinimum(0),
                        env.getMinimum(1),
                        env.getMaximum(0),
                        env.getMaximum(1));
-            }
+            bbox.setCrs(CRS.lookupIdentifier(env.getCoordinateReferenceSystem(),true));
+            return bbox;
+
+
+//            final CoordinateReferenceSystem EPSG4326 = CRS.decode("EPSG:4326");
+
+//            if(CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), EPSG4326)){
+//               Envelope enveloppe = CRS.transform(env, EPSG4326);
+//               return new WGS84BoundingBoxType(
+//                       enveloppe.getMinimum(0),
+//                       enveloppe.getMinimum(1),
+//                       enveloppe.getMaximum(0),
+//                       enveloppe.getMaximum(1));
+//            }else{
+//                return new WGS84BoundingBoxType(
+//                       env.getMinimum(0),
+//                       env.getMinimum(1),
+//                       env.getMaximum(0),
+//                       env.getMaximum(1));
+//            }
 
         } catch (IOException ex) {
             throw new CstlServiceException(ex);
-        } catch (TransformException ex) {
-            throw new CstlServiceException(ex);
-        } catch (FactoryException ex) {
+        }
+//        catch (TransformException ex) {
+//            throw new CstlServiceException(ex);
+//        } 
+        catch (FactoryException ex) {
             throw new CstlServiceException(ex);
         }
     }
