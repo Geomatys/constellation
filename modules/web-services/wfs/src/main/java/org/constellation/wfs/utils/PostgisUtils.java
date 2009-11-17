@@ -22,12 +22,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
+import org.geotoolkit.data.FeatureReader;
+import org.geotoolkit.data.om.OMDataStoreFactory;
 import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
 import org.geotoolkit.data.collection.FeatureCollection;
@@ -43,6 +46,39 @@ public class PostgisUtils {
     private static final Logger LOGGER = Logger.getLogger("org.mdweb.utils");
 
     private PostgisUtils() {}
+
+    public static FeatureReader createOMLayer(String host, int port, String databaseName, String user, String pass, String featureType) throws IOException {
+
+       final Map params = new HashMap<String, Object>();
+
+       params.put("dbtype", "OM");
+       params.put(OMDataStoreFactory.HOST.getName().toString(),     host);
+       params.put(OMDataStoreFactory.PORT.getName().toString(),     port);
+       params.put(OMDataStoreFactory.DATABASE.getName().toString(), databaseName);
+       params.put(OMDataStoreFactory.USER.getName().toString(),     user);
+       params.put(OMDataStoreFactory.PASSWD.getName().toString(),   pass);
+
+       final DataStore store = DataStoreFinder.getDataStore(params);
+       if (store != null) {
+            return store.getFeatureReader(featureType);
+       }
+       return null;
+   }
+
+    public static FeatureReader createEmbeddedOMLayer(String url, String featureType) throws IOException {
+
+       final Map params = new HashMap<String, Object>();
+
+       params.put("dbtype", "OM");
+       params.put(OMDataStoreFactory.SGBDTYPE.getName().toString(), "derby");
+       params.put(OMDataStoreFactory.DERBYURL.getName().toString(), url);
+
+       final DataStore store = DataStoreFinder.getDataStore(params);
+       if (store != null) {
+            return store.getFeatureReader(featureType);
+       }
+       return null;
+   }
 
     public static FeatureSource createPostGISLayer(String host, int port, String schema, String databaseName, String user, String pass, String featureSource) throws IOException{
 
@@ -98,20 +134,35 @@ public class PostgisUtils {
        return null;
    }
 
-   public static FeatureCollection createShapeLayer(File file) throws MalformedURLException, IOException {
-        Map<String,Serializable> params = new HashMap<String,Serializable>();
+    public static FeatureCollection createShapeLayer(File file) throws MalformedURLException, IOException {
+        Map<String, Serializable> params = new HashMap<String, Serializable>();
         if (!file.exists()) {
             System.out.println("the file does not exist");
+            return null;
         }
 
-       params.put("url", file.toURI().toURL());
-       DataStore store = DataStoreFinder.getDataStore(params);
-       if (store != null) {
-           FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
-           return fs.getFeatures();
-       } else {
-           System.out.println("datastore null");
-       }
-       return null;
-   }
+        params.put("url", file.toURI().toURL());
+        DataStore store = DataStoreFinder.getDataStore(params);
+        if (store != null) {
+            FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
+            return fs.getFeatures();
+        } else {
+            System.out.println("datastore null");
+        }
+        return null;
+    }
+
+    public static FeatureCollection createShapeLayer(URL url) throws MalformedURLException, IOException {
+        Map<String, Serializable> params = new HashMap<String, Serializable>();
+
+        params.put("url", url);
+        DataStore store = DataStoreFinder.getDataStore(params);
+        if (store != null) {
+            FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
+            return fs.getFeatures();
+        } else {
+            System.out.println("datastore null");
+        }
+        return null;
+    }
 }

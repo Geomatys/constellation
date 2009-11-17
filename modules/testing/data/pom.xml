@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Configuration of "testing" module from Constellation project.
-  Version: $Id$
+  Configuration of "embedded" module from Constellation project.
+  Version: $Id: pom.xml 1864 2009-10-01 14:44:36Z cedricbr $
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.constellation</groupId>
-    <artifactId>modules</artifactId>
+    <artifactId>testing</artifactId>
     <version>0.5-SNAPSHOT</version>
   </parent>
 
@@ -17,12 +17,12 @@
   <!--
     Module description.
   -->
-  <groupId>org.constellation</groupId>
-  <artifactId>testing</artifactId>
-  <packaging>pom</packaging>
-  <name>Modules for applying tests on web services</name>
+  <groupId>org.constellation.testing</groupId>
+  <artifactId>cstl-test-data</artifactId>
+  <packaging>jar</packaging>
+  <name>Data for test</name>
   <description>
-    Regroup some standard tests on the Constellation's OGC webservices.
+    A set of resources used in several module for unit test.
   </description>
 
 
@@ -35,17 +35,6 @@
       <id>glegal</id>
       <name>Guilhem Legal</name>
       <email>guilhem.legal@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>desruisseaux</id>
-      <name>Martin Desruisseaux</name>
-      <email>desruisseaux@users.sourceforge.net</email>
       <organization>Geomatys</organization>
       <organizationUrl>http://www.geomatys.fr/</organizationUrl>
       <roles>
@@ -67,14 +56,15 @@
   </developers>
 
 
+  <!--
+    Required dependencies for building. These dependencies wil be included into
+    the JARs list that Maven will put into the directory "target/binaries".
+  -->
+  <dependencies>
+  </dependencies>
 
-  <!-- =========================================================== -->
-  <!--     Modules included in the build                           -->
-  <!-- =========================================================== -->
-  <modules>
-    <module>data</module>
-    <module>embedded</module>
-    <module>cite</module>
-  </modules>
+
+  <build>
+  </build>
 
 </project>

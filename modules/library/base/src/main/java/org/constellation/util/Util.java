@@ -474,12 +474,12 @@ public final class Util {
                 }
             } else {
                 LOGGER.info("The Constellation directory was not present in the temporary folder.");
-            }
+        }
         }
         return null;
     }
 
-    /**
+/**
      * Searches in the Context ClassLoader for the named files and returns a
      * {@code List<String>} with, for each named package,
      *

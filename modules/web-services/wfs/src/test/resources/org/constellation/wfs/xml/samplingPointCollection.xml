@@ -1,0 +1,29 @@
+<?xml version='1.0'?>
+<gml:FeatureCollection xmlns:gml="http://www.opengis.net/gml" xmlns:sampling="http://www.opengis.net/sampling/1.0">
+    <gml:featureMember>
+        <sampling:SamplingPoint gml:id="station-001">
+            <id>station-001</id>
+            <description>Point d'eau BSSS</description>
+            <name>10972X0137-PONT</name>
+            <sampledFeature>urn:-sandre:object:bdrhf:123X</sampledFeature>
+            <position>
+                <gml:Point srsName="EPSG:27582">
+                    <gml:pos srsName="EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
+                </gml:Point>
+            </position>
+        </sampling:SamplingPoint>
+    </gml:featureMember>
+    <gml:featureMember>
+        <sampling:SamplingPoint gml:id="station-002">
+            <id>station-002</id>
+            <description>Point d'eau BSSS</description>
+            <name>10972X0137-PLOUF</name>
+            <sampledFeature>urn:-sandre:object:bdrhf:123X</sampledFeature>
+            <position>
+                <gml:Point srsName="EPSG:27582">
+                    <gml:pos srsName="EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
+                </gml:Point>
+            </position>
+        </sampling:SamplingPoint>
+    </gml:featureMember>
+</gml:FeatureCollection>

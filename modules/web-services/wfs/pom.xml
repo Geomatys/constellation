@@ -91,6 +91,16 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-jaxp-gml</artifactId>
     </dependency>
+    <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-om</artifactId>
+    </dependency>
+     <dependency>
+      <groupId>org.constellation.testing</groupId>
+      <artifactId>cstl-test-data</artifactId>
+      <version>${project.version}</version>
+      <!--scope>test</scope-->
+    </dependency>
   </dependencies>
 
 </project>

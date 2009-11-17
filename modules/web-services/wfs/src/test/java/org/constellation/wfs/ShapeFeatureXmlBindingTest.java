@@ -18,8 +18,12 @@
 package org.constellation.wfs;
 
 import com.vividsolutions.jts.geom.Geometry;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 
+import java.net.URL;
+import java.util.Enumeration;
 import org.constellation.util.Util;
 import org.constellation.wfs.utils.PostgisUtils;
 
@@ -44,7 +48,7 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FeatureXmlBindingTest {
+public class ShapeFeatureXmlBindingTest {
 
     private static FeatureCollection fcoll;
 
@@ -60,7 +64,9 @@ public class FeatureXmlBindingTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        fcoll       = PostgisUtils.createShapeLayer(Util.getFileFromResource("org.constellation.wfs.shapefile.admin_commune/ADMIN_COMMUNE.SHP"));
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        URL url = classloader.getResource("org/constellation/ws/embedded/wms111/shapefiles/Bridges.shp");
+        fcoll       = PostgisUtils.createShapeLayer(url);
         featureType = fcoll.getSchema();
     }
 
@@ -97,7 +103,7 @@ public class FeatureXmlBindingTest {
 
         String result = featureWriter.write(feature);
 
-        String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.adminCommune_feature.xml"));
+        String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.bridge.xml"));
         
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
@@ -114,7 +120,7 @@ public class FeatureXmlBindingTest {
     public void featureCollectionMarshallTest() throws Exception {
         String result = featureWriter.write(fcoll);
 
-        String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.adminCommune_Collection.xml"));
+        String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"));
 
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
@@ -138,7 +144,7 @@ public class FeatureXmlBindingTest {
         }
         ite.close();
 
-        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/adminCommune_feature.xml");
+        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/bridge.xml");
         SimpleFeature result = (SimpleFeature) featureReader.read(stream);
 
         featureEquals(expResult, result);
@@ -151,7 +157,7 @@ public class FeatureXmlBindingTest {
     @Test
     public void featureCollectionUnMarshallTest() throws Exception {
 
-        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/adminCommune_Collection.xml");
+        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/bridgeCollection.xml");
         FeatureCollection result = (FeatureCollection) featureReader.read(stream);
 
 
@@ -164,19 +170,8 @@ public class FeatureXmlBindingTest {
         FeatureIterator resIterator = result.features();
         SimpleFeature temp          = null;
         while (expIterator.hasNext()) {
-            SimpleFeature expFeature = (SimpleFeature)expIterator.next();
-            SimpleFeature resFeature;
-            if (expFeature.getID().equals("ADMIN_COMMUNE.10")) {
-                resFeature = temp;
-            } else {
-                resFeature = (SimpleFeature)resIterator.next();
-                if (resFeature.getID().equals("ADMIN_COMMUNE.10")) {
-                    temp       = resFeature;
-                    resFeature = (SimpleFeature)resIterator.next();
-                }
-            }
-            
-            
+            SimpleFeature expFeature  = (SimpleFeature)expIterator.next();
+            SimpleFeature  resFeature = (SimpleFeature)resIterator.next();
 
             featureEquals(expFeature, resFeature);
         }
@@ -191,8 +186,8 @@ public class FeatureXmlBindingTest {
     @Test
     public void featuretypeUnMarshallTest() throws Exception {
         
-        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xsd/admin_commune.xsd");
-        FeatureType result  = featureTypeReader.read(stream, "ADMIN_COMMUNE");
+        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xsd/bridge.xsd");
+        FeatureType result  = featureTypeReader.read(stream, "Bridges");
 
 //        assertEquals(featureType, result);
         
@@ -204,7 +199,7 @@ public class FeatureXmlBindingTest {
      */
     @Test
     public void featuretypeMarshallTest() throws Exception {
-        String expResult = Util.stringFromFile(Util.getFileFromResource("org/constellation/wfs/xsd/admin_commune.xsd"));
+        String expResult = Util.stringFromFile(Util.getFileFromResource("org/constellation/wfs/xsd/bridge.xsd"));
         String result    = featureTypeWriter.write(featureType);
 
         expResult = removeXmlns(expResult);
