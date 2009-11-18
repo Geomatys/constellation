@@ -47,8 +47,52 @@ public class WFSWorkerTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        final File outputDir = initDataDirectory();
+        initFeatureSource();
+    }
+
+    
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+    }
+
+
+
+    @Before
+    public void setUp() throws Exception {
         
+    }
+
+    @After
+    public void tearDown() throws Exception {
+    }
+
+    /**
+     * test the feature marshall
+     *
+     */
+    @Test
+    public void getFeatureTest() throws Exception {
+        GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        FeatureCollection result = worker.getFeature(request);
+
+        //System.out.println("result:" + result);
+    }
+
+    /**
+     * test the feature marshall
+     *
+     */
+    @Test
+    public void DescribeFeatureTest() throws Exception {
+    }
+
+
+    private static void initFeatureSource() throws IOException {
+
+         final File outputDir = initDataDirectory();
+
         // Defines a ShapeFile data provider
         final ProviderSource sourceShape = new ProviderSource();
         sourceShape.loadAll = true;
@@ -93,9 +137,7 @@ public class WFSWorkerTest {
                 break;
             }
         }
-       
     }
-
     /**
      * Initialises the data directory in unzipping the jar containing the resources
      * into a temporary directory.
@@ -123,41 +165,5 @@ public class WFSWorkerTest {
         IOUtilities.unzip(in, outputDir);
         in.close();
         return outputDir;
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-
-
-    @Before
-    public void setUp() throws Exception {
-        
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    /**
-     * test the feature marshall
-     *
-     */
-    @Test
-    public void getFeatureTest() throws Exception {
-        GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-
-        FeatureCollection result = worker.getFeature(request);
-
-        //System.out.println("result:" + result);
-    }
-
-    /**
-     * test the feature marshall
-     *
-     */
-    @Test
-    public void DescribeFeatureTest() throws Exception {
     }
 }

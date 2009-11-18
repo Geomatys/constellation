@@ -9,7 +9,7 @@
                     <xsd:element name="description" maxOccurs="1" minOccurs="0" type="xsd:string"/>
                     <xsd:element name="name" maxOccurs="unbounded" minOccurs="1" type="xsd:string"/>
                     <xsd:element name="sampledFeature" maxOccurs="unbounded" minOccurs="1" type="xsd:string"/>
-                    <xsd:element name="position" maxOccurs="1" minOccurs="1" type="gml:GeometryPropertyType"/>
+                    <xsd:element name="position" maxOccurs="1" minOccurs="1" type="gml:Point"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
