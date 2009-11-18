@@ -156,7 +156,7 @@ public class OMFeatureXmlBindingTest {
      * test the feature unmarshall
      *
      */
-    @Ignore
+    @Test
     public void featureUnMarshallTest() throws Exception {
 
         FeatureIterator ite = fcoll.features();
@@ -177,7 +177,7 @@ public class OMFeatureXmlBindingTest {
      * test the feature marshall
      *
      */
-    @Ignore
+    @Test
     public void featureCollectionUnMarshallTest() throws Exception {
 
         InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/samplingPointCollection.xml");

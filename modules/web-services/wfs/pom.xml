@@ -99,7 +99,7 @@
       <groupId>org.constellation.testing</groupId>
       <artifactId>cstl-test-data</artifactId>
       <version>${project.version}</version>
-      <!--scope>test</scope-->
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

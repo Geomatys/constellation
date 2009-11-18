@@ -1,5 +1,11 @@
 <?xml version='1.0'?>
-<gml:FeatureCollection xmlns:gml="http://www.opengis.net/gml">
+<gml:FeatureCollection gml:id="featureCollection" xmlns:gml="http://www.opengis.net/gml">
+    <gml:boundedBy>
+        <gml:Envelope gml:srsName="EPSG:4326">
+            <gml:lowerCorner>2.0E-4 7.0E-4</gml:lowerCorner>
+            <gml:upperCorner>2.0E-4 7.0E-4</gml:upperCorner>
+        </gml:Envelope>
+    </gml:boundedBy>
     <gml:featureMember>
         <gml:Bridges gml:id="Bridges.1">
             <FID>110</FID>

@@ -18,12 +18,9 @@
 package org.constellation.wfs;
 
 import com.vividsolutions.jts.geom.Geometry;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 
 import java.net.URL;
-import java.util.Enumeration;
 import org.constellation.util.Util;
 import org.constellation.wfs.utils.PostgisUtils;
 
