@@ -235,7 +235,10 @@ public class WFSWorker {
             final FilterType jaxbFilter   = query.getFilter();
             final SortByType jaxbSortBy   = query.getSortBy();
             final String srs              = query.getSrsName();
-            final String typeName         = query.getTypeName().get(0).getLocalPart();
+            final List<String> typeNames  = new ArrayList<String>();
+            for (QName typeName : query.getTypeName()) {
+                typeNames.add(typeName.getLocalPart());
+            }
             final List<Object> properties = query.getPropertyNameOrXlinkPropertyNameOrFunction();
             
             final Filter filter;
@@ -295,11 +298,13 @@ public class WFSWorker {
                 fsQuery.setMaxFeatures(maxFeatures);
             }
 
+            for (String typeName : typeNames) {
             final FeatureLayerDetails layer = (FeatureLayerDetails)proxy.get(typeName);
-            try {
-                collections.add(layer.getSource().getFeatures(fsQuery));
-            } catch (IOException ex) {
-                throw new CstlServiceException(ex);
+                try {
+                    collections.add(layer.getSource().getFeatures(fsQuery));
+                } catch (IOException ex) {
+                    throw new CstlServiceException(ex);
+                }
             }
 
         }
@@ -312,14 +317,14 @@ public class WFSWorker {
          *
          * result TODO find an id and a member type
          */
-        final FeatureCollection <SimpleFeatureType, SimpleFeature> result = new DefaultFeatureCollection("", null);
+        final FeatureCollection <SimpleFeatureType, SimpleFeature> result = new DefaultFeatureCollection("collection-1", null);
         for (final FeatureCollection collection: collections) {
             final FeatureIterator<SimpleFeature> iterator = collection.features();
-            try{
+            try {
                 while (iterator.hasNext()) {
                     result.add(iterator.next());
                 }
-            }finally{
+            } finally {
                 iterator.close();
             }
         }
