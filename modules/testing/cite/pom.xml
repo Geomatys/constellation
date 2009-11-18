@@ -230,6 +230,14 @@
                     </copy>
                   </then>
                 </if>
+                <if>
+                  <available file="${basedir}/tests/wfs-1.1.0"/>
+                  <then>
+                    <copy todir="${basedir}/engine/scripts/wfs-1.1.0">
+                      <fileset dir="${basedir}/tests/wfs-1.1.0" includes="**/*" excludes="**/.svn"/>
+                    </copy>
+                  </then>
+                </if>
 
                 <!-- copy the legacy components into the engine/components dir -->
                 <copy todir="${basedir}/engine/components">
@@ -278,6 +286,7 @@
             </executions>
             <configuration>
               <services>
+                <service>wfs-1.1.0</service>
                 <service>sos-1.0.0</service>
                 <service>wms-1.1.1</service>
                 <service>wms-1.3.0</service>
