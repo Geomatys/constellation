@@ -227,10 +227,6 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-csw</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-wms</artifactId>
-    </dependency>
     <!-- Required only when creating the embedded EPSG database -->
     <dependency>
       <groupId>org.geotoolkit</groupId>
