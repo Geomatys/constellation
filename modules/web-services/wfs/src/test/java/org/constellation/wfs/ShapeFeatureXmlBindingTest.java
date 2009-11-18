@@ -47,7 +47,8 @@ import static org.junit.Assert.*;
  */
 public class ShapeFeatureXmlBindingTest {
 
-    private static FeatureCollection fcoll;
+    private static FeatureCollection fcollBridge;
+    private static FeatureCollection fcollPolygons;
 
     private XmlFeatureWriter featureWriter;
 
@@ -57,14 +58,20 @@ public class ShapeFeatureXmlBindingTest {
 
     private XmlFeatureTypeWriter featureTypeWriter;
 
-    private static FeatureType featureType;
+    private static FeatureType bridgeFeatureType;
+
+    private static FeatureType polygonFeatureType;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        URL url = classloader.getResource("org/constellation/ws/embedded/wms111/shapefiles/Bridges.shp");
-        fcoll       = PostgisUtils.createShapeLayer(url);
-        featureType = fcoll.getSchema();
+        URL url            = classloader.getResource("org/constellation/ws/embedded/wms111/shapefiles/Bridges.shp");
+        fcollBridge        = PostgisUtils.createShapeLayer(url);
+        bridgeFeatureType  = fcollBridge.getSchema();
+
+        url                = classloader.getResource("org/constellation/ws/embedded/wms111/shapefiles/BasicPolygons.shp");
+        fcollPolygons      = PostgisUtils.createShapeLayer(url);
+        polygonFeatureType = fcollBridge.getSchema();
     }
 
     @AfterClass
@@ -76,7 +83,7 @@ public class ShapeFeatureXmlBindingTest {
     @Before
     public void setUp() throws Exception {
         featureWriter     = new JAXPEventFeatureWriter();
-        featureReader     = new JAXPEventFeatureReader(featureType);
+        featureReader     = new JAXPEventFeatureReader(bridgeFeatureType);
         featureTypeReader = new JAXBFeatureTypeReader();
         featureTypeWriter = new JAXBFeatureTypeWriter();
     }
@@ -91,7 +98,7 @@ public class ShapeFeatureXmlBindingTest {
      */
     @Test
     public void featureMarshallTest() throws Exception {
-        FeatureIterator ite = fcoll.features();
+        FeatureIterator ite = fcollBridge.features();
         SimpleFeature feature = null;
         if (ite.hasNext()) {
             feature = (SimpleFeature) ite.next();
@@ -115,7 +122,7 @@ public class ShapeFeatureXmlBindingTest {
      */
     @Test
     public void featureCollectionMarshallTest() throws Exception {
-        String result = featureWriter.write(fcoll);
+        String result = featureWriter.write(fcollBridge);
 
         String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"));
 
@@ -134,7 +141,7 @@ public class ShapeFeatureXmlBindingTest {
     @Test
     public void featureUnMarshallTest() throws Exception {
         
-        FeatureIterator ite = fcoll.features();
+        FeatureIterator ite = fcollBridge.features();
         SimpleFeature expResult = null;
         if (ite.hasNext()) {
             expResult = (SimpleFeature) ite.next();
@@ -158,12 +165,12 @@ public class ShapeFeatureXmlBindingTest {
         FeatureCollection result = (FeatureCollection) featureReader.read(stream);
 
 
-        assertEquals(fcoll.getID(), result.getID());
-        assertEquals(fcoll.size(), result.size());
+        assertEquals(fcollBridge.getID(), result.getID());
+        assertEquals(fcollBridge.size(), result.size());
         // TODO assertTrue(fcoll.getBounds().equals(result.getBounds()));
-        assertEquals(fcoll.getSchema(), result.getSchema());
+        assertEquals(fcollBridge.getSchema(), result.getSchema());
         
-        FeatureIterator expIterator = fcoll.features();
+        FeatureIterator expIterator = fcollBridge.features();
         FeatureIterator resIterator = result.features();
         SimpleFeature temp          = null;
         while (expIterator.hasNext()) {
@@ -197,7 +204,7 @@ public class ShapeFeatureXmlBindingTest {
     @Test
     public void featuretypeMarshallTest() throws Exception {
         String expResult = Util.stringFromFile(Util.getFileFromResource("org/constellation/wfs/xsd/bridge.xsd"));
-        String result    = featureTypeWriter.write(featureType);
+        String result    = featureTypeWriter.write(bridgeFeatureType);
 
         expResult = removeXmlns(expResult);
         result    = removeXmlns(result);

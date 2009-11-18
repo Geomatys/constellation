@@ -50,8 +50,6 @@ import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.GmlObjectIdType;
 import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
@@ -83,7 +81,7 @@ public class WFSService extends OGCWebService {
 
     private final WFSWorker worker;
 
-    private final XmlFeatureWriter featureWriter;
+    //private final XmlFeatureWriter featureWriter;
 
     /**
      * Build a new Restfull WFS service.
@@ -100,7 +98,7 @@ public class WFSService extends OGCWebService {
                           ":org.geotoolkit.xsd.xml.v2001"
                           , "");
             candidate       = new WFSWorker();
-            writerCandidate = new JAXPEventFeatureWriter();
+            //writerCandidate = new JAXPEventFeatureWriter();
 
         } catch (JAXBException ex){
             LOGGER.severe("The WFS service is not running."       + '\n' +
@@ -109,7 +107,7 @@ public class WFSService extends OGCWebService {
                           " details: " + ex.toString());
         } 
         this.worker        = candidate;
-        this.featureWriter = writerCandidate;
+        //this.featureWriter = writerCandidate;
 
         if (worker != null) {
             LOGGER.info("WFS Service started");
@@ -156,7 +154,7 @@ public class WFSService extends OGCWebService {
             } else if (STR_GETFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof GetFeatureType)) {
                 final GetFeatureType model = adaptGetFeatureType(objectRequest);
                 version = getVersionFromNumber(model.getVersion());
-                return Response.ok(featureWriter.write(worker.getFeature(model)), worker.getOutputFormat()).build();
+                return Response.ok(worker.getFeature(model), worker.getOutputFormat()).build();
 
             } else if (STR_GETGMLOBJECT.equalsIgnoreCase(request) || (objectRequest instanceof GetGmlObjectType)) {
                 final GetGmlObjectType model = adaptGetGMLObject(objectRequest);
