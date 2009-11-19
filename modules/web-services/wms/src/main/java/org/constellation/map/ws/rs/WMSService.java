@@ -352,16 +352,26 @@ public class WMSService extends GridWebService {
      * @throws CstlServiceException
      */
     private GetCapabilities adaptGetCapabilities(final String version) throws CstlServiceException {
-        if (version == null) {
-            final ServiceDef capsService = getBestVersion(null);
-            return new GetCapabilities(capsService.version);
-        }
-        final ServiceDef bestVersion = getBestVersion(version);
         final String service = getParameter(KEY_SERVICE, true);
         if (!ServiceType.WMS.toString().equalsIgnoreCase(service)) {
             throw new CstlServiceException("Invalid service specified. Should be WMS.",
                     INVALID_PARAMETER_VALUE, KEY_SERVICE.toLowerCase());
         }
+        if (version == null) {
+            final ServiceDef capsService = getBestVersion(null);
+            String format = getParameter(KEY_FORMAT, false);
+            // Verify that the format is not null, and is not something totally different from the known
+            // output formats. If it is the case, choose the default output format according to the version.
+            if (format == null || format.isEmpty() ||
+                    (!format.equalsIgnoreCase(MimeType.APP_XML) && !format.equalsIgnoreCase(MimeType.APPLICATION_XML)
+                  && !format.equalsIgnoreCase(MimeType.TEXT_XML) && !format.equalsIgnoreCase(MimeType.APP_WMS_XML)))
+            {
+                format = (ServiceDef.WMS_1_1_1_SLD.version.equals(capsService.version)) ?
+                    MimeType.APP_WMS_XML : MimeType.TEXT_XML;
+            }
+            return new GetCapabilities(capsService.version, format);
+        }
+        final ServiceDef bestVersion = getBestVersion(version);
         String format = getParameter(KEY_FORMAT, false);
         // Verify that the format is not null, and is not something totally different from the known
         // output formats. If it is the case, choose the default output format according to the version.
@@ -369,7 +379,7 @@ public class WMSService extends GridWebService {
                 (!format.equalsIgnoreCase(MimeType.APP_XML) && !format.equalsIgnoreCase(MimeType.APPLICATION_XML)
               && !format.equalsIgnoreCase(MimeType.TEXT_XML) && !format.equalsIgnoreCase(MimeType.APP_WMS_XML)))
         {
-            format = (ServiceDef.WMS_1_1_1_SLD.version.toString().equals(version)) ?
+            format = (ServiceDef.WMS_1_1_1_SLD.version.equals(bestVersion.version)) ?
                      MimeType.APP_WMS_XML : MimeType.TEXT_XML;
         }
         return new GetCapabilities(bestVersion.version, format);
