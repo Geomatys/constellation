@@ -18,9 +18,10 @@
 package org.constellation.wfs;
 
 import com.vividsolutions.jts.geom.Geometry;
-import java.io.InputStream;
 
+import java.io.InputStream;
 import java.net.URL;
+
 import org.constellation.util.Util;
 import org.constellation.wfs.utils.PostgisUtils;
 
@@ -30,10 +31,10 @@ import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.XmlFeatureTypeReader;
 import org.geotoolkit.feature.xml.XmlFeatureTypeWriter;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureReader;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureWriter;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.FeatureType;
@@ -45,7 +46,7 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class ShapeFeatureXmlBindingTest {
+public class StreamShapeFeatureXmlBindingTest {
 
     private static FeatureCollection fcollBridge;
     private static FeatureCollection fcollPolygons;
@@ -82,8 +83,8 @@ public class ShapeFeatureXmlBindingTest {
 
     @Before
     public void setUp() throws Exception {
-        featureWriter     = new JAXPEventFeatureWriter();
-        featureReader     = new JAXPEventFeatureReader(bridgeFeatureType);
+        featureWriter     = new JAXPStreamFeatureWriter();
+        featureReader     = new JAXPStreamFeatureReader(bridgeFeatureType);
         featureTypeReader = new JAXBFeatureTypeReader();
         featureTypeWriter = new JAXBFeatureTypeWriter();
     }
@@ -112,6 +113,9 @@ public class ShapeFeatureXmlBindingTest {
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
+        
+        // we change the xml header
+        expresult = expresult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
 
         assertEquals(expresult, result);
 
@@ -131,6 +135,8 @@ public class ShapeFeatureXmlBindingTest {
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
         expresult = expresult.replaceAll("ID></ID", "ID> </ID");
+        // we change the xml header
+        expresult = expresult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
         
         assertEquals(expresult, result);
     }
@@ -148,6 +154,7 @@ public class ShapeFeatureXmlBindingTest {
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
+        expresult = expresult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
 
         assertEquals(expresult, result);
 
@@ -160,6 +167,7 @@ public class ShapeFeatureXmlBindingTest {
         expresult = expresult.replaceAll("> *<", "><");
 
         expresult = expresult.replaceAll("ID></ID", "ID> </ID");
+        expresult = expresult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
 
         // and we replace the space for the specified data
         assertEquals(expresult, result);
@@ -300,6 +308,7 @@ public class ShapeFeatureXmlBindingTest {
 
         for (int j = 0; j < expResult.getAttributeCount(); j++) {
             if (expResult.getAttributes().get(j) instanceof Geometry) {
+                assertTrue(result.getAttributes().get(j) != null);
                 assertTrue(((Geometry) expResult.getAttributes().get(j)).equals((Geometry) result.getAttributes().get(j)));
             } else {
                 assertEquals(expResult.getAttributes().get(j), result.getAttributes().get(j));

@@ -22,7 +22,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import javax.xml.namespace.QName;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
@@ -30,10 +34,16 @@ import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
+import org.constellation.util.Util;
 import org.geotoolkit.data.collection.FeatureCollection;
+import org.geotoolkit.data.store.EmptyFeatureCollection;
+import org.geotoolkit.feature.xml.XmlFeatureWriter;
+import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureWriter;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
+import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
+import org.geotoolkit.xml.MarshallerPool;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -44,8 +54,21 @@ import static org.junit.Assert.*;
  */
 public class WFSWorkerTest {
 
-    private static WFSWorker worker = new DefaultWFSWorker();
+    private static WFSWorker worker ;
+    static {
+        try {
 
+            worker = new DefaultWFSWorker(new MarshallerPool("org.geotoolkit.wfs.xml.v110" +
+            		  ":org.geotoolkit.ogc.xml.v110" +
+            		  ":org.geotoolkit.gml.xml.v311" +
+                          ":org.geotoolkit.xsd.xml.v2001"));
+        } catch (Exception ex) {
+            
+        }
+    }
+
+    private XmlFeatureWriter featureWriter;
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
 
@@ -62,7 +85,7 @@ public class WFSWorkerTest {
 
     @Before
     public void setUp() throws Exception {
-        
+        featureWriter     = new JAXPEventFeatureWriter();
     }
 
     @After
@@ -75,11 +98,36 @@ public class WFSWorkerTest {
      */
     @Test
     public void getFeatureTest() throws Exception {
+
+        /**
+         * Test 2 : empty query => response empty collection
+         */
         GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
         FeatureCollection result = worker.getFeature(request);
 
-        //System.out.println("result:" + result);
+        FeatureCollection ExpResult = new EmptyFeatureCollection(null);
+
+        assertEquals(ExpResult, result);
+
+        /**
+         * Test 2 : query on typeName bridges
+         */
+
+        List<QueryType> queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("Bridges", "Bridges")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        String xmlResult    = featureWriter.write(result);
+        String xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"));
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        assertEquals(xmlExpResult, xmlResult);
+        
     }
 
     /**

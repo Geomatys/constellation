@@ -83,6 +83,7 @@ import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
+import org.geotoolkit.data.store.EmptyFeatureCollection;
 
 // GeoAPI dependencies
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -486,8 +487,11 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
          *
          * result TODO find an id and a member type
          */
-
-        return FeatureCollectionGroup.sequence( collections.toArray(new FeatureCollection[collections.size()]) );
+	if (collections.size() > 0) {
+	        return FeatureCollectionGroup.sequence( collections.toArray(new FeatureCollection[collections.size()]) );
+        } else {
+	        return new EmptyFeatureCollection(null);
+	}
     }
 
     /**
