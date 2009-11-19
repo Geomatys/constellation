@@ -18,13 +18,9 @@
 package org.constellation.filter;
 
 // J2SE dependencies
-import java.awt.geom.Line2D;
 import java.util.logging.Logger;
 
 // Geotools dependencies
-import org.geotoolkit.filter.FilterFactoryImpl;
-import org.geotoolkit.geometry.GeneralDirectPosition;
-import org.geotoolkit.geometry.GeneralEnvelope;
 
 // JUnit dependencies
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
@@ -35,7 +31,6 @@ import org.junit.*;
 import org.opengis.filter.Filter;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
-import org.opengis.filter.spatial.BinarySpatialOperator;
 import org.opengis.filter.spatial.Contains;
 import org.opengis.filter.spatial.Crosses;
 import org.opengis.filter.spatial.DWithin;
@@ -43,7 +38,6 @@ import org.opengis.filter.spatial.Disjoint;
 import org.opengis.filter.spatial.Equals;
 import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
-import org.opengis.filter.spatial.SpatialOperator;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
 import static org.junit.Assert.*;
@@ -57,7 +51,6 @@ public class CQLParserTest {
     
     private LuceneFilterParser filterParser;
     private Logger       logger = Logger.getLogger("org.constellation.filter");
-    private FilterFactoryImpl filterFactory = new FilterFactoryImpl();
     
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -88,7 +81,7 @@ public class CQLParserTest {
          * Test 1: PropertyIsLike 
          */
         
-        FilterType filter = filterParser.cqlToFilter("Title LIKE 'VM%'");
+        FilterType filter = FilterParser.cqlToFilter("Title LIKE 'VM%'");
         
         assertTrue(filter.getComparisonOps() != null);
         assertTrue(filter.getLogicOps()      == null);
@@ -105,7 +98,7 @@ public class CQLParserTest {
          *  Test 2: PropertyIsEquals
          */
         
-        filter = filterParser.cqlToFilter("Title ='VM'");
+        filter = FilterParser.cqlToFilter("Title ='VM'");
         
         
         assertTrue(filter.getComparisonOps() != null);
@@ -123,7 +116,7 @@ public class CQLParserTest {
          *  Test 3: PropertyIsNotEquals
          */
         
-        filter =filterParser.cqlToFilter("Title <>'VM'");
+        filter =FilterParser.cqlToFilter("Title <>'VM'");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -140,7 +133,7 @@ public class CQLParserTest {
         /**
          * Test 4: PropertyIsNull
          */ 
-        filter = filterParser.cqlToFilter("Title IS NULL");
+        filter = FilterParser.cqlToFilter("Title IS NULL");
         
         assertTrue(filter.getComparisonOps() != null);
         assertTrue(filter.getLogicOps()      == null);
@@ -156,7 +149,7 @@ public class CQLParserTest {
         /**
          * Test 5: PropertyIsGreaterThan
          */
-        filter = filterParser.cqlToFilter("CreationDate AFTER 2007-06-02T00:00:00Z");
+        filter = FilterParser.cqlToFilter("CreationDate AFTER 2007-06-02T00:00:00Z");
         
         assertTrue(filter.getComparisonOps() != null);
         assertTrue(filter.getLogicOps()      == null);
@@ -172,7 +165,7 @@ public class CQLParserTest {
          /**
          * Test 6: PropertyIsLessThan
          */
-        filter = filterParser.cqlToFilter("CreationDate BEFORE 2007-06-02T00:00:00Z");
+        filter = FilterParser.cqlToFilter("CreationDate BEFORE 2007-06-02T00:00:00Z");
         
         assertTrue(filter.getComparisonOps() != null);
         assertTrue(filter.getLogicOps()      == null);
@@ -197,7 +190,7 @@ public class CQLParserTest {
         /**
          * Test 1: AND between two propertyIsEqualTo 
          */
-        FilterType filter = filterParser.cqlToFilter("Title = 'starship trooper' AND Author = 'Timothee Gustave'");
+        FilterType filter = FilterParser.cqlToFilter("Title = 'starship trooper' AND Author = 'Timothee Gustave'");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -215,7 +208,7 @@ public class CQLParserTest {
          * Test 2: OR between two propertyIsEqualTo 
          */
         
-        filter = filterParser.cqlToFilter("Title = 'starship trooper' OR Author = 'Timothee Gustave'");
+        filter = FilterParser.cqlToFilter("Title = 'starship trooper' OR Author = 'Timothee Gustave'");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -231,7 +224,7 @@ public class CQLParserTest {
         /**
          * Test 3:  OR between three propertyIsEqualTo 
          */
-        filter = filterParser.cqlToFilter("Title = 'starship trooper' OR Author = 'Timothee Gustave' OR Id = '268'");
+        filter = FilterParser.cqlToFilter("Title = 'starship trooper' OR Author = 'Timothee Gustave' OR Id = '268'");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -248,7 +241,7 @@ public class CQLParserTest {
          * Test 4: Not propertyIsEqualTo 
          */
         
-        filter = filterParser.cqlToFilter("NOT Title = 'starship trooper'");
+        filter = FilterParser.cqlToFilter("NOT Title = 'starship trooper'");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -274,7 +267,7 @@ public class CQLParserTest {
         /**
          * Test 1: a simple spatial Filter Intersects 
          */
-        FilterType filter = filterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.42)) ");
+        FilterType filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.42)) ");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -295,7 +288,7 @@ public class CQLParserTest {
         /**
          * Test 2: a simple Distance Filter DWithin
          */
-        filter = filterParser.cqlToFilter("DWITHIN(BoundingBox, POINT(12.1 28.9), 10, meters)");
+        filter = FilterParser.cqlToFilter("DWITHIN(BoundingBox, POINT(12.1 28.9), 10, meters)");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -319,7 +312,7 @@ public class CQLParserTest {
         /**
          * Test 3: a simple Distance Filter Beyond
          */
-        filter = filterParser.cqlToFilter("BEYOND(BoundingBox, POINT(12.1 28.9), 10, meters)");
+        filter = FilterParser.cqlToFilter("BEYOND(BoundingBox, POINT(12.1 28.9), 10, meters)");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -342,7 +335,7 @@ public class CQLParserTest {
         /**
          * Test 4: a simple BBOX filter
          */
-        filter = filterParser.cqlToFilter("BBOX(BoundingBox, 10,20,30,40)");
+        filter = FilterParser.cqlToFilter("BBOX(BoundingBox, 10,20,30,40)");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -357,13 +350,14 @@ public class CQLParserTest {
         
         assertTrue(spaQuery.getSpatialFilter() instanceof LuceneOGCFilter);
         BBOX spabbox = (BBOX) ((LuceneOGCFilter) spaQuery.getSpatialFilter()).getOGCFilter();
-                
+
+        //System.out.println("spabbox:" + spabbox.getSRS());
         assertTrue(spabbox instanceof BBOX);
         
         /**
          * Test 4: a simple Contains filter
          */
-        filter = filterParser.cqlToFilter("CONTAINS(BoundingBox, POINT(14.05 46.46))");
+        filter = FilterParser.cqlToFilter("CONTAINS(BoundingBox, POINT(14.05 46.46))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -384,7 +378,7 @@ public class CQLParserTest {
         /**
          * Test 5: a simple Contains filter
          */
-        filter = filterParser.cqlToFilter("CONTAINS(BoundingBox, LINESTRING(1 2, 10 15))");
+        filter = FilterParser.cqlToFilter("CONTAINS(BoundingBox, LINESTRING(1 2, 10 15))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -405,7 +399,7 @@ public class CQLParserTest {
         /*
          * Test 6: a simple Contains filter
          */
-        filter = filterParser.cqlToFilter("CONTAINS(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        filter = FilterParser.cqlToFilter("CONTAINS(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -426,7 +420,7 @@ public class CQLParserTest {
          /**
          * Test 7: a simple Crosses filter
          */
-        filter = filterParser.cqlToFilter("CROSS(BoundingBox, POINT(14.05 46.46))");
+        filter = FilterParser.cqlToFilter("CROSS(BoundingBox, POINT(14.05 46.46))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -447,7 +441,7 @@ public class CQLParserTest {
         /**
          * Test 8: a simple Crosses filter
          */
-        filter = filterParser.cqlToFilter("CROSS(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        filter = FilterParser.cqlToFilter("CROSS(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -468,7 +462,7 @@ public class CQLParserTest {
         /**
          * Test 9: a simple Disjoint filter
          */
-        filter = filterParser.cqlToFilter("DISJOINT(BoundingBox, POINT(14.05 46.46))");
+        filter = FilterParser.cqlToFilter("DISJOINT(BoundingBox, POINT(14.05 46.46))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -489,7 +483,7 @@ public class CQLParserTest {
         /**
          * Test 10: a simple Disjoint filter
          */
-        filter = filterParser.cqlToFilter("DISJOINT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        filter = FilterParser.cqlToFilter("DISJOINT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -510,7 +504,7 @@ public class CQLParserTest {
         /**
          * Test 11: a simple Equals filter
          */
-        filter = filterParser.cqlToFilter("EQUAL(BoundingBox, POINT(14.05 46.46))");
+        filter = FilterParser.cqlToFilter("EQUAL(BoundingBox, POINT(14.05 46.46))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -531,7 +525,7 @@ public class CQLParserTest {
         /**
          * Test 12: a simple Equals filter
          */
-        filter = filterParser.cqlToFilter("EQUAL(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        filter = FilterParser.cqlToFilter("EQUAL(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -552,7 +546,7 @@ public class CQLParserTest {
         /**
          * Test 13: a simple Overlaps filter
          */
-        filter = filterParser.cqlToFilter("OVERLAP(BoundingBox, POINT(14.05 46.46))");
+        filter = FilterParser.cqlToFilter("OVERLAP(BoundingBox, POINT(14.05 46.46))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -573,7 +567,7 @@ public class CQLParserTest {
         /**
          * Test 14: a simple Overlaps filter
          */
-        filter = filterParser.cqlToFilter("OVERLAP(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        filter = FilterParser.cqlToFilter("OVERLAP(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -594,7 +588,7 @@ public class CQLParserTest {
         /**
          * Test 15: a simple Touches filter
          */
-        filter = filterParser.cqlToFilter("TOUCH(BoundingBox, POINT(14.05 46.46))");
+        filter = FilterParser.cqlToFilter("TOUCH(BoundingBox, POINT(14.05 46.46))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -615,7 +609,7 @@ public class CQLParserTest {
         /**
          * Test 16: a simple Touches filter
          */
-        filter = filterParser.cqlToFilter("TOUCH(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        filter = FilterParser.cqlToFilter("TOUCH(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -636,7 +630,7 @@ public class CQLParserTest {
         /**
          * Test 17: a simple Within filter
          */
-        filter = filterParser.cqlToFilter("WITHIN(BoundingBox, POINT(14.05 46.46))");
+        filter = FilterParser.cqlToFilter("WITHIN(BoundingBox, POINT(14.05 46.46))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -657,7 +651,7 @@ public class CQLParserTest {
         /**
          * Test 18: a simple Within filter
          */
-        filter = filterParser.cqlToFilter("WITHIN(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        filter = FilterParser.cqlToFilter("WITHIN(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
@@ -687,7 +681,7 @@ public class CQLParserTest {
         /**
          * Test 1: two spatial Filter with AND 
          */
-        FilterType filter = filterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND OVERLAP(BoundingBox, ENVELOPE(22.07, 60.23, 11.69, 73.48))");
+        FilterType filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND OVERLAP(BoundingBox, ENVELOPE(22.07, 60.23, 11.69, 73.48))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -711,7 +705,7 @@ public class CQLParserTest {
          * Test 2: three spatial Filter with OR 
          */
 
-        filter = filterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR CONTAINS(BoundingBox, POINT(22.07 60.23)) OR BBOX(BoundingBox, 10,20,30,40)");
+        filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR CONTAINS(BoundingBox, POINT(22.07 60.23)) OR BBOX(BoundingBox, 10,20,30,40)");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -755,7 +749,7 @@ public class CQLParserTest {
          * Test 3: three spatial Filter F1 AND (F2 OR F3)
          */
 
-        filter = filterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND (CONTAINS(BoundingBox, POINT(22.07 60.23)) OR BBOX(BoundingBox, 10,20,30,40))");
+        filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND (CONTAINS(BoundingBox, POINT(22.07 60.23)) OR BBOX(BoundingBox, 10,20,30,40))");
         
         
         assertTrue(filter.getComparisonOps() == null);
@@ -796,7 +790,7 @@ public class CQLParserTest {
          * Test 4: three spatial Filter (NOT F1) AND F2 AND F3
          */
        
-        filter = filterParser.cqlToFilter("NOT INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND CONTAINS(BoundingBox, POINT(22.07 60.23)) AND BBOX(BoundingBox, 10,20,30,40)");
+        filter = FilterParser.cqlToFilter("NOT INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND CONTAINS(BoundingBox, POINT(22.07 60.23)) AND BBOX(BoundingBox, 10,20,30,40)");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -839,7 +833,7 @@ public class CQLParserTest {
          * Test 5: three spatial Filter NOT (F1 OR F2) AND F3
          */
         
-        filter = filterParser.cqlToFilter("NOT (INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR CONTAINS(BoundingBox, POINT(22.07 60.23))) AND BBOX(BoundingBox, 10,20,30,40)");
+        filter = FilterParser.cqlToFilter("NOT (INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR CONTAINS(BoundingBox, POINT(22.07 60.23))) AND BBOX(BoundingBox, 10,20,30,40)");
         
         
         assertTrue(filter.getComparisonOps() == null);
@@ -897,7 +891,7 @@ public class CQLParserTest {
          * Test 1: PropertyIsLike AND INTERSECT 
          */
         
-        FilterType filter = filterParser.cqlToFilter("Title LIKE '%VM%' AND INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        FilterType filter = FilterParser.cqlToFilter("Title LIKE '%VM%' AND INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -919,7 +913,7 @@ public class CQLParserTest {
          * Test 2: PropertyIsLike AND INTERSECT AND propertyIsEquals
          */
         
-        filter = filterParser.cqlToFilter("Title LIKE '%VM%' AND INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND Title = 'VM'");
+        filter = FilterParser.cqlToFilter("Title LIKE '%VM%' AND INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND Title = 'VM'");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -947,7 +941,7 @@ public class CQLParserTest {
          * Test 3:  INTERSECT AND propertyIsEquals AND BBOX
          */
         
-        filter = filterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND Title = 'VM' AND BBOX(BoundingBox, 10,20,30,40)");
+        filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND Title = 'VM' AND BBOX(BoundingBox, 10,20,30,40)");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -974,7 +968,7 @@ public class CQLParserTest {
         /**
          * Test 4: PropertyIsLike OR INTERSECT OR propertyIsEquals
          */
-        filter = filterParser.cqlToFilter("Title LIKE '%VM%' OR INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR Title = 'VM'");
+        filter = FilterParser.cqlToFilter("Title LIKE '%VM%' OR INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR Title = 'VM'");
         
         
         assertTrue(filter.getComparisonOps() == null);
@@ -1002,7 +996,7 @@ public class CQLParserTest {
          * Test 5:  INTERSECT OR propertyIsEquals OR BBOX
          */
         
-        filter = filterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR Title = 'VM' OR BBOX(BoundingBox, 10,20,30,40)");
+        filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR Title = 'VM' OR BBOX(BoundingBox, 10,20,30,40)");
         
         
         assertTrue(filter.getComparisonOps() == null);
@@ -1034,7 +1028,7 @@ public class CQLParserTest {
          * Test 6:  INTERSECT AND (propertyIsEquals OR BBOX)
          */
         
-        filter = filterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND (Title = 'VM' OR BBOX(BoundingBox, 10,20,30,40))");
+        filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND (Title = 'VM' OR BBOX(BoundingBox, 10,20,30,40))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -1069,7 +1063,7 @@ public class CQLParserTest {
          * Test 7:  propertyIsEquals OR (propertyIsLike AND BBOX)
          */
         
-        filter = filterParser.cqlToFilter("Title = 'VMAI' OR (Title LIKE 'LO?Li' AND DWITHIN(BoundingBox, POINT(12.1 28.9), 10, meters))");
+        filter = FilterParser.cqlToFilter("Title = 'VMAI' OR (Title LIKE 'LO?Li' AND DWITHIN(BoundingBox, POINT(12.1 28.9), 10, meters))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
@@ -1152,7 +1146,7 @@ public class CQLParserTest {
 </Filter>
          */
         
-        filter = filterParser.cqlToFilter("Title Like '%VM%' AND INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND (Title = 'PLOUF' OR BBOX(BoundingBox, 10,20,30,40)) AND (Title = 'VMAI' OR (BEYOND(BoundingBox, POINT(14.05 46.46), 10, meters) AND Title LIKE 'LO?Li'))");
+        filter = FilterParser.cqlToFilter("Title Like '%VM%' AND INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND (Title = 'PLOUF' OR BBOX(BoundingBox, 10,20,30,40)) AND (Title = 'VMAI' OR (BEYOND(BoundingBox, POINT(14.05 46.46), 10, meters) AND Title LIKE 'LO?Li'))");
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);

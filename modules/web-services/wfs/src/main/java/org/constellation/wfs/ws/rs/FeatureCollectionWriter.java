@@ -22,11 +22,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBException;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureWriter;
 import org.geotoolkit.data.collection.FeatureCollection;
@@ -37,6 +39,8 @@ import org.geotoolkit.data.collection.FeatureCollection;
  */
 @Provider
 public class FeatureCollectionWriter<T extends FeatureCollection> implements MessageBodyWriter<T> {
+
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.wfs.ws.rs");
 
     @Override
     public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
@@ -50,8 +54,12 @@ public class FeatureCollectionWriter<T extends FeatureCollection> implements Mes
 
     @Override
     public void writeTo(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
-        XmlFeatureWriter featureWriter = new JAXPEventFeatureWriter();
-        featureWriter.write(t, out);
+        try {
+            XmlFeatureWriter featureWriter = new JAXPEventFeatureWriter();
+            featureWriter.write(t, out);
+        } catch (JAXBException ex) {
+            LOGGER.severe("JAXB exception while writing the feature collection");
+        }
     }
 
 }
