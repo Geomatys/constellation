@@ -17,11 +17,7 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
-import com.sun.jersey.api.core.HttpContext;
 import java.awt.image.BufferedImage;
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
 
 //Constellation dependencies
 import org.constellation.query.wms.DescribeLayer;
@@ -29,10 +25,11 @@ import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.query.wms.GetMap;
-import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.Worker;
 
-//Geotools dependencies
+//Geotoolkit dependencies
+import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 
 
@@ -44,27 +41,7 @@ import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
  * 
  * @author Johann Sorel (Geomatys)
  */
-public interface WMSWorker {
-
-    /**
-     * Initialize the {@see #uriContext} information.
-     */
-    void initUriContext(final UriInfo uriInfo);
-
-    /**
-     * Initialize the {@see #httpContext} value.
-     */
-    void initHTTPContext(final HttpContext httpCtxt);
-
-    /**
-     * Initialize the {@see #servletContext} value.
-     */
-    void initServletContext(final ServletContext servCtxt);
-
-    /**
-     * Initialize the {@see #servletContext} value.
-     */
-    void initSecurityContext(final SecurityContext secCtxt);
+public interface WMSWorker extends Worker{
 
     /**
      * Returns a description of the requested layer.

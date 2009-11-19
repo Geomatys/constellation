@@ -16,6 +16,8 @@
  */
 package org.constellation.wfs;
 
+import org.constellation.wfs.ws.WFSWorker;
+import org.constellation.wfs.ws.DefaultWFSWorker;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -42,7 +44,7 @@ import static org.junit.Assert.*;
  */
 public class WFSWorkerTest {
 
-    private static WFSWorker worker = new WFSWorker();
+    private static WFSWorker worker = new DefaultWFSWorker();
 
     @BeforeClass
     public static void setUpClass() throws Exception {

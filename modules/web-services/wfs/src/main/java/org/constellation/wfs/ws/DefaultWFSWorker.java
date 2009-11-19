@@ -15,29 +15,37 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.wfs;
+package org.constellation.wfs.ws;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.WebService;
 
 // Geotoolkit dependencies
-import org.geotoolkit.data.DefaultFeatureCollection;
 import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.data.collection.FeatureCollectionGroup;
-import org.geotoolkit.data.collection.FeatureIterator;
 import org.geotoolkit.data.query.DefaultQuery;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
@@ -45,6 +53,9 @@ import org.geotoolkit.gml.xml.v311.AbstractGMLEntry;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
+import org.geotoolkit.ows.xml.AbstractDCP;
+import org.geotoolkit.ows.xml.AbstractHTTP;
+import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 import org.geotoolkit.ows.xml.v100.AddressType;
 import org.geotoolkit.ows.xml.v100.CodeType;
 import org.geotoolkit.ows.xml.v100.ContactType;
@@ -70,42 +81,49 @@ import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
+import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 
 // GeoAPI dependencies
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.sort.SortBy;
-import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class WFSWorker {
+public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
 
     /**
      * The default logger.
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.wfs");
 
-    private static final String CSTL_NAMESPACE = "http://constellation-sdi.org";
-    private static final String CSTL_PREFIX = "cstl";
-
     private final List<String> standardCRS = new ArrayList<String>();
     private final ServiceIdentification serviceIdentification;
     private final ServiceProvider serviceProvider;
 
+    /**
+     * The web service unmarshaller, which will use the web service name space.
+     */
+    private final MarshallerPool marshallerPool;
+
+    /**
+     * A map containing the Capabilities Object already loaded from file.
+     */
+    private final Map<String,Object> capabilities = new HashMap<String,Object>();
 
 
-    public WFSWorker() {
+    public DefaultWFSWorker(final MarshallerPool marshallerPool) {
+        this.marshallerPool = marshallerPool;
 
         standardCRS.add("CRS:84");
         standardCRS.add("EPSG:4326");
@@ -142,11 +160,48 @@ public class WFSWorker {
                 );
     }
 
-    public WFSCapabilitiesType getCapabilities(final GetCapabilitiesType model) throws CstlServiceException {
-        final WFSCapabilitiesType template = new WFSCapabilitiesType();
+    public DefaultWFSWorker() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
 
-        template.setServiceIdentification(serviceIdentification);
-        template.setServiceProvider(serviceProvider);
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public WFSCapabilitiesType getCapabilities(final GetCapabilitiesType getCapab) throws CstlServiceException {
+
+        final String queryVersion = getCapab.getVersion().toString();
+
+        //Add accepted CRS codes
+        final List<String> crs = new ArrayList<String>();
+        crs.add("EPSG:4326");
+        crs.add("CRS:84");
+        crs.add("EPSG:3395");
+        crs.add("EPSG:27571");
+        crs.add("EPSG:27572");
+        crs.add("EPSG:27573");
+        crs.add("EPSG:27574");
+
+
+        //Generate the correct URL in the static part. ?TODO: clarify this.
+        final WFSCapabilitiesType inCapabilities;
+        try {
+            inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(
+                    getServletContext().getRealPath("WEB-INF"), queryVersion);
+        } catch (IOException e) {
+            throw new CstlServiceException(e, NO_APPLICABLE_CODE);
+        } catch (JAXBException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
+        final String url = getUriContext().getBaseUri().toString();
+//        inCapabilities.getService().getOnlineResource().setHref(url + "wfs");
+//        final AbstractRequest request = inCapabilities.getFilterCapabilities().getRequest();
+//
+//        updateURL(request.getGetCapabilities().getDCPType(), url);
+//        updateURL(request.getGetFeatureInfo().getDCPType(), url);
+//        updateURL(request.getGetMap().getDCPType(), url);
+//        updateExtendedOperationURL(request, getCapab.getVersion(), url);
+
 
         //types possible, providers gives this list-----------------------------
         final FeatureTypeListType ftl     = new FeatureTypeListType();
@@ -173,20 +228,129 @@ public class WFSWorker {
             }
         }
         ftl.setFeatureType(types);
-        template.setFeatureTypeList(ftl);
+        inCapabilities.setFeatureTypeList(ftl);
 
         //todo ...etc...--------------------------------------------------------
-        template.getOperationsMetadata();
-        template.setFilterCapabilities(null);
-        template.setServesGMLObjectTypeList(null);
-        template.setSupportsGMLObjectTypeList(null);
-        template.getSupportsGMLObjectTypeList();
-        template.getUpdateSequence();
-        template.getVersion();
+        inCapabilities.getOperationsMetadata();
+        inCapabilities.setFilterCapabilities(null);
+        inCapabilities.setServesGMLObjectTypeList(null);
+        inCapabilities.setSupportsGMLObjectTypeList(null);
+        inCapabilities.getSupportsGMLObjectTypeList();
+        inCapabilities.getUpdateSequence();
+        inCapabilities.getVersion();
 
-        return template;
+
+        return inCapabilities;
     }
 
+    /**
+     * Returns the file where to read the capabilities document for each service.
+     * If no such file is found, then this method returns {@code null}.
+     *
+     * @param home    The home directory, where to search for configuration files.
+     * @param version The version of the GetCapabilities.
+     * @return The capabilities Object, or {@code null} if none.
+     *
+     * @throws JAXBException
+     * @throws IOException
+     */
+    private Object getStaticCapabilitiesObject(final String home, final String version) throws JAXBException, IOException {
+        final String fileName = "WFSCapabilities" + version + ".xml";
+        final File changeFile = getFile("change.properties", home);
+        final Properties p = new Properties();
+
+        // if the flag file is present we load the properties
+        if (changeFile != null && changeFile.exists()) {
+            final FileInputStream in = new FileInputStream(changeFile);
+            p.load(in);
+            in.close();
+        } else {
+            p.put("update", "false");
+        }
+
+        //Look if the template capabilities is already in cache.
+        Object response = capabilities.get(fileName);
+        final boolean update = p.getProperty("update").equals("true");
+
+        if (response == null || update) {
+            if (update) {
+                LOGGER.info("updating metadata");
+            }
+
+            final File f = getFile(fileName, home);
+            Unmarshaller unmarshaller = null;
+            try {
+                unmarshaller = marshallerPool.acquireUnmarshaller();
+                // If the file is not present in the configuration directory, take the one in resource.
+                if (!f.exists()) {
+                    final InputStream in = getClass().getResourceAsStream(fileName);
+                    response = unmarshaller.unmarshal(in);
+                    in.close();
+                } else {
+                    response = unmarshaller.unmarshal(f);
+                }
+
+                if(response instanceof JAXBElement){
+                    response = ((JAXBElement)response).getValue();
+                    System.out.println(" >>>>>>>>>>>>>>>>>>>>   response : " + response);
+                }
+
+                capabilities.put(fileName, response);
+
+            } finally {
+                if (unmarshaller != null) {
+                    marshallerPool.release(unmarshaller);
+                }
+            }
+
+            //this.setLastUpdateSequence(System.currentTimeMillis());
+            p.put("update", "false");
+
+            // if the flag file is present we store the properties
+            if (changeFile != null && changeFile.exists()) {
+                final FileOutputStream out = new FileOutputStream(changeFile);
+                p.store(out, "updated from WebService");
+                out.close();
+            }
+        }
+
+        return response;
+    }
+
+    /**
+     * Return a file located in the home directory. In this implementation, it should be
+     * the WEB-INF directory of the deployed service.
+     *
+     * @param fileName The name of the file requested.
+     * @return The specified file.
+     */
+    private File getFile(final String fileName, final String home) {
+         File path;
+         if (home == null || !(path = new File(home)).isDirectory()) {
+            path = WebService.getSicadeDirectory();
+         }
+         if (fileName != null)
+            return new File(path, fileName);
+         else return path;
+    }
+
+    /**
+     * update The URL in capabilities document with the service actual URL.
+     */
+    private void updateURL(final List<? extends AbstractDCP> dcpList, final String url) {
+        for(AbstractDCP dcp: dcpList) {
+            final AbstractHTTP http = dcp.getHTTP();
+            List<? extends AbstractOnlineResourceType> types = http.getGetOrPost();
+            for(AbstractOnlineResourceType aort : types){
+                aort.setHref(url + "wfs?SERVICE=WFS&");
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public Schema describeFeatureType(final DescribeFeatureTypeType model) throws CstlServiceException {
 
         final JAXBFeatureTypeWriter writer;
@@ -224,6 +388,10 @@ public class WFSWorker {
         return writer.getSchemaFromFeatureType(types);
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public FeatureCollection getFeature(final GetFeatureType request) throws CstlServiceException {
 
         final LayerProviderProxy proxy = LayerProviderProxy.getInstance();
@@ -322,18 +490,34 @@ public class WFSWorker {
         return FeatureCollectionGroup.sequence( collections.toArray(new FeatureCollection[collections.size()]) );
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public AbstractGMLEntry getGMLObject(GetGmlObjectType grbi) throws CstlServiceException {
         throw new CstlServiceException("WFS get GML Object is not supported on this Constellation version.");
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public LockFeatureResponseType lockFeature(LockFeatureType gr) throws CstlServiceException {
         throw new CstlServiceException("WFS Lock is not supported on this Constellation version.");
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public TransactionResponseType transaction(TransactionType t) throws CstlServiceException {
         throw new CstlServiceException("WFS-T is not supported on this Constellation version.");
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public String getOutputFormat() {
         return "text/xml";
     }

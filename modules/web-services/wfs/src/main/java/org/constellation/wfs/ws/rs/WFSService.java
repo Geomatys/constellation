@@ -38,13 +38,15 @@ import javax.xml.namespace.QName;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
+import java.util.logging.Level;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 // constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.util.Util;
-import org.constellation.wfs.WFSWorker;
+import org.constellation.wfs.ws.DefaultWFSWorker;
+import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
 
@@ -93,7 +95,7 @@ public class WFSService extends OGCWebService {
             		  ":org.geotoolkit.gml.xml.v311" +
                           ":org.geotoolkit.xsd.xml.v2001"
                           , "");
-            candidate       = new WFSWorker();
+            candidate       = new DefaultWFSWorker(getMarshallerPool());
 
         } catch (JAXBException ex){
             LOGGER.severe("The WFS service is not running."       + '\n' +
@@ -102,6 +104,7 @@ public class WFSService extends OGCWebService {
                           " details: " + ex.toString());
         } 
         this.worker        = candidate;
+
 
         if (worker != null) {
             LOGGER.info("WFS Service started");
@@ -123,6 +126,12 @@ public class WFSService extends OGCWebService {
 
         Marshaller marshaller = null;
         ServiceDef version = null;
+
+        worker.initHTTPContext(getHttpContext());
+        worker.initSecurityContext(null);
+        worker.initServletContext(getServletContext());
+        worker.initUriContext(getUriContext());
+
         try {
             marshaller = getMarshallerPool().acquireMarshaller();
 
@@ -208,8 +217,8 @@ public class WFSService extends OGCWebService {
                 !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                 !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
                 !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-            //ex.printStackTrace();
-            } else {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
+        } else {
             LOGGER.severe("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
         if (isJaxBContextValid()) {
@@ -362,7 +371,7 @@ public class WFSService extends OGCWebService {
             }
             versions = new AcceptVersionsType(version);
         } else {
-             versions = new AcceptVersionsType("2.0.2");
+             versions = new AcceptVersionsType("1.1.0");
         }
 
         AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));

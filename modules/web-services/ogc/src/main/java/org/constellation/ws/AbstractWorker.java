@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.map.ws;
+package org.constellation.ws;
 
 //J2SE dependencies
 import com.sun.jersey.api.core.HttpContext;
@@ -26,12 +26,12 @@ import javax.ws.rs.core.UriInfo;
  * Abstract definition of a {@code Web Map Service} worker called by a facade
  * to perform the logic for a particular WMS instance.
  *
- * @version $Id$
+ * @version $Id: AbstractWMSWorker.java 1889 2009-10-14 16:05:52Z eclesia $
  * 
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractWMSWorker implements WMSWorker {
+public abstract class AbstractWorker implements Worker{
 
     /**
      * Contains information about the HTTP exchange of the request, for instance, 

@@ -66,17 +66,7 @@ import org.constellation.query.wms.WMSQuery;
 import org.constellation.register.RegisterException;
 import org.constellation.util.PeriodUtilities;
 import org.constellation.util.Util;
-import org.geotoolkit.wms.xml.AbstractDCP;
-import org.geotoolkit.wms.xml.AbstractDimension;
-import org.geotoolkit.wms.xml.AbstractHTTP;
-import org.geotoolkit.wms.xml.AbstractLayer;
-import org.geotoolkit.wms.xml.AbstractOperation;
-import org.geotoolkit.wms.xml.AbstractProtocol;
-import org.geotoolkit.wms.xml.AbstractRequest;
-import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
-import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
-import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
-import org.geotoolkit.wms.xml.v130.OperationType;
+import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -102,6 +92,17 @@ import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.wms.xml.AbstractDCP;
+import org.geotoolkit.wms.xml.AbstractDimension;
+import org.geotoolkit.wms.xml.AbstractHTTP;
+import org.geotoolkit.wms.xml.AbstractLayer;
+import org.geotoolkit.wms.xml.AbstractOperation;
+import org.geotoolkit.wms.xml.AbstractProtocol;
+import org.geotoolkit.wms.xml.AbstractRequest;
+import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
+import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
+import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
+import org.geotoolkit.wms.xml.v130.OperationType;
 
 //Geoapi dependencies
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -110,7 +111,6 @@ import org.opengis.sld.StyledLayerDescriptor;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.query.wms.WMSQuery.*;
-
 
 
 /**
@@ -130,7 +130,7 @@ import static org.constellation.query.wms.WMSQuery.*;
  * @author Johann Sorel (Geomatys)
  * @since 0.3
  */
-public class DefaultWMSWorker extends AbstractWMSWorker {
+public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
     /**
      * The default debugging logger for the WMS service.
      */
@@ -580,8 +580,7 @@ public class DefaultWMSWorker extends AbstractWMSWorker {
      * update The URL in capabilities document for the extended operation.
      */
     private void updateExtendedOperationURL(final AbstractRequest request, final Version version,
-                                                                           final String url)
-    {
+                                                                           final String url){
 
         if (version.toString().equals(ServiceDef.WMS_1_3_0_SLD.version.toString())) {
             final org.geotoolkit.wms.xml.v130.Request r = (org.geotoolkit.wms.xml.v130.Request) request;
