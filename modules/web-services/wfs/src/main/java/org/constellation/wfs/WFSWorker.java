@@ -36,6 +36,7 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.data.DefaultFeatureCollection;
 import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.collection.FeatureCollection;
+import org.geotoolkit.data.collection.FeatureCollectionGroup;
 import org.geotoolkit.data.collection.FeatureIterator;
 import org.geotoolkit.data.query.DefaultQuery;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
@@ -317,18 +318,8 @@ public class WFSWorker {
          *
          * result TODO find an id and a member type
          */
-        final FeatureCollection <SimpleFeatureType, SimpleFeature> result = new DefaultFeatureCollection("collection-1", null);
-        for (final FeatureCollection collection: collections) {
-            final FeatureIterator<SimpleFeature> iterator = collection.features();
-            try {
-                while (iterator.hasNext()) {
-                    result.add(iterator.next());
-                }
-            } finally {
-                iterator.close();
-            }
-        }
-        return result;
+
+        return FeatureCollectionGroup.sequence( collections.toArray(new FeatureCollection[collections.size()]) );
     }
 
     public AbstractGMLEntry getGMLObject(GetGmlObjectType grbi) throws CstlServiceException {
