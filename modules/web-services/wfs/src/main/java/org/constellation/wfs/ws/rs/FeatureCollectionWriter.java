@@ -30,7 +30,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureWriter;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.data.collection.FeatureCollection;
 
 /**
@@ -55,7 +55,7 @@ public class FeatureCollectionWriter<T extends FeatureCollection> implements Mes
     @Override
     public void writeTo(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
         try {
-            XmlFeatureWriter featureWriter = new JAXPEventFeatureWriter();
+            XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter();
             featureWriter.write(t, out);
         } catch (JAXBException ex) {
             LOGGER.severe("JAXB exception while writing the feature collection");

@@ -38,6 +38,8 @@ import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureWriter;
 
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -50,7 +52,7 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class OMFeatureXmlBindingTest {
+public class StreamOMFeatureXmlBindingTest {
 
     private static DefaultDataSource ds = null;
     
@@ -68,7 +70,7 @@ public class OMFeatureXmlBindingTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        final String url = "jdbc:derby:memory:Test1;create=true";
+        final String url = "jdbc:derby:memory:TestStream;create=true";
         ds = new DefaultDataSource(url);
 
         Connection con = ds.getConnection();
@@ -100,8 +102,8 @@ public class OMFeatureXmlBindingTest {
 
     @Before
     public void setUp() throws Exception {
-        featureWriter     = new JAXPEventFeatureWriter();
-        featureReader     = new JAXPEventFeatureReader(featureType);
+        featureWriter     = new JAXPStreamFeatureWriter();
+        featureReader     = new JAXPStreamFeatureReader(featureType);
         featureTypeReader = new JAXBFeatureTypeReader();
         featureTypeWriter = new JAXBFeatureTypeWriter();
     }
@@ -130,6 +132,7 @@ public class OMFeatureXmlBindingTest {
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
+        expresult = expresult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
 
         assertEquals(expresult, result);
     }
@@ -147,6 +150,7 @@ public class OMFeatureXmlBindingTest {
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
+        expresult = expresult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
 
         // and we replace the space for the specified data
         assertEquals(expresult, result);

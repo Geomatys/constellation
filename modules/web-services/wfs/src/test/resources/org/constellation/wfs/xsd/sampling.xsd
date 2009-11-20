@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xsd:schema elementFormDefault="qualified" targetNamespace="http://www.opengis.net/sampling/1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml">
+<xsd:schema elementFormDefault="qualified" targetNamespace="http://www.opengis.net/sampling/1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml" xmlns:sampling="http://www.opengis.net/sampling/1.0">
     <xsd:import schemaLocation="http://schemas.opengis.net/gml/3.1.1/base/gml.xsd" namespace="http://www.opengis.net/gml"/>
     <xsd:element name="SamplingPoint" type="sampling:SamplingPointType" />
     <xsd:complexType name="SamplingPointType">
