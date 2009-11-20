@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -56,15 +56,6 @@ import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ows.xml.AbstractDCP;
 import org.geotoolkit.ows.xml.AbstractHTTP;
 import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
-import org.geotoolkit.ows.xml.v100.AddressType;
-import org.geotoolkit.ows.xml.v100.CodeType;
-import org.geotoolkit.ows.xml.v100.ContactType;
-import org.geotoolkit.ows.xml.v100.KeywordsType;
-import org.geotoolkit.ows.xml.v100.OnlineResourceType;
-import org.geotoolkit.ows.xml.v100.ResponsiblePartySubsetType;
-import org.geotoolkit.ows.xml.v100.ServiceIdentification;
-import org.geotoolkit.ows.xml.v100.ServiceProvider;
-import org.geotoolkit.ows.xml.v100.TelephoneType;
 import org.geotoolkit.ows.xml.v100.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sld.xml.XMLUtilities;
@@ -84,6 +75,7 @@ import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.data.store.EmptyFeatureCollection;
+import org.geotoolkit.metadata.iso.citation.Citations;
 
 // GeoAPI dependencies
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -109,8 +101,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
     private static final Logger LOGGER = Logger.getLogger("org.constellation.wfs");
 
     private final List<String> standardCRS = new ArrayList<String>();
-    private final ServiceIdentification serviceIdentification;
-    private final ServiceProvider serviceProvider;
 
     /**
      * The web service unmarshaller, which will use the web service name space.
@@ -126,39 +116,19 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
     public DefaultWFSWorker(final MarshallerPool marshallerPool) {
         this.marshallerPool = marshallerPool;
 
-        standardCRS.add("CRS:84");
-        standardCRS.add("EPSG:4326");
-        standardCRS.add("EPSG:3395");
+        //todo wait for martin fix
+        standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:4326");
+        standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:3395");
 
-        serviceIdentification = new ServiceIdentification(
-                "WFS",
-                "Constellation WFS Service.",
-                new KeywordsType("Constellation","WFS"),
-                new CodeType("what's that ??"),
-                UnmodifiableArrayList.wrap(new String[]{"1.1.0"}),
-                "None",
-                "None");
-        serviceProvider = new ServiceProvider(
-                "Constellation",
-                new OnlineResourceType("http://constellation.codehaus.org"),
-                new ResponsiblePartySubsetType(
-                    "Vincent Heurteaux",
-                    "PDG",
-                    new ContactType(
-                        new TelephoneType("04 67 54 87 30",""),
-                        new AddressType(
-                            "24 rue Pierre Renaudel",
-                            "ARLES",
-                            "Bouches du rhone",
-                            "13200", 
-                            "France",
-                            "vincent.heurteaux@geomatys.fr"),
-                        new OnlineResourceType("http://constellation.codehaus.org"),
-                        "9h - 19h",
-                        "none"),
-                    new CodeType("")
-                    )
-                );
+//        try{
+//            standardCRS.add(CRS.lookupIdentifier(Citations.URN_OGC, CRS.decode("CRS:84"), true));
+//            standardCRS.add(CRS.lookupIdentifier(Citations.URN_OGC, CRS.decode("EPSG:4326"), true));
+//            standardCRS.add(CRS.lookupIdentifier(Citations.URN_OGC, CRS.decode("EPSG:3395"), true));
+//        }catch(FactoryException ex){
+//            LOGGER.log(Level.SEVERE, "Could not find urn identifiers : " + ex.getLocalizedMessage(),ex);
+//        }
+
+
     }
 
     public DefaultWFSWorker() {
@@ -173,17 +143,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
 
         final String queryVersion = getCapab.getVersion().toString();
 
-        //Add accepted CRS codes
-        final List<String> crs = new ArrayList<String>();
-        crs.add("EPSG:4326");
-        crs.add("CRS:84");
-        crs.add("EPSG:3395");
-        crs.add("EPSG:27571");
-        crs.add("EPSG:27572");
-        crs.add("EPSG:27573");
-        crs.add("EPSG:27574");
-
-
         //Generate the correct URL in the static part. ?TODO: clarify this.
         final WFSCapabilitiesType inCapabilities;
         try {
@@ -194,15 +153,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
-        final String url = getUriContext().getBaseUri().toString();
-//        inCapabilities.getService().getOnlineResource().setHref(url + "wfs");
-//        final AbstractRequest request = inCapabilities.getFilterCapabilities().getRequest();
-//
-//        updateURL(request.getGetCapabilities().getDCPType(), url);
-//        updateURL(request.getGetFeatureInfo().getDCPType(), url);
-//        updateURL(request.getGetMap().getDCPType(), url);
-//        updateExtendedOperationURL(request, getCapab.getVersion(), url);
-
 
         //types possible, providers gives this list-----------------------------
         final FeatureTypeListType ftl     = new FeatureTypeListType();
@@ -215,10 +165,17 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
                 final SimpleFeatureType type  = fld.getSource().getSchema();
                 final FeatureTypeType ftt;
                 try {
+                    
+                    //todo wait for martin fix
+                    String id = CRS.lookupIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+                    final String defaultCRS = "urn:x-ogc:def:crs:" + id.replaceAll(":", ":7.01:");
+//                    final String defaultCRS = CRS.lookupIdentifier(Citations.URN_OGC,
+//                            type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+
                     ftt = new FeatureTypeType(
                             new QName(layerName, layerName),
                             fld.getName(),
-                            CRS.lookupIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem(), true),
+                            defaultCRS,
                             standardCRS,
                             UnmodifiableArrayList.wrap(new WGS84BoundingBoxType[]{toBBox(fld.getSource())}));
                     types.add(ftt);
@@ -293,7 +250,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
 
                 if(response instanceof JAXBElement){
                     response = ((JAXBElement)response).getValue();
-                    System.out.println(" >>>>>>>>>>>>>>>>>>>>   response : " + response);
                 }
 
                 capabilities.put(fileName, response);

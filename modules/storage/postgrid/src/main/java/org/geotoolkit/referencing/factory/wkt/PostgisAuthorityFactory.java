@@ -1,6 +1,6 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
- *    http://geotools.org
+ *    http://geotoolkit.org
  *    (C) 2007, Geotools Project Managment Committee (PMC)
  *    (C) 2007, Geomatys
  *

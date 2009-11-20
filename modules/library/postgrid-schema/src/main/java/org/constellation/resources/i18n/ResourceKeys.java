@@ -1,6 +1,6 @@
 /*
  *    GeoTools - OpenSource mapping toolkit
- *    http://geotools.org
+ *    http://geotoolkit.org
  *    (C) 2003-2007, Geotools Project Managment Committee (PMC)
  *    
  *    This library is free software; you can redistribute it and/or

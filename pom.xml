@@ -550,8 +550,8 @@
     Repositories where to find dependencies. A directory http://*.maven.org/
     is implicit. One can find the necessary dependencies for Maven itself, and
     some usual dependencies as the JDBC driver for PostgreSQL. The directory
-    "Geotools" contains JARs of Geotools as well as some needed dependencies
-    for Geotools but not published on the Maven repository, for example the
+    "GeotoolKit" contains JARs of GeotoolKit as well as some needed dependencies
+    for GeotoolKit but not published on the Maven repository, for example the
     UCAR library for the reading of NetCDF files.
   -->
   <repositories>

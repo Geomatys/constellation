@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<wfs:WFS_Capabilities version="1.1.0" 
-xmlns:wfs="http://www.opengis.net/wfs"
+<WFS_Capabilities version="1.1.0"
+xmlns="http://www.opengis.net/wfs"
 xmlns:ows="http://www.opengis.net/ows"
 xmlns:ogc="http://www.opengis.net/ogc"
 xmlns:gml="http://www.opengis.net/gml"
@@ -144,4 +144,4 @@ xmlns:ins="http://www.inspire.org">
 
 
 
-</wfs:WFS_Capabilities>
+</WFS_Capabilities>
