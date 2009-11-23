@@ -42,8 +42,8 @@ public class ProviderSource {
     public final List<ProviderLayer> layers = new ArrayList<ProviderLayer>();
     
     public ProviderLayer getLayer(final String key){
-        for(final ProviderLayer layer : layers){
-            if(layer.name.equals(key)){
+        for (final ProviderLayer layer : layers) {
+            if (layer.name.equals(key)) {
                 return layer;
             }
         }

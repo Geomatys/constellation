@@ -111,13 +111,13 @@ public class BDD {
                     return Integer.parseInt(portName);
                 } catch (NumberFormatException ex) {
                     Logger.getAnonymousLogger().severe("unable to parse the port number: " + portName);
-                    return -1;
+                    return 5432;
                 }
             } else {
-                return -1;
+                return 5432;
             }
         }
-        return -1;
+        return 5432;
     }
 
     /**

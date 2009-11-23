@@ -165,13 +165,17 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
                 final SimpleFeatureType type  = fld.getSource().getSchema();
                 final FeatureTypeType ftt;
                 try {
-                    
-                    //todo wait for martin fix
-                    String id = CRS.lookupIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
-                    final String defaultCRS = "urn:x-ogc:def:crs:" + id.replaceAll(":", ":7.01:");
-//                    final String defaultCRS = CRS.lookupIdentifier(Citations.URN_OGC,
-//                            type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
 
+                    final String defaultCRS;
+                    if (type.getGeometryDescriptor() != null && type.getGeometryDescriptor().getCoordinateReferenceSystem() != null) {
+                        //todo wait for martin fix
+                        String id  = CRS.lookupIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+                        defaultCRS = "urn:x-ogc:def:crs:" + id.replaceAll(":", ":7.01:");
+    //                    final String defaultCRS = CRS.lookupIdentifier(Citations.URN_OGC,
+    //                            type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+                    } else {
+                        defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
+                    }
                     ftt = new FeatureTypeType(
                             new QName(layerName, layerName),
                             fld.getName(),
@@ -394,7 +398,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
             }
 
             //decode property names---------------------------------------------
-            for(Object obj : properties){
+            for (Object obj : properties) {
                 if(obj instanceof JAXBElement){
                     obj = ((JAXBElement)obj).getValue();
                 }
@@ -489,14 +493,17 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
     private static WGS84BoundingBoxType toBBox(FeatureSource source) throws CstlServiceException{
         try {
             final JTSEnvelope2D env = source.getBounds();
-
-            WGS84BoundingBoxType bbox =  new WGS84BoundingBoxType(
-                       env.getMinimum(0),
-                       env.getMinimum(1),
-                       env.getMaximum(0),
-                       env.getMaximum(1));
-            bbox.setCrs(CRS.lookupIdentifier(env.getCoordinateReferenceSystem(),true));
-            return bbox;
+            if (env != null) {
+                WGS84BoundingBoxType bbox =  new WGS84BoundingBoxType(
+                           env.getMinimum(0),
+                           env.getMinimum(1),
+                           env.getMaximum(0),
+                           env.getMaximum(1));
+                bbox.setCrs(CRS.lookupIdentifier(env.getCoordinateReferenceSystem(),true));
+                return bbox;
+            } else {
+                return new WGS84BoundingBoxType(-180, -90, 180, 90);
+            }
 
 
 //            final CoordinateReferenceSystem EPSG4326 = CRS.decode("EPSG:4326");

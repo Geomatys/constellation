@@ -67,14 +67,33 @@
   </developers>
 
 
+  <!--
+    By default, build all test module. Several profiles are defined
+    to specifically skip some test module.
+  -->
+  <profiles>
+    <profile>
+      <id>all</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>data</module>
+    	<module>embedded</module>
+	<module>cite</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>wfs</id>
+      <modules>
+       <module>data</module>
+      </modules>
+    </profile>
+  </profiles>
 
   <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
-  <modules>
-    <module>data</module>
-    <module>embedded</module>
-    <module>cite</module>
-  </modules>
+  <modules/>
 
 </project>

@@ -106,6 +106,12 @@
       </modules>
     </profile>
     <profile>
+      <id>wfs</id>
+      <modules>
+        <module>wfs</module>
+      </modules>
+    </profile>
+    <profile>
       <id>csw</id>
       <modules>
         <module>csw</module>
