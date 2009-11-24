@@ -23,19 +23,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.NamedLayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
 
+import org.opengis.feature.type.Name;
 import static org.constellation.provider.sml.SMLProvider.*;
 /**
  *
- * @version $Id: ShapeFileProviderService.java 1950 2009-11-16 09:59:25Z eclesia $
+ * @version $Id: 
  *
  * @author Johann Sorel (Geoamtys)
  * @author Guilhem Legal (Geomatys)
  */
-public class SMLProviderService extends AbstractProviderService<String,LayerDetails> implements LayerProviderService {
+public class SMLProviderService extends AbstractProviderService<Name,LayerDetails> implements NamedLayerProviderService {
 
     /**
      * Default logger.

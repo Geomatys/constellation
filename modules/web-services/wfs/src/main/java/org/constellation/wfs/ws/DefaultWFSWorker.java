@@ -38,6 +38,7 @@ import javax.xml.namespace.QName;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.NamedLayerProviderProxy;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.WebService;
@@ -48,6 +49,7 @@ import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.data.collection.FeatureCollectionGroup;
 import org.geotoolkit.data.query.DefaultQuery;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
+import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.xml.v311.AbstractGMLEntry;
 import org.geotoolkit.ogc.xml.v110.FilterType;
@@ -75,11 +77,11 @@ import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.data.store.EmptyFeatureCollection;
-import org.geotoolkit.metadata.iso.citation.Citations;
 
 // GeoAPI dependencies
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.sort.SortBy;
@@ -178,6 +180,39 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
                     }
                     ftt = new FeatureTypeType(
                             new QName(layerName, layerName),
+                            fld.getName(),
+                            defaultCRS,
+                            standardCRS,
+                            UnmodifiableArrayList.wrap(new WGS84BoundingBoxType[]{toBBox(fld.getSource())}));
+                    types.add(ftt);
+                } catch (FactoryException ex) {
+                    LOGGER.log(Level.SEVERE, null, ex);
+                }
+
+            }
+        }
+
+        final NamedLayerProviderProxy namedProxy    = NamedLayerProviderProxy.getInstance();
+        for (final Name layerName : namedProxy.getKeys()) {
+            final LayerDetails layer = namedProxy.get(layerName);
+            if (layer instanceof FeatureLayerDetails){
+                final FeatureLayerDetails fld = (FeatureLayerDetails) layer;
+                final SimpleFeatureType type  = fld.getSource().getSchema();
+                final FeatureTypeType ftt;
+                try {
+
+                    final String defaultCRS;
+                    if (type.getGeometryDescriptor() != null && type.getGeometryDescriptor().getCoordinateReferenceSystem() != null) {
+                        //todo wait for martin fix
+                        String id  = CRS.lookupIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+                        defaultCRS = "urn:x-ogc:def:crs:" + id.replaceAll(":", ":7.01:");
+    //                    final String defaultCRS = CRS.lookupIdentifier(Citations.URN_OGC,
+    //                            type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+                    } else {
+                        defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
+                    }
+                    ftt = new FeatureTypeType(
+                            Utils.getQnameFromName(layerName),
                             fld.getName(),
                             defaultCRS,
                             standardCRS,
@@ -320,24 +355,36 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex);
         }
-        final LayerProviderProxy proxy = LayerProviderProxy.getInstance();
-        final List<QName> names = model.getTypeName();
-        final List<FeatureType> types = new ArrayList<FeatureType>();
+        final LayerProviderProxy proxy           = LayerProviderProxy.getInstance();
+        final NamedLayerProviderProxy namedProxy = NamedLayerProviderProxy.getInstance();
+        final List<QName> names                  = model.getTypeName();
+        final List<FeatureType> types            = new ArrayList<FeatureType>();
 
-        if (names.isEmpty()){
+        if (names.isEmpty()) {
             //search all types
-            for(final String name : proxy.getKeys()){
+            for (final String name : proxy.getKeys()) {
                 final LayerDetails layer = proxy.get(name);
-                if(layer == null || !(layer instanceof FeatureLayerDetails)) continue;
+                if (layer == null || !(layer instanceof FeatureLayerDetails)) continue;
 
                 final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
-                final SimpleFeatureType sft = fld.getSource().getSchema();
+                final SimpleFeatureType sft   = fld.getSource().getSchema();
+                types.add(sft);
+            }
+            for (final Name name : namedProxy.getKeys()) {
+                final LayerDetails layer = namedProxy.get(name);
+                if (layer == null || !(layer instanceof FeatureLayerDetails)) continue;
+
+                final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
+                final SimpleFeatureType sft   = fld.getSource().getSchema();
                 types.add(sft);
             }
         } else {
             //search only the given list
-            for(final QName name : names){
-                final LayerDetails layer = proxy.get(name.getLocalPart());
+            for (final QName name : names) {
+                LayerDetails layer = proxy.get(name.getLocalPart());
+                if (layer == null) {
+                    layer = namedProxy.get(Utils.getNameFromQname(name));
+                }
                 if(layer == null || !(layer instanceof FeatureLayerDetails)) continue;
 
                 final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
@@ -355,26 +402,23 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
     @Override
     public FeatureCollection getFeature(final GetFeatureType request) throws CstlServiceException {
 
-        final LayerProviderProxy proxy = LayerProviderProxy.getInstance();
-        final XMLUtilities util = new XMLUtilities();
-        final Integer maxFeatures = request.getMaxFeatures();
-
+        final LayerProviderProxy proxy            = LayerProviderProxy.getInstance();
+        final NamedLayerProviderProxy namedProxy  = NamedLayerProviderProxy.getInstance();
+        final XMLUtilities util                   = new XMLUtilities();
+        final Integer maxFeatures                 = request.getMaxFeatures();
         final List<FeatureCollection> collections = new ArrayList<FeatureCollection>();
         
         for (final QueryType query : request.getQuery()) {
             final FilterType jaxbFilter   = query.getFilter();
             final SortByType jaxbSortBy   = query.getSortBy();
             final String srs              = query.getSrsName();
-            final List<String> typeNames  = new ArrayList<String>();
-            for (QName typeName : query.getTypeName()) {
-                typeNames.add(typeName.getLocalPart());
-            }
+            final List<QName> typeNames   = query.getTypeName();
             final List<Object> properties = query.getPropertyNameOrXlinkPropertyNameOrFunction();
             
             final Filter filter;
             final CoordinateReferenceSystem crs;
             final List<String> propNames = new ArrayList<String>();
-            final List<SortBy> sortBys = new ArrayList<SortBy>();
+            final List<SortBy> sortBys   = new ArrayList<SortBy>();
 
             //decode filter-----------------------------------------------------
             if(jaxbFilter != null){
@@ -428,8 +472,11 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
                 fsQuery.setMaxFeatures(maxFeatures);
             }
 
-            for (String typeName : typeNames) {
-            final FeatureLayerDetails layer = (FeatureLayerDetails)proxy.get(typeName);
+            for (QName typeName : typeNames) {
+            FeatureLayerDetails layer = (FeatureLayerDetails)proxy.get(typeName.getLocalPart());
+            if (layer == null) {
+                layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(typeName));
+            }
                 try {
                     collections.add(layer.getSource().getFeatures(fsQuery));
                 } catch (IOException ex) {

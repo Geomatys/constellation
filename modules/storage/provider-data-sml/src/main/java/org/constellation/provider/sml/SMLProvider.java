@@ -32,8 +32,8 @@ import java.util.Set;
 
 import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.NamedLayerProvider;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
@@ -43,19 +43,16 @@ import org.constellation.resources.ArraySet;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.data.FeatureSource;
-import org.geotoolkit.data.sml.SMLDataStore;
 import org.geotoolkit.data.sml.SMLDataStoreFactory;
-import org.geotoolkit.map.ElevationModel;
-import org.geotoolkit.util.collection.Cache;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 import org.xml.sax.SAXException;
 
 
 
 /**
- * Shapefile Data provider. index and cache Datastores for the shapefiles
- * whithin the given folder.
+ * SensorML Data provider. index and cache Datastores for the specified database (MDWeb strcuture).
  *
  * @version $Id: ShapeFileProvider.java 1870 2009-10-07 08:09:43Z eclesia $
  *
@@ -63,20 +60,20 @@ import org.xml.sax.SAXException;
  * @author Cédric Briançon (Geomatys)
  * @author Guilhem Legal (Geomatys)
  */
-public class SMLProvider implements LayerProvider {
+public class SMLProvider implements NamedLayerProvider {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgis");
-    private static final String KEY_SML_CONFIG  = "sml_config";
-    public static final String KEY_DBTYPE          = SMLDataStoreFactory.DBTYPE.getName().toString();
-    public static final String KEY_HOST            = SMLDataStoreFactory.HOST.getName().toString();
-    public static final String KEY_PORT            = SMLDataStoreFactory.PORT.getName().toString();
-    public static final String KEY_DATABASE        = SMLDataStoreFactory.DATABASE.getName().toString();
-    public static final String KEY_USER            = SMLDataStoreFactory.USER.getName().toString();
-    public static final String KEY_PASSWD          = SMLDataStoreFactory.PASSWD.getName().toString();
-    public static final String KEY_NAMESPACE       = SMLDataStoreFactory.NAMESPACE.getName().toString();
+    private static final Logger LOGGER         = Logger.getLogger("org.constellation.provider.postgis");
+    private static final String KEY_SML_CONFIG = "sml_config";
+    public  static final String KEY_DBTYPE     = SMLDataStoreFactory.DBTYPE.getName().toString();
+    public  static final String KEY_HOST       = SMLDataStoreFactory.HOST.getName().toString();
+    public  static final String KEY_PORT       = SMLDataStoreFactory.PORT.getName().toString();
+    public  static final String KEY_DATABASE   = SMLDataStoreFactory.DATABASE.getName().toString();
+    public  static final String KEY_USER       = SMLDataStoreFactory.USER.getName().toString();
+    public  static final String KEY_PASSWD     = SMLDataStoreFactory.PASSWD.getName().toString();
+    public  static final String KEY_NAMESPACE  = SMLDataStoreFactory.NAMESPACE.getName().toString();
 
     private final Map<String,Serializable> params = new HashMap<String,Serializable>();
-    private final List<String> index = new ArrayList<String>();
+    private final List<Name> index = new ArrayList<Name>();
     private DataStore store;
     private final ProviderSource source;
 
@@ -147,8 +144,8 @@ public class SMLProvider implements LayerProvider {
      * {@inheritDoc }
      */
     @Override
-    public Class<String> getKeyClass() {
-        return String.class;
+    public Class<Name> getKeyClass() {
+        return Name.class;
     }
 
     /**
@@ -163,15 +160,15 @@ public class SMLProvider implements LayerProvider {
      * {@inheritDoc }
      */
     @Override
-    public Set<String> getKeys() {
-        return new ArraySet<String>(index);
+    public Set<Name> getKeys() {
+        return new ArraySet<Name>(index);
     }
 
     /**
      * {@inheritDoc }
      */
     @Override
-    public boolean contains(String key) {
+    public boolean contains(Name key) {
         return index.contains(key);
     }
 
@@ -179,7 +176,7 @@ public class SMLProvider implements LayerProvider {
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(final String key) {
+    public LayerDetails get(final Name key) {
         if (!index.contains(key)) {
             return null;
         }
@@ -189,7 +186,7 @@ public class SMLProvider implements LayerProvider {
         final String dateEndField;
         final String elevationStartField;
         final String elevationEndField;
-        final ProviderLayer layer = source.getLayer(key);
+        final ProviderLayer layer = source.getLayer(key.getLocalPart());
         if (layer != null) {
             styles              = layer.styles;
             dateStartField      = layer.dateStartField;
@@ -214,7 +211,7 @@ public class SMLProvider implements LayerProvider {
         if (fs == null) {
             return null;
         }
-        return new SMLLayerDetails(key, fs, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
+        return new SMLLayerDetails(key.getLocalPart(), fs, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
         
     }
 
@@ -244,7 +241,7 @@ public class SMLProvider implements LayerProvider {
 
     private void visit() {
         try {
-            for (final String name : store.getTypeNames()) {
+            for (final Name name : (List<Name>)store.getNames()) {
                 index.add(name);
             }
         } catch (IOException ex) {
@@ -284,9 +281,9 @@ public class SMLProvider implements LayerProvider {
         }
 
         final StringBuilder builder = new StringBuilder("DATA PROVIDER : SensorML ");
-        for(final SMLProvider dp : dps){
+        for (final SMLProvider dp : dps){
             builder.append("\n["+ dp.source.parameters.get(KEY_DATABASE)+"=");
-            for(final String layer : dp.getKeys()){
+            for(final Name layer : dp.getKeys()){
                 builder.append(layer + ",");
             }
             builder.append("]");
@@ -311,11 +308,6 @@ public class SMLProvider implements LayerProvider {
         }
 
         return ProviderConfig.read(new File(configFile.trim()));
-    }
-
-    @Override
-    public ElevationModel getElevationModel(String name) {
-        return null;
     }
 
 }
