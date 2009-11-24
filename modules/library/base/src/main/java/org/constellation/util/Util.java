@@ -1559,16 +1559,19 @@ public final class Util {
      * @throws IOException if the file does not exist or cannot be read.
      */
     public static String stringFromFile(File f) throws IOException {
-        
-        final StringBuilder sb  = new StringBuilder();
-        final BufferedReader br = new BufferedReader(new FileReader(f));
-        String line;
-        while ((line = br.readLine()) != null){
-            sb.append(line).append('\n');
+
+        if (f != null) {
+            final StringBuilder sb  = new StringBuilder();
+            final BufferedReader br = new BufferedReader(new FileReader(f));
+            String line;
+            while ((line = br.readLine()) != null){
+                sb.append(line).append('\n');
+            }
+            br.close();
+
+            return sb.toString();
         }
-        br.close();
-        
-        return sb.toString();
+        return null;
     }
     
     /**

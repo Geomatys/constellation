@@ -65,9 +65,16 @@ public class OMProviderService extends AbstractProviderService<Name,LayerDetails
             try {
                 OMProvider provider = new OMProvider(ps);
                 PROVIDERS.add(provider);
-                LOGGER.log(Level.INFO, "[PROVIDER]> O&M provider created : "
-                        + provider.getSource().parameters.get(KEY_HOST) + " > "
-                        + provider.getSource().parameters.get(KEY_DATABASE));
+                String msg = "[PROVIDER]> O&M provider created : ";
+                String SGBDType = provider.getSource().parameters.get(KEY_SGBDTYPE);
+                if (SGBDType != null && SGBDType.equals("derby")) {
+                    msg = msg + "java DB: > "
+                              + provider.getSource().parameters.get(KEY_DERBYURL);
+                } else {
+                    msg = msg + provider.getSource().parameters.get(KEY_HOST) + " > "
+                              + provider.getSource().parameters.get(KEY_DATABASE);
+                }
+                LOGGER.info(msg);
             } catch (Exception ex) {
                 // we should not catch exception, but here it's better to start all source we can
                 // rather than letting a potential exception block the provider proxy

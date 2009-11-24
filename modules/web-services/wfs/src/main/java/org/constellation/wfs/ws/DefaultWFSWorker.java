@@ -495,7 +495,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
          * result TODO find an id and a member type
          */
 	if (collections.size() > 0) {
-	        return FeatureCollectionGroup.sequence( collections.toArray(new FeatureCollection[collections.size()]) );
+	        return FeatureCollectionGroup.sequence("collection-1",collections.toArray(new FeatureCollection[collections.size()]));
         } else {
 	        return new EmptyFeatureCollection(null);
 	}

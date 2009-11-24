@@ -22,16 +22,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.NamedLayerProviderProxy;
+import org.constellation.provider.NamedLayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
+import org.constellation.provider.om.OMProvider;
+import org.constellation.provider.om.OMProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.util.Util;
@@ -40,11 +46,19 @@ import org.geotoolkit.data.store.EmptyFeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureWriter;
 import org.geotoolkit.internal.io.IOUtilities;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
+import org.geotoolkit.ogc.xml.v110.FilterType;
+import org.geotoolkit.ogc.xml.v110.LiteralType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
+import org.geotoolkit.ogc.xml.v110.PropertyNameType;
+import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.xml.MarshallerPool;
 
+import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -67,11 +81,15 @@ public class WFSWorkerTest {
         }
     }
 
+    private static MarshallerPool pool;
+
+    private static DefaultDataSource ds = null;
+    
     private XmlFeatureWriter featureWriter;
     
     @BeforeClass
     public static void setUpClass() throws Exception {
-
+        pool = new MarshallerPool(org.geotoolkit.xsd.xml.v2001.ObjectFactory.class);
         initFeatureSource();
     }
 
@@ -79,6 +97,9 @@ public class WFSWorkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        if (ds != null) {
+            ds.shutdown();
+        }
     }
 
 
@@ -127,7 +148,65 @@ public class WFSWorkerTest {
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
         assertEquals(xmlExpResult, xmlResult);
-        
+
+        /**
+         * Test 3 : query on typeName samplingPoint
+         */
+
+        queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        xmlResult    = featureWriter.write(result);
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection.xml"));
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        assertEquals(xmlExpResult, xmlResult);
+
+        /**
+         * Test 4 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
+         */
+
+        queries = new ArrayList<QueryType>();
+        ComparisonOpsType pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("name"), Boolean.TRUE);
+        FilterType filter = new FilterType(pe);
+        queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        xmlResult    = featureWriter.write(result);
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2.xml"));
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        assertEquals(xmlExpResult, xmlResult);
+
+        /**
+         * Test 5 : query on typeName samplingPoint whith a filter id = station-001 TODO
+         
+
+        queries = new ArrayList<QueryType>();
+        pe = new PropertyIsEqualToType(new LiteralType("station-001"), new PropertyNameType("id"), Boolean.TRUE);
+        filter = new FilterType(pe);
+        queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        xmlResult    = featureWriter.write(result);
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2.xml"));
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        assertEquals(xmlExpResult, xmlResult);
+        */
     }
 
     /**
@@ -136,14 +215,45 @@ public class WFSWorkerTest {
      */
     @Test
     public void DescribeFeatureTest() throws Exception {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+
+        /**
+         * Test 1 : describe Feature type bridges
+         */
+        List<QName> typeNames = new ArrayList<QName>();
+        typeNames.add(new QName("Bridges", "Bridges"));
+        DescribeFeatureTypeType request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
+
+        Schema result = worker.describeFeatureType(request);
+
+        Schema ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/bridge.xsd"));
+
+        assertEquals(ExpResult, result);
+
+        /**
+         * Test 2 : describe Feature type Sampling point
+         */
+        typeNames = new ArrayList<QName>();
+        typeNames.add(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
+        request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.describeFeatureType(request);
+
+        ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/sampling.xsd"));
+
+        assertEquals(ExpResult, result);
     }
 
 
-    private static void initFeatureSource() throws IOException {
+    private static void initFeatureSource() throws Exception {
 
          final File outputDir = initDataDirectory();
 
-        // Defines a ShapeFile data provider
+        /****************************************
+         *                                      *
+         * Defines a ShapeFile data provider    *
+         *                                      *
+         ****************************************/
         final ProviderSource sourceShape = new ProviderSource();
         sourceShape.loadAll = true;
         sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
@@ -181,6 +291,41 @@ public class WFSWorkerTest {
             // Here we should have the shapefile data provider defined previously
             if (service instanceof ShapeFileProviderService) {
                 service.init(configShape);
+                if (service.getProviders().isEmpty()) {
+                    return;
+                }
+                break;
+            }
+        }
+
+        /****************************************
+         *                                      *
+         *    Defines a O&M data provider       *
+         *                                      *
+         ****************************************/
+
+        final String url = "jdbc:derby:memory:TestWFSWorker";
+        ds = new DefaultDataSource(url + ";create=true");
+
+        Connection con = ds.getConnection();
+
+        Util.executeSQLScript("org/constellation/wfs/sql/structure-observations.sql", con);
+        Util.executeSQLScript("org/constellation/wfs/sql/sos-data.sql", con);
+
+        con.close();
+        
+        final ProviderSource sourceOM = new ProviderSource();
+        sourceOM.loadAll = true;
+        sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
+        sourceOM.parameters.put(OMProvider.KEY_DERBYURL, url);
+
+        final ProviderConfig configOM = new ProviderConfig();
+        configOM.sources.add(sourceOM);
+
+        for (NamedLayerProviderService service : NamedLayerProviderProxy.getInstance().getServices()) {
+            // Here we should have the shapefile data provider defined previously
+            if (service instanceof OMProviderService) {
+                service.init(configOM);
                 if (service.getProviders().isEmpty()) {
                     return;
                 }
