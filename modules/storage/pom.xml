@@ -101,6 +101,7 @@
     <module>provider-data-postgrid</module>
     <module>provider-data-shapefile</module>
     <module>provider-data-sml</module>
+    <module>provider-data-om</module>
     <module>provider-style-sld</module>
     <module>provider-style-unnormalize</module>
   </modules>
