@@ -47,7 +47,8 @@ import org.constellation.ws.rs.WebService;
 import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.data.collection.FeatureCollectionGroup;
-import org.geotoolkit.data.query.DefaultQuery;
+import org.geotoolkit.data.query.Query;
+import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
@@ -458,18 +459,18 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
                 sortBys.addAll(util.getTransformer110().visitSortBy(jaxbSortBy));
             }
 
-            final DefaultQuery fsQuery = new DefaultQuery();
-            fsQuery.setFilter(filter);
-            fsQuery.setCoordinateSystem(crs);
-            fsQuery.setCoordinateSystemReproject(crs);
+            final QueryBuilder queryBuilder = new QueryBuilder()
+                    .setFilter(filter)
+                    .setCRS(crs);
+
             if(!propNames.isEmpty()){
-                fsQuery.setPropertyNames(propNames);
+                queryBuilder.setProperties(propNames.toArray(new String[propNames.size()]));
             }
             if(!sortBys.isEmpty()){
-                fsQuery.setSortBy(sortBys.toArray(new SortBy[sortBys.size()]));
+                queryBuilder.setSortBy(sortBys.toArray(new SortBy[sortBys.size()]));
             }
             if(maxFeatures != null){
-                fsQuery.setMaxFeatures(maxFeatures);
+                queryBuilder.setMaxFeatures(maxFeatures);
             }
 
             for (QName typeName : typeNames) {
@@ -478,7 +479,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
                 layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(typeName));
             }
                 try {
-                    collections.add(layer.getSource().getFeatures(fsQuery));
+                    collections.add(layer.getSource().getFeatures(queryBuilder.buildQuery()));
                 } catch (IOException ex) {
                     throw new CstlServiceException(ex);
                 }

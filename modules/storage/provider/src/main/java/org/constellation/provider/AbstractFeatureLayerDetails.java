@@ -35,13 +35,13 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.ws.ServiceType;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.data.query.DefaultQuery;
 import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.query.Query;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.DefaultGlyphService;
 import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.data.collection.FeatureIterator;
+import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.filter.text.cql2.CQL;
 import org.geotoolkit.filter.text.cql2.CQLException;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
@@ -216,8 +216,10 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
                 return dates;
             }
             
-            final DefaultQuery query = new DefaultQuery();
-            query.setPropertyNames(new String[]{dateStartField});
+            final Query query = new QueryBuilder()
+                    .setTypeName(fs.getSchema().getName())
+                    .setProperties(new String[]{dateStartField})
+                    .buildQuery();
             
             FeatureIterator<SimpleFeature> features = null;
             try{
@@ -263,9 +265,11 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
                 LOGGER.log(Level.WARNING , "Invalide field type for elevations, layer " + name +", must be a Number, found a " + type);
                 return elevations;
             }
-            
-            final DefaultQuery query = new DefaultQuery();
-            query.setPropertyNames(new String[]{elevationStartField});
+
+            final Query query = new QueryBuilder()
+                    .setTypeName(fs.getSchema().getName())
+                    .setProperties(new String[]{elevationStartField})
+                    .buildQuery();
             
             FeatureIterator<SimpleFeature> features = null;
             try{
@@ -329,7 +333,9 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     }
 
     protected Query createQuery(final Date date, final Number elevation){
-        final DefaultQuery query = new DefaultQuery();
+        final QueryBuilder queryBuilder = new QueryBuilder();
+        queryBuilder.setTypeName(fs.getSchema().getName());
+        
         final StringBuilder builder = new StringBuilder();
         
         if (date != null && this.dateStartField != null) {
@@ -354,13 +360,13 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
         final String cqlQuery = builder.toString();
         if(cqlQuery != null && !cqlQuery.isEmpty()){
             try {
-                query.setFilter(CQL.toFilter(cqlQuery));
+                queryBuilder.setFilter(CQL.toFilter(cqlQuery));
             } catch (CQLException ex) {
                 LOGGER.log(Level.SEVERE, "Could not parse CQL query", ex);
             }
         }
         
-        return query;
+        return queryBuilder.buildQuery();
     }
     
     protected abstract MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws IOException;
