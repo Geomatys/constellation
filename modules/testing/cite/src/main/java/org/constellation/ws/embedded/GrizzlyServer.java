@@ -33,6 +33,8 @@ import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
+import org.constellation.provider.postgis.PostGisProvider;
+import org.constellation.provider.postgis.PostGisProviderService;
 import org.constellation.provider.postgrid.PostGridProvider;
 import org.constellation.provider.postgrid.PostGridProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
@@ -90,22 +92,22 @@ public final class GrizzlyServer {
         PostgridTestCase.init();
 
         // Defines a PostGrid data provider
-        final ProviderSource source = new ProviderSource();
-        source.parameters.put(PostGridProvider.KEY_DATABASE, "jdbc:postgresql://hyperion.geomatys.com/coverages-test");
-        source.parameters.put(PostGridProvider.KEY_DRIVER,   "org.postgresql.Driver");
-        source.parameters.put(PostGridProvider.KEY_PASSWORD, "g3ouser");
-        source.parameters.put(PostGridProvider.KEY_READONLY, "true");
+        final ProviderSource sourcePostGrid = new ProviderSource();
+        sourcePostGrid.parameters.put(PostGridProvider.KEY_DATABASE, "jdbc:postgresql://hyperion.geomatys.com/coverages-test");
+        sourcePostGrid.parameters.put(PostGridProvider.KEY_DRIVER,   "org.postgresql.Driver");
+        sourcePostGrid.parameters.put(PostGridProvider.KEY_PASSWORD, "g3ouser");
+        sourcePostGrid.parameters.put(PostGridProvider.KEY_READONLY, "true");
         final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-        source.parameters.put(PostGridProvider.KEY_ROOT_DIRECTORY, rootDir);
-        source.parameters.put(PostGridProvider.KEY_USER,     "geouser");
+        sourcePostGrid.parameters.put(PostGridProvider.KEY_ROOT_DIRECTORY, rootDir);
+        sourcePostGrid.parameters.put(PostGridProvider.KEY_USER,     "geouser");
 
-        final ProviderConfig config = new ProviderConfig();
-        config.sources.add(source);
+        final ProviderConfig configPostGrid = new ProviderConfig();
+        configPostGrid.sources.add(sourcePostGrid);
 
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             // Here we should have the postgrid data provider defined previously
             if (service instanceof PostGridProviderService) {
-                service.init(config);
+                service.init(configPostGrid);
                 if (service.getProviders().isEmpty()) {
                     return;
                 }
@@ -174,6 +176,29 @@ public final class GrizzlyServer {
             // Here we should have the shapefile data provider defined previously
             if (service instanceof ShapeFileProviderService) {
                 service.init(configShape);
+                if (service.getProviders().isEmpty()) {
+                    return;
+                }
+                break;
+            }
+        }
+
+        // Defines a PostGis data provider
+        final ProviderSource sourcePostGis = new ProviderSource();
+        sourcePostGis.parameters.put(PostGisProvider.KEY_DATABASE, "cite-wfs");
+        sourcePostGis.parameters.put(PostGisProvider.KEY_HOST,     "crios.geomatys.com");
+        sourcePostGis.parameters.put(PostGisProvider.KEY_SCHEMA,   "public");
+        sourcePostGis.parameters.put(PostGisProvider.KEY_USER,     "geouser");
+        sourcePostGis.parameters.put(PostGisProvider.KEY_PASSWD,   "g3ouser");
+
+        final ProviderConfig configPostGis = new ProviderConfig();
+        configPostGis.sources.add(sourcePostGis);
+        sourcePostGis.loadAll = true;
+
+        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
+            // Here we should have the postgis data provider defined previously
+            if (service instanceof PostGisProviderService) {
+                service.init(configPostGis);
                 if (service.getProviders().isEmpty()) {
                     return;
                 }

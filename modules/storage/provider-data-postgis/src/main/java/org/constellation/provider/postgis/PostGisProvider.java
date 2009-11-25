@@ -180,7 +180,6 @@ public class PostGisProvider implements LayerProvider{
         if (!index.contains(key)) {
             return null;
         }
-        final ProviderLayer layer = source.getLayer(key);
         final FeatureSource<SimpleFeatureType, SimpleFeature> fs;
         try {
             fs = store.getFeatureSource(key);
@@ -192,10 +191,22 @@ public class PostGisProvider implements LayerProvider{
         if (fs == null) {
             return null;
         }
-        final List<String> styles = layer.styles;
-        return new PostGisLayerDetails(key, fs, styles,
-                layer.dateStartField, layer.dateEndField,
-                layer.elevationStartField, layer.elevationEndField);
+        final ProviderLayer layer = source.getLayer(key);
+        if (layer == null) {
+            try {
+                return new PostGisLayerDetails(key, store.getFeatureSource(key), null,
+                        null, null, null, null);
+            } catch (IOException ex) {
+                //we could not create the feature source
+                LOGGER.log(Level.SEVERE, "we could not create the feature source", ex);
+            }
+        } else {
+            final List<String> styles = layer.styles;
+            return new PostGisLayerDetails(key, fs, styles,
+                    layer.dateStartField, layer.dateEndField,
+                    layer.elevationStartField, layer.elevationEndField);
+        }
+        return null;
     }
 
     /**
@@ -225,7 +236,7 @@ public class PostGisProvider implements LayerProvider{
     private void visit() {
         try {
             for (final String name : store.getTypeNames()) {
-                if (source.containsLayer(name)) {
+                if (source.loadAll || source.containsLayer(name)) {
                     index.add(name);
                 }
             }
