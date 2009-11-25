@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.NamedLayerProviderProxy;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.rs.WebService;
 
 // Geotoolkit dependencies
@@ -80,16 +82,19 @@ import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.data.store.EmptyFeatureCollection;
 
 // GeoAPI dependencies
+import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.sort.SortBy;
+import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import org.opengis.referencing.operation.TransformException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -157,8 +162,16 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
 
-        //types possible, providers gives this list-----------------------------
-        final FeatureTypeListType ftl     = new FeatureTypeListType();
+        final String url = getUriContext().getBaseUri().toString();
+
+        OGCWebService.updateOWSURL(inCapabilities.getOperationsMetadata().getOperation(), url, "WFS");
+
+        /*
+         *  Unamed provider
+         * 
+         * types possible, providers gives this list-----------------------------
+         *
+         */
         final List<FeatureTypeType> types = new ArrayList<FeatureTypeType>();
         final LayerProviderProxy proxy    = LayerProviderProxy.getInstance();
         for (final String layerName : proxy.getKeys()) {
@@ -193,6 +206,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
             }
         }
 
+        /*
+         *  Named provider
+         */
         final NamedLayerProviderProxy namedProxy    = NamedLayerProviderProxy.getInstance();
         for (final Name layerName : namedProxy.getKeys()) {
             final LayerDetails layer = namedProxy.get(layerName);
@@ -225,12 +241,12 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
 
             }
         }
-        ftl.setFeatureType(types);
-        inCapabilities.setFeatureTypeList(ftl);
+
+        inCapabilities.setFeatureTypeList(new FeatureTypeListType(null, types));
 
         //todo ...etc...--------------------------------------------------------
         inCapabilities.getOperationsMetadata();
-        inCapabilities.setFilterCapabilities(null);
+        //inCapabilities.setFilterCapabilities(null);
         inCapabilities.setServesGMLObjectTypeList(null);
         inCapabilities.setSupportsGMLObjectTypeList(null);
         inCapabilities.getSupportsGMLObjectTypeList();
@@ -422,14 +438,14 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
             final List<SortBy> sortBys   = new ArrayList<SortBy>();
 
             //decode filter-----------------------------------------------------
-            if(jaxbFilter != null){
+            if (jaxbFilter != null){
                 filter = util.getTransformer110().visitFilter(jaxbFilter);
             }else{
                 filter = Filter.INCLUDE;
             }
 
             //decode crs--------------------------------------------------------
-            if(srs != null){
+            if (srs != null){
                 try {
                     crs = CRS.decode(srs, true);
                     //todo use other properties to filter properly
@@ -438,17 +454,17 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
                 } catch (FactoryException ex) {
                     throw new CstlServiceException(ex);
                 }
-            }else{
+            } else {
                 crs = null;
             }
 
             //decode property names---------------------------------------------
             for (Object obj : properties) {
-                if(obj instanceof JAXBElement){
+                if (obj instanceof JAXBElement){
                     obj = ((JAXBElement)obj).getValue();
                 }
 
-                if(obj instanceof PropertyNameType){
+                if (obj instanceof PropertyNameType){
                     final PropertyName pn = util.getTransformer110().visitPropertyName((PropertyNameType) obj);
                     propNames.add(pn.getPropertyName());
                 }
@@ -466,7 +482,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
             if(!propNames.isEmpty()){
                 queryBuilder.setProperties(propNames.toArray(new String[propNames.size()]));
             }
-            if(!sortBys.isEmpty()){
+            if (!sortBys.isEmpty()) {
                 queryBuilder.setSortBy(sortBys.toArray(new SortBy[sortBys.size()]));
             }
             if(maxFeatures != null){
@@ -474,10 +490,20 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
             }
 
             for (QName typeName : typeNames) {
-            FeatureLayerDetails layer = (FeatureLayerDetails)proxy.get(typeName.getLocalPart());
-            if (layer == null) {
-                layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(typeName));
-            }
+
+                FeatureLayerDetails layer = (FeatureLayerDetails)proxy.get(typeName.getLocalPart());
+                if (layer == null) {
+                    layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(typeName));
+                }
+                FeatureType ft = layer.getSource().getSchema();
+                queryBuilder.setTypeName(ft.getName());
+                Collection<String> filterProperties =  (Collection<String>) filter.accept(ListingPropertyVisitor.VISITOR, null);
+                for (String filterProperty : filterProperties) {
+                    if (ft.getDescriptor(filterProperty) == null) {
+                        throw new CstlServiceException("The feature Type " + typeName + " does not has such a property:" + filterProperty);
+                    }
+                }
+
                 try {
                     collections.add(layer.getSource().getFeatures(queryBuilder.buildQuery()));
                 } catch (IOException ex) {
@@ -541,43 +567,48 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
     private static WGS84BoundingBoxType toBBox(FeatureSource source) throws CstlServiceException{
         try {
             final JTSEnvelope2D env = source.getBounds();
+//            if (env != null) {
+//                if(CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), EPSG4326)){
+//                Envelope enveloppe = CRS.transform(env, EPSG4326);
+//                WGS84BoundingBoxType bbox =  new WGS84BoundingBoxType(
+//                           env.getMinimum(0),
+//                           env.getMinimum(1),
+//                           env.getMaximum(0),
+//                           env.getMaximum(1));
+//                // fixed value by the standard
+//                bbox.setCrs("urn:ogc:def:crs:OGC:2:84");
+//                return bbox;
+//            } else {
+//                return new WGS84BoundingBoxType(-180, -90, 180, 90);
+//            }
+
+            final CoordinateReferenceSystem EPSG4326 = CRS.decode("EPSG:4326");
             if (env != null) {
-                WGS84BoundingBoxType bbox =  new WGS84BoundingBoxType(
+                if (CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), EPSG4326)) {
+                   return new WGS84BoundingBoxType(
+                           "urn:ogc:def:crs:OGC:2:84",
                            env.getMinimum(0),
                            env.getMinimum(1),
                            env.getMaximum(0),
                            env.getMaximum(1));
-                bbox.setCrs(CRS.lookupIdentifier(env.getCoordinateReferenceSystem(),true));
-                return bbox;
+                } else {
+                    Envelope enveloppe = CRS.transform(env, EPSG4326);
+                    return new WGS84BoundingBoxType(
+                            "urn:ogc:def:crs:OGC:2:84",
+                           enveloppe.getMinimum(0),
+                           enveloppe.getMinimum(1),
+                           enveloppe.getMaximum(0),
+                           enveloppe.getMaximum(1));
+                }
             } else {
-                return new WGS84BoundingBoxType(-180, -90, 180, 90);
+                return new WGS84BoundingBoxType("urn:ogc:def:crs:OGC:2:84", -180, -90, 180, 90);
             }
-
-
-//            final CoordinateReferenceSystem EPSG4326 = CRS.decode("EPSG:4326");
-
-//            if(CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), EPSG4326)){
-//               Envelope enveloppe = CRS.transform(env, EPSG4326);
-//               return new WGS84BoundingBoxType(
-//                       enveloppe.getMinimum(0),
-//                       enveloppe.getMinimum(1),
-//                       enveloppe.getMaximum(0),
-//                       enveloppe.getMaximum(1));
-//            }else{
-//                return new WGS84BoundingBoxType(
-//                       env.getMinimum(0),
-//                       env.getMinimum(1),
-//                       env.getMaximum(0),
-//                       env.getMaximum(1));
-//            }
 
         } catch (IOException ex) {
             throw new CstlServiceException(ex);
-        }
-//        catch (TransformException ex) {
-//            throw new CstlServiceException(ex);
-//        } 
-        catch (FactoryException ex) {
+        } catch (TransformException ex) {
+            throw new CstlServiceException(ex);
+        } catch (FactoryException ex) {
             throw new CstlServiceException(ex);
         }
     }

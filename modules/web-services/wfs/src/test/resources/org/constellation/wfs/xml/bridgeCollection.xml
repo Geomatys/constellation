@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <gml:FeatureCollection gml:id="collection-1" xmlns:gml="http://www.opengis.net/gml">
     <gml:boundedBy>
-        <gml:Envelope gml:srsName="EPSG:4326">
+        <gml:Envelope srsName="EPSG:4326">
             <gml:lowerCorner>2.0E-4 7.0E-4</gml:lowerCorner>
             <gml:upperCorner>2.0E-4 7.0E-4</gml:upperCorner>
         </gml:Envelope>

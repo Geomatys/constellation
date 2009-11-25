@@ -41,6 +41,7 @@ import org.constellation.provider.om.OMProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.util.Util;
+import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.data.store.EmptyFeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
@@ -188,6 +189,27 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
+         * Test 6 : query on typeName samplingPoint whith a filter with unexpected property
+         */
+
+        queries = new ArrayList<QueryType>();
+        pe = new PropertyIsEqualToType(new LiteralType("whatever"), new PropertyNameType("wrongProperty"), Boolean.TRUE);
+        filter = new FilterType(pe);
+        queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        boolean exLaunched = false;
+        try {
+            result = worker.getFeature(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+        }
+
+        assertTrue(exLaunched);
+        
+
+
+        /**
          * Test 5 : query on typeName samplingPoint whith a filter id = station-001 TODO
          
 
@@ -210,7 +232,7 @@ public class WFSWorkerTest {
     }
 
     /**
-     * test the feature marshall
+     * 
      *
      */
     @Test

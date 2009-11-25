@@ -52,9 +52,9 @@ import org.xml.sax.SAXException;
 
 
 /**
- * SensorML Data provider. index and cache Datastores for the specified database (MDWeb strcuture).
+ * Observation and Measurmement Data provider. index and cache Datastores for the specified database.
  *
- * @version $Id: ShapeFileProvider.java 1870 2009-10-07 08:09:43Z eclesia $
+ * @version $Id:
  *
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)

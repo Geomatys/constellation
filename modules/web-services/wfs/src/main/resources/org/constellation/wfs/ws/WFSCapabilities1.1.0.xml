@@ -130,10 +130,6 @@ xmlns:ins="http://www.inspire.org">
             </ogc:ComparisonOperators>
             <ogc:ArithmeticOperators>
                 <ogc:SimpleArithmetic/>
-                <ogc:Functions>
-                    <ogc:FunctionNames>
-                    </ogc:FunctionNames>
-                </ogc:Functions>
             </ogc:ArithmeticOperators>
         </ogc:Scalar_Capabilities>
         <ogc:Id_Capabilities>
