@@ -33,14 +33,12 @@ import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.XmlFeatureTypeReader;
 import org.geotoolkit.feature.xml.XmlFeatureTypeWriter;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureReader;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureWriter;
-
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
@@ -75,8 +73,8 @@ public class StreamOMFeatureXmlBindingTest {
 
         Connection con = ds.getConnection();
 
-        Util.executeSQLScript("org/constellation/wfs/sql/structure-observations.sql", con);
-        Util.executeSQLScript("org/constellation/wfs/sql/sos-data.sql", con);
+        Util.executeSQLScript("org/constellation/sql/structure-observations.sql", con);
+        Util.executeSQLScript("org/constellation/sql/sos-data.sql", con);
 
         FeatureReader fr = PostgisUtils.createEmbeddedOMLayer(url, "SamplingPoint");
         featureType      = fr.getFeatureType();

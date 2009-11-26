@@ -8,7 +8,7 @@
     <sa:sampledFeature xlink:href="urn:-sandre:object:bdrhf:123X"/>
     <sa:position>
         <gml:Point gml:id="STATION-LOCALISATION">
-            <gml:pos srsName="urn:ogc:crs:EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
+            <gml:pos srsName="urn:ogc:def:crs:EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
         </gml:Point>
     </sa:position>
 </sa:SamplingPoint>

@@ -121,15 +121,6 @@ public class OMProvider implements NamedLayerProvider {
 
         store = DataStoreFinder.getDataStore(params);
         if (store == null) {
-            LOGGER.info("le finder a foiré");
-            OMDataStoreFactory fact = new OMDataStoreFactory();
-            store = fact.createDataStore(params);
-        } else {
-            LOGGER.info("le finder a marché");
-        }
-        
-
-        if (store == null) {
             final StringBuilder sb = new StringBuilder("Could not connect to O&M : \n");
             for(final Map.Entry<String,Serializable> entry : params.entrySet()){
                 if (entry.getKey().equals(KEY_PASSWD)) {

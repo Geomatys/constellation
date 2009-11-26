@@ -63,8 +63,8 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
         Connection con = ds.getConnection();
 
-        Util.executeSQLScript("org/constellation/sos/sql/structure-observations.sql", con);
-        Util.executeSQLScript("org/constellation/sos/sql/sos-data.sql", con);
+        Util.executeSQLScript("org/constellation/sql/structure-observations.sql", con);
+        Util.executeSQLScript("org/constellation/sql/sos-data.sql", con);
        
 
         MarshallerPool pool   = new MarshallerPool(org.constellation.configuration.ObjectFactory.class);

@@ -329,8 +329,8 @@ public class WFSWorkerTest {
 
         Connection con = ds.getConnection();
 
-        Util.executeSQLScript("org/constellation/wfs/sql/structure-observations.sql", con);
-        Util.executeSQLScript("org/constellation/wfs/sql/sos-data.sql", con);
+        Util.executeSQLScript("org/constellation/sql/structure-observations.sql", con);
+        Util.executeSQLScript("org/constellation/sql/sos-data.sql", con);
 
         con.close();
         

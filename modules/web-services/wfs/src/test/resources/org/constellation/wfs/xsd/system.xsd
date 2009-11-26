@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xsd:schema elementFormDefault="qualified" targetNamespace="http://www.opengis.net/sml/1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:gml="http://www.opengis.net/gml" xmlns:sml="http://www.opengis.net/sml/1.0" >
+    <xsd:import schemaLocation="http://schemas.opengis.net/gml/3.1.1/base/gml.xsd" namespace="http://www.opengis.net/gml"/>
+    <xsd:element name="System" type="sml:SystemType" />
+    <xsd:complexType name="SystemType">
+        <xsd:complexContent>
+            <xsd:extension base="gml:_Feature" >
+                <xsd:sequence>
+                    <xsd:element name="description" maxOccurs="1" minOccurs="0" type="xsd:string"/>
+                    <xsd:element name="name" maxOccurs="1" minOccurs="1" type="xsd:string"/>
+                    <xsd:element name="keywords" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
+                    <xsd:element name="phenomenons" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
+                    <xsd:element name="smltype" maxOccurs="1" minOccurs="1" type="xsd:string"/>
+                    <xsd:element name="smlref" maxOccurs="1" minOccurs="1" type="xsd:string"/>
+                    <xsd:element name="inputs" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
+                    <xsd:element name="outputs" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
+                    <xsd:element name="producer" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
+                    <xsd:element name="components" maxOccurs="unbounded" minOccurs="0" type="xsd:string"/>
+                    <xsd:element name="location" maxOccurs="1" minOccurs="1" type="gml:Point"/>
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+</xsd:schema>

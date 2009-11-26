@@ -21,8 +21,8 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import java.io.File;
 import java.io.InputStream;
-
 import java.sql.Connection;
+
 import org.constellation.util.Util;
 import org.constellation.wfs.utils.PostgisUtils;
 
@@ -38,23 +38,25 @@ import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
-
 import org.geotoolkit.internal.sql.DefaultDataSource;
+
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.FeatureType;
 
 import org.junit.*;
+import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import static org.junit.Assert.*;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class OMFeatureXmlBindingTest {
+public class SMLFeatureXmlBindingTest {
 
     private static DefaultDataSource ds = null;
-    
+
     private static FeatureCollection fcoll;
 
     private XmlFeatureWriter featureWriter;
@@ -69,15 +71,16 @@ public class OMFeatureXmlBindingTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        final String url = "jdbc:derby:memory:TestOM;create=true";
+        final String url = "jdbc:derby:memory:TestSML;create=true";
         ds = new DefaultDataSource(url);
 
         Connection con = ds.getConnection();
 
-        Util.executeSQLScript("org/constellation/sql/structure-observations.sql", con);
-        Util.executeSQLScript("org/constellation/sql/sos-data.sql", con);
+        Util.executeSQLScript("org/constellation/wfs/sql/structure-mdweb.sql", con);
+        Util.executeSQLScript("org/constellation/wfs/sql/sml-schema.sql", con);
+        Util.executeSQLScript("org/constellation/wfs/sql/sml-data.sql", con);
 
-        FeatureReader fr = PostgisUtils.createEmbeddedOMLayer(url, "SamplingPoint");
+        FeatureReader fr = PostgisUtils.createEmbeddedSMLLayer(url, "System");
         featureType      = fr.getFeatureType();
         fcoll            = new DefaultFeatureCollection("collection-1", (SimpleFeatureType) featureType);
         while (fr.hasNext()) {
@@ -126,12 +129,11 @@ public class OMFeatureXmlBindingTest {
 
         String result = featureWriter.write(feature);
 
-        String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPoint-1.xml"));
+        String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.system-1.xml"));
 
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
-        expresult = expresult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
 
         assertEquals(expresult, result);
     }
@@ -144,12 +146,11 @@ public class OMFeatureXmlBindingTest {
     public void featureCollectionMarshallTest() throws Exception {
         String result = featureWriter.write(fcoll);
 
-        String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection.xml"));
+        String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"));
 
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
-        expresult = expresult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
 
         // and we replace the space for the specified data
         assertEquals(expresult, result);
@@ -169,10 +170,10 @@ public class OMFeatureXmlBindingTest {
         }
         ite.close();
 
-        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/samplingPoint-1.xml");
+        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/system-1.xml");
         SimpleFeature result = (SimpleFeature) featureReader.read(stream);
         assertTrue(result != null);
-        
+
         featureEquals(expResult, result);
     }
 
@@ -183,7 +184,7 @@ public class OMFeatureXmlBindingTest {
     @Test
     public void featureCollectionUnMarshallTest() throws Exception {
 
-        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/samplingPointCollection.xml");
+        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/systemCollection-1.xml");
         FeatureCollection result = (FeatureCollection) featureReader.read(stream);
         assertTrue(result != null);
 
@@ -212,7 +213,7 @@ public class OMFeatureXmlBindingTest {
     @Test
     public void featuretypeUnMarshallTest() throws Exception {
 
-        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xsd/sampling.xsd");
+        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xsd/system.xsd");
         FeatureType result  = featureTypeReader.read(stream, "SamplingPoint");
 
 //        assertEquals(featureType, result);
@@ -225,7 +226,7 @@ public class OMFeatureXmlBindingTest {
      */
     @Test
     public void featuretypeMarshallTest() throws Exception {
-        String expResult = Util.stringFromFile(Util.getFileFromResource("org/constellation/wfs/xsd/sampling.xsd"));
+        String expResult = Util.stringFromFile(Util.getFileFromResource("org/constellation/wfs/xsd/system.xsd"));
         String result    = featureTypeWriter.write(featureType);
 
         expResult = removeXmlns(expResult);
@@ -242,11 +243,16 @@ public class OMFeatureXmlBindingTest {
         assertEquals(expResult.getFeatureType(), result.getFeatureType());
         assertEquals(expResult.getAttributeCount(), result.getAttributeCount());
 
+        PropertyDescriptor[] descriptors = featureType.getDescriptors().toArray(new PropertyDescriptor[featureType.getDescriptors().size()]);
+
         for (int j = 0; j < expResult.getAttributeCount(); j++) {
             if (expResult.getAttributes().get(j) instanceof Geometry) {
                 assertTrue(((Geometry) expResult.getAttributes().get(j)).equals((Geometry) result.getAttributes().get(j)));
             } else {
-                assertEquals(expResult.getAttributes().get(j), result.getAttributes().get(j));
+
+                Name n = descriptors[j].getName();
+                assertEquals("attribute:" + n + " exp value:" + expResult.getAttributes().get(j) + " res value:" + result.getAttributes().get(j),
+                             expResult.getAttributes().get(j), result.getAttributes().get(j));
             }
         }
         assertEquals(expResult, result);

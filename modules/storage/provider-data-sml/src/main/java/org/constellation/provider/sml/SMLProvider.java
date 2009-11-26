@@ -112,15 +112,6 @@ public class SMLProvider implements NamedLayerProvider {
 
         store = DataStoreFinder.getDataStore(params);
         if (store == null) {
-            LOGGER.info("le finder a foiré");
-            SMLDataStoreFactory fact = new SMLDataStoreFactory();
-            store = fact.createDataStore(params);
-        } else {
-            LOGGER.info("le finder a marché");
-        }
-        
-
-        if (store == null) {
             final StringBuilder sb = new StringBuilder("Could not connect to SML : \n");
             for(final Map.Entry<String,Serializable> entry : params.entrySet()){
                 if (entry.getKey().equals(KEY_PASSWD)) {

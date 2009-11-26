@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sml:System gml:id="2" xmlns:gml="http://www.opengis.net/gml" xmlns:sml="http://www.opengis.net/sml/1.0">
+    <gml:description>information about the piezometer</gml:description>
+    <gml:name>Piezometer Test</gml:name>
+    <sml:keywords>piezometer</sml:keywords>
+    <sml:keywords>geosciences</sml:keywords>
+    <sml:keywords>point d'eau</sml:keywords>
+    <sml:phenomenons>time</sml:phenomenons>
+    <sml:phenomenons>depth</sml:phenomenons>
+    <sml:phenomenons>validity</sml:phenomenons>
+    <sml:smltype>System</sml:smltype>
+    <sml:smlref>http://ades.eaufrance.fr/FichePtEau.aspx?code=10972X0137/PONT</sml:smlref>
+    <sml:inputs name="level">urn:x-ogc:def:phenomenon:OGC:level</sml:inputs>
+    <sml:outputs name="time">urn:x-ogc:def:phenomenon:observationTime</sml:outputs>
+    <sml:outputs name="validity">urn:x-ogc:def:phenomenon:BRGM:validity</sml:outputs>
+    <sml:outputs name="depth">urn:x-ogc:def:phenomenon:OGC:depth</sml:outputs>
+    <sml:location>
+        <gml:Point srsName="EPSG:27582">
+            <gml:pos srsName="EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
+        </gml:Point>
+    </sml:location>
+</sml:System>

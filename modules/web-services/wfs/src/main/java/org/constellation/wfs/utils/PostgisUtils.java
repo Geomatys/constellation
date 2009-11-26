@@ -35,6 +35,7 @@ import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
 import org.geotoolkit.data.collection.FeatureCollection;
 
+import org.geotoolkit.data.sml.SMLDataStoreFactory;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
@@ -74,6 +75,22 @@ public class PostgisUtils {
        params.put(OMDataStoreFactory.DERBYURL.getName().toString(), url);
 
        final DataStore store = DataStoreFinder.getDataStore(params);
+       if (store != null) {
+            return store.getFeatureReader(featureType);
+       }
+       return null;
+   }
+
+    public static FeatureReader createEmbeddedSMLLayer(String url, String featureType) throws IOException {
+
+       final Map params = new HashMap<String, Object>();
+
+       params.put("dbtype", "SML");
+       params.put(SMLDataStoreFactory.SGBDTYPE.getName().toString(), "derby");
+       params.put(SMLDataStoreFactory.DERBYURL.getName().toString(), url);
+
+       final DataStore store = DataStoreFinder.getDataStore(params);
+        System.out.println(store.getClass().getSimpleName());
        if (store != null) {
             return store.getFeatureReader(featureType);
        }
