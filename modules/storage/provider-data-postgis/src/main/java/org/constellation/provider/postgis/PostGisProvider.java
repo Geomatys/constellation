@@ -113,10 +113,12 @@ public class PostGisProvider implements LayerProvider{
         final String database = source.parameters.get(KEY_DATABASE);
         final String user       = source.parameters.get(KEY_USER);
         final String passwd     = source.parameters.get(KEY_PASSWD);
+        final String namespace     = source.parameters.get(KEY_NAMESPACE);
         params.put(KEY_SCHEMA, schema);
         params.put(KEY_DATABASE, database);
         params.put(KEY_USER, user);
         params.put(KEY_PASSWD, passwd);
+        params.put(KEY_NAMESPACE, namespace);
 
         store = DataStoreFinder.getDataStore(params);
 
