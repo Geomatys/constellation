@@ -49,7 +49,6 @@ import org.constellation.ws.rs.WebService;
 import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.data.collection.FeatureCollectionGroup;
-import org.geotoolkit.data.query.Query;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.Utils;
@@ -58,9 +57,6 @@ import org.geotoolkit.gml.xml.v311.AbstractGMLEntry;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
-import org.geotoolkit.ows.xml.AbstractDCP;
-import org.geotoolkit.ows.xml.AbstractHTTP;
-import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 import org.geotoolkit.ows.xml.v100.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sld.xml.XMLUtilities;
@@ -345,19 +341,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
          if (fileName != null)
             return new File(path, fileName);
          else return path;
-    }
-
-    /**
-     * update The URL in capabilities document with the service actual URL.
-     */
-    private void updateURL(final List<? extends AbstractDCP> dcpList, final String url) {
-        for(AbstractDCP dcp: dcpList) {
-            final AbstractHTTP http = dcp.getHTTP();
-            List<? extends AbstractOnlineResourceType> types = http.getGetOrPost();
-            for(AbstractOnlineResourceType aort : types){
-                aort.setHref(url + "wfs?SERVICE=WFS&");
-            }
-        }
     }
 
     /**

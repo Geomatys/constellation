@@ -103,8 +103,6 @@ public class WFSWorkerTest {
         }
     }
 
-
-
     @Before
     public void setUp() throws Exception {
         featureWriter     = new JAXPEventFeatureWriter();
