@@ -1,6 +1,5 @@
 <?xml version='1.0'?>
 <gml:BasicPolygons gml:id="BasicPolygons.1" xmlns:gml="http://www.opengis.net/gml">
-    <ID> </ID>
     <the_geom>
         <gml:MultiGeometry>
             <gml:geometryMember>
@@ -30,4 +29,5 @@
             </gml:geometryMember>
         </gml:MultiGeometry>
     </the_geom>
+    <ID> </ID>
 </gml:BasicPolygons>

@@ -8,7 +8,6 @@
     </gml:boundedBy>
     <gml:featureMember>
         <gml:BasicPolygons gml:id="BasicPolygons.1">
-            <ID> </ID>
             <the_geom>
                 <gml:MultiGeometry>
                     <gml:geometryMember>
@@ -38,11 +37,11 @@
                     </gml:geometryMember>
                 </gml:MultiGeometry>
             </the_geom>
+            <ID> </ID>
         </gml:BasicPolygons>
     </gml:featureMember>
     <gml:featureMember>
         <gml:BasicPolygons gml:id="BasicPolygons.2">
-            <ID> </ID>
             <the_geom>
                 <gml:MultiGeometry>
                     <gml:geometryMember>
@@ -72,11 +71,11 @@
                     </gml:geometryMember>
                 </gml:MultiGeometry>
             </the_geom>
+            <ID> </ID>
         </gml:BasicPolygons>
     </gml:featureMember>
     <gml:featureMember>
         <gml:BasicPolygons gml:id="BasicPolygons.3">
-            <ID> </ID>
             <the_geom>
                 <gml:MultiGeometry>
                     <gml:geometryMember>
@@ -106,6 +105,7 @@
                     </gml:geometryMember>
                 </gml:MultiGeometry>
             </the_geom>
+            <ID> </ID>
         </gml:BasicPolygons>
     </gml:featureMember>
 </wfs:FeatureCollection>

@@ -5,6 +5,11 @@
     <sml:keywords>piezometer</sml:keywords>
     <sml:keywords>geosciences</sml:keywords>
     <sml:keywords>point d'eau</sml:keywords>
+    <sml:location>
+        <gml:Point srsName="EPSG:27582">
+            <gml:pos srsName="EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
+        </gml:Point>
+    </sml:location>
     <sml:phenomenons>time</sml:phenomenons>
     <sml:phenomenons>depth</sml:phenomenons>
     <sml:phenomenons>validity</sml:phenomenons>
@@ -14,9 +19,4 @@
     <sml:outputs name="time">urn:x-ogc:def:phenomenon:observationTime</sml:outputs>
     <sml:outputs name="validity">urn:x-ogc:def:phenomenon:BRGM:validity</sml:outputs>
     <sml:outputs name="depth">urn:x-ogc:def:phenomenon:OGC:depth</sml:outputs>
-    <sml:location>
-        <gml:Point srsName="EPSG:27582">
-            <gml:pos srsName="EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
-        </gml:Point>
-    </sml:location>
 </sml:System>
