@@ -62,8 +62,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * Connection to an observation database through JDBC (<cite>Java Database Connectivity</cite>).
  * Connection parameters are stored in a {@code "config.xml"} configuration file stored in the
- * {@code "Application Data\Sicade"} user directory on Windows, or {@code ".sicade"} user
- * directory on Unix.
+ * {@code "Application Data\Constellation"} user directory on Windows, or {@code ".constellation"}
+ * user directory on Unix.
  *
  * @version $Id$
  * @author Martin Desruisseaux
@@ -72,12 +72,12 @@ public class Database {
     /**
      * The user directory where to store the configuration file on Unix platforms.
      */
-    private static final String UNIX_DIRECTORY = ".sicade";
+    private static final String UNIX_DIRECTORY = ".constellation";
 
     /**
      * The user directory where to store the configuration file on Windows platforms.
      */
-    private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
+    private static final String WINDOWS_DIRECTORY = "Application Data\\Constellation";
 
     /**
      * The file where to store configuration parameters.

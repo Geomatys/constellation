@@ -52,6 +52,7 @@ import org.constellation.configuration.UpdatePropertiesFileType;
 import org.constellation.configuration.UpdateXMLFileType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.util.Util;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
@@ -101,9 +102,9 @@ public class ConfigurationService extends AbstractWebService  {
     
     public static final Map<String, File> SERVCE_DIRECTORY = new HashMap<String, File>();
     static {
-        SERVCE_DIRECTORY.put("CSW",      new File(getSicadeDirectory(), "csw_configuration"));
-        SERVCE_DIRECTORY.put("SOS",      new File(getSicadeDirectory(), "sos_configuration"));
-        SERVCE_DIRECTORY.put("MDSEARCH", new File(getSicadeDirectory(), "mdweb/search"));
+        SERVCE_DIRECTORY.put("CSW",      new File(ConfigDirectory.getConfigDirectory(), "csw_configuration"));
+        SERVCE_DIRECTORY.put("SOS",      new File(ConfigDirectory.getConfigDirectory(), "sos_configuration"));
+        SERVCE_DIRECTORY.put("MDSEARCH", new File(ConfigDirectory.getConfigDirectory(), "mdweb/search"));
     }
     
     /**

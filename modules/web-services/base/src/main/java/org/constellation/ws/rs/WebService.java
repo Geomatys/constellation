@@ -18,11 +18,9 @@
 package org.constellation.ws.rs;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 
@@ -48,12 +46,12 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
 
 // Constellation dependencies
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
 // Geotoolkit dependencies
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.util.Versioned;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
@@ -127,18 +125,6 @@ public abstract class WebService {
      * Specifies if the process is running on a Glassfish application server.
      */
     private static final boolean RUNNING_ON_GLASSFISH;
-
-    /**
-     * The user directory where configuration files are stored on Unix platforms.
-     * TODO: How does this relate to the directories used in deployment? This is
-     *       in the home directory of the user running the container?
-     */
-    private static final String UNIX_DIRECTORY = ".sicade";
-
-    /**
-     * The user directory where configuration files are stored on Windows platforms.
-     */
-    private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
 
     static {
         RUNNING_ON_GLASSFISH = (System.getProperty("domain.name") != null) ? true : false;
@@ -472,7 +458,7 @@ public abstract class WebService {
          final String home = getServletContext().getRealPath("WEB-INF");
 
          if (home == null || !(path = new File(home)).isDirectory()) {
-            path = getSicadeDirectory();
+            path = ConfigDirectory.getConfigDirectory();
          }
          if (fileName != null)
             return new File(path, fileName);
@@ -487,50 +473,6 @@ public abstract class WebService {
      */
     protected String getServiceURL() {
         return getUriContext().getBaseUri().toString();
-    }
-
-    public static File getConfigDirectory() {
-        try {
-            final String path = getPropertyValue("Constellation", "config_dir");
-            if (path != null) {
-                final File folder = new File(path);
-                if (folder.exists() && folder.canRead() && folder.canWrite()) {
-                    return folder;
-                } else {
-                    try {
-                        folder.createNewFile();
-                        return folder;
-                    } catch (IOException ex) {
-                        LOGGER.log(Level.SEVERE,"", ex);
-                    }
-                }
-            } else {
-                LOGGER.log(Level.WARNING,"config_dir is not defined in the Constellation JNDI resource.");
-            }
-
-        } catch (NamingException ex) {
-            LOGGER.fine(ex.getMessage());
-        }
-        return getSicadeDirectory();
-    }
-
-    /**
-     * Return the ".sicade" directory.
-     *
-     * @return The ".sicade" directory containing.
-     * @deprecated This directory should not be used
-     */
-    @Deprecated
-    public static final File getSicadeDirectory() {
-        final File sicadeDirectory;
-        final String home = System.getProperty("user.home");
-
-        if (System.getProperty("os.name", "").startsWith("Windows")) {
-             sicadeDirectory = new File(home, WINDOWS_DIRECTORY);
-        } else {
-             sicadeDirectory = new File(home, UNIX_DIRECTORY);
-        }
-        return sicadeDirectory;
     }
 
     /**

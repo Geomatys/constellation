@@ -69,11 +69,11 @@ import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.utils.MailSendingUtilities;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.util.Util;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.rs.WebService;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 
@@ -364,19 +364,19 @@ public class CSWworker {
     
     /**
      * In some implementations there is no sicade directory.
-     * So if we don't find The .sicade/csw_configuration directory
+     * So if we don't find The .constellation/csw_configuration directory
      * IFREMER hack
      * we search the CATALINA_HOME/webapps/sdn-csw_WS/WEB-INF/csw_configuration
      */
     private File getConfigDirectory() {
         final String configUrl = "csw_configuration";
-        final File configDir = new File(WebService.getConfigDirectory(), configUrl);
+        final File configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
         if (configDir.exists()) {
             LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
             return configDir;
         } else {
 
-            /* Ifremer's server does not contain any .sicade directory, so the
+            /* Ifremer's server does not contain any default config directory, so the
              * configuration files are put under the WEB-INF/classes/configuration directory of the WAR file.
              */
             return Util.getDirectoryFromResource(configUrl);

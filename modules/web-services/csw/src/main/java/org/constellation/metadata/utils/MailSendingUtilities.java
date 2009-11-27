@@ -42,6 +42,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.naming.NamingException;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.rs.WebService;
 
 /**
@@ -67,7 +68,7 @@ public final class MailSendingUtilities {
         final Properties configProps = new Properties();
 
         try {
-            final File f = new File(WebService.getConfigDirectory(), "mailing.properties");
+            final File f = new File(ConfigDirectory.getConfigDirectory(), "mailing.properties");
             configProps.load(new FileInputStream(f));
         } catch (IOException ex) {
             Logger.getLogger(MailSendingUtilities.class.getName()).log(Level.SEVERE, null, ex);

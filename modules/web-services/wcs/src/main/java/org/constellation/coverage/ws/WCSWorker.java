@@ -53,6 +53,7 @@ import org.constellation.coverage.catalog.Series;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.register.RegisterException;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
@@ -60,7 +61,6 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.rs.OGCWebService;
-import org.constellation.ws.rs.WebService;
 
 // Geotoolkit dependencies
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -1066,7 +1066,7 @@ public final class WCSWorker {
     private File getFile(final String fileName, final String home) {
          File path;
          if (home == null || !(path = new File(home)).isDirectory()) {
-            path = WebService.getSicadeDirectory();
+            path = ConfigDirectory.getConfigDirectory();
          }
          if (fileName != null)
             return new File(path, fileName);

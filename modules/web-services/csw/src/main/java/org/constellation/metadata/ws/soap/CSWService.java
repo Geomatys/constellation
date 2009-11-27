@@ -40,6 +40,8 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 
 //geotoolkit dependencies
+import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.v202.Capabilities;
@@ -86,16 +88,6 @@ public class CSWService {
      * a service worker
      */
     private CSWworker worker;
-    
-    /**
-     * The user directory where to store the configuration file on Unix platforms.
-     */
-    private static final String UNIX_DIRECTORY = ".sicade";
-
-    /**
-     * The user directory where to store the configuration file on Windows platforms.
-     */
-    private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
 
     /**
      * A JAXB unmarshaller used to create java object from XML file.
@@ -246,40 +238,31 @@ public class CSWService {
      * @return The capabilities Object, or {@code null} if none.
      */
     public Object getCapabilitiesObject() throws JAXBException {
-       final String fileName = "CSWCapabilities2.0.2.xml";
-       
-       Object response = capabilities.get(fileName);
-       if (response == null) {
+        final String fileName = "CSWCapabilities2.0.2.xml";
 
-           String home;
-
-           final String env = "/home/tomcat/.sicade"; //System.getenv("CATALINA_HOME");
-            // we get the configuration file
-           File path = new File(env + "/csw_configuration/");
-           //we delete the /WS
-           if (!path.isDirectory()) {
-                home = System.getProperty("user.home");
-                if (System.getProperty("os.name", "").startsWith("Windows")) {
-                    path = new File(home, WINDOWS_DIRECTORY);
-                } else {
-                    path = new File(home, UNIX_DIRECTORY);
+        Object response = capabilities.get(fileName);
+        if (response == null) {
+            final String configUrl = "csw_configuration";
+            File configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
+            if (configDir.exists()) {
+                LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
+            } else {
+                return Util.getDirectoryFromResource(configUrl);
+            }
+            final File f = new File(configDir, fileName);
+            LOGGER.info(f.toString());
+            Unmarshaller unmarshaller = null;
+            try {
+                unmarshaller = marshallerPool.acquireUnmarshaller();
+                response = unmarshaller.unmarshal(f);
+                capabilities.put(fileName, response);
+            } finally {
+                if (unmarshaller != null) {
+                    marshallerPool.release(unmarshaller);
                 }
             }
-
-           final File f = new File(path, fileName);
-           LOGGER.info(f.toString());
-           Unmarshaller unmarshaller = null;
-           try {
-               unmarshaller = marshallerPool.acquireUnmarshaller();
-               response = unmarshaller.unmarshal(f);
-               capabilities.put(fileName, response);
-           } finally {
-               if (unmarshaller != null) {
-                   marshallerPool.release(unmarshaller);
-               }
-           }
-       }
-       return response;
+        }
+        return response;
     }
 }
 

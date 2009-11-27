@@ -57,6 +57,7 @@ import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.StyleProviderProxy;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
@@ -70,7 +71,6 @@ import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.rs.WebService;
 
 //Geotoolkit dependencies
 import org.geotoolkit.display.exception.PortrayalException;
@@ -552,7 +552,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
     private File getFile(final String fileName, final String home) {
          File path;
          if (home == null || !(path = new File(home)).isDirectory()) {
-            path = WebService.getSicadeDirectory();
+            path = ConfigDirectory.getConfigDirectory();
          }
          if (fileName != null)
             return new File(path, fileName);

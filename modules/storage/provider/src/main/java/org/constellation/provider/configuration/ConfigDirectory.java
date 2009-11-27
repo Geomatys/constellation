@@ -58,30 +58,34 @@ public final class ConfigDirectory {
      * TODO: How does this relate to the directories used in deployment? This is
      *       in the home directory of the user running the container?
      */
-    private static final String UNIX_DIRECTORY = ".sicade";
+    public static final String UNIX_DIRECTORY = ".constellation";
 
     /**
      * The user directory where configuration files are stored on Windows platforms.
      */
-    private static final String WINDOWS_DIRECTORY = "Application Data\\Sicade";
+    public static final String WINDOWS_DIRECTORY = "Application Data\\Constellation";
 
+    /**
+     * Returns the configuration directory for Constellation. It is either the one
+     * defined in the JNDI variable, or the default in the home directory.
+     */
     public static File getConfigDirectory() {
         try {
             final String path = getPropertyValue("Constellation", "config_dir");
-            if(path != null){
+            if (path != null) {
                 final File folder = new File(path);
-                if(folder.exists() && folder.canRead() && folder.canWrite()){
+                if (folder.exists() && folder.canRead() && folder.canWrite()) {
                     return folder;
-                }else{
+                } else {
                     try {
                         folder.createNewFile();
                         return folder;
                     } catch (IOException ex) {
-                        LOGGER.log(Level.INFO,"", ex);
+                        LOGGER.log(Level.INFO, "", ex);
                     }
                 }
             } else {
-                LOGGER.log(Level.INFO,"config_dir is not defined in the Constellation JNDI resource.");
+                LOGGER.log(Level.INFO, "config_dir is not defined in the Constellation JNDI resource.");
             }
 
         } catch (NamingException ex) {
@@ -89,24 +93,22 @@ public final class ConfigDirectory {
                     "Using the default configuration directory instead.", ex);
         }
 
-        return getSicadeDirectory();
+        return getConstellationDirectory();
     }
 
     /**
-     * Return the ".sicade" directory.
-     *
-     * @return The ".sicade" directory containing.
+     * Return the ".constellation" directory.
      */
-    public static File getSicadeDirectory() {
-        File sicadeDirectory;
+    private static File getConstellationDirectory() {
+        File constellationDirectory;
         final String home = System.getProperty("user.home");
 
         if (System.getProperty("os.name", "").startsWith("Windows")) {
-             sicadeDirectory = new File(home, WINDOWS_DIRECTORY);
+             constellationDirectory = new File(home, WINDOWS_DIRECTORY);
         } else {
-             sicadeDirectory = new File(home, UNIX_DIRECTORY);
+             constellationDirectory = new File(home, UNIX_DIRECTORY);
         }
-        return sicadeDirectory;
+        return constellationDirectory;
     }
 
     /**
@@ -162,12 +164,12 @@ public final class ConfigDirectory {
         return value;
     }
 
+    /**
+     * Returns the file named "config.xml" under the folder "WEB-INF/classes" of the
+     * Constellation' web archive, or {@code null} if no config file was found.
+     */
     public static File getWarPackagedConfig() {
-        /* Ifremer's server does not contain any .sicade directory, so the
-         * configuration file is put under the WEB-INF/classes directory of constellation.
-         */
-        LOGGER.warning("Connecting to the database using WAR packaged config.xml file !");
-
+        LOGGER.warning("Try to find the file config.xml into the web archive of Constellation !");
 
         final InputStream is = Util.getResourceAsStream("/config.xml");
         if (is != null) {
@@ -188,7 +190,7 @@ public final class ConfigDirectory {
             }
 
         } else {
-            LOGGER.info("no config resource found");
+            LOGGER.info("No config.xml resource found in the archive.");
         }
         return null;
     }

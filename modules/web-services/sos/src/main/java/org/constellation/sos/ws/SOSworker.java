@@ -55,6 +55,7 @@ import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationFilterReader;
@@ -67,7 +68,6 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
-import org.constellation.ws.rs.WebService;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
@@ -1903,19 +1903,19 @@ public class SOSworker {
 
     /**
      * In some implementations there is no sicade directory.
-     * So if we don't find The .sicade/sos_configuration directory
+     * So if we don't find The .constellation/sos_configuration directory
      * IFREMER hack
      * we search the CATALINA_HOME/webapps/ifremer-sos/WEB-INF/sos_configuration
      */
     private File getConfigDirectory() {
         final String configUrl = "sos_configuration";
-        final File configDir   = new File(WebService.getConfigDirectory(), configUrl);
+        final File configDir   = new File(ConfigDirectory.getConfigDirectory(), configUrl);
         if (configDir.exists()) {
             LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
             return configDir;
         } else {
 
-            /* Ifremer's server does not contain any .sicade directory, so the
+            /* Ifremer's server does not contain any .constellation directory, so the
              * configuration files are put under the WEB-INF/classes/configuration directory of the WAR file.
              */
             return Util.getDirectoryFromResource(configUrl);

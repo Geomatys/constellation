@@ -40,10 +40,10 @@ import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.NamedLayerProviderProxy;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
-import org.constellation.ws.rs.WebService;
 
 // Geotoolkit dependencies
 import org.geotoolkit.data.FeatureSource;
@@ -336,7 +336,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
     private File getFile(final String fileName, final String home) {
          File path;
          if (home == null || !(path = new File(home)).isDirectory()) {
-            path = WebService.getSicadeDirectory();
+            path = ConfigDirectory.getConfigDirectory();
          }
          if (fileName != null)
             return new File(path, fileName);
