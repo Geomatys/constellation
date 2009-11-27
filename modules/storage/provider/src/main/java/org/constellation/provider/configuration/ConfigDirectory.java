@@ -81,11 +81,11 @@ public final class ConfigDirectory {
                         folder.createNewFile();
                         return folder;
                     } catch (IOException ex) {
-                        LOGGER.log(Level.INFO, "", ex);
+                        LOGGER.log(Level.INFO, "Unable to create the file "+ folder, ex);
                     }
                 }
             } else {
-                LOGGER.log(Level.INFO, "config_dir is not defined in the Constellation JNDI resource.");
+                throw new NamingException("config_dir is not defined in the Constellation JNDI resource.");
             }
 
         } catch (NamingException ex) {

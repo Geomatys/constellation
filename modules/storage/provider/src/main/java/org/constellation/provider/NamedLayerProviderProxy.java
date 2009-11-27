@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.util.Util;
 import org.opengis.feature.type.Name;
 
 /**
@@ -165,8 +166,18 @@ public class NamedLayerProviderProxy implements NamedLayerProvider {
         final ServiceLoader<NamedLayerProviderService> loader = ServiceLoader.load(NamedLayerProviderService.class);
         for(final NamedLayerProviderService service : loader){
             final String name = service.getName();
-            final String path = CONFIG_PATH + name + ".xml";
-            File configFile = new File(path);
+            final String fileName = name + ".xml";
+            /*
+             * First check that there are config files in the WEB-INF/classes directory
+             */
+            File configFile = Util.getFileFromResource(fileName);
+            /*
+             * No config file in the resources, then we try with the default config directory.
+             */
+            if (configFile == null || !configFile.exists()) {
+                final String path = CONFIG_PATH + fileName;
+                configFile = new File(path);
+            }
             /*
              * HACK for ifremer.
              */

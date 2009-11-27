@@ -26,6 +26,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.util.Util;
 import org.geotoolkit.map.ElevationModel;
 
 /**
@@ -194,8 +195,18 @@ public class LayerProviderProxy implements LayerProvider{
         final ServiceLoader<LayerProviderService> loader = ServiceLoader.load(LayerProviderService.class);
         for(final LayerProviderService service : loader){
             final String name = service.getName();
-            final String path = CONFIG_PATH + name + ".xml";
-            File configFile = new File(path);
+            final String fileName = name + ".xml";
+            /*
+             * First check that there are config files in the WEB-INF/classes directory
+             */
+            File configFile = Util.getFileFromResource(fileName);
+            /*
+             * No config file in the resources, then we try with the default config directory.
+             */
+            if (configFile == null || !configFile.exists()) {
+                final String path = CONFIG_PATH + fileName;
+                configFile = new File(path);
+            }
             /*
              * HACK for ifremer.
              */
