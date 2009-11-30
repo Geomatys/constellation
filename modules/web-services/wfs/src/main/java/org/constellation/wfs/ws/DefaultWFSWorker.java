@@ -458,9 +458,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
                 sortBys.addAll(util.getTransformer110().visitSortBy(jaxbSortBy));
             }
 
-            final QueryBuilder queryBuilder = new QueryBuilder()
-                    .setFilter(filter)
-                    .setCRS(crs);
+            final QueryBuilder queryBuilder = new QueryBuilder();
+            queryBuilder.setFilter(filter);
+            queryBuilder.setCRS(crs);
 
             if(!propNames.isEmpty()){
                 queryBuilder.setProperties(propNames.toArray(new String[propNames.size()]));
