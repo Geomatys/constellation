@@ -216,10 +216,10 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
                 return dates;
             }
             
-            final Query query = new QueryBuilder()
-                    .setTypeName(fs.getSchema().getName())
-                    .setProperties(new String[]{dateStartField})
-                    .buildQuery();
+            final QueryBuilder builder = new QueryBuilder();
+            builder.setTypeName(fs.getSchema().getName());
+            builder.setProperties(new String[]{dateStartField});
+            final Query query = builder.buildQuery();
             
             FeatureIterator<SimpleFeature> features = null;
             try{
@@ -266,10 +266,10 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
                 return elevations;
             }
 
-            final Query query = new QueryBuilder()
-                    .setTypeName(fs.getSchema().getName())
-                    .setProperties(new String[]{elevationStartField})
-                    .buildQuery();
+            final QueryBuilder builder = new QueryBuilder();
+            builder.setTypeName(fs.getSchema().getName());
+            builder.setProperties(new String[]{elevationStartField});
+            final Query query = builder.buildQuery();
             
             FeatureIterator<SimpleFeature> features = null;
             try{
