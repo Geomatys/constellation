@@ -190,6 +190,7 @@ public final class GrizzlyServer {
         sourcePostGis.parameters.put(PostGisProvider.KEY_SCHEMA,   "public");
         sourcePostGis.parameters.put(PostGisProvider.KEY_USER,     "geouser");
         sourcePostGis.parameters.put(PostGisProvider.KEY_PASSWD,   "g3ouser");
+        sourcePostGis.parameters.put(PostGisProvider.KEY_NAMESPACE,"http://cite.opengeospatial.org/gmlsf");
 
         final ProviderConfig configPostGis = new ProviderConfig();
         configPostGis.sources.add(sourcePostGis);
