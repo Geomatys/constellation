@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderService;
+import org.constellation.provider.Provider;
 import org.constellation.provider.configuration.ProviderSource;
 
 import static org.constellation.provider.postgis.PostGisProvider.*;
@@ -62,10 +63,12 @@ public class PostGisProviderService extends AbstractProviderService<String,Layer
      * {@inheritDoc }
      */
     @Override
-    protected void disposeProviders() {
-        for(final PostGisProvider provider : PROVIDERS){
+    protected void disposeProvider(Provider provider) {
+        if(PROVIDERS.contains(provider)){
             provider.dispose();
             PROVIDERS.remove(provider);
+        }else{
+            throw new IllegalArgumentException("This provider doesn't belong to this service.");
         }
     }
 

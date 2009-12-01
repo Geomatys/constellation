@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.logging.Logger;
 
 import org.constellation.provider.AbstractProviderService;
+import org.constellation.provider.Provider;
 import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderSource;
 
@@ -61,7 +62,7 @@ public class GO2StyleProviderService extends AbstractProviderService<String,Muta
      * {@inheritDoc }
      */
     @Override
-    protected void disposeProviders() {
+    protected void disposeProvider(Provider provider) {
     }
 
     /**

@@ -18,6 +18,8 @@ package org.constellation.provider;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
@@ -49,7 +51,7 @@ public abstract class AbstractProviderService<K, V> implements ProviderService<K
      * Used by setConfiguration to dispose providers before the new ones
      * are loaded.
      */
-    protected abstract void disposeProviders();
+    protected abstract void disposeProvider(Provider provider);
 
     /**
      * Used by setConfiguration to load a single source.
@@ -73,7 +75,11 @@ public abstract class AbstractProviderService<K, V> implements ProviderService<K
             throw new NullPointerException("Configuration file can not be null");
         }
 
-        disposeProviders();
+        //unload previous providers
+        final Collection<Provider> providers = new ArrayList<Provider>(getProviders());
+        for(Provider p : providers){
+            disposeProvider(p);
+        }
 
         ProviderConfig config = null;
         try {
@@ -98,7 +104,12 @@ public abstract class AbstractProviderService<K, V> implements ProviderService<K
             throw new NullPointerException("Configuration can not be null");
         }
 
-        disposeProviders();
+        //unload previous providers
+        final Collection<Provider> providers = new ArrayList<Provider>(getProviders());
+        for(Provider p : providers){
+            disposeProvider(p);
+        }
+        
         this.configuration = configuration;
 
         for (final ProviderSource ps : configuration.sources) {
