@@ -35,6 +35,11 @@ public enum ServiceType {
     WCS,
 
     /**
+     * Web Feature ServiceType.
+     */
+    WFS,
+
+    /**
      * Catalog ServiceType-Web.
      */
     CSW,

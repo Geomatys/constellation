@@ -19,6 +19,7 @@ package org.constellation.wfs.ws;
 
 
 // Constellation dependencies
+import java.util.Map;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
@@ -57,7 +58,7 @@ public interface WFSWorker extends Worker {
 
     Schema describeFeatureType(final DescribeFeatureTypeType model) throws CstlServiceException;
 
-    FeatureCollection getFeature(final GetFeatureType request) throws CstlServiceException;
+    Object getFeature(final GetFeatureType request) throws CstlServiceException;
 
     AbstractGMLEntry getGMLObject(GetGmlObjectType grbi) throws CstlServiceException;
 
@@ -66,5 +67,7 @@ public interface WFSWorker extends Worker {
     TransactionResponseType transaction(TransactionType t) throws CstlServiceException;
 
     String getOutputFormat();
+
+    Map<String, String> getSchemaLocations();
 
 }

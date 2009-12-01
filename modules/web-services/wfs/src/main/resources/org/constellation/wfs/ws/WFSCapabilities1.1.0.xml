@@ -61,6 +61,9 @@ xmlns:ins="http://www.inspire.org">
             <ows:Parameter name="AcceptFormats">
                 <ows:Value>text/xml</ows:Value>
             </ows:Parameter>
+            <ows:Parameter name="Service">
+                <ows:Value>WFS</ows:Value>
+            </ows:Parameter>
         </ows:Operation>
         <ows:Operation name="DescribeFeatureType">
             <ows:DCP>
@@ -71,6 +74,12 @@ xmlns:ins="http://www.inspire.org">
             </ows:DCP>
             <ows:Parameter name="outputFormat">
                 <ows:Value>text/xml; subtype=gml/3.1.1</ows:Value>
+            </ows:Parameter>
+            <ows:Parameter name="Service">
+                <ows:Value>WFS</ows:Value>
+            </ows:Parameter>
+            <ows:Parameter name="Version">
+                <ows:Value>1.1.0</ows:Value>
             </ows:Parameter>
         </ows:Operation>
         <ows:Operation name="GetFeature">
@@ -86,6 +95,12 @@ xmlns:ins="http://www.inspire.org">
             </ows:Parameter>
             <ows:Parameter name="outputFormat">
                 <ows:Value>text/xml; subtype=gml/3.1.1</ows:Value>
+            </ows:Parameter>
+            <ows:Parameter name="Service">
+                <ows:Value>WFS</ows:Value>
+            </ows:Parameter>
+            <ows:Parameter name="Version">
+                <ows:Value>1.1.0</ows:Value>
             </ows:Parameter>
             <ows:Constraint name="LocalTraverseXLinkScope">
                 <ows:Value>2</ows:Value>

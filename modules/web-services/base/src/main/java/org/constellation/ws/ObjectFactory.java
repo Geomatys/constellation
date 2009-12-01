@@ -49,7 +49,7 @@ public final class ObjectFactory {
     public ServiceExceptionReport createServiceExceptionReport() {
         return new ServiceExceptionReport();
     }
-    
+
     /**
      * Create an instance of {@link JAXBElement }{@code <}{@link ExpressionType }{@code >}}
      * 

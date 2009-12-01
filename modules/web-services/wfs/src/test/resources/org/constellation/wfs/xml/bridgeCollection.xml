@@ -10,7 +10,7 @@
         <gml:Bridges gml:id="Bridges.1">
             <the_geom>
                 <gml:Point srsName="EPSG:4326">
-                    <gml:pos srsName="EPSG:4326" srsDimension="2">2.0E-4 7.0E-4</gml:pos>
+                    <gml:pos>2.0E-4 7.0E-4</gml:pos>
                 </gml:Point>
             </the_geom>
             <FID>110</FID>

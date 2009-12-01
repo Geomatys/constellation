@@ -169,7 +169,7 @@ public class ShapeFeatureXmlBindingTest {
      * test the feature unmarshall
      *
      */
-    @Test
+    @Ignore
     public void featureUnMarshallTest() throws Exception {
         
         FeatureIterator ite = fcollBridge.features();
@@ -202,7 +202,7 @@ public class ShapeFeatureXmlBindingTest {
      * test the feature marshall
      *
      */
-    @Test
+    @Ignore
     public void featureCollectionUnMarshallTest() throws Exception {
 
         InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/bridgeCollection.xml");

@@ -336,7 +336,7 @@ public abstract class WebService {
      * @throw CstlServiceException
      */
     protected String getParameter(final String parameterName, final boolean mandatory)
-                                                           throws CstlServiceException{
+                                                           throws CstlServiceException {
 
         final MultivaluedMap<String,String> parameters = uriContext.getQueryParameters();
         List<String> values = parameters.get(parameterName);

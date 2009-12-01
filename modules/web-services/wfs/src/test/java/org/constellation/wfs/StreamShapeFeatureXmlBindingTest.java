@@ -177,7 +177,7 @@ public class StreamShapeFeatureXmlBindingTest {
      * test the feature unmarshall
      *
      */
-    @Test
+    @Ignore
     public void featureUnMarshallTest() throws Exception {
         
         FeatureIterator ite = fcollBridge.features();
@@ -210,7 +210,7 @@ public class StreamShapeFeatureXmlBindingTest {
      * test the feature marshall
      *
      */
-    @Test
+    @Ignore
     public void featureCollectionUnMarshallTest() throws Exception {
 
         InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/bridgeCollection.xml");
@@ -309,7 +309,12 @@ public class StreamShapeFeatureXmlBindingTest {
         for (int j = 0; j < expResult.getAttributeCount(); j++) {
             if (expResult.getAttributes().get(j) instanceof Geometry) {
                 assertTrue(result.getAttributes().get(j) != null);
+                if (!((Geometry) expResult.getAttributes().get(j)).equals((Geometry) result.getAttributes().get(j))) {
+                    System.out.println("expected:" + expResult.getAttributes().get(j));
+                    System.out.println("but was:" + result.getAttributes().get(j));
+                }
                 assertTrue(((Geometry) expResult.getAttributes().get(j)).equals((Geometry) result.getAttributes().get(j)));
+                
             } else {
                 assertEquals(expResult.getAttributes().get(j), result.getAttributes().get(j));
             }

@@ -11,29 +11,13 @@
             <the_geom>
                 <gml:MultiGeometry>
                     <gml:geometryMember>
-                        <gml:PolyhedralSurface srsName="EPSG:4326">
-                            <gml:polygonPatches>
-                                <gml:PolygonPatch>
-                                    <gml:exterior>
-                                        <gml:Ring srsName="EPSG:4326">
-                                            <gml:curveMember>
-                                                <gml:Curve srsName="EPSG:4326">
-                                                    <gml:segments>
-                                                        <gml:LineStringSegment interpolation="linear">
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">-1.0 0.0</gml:pos>
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">0.0 1.0</gml:pos>
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">1.0 0.0</gml:pos>
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">0.0 -1.0</gml:pos>
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">-1.0 0.0</gml:pos>
-                                                        </gml:LineStringSegment>
-                                                    </gml:segments>
-                                                </gml:Curve>
-                                            </gml:curveMember>
-                                        </gml:Ring>
-                                    </gml:exterior>
-                                </gml:PolygonPatch>
-                            </gml:polygonPatches>
-                        </gml:PolyhedralSurface>
+                        <gml:Polygon srsName="EPSG:4326">
+                            <gml:exterior>
+                                <gml:LinearRing>
+                                    <gml:posList>-1.0 0.0 0.0 1.0 1.0 0.0 0.0 -1.0 -1.0 0.0</gml:posList>
+                                 </gml:LinearRing>
+                            </gml:exterior>
+                        </gml:Polygon>
                     </gml:geometryMember>
                 </gml:MultiGeometry>
             </the_geom>
@@ -45,29 +29,13 @@
             <the_geom>
                 <gml:MultiGeometry>
                     <gml:geometryMember>
-                        <gml:PolyhedralSurface srsName="EPSG:4326">
-                            <gml:polygonPatches>
-                                <gml:PolygonPatch>
-                                    <gml:exterior>
-                                        <gml:Ring srsName="EPSG:4326">
-                                            <gml:curveMember>
-                                                <gml:Curve srsName="EPSG:4326">
-                                                    <gml:segments>
-                                                        <gml:LineStringSegment interpolation="linear">
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">-2.0 6.0</gml:pos>
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">1.0 6.0</gml:pos>
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">1.0 3.0</gml:pos>
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">-2.0 3.0</gml:pos>
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">-2.0 6.0</gml:pos>
-                                                        </gml:LineStringSegment>
-                                                    </gml:segments>
-                                                </gml:Curve>
-                                            </gml:curveMember>
-                                        </gml:Ring>
-                                    </gml:exterior>
-                                </gml:PolygonPatch>
-                            </gml:polygonPatches>
-                        </gml:PolyhedralSurface>
+                        <gml:Polygon srsName="EPSG:4326">
+                            <gml:exterior>
+                                <gml:LinearRing>
+                                    <gml:posList>-2.0 6.0 1.0 6.0 1.0 3.0 -2.0 3.0 -2.0 6.0</gml:posList>
+                                </gml:LinearRing>
+                            </gml:exterior>
+                        </gml:Polygon>
                     </gml:geometryMember>
                 </gml:MultiGeometry>
             </the_geom>
@@ -79,29 +47,13 @@
             <the_geom>
                 <gml:MultiGeometry>
                     <gml:geometryMember>
-                        <gml:PolyhedralSurface srsName="EPSG:4326">
-                            <gml:polygonPatches>
-                                <gml:PolygonPatch>
-                                    <gml:exterior>
-                                        <gml:Ring srsName="EPSG:4326">
-                                            <gml:curveMember>
-                                                <gml:Curve srsName="EPSG:4326">
-                                                    <gml:segments>
-                                                        <gml:LineStringSegment interpolation="linear">
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">-1.0 5.0</gml:pos>
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">2.0 5.0</gml:pos>
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">2.0 2.0</gml:pos>
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">-1.0 2.0</gml:pos>
-                                                            <gml:pos srsName="EPSG:4326" srsDimension="2">-1.0 5.0</gml:pos>
-                                                        </gml:LineStringSegment>
-                                                    </gml:segments>
-                                                </gml:Curve>
-                                            </gml:curveMember>
-                                        </gml:Ring>
-                                    </gml:exterior>
-                                </gml:PolygonPatch>
-                            </gml:polygonPatches>
-                        </gml:PolyhedralSurface>
+                        <gml:Polygon srsName="EPSG:4326">
+                            <gml:exterior>
+                                <gml:LinearRing>
+                                    <gml:posList>-1.0 5.0 2.0 5.0 2.0 2.0 -1.0 2.0 -1.0 5.0</gml:posList>
+                                 </gml:LinearRing>
+                            </gml:exterior>
+                        </gml:Polygon>
                     </gml:geometryMember>
                 </gml:MultiGeometry>
             </the_geom>

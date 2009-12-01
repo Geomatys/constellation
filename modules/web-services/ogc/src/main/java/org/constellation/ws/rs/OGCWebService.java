@@ -303,6 +303,24 @@ public abstract class OGCWebService extends AbstractWebService {
     }
 
     /**
+     * Return a Version Object from the version number.
+     * if the version number is not correct return the default version.
+     *
+     * @param number the version number.
+     * @return
+     */
+    protected ServiceDef getVersionFromNumber(Version number) {
+        if (number != null) {
+            for (ServiceDef v : supportedVersions) {
+                if (v.version.toString().equals(number.toString())){
+                    return v;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * If the requested version number is not available we choose the best version to return.
      *
      * @param number A version number, which will be compared to the ones specified.

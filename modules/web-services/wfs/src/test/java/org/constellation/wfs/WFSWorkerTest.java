@@ -124,7 +124,7 @@ public class WFSWorkerTest {
          */
         GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
-        FeatureCollection result = worker.getFeature(request);
+        Object result = worker.getFeature(request);
 
         FeatureCollection ExpResult = new EmptyFeatureCollection(null);
 
@@ -140,7 +140,7 @@ public class WFSWorkerTest {
 
         result = worker.getFeature(request);
 
-        String xmlResult    = featureWriter.write(result);
+        String xmlResult    = featureWriter.write((FeatureCollection)result);
         String xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
@@ -158,7 +158,7 @@ public class WFSWorkerTest {
 
         result = worker.getFeature(request);
 
-        xmlResult    = featureWriter.write(result);
+        xmlResult    = featureWriter.write((FeatureCollection)result);
         xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
@@ -178,7 +178,7 @@ public class WFSWorkerTest {
 
         result = worker.getFeature(request);
 
-        xmlResult    = featureWriter.write(result);
+        xmlResult    = featureWriter.write((FeatureCollection)result);
         xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");

@@ -47,9 +47,12 @@ import org.constellation.util.Util;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.ws.CstlServiceException;
+//import org.constellation.ws.ExceptionReport;
+//import org.constellation.ws.ExceptionType;
 import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
+import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.GmlObjectIdType;
 import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
@@ -81,6 +84,8 @@ public class WFSService extends OGCWebService {
 
     private final WFSWorker worker;
 
+    private static Map<String, String> schemaLocations;
+
     /**
      * Build a new Restfull WFS service.
      */
@@ -89,10 +94,11 @@ public class WFSService extends OGCWebService {
 
         WFSWorker candidate              = null;
         try {
-            setXMLContext("org.geotoolkit.wfs.xml.v110" +
-            		  ":org.geotoolkit.ogc.xml.v110" +
-            		  ":org.geotoolkit.gml.xml.v311" +
-                          ":org.geotoolkit.xsd.xml.v2001"
+            setXMLContext("org.geotoolkit.wfs.xml.v110"   +
+            		  ":org.geotoolkit.ogc.xml.v110"  +
+            		  ":org.geotoolkit.gml.xml.v311"  +
+                          ":org.geotoolkit.xsd.xml.v2001" +
+                          ":org.constellation.ws"
                           , "");
             candidate       = new DefaultWFSWorker(getMarshallerPool());
 
@@ -138,7 +144,7 @@ public class WFSService extends OGCWebService {
                 objectRequest = ((JAXBElement<?>)objectRequest).getValue();
             }
 
-            final String request = (objectRequest == null) ? getParameter("REQUEST", true) : null;
+            final String request = (objectRequest == null) ? getParameter(KEY_REQUEST, true) : null;
             logParameters();
 
             if (STR_GETCAPABILITIES.equalsIgnoreCase(request) || (objectRequest instanceof GetCapabilitiesType)) {
@@ -156,7 +162,15 @@ public class WFSService extends OGCWebService {
             } else if (STR_GETFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof GetFeatureType)) {
                 final GetFeatureType model = adaptGetFeatureType(objectRequest);
                 version = getVersionFromNumber(model.getVersion());
-                return Response.ok(worker.getFeature(model), worker.getOutputFormat()).build();
+                Object response = worker.getFeature(model);
+                if (response instanceof FeatureCollection) {
+                    this.schemaLocations = worker.getSchemaLocations();
+                    return Response.ok(response, worker.getOutputFormat()).build();
+                } else {
+                    final StringWriter sw = new StringWriter();
+                    marshaller.marshal(response, sw);
+                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                }
 
             } else if (STR_GETGMLOBJECT.equalsIgnoreCase(request) || (objectRequest instanceof GetGmlObjectType)) {
                 final GetGmlObjectType model = adaptGetGMLObject(objectRequest);
@@ -224,8 +238,18 @@ public class WFSService extends OGCWebService {
             if (serviceDef == null) {
                 serviceDef = getBestVersion(null);
             }
+            /*
+             *  TO SEE
+             ExceptionType ext = new ExceptionType(ex.getMessage(), ex.getExceptionCode(), ex.getLocator());
+             ExceptionReport report = new ExceptionReport(serviceDef.exceptionVersion, ext);*/
             final String version = serviceDef.exceptionVersion.toString();
-            ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
+            String exceptionCode;
+            if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
+                exceptionCode = Util.transformCodeName(ex.getExceptionCode().name());
+            } else {
+                exceptionCode = ex.getExceptionCode().name();
+            }
+            ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(), version);
             StringWriter sw = new StringWriter();
             Marshaller marshaller = null;
             try {
@@ -698,4 +722,7 @@ public class WFSService extends OGCWebService {
         return new TransactionType(service, version, handle, releaseAction, delete);
     }
 
+    public static Map<String, String> getSchemaLocations() {
+        return schemaLocations;
+    }
 }

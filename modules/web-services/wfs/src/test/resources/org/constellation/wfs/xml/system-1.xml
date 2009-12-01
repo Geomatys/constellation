@@ -7,7 +7,7 @@
     <sml:keywords>point d'eau</sml:keywords>
     <sml:location>
         <gml:Point srsName="EPSG:27582">
-            <gml:pos srsName="EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
+            <gml:pos>65400.0 1731368.0</gml:pos>
         </gml:Point>
     </sml:location>
     <sml:phenomenons>time</sml:phenomenons>

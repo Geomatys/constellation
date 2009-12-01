@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +44,12 @@ import org.constellation.provider.NamedLayerProviderProxy;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.ServiceType;
+import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
+import org.geotoolkit.wfs.xml.RequestBase;
 import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.data.collection.FeatureCollectionGroup;
@@ -55,7 +59,6 @@ import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.xml.v311.AbstractGMLEntry;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ows.xml.v100.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
@@ -76,14 +79,19 @@ import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.data.store.EmptyFeatureCollection;
+import org.geotoolkit.filter.accessor.Accessors;
+import org.geotoolkit.filter.accessor.PropertyAccessor;
+import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
+import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
+import org.geotoolkit.wfs.xml.v110.ResultTypeType;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
-import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
-import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
@@ -91,13 +99,13 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.opengis.referencing.operation.TransformException;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
+public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
     /**
      * The default logger.
@@ -117,6 +125,13 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
     private final Map<String,Object> capabilities = new HashMap<String,Object>();
 
 
+    /**
+     * The current version of the service.
+     */
+    private ServiceVersion actingVersion = new ServiceVersion(ServiceType.WFS, "1.1.0");
+
+    private Map<String, String> schemaLocations;
+    
     public DefaultWFSWorker(final MarshallerPool marshallerPool) {
         this.marshallerPool = marshallerPool;
 
@@ -144,14 +159,16 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
      */
     @Override
     public WFSCapabilitiesType getCapabilities(final GetCapabilitiesType getCapab) throws CstlServiceException {
+        LOGGER.info("GetCapabilities request proccesing");
+        long start = System.currentTimeMillis();
 
-        final String queryVersion = getCapab.getVersion().toString();
-
-        //Generate the correct URL in the static part. ?TODO: clarify this.
+        // we verify the base attribute
+        verifyBaseRequest(getCapab, false);
+        
         final WFSCapabilitiesType inCapabilities;
         try {
             inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(
-                    getServletContext().getRealPath("WEB-INF"), queryVersion);
+                    getServletContext().getRealPath("WEB-INF"), actingVersion.toString());
         } catch (IOException e) {
             throw new CstlServiceException(e, NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
@@ -250,6 +267,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
         inCapabilities.getVersion();
 
 
+        LOGGER.info("GetCapabilities treated in " + (System.currentTimeMillis() - start) + "ms");
         return inCapabilities;
     }
 
@@ -347,8 +365,13 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
      * {@inheritDoc }
      */
     @Override
-    public Schema describeFeatureType(final DescribeFeatureTypeType model) throws CstlServiceException {
+    public Schema describeFeatureType(final DescribeFeatureTypeType request) throws CstlServiceException {
+        LOGGER.info("DecribeFeatureType request proccesing");
+        long start = System.currentTimeMillis();
 
+        // we verify the base attribute
+        verifyBaseRequest(request, false);
+        
         final JAXBFeatureTypeWriter writer;
         try {
             writer = new JAXBFeatureTypeWriter();
@@ -357,7 +380,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
         }
         final LayerProviderProxy proxy           = LayerProviderProxy.getInstance();
         final NamedLayerProviderProxy namedProxy = NamedLayerProviderProxy.getInstance();
-        final List<QName> names                  = model.getTypeName();
+        final List<QName> names                  = request.getTypeName();
         final List<FeatureType> types            = new ArrayList<FeatureType>();
 
         if (names.isEmpty()) {
@@ -385,7 +408,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
                 if (layer == null) {
                     layer = namedProxy.get(Utils.getNameFromQname(name));
                 }
-                if(layer == null || !(layer instanceof FeatureLayerDetails)) continue;
+                if(layer == null || !(layer instanceof FeatureLayerDetails)) {
+                    throw new CstlServiceException("The specified TypeNames does not exist:" + name);
+                }
 
                 final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
                 final SimpleFeatureType sft   = fld.getSource().getSchema();
@@ -393,6 +418,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
             }
         }
 
+        LOGGER.info("DescribeFeatureType treated in " + (System.currentTimeMillis() - start) + "ms");
         return writer.getSchemaFromFeatureType(types);
     }
 
@@ -400,13 +426,19 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
      * {@inheritDoc }
      */
     @Override
-    public FeatureCollection getFeature(final GetFeatureType request) throws CstlServiceException {
+    public Object getFeature(final GetFeatureType request) throws CstlServiceException {
+        LOGGER.info("GetFeature request proccesing");
+        long start = System.currentTimeMillis();
 
+        // we verify the base attribute
+        verifyBaseRequest(request, false);
+        
         final LayerProviderProxy proxy            = LayerProviderProxy.getInstance();
         final NamedLayerProviderProxy namedProxy  = NamedLayerProviderProxy.getInstance();
         final XMLUtilities util                   = new XMLUtilities();
         final Integer maxFeatures                 = request.getMaxFeatures();
         final List<FeatureCollection> collections = new ArrayList<FeatureCollection>();
+        schemaLocations                           = new HashMap<String, String>();
         
         for (final QueryType query : request.getQuery()) {
             final FilterType jaxbFilter   = query.getFilter();
@@ -421,10 +453,14 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
             final List<SortBy> sortBys   = new ArrayList<SortBy>();
 
             //decode filter-----------------------------------------------------
-            if (jaxbFilter != null){
-                filter = util.getTransformer110().visitFilter(jaxbFilter);
-            }else{
-                filter = Filter.INCLUDE;
+            try {
+                if (jaxbFilter != null){
+                    filter = util.getTransformer110().visitFilter(jaxbFilter);
+                }else{
+                    filter = Filter.INCLUDE;
+                }
+            } catch(Exception ex) {
+                throw new CstlServiceException(ex);
             }
 
             //decode crs--------------------------------------------------------
@@ -446,10 +482,13 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
                 if (obj instanceof JAXBElement){
                     obj = ((JAXBElement)obj).getValue();
                 }
-
-                if (obj instanceof PropertyNameType){
-                    final PropertyName pn = util.getTransformer110().visitPropertyName((PropertyNameType) obj);
-                    propNames.add(pn.getPropertyName());
+                
+                if (obj instanceof String) {
+                    String pName = (String) obj;
+                    if (pName.indexOf(":") != -1) {
+                        pName = pName.substring(pName.indexOf(":") + 1);
+                    }
+                    propNames.add(pName);
                 }
             }
 
@@ -462,9 +501,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
             queryBuilder.setFilter(filter);
             queryBuilder.setCRS(crs);
 
-            if(!propNames.isEmpty()){
-                queryBuilder.setProperties(propNames.toArray(new String[propNames.size()]));
-            }
             if (!sortBys.isEmpty()) {
                 queryBuilder.setSortBy(sortBys.toArray(new SortBy[sortBys.size()]));
             }
@@ -477,12 +513,35 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
                 FeatureLayerDetails layer = (FeatureLayerDetails)proxy.get(typeName.getLocalPart());
                 if (layer == null) {
                     layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(typeName));
+
+                    if (layer == null) {
+                        throw new CstlServiceException("The specified TypeNames does not exist:" + typeName);
+                    }
                 }
                 FeatureType ft = layer.getSource().getSchema();
+
+                if (!propNames.isEmpty()) {
+                    List<String> propertyNames = new ArrayList<String>();
+                    for (PropertyDescriptor pdesc : ft.getDescriptors()) {
+                        if (!pdesc.isNillable()) {
+                            String propName = pdesc.getName().getLocalPart();
+                            if (!propertyNames.contains(propName)) {
+                                propertyNames.add(propName);
+                            }
+                        } else if (propNames.contains(pdesc.getName().getLocalPart())) {
+                            propertyNames.add(pdesc.getName().getLocalPart());
+                        }
+                    }
+                    queryBuilder.setProperties(propertyNames.toArray(new String[propertyNames.size()]));
+                } else  {
+                    queryBuilder.setProperties(null);
+                }
+
                 queryBuilder.setTypeName(ft.getName());
                 Collection<String> filterProperties =  (Collection<String>) filter.accept(ListingPropertyVisitor.VISITOR, null);
                 for (String filterProperty : filterProperties) {
-                    if (ft.getDescriptor(filterProperty) == null) {
+                    PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, filterProperty, null);
+                    if (pa == null || pa.get(ft, filterProperty, null) == null) {
                         throw new CstlServiceException("The feature Type " + typeName + " does not has such a property:" + filterProperty);
                     }
                 }
@@ -491,6 +550,21 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
                     collections.add(layer.getSource().getFeatures(queryBuilder.buildQuery()));
                 } catch (IOException ex) {
                     throw new CstlServiceException(ex);
+                }
+
+                // we write The SchemaLocation
+                String namespace = typeName.getNamespaceURI();
+                if (schemaLocations.containsKey(namespace)) {
+                    LOGGER.severe("TODO multiple typeName schemaLocation");
+
+                } else {
+                    String prefix          = typeName.getPrefix();
+                    if (getUriContext() != null) {
+                        String describeRequest = getUriContext().getBaseUri().toString() + "wfs?request=DescribeFeatureType&version=1.1.0&service=WFS";
+                        describeRequest        = describeRequest + "&namespace=xmlns(" + prefix + "=" + namespace + ")";
+                        describeRequest        = describeRequest + "&Typename=" + prefix + ':' + typeName.getLocalPart() + "";
+                        schemaLocations.put(namespace, describeRequest);
+                    }
                 }
             }
 
@@ -504,11 +578,17 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
          *
          * result TODO find an id and a member type
          */
+        FeatureCollection response;
 	if (collections.size() > 0) {
-	        return FeatureCollectionGroup.sequence("collection-1",collections.toArray(new FeatureCollection[collections.size()]));
+	        response = FeatureCollectionGroup.sequence("collection-1",collections.toArray(new FeatureCollection[collections.size()]));
         } else {
-	        return new EmptyFeatureCollection(null);
+	        response = new EmptyFeatureCollection(null);
 	}
+        if (request.getResultType() == ResultTypeType.HITS) {
+            return new FeatureCollectionType(response.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
+        }
+        LOGGER.info("GetFeature treated in " + (System.currentTimeMillis() - start) + "ms");
+        return response;
     }
 
     /**
@@ -596,4 +676,43 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker{
         }
     }
 
+    /**
+     * Verify that the bases request attributes are correct.
+     *
+     * @param request an object request with the base attribute (all except GetCapabilities request);
+     */
+    private void verifyBaseRequest(final RequestBase request, boolean versionMandatory) throws CstlServiceException {
+        if (request != null) {
+            if (request.getService() != null) {
+                if (!request.getService().equals("WFS"))  {
+                    throw new CstlServiceException("service must be \"WFS\"!",
+                                                  INVALID_PARAMETER_VALUE, "service");
+                }
+            } else {
+                throw new CstlServiceException("service must be specified!",
+                                              MISSING_PARAMETER_VALUE, "service");
+            }
+            if (request.getVersion() != null) {
+                if (request.getVersion().toString().equals("1.1.0") || request.getVersion().toString().equals("1.1")) {
+                    this.actingVersion = new ServiceVersion(ServiceType.WFS, "1.1.0");
+
+                } else {
+                    throw new CstlServiceException("version must be \"1.1.0\"!", VERSION_NEGOTIATION_FAILED, "version");
+                }
+            } else {
+                if (versionMandatory) {
+                    throw new CstlServiceException("version must be specified!", MISSING_PARAMETER_VALUE, "version");
+                } else {
+                    this.actingVersion = new ServiceVersion(ServiceType.WFS, "1.1.0");
+                }
+            }
+         } else {
+            throw new CstlServiceException("The request is null!", NO_APPLICABLE_CODE);
+         }
+    }
+
+    @Override
+    public Map<String, String> getSchemaLocations() {
+        return schemaLocations;
+    }
 }
