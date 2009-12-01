@@ -156,16 +156,7 @@ public class LayerProviderProxy implements LayerProvider{
      */
     @Override
     public void reload() {
-
-        for(LayerProviderService service : SERVICES){
-
-
-
-//            for(LayerProvider provider : service.getProviders()){
-//                provider.dispose();
-//            }
-        }
-
+        loadServices();
     }
     
     /**
@@ -195,6 +186,12 @@ public class LayerProviderProxy implements LayerProvider{
 
         CONFIG_PATH = configPath;
 
+        loadServices();
+
+    }
+
+    public static void loadServices() {
+        SERVICES.clear();
         final ServiceLoader<LayerProviderService> loader = ServiceLoader.load(LayerProviderService.class);
         for(final LayerProviderService service : loader){
             final String name = service.getName();
@@ -220,13 +217,13 @@ public class LayerProviderProxy implements LayerProvider{
                 }
             }
 
-            
+
             service.setConfiguration(configFile);
 
             SERVICES.add(service);
         }
-
     }
+
 
     public static synchronized LayerProviderProxy getInstance(){
         if(INSTANCE == null){

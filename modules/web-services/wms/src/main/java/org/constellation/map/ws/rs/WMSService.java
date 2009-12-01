@@ -47,6 +47,7 @@ import org.constellation.ServiceDef;
 import org.constellation.map.ws.DefaultWMSWorker;
 import org.constellation.map.ws.QueryContext;
 import org.constellation.map.ws.WMSWorker;
+import org.constellation.provider.LayerProviderProxy;
 import org.constellation.query.QueryAdapter;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetMap;
@@ -611,6 +612,7 @@ public class WMSService extends GridWebService {
     @PreDestroy
     @Override
     public void destroy() {
+        LayerProviderProxy.getInstance().reload();
         LOGGER.info("Shutting down the REST WMS service facade.");
     }
 }
