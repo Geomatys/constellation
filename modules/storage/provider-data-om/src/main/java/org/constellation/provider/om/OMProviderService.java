@@ -21,10 +21,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.NamedLayerProviderService;
-import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
 
 import org.opengis.feature.type.Name;
@@ -42,46 +42,57 @@ public class OMProviderService extends AbstractProviderService<Name,LayerDetails
      * Default logger.
      */
     private static final Logger LOGGER = Logger.getLogger(OMProviderService.class.getName());
-    private static final String NAME = "observation";
     private static final String ERROR_MSG = "[PROVIDER]> Invalid observation provider config";
 
     private static final Collection<OMProvider> PROVIDERS = new ArrayList<OMProvider>();
     private static final Collection<OMProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
+    public OMProviderService(){
+        super("observation");
+    }
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Collection<OMProvider> getProviders() {
         return IMMUTABLE;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public String getName() {
-        return NAME;
+    protected void disposeProviders() {
+        for(final OMProvider provider : PROVIDERS){
+            provider.dispose();
+            PROVIDERS.remove(provider);
+        }
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public void init(ProviderConfig config) {
-        PROVIDERS.clear();
-        for (final ProviderSource ps : config.sources) {
-            try {
-                OMProvider provider = new OMProvider(ps);
-                PROVIDERS.add(provider);
-                String msg = "[PROVIDER]> O&M provider created : ";
-                String SGBDType = provider.getSource().parameters.get(KEY_SGBDTYPE);
-                if (SGBDType != null && SGBDType.equals("derby")) {
-                    msg = msg + "java DB: > "
-                              + provider.getSource().parameters.get(KEY_DERBYURL);
-                } else {
-                    msg = msg + provider.getSource().parameters.get(KEY_HOST) + " > "
-                              + provider.getSource().parameters.get(KEY_DATABASE);
-                }
-                LOGGER.info(msg);
-            } catch (Exception ex) {
-                // we should not catch exception, but here it's better to start all source we can
-                // rather than letting a potential exception block the provider proxy
-                LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
+    protected void loadProvider(ProviderSource ps) {
+        try {
+            OMProvider provider = new OMProvider(ps);
+            PROVIDERS.add(provider);
+            String msg = "[PROVIDER]> O&M provider created : ";
+            String SGBDType = provider.getSource().parameters.get(KEY_SGBDTYPE);
+            if (SGBDType != null && SGBDType.equals("derby")) {
+                msg = msg + "java DB: > "
+                          + provider.getSource().parameters.get(KEY_DERBYURL);
+            } else {
+                msg = msg + provider.getSource().parameters.get(KEY_HOST) + " > "
+                          + provider.getSource().parameters.get(KEY_DATABASE);
             }
+            LOGGER.info(msg);
+        } catch (Exception ex) {
+            // we should not catch exception, but here it's better to start all source we can
+            // rather than letting a potential exception block the provider proxy
+            LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
         }
-
     }
 
 }

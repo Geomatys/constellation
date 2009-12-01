@@ -32,9 +32,11 @@ public interface ProviderService<K,V> {
 
     String getName();
 
-    void init(File config);
+    ProviderConfig getConfiguration();
 
-    void init(ProviderConfig props);
+    void setConfiguration(File config);
+
+    void setConfiguration(ProviderConfig props);
 
     Collection<? extends Provider<K,V>> getProviders();
 

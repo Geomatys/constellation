@@ -189,7 +189,7 @@ public class NamedLayerProviderProxy implements NamedLayerProvider {
             }
 
 
-            service.init(configFile);
+            service.setConfiguration(configFile);
 
             SERVICES.add(service);
         }

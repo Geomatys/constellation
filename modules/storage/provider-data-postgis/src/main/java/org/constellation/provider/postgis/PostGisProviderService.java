@@ -16,16 +16,15 @@
  */
 package org.constellation.provider.postgis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
 
 import static org.constellation.provider.postgis.PostGisProvider.*;
@@ -42,39 +41,50 @@ public class PostGisProviderService extends AbstractProviderService<String,Layer
      * Default logger.
      */
     private static final Logger LOGGER = Logger.getLogger(PostGisProviderService.class.getName());
-    private static final String NAME = "postgis";
     private static final String ERROR_MSG = "[PROVIDER]> Invalid postgis provider config";
 
     private static final Collection<PostGisProvider> PROVIDERS = new ArrayList<PostGisProvider>();
     private static final Collection<PostGisProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
+    public PostGisProviderService(){
+        super("postgis");
+    }
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Collection<PostGisProvider> getProviders() {
         return IMMUTABLE;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public String getName() {
-        return NAME;
+    protected void disposeProviders() {
+        for(final PostGisProvider provider : PROVIDERS){
+            provider.dispose();
+            PROVIDERS.remove(provider);
+        }
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public void init(ProviderConfig config) {
-        PROVIDERS.clear();
-        for (final ProviderSource ps : config.sources) {
-            try {
-                PostGisProvider provider = new PostGisProvider(ps);
-                PROVIDERS.add(provider);
-                LOGGER.log(Level.INFO, "[PROVIDER]> postgis provider created : " 
-                        + provider.getSource().parameters.get(KEY_HOST) + " > "
-                        + provider.getSource().parameters.get(KEY_DATABASE));
-            } catch (Exception ex) {
-                // we should not catch exception, but here it's better to start all source we can
-                // rather than letting a potential exception block the provider proxy
-                LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
-            }
+    protected void loadProvider(ProviderSource ps) {
+        try {
+            PostGisProvider provider = new PostGisProvider(ps);
+            PROVIDERS.add(provider);
+            LOGGER.log(Level.INFO, "[PROVIDER]> postgis provider created : "
+                    + provider.getSource().parameters.get(KEY_HOST) + " > "
+                    + provider.getSource().parameters.get(KEY_DATABASE));
+        } catch (Exception ex) {
+            // we should not catch exception, but here it's better to start all source we can
+            // rather than letting a potential exception block the provider proxy
+            LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
         }
-
     }
 
 }

@@ -310,7 +310,7 @@ public class WFSWorkerTest {
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             // Here we should have the shapefile data provider defined previously
             if (service instanceof ShapeFileProviderService) {
-                service.init(configShape);
+                service.setConfiguration(configShape);
                 if (service.getProviders().isEmpty()) {
                     return;
                 }
@@ -345,7 +345,7 @@ public class WFSWorkerTest {
         for (NamedLayerProviderService service : NamedLayerProviderProxy.getInstance().getServices()) {
             // Here we should have the shapefile data provider defined previously
             if (service instanceof OMProviderService) {
-                service.init(configOM);
+                service.setConfiguration(configOM);
                 if (service.getProviders().isEmpty()) {
                     return;
                 }

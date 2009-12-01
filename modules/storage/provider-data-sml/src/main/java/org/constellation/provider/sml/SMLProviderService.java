@@ -42,39 +42,50 @@ public class SMLProviderService extends AbstractProviderService<Name,LayerDetail
      * Default logger.
      */
     private static final Logger LOGGER = Logger.getLogger(SMLProviderService.class.getName());
-    private static final String NAME = "sensorML";
     private static final String ERROR_MSG = "[PROVIDER]> Invalid sensorML provider config";
 
     private static final Collection<SMLProvider> PROVIDERS = new ArrayList<SMLProvider>();
     private static final Collection<SMLProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
+    public SMLProviderService(){
+        super("sensorML");
+    }
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Collection<SMLProvider> getProviders() {
         return IMMUTABLE;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public String getName() {
-        return NAME;
+    protected void disposeProviders() {
+        for(final SMLProvider provider : PROVIDERS){
+            provider.dispose();
+            PROVIDERS.remove(provider);
+        }
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public void init(ProviderConfig config) {
-        PROVIDERS.clear();
-        for (final ProviderSource ps : config.sources) {
-            try {
-                SMLProvider provider = new SMLProvider(ps);
-                PROVIDERS.add(provider);
-                LOGGER.log(Level.INFO, "[PROVIDER]> sensorML provider created : "
-                        + provider.getSource().parameters.get(KEY_HOST) + " > "
-                        + provider.getSource().parameters.get(KEY_DATABASE));
-            } catch (Exception ex) {
-                // we should not catch exception, but here it's better to start all source we can
-                // rather than letting a potential exception block the provider proxy
-                LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
-            }
+    protected void loadProvider(ProviderSource ps) {
+        try {
+            SMLProvider provider = new SMLProvider(ps);
+            PROVIDERS.add(provider);
+            LOGGER.log(Level.INFO, "[PROVIDER]> sensorML provider created : "
+                    + provider.getSource().parameters.get(KEY_HOST) + " > "
+                    + provider.getSource().parameters.get(KEY_DATABASE));
+        } catch (Exception ex) {
+            // we should not catch exception, but here it's better to start all source we can
+            // rather than letting a potential exception block the provider proxy
+            LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
         }
-
     }
 
 }

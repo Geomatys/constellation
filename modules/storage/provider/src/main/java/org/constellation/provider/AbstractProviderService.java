@@ -21,7 +21,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.constellation.provider.configuration.ProviderConfig;
+import org.constellation.provider.configuration.ProviderSource;
+
 import org.xml.sax.SAXException;
 
 /**
@@ -29,24 +32,48 @@ import org.xml.sax.SAXException;
  * @version $Id$
  *
  * @author Cédric Briançon (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
 public abstract class AbstractProviderService<K, V> implements ProviderService<K, V> {
 
-    private File configFile = null;
-
     private static final Logger LOGGER = Logger.getLogger(AbstractProviderService.class.getName());
 
+    private final String name;
+    private ProviderConfig configuration = new ProviderConfig();
+
+    protected AbstractProviderService(String name){
+        this.name = name;
+    }
+
+    /**
+     * Used by setConfiguration to dispose providers before the new ones
+     * are loaded.
+     */
+    protected abstract void disposeProviders();
+
+    /**
+     * Used by setConfiguration to load a single source.
+     */
+    protected abstract void loadProvider(ProviderSource ps);
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public synchronized void init(File file) {
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public final void setConfiguration(File file) {
         if (file == null) {
             throw new NullPointerException("Configuration file can not be null");
         }
 
-        if (configFile != null) {
-            throw new IllegalStateException("The "+ getName() +" provider service has already been initialize");
-        }
-
-        configFile = file;
+        disposeProviders();
 
         ProviderConfig config = null;
         try {
@@ -59,10 +86,33 @@ public abstract class AbstractProviderService<K, V> implements ProviderService<K
             LOGGER.log(Level.SEVERE, null, ex);
         }
 
-        if (config == null) {
-            return;
+        setConfiguration(config);
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public final void setConfiguration(ProviderConfig configuration) {
+        if(configuration == null){
+            throw new NullPointerException("Configuration can not be null");
         }
 
-        init(config);
+        disposeProviders();
+        this.configuration = configuration;
+
+        for (final ProviderSource ps : configuration.sources) {
+            loadProvider(ps);
+        }
+
     }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public ProviderConfig getConfiguration() {
+        return configuration;
+    }
+
 }

@@ -101,7 +101,7 @@ public abstract class AbstractGrizzlyServer extends PostgridTestCase {
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             // Here we should have the postgrid data provider defined previously
             if (service instanceof PostGridProviderService) {
-                service.init(config);
+                service.setConfiguration(config);
                 assumeTrue(!(service.getProviders().isEmpty()));
                 if (service.getProviders().isEmpty()) {
                     return;

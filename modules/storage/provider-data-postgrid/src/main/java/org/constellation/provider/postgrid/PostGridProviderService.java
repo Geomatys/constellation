@@ -44,38 +44,49 @@ public class PostGridProviderService extends AbstractProviderService<String,Laye
      * Default logger.
      */
     private static final Logger LOGGER = Logging.getLogger(PostGridProviderService.class);
-    private static final String NAME = "postgrid";
     private static final String ERROR_MSG = "[PROVIDER]> Invalid postgrid provider config";
 
     private static final Collection<PostGridProvider> PROVIDERS = new ArrayList<PostGridProvider>();
     private static final Collection<PostGridProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
+    public PostGridProviderService(){
+        super("postgrid");
+    }
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Collection<PostGridProvider> getProviders() {
         return IMMUTABLE;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public String getName() {
-        return NAME;
+    protected void disposeProviders() {
+        for(final PostGridProvider provider : PROVIDERS){
+            provider.dispose();
+            PROVIDERS.remove(provider);
+        }
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public void init(ProviderConfig provConf) {
-        PROVIDERS.clear();
-
-        for (final ProviderSource ps : provConf.sources) {
-            try {
-                final PostGridProvider provider = new PostGridProvider(ps);
-                PROVIDERS.add(provider);
-                LOGGER.log(Level.INFO, "[PROVIDER]> postgrid provider created : "
-                        + provider.getSource().parameters.get(KEY_DATABASE) + " > "
-                        + provider.getSource().parameters.get(KEY_ROOT_DIRECTORY));
-            } catch (Exception ex) {
-                // we should not catch exception, but here it's better to start all source we can
-                // rather than letting a potential exception block the provider proxy
-                LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
-            }
+    protected void loadProvider(ProviderSource ps){
+        try {
+            final PostGridProvider provider = new PostGridProvider(ps);
+            PROVIDERS.add(provider);
+            LOGGER.log(Level.INFO, "[PROVIDER]> postgrid provider created : "
+                    + provider.getSource().parameters.get(KEY_DATABASE) + " > "
+                    + provider.getSource().parameters.get(KEY_ROOT_DIRECTORY));
+        } catch (Exception ex) {
+            // we should not catch exception, but here it's better to start all source we can
+            // rather than letting a potential exception block the provider proxy
+            LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
         }
     }
 

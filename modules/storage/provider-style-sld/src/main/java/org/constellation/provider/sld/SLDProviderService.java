@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.StyleProviderService;
-import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.style.MutableStyle;
@@ -44,37 +43,48 @@ public class SLDProviderService extends AbstractProviderService<String,MutableSt
      * Default logger.
      */
     private static final Logger LOGGER = Logger.getLogger(SLDProviderService.class.getName());
-    private static final String NAME = "sld";
     private static final String ERROR_MSG = "[PROVIDER]> Invalid SLD provider config";
 
     private static final Collection<SLDProvider> PROVIDERS = new ArrayList<SLDProvider>();
     private static final Collection<SLDProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
+    public SLDProviderService(){
+        super("sld");
+    }
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Collection<SLDProvider> getProviders() {
         return IMMUTABLE;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public String getName() {
-        return NAME;
+    protected void disposeProviders() {
+        for(final SLDProvider provider : PROVIDERS){
+            provider.dispose();
+            PROVIDERS.remove(provider);
+        }
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public void init(ProviderConfig config) {
-        PROVIDERS.clear();
-        for (final ProviderSource ps : config.sources) {
-            try {
-                SLDProvider provider = new SLDProvider(ps);
-                PROVIDERS.add(provider);
-                LOGGER.log(Level.INFO, "[PROVIDER]> SLD provider created : " + provider.getSource().parameters.get(KEY_FOLDER_PATH));
-            } catch (Exception ex) {
-                // we should not catch exception, but here it's better to start all source we can
-                // rather than letting a potential exception block the provider proxy
-                LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
-            }
+    protected void loadProvider(ProviderSource ps) {
+        try {
+            SLDProvider provider = new SLDProvider(ps);
+            PROVIDERS.add(provider);
+            LOGGER.log(Level.INFO, "[PROVIDER]> SLD provider created : " + provider.getSource().parameters.get(KEY_FOLDER_PATH));
+        } catch (Exception ex) {
+            // we should not catch exception, but here it's better to start all source we can
+            // rather than letting a potential exception block the provider proxy
+            LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
         }
-
     }
 
 }

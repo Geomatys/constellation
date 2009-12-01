@@ -176,7 +176,7 @@ public final class StyleProviderProxy implements Provider<String,MutableStyle>{
                 final String path = CONFIG_PATH + fileName;
                 configFile = new File(path);
             }
-            service.init(configFile);
+            service.setConfiguration(configFile);
 
             SERVICES.add(service);
         }

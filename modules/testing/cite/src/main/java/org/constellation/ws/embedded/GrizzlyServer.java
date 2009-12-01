@@ -107,7 +107,7 @@ public final class GrizzlyServer {
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             // Here we should have the postgrid data provider defined previously
             if (service instanceof PostGridProviderService) {
-                service.init(configPostGrid);
+                service.setConfiguration(configPostGrid);
                 if (service.getProviders().isEmpty()) {
                     return;
                 }
@@ -130,7 +130,7 @@ public final class GrizzlyServer {
         for (StyleProviderService service : StyleProviderProxy.getInstance().getServices()) {
             // Here we should have the styles data provider defined previously
             if (service instanceof SLDProviderService) {
-                service.init(configStyle);
+                service.setConfiguration(configStyle);
                 if (service.getProviders().isEmpty()) {
                     return;
                 }
@@ -175,7 +175,7 @@ public final class GrizzlyServer {
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             // Here we should have the shapefile data provider defined previously
             if (service instanceof ShapeFileProviderService) {
-                service.init(configShape);
+                service.setConfiguration(configShape);
                 if (service.getProviders().isEmpty()) {
                     return;
                 }
@@ -198,7 +198,7 @@ public final class GrizzlyServer {
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             // Here we should have the postgis data provider defined previously
             if (service instanceof PostGisProviderService) {
-                service.init(configPostGis);
+                service.setConfiguration(configPostGis);
                 if (service.getProviders().isEmpty()) {
                     return;
                 }

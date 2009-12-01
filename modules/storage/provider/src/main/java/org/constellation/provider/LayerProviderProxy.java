@@ -158,9 +158,12 @@ public class LayerProviderProxy implements LayerProvider{
     public void reload() {
 
         for(LayerProviderService service : SERVICES){
-            for(LayerProvider provider : service.getProviders()){
-                provider.reload();
-            }
+
+
+
+//            for(LayerProvider provider : service.getProviders()){
+//                provider.dispose();
+//            }
         }
 
     }
@@ -218,7 +221,7 @@ public class LayerProviderProxy implements LayerProvider{
             }
 
             
-            service.init(configFile);
+            service.setConfiguration(configFile);
 
             SERVICES.add(service);
         }

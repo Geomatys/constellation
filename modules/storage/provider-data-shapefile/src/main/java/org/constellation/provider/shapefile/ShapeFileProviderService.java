@@ -21,10 +21,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
 
 import static org.constellation.provider.shapefile.ShapeFileProvider.*;
@@ -41,37 +41,48 @@ public class ShapeFileProviderService extends AbstractProviderService<String,Lay
      * Default logger.
      */
     private static final Logger LOGGER = Logger.getLogger(ShapeFileProviderService.class.getName());
-    private static final String NAME = "shapefile";
     private static final String ERROR_MSG = "[PROVIDER]> Invalid shapefile provider config";
 
     private static final Collection<ShapeFileProvider> PROVIDERS = new ArrayList<ShapeFileProvider>();
     private static final Collection<ShapeFileProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
+    public ShapeFileProviderService(){
+        super("shapefile");
+    }
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Collection<ShapeFileProvider> getProviders() {
         return IMMUTABLE;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public String getName() {
-        return NAME;
+    protected void disposeProviders() {
+        for(final ShapeFileProvider provider : PROVIDERS){
+            provider.dispose();
+            PROVIDERS.remove(provider);
+        }
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
-    public void init(ProviderConfig config) {
-        PROVIDERS.clear();
-        for (final ProviderSource ps : config.sources) {
-            try {
-                ShapeFileProvider provider = new ShapeFileProvider(ps);
-                PROVIDERS.add(provider);
-                LOGGER.log(Level.INFO, "[PROVIDER]> shapefile provider created : " + provider.getSource().parameters.get(KEY_FOLDER_PATH));
-            } catch (Exception ex) {
-                // we should not catch exception, but here it's better to start all source we can
-                // rather than letting a potential exception block the provider proxy
-                LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
-            }
+    protected void loadProvider(ProviderSource ps) {
+        try {
+            ShapeFileProvider provider = new ShapeFileProvider(ps);
+            PROVIDERS.add(provider);
+            LOGGER.log(Level.INFO, "[PROVIDER]> shapefile provider created : " + provider.getSource().parameters.get(KEY_FOLDER_PATH));
+        } catch (Exception ex) {
+            // we should not catch exception, but here it's better to start all source we can
+            // rather than letting a potential exception block the provider proxy
+            LOGGER.log(Level.SEVERE, ERROR_MSG, ex);
         }
-
     }
 
 }
