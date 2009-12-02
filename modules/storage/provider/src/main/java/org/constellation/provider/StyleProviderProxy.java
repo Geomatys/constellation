@@ -125,13 +125,7 @@ public final class StyleProviderProxy implements Provider<String,MutableStyle>{
      */
     @Override
     public void reload() {
-
-        for(StyleProviderService service : SERVICES){
-            for(StyleProvider provider : service.getProviders()){
-                provider.reload();
-            }
-        }
-
+        loadServices();
     }
 
     /**
@@ -160,7 +154,11 @@ public final class StyleProviderProxy implements Provider<String,MutableStyle>{
         }
 
         CONFIG_PATH = configPath;
+        loadServices();
+    }
 
+    public static void loadServices() {
+        SERVICES.clear();
         final ServiceLoader<StyleProviderService> loader = ServiceLoader.load(StyleProviderService.class);
         for(final StyleProviderService service : loader){
             final String name = service.getName();
@@ -180,8 +178,8 @@ public final class StyleProviderProxy implements Provider<String,MutableStyle>{
 
             SERVICES.add(service);
         }
-
     }
+
 
     public static synchronized StyleProviderProxy getInstance(){
         if(INSTANCE == null){

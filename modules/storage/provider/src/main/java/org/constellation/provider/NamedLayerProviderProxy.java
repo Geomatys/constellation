@@ -127,13 +127,7 @@ public class NamedLayerProviderProxy implements NamedLayerProvider {
      */
     @Override
     public void reload() {
-
-        for(NamedLayerProviderService service : SERVICES){
-            for(NamedLayerProvider provider : service.getProviders()){
-                provider.reload();
-            }
-        }
-
+        loadServices();
     }
 
     /**
@@ -149,7 +143,6 @@ public class NamedLayerProviderProxy implements NamedLayerProvider {
         }
 
         SERVICES.clear();
-
     }
 
     private static synchronized void init(final String configPath){
@@ -162,6 +155,10 @@ public class NamedLayerProviderProxy implements NamedLayerProvider {
         }
 
         CONFIG_PATH = configPath;
+        loadServices();
+    }
+
+    private static void loadServices(){
 
         final ServiceLoader<NamedLayerProviderService> loader = ServiceLoader.load(NamedLayerProviderService.class);
         for(final NamedLayerProviderService service : loader){
@@ -193,7 +190,6 @@ public class NamedLayerProviderProxy implements NamedLayerProvider {
 
             SERVICES.add(service);
         }
-
     }
 
     public static synchronized NamedLayerProviderProxy getInstance(){
