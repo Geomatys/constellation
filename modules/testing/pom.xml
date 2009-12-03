@@ -80,7 +80,9 @@
       <modules>
         <module>data</module>
     	<module>embedded</module>
+        <!-- Disabled to enable the tag 0.5.1 to build
 	<module>cite</module>
+        -->
       </modules>
     </profile>
     <profile>
