@@ -116,9 +116,9 @@ public class WFSService extends OGCWebService {
         } 
         this.worker        = candidate;
 
-
+        //activateRequestValidation("http://schemas.opengis.net/wfs/1.1.0/wfs.xsd");
         if (worker != null) {
-            LOGGER.info("WFS Service started");
+            LOGGER.info("WFS Service running");
         }
     }
 

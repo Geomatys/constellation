@@ -26,6 +26,8 @@ import javax.servlet.ServletContext;
 
 // jersey dependencies
 import com.sun.jersey.api.core.HttpContext;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -46,6 +48,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
 
 // Constellation dependencies
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -57,6 +61,7 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 
 import static org.constellation.ws.ExceptionCode.*;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -168,6 +173,16 @@ public abstract class WebService {
     private boolean fullRequestLog = false;
 
     /**
+     * If this flag is set to true a validator is added to the XML request unmarshaller.
+     */
+    private boolean requestValidationActivated = false;
+
+    /**
+     * if the flag requestValidationActivated is set to true this attribute muste contain the main xsd file.
+     */
+    private String mainXsdPath = null;
+
+    /**
      * Initialize the basic attribute of a web service.
      */
     public WebService() {
@@ -269,6 +284,17 @@ public abstract class WebService {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
+                if (requestValidationActivated) {
+                    try {
+                        SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                        Schema schema    = sf.newSchema(new URL(mainXsdPath));
+                        unmarshaller.setSchema(schema);
+                    } catch (SAXException ex) {
+                        LOGGER.severe("SAX exception while adding the Validator to the JAXB unmarshaller");
+                    } catch (MalformedURLException ex) {
+                        LOGGER.severe("MalformedURL exception while adding the Validator to the JAXB unmarshaller");
+                    }
+                }
                 request = unmarshaller.unmarshal(is);
             } catch (UnmarshalException e) {
                 String errorMsg = e.getMessage();
@@ -374,7 +400,7 @@ public abstract class WebService {
                     return value;
                 }
                 throw new CstlServiceException("The parameter " + parameterName + " should have a value",
-                        INVALID_PARAMETER_VALUE, parameterName.toLowerCase());
+                        MISSING_PARAMETER_VALUE, parameterName.toLowerCase());
             } else {
                 return value;
             }
@@ -536,5 +562,10 @@ public abstract class WebService {
      */
     public void setFullRequestLog(boolean fullRequestLog) {
         this.fullRequestLog = fullRequestLog;
+    }
+
+    public void activateRequestValidation(String mainXsdPath) {
+        this.mainXsdPath                = mainXsdPath;
+        this.requestValidationActivated = true;
     }
 }

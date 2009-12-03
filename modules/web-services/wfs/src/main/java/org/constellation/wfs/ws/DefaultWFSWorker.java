@@ -82,7 +82,6 @@ import org.geotoolkit.data.store.EmptyFeatureCollection;
 import org.geotoolkit.filter.accessor.Accessors;
 import org.geotoolkit.filter.accessor.PropertyAccessor;
 import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
-import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -100,6 +99,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import org.opengis.referencing.operation.TransformException;
+import org.opengis.util.CodeList;
 
 
 /**
@@ -166,12 +166,12 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         long start = System.currentTimeMillis();
 
         // we verify the base attribute
-        verifyBaseRequest(getCapab, false);
+        verifyBaseRequest(getCapab, false, true);
 
         if (getCapab.getAcceptFormats() != null && getCapab.getAcceptFormats().getOutputFormat() != null && getCapab.getAcceptFormats().getOutputFormat().size() > 0) {
             outputFormat =  getCapab.getAcceptFormats().getOutputFormat().get(0);
         } else {
-            outputFormat = "text/xml";
+            outputFormat = "application/xml";
         }
         
         final WFSCapabilitiesType inCapabilities;
@@ -379,7 +379,13 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         long start = System.currentTimeMillis();
 
         // we verify the base attribute
-        verifyBaseRequest(request, false);
+        verifyBaseRequest(request, false, false);
+
+        String requestOutputFormat                = request.getOutputFormat();
+        if (requestOutputFormat == null) {
+            requestOutputFormat = "text/xml; subtype=gml/3.1.1";
+        }
+        outputFormat = requestOutputFormat;
         
         final JAXBFeatureTypeWriter writer;
         try {
@@ -440,7 +446,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         long start = System.currentTimeMillis();
 
         // we verify the base attribute
-        verifyBaseRequest(request, false);
+        verifyBaseRequest(request, false, false);
 
         String requestOutputFormat                = request.getOutputFormat();
         if (requestOutputFormat == null) {
@@ -454,6 +460,10 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         final Integer maxFeatures                 = request.getMaxFeatures();
         final List<FeatureCollection> collections = new ArrayList<FeatureCollection>();
         schemaLocations                           = new HashMap<String, String>();
+
+        if (request.getQuery() == null || request.getQuery().size() == 0) {
+            throw new CstlServiceException("You must specify a query!", MISSING_PARAMETER_VALUE);
+        }
         
         for (final QueryType query : request.getQuery()) {
             final FilterType jaxbFilter   = query.getFilter();
@@ -554,7 +564,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     }
                     // if the requestPropNames is not empty there is unKnown propertyNames
                     if (!requestPropNames.isEmpty()) {
-                        throw new CstlServiceException("The feature Type " + typeName + " does not has such a property:" + requestPropNames.get(0));
+                        throw new CstlServiceException("The feature Type " + typeName + " does not has such a property:" + requestPropNames.get(0), INVALID_PARAMETER_VALUE);
                     }
 
                     queryBuilder.setProperties(propertyNames.toArray(new String[propertyNames.size()]));
@@ -567,7 +577,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 for (String filterProperty : filterProperties) {
                     PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, filterProperty, null);
                     if (pa == null || pa.get(ft, filterProperty, null) == null) {
-                        throw new CstlServiceException("The feature Type " + typeName + " does not has such a property:" + filterProperty);
+                        throw new CstlServiceException("The feature Type " + typeName + " does not has such a property:" + filterProperty, INVALID_PARAMETER_VALUE);
                     }
                 }
 
@@ -610,7 +620,10 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 	        response = new EmptyFeatureCollection(null);
 	}
         if (request.getResultType() == ResultTypeType.HITS) {
-            return new FeatureCollectionType(response.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
+            FeatureCollectionType collection = new FeatureCollectionType(response.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
+            collection.setId("collection-1");
+            return collection;
+
         }
         LOGGER.info("GetFeature treated in " + (System.currentTimeMillis() - start) + "ms");
         return response;
@@ -706,10 +719,12 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      *
      * @param request an object request with the base attribute (all except GetCapabilities request);
      */
-    private void verifyBaseRequest(final RequestBase request, boolean versionMandatory) throws CstlServiceException {
+    private void verifyBaseRequest(final RequestBase request, boolean versionMandatory, boolean getCapabilities) throws CstlServiceException {
         if (request != null) {
             if (request.getService() != null) {
-                if (!request.getService().equals("WFS"))  {
+                if (request.getService().equals("")) {
+                  // we let pass (CITE test)
+                } else if (!request.getService().equals("WFS"))  {
                     throw new CstlServiceException("service must be \"WFS\"!",
                                                   INVALID_PARAMETER_VALUE, "service");
                 }
@@ -718,11 +733,17 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                                               MISSING_PARAMETER_VALUE, "service");
             }
             if (request.getVersion() != null) {
-                if (request.getVersion().toString().equals("1.1.0") || request.getVersion().toString().equals("1.1")) {
+                if (request.getVersion().toString().equals("1.1.0") || request.getVersion().toString().equals("1.1") || request.getVersion().toString().equals("")) {
                     this.actingVersion = new ServiceVersion(ServiceType.WFS, "1.1.0");
 
                 } else {
-                    throw new CstlServiceException("version must be \"1.1.0\"!", VERSION_NEGOTIATION_FAILED, "version");
+                    CodeList code;
+                    if (getCapabilities) {
+                        code = VERSION_NEGOTIATION_FAILED;
+                    } else {
+                        code = INVALID_PARAMETER_VALUE;
+                    }
+                    throw new CstlServiceException("version must be \"1.1.0\"!", code, "version");
                 }
             } else {
                 if (versionMandatory) {

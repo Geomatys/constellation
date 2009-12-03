@@ -120,16 +120,21 @@ public class WFSWorkerTest {
     public void getFeatureTest() throws Exception {
 
         /**
-         * Test 2 : empty query => response empty collection
+         * Test 2 : empty query => error
          */
         GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
-        Object result = worker.getFeature(request);
+        boolean exLaunched = false;
+        Object result = null;
+        try {
+            result = worker.getFeature(request);
 
-        FeatureCollection ExpResult = new EmptyFeatureCollection(null);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+        }
 
-        assertEquals(ExpResult, result);
-
+        assertTrue(exLaunched);
+        
         /**
          * Test 2 : query on typeName bridges
          */
@@ -196,7 +201,7 @@ public class WFSWorkerTest {
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
-        boolean exLaunched = false;
+        exLaunched = false;
         try {
             result = worker.getFeature(request);
         } catch (CstlServiceException ex) {
@@ -363,7 +368,9 @@ public class WFSWorkerTest {
     private static File initDataDirectory() throws IOException {
         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         String styleResource = classloader.getResource("org/constellation/ws/embedded/wms111/styles").getFile();
-        styleResource = styleResource.substring(0, styleResource.indexOf('!'));
+        if (styleResource.indexOf('!') != -1) {
+            styleResource = styleResource.substring(0, styleResource.indexOf('!'));
+        }
         if (styleResource.startsWith("file:")) {
             styleResource = styleResource.substring(5);
         }
