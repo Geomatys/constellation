@@ -39,10 +39,12 @@ import javax.xml.namespace.QName;
 import com.sun.jersey.spi.resource.Singleton;
 import java.util.logging.Level;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 // constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
@@ -53,8 +55,11 @@ import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
 import org.geotoolkit.data.collection.FeatureCollection;
+import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.GmlObjectIdType;
+import org.geotoolkit.ogc.xml.v110.SortByType;
+import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
@@ -71,6 +76,7 @@ import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 
+import org.opengis.filter.sort.SortOrder;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.query.wfs.WFSQuery.*;
 
@@ -151,25 +157,25 @@ public class WFSService extends OGCWebService {
                 final GetCapabilitiesType model = adaptGetCapabilities(objectRequest);
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(model), sw);
-                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                return Response.ok(sw.toString(), getOutputFormat()).build();
 
             } else if (STR_DESCRIBEFEATURETYPE.equalsIgnoreCase(request) || (objectRequest instanceof DescribeFeatureTypeType)) {
                 final DescribeFeatureTypeType model = adaptDescripbeFeatureType(objectRequest);
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.describeFeatureType(model), sw);
-                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                return Response.ok(sw.toString(), getOutputFormat()).build();
 
             } else if (STR_GETFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof GetFeatureType)) {
                 final GetFeatureType model = adaptGetFeatureType(objectRequest);
                 version = getVersionFromNumber(model.getVersion());
                 Object response = worker.getFeature(model);
                 if (response instanceof FeatureCollection) {
-                    this.schemaLocations = worker.getSchemaLocations();
-                    return Response.ok(response, worker.getOutputFormat()).build();
+                    schemaLocations = worker.getSchemaLocations();
+                    return Response.ok(response, getOutputFormat()).build();
                 } else {
                     final StringWriter sw = new StringWriter();
                     marshaller.marshal(response, sw);
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                    return Response.ok(sw.toString(), getOutputFormat()).build();
                 }
 
             } else if (STR_GETGMLOBJECT.equalsIgnoreCase(request) || (objectRequest instanceof GetGmlObjectType)) {
@@ -177,21 +183,21 @@ public class WFSService extends OGCWebService {
                 version = getVersionFromNumber(model.getVersion());
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getGMLObject(model), sw);
-                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                return Response.ok(sw.toString(), getOutputFormat()).build();
 
             } else if (STR_LOCKFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof LockFeatureType)) {
                 final LockFeatureType model = adaptLockFeature(objectRequest);
                 version = getVersionFromNumber(model.getVersion());
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.lockFeature(model), sw);
-                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                return Response.ok(sw.toString(), getOutputFormat()).build();
 
             } else if (STR_TRANSACTION.equalsIgnoreCase(request) || (objectRequest instanceof TransactionType)) {
                 final TransactionType model = adaptTransaction(objectRequest);
                 version = getVersionFromNumber(model.getVersion());
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.transaction(model), sw);
-                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                return Response.ok(sw.toString(), getOutputFormat()).build();
             }
 
             //unvalid request, throw an error
@@ -481,8 +487,9 @@ public class WFSService extends OGCWebService {
                                                   INVALID_PARAMETER_VALUE, "typeName");
                     }
                 } else {
-                    throw new CstlServiceException("The typeName parameter is malformed : [" + token + "] the good pattern is ns1:feature",
-                                                  INVALID_PARAMETER_VALUE, "typeName");
+                    typeNames.add(new QName(token));
+                    /*throw new CstlServiceException("The typeName parameter is malformed : [" + token + "] the good pattern is ns1:feature",
+                                                  INVALID_PARAMETER_VALUE, "typeName");*/
                 }
             }
         }
@@ -517,14 +524,77 @@ public class WFSService extends OGCWebService {
             }
         }
 
-        String featureVersion = getParameter("featureVersion", false);
+        String bbox = getParameter("bbox", false);
+        if (bbox != null) {
+            final double[] coodinates = new double[4];
 
+            final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
+            int index = 0;
+            while (tokens.hasMoreTokens() && index < 4) {
+                final double value = StringUtilities.toDouble(tokens.nextToken());
+                coodinates[index] = value;
+                index++;
+            }
+            String crs = null;
+            if (tokens.hasMoreTokens()) {
+                crs = tokens.nextToken();
+            }
+            
+            if (coodinates != null) {
+                BBOXType bboxFilter = new BBOXType("", coodinates[0], coodinates[1], coodinates[2], coodinates[3], null);
+                if (filter == null) {
+                    filter = new FilterType(bboxFilter);
+                } else {
+                    LOGGER.info("unexpected case --> filter + bbox TODO");
+                }
+            }
+        }
+
+        String featureVersion = getParameter("featureVersion", false);
         QueryType query = new QueryType(filter, typeNames, featureVersion);
+
+
+        // TODO handle multiple properties and handle prefixed properties
+        String sortByParam = getParameter("sortBy", false);
+        if (sortByParam != null) {
+            if (sortByParam.indexOf(':') != -1) {
+                sortByParam = sortByParam.substring(sortByParam.indexOf(':') + 1);
+            }
+            //we get the order
+            SortOrder order;
+            if (sortByParam.indexOf(" ") != -1) {
+                char cOrder = sortByParam.charAt(sortByParam.length() -1);
+                sortByParam = sortByParam.substring(0, sortByParam.indexOf(" "));
+                if (cOrder == 'D') {
+                    order = SortOrder.DESCENDING;
+                } else {
+                    order = SortOrder.ASCENDING;
+                }
+            } else {
+                order = SortOrder.ASCENDING;
+            }
+            List<SortPropertyType> sortProperties = new ArrayList<SortPropertyType>();
+            sortProperties.add(new SortPropertyType(sortByParam, order));
+            SortByType sortBy = new SortByType(sortProperties);
+            query.setSortBy(sortBy);
+        }
+
+        String propertyNameParam = getParameter("propertyName", false);
+        if (propertyNameParam != null) {
+            List<String> propertyNames = new ArrayList<String>();
+            final StringTokenizer tokens = new StringTokenizer(propertyNameParam, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                propertyNames.add(token);
+            }
+            query.getPropertyNameOrXlinkPropertyNameOrFunction().addAll(propertyNames);
+        }
+        
 
         String result = getParameter("resultType", false);
         ResultTypeType resultType = null;
         if (result != null) {
-            resultType = ResultTypeType.fromValue(result);
+            resultType = ResultTypeType.fromValue(result.toLowerCase());
         }
         return new GetFeatureType(service, version, handle, maxFeature, Arrays.asList(query), resultType, outputFormat);
 
@@ -724,5 +794,14 @@ public class WFSService extends OGCWebService {
 
     public static Map<String, String> getSchemaLocations() {
         return schemaLocations;
+    }
+
+    public MediaType getOutputFormat() {
+        String format = worker.getOutputFormat();
+        if (format.equals("text/xml; subtype=gml/3.1.1")) {
+            return new MediaType("text", "xml; subtype=gml/3.1.1");
+        } else {
+            return MediaType.valueOf(format);
+        }
     }
 }

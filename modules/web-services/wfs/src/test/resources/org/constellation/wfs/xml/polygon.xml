@@ -1,8 +1,8 @@
 <?xml version='1.0'?>
 <gml:BasicPolygons gml:id="BasicPolygons.1" xmlns:gml="http://www.opengis.net/gml">
     <the_geom>
-        <gml:MultiGeometry>
-            <gml:geometryMember>
+        <gml:MultiSurface srsName="EPSG:4326">
+            <gml:surfaceMember>
                 <gml:Polygon srsName="EPSG:4326">
                     <gml:exterior>
                         <gml:LinearRing>
@@ -10,8 +10,8 @@
                         </gml:LinearRing>
                      </gml:exterior>
                 </gml:Polygon>
-            </gml:geometryMember>
-        </gml:MultiGeometry>
+            </gml:surfaceMember>
+        </gml:MultiSurface>
     </the_geom>
     <ID> </ID>
 </gml:BasicPolygons>

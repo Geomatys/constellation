@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <wfs:FeatureCollection gml:id="collection-1" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" xmlns:sml="http://www.opengis.net/sml/1.0">
     <gml:boundedBy>
-        <gml:Envelope>
+        <gml:Envelope srsName="EPSG:4326">
             <gml:lowerCorner>65400.0 1731368.0</gml:lowerCorner>
             <gml:upperCorner>65400.0 1731368.0</gml:upperCorner>
         </gml:Envelope>

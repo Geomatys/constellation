@@ -82,6 +82,7 @@ import org.geotoolkit.data.store.EmptyFeatureCollection;
 import org.geotoolkit.filter.accessor.Accessors;
 import org.geotoolkit.filter.accessor.PropertyAccessor;
 import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -131,6 +132,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     private ServiceVersion actingVersion = new ServiceVersion(ServiceType.WFS, "1.1.0");
 
     private Map<String, String> schemaLocations;
+
+    private String outputFormat = "text/xml";
     
     public DefaultWFSWorker(final MarshallerPool marshallerPool) {
         this.marshallerPool = marshallerPool;
@@ -164,6 +167,12 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
         // we verify the base attribute
         verifyBaseRequest(getCapab, false);
+
+        if (getCapab.getAcceptFormats() != null && getCapab.getAcceptFormats().getOutputFormat() != null && getCapab.getAcceptFormats().getOutputFormat().size() > 0) {
+            outputFormat =  getCapab.getAcceptFormats().getOutputFormat().get(0);
+        } else {
+            outputFormat = "text/xml";
+        }
         
         final WFSCapabilitiesType inCapabilities;
         try {
@@ -432,7 +441,13 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
         // we verify the base attribute
         verifyBaseRequest(request, false);
-        
+
+        String requestOutputFormat                = request.getOutputFormat();
+        if (requestOutputFormat == null) {
+            requestOutputFormat = "text/xml; subtype=gml/3.1.1";
+        }
+        outputFormat = requestOutputFormat;
+
         final LayerProviderProxy proxy            = LayerProviderProxy.getInstance();
         final NamedLayerProviderProxy namedProxy  = NamedLayerProviderProxy.getInstance();
         final XMLUtilities util                   = new XMLUtilities();
@@ -449,14 +464,14 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             
             final Filter filter;
             final CoordinateReferenceSystem crs;
-            final List<String> propNames = new ArrayList<String>();
-            final List<SortBy> sortBys   = new ArrayList<SortBy>();
+            final List<String> requestPropNames = new ArrayList<String>();
+            final List<SortBy> sortBys          = new ArrayList<SortBy>();
 
             //decode filter-----------------------------------------------------
             try {
-                if (jaxbFilter != null){
+                if (jaxbFilter != null) {
                     filter = util.getTransformer110().visitFilter(jaxbFilter);
-                }else{
+                } else {
                     filter = Filter.INCLUDE;
                 }
             } catch(Exception ex) {
@@ -488,7 +503,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     if (pName.indexOf(":") != -1) {
                         pName = pName.substring(pName.indexOf(":") + 1);
                     }
-                    propNames.add(pName);
+                    requestPropNames.add(pName);
                 }
             }
 
@@ -520,18 +535,28 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 }
                 FeatureType ft = layer.getSource().getSchema();
 
-                if (!propNames.isEmpty()) {
+                if (!requestPropNames.isEmpty()) {
                     List<String> propertyNames = new ArrayList<String>();
                     for (PropertyDescriptor pdesc : ft.getDescriptors()) {
+                        String propName = pdesc.getName().getLocalPart();
+
                         if (!pdesc.isNillable()) {
-                            String propName = pdesc.getName().getLocalPart();
                             if (!propertyNames.contains(propName)) {
                                 propertyNames.add(propName);
                             }
-                        } else if (propNames.contains(pdesc.getName().getLocalPart())) {
-                            propertyNames.add(pdesc.getName().getLocalPart());
+                        } else if (requestPropNames.contains(propName)) {
+                            propertyNames.add(propName);
+                        }
+                        
+                        if (requestPropNames.contains(propName)) {
+                                requestPropNames.remove(propName);
                         }
                     }
+                    // if the requestPropNames is not empty there is unKnown propertyNames
+                    if (!requestPropNames.isEmpty()) {
+                        throw new CstlServiceException("The feature Type " + typeName + " does not has such a property:" + requestPropNames.get(0));
+                    }
+
                     queryBuilder.setProperties(propertyNames.toArray(new String[propertyNames.size()]));
                 } else  {
                     queryBuilder.setProperties(null);
@@ -620,7 +645,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      */
     @Override
     public String getOutputFormat() {
-        return "text/xml";
+        return outputFormat;
     }
 
     /**

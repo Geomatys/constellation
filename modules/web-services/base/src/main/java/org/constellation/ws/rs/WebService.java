@@ -351,13 +351,13 @@ public abstract class WebService {
             }
         }
 
-        if(values == null){
-            if(mandatory){
+        if (values == null) {
+            if (mandatory) {
                 throw new CstlServiceException("The parameter " + parameterName + " must be specified",
                         MISSING_PARAMETER_VALUE, parameterName.toLowerCase());
             }
             return null;
-        }else{
+        } else {
             final String value = values.get(0);
             if ((value == null || value.equals("")) && mandatory) {
                 /* For the STYLE/STYLES parameters, they are mandatory in the GetMap request.
@@ -374,7 +374,7 @@ public abstract class WebService {
                     return value;
                 }
                 throw new CstlServiceException("The parameter " + parameterName + " should have a value",
-                        INVALID_PARAMETER_VALUE);
+                        INVALID_PARAMETER_VALUE, parameterName.toLowerCase());
             } else {
                 return value;
             }
