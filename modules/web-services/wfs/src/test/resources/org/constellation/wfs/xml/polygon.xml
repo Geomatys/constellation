@@ -1,9 +1,9 @@
 <?xml version='1.0'?>
 <gml:BasicPolygons gml:id="BasicPolygons.1" xmlns:gml="http://www.opengis.net/gml">
     <the_geom>
-        <gml:MultiSurface srsName="EPSG:4326">
+        <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
             <gml:surfaceMember>
-                <gml:Polygon srsName="EPSG:4326">
+                <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
                     <gml:exterior>
                         <gml:LinearRing>
                             <gml:posList>-1.0 0.0 0.0 1.0 1.0 0.0 0.0 -1.0 -1.0 0.0</gml:posList>

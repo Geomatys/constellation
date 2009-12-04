@@ -33,6 +33,7 @@ import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
 // Geotools dependencies
@@ -190,8 +191,7 @@ public abstract class OGCWebService extends AbstractWebService {
     @Override
     protected Response launchException(final String message, String codeName, final String locator) throws JAXBException {
         if (isOWS(actingVersion)) {
-            codeName = codeName.replace("_", "");
-            codeName = codeName.toLowerCase();
+            codeName = Util.transformCodeName(codeName);
         }
         final OWSExceptionCode code   = CodeLists.valueOf(OWSExceptionCode.class, codeName);
         final CstlServiceException ex = new CstlServiceException(message, code, locator);
@@ -358,10 +358,11 @@ public abstract class OGCWebService extends AbstractWebService {
         if (def == null) {
             throw new IllegalArgumentException("Unable to know if the service is OWS because it is not defined.");
         }
-        return  def.equals(ServiceDef.CSW_2_0_2) || def.equals(ServiceDef.PDP)       ||
-                def.equals(ServiceDef.PEP)       || def.equals(ServiceDef.SOS_1_0_0) ||
-                def.equals(ServiceDef.WCS_1_1_1) || def.equals(ServiceDef.WCS_1_1_0) ||
-                def.equals(ServiceDef.WCS_1_1_2) || def.equals(ServiceDef.WMTS_1_0_0);
+        return  def.equals(ServiceDef.CSW_2_0_2) || def.equals(ServiceDef.PDP)        ||
+                def.equals(ServiceDef.PEP)       || def.equals(ServiceDef.SOS_1_0_0)  ||
+                def.equals(ServiceDef.WCS_1_1_1) || def.equals(ServiceDef.WCS_1_1_0)  ||
+                def.equals(ServiceDef.WCS_1_1_2) || def.equals(ServiceDef.WMTS_1_0_0) ||
+                def.equals(ServiceDef.WFS_1_1_0) ;
     }
 
     /**

@@ -1,7 +1,7 @@
 <?xml version='1.0'?>
 <wfs:FeatureCollection gml:id="collection-1" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs">
     <gml:boundedBy>
-        <gml:Envelope srsName="EPSG:4326">
+        <gml:Envelope srsName="urn:ogc:def:crs:epsg:4326">
             <gml:lowerCorner>2.0E-4 7.0E-4</gml:lowerCorner>
             <gml:upperCorner>2.0E-4 7.0E-4</gml:upperCorner>
         </gml:Envelope>
@@ -9,7 +9,7 @@
     <gml:featureMember>
         <gml:Bridges gml:id="Bridges.1">
             <the_geom>
-                <gml:Point srsName="EPSG:4326">
+                <gml:Point srsName="urn:ogc:def:crs:epsg:4326">
                     <gml:pos>2.0E-4 7.0E-4</gml:pos>
                 </gml:Point>
             </the_geom>

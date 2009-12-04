@@ -244,10 +244,6 @@ public class WFSService extends OGCWebService {
             if (serviceDef == null) {
                 serviceDef = getBestVersion(null);
             }
-            /*
-             *  TO SEE
-             ExceptionType ext = new ExceptionType(ex.getMessage(), ex.getExceptionCode(), ex.getLocator());
-             ExceptionReport report = new ExceptionReport(serviceDef.exceptionVersion, ext);*/
             final String version = serviceDef.exceptionVersion.toString();
             String exceptionCode;
             if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
@@ -483,8 +479,11 @@ public class WFSService extends OGCWebService {
                     if (namesp != null) {
                         typeNames.add(new QName(namesp, localPart, prefix));
                     } else {
-                        throw new CstlServiceException("The typeName parameter is malformed : the prefix [" + prefix + "] is not bounded with a namespace",
-                                                  INVALID_PARAMETER_VALUE, "typeName");
+                        // we assume that the query was typeName=namespace:localPart
+
+                        typeNames.add(new QName(prefix, localPart));
+                        /*throw new CstlServiceException("The typeName parameter is malformed : the prefix [" + prefix + "] is not bounded with a namespace",
+                                                  INVALID_PARAMETER_VALUE, "typeName");*/
                     }
                 } else {
                     typeNames.add(new QName(token));

@@ -305,9 +305,14 @@ public abstract class WebService {
                         errorMsg = e.getLinkedException().getMessage();
                     }
                 }
-                LOGGER.severe("UNMARSHALL EXCEPTION: " + errorMsg);
+                String codeName;
+                if (errorMsg != null && errorMsg.startsWith("unexpected element")) {
+                    codeName = OPERATION_NOT_SUPPORTED.name();
+                } else {
+                    codeName = INVALID_REQUEST.name();
+                }
 
-                return launchException("The XML request is not valid.\nCause:" + errorMsg, INVALID_REQUEST.name(), null);
+                return launchException("The XML request is not valid.\nCause:" + errorMsg, codeName, null);
             } finally {
                 if (unmarshaller != null)  {
                     marshallerPool.release(unmarshaller);

@@ -683,7 +683,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 //                return new WGS84BoundingBoxType(-180, -90, 180, 90);
 //            }
 
-            final CoordinateReferenceSystem EPSG4326 = CRS.decode("EPSG:4326");
+            final CoordinateReferenceSystem EPSG4326 = CRS.decode("urn:ogc:def:crs:OGC:2:84");
             if (env != null) {
                 if (CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), EPSG4326)) {
                    return new WGS84BoundingBoxType(
@@ -724,7 +724,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             if (request.getService() != null) {
                 if (request.getService().equals("")) {
                   // we let pass (CITE test)
-                } else if (!request.getService().equals("WFS"))  {
+                } else if (!request.getService().equalsIgnoreCase("WFS"))  {
                     throw new CstlServiceException("service must be \"WFS\"!",
                                                   INVALID_PARAMETER_VALUE, "service");
                 }
@@ -733,7 +733,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                                               MISSING_PARAMETER_VALUE, "service");
             }
             if (request.getVersion() != null) {
-                if (request.getVersion().toString().equals("1.1.0") || request.getVersion().toString().equals("1.1") || request.getVersion().toString().equals("")) {
+                if (request.getVersion().toString().equals("1.1.0") || request.getVersion().toString().equals("1.1") || 
+                        request.getVersion().toString().equals("")  || request.getVersion().toString().equals("1.0.0") ) { // hack for openScale accept 1.0.0
                     this.actingVersion = new ServiceVersion(ServiceType.WFS, "1.1.0");
 
                 } else {
