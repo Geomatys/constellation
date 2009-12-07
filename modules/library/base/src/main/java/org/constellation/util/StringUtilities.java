@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -502,5 +503,52 @@ public final class StringUtilities {
             }
         }
         return toSort;
+    }
+
+    public static List<Double[]> toCategoriesRange(final String ranges) {
+        final List<Double[]> exts = new ArrayList<Double[]>();
+        final String[] blocks = ranges.split("/");
+
+        for(final String block : blocks){
+            final String[] parts = block.split(",");
+
+            if(parts.length == 1){
+                //single value range
+                final Double d = Double.valueOf(parts[0]);
+                exts.add( new Double[]{d,d} ) ;
+            }else if(parts.length == 2){
+                //interval range
+                final Double d1 = Double.valueOf(parts[0]);
+                final Double d2 = Double.valueOf(parts[1]);
+                exts.add( new Double[]{d1,d2} ) ;
+            }else{
+                //not possible, invalid string
+                throw new IllegalArgumentException("Range definition is not valid : " + ranges);
+            }
+        }
+
+        Collections.sort(exts, new Comparator<Double[]>(){
+            @Override
+            public int compare(Double[] t, Double[] t1) {
+                double res = t[0] - t1[0];
+                if(res < 0){
+                    return -1;
+                }else if(res > 0){
+                    return 1;
+                }else{
+                    res = t[1] - t1[1];
+                    if(res < 0){
+                        return -1;
+                    }else if(res > 0){
+                        return 1;
+                    }else{
+                        return 0;
+                    }
+                }
+
+            }
+        });
+
+        return exts;
     }
 }
