@@ -57,6 +57,7 @@ import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.register.RegisterException;
 import org.constellation.util.StringUtilities;
+import org.constellation.util.StyleUtils;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -963,7 +964,7 @@ public final class WCSWorker {
 
             final String styleName = layerRef.getFavoriteStyles().get(0);
             final MutableStyle incomingStyle = StyleProviderProxy.getInstance().get(styleName);
-            final MutableStyle style = filterStyle(incomingStyle, request.getRangeSubset());
+            final MutableStyle style = StyleUtils.filterStyle(incomingStyle, request.getRangeSubset());
             try {
                 final MapContext context = PortrayalUtil.createContext(layerRef, style, renderParameters);
                 sdef.setContext(context);
@@ -1146,26 +1147,6 @@ public final class WCSWorker {
     }
 
     /**
-     * Generates a style from a list of categories to highlight.
-     *
-     * @param incomingStyle The source style.
-     * @param categories A list of categories to highlight in the returned style.
-     * @return A style that highlights the categories selected.
-     */
-    private MutableStyle filterStyle(MutableStyle incomingStyle, final RangeSubset categories) {
-        // For the moment just implements the version 1.0.0 of the WCS standards.
-        // TODO: implement me !
-        if (categories instanceof org.geotoolkit.wcs.xml.v100.RangeSubsetType) {
-            final org.geotoolkit.wcs.xml.v100.RangeSubsetType rangeSubset =
-                    (org.geotoolkit.wcs.xml.v100.RangeSubsetType) categories;
-            //rangeSubset.getAxisSubset().get(0).getIntervalOrSingleValue()
-            throw new UnsupportedOperationException("Not supported yet.");
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * This method should be considered private.
      */
     public void internalInitServletContext(final ServletContext servletContext) {
@@ -1178,5 +1159,7 @@ public final class WCSWorker {
     public void internalInitUriContext(final UriInfo uriContext) {
         this.uriContext = uriContext;
     }
+
+
 
 }
