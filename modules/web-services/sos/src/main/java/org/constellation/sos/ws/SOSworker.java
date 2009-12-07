@@ -1353,6 +1353,10 @@ public class SOSworker {
      *                         and an observation template for this sensor.
      */
     public RegisterSensorResponse registerSensor(RegisterSensor requestRegSensor) throws CstlServiceException {
+        if (profile == DISCOVERY) {
+            throw new CstlServiceException("The operation registerSensor is not supported by the service",
+                     INVALID_PARAMETER_VALUE, "request");
+        }
         LOGGER.info("registerSensor request processing"  + '\n');
         final long start = System.currentTimeMillis();
         
@@ -1453,6 +1457,10 @@ public class SOSworker {
      * @param requestInsObs an InsertObservation request containing an O&M object and a Sensor id.
      */
     public InsertObservationResponse insertObservation(InsertObservation requestInsObs) throws CstlServiceException {
+        if (profile == DISCOVERY) {
+            throw new CstlServiceException("The operation insertObservation is not supported by the service",
+                     INVALID_PARAMETER_VALUE, "request");
+        }
         LOGGER.info("InsertObservation request processing"  + '\n');
         final long start = System.currentTimeMillis();
 
@@ -1718,12 +1726,14 @@ public class SOSworker {
 
                 // we add the feature of interest (station) to the offering
                 OfferingSamplingFeatureEntry offSF = null;
-                ref = omReader.getReference(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
-                if (!offering.getFeatureOfInterest().contains(ref)) {
-                    if (ref == null) {
-                        ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                if (template.getFeatureOfInterest() != null) {
+                    ref = omReader.getReference(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                    if (!offering.getFeatureOfInterest().contains(ref)) {
+                        if (ref == null) {
+                            ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                        }
+                        offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
                     }
-                    offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
                 }
                 omWriter.updateOffering(offProc, offPheno, offSF);
             // we build a new offering
@@ -1742,7 +1752,12 @@ public class SOSworker {
                 final PhenomenonEntry phenomenon = (PhenomenonEntry) template.getObservedProperty();
 
                 //we add the template feature of interest
-                final ReferenceEntry station = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                final ReferenceEntry station;
+                if (template.getFeatureOfInterest() != null) {
+                    station = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                } else {
+                    station = null;
+                }
 
                 //we create a list of accepted responseMode (fixed)
                 final List<ResponseModeType> responses  = Arrays.asList(INLINE, RESULT_TEMPLATE);
@@ -1791,12 +1806,14 @@ public class SOSworker {
 
             // we add the feature of interest (station) to the offering
             OfferingSamplingFeatureEntry offSF = null;
-            ref = omReader.getReference(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
-            if (!offering.getFeatureOfInterest().contains(ref)) {
-                if (ref == null) {
-                    ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+            if (template.getFeatureOfInterest() != null) {
+                ref = omReader.getReference(((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                if (!offering.getFeatureOfInterest().contains(ref)) {
+                    if (ref == null) {
+                        ref = new ReferenceEntry(null, ((SamplingFeatureEntry) template.getFeatureOfInterest()).getId());
+                    }
+                    offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
                 }
-                offSF = new OfferingSamplingFeatureEntry(offering.getId(), ref);
             }
             omWriter.updateOffering(offProc, offPheno, offSF);
         } else {
@@ -1813,7 +1830,12 @@ public class SOSworker {
             final PhenomenonEntry phenomenon = (PhenomenonEntry)template.getObservedProperty();
 
             //we add the template feature of interest
-            final ReferenceEntry station = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
+            final ReferenceEntry station;
+            if (template.getFeatureOfInterest() != null) {
+                station = new ReferenceEntry(null, ((SamplingFeatureEntry)template.getFeatureOfInterest()).getId());
+            } else {
+                station = null;
+            }
 
             //we create a list of accepted responseMode (fixed)
             final List<ResponseModeType> responses  = Arrays.asList(RESULT_TEMPLATE, INLINE);

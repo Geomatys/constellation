@@ -231,19 +231,19 @@ public class DefaultObservationWriter implements ObservationWriter {
             }
 
             if (srsName.equals("27582")) {
-                request = request + " projected_localisations WHERE id='" + physicalID + "'";
+                request = request + " \"sos\".\"projected_localisations\" WHERE id='" + physicalID + "'";
                 result2 = stmt2.executeQuery(request);
                 if (!result2.next()) {
-                    request = "INSERT INTO projected_localisations VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + position.getSrsName() + "))";
+                    request = "INSERT INTO \"sos\".\"projected_localisations\" VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + srsName + "))";
                 } else {
                     insert = false;
                     LOGGER.severe("Projected sensor location already registred for " + physicalID + " keeping old location");
                 }
             } else if (srsName.equals("4326")) {
-                request = request + " geographic_localisations WHERE id='" + physicalID + "'";
+                request = request + " \"sos\".\"geographic_localisations\" WHERE id='" + physicalID + "'";
                 result2 = stmt2.executeQuery(request);
                 if (!result2.next()) {
-                    request = "INSERT INTO geographic_localisations VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + position.getSrsName() + "))";
+                    request = "INSERT INTO \"sos\".\"geographic_localisations\" VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + srsName + "))";
                 } else {
                     insert = false;
                     LOGGER.severe("Geographic sensor location already registred for " + physicalID + " keeping old location");

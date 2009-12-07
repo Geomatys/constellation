@@ -155,10 +155,10 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                     statement.setInt(indexOf(query.idResult), id + 1);
                 } catch (NumberFormatException ex) {
                     LOGGER.severe("unable to parse the result id:" + res);
-                    statement.setNull(indexOf(query.idResult), java.sql.Types.INTEGER);
+                    statement.setInt(indexOf(query.idResult), 1);
                 }
             } else {
-                statement.setNull(indexOf(query.idResult), java.sql.Types.INTEGER);
+                statement.setInt(indexOf(query.idResult), 1);
             }
             p.close();
             

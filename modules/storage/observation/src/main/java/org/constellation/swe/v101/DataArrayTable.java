@@ -165,7 +165,7 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
      */
     @Override
     public String searchFreeIdentifier(String base) throws CatalogException, SQLException {
-        final PreparedStatement stmt = this.getStatement("SELECT COUNT(id_array_definition) FROM data_array_definition");
+        final PreparedStatement stmt = this.getStatement("SELECT COUNT(\"id_array_definition\") FROM \"observation\".\"data_array_definition\"");
         final ResultSet result = stmt.executeQuery();
         result.next();
         final int nbLine = result.getInt(1);

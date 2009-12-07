@@ -373,7 +373,7 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
             statement.setString(indexOf(query.name),         id);
             statement.setString(indexOf(query.description),  obs.getDefinition());
         
-            // regler le probleme avec la distribution
+            // TODO regler le probleme avec la distribution
             statement.setString(indexOf(query.distribution), "normale");
         
         
