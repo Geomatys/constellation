@@ -94,7 +94,6 @@ import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCoverage;
 import org.geotoolkit.wcs.xml.GetCapabilities;
 import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
-import org.geotoolkit.wcs.xml.RangeSubset;
 import org.geotoolkit.wcs.xml.v100.ContentMetadata;
 import org.geotoolkit.wcs.xml.v100.CoverageDescription;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
@@ -962,9 +961,15 @@ public final class WCSWorker {
             renderParameters.put("ELEVATION", elevation);
             final SceneDef sdef = new SceneDef();
 
-            final String styleName = layerRef.getFavoriteStyles().get(0);
-            final MutableStyle incomingStyle = StyleProviderProxy.getInstance().get(styleName);
-            final MutableStyle style = StyleUtils.filterStyle(incomingStyle, request.getRangeSubset());
+            final List<String> styleNames = layerRef.getFavoriteStyles();
+            final MutableStyle style;
+            if (!styleNames.isEmpty()) {
+                final String styleName = styleNames.get(0);
+                final MutableStyle incomingStyle = StyleProviderProxy.getInstance().get(styleName);
+                style = StyleUtils.filterStyle(incomingStyle, request.getRangeSubset());
+            } else {
+                style = null;
+            }
             try {
                 final MapContext context = PortrayalUtil.createContext(layerRef, style, renderParameters);
                 sdef.setContext(context);

@@ -147,7 +147,7 @@ public class StyleUtils {
 
     private static Literal toLiteral(Double limit){
         if(limit == Double.NEGATIVE_INFINITY){
-            return FF.literal(null);
+            return null;
         }else{
             return FF.literal(limit.doubleValue());
         }
