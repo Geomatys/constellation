@@ -13,7 +13,7 @@
   </KeywordList>
   <!-- Top-level web address of service or service provider.  See also OnlineResource
   elements under <DCPType>. -->
-  <OnlineResource xlink:type="simple" xlink:href="http://sensor.geomatys.fr/"/>
+  <OnlineResource xlink:type="simple" xlink:href="http://www.geomatys.fr/"/>
   <!-- Contact information -->
   <ContactInformation>
     <ContactPersonPrimary>

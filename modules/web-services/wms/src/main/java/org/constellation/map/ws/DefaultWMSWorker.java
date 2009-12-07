@@ -219,7 +219,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
         final String url = getUriContext().getBaseUri().toString();
-        inCapabilities.getService().getOnlineResource().setHref(url + "wms");
+        //inCapabilities.getService().getOnlineResource().setHref(url + "wms");//No, this is to "refer to the web site of the service provider."
         final AbstractRequest request = inCapabilities.getCapability().getRequest();
 
         updateURL(request.getGetCapabilities().getDCPType(), url);
