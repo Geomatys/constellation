@@ -53,6 +53,7 @@ import org.constellation.coverage.catalog.Series;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.register.RegisterException;
 import org.constellation.util.StringUtilities;
@@ -85,12 +86,14 @@ import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.resources.Errors;
+import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCoverage;
 import org.geotoolkit.wcs.xml.GetCapabilities;
 import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
+import org.geotoolkit.wcs.xml.RangeSubset;
 import org.geotoolkit.wcs.xml.v100.ContentMetadata;
 import org.geotoolkit.wcs.xml.v100.CoverageDescription;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
@@ -958,8 +961,11 @@ public final class WCSWorker {
             renderParameters.put("ELEVATION", elevation);
             final SceneDef sdef = new SceneDef();
 
+            final String styleName = layerRef.getFavoriteStyles().get(0);
+            final MutableStyle incomingStyle = StyleProviderProxy.getInstance().get(styleName);
+            final MutableStyle style = filterStyle(incomingStyle, request.getRangeSubset());
             try {
-                final MapContext context = PortrayalUtil.createContext(layerRef, null, renderParameters);
+                final MapContext context = PortrayalUtil.createContext(layerRef, style, renderParameters);
                 sdef.setContext(context);
             } catch (PortrayalException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
@@ -1136,6 +1142,26 @@ public final class WCSWorker {
                    postMethod.getOnlineResource().setHref(uriContext.getBaseUri().toString() + "wcs?SERVICE=WCS&");
                }
            }
+        }
+    }
+
+    /**
+     * Generates a style from a list of categories to highlight.
+     *
+     * @param incomingStyle The source style.
+     * @param categories A list of categories to highlight in the returned style.
+     * @return A style that highlights the categories selected.
+     */
+    private MutableStyle filterStyle(MutableStyle incomingStyle, final RangeSubset categories) {
+        // For the moment just implements the version 1.0.0 of the WCS standards.
+        // TODO: implement me !
+        if (categories instanceof org.geotoolkit.wcs.xml.v100.RangeSubsetType) {
+            final org.geotoolkit.wcs.xml.v100.RangeSubsetType rangeSubset =
+                    (org.geotoolkit.wcs.xml.v100.RangeSubsetType) categories;
+            //rangeSubset.getAxisSubset().get(0).getIntervalOrSingleValue()
+            throw new UnsupportedOperationException("Not supported yet.");
+        } else {
+            return null;
         }
     }
 

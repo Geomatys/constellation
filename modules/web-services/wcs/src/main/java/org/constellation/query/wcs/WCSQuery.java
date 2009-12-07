@@ -78,6 +78,8 @@ public interface WCSQuery extends Query {
     public static final String KEY_RESZ   = "RESZ";
     /** Parameter used in getCoverage */
     public static final String KEY_INTERPOLATION = "INTERPOLATION";
+    /** Specific Geomatys parameter used in getCoverage */
+    public static final String KEY_CATEGORIES = "CATEGORIES";
 
     /** Parameter used in getCoverage 1.1.1 */
     public static final String KEY_GRIDCS      = "GRIDCS";

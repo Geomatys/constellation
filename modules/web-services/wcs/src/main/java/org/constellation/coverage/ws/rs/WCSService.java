@@ -25,6 +25,7 @@ import java.awt.image.RenderedImage;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
@@ -528,8 +529,29 @@ public class WCSService extends GridWebService {
         final org.geotoolkit.wcs.xml.v100.DomainSubsetType domain =
                 new org.geotoolkit.wcs.xml.v100.DomainSubsetType(temporal, spatial);
 
-        //range subset (not yet used)
-        final org.geotoolkit.wcs.xml.v100.RangeSubsetType range = null;
+        //range subset
+        final org.geotoolkit.wcs.xml.v100.RangeSubsetType rangeSubset;
+        final String categories = getParameter(KEY_CATEGORIES, false);
+        if (categories != null) {
+            final List<Double[]> ranges = StringUtilities.toCategoriesRange(categories);
+            final List<Object> objects = new ArrayList<Object>();
+            for (Double[] range : ranges) {
+                if (range[0] == range[1]) {
+                    objects.add(new org.geotoolkit.wcs.xml.v100.TypedLiteralType(String.valueOf(range[0]), "xs:double"));
+                } else {
+                    objects.add(new org.geotoolkit.wcs.xml.v100.IntervalType(
+                                    new org.geotoolkit.wcs.xml.v100.TypedLiteralType(String.valueOf(range[0]), "xs:double"),
+                                    new org.geotoolkit.wcs.xml.v100.TypedLiteralType(String.valueOf(range[1]), "xs:double")));
+                }
+            }
+
+            final org.geotoolkit.wcs.xml.v100.RangeSubsetType.AxisSubset axisSubset =
+                    new org.geotoolkit.wcs.xml.v100.RangeSubsetType.AxisSubset(KEY_CATEGORIES, objects);
+            final List<org.geotoolkit.wcs.xml.v100.RangeSubsetType.AxisSubset> axisSubsets = Collections.singletonList(axisSubset);
+            rangeSubset = new org.geotoolkit.wcs.xml.v100.RangeSubsetType(axisSubsets);
+        } else {
+            rangeSubset = null;
+        }
 
         //interpolation method
         final org.geotoolkit.wcs.xml.v100.InterpolationMethod interpolation =
@@ -553,7 +575,7 @@ public class WCSService extends GridWebService {
                                                            resolutions);
 
         return new org.geotoolkit.wcs.xml.v100.GetCoverageType(
-                getParameter(KEY_COVERAGE, true), domain, range, interpolation, output);
+                getParameter(KEY_COVERAGE, true), domain, rangeSubset, interpolation, output);
     }
 
     /**
