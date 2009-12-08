@@ -296,10 +296,8 @@ public class SOSworker {
             configurationDirectory = getConfigDirectory();
         }
 
-        LOGGER.info("path to config file=" + configurationDirectory);
-        final String notWorkingMsg = "The SOS service is not running!";
-        
-        isStarted = true;
+        final String notWorkingMsg     = "The SOS service is not running!";
+        isStarted                      = true;
         SOSConfiguration configuration = null;
 
         // Database configuration
@@ -329,12 +327,6 @@ public class SOSworker {
                 LOGGER.info("Redirecting the log to: " + configuration.getLogFolder());
             }
             this.profile = configuration.getProfile();
-            if (this.profile == DISCOVERY) {
-                LOGGER.info("Discovery profile loaded." + '\n');
-            } else {
-                LOGGER.info("Transactional profile loaded." + '\n');
-            }
-
             this.verifySynchronization = configuration.isVerifySynchronization();
 
             // the file who record the map between phisycal ID and DB ID.
@@ -419,9 +411,6 @@ public class SOSworker {
             // we log some implementation informations
             logInfos();
 
-            LOGGER.info("SOS service running" + '\n');
-            
-
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             String msg;
@@ -450,35 +439,44 @@ public class SOSworker {
      */
     public void logInfos() {
         final String loaded =  " loaded.\n";
-        if (smlReader != null) {
-            LOGGER.info(smlReader.getInfos() + loaded);
+        final StringBuilder infos = new StringBuilder();
+
+        if (this.profile == DISCOVERY) {
+            infos.append("Discovery profile loaded.").append('\n');
         } else {
-            LOGGER.warning("No SensorML reader loaded.\n");
+            infos.append("Transactional profile loaded.").append('\n');
+        }
+        if (smlReader != null) {
+            infos.append(smlReader.getInfos() + loaded).append('\n');
+        } else {
+            infos.append("No SensorML reader loaded.\n");
         }
         if ( profile == TRANSACTIONAL) {
             if (smlWriter != null) {
-                LOGGER.info(smlWriter.getInfos() + loaded);
+                infos.append(smlWriter.getInfos() + loaded).append('\n');
             } else {
-                LOGGER.warning("No SensorML writer loaded.\n");
+                infos.append("No SensorML writer loaded.\n");
             }
         }
         if (omReader != null) {
-            LOGGER.info(omReader.getInfos() + loaded);
+            infos.append(omReader.getInfos() + loaded).append('\n');
         } else {
-            LOGGER.warning("No O&M reader loaded.\n");
+            infos.append("No O&M reader loaded.\n");
         }
         if (omFilter != null) {
-            LOGGER.info(omFilter.getInfos() + loaded);
+            infos.append(omFilter.getInfos() + loaded).append('\n');
         } else {
-            LOGGER.warning("No O&M filter loaded.\n");
+            infos.append("No O&M filter loaded.\n");
         }
         if ( profile == TRANSACTIONAL) {
             if (omWriter != null) {
-                LOGGER.info(omWriter.getInfos() + loaded);
+                infos.append(omWriter.getInfos() + loaded).append('\n');
             } else {
-                LOGGER.warning("No O&M writer loaded.\n");
+                infos.append("No O&M writer loaded.\n");
             }
         }
+        infos.append("SOS service running").append('\n');
+        LOGGER.info(infos.toString());
     }
 
     /**
