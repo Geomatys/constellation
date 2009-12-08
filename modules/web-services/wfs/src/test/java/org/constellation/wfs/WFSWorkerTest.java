@@ -164,7 +164,7 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection.xml"));
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
@@ -184,7 +184,7 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2.xml"));
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
