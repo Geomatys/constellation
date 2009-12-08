@@ -20,6 +20,7 @@ package org.constellation.sos.ws.soap;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.ws.WebFault;
 import javax.xml.ws.WebServiceException;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 
@@ -29,6 +30,7 @@ import org.geotoolkit.ows.xml.v110.ExceptionReport;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "SOServiceException", namespace="http://soap.webservice.sos.constellation.org/")
+@WebFault
 public class SOServiceException extends WebServiceException {
     private static final long serialVersionUID = 6093245564310503955L;
     

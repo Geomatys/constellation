@@ -124,8 +124,13 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
             }
         
             statement.setString(indexOf(query.name), station.getName());
-            final Iterator i = station.getSampledFeatures().iterator();
-            statement.setString(indexOf(query.sampledFeature), (String)i.next());
+            final Iterator<FeaturePropertyType> i = station.getSampledFeatures().iterator();
+            if (i.hasNext()) {
+                FeaturePropertyType fp = i.next();
+                statement.setString(indexOf(query.sampledFeature), (String)fp.getHref());
+            } else {
+                statement.setNull(indexOf(query.sampledFeature), java.sql.Types.VARCHAR);
+            }
         
             if( station.getPosition() != null ) {
                 statement.setString(indexOf(query.pointIdentifier), station.getPosition().getId());

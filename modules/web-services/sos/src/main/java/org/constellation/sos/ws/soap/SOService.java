@@ -21,6 +21,7 @@ package org.constellation.sos.ws.soap;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // JAX-WS dependencies
@@ -31,11 +32,11 @@ import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 
 // JAXB dependencies
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
+import javax.xml.bind.annotation.XmlSeeAlso;
 import org.constellation.ServiceDef;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
@@ -53,6 +54,7 @@ import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.constellation.sos.ws.SOSworker;
 import org.constellation.util.Util;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.xml.MarshallerPool;
 
 
 /**
@@ -61,6 +63,9 @@ import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
  */
 @WebService(name = "SOService")
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
+@XmlSeeAlso({org.geotoolkit.sml.xml.v100.ObjectFactory.class,
+             org.geotoolkit.sml.xml.v101.ObjectFactory.class,
+             org.geotoolkit.sampling.xml.v100.ObjectFactory.class})
 public class SOService {
     
     /**
@@ -81,15 +86,18 @@ public class SOService {
     /**
      * A JAXB unmarshaller used to create java object from XML file.
      */
-    private Unmarshaller unmarshaller;
+    private MarshallerPool marshallerPool;
     
     /**
      * Initialize the database connection.
      */
-    public SOService() throws JAXBException, CstlServiceException {
+    public SOService() throws CstlServiceException {
        worker                      = new SOSworker(null);
-       final JAXBContext jbcontext = JAXBContext.newInstance("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml");
-       unmarshaller                = jbcontext.createUnmarshaller();
+        try {
+            marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100");
+        } catch (JAXBException ex) {
+           LOGGER.log(Level.SEVERE, "unable to create the JAXBContext", ex);
+        }
 
        //TODO find real url
        worker.setServiceURL("http://localhost:8080/SOServer/SOService");
@@ -112,8 +120,6 @@ public class SOService {
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());
-        } catch (JAXBException ex) {
-            throw new SOServiceException(ex.getMessage(), ex.getErrorCode(), null);
         }
     }
     
@@ -214,22 +220,28 @@ public class SOService {
      * @return The capabilities Object, or {@code null} if none.
      * @throws JAXBException
      */
-    public Object getCapabilitiesObject() throws JAXBException {
-        final String fileName = "SOSCapabilities1.0.0.xml";
-
-        Object response = capabilities.get(fileName);
+    public Object getCapabilitiesObject() {
+        final String fileName     = "SOSCapabilities1.0.0.xml";
+        Object response           = capabilities.get(fileName);
         if (response == null) {
-            final String configUrl = "csw_configuration";
-            File configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
+            final String configUrl    = "sos_configuration";
+            File configDir            = new File(ConfigDirectory.getConfigDirectory(), configUrl);
             if (configDir.exists()) {
                 LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
             } else {
                 return Util.getDirectoryFromResource(configUrl);
             }
-            final File f = new File(configDir, fileName);
-            LOGGER.info(f.toString());
-            response = unmarshaller.unmarshal(f);
+            try {
+                Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+                final File f              = new File(configDir, fileName);
+                LOGGER.info(f.toString());
+                response                  = unmarshaller.unmarshal(f);
+                marshallerPool.release(unmarshaller);
+            } catch(JAXBException ex) {
+                LOGGER.log(Level.SEVERE, "unable to unmarshall the capabilities file", ex);
+            }
             capabilities.put(fileName, response);
+            
         }
         return response;
     }

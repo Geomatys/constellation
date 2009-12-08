@@ -122,17 +122,17 @@ public class PostGisProvider implements LayerProvider{
 
         store = DataStoreFinder.getDataStore(params);
 
-        if(store == null){
+        if (store == null) {
             final StringBuilder sb = new StringBuilder("Could not connect to PostGIS : \n");
-            for(final Map.Entry<String,Serializable> entry : params.entrySet()){
-                if(entry.getKey().equals(KEY_PASSWD)){
-                    sb.append(entry.getKey()).append(" : *******");
-                }else{
-                    sb.append(entry.getKey()).append(" : ").append(entry.getValue());
+            for (final Map.Entry<String,Serializable> entry : params.entrySet()){
+                if (entry.getKey().equals(KEY_PASSWD)){
+                    sb.append(entry.getKey()).append(" : *******").append('\n');
+                } else {
+                    sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append('\n');
                 }
             }
             throw new IOException(sb.toString());
-        }else{
+        } else {
             visit();
         }
         
