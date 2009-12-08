@@ -176,7 +176,7 @@ class PostGridLayerDetails implements CoverageLayerDetails {
         
 //        MeasurementRange dimRange = null;
 //
-//        if (params != null) {
+        if (params != null) {
 //            dimRange = (MeasurementRange) params.get(KEY_DIM_RANGE);
 //            if (dimRange == null) {
 //                final MeasurementRange<?>[] postgridRange = getSampleValueRanges();
@@ -185,15 +185,15 @@ class PostGridLayerDetails implements CoverageLayerDetails {
 //                }
 //            }
 //            mapLayer.setDimRange(dimRange);
-//            final Double elevation = (Double) params.get(KEY_ELEVATION);
-//            if (elevation != null) {
-//                mapLayer.setElevation(elevation);
-//            }
-//            final Date time = (Date) params.get(KEY_TIME);
-//            if (time != null) {
-//                mapLayer.times().add(time);
-//            }
-//        }
+            final Double elevation = (Double) params.get(KEY_ELEVATION);
+            if (elevation != null) {
+                mapLayer.setElevation(elevation);
+            }
+            final Date time = (Date) params.get(KEY_TIME);
+            if (time != null) {
+                mapLayer.times().add(time);
+            }
+        }
 //
 //        if(dimRange != null){
 //            //a dim range is define, it replace any given style.
