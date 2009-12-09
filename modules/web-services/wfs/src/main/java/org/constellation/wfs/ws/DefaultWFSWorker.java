@@ -684,7 +684,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 //            }
 
             final CoordinateReferenceSystem EPSG4326 = CRS.decode("urn:ogc:def:crs:OGC:2:84");
-            if (env != null) {
+            if (env != null && !env.isEmpty()) {
                 if (CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), EPSG4326)) {
                    return new WGS84BoundingBoxType(
                            "urn:ogc:def:crs:OGC:2:84",
