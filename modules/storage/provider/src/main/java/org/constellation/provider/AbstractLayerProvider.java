@@ -28,6 +28,8 @@ import org.opengis.feature.type.Name;
  */
 public abstract class AbstractLayerProvider implements LayerProvider{
 
+    protected static final String DEFAULT_NAMESPACE = "http://geotoolkit.org";
+
     /**
      * {@inheritDoc }
      */

@@ -51,6 +51,7 @@ import org.opengis.feature.type.Name;
  * @author Cédric Briançon (Geomatys)
  */
 public class ShapeFileProvider extends AbstractLayerProvider {
+
     /**
      * Default logger.
      */
@@ -220,7 +221,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             if (fullName.toLowerCase().endsWith(MASK)){
                 final String name = fullName.substring(0, fullName.length()-4);
                 if (source.loadAll || source.containsLayer(name)){
-                    index.put(new DefaultName("",name), candidate);
+                    index.put(new DefaultName(DEFAULT_NAMESPACE,name), candidate);
                 }
             }
         }

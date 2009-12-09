@@ -33,7 +33,6 @@ import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
 import org.constellation.provider.AbstractLayerProvider;
 
-import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.provider.configuration.ProviderConfig;
@@ -46,11 +45,9 @@ import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
 import org.geotoolkit.map.ElevationModel;
-import org.opengis.feature.Feature;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 
 import org.xml.sax.SAXException;
