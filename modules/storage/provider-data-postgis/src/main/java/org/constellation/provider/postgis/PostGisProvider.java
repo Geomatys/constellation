@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
+import org.constellation.provider.AbstractLayerProvider;
 
 import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerDetails;
@@ -45,9 +46,12 @@ import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
 import org.geotoolkit.map.ElevationModel;
+import org.opengis.feature.Feature;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 
 import org.xml.sax.SAXException;
 
@@ -60,7 +64,8 @@ import org.xml.sax.SAXException;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class PostGisProvider implements LayerProvider{
+public class PostGisProvider extends AbstractLayerProvider{
+
     private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.postgis");
     private static final String KEY_POSTGIS_CONFIG  = "postgis_config";
     public static final String KEY_DBTYPE          = PostgisNGDataStoreFactory.DBTYPE.getName().toString();
@@ -79,8 +84,8 @@ public class PostGisProvider implements LayerProvider{
 //    public static final String KEY_WKBENABLED      = PostgisNGDataStoreFactory.WKBENABLED.key;
 
     private final Map<String,Serializable> params = new HashMap<String,Serializable>();
-    private final List<String> index = new ArrayList<String>();
-    private final DataStore store;
+    private final List<Name> index = new ArrayList<Name>();
+    private final DataStore<SimpleFeatureType, SimpleFeature> store;
     private final ProviderSource source;
 
 
@@ -120,7 +125,7 @@ public class PostGisProvider implements LayerProvider{
         params.put(KEY_PASSWD, passwd);
         params.put(KEY_NAMESPACE, namespace);
 
-        store = DataStoreFinder.getDataStore(params);
+        store = (DataStore<SimpleFeatureType, SimpleFeature>) DataStoreFinder.getDataStore(params);
 
         if (store == null) {
             final StringBuilder sb = new StringBuilder("Could not connect to PostGIS : \n");
@@ -146,31 +151,15 @@ public class PostGisProvider implements LayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public Class<String> getKeyClass() {
-        return String.class;
+    public Set<Name> getKeys() {
+        return new ArraySet<Name>(index);
     }
 
     /**
      * {@inheritDoc }
      */
     @Override
-    public Class<LayerDetails> getValueClass() {
-        return LayerDetails.class;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Set<String> getKeys() {
-        return new ArraySet<String>(index);
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public boolean contains(String key) {
+    public boolean contains(Name key) {
         return index.contains(key);
     }
 
@@ -178,7 +167,7 @@ public class PostGisProvider implements LayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(final String key) {
+    public LayerDetails get(final Name key) {
         if (!index.contains(key)) {
             return null;
         }
@@ -193,10 +182,10 @@ public class PostGisProvider implements LayerProvider{
         if (fs == null) {
             return null;
         }
-        final ProviderLayer layer = source.getLayer(key);
+        final ProviderLayer layer = source.getLayer(key.getLocalPart());
         if (layer == null) {
             try {
-                return new PostGisLayerDetails(key, store.getFeatureSource(key), null,
+                return new PostGisLayerDetails(key.getLocalPart(), store.getFeatureSource(key), null,
                         null, null, null, null);
             } catch (IOException ex) {
                 //we could not create the feature source
@@ -204,7 +193,7 @@ public class PostGisProvider implements LayerProvider{
             }
         } else {
             final List<String> styles = layer.styles;
-            return new PostGisLayerDetails(key, fs, styles,
+            return new PostGisLayerDetails(key.getLocalPart(), fs, styles,
                     layer.dateStartField, layer.dateEndField,
                     layer.elevationStartField, layer.elevationEndField);
         }
@@ -237,8 +226,8 @@ public class PostGisProvider implements LayerProvider{
 
     private void visit() {
         try {
-            for (final String name : store.getTypeNames()) {
-                if (source.loadAll || source.containsLayer(name)) {
+            for (final Name name : store.getNames()) {
+                if (source.loadAll || source.containsLayer(name.getLocalPart())) {
                     index.add(name);
                 }
             }
@@ -281,7 +270,7 @@ public class PostGisProvider implements LayerProvider{
         final StringBuilder builder = new StringBuilder("DATA PROVIDER : PostGIS ");
         for(final PostGisProvider dp : dps){
             builder.append("\n["+ dp.source.parameters.get(KEY_DATABASE)+"=");
-            for(final String layer : dp.getKeys()){
+            for(final Name layer : dp.getKeys()){
                 builder.append(layer + ",");
             }
             builder.append("]");

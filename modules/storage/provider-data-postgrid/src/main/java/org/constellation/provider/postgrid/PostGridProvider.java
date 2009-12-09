@@ -26,8 +26,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.sql.DataSource;
+
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
@@ -36,15 +36,17 @@ import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.LayerTable;
 import org.constellation.map.PostGridReader;
+import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.LayerProvider;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
+import org.geotoolkit.feature.DefaultName;
 
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.sql.WrappedDataSource;
 import org.geotoolkit.util.logging.Logging;
+import org.opengis.feature.type.Name;
 import org.postgresql.ds.PGConnectionPoolDataSource;
 
 
@@ -53,7 +55,7 @@ import org.postgresql.ds.PGConnectionPoolDataSource;
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
-public class PostGridProvider implements LayerProvider{
+public class PostGridProvider extends AbstractLayerProvider{
 
     public static final String KEY_DATABASE = "Database";
     public static final String KEY_USER = "User";
@@ -65,9 +67,9 @@ public class PostGridProvider implements LayerProvider{
 
     private static final Logger LOGGER = Logging.getLogger(PostGridProvider.class);
 
-    private final Map<String,Layer> index = new HashMap<String,Layer>();
-    private final Map<String,List<String>> favorites = new  HashMap<String, List<String>>();
-    private final Map<String,PostGridLayerDetails> cache = new HashMap<String, PostGridLayerDetails>();
+    private final Map<Name,Layer> index = new HashMap<Name,Layer>();
+    private final Map<Name,List<String>> favorites = new  HashMap<Name, List<String>>();
+    private final Map<Name,PostGridLayerDetails> cache = new HashMap<Name, PostGridLayerDetails>();
 
     private final ProviderSource source;
     private final Database database;
@@ -151,23 +153,7 @@ public class PostGridProvider implements LayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public Class<String> getKeyClass() {
-        return String.class;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<LayerDetails> getValueClass() {
-        return LayerDetails.class;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Set<String> getKeys() {
+    public Set<Name> getKeys() {
         return index.keySet();
     }
 
@@ -175,7 +161,7 @@ public class PostGridProvider implements LayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public boolean contains(String key) {
+    public boolean contains(Name key) {
         return index.containsKey(key);
     }
 
@@ -183,7 +169,7 @@ public class PostGridProvider implements LayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(final String key) {
+    public LayerDetails get(final Name key) {
 
         PostGridLayerDetails detail = cache.get(key);
 
@@ -201,7 +187,7 @@ public class PostGridProvider implements LayerProvider{
             /*-reader is null, this layer is not registered in this provider.
             if(reader == null) return null;*/
 
-            final ProviderLayer layerDef = source.getLayer(key);
+            final ProviderLayer layerDef = source.getLayer(key.getLocalPart());
             final List<String> styles = new ArrayList<String>();
             final String elevationModel;
             if(layerDef != null){
@@ -264,7 +250,7 @@ public class PostGridProvider implements LayerProvider{
 
             if(set != null && !set.isEmpty()) {
                 for(Layer layer : set) {
-                    index.put(layer.getName(),layer);
+                    index.put(new DefaultName(layer.getName()),layer);
                 }
             }
 
@@ -279,7 +265,7 @@ public class PostGridProvider implements LayerProvider{
 
         final ProviderLayer layer = source.getLayer(name);
         if(layer != null && layer.isElevationModel){
-            final PostGridLayerDetails pgld = (PostGridLayerDetails) get(name);
+            final PostGridLayerDetails pgld = (PostGridLayerDetails) getByIdentifier(name);
             if(pgld != null){
                 return MapBuilder.createElevationModel(pgld.getReader());
             }

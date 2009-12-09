@@ -40,7 +40,6 @@ import javax.xml.namespace.QName;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.NamedLayerProviderProxy;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
@@ -188,50 +187,12 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
         OGCWebService.updateOWSURL(inCapabilities.getOperationsMetadata().getOperation(), url, "WFS");
 
-        /*
-         *  Unamed provider
-         * 
-         * types possible, providers gives this list-----------------------------
-         *
-         */
         final List<FeatureTypeType> types = new ArrayList<FeatureTypeType>();
-        final LayerProviderProxy proxy    = LayerProviderProxy.getInstance();
-        for (final String layerName : proxy.getKeys()) {
-            final LayerDetails layer = proxy.get(layerName);
-            if (layer instanceof FeatureLayerDetails){
-                final FeatureLayerDetails fld = (FeatureLayerDetails) layer;
-                final SimpleFeatureType type  = fld.getSource().getSchema();
-                final FeatureTypeType ftt;
-                try {
-
-                    final String defaultCRS;
-                    if (type.getGeometryDescriptor() != null && type.getGeometryDescriptor().getCoordinateReferenceSystem() != null) {
-                        //todo wait for martin fix
-                        String id  = CRS.lookupIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
-                        defaultCRS = "urn:x-ogc:def:crs:" + id.replaceAll(":", ":7.01:");
-    //                    final String defaultCRS = CRS.lookupIdentifier(Citations.URN_OGC,
-    //                            type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
-                    } else {
-                        defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
-                    }
-                    ftt = new FeatureTypeType(
-                            new QName(layerName, layerName),
-                            fld.getName(),
-                            defaultCRS,
-                            standardCRS,
-                            UnmodifiableArrayList.wrap(new WGS84BoundingBoxType[]{toBBox(fld.getSource())}));
-                    types.add(ftt);
-                } catch (FactoryException ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
-                }
-
-            }
-        }
 
         /*
-         *  Named provider
+         *  layer providers
          */
-        final NamedLayerProviderProxy namedProxy    = NamedLayerProviderProxy.getInstance();
+        final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
         for (final Name layerName : namedProxy.getKeys()) {
             final LayerDetails layer = namedProxy.get(layerName);
             if (layer instanceof FeatureLayerDetails){
@@ -393,21 +354,12 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex);
         }
-        final LayerProviderProxy proxy           = LayerProviderProxy.getInstance();
-        final NamedLayerProviderProxy namedProxy = NamedLayerProviderProxy.getInstance();
+        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
         final List<QName> names                  = request.getTypeName();
         final List<FeatureType> types            = new ArrayList<FeatureType>();
 
         if (names.isEmpty()) {
             //search all types
-            for (final String name : proxy.getKeys()) {
-                final LayerDetails layer = proxy.get(name);
-                if (layer == null || !(layer instanceof FeatureLayerDetails)) continue;
-
-                final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
-                final SimpleFeatureType sft   = fld.getSource().getSchema();
-                types.add(sft);
-            }
             for (final Name name : namedProxy.getKeys()) {
                 final LayerDetails layer = namedProxy.get(name);
                 if (layer == null || !(layer instanceof FeatureLayerDetails)) continue;
@@ -419,10 +371,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         } else {
             //search only the given list
             for (final QName name : names) {
-                LayerDetails layer = proxy.get(name.getLocalPart());
-                if (layer == null) {
-                    layer = namedProxy.get(Utils.getNameFromQname(name));
-                }
+                LayerDetails layer = namedProxy.get(Utils.getNameFromQname(name));
+                
                 if(layer == null || !(layer instanceof FeatureLayerDetails)) {
                     throw new CstlServiceException("The specified TypeNames does not exist:" + name);
                 }
@@ -454,8 +404,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         }
         outputFormat = requestOutputFormat;
 
-        final LayerProviderProxy proxy            = LayerProviderProxy.getInstance();
-        final NamedLayerProviderProxy namedProxy  = NamedLayerProviderProxy.getInstance();
+        final LayerProviderProxy namedProxy       = LayerProviderProxy.getInstance();
         final XMLUtilities util                   = new XMLUtilities();
         final Integer maxFeatures                 = request.getMaxFeatures();
         final List<FeatureCollection> collections = new ArrayList<FeatureCollection>();
@@ -535,14 +484,12 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
             for (QName typeName : typeNames) {
 
-                FeatureLayerDetails layer = (FeatureLayerDetails)proxy.get(typeName.getLocalPart());
-                if (layer == null) {
-                    layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(typeName));
+                FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(typeName));
 
-                    if (layer == null) {
-                        throw new CstlServiceException("The specified TypeNames does not exist:" + typeName);
-                    }
+                if (layer == null) {
+                    throw new CstlServiceException("The specified TypeNames does not exist:" + typeName);
                 }
+                
                 FeatureType ft = layer.getSource().getSchema();
 
                 if (!requestPropNames.isEmpty()) {

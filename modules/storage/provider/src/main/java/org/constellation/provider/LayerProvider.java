@@ -17,6 +17,7 @@
 package org.constellation.provider;
 
 import org.geotoolkit.map.ElevationModel;
+import org.opengis.feature.type.Name;
 
 
 /**
@@ -25,7 +26,7 @@ import org.geotoolkit.map.ElevationModel;
  *
  * @author Johann Sorel (Geomatys)
  */
-public interface LayerProvider extends Provider<String,LayerDetails>{
+public interface LayerProvider extends Provider<Name,LayerDetails>{
 
     ElevationModel getElevationModel(String name);
 

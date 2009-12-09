@@ -26,10 +26,10 @@ import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.Provider;
-import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.util.logging.Logging;
+import org.opengis.feature.type.Name;
 
 import static org.constellation.provider.postgrid.PostGridProvider.*;
 
@@ -39,7 +39,7 @@ import static org.constellation.provider.postgrid.PostGridProvider.*;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class PostGridProviderService extends AbstractProviderService<String,LayerDetails> implements LayerProviderService {
+public class PostGridProviderService extends AbstractProviderService<Name,LayerDetails> implements LayerProviderService {
 
     /**
      * Default logger.

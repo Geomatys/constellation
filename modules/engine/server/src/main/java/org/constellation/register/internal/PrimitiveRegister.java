@@ -23,7 +23,6 @@ import java.util.Set;
 import org.constellation.ServiceDef;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.NamedLayerProviderProxy;
 import org.constellation.register.PrimitiveRegisterIF;
 import org.constellation.register.RegisterException;
 import org.opengis.feature.type.Name;
@@ -105,8 +104,8 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
     private List<LayerDetails> getAllLayerRefs() throws RegisterException {
 
         final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
-        final Set<String> layerNames = LayerProviderProxy.getInstance().getKeys();
-        for (String layerName : layerNames) {
+        final Set<Name> layerNames = LayerProviderProxy.getInstance().getKeys();
+        for (Name layerName : layerNames) {
             final LayerDetails layerRef = LayerProviderProxy.getInstance().get(layerName);
 
             if (null == layerRef) {
@@ -136,7 +135,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
         final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
         for (String layerName : layerNames) {
-            LayerDetails layerRef = LayerProviderProxy.getInstance().get(layerName);
+            LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName);
 
             if (null == layerRef) {
 
@@ -160,7 +159,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
     private LayerDetails getLayerRef(String layerName) throws RegisterException {
 
-        LayerDetails layerRef = LayerProviderProxy.getInstance().get(layerName);
+        LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName);
 
         if (null == layerRef) {
 

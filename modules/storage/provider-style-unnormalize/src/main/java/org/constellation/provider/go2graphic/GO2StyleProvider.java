@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.constellation.provider.StyleProvider;
+import org.constellation.provider.AbstractStyleProvider;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.display2d.ext.vectorfield.VectorFieldSymbolizer;
@@ -34,7 +34,7 @@ import org.opengis.style.Symbolizer;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class GO2StyleProvider implements StyleProvider{
+public class GO2StyleProvider extends AbstractStyleProvider{
     
     private final Map<String,MutableStyle> index = new HashMap<String,MutableStyle>();
     

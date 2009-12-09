@@ -20,7 +20,6 @@ package org.constellation.provider.shapefile;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,15 +27,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.constellation.provider.LayerProvider;
+import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
+import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.util.collection.Cache;
+import org.opengis.feature.type.Name;
 
 
 
@@ -49,7 +50,7 @@ import org.geotoolkit.util.collection.Cache;
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-public class ShapeFileProvider implements LayerProvider {
+public class ShapeFileProvider extends AbstractLayerProvider {
     /**
      * Default logger.
      */
@@ -74,8 +75,8 @@ public class ShapeFileProvider implements LayerProvider {
     /**
      * Keeps a link between the file name and the file.
      */
-    private final Map<String,File> index = new HashMap<String,File>();
-    private final Map<String,DataStore> cache = new Cache<String, DataStore>(10, 10, true);
+    private final Map<Name,File> index = new HashMap<Name,File>();
+    private final Map<Name,DataStore> cache = new Cache<Name, DataStore>(10, 10, true);
 
 
     protected ShapeFileProvider(final ProviderSource source) throws IllegalArgumentException {
@@ -99,27 +100,12 @@ public class ShapeFileProvider implements LayerProvider {
         return source;
     }
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<String> getKeyClass() {
-        return String.class;
-    }
 
     /**
      * {@inheritDoc }
      */
     @Override
-    public Class<LayerDetails> getValueClass() {
-        return LayerDetails.class;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Set<String> getKeys() {
+    public Set<Name> getKeys() {
         return index.keySet();
     }
 
@@ -127,7 +113,7 @@ public class ShapeFileProvider implements LayerProvider {
      * {@inheritDoc }
      */
     @Override
-    public boolean contains(final String key) {
+    public boolean contains(final Name key) {
         return index.containsKey(key);
     }
 
@@ -137,7 +123,7 @@ public class ShapeFileProvider implements LayerProvider {
      * @todo Should use {@code cache.getOrCreate(...)} for concurrent access.
      */
     @Override
-    public LayerDetails get(final String key) {
+    public LayerDetails get(final Name key) {
         DataStore store = cache.get(key);
 
         if(store == null) {
@@ -154,10 +140,10 @@ public class ShapeFileProvider implements LayerProvider {
         }
 
         if(store != null) {
-            final ProviderLayer layer = source.getLayer(key);
+            final ProviderLayer layer = source.getLayer(key.getLocalPart());
             if (layer == null) {
                 try {
-                    return new ShapeFileLayerDetails(key, store.getFeatureSource(key), null,
+                    return new ShapeFileLayerDetails(key.getLocalPart(), store.getFeatureSource(key.getLocalPart()), null,
                             null, null, null, null);
                 } catch (IOException ex) {
                     //we could not create the feature source
@@ -166,7 +152,7 @@ public class ShapeFileProvider implements LayerProvider {
             } else {
                 final List<String> styles = layer.styles;
                 try {
-                    return new ShapeFileLayerDetails(key, store.getFeatureSource(key), styles,
+                    return new ShapeFileLayerDetails(key.getLocalPart(), store.getFeatureSource(key.getLocalPart()), styles,
                             layer.dateStartField, layer.dateEndField,
                             layer.elevationStartField, layer.elevationEndField);
                 } catch (IOException ex) {
@@ -234,13 +220,13 @@ public class ShapeFileProvider implements LayerProvider {
             if (fullName.toLowerCase().endsWith(MASK)){
                 final String name = fullName.substring(0, fullName.length()-4);
                 if (source.loadAll || source.containsLayer(name)){
-                    index.put(name, candidate);
+                    index.put(new DefaultName("",name), candidate);
                 }
             }
         }
     }
 
-    private DataStore loadDataStore(final File f) {
+    private static DataStore loadDataStore(final File f) {
         if (f == null || !f.exists()) {
             return null;
         }

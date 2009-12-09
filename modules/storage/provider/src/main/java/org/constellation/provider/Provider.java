@@ -39,7 +39,6 @@ public interface Provider<K,V> {
      */
     Class<V> getValueClass();
     
-    
     /**
      * Use this method if you need the complete list of entries in this data provider.
      * If you are just searching if a special key exists than you should use the contains method.
@@ -53,7 +52,15 @@ public interface Provider<K,V> {
      * @return true if the given key data is in this data provider .
      */
     boolean contains(K key);
-    
+
+    /**
+     * Get the data related to the given key. the key is stored as a String here
+     * for convinient needs. The service should be able to transform
+     * the String key to it's own key class.
+     * @return V object if it is in the dataprovider, or null if not.
+     */
+    V getByIdentifier(String key);
+
     /**
      * Get the data related to the given key.
      * @return V object if it is in the dataprovider, or null if not.

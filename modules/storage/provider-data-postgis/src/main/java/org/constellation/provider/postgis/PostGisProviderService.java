@@ -27,6 +27,7 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.Provider;
 import org.constellation.provider.configuration.ProviderSource;
+import org.opengis.feature.type.Name;
 
 import static org.constellation.provider.postgis.PostGisProvider.*;
 
@@ -36,7 +37,7 @@ import static org.constellation.provider.postgis.PostGisProvider.*;
  *
  * @author Johann Sorel (Geoamtys)
  */
-public class PostGisProviderService extends AbstractProviderService<String,LayerDetails> implements LayerProviderService {
+public class PostGisProviderService extends AbstractProviderService<Name,LayerDetails> implements LayerProviderService {
 
     /**
      * Default logger.

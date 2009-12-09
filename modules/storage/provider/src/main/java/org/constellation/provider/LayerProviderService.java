@@ -17,6 +17,7 @@
 package org.constellation.provider;
 
 import java.util.Collection;
+import org.opengis.feature.type.Name;
 
 
 /**
@@ -25,7 +26,7 @@ import java.util.Collection;
  *
  * @author Johann Sorel (Geomatys)
  */
-public interface LayerProviderService extends ProviderService<String,LayerDetails>{
+public interface LayerProviderService extends ProviderService<Name,LayerDetails>{
 
     @Override
     public Collection<? extends LayerProvider> getProviders();

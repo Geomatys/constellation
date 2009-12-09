@@ -32,8 +32,8 @@ import java.util.Set;
 
 import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
+import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.NamedLayerProvider;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
@@ -60,7 +60,7 @@ import org.xml.sax.SAXException;
  * @author Cédric Briançon (Geomatys)
  * @author Guilhem Legal (Geomatys)
  */
-public class SMLProvider implements NamedLayerProvider {
+public class SMLProvider extends AbstractLayerProvider {
 
     private static final Logger LOGGER         = Logger.getLogger("org.constellation.provider.postgis");
     private static final String KEY_SML_CONFIG = "sml_config";
@@ -129,22 +129,6 @@ public class SMLProvider implements NamedLayerProvider {
 
     protected ProviderSource getSource(){
         return source;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<Name> getKeyClass() {
-        return Name.class;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<LayerDetails> getValueClass() {
-        return LayerDetails.class;
     }
 
     /**

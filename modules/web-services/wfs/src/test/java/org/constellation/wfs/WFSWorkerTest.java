@@ -31,8 +31,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
-import org.constellation.provider.NamedLayerProviderProxy;
-import org.constellation.provider.NamedLayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
@@ -347,7 +345,7 @@ public class WFSWorkerTest {
         final ProviderConfig configOM = new ProviderConfig();
         configOM.sources.add(sourceOM);
 
-        for (NamedLayerProviderService service : NamedLayerProviderProxy.getInstance().getServices()) {
+        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             // Here we should have the shapefile data provider defined previously
             if (service instanceof OMProviderService) {
                 service.setConfiguration(configOM);

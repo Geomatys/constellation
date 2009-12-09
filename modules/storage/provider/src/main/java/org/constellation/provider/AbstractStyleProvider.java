@@ -17,12 +17,22 @@
 
 package org.constellation.provider;
 
-import org.opengis.feature.type.Name;
+import org.geotoolkit.style.MutableStyle;
 
 /**
+ * Abstract implementation of StyleProvider which only handle the
+ * getByIdentifier(String key) method.
  *
- * @author Guilhem Legal (Geomatys)
+ * @author Johann Sorel (Geomatys)
  */
-public interface NamedLayerProvider extends Provider<Name,LayerDetails> {
+public abstract class AbstractStyleProvider implements StyleProvider{
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public MutableStyle getByIdentifier(String key) {
+        return get(key);
+    }
 
 }

@@ -28,6 +28,7 @@ import java.util.Set;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.util.Util;
 import org.geotoolkit.map.ElevationModel;
+import org.opengis.feature.type.Name;
 
 /**
  * Main data provider for MapLayer objects. This class act as a proxy for 
@@ -37,7 +38,7 @@ import org.geotoolkit.map.ElevationModel;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class LayerProviderProxy implements LayerProvider{
+public class LayerProviderProxy extends AbstractLayerProvider{
 
     /**
      * Default logger.
@@ -53,30 +54,13 @@ public class LayerProviderProxy implements LayerProvider{
 
     private LayerProviderProxy(){}
     
-        
     /**
      * {@inheritDoc }
      */
     @Override
-    public Class<String> getKeyClass() {
-        return String.class;
-    }
+    public Set<Name> getKeys() {
 
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Class<LayerDetails> getValueClass() {
-        return LayerDetails.class;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    @Override
-    public Set<String> getKeys() {
-
-        final Set<String> keys = new HashSet<String>();
+        final Set<Name> keys = new HashSet<Name>();
 
         for(LayerProviderService service : SERVICES){
             for(LayerProvider provider : service.getProviders()){
@@ -91,7 +75,7 @@ public class LayerProviderProxy implements LayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public boolean contains(String key) {
+    public boolean contains(Name key) {
 
         for(LayerProviderService service : SERVICES){
             for(LayerProvider provider : service.getProviders()){
@@ -106,7 +90,7 @@ public class LayerProviderProxy implements LayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(String key) {
+    public LayerDetails get(Name key) {
 
         for(LayerProviderService service : SERVICES){
             for(LayerProvider provider : service.getProviders()){
@@ -116,22 +100,6 @@ public class LayerProviderProxy implements LayerProvider{
         }
 
         return null;
-    }
-
-    /**
-     * {@inheritDoc }
-     */
-    public List<String> getFavoriteStyles(String layerName) {
-        final List<String> styles = new ArrayList<String>();
-
-        for(LayerProviderService service : SERVICES){
-            for(LayerProvider provider : service.getProviders()){
-                final List<String> sts = provider.get(layerName).getFavoriteStyles();
-                styles.addAll(sts);
-            }
-        }
-
-        return styles;
     }
 
     @Override

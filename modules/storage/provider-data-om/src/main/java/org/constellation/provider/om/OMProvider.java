@@ -29,21 +29,22 @@ import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.NamedLayerProvider;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
-
 import org.constellation.resources.ArraySet;
+
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.om.OMDataStoreFactory;
+
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
@@ -60,7 +61,7 @@ import org.xml.sax.SAXException;
  * @author Cédric Briançon (Geomatys)
  * @author Guilhem Legal (Geomatys)
  */
-public class OMProvider implements NamedLayerProvider {
+public class OMProvider extends AbstractLayerProvider {
 
     private static final Logger LOGGER         = Logger.getLogger("org.constellation.provider.om");
     private static final String KEY_OM_CONFIG  = "om_config";

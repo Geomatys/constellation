@@ -36,7 +36,7 @@ import org.geotoolkit.style.MutableStyle;
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
-public final class StyleProviderProxy implements Provider<String,MutableStyle>{
+public final class StyleProviderProxy extends AbstractStyleProvider{
 
     /**
      * Default logger.

@@ -123,7 +123,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         builder.append("\t<").append(layerNameCorrected).append("_layer").append(endMark)
                .append("\t\t<").append(layerNameCorrected).append("_feature").append(endMark);
 
-        final LayerDetails layerPostgrid = dp.get(layerName);
+        final LayerDetails layerPostgrid = dp.getByIdentifier(layerName);
         final Envelope objEnv = gfi.getEnvelope();
         final Date time = gfi.getTime();
         final Double elevation = gfi.getElevation();

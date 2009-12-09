@@ -21,11 +21,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.constellation.provider.AbstractProviderService;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.NamedLayerProviderService;
+import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.Provider;
-import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
 
 import org.opengis.feature.type.Name;
@@ -37,7 +37,7 @@ import static org.constellation.provider.sml.SMLProvider.*;
  * @author Johann Sorel (Geoamtys)
  * @author Guilhem Legal (Geomatys)
  */
-public class SMLProviderService extends AbstractProviderService<Name,LayerDetails> implements NamedLayerProviderService {
+public class SMLProviderService extends AbstractProviderService<Name,LayerDetails> implements LayerProviderService {
 
     /**
      * Default logger.
