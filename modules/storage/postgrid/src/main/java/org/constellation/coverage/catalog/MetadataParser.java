@@ -445,7 +445,7 @@ final class MetadataParser {
         }
         if (GeographicMetadataFormat.GEOGRAPHIC_3D.equalsIgnoreCase(type)) {
             // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
-            return 4327; // WGS 84
+            return 4979; // WGS 84
         }
         final Identification cs = referencing.getCoordinateSystem();
         type = (cs == null) ? null : cs.type;
@@ -455,7 +455,7 @@ final class MetadataParser {
         }
         if (GeographicMetadataFormat.ELLIPSOIDAL.equalsIgnoreCase(type)) {
             // TODO: THIS IS A TEMPORARY HACK. NEED TO PARSE PARAMETERS.
-            return referencing.getDimension() <= 2 ? 4326 : 4327; // WGS 84
+            return referencing.getDimension() <= 2 ? 4326 : 4979; // WGS 84
         }
         return 0;
     }
@@ -469,7 +469,7 @@ final class MetadataParser {
     public int getHorizontalSRID() throws SQLException, CatalogException {
         int id = getSRID();
         switch (id) {
-            case 4327: id = 4326; break;
+            case 4979: id = 4326; break;
         }
         return id;
     }
