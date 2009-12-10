@@ -108,7 +108,7 @@
 
             <h:form id="form_4" enctype="multipart/form-data">
                 <div class="content">
-                    <h3>Data ans Style Providers</h3>
+                    <h3>Data and Style Providers</h3>
                     <br/>
                     <h:panelGrid id="providers_panel" columns="2" width="100%" columnClasses="colclasse">
 
