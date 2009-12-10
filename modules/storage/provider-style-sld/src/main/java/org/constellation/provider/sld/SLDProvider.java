@@ -246,6 +246,9 @@ public class SLDProvider extends AbstractStyleProvider{
         if(candidate.isFile()){
             final String fullName = candidate.getName();
             final String lowerCase = fullName.toLowerCase();
+
+            if(lowerCase.startsWith(".")) return;
+
             for(final String mask : MASKS){
                 if(lowerCase.endsWith(mask)){
                     final String name = fullName.substring(0, fullName.length()-4);
