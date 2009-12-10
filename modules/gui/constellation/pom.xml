@@ -287,11 +287,20 @@
       <groupId>poi</groupId>
       <artifactId>poi</artifactId>
     </dependency>
+
+    <!-- ajax4jsf -->
+            <dependency>
+                <groupId>org.ajax4jsf</groupId>
+                <artifactId>ajax4jsf</artifactId>
+                <version>1.1.2-GEOMATYS</version>
+            </dependency>
+
   </dependencies>
 
   <properties>
-    <netbeans.hint.deploy.server>gfv3</netbeans.hint.deploy.server>
+    <netbeans.hint.deploy.server>J2EE</netbeans.hint.deploy.server>
   </properties>
 
 </project>
+
 

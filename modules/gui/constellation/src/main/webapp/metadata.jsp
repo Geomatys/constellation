@@ -1,30 +1,29 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<%@ page language="java" %>
-<%@ page session="true" %>
-<%@ page buffer="100kb" %>
 
+<%@page contentType="text/html"%>
+<%@page pageEncoding="UTF-8"%>
+<%@ taglib uri="https://ajax4jsf.dev.java.net/ajax" prefix="a4j"%>
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h" %>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f" %>
 <%@ taglib uri="http://myfaces.apache.org/tomahawk" prefix="t"%>
 <%@ taglib uri="http://myfaces.apache.org/sandbox" prefix="s"%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <title>Constellation Metadata Editor</title>
         <link rel="stylesheet" type="text/css" href="resources/css/style.css"/>
     </head>
     <body>
         <f:view>
+            <center><h:graphicImage url="resources/img/constellation400.png"/></center>
+
             <h:form id="form_1" enctype="multipart/form-data">
                 <div id="contentUpload" class="content">
-                    <h:outputText value="Load your preference file : " style="font-size:17px;font-weight:bold;"/>
+                    <h3>Load your preference file</h3>
                     <br/>
 		    <br/>
-                    <%-- Upload panel --%>
                     <h:panelGrid id="upload_panel" columns="2">
                         <h:outputText id="upload_label" value="Upload XML file : " />
                         <t:inputFileUpload id="fileupload"
@@ -40,8 +39,8 @@
                         <t:commandLink styleClass="button" id="uploadButton" onclick="this.blur();" style="margin:20px;" action="#{servicesBean.doUpload}">
                             <h:outputText id="labelUpload" value="Upload"/>
                         </t:commandLink>
-                        <f:verbatim><br></f:verbatim>
                         
+                        <br/>
                         <s:pprPanelGroup id="statepanel" partialTriggerPattern="form_1:.*">
                             <h:panelGrid id="fileinfos_panel" columns="2" border="0" cellspacing="5">
                                 
@@ -60,8 +59,7 @@
             
             <h:form id="form_2">
                 <div id="content" class="content">
-                    
-                    <h:outputText value="Web Services Metadata editor for Constellation" style="font-size:17px;font-weight:bold;"/>
+                    <h3>Web Services Metadata editor for Constellation</h3>
                     <br/>
                     <h:panelGrid id="ServiceIdentificationGrid" columns="2" cellpadding="2" cellspacing="30" width="100%">
                         <h:outputLabel for="selone_lb" value="Select Web services metadata : " />
@@ -91,8 +89,7 @@
 
              <h:form id="form_3">
                 <div id="configuration" class="content">
-                    
-                    <h:outputText value="Web Services configuration and maintenance for Constellation" style="font-size:17px;font-weight:bold;"/>
+                    <h3>Web Services configuration and maintenance for Constellation</h3>
                     <br/>
                     <h:panelGrid id="maintenanceGrid" columns="2" cellpadding="2" cellspacing="30" width="100%">
                         <t:commandLink styleClass="button" id="restart-id" onclick="" action="#{configurationBean.restartServices}">
@@ -108,6 +105,36 @@
                    
                 </div>
             </h:form>
+
+            <h:form id="form_4" enctype="multipart/form-data">
+                <div class="content">
+                    <h3>Data ans Style Providers</h3>
+                    <br/>
+                    <h:panelGrid id="providers_panel" columns="2" width="100%" columnClasses="colclasse">
+
+                    <a4j:commandButton value="Reload data providers" action="#{servicesBean.reloadLayerProviders}" reRender="layerPane">
+                    </a4j:commandButton>
+
+                    <a4j:commandButton value="Reload style providers" action="#{servicesBean.reloadStyleProviders}" reRender="stylePane">
+                    </a4j:commandButton>
+
+                    <h:panelGroup id="layerPane">
+                        <a4j:repeat value="#{servicesBean.layerProviders}" var="x">
+                            <h:outputText value="#{x}"/><br/>
+                        </a4j:repeat>
+                    </h:panelGroup>
+
+                    <h:panelGroup id="stylePane">
+                        <a4j:repeat value="#{servicesBean.styleProviders}" var="x">
+                            <h:outputText value="#{x}"/><br/>
+                        </a4j:repeat>
+                    </h:panelGroup>
+
+                    </h:panelGrid>
+
+                </div>
+            </h:form>
+
 
             <iframe style="display: none;" src="" name="target_xml" id="target_xml"/>
         </f:view>

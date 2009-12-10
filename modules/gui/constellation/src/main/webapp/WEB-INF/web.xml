@@ -79,6 +79,20 @@
 
     <!-- Servlet for constellation JSF interface -->
 
+    <!-- a4j -->
+    <filter>
+        <display-name>Ajax4jsf Filter</display-name>
+        <filter-name>ajax4jsf</filter-name>
+        <filter-class>org.ajax4jsf.Filter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ajax4jsf</filter-name>
+        <servlet-name>Faces Servlet</servlet-name>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
     <!-- filters for tomahawk and sandbox -->
     <filter>
         <filter-name>MyFacesExtensionsFilter</filter-name>

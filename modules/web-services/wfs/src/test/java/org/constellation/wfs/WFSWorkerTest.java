@@ -138,7 +138,7 @@ public class WFSWorkerTest {
          */
 
         List<QueryType> queries = new ArrayList<QueryType>();
-        queries.add(new QueryType(null, Arrays.asList(new QName("Bridges", "Bridges")), null));
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://geotoolkit.org", "Bridges")), null));
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
         result = worker.getFeature(request);
@@ -244,7 +244,7 @@ public class WFSWorkerTest {
          * Test 1 : describe Feature type bridges
          */
         List<QName> typeNames = new ArrayList<QName>();
-        typeNames.add(new QName("Bridges", "Bridges"));
+        typeNames.add(new QName("http://geotoolkit.org", "Bridges"));
         DescribeFeatureTypeType request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
 
         Schema result = worker.describeFeatureType(request);

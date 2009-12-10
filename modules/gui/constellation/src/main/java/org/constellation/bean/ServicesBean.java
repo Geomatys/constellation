@@ -76,8 +76,11 @@ import org.geotoolkit.wms.xml.v130.Service;
 import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
 import org.geotoolkit.wms.xml.v130.WMSCapabilities;
 import org.apache.myfaces.custom.fileupload.UploadedFile;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.gml.xml.v311.CodeListType;
 import org.geotoolkit.xml.MarshallerPool;
+import org.opengis.feature.type.Name;
 
 /**
  *
@@ -1427,4 +1430,27 @@ public class ServicesBean {
     public void setExistPrefrence(boolean existPrefrence) {
         this.existPrefrence = existPrefrence;
     }
+
+    public void reloadLayerProviders(){
+        LayerProviderProxy.getInstance().reload();
+    }
+
+    public void reloadStyleProviders(){
+        StyleProviderProxy.getInstance().reload();
+    }
+
+    public List<String> getLayerProviders(){
+        final List<String> names = new ArrayList<String>();
+        for(Name n : LayerProviderProxy.getInstance().getKeys()){
+            names.add("{"+ n.getNamespaceURI() + "}" + n.getLocalPart());
+        }
+        return names;
+    }
+
+    public List<String> getStyleProviders(){
+        final List<String> names = new ArrayList<String>();
+        names.addAll(StyleProviderProxy.getInstance().getKeys());
+        return names;
+    }
+
 }

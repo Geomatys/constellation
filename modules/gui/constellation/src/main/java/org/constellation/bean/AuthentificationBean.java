@@ -51,15 +51,19 @@ public class AuthentificationBean {
     }
     
     public String authentify() {
-        
+
+        System.out.println("laaaaaaaaaaaaa");
+
         //TODO remove this ugly thing
         if (login != null && login.equals("admin") && password != null && password.equals("admin")) {
             final Cookie cookie = new Cookie("authent", login + ':' + password);
             cookie.setPath(contextPath);
             response.addCookie(cookie);
             LOGGER.info("cookie added with value:" + login + ':' + password);
+            System.out.println(">>>>>>>>> log in");
             return "authentified";
         } else {
+            System.out.println(">>>>>>>>> niet");
             return "notAllowed";
         }
         
