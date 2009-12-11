@@ -139,13 +139,13 @@ public class PostGridReader implements CoverageReader {
 
         DirectPosition point1 = new DirectPosition2D(
                     requestEnvelope.getCoordinateReferenceSystem(),
-                    requestEnvelope.getSpan(0),
-                    requestEnvelope.getSpan(1));
+                    requestEnvelope.getMedian(0),
+                    requestEnvelope.getMedian(1));
 
         DirectPosition point2 = new DirectPosition2D(
                     requestEnvelope.getCoordinateReferenceSystem(),
-                    requestEnvelope.getSpan(0) + objResolution[0],
-                    requestEnvelope.getSpan(1) + objResolution[1]);
+                    requestEnvelope.getMedian(0) + objResolution[0],
+                    requestEnvelope.getMedian(1) + objResolution[1]);
 
         if(!requestCRS.equals(crs)){
             //reproject requested enveloppe to dataCRS
