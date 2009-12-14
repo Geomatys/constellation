@@ -221,7 +221,7 @@ public class WCSService extends GridWebService {
                     !format.equalsIgnoreCase(MimeType.IMAGE_TIFF) && !format.equalsIgnoreCase(TIFF) &&
                     !format.equalsIgnoreCase(MimeType.IMAGE_PNG)  && !format.equalsIgnoreCase(PNG)  &&
                     !format.equalsIgnoreCase(GEOTIFF)             && !format.equalsIgnoreCase(NETCDF) &&
-                    !format.equalsIgnoreCase(MATRIX))
+                    !format.equalsIgnoreCase(MATRIX)              && !format.equalsIgnoreCase(ASCII_GRID))
                 {
                     throw new CstlServiceException("The format specified is not recognized. Please choose a known format " +
                         "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT,
@@ -229,7 +229,10 @@ public class WCSService extends GridWebService {
                 }
                 final RenderedImage rendered = worker.getCoverage(getcov);
                 if (format.equalsIgnoreCase(MATRIX)) {
-                    format = "application/matrix";
+                    format = "text/x-matrix";
+                }
+                if (format.equalsIgnoreCase(ASCII_GRID)) {
+                    format = "text/x-ascii-grid";
                 }
                 // Convert the supported image type into known mime-type.
                 if (format.equalsIgnoreCase(PNG)) {

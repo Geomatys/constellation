@@ -343,6 +343,7 @@ public final class WCSWorker {
             supportedFormats.add(new CodeListType("bmp"));
             supportedFormats.add(new CodeListType("tiff"));
             supportedFormats.add(new CodeListType("matrix"));
+            supportedFormats.add(new CodeListType("ascii-grid"));
             String nativeFormat = "unknown";
             final Iterator<Series> it = coverageRef.getSeries().iterator();
             if (it.hasNext()) {
@@ -493,6 +494,7 @@ public final class WCSWorker {
             supportedFormats.add(MimeType.IMAGE_JPEG);
             supportedFormats.add(MimeType.IMAGE_BMP);
             supportedFormats.add("application/matrix");
+            supportedFormats.add("ascii-grid");
 
             final CoverageDescriptionType coverageDescription = new CoverageDescriptionType(title, abstractt,
                     keywords, coverageRef.getName(), domain, range, supportedCRS, supportedFormats);
@@ -922,7 +924,7 @@ public final class WCSWorker {
          * It can be a text one (format MATRIX) or an image one (png, gif ...).
          */
         final String format = request.getFormat();
-        if ( format.equalsIgnoreCase(MATRIX) ) {
+        if ( format.equalsIgnoreCase(MATRIX) || format.equalsIgnoreCase(ASCII_GRID)) {
 
             //NOTE ADRIAN HACKED HERE
             final Double elevation = (envelope.getDimension() > 2) ? envelope.getMedian(2) : null;

@@ -99,6 +99,8 @@ public interface WCSQuery extends Query {
     /** Format value used in getCoverage */
     public static final String MATRIX     = "MATRIX";
     /** Format value used in getCoverage */
+    public static final String ASCII_GRID = "ASCII-GRID";
+    /** Format value used in getCoverage */
     public static final String GEOTIFF    = "GEOTIFF";
     /** Format value used in getCoverage */
     public static final String NETCDF     = "NETCDF";
