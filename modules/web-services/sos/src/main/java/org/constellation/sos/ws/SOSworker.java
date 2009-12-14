@@ -266,6 +266,8 @@ public class SOSworker {
      */
     private static FactoryRegistry factory = new FactoryRegistry(AbstractSOSFactory.class);
 
+    private AbstractSOSFactory sosFactory;
+
     /**
      * A flag indicating if the worker is correctly started.
      */
@@ -363,7 +365,7 @@ public class SOSworker {
             omConfiguration.setConfigurationDirectory(configurationDirectory);
 
             // we load the factory from the available classes
-            final AbstractSOSFactory sosFactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
+            sosFactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
         
             //we initialize the properties attribute
             final String observationIdBase  = configuration.getObservationIdBase() != null ?
@@ -706,6 +708,10 @@ public class SOSworker {
         //we verify the base request attribute
         verifyBaseRequest(requestObservation);
 
+        // we clone the filter for this request
+        ObservationFilter localOmFilter = sosFactory.cloneObservationFilter(omFilter);
+
+
         //we verify that the output format is good.     
         if (requestObservation.getResponseFormat() != null) {
             if (!acceptedResponseFormat.contains(requestObservation.getResponseFormat())) {
@@ -752,7 +758,7 @@ public class SOSworker {
             }
         }
         try {
-            omFilter.initFilterObservation(mode, resultModel);
+            localOmFilter.initFilterObservation(mode, resultModel);
         } catch (IllegalArgumentException ex) {
             throw new CstlServiceException(ex);
         }
@@ -836,7 +842,7 @@ public class SOSworker {
                 }
             }
         }
-        omFilter.setProcedure(procedures, off);
+        localOmFilter.setProcedure(procedures, off);
 
         //we get the list of phenomenon
         //TODO verifier que les pheno appartiennent a l'offering
@@ -862,13 +868,13 @@ public class SOSworker {
                     singlePhenomenons.add(phenomenonName);
                 }
             }
-            omFilter.setObservedProperties(singlePhenomenons, compositePhenomenons);
+            localOmFilter.setObservedProperties(singlePhenomenons, compositePhenomenons);
         }
 
 
         //we treat the time restriction
         final List<EventTime> times = requestObservation.getEventTime();
-        final AbstractTimeGeometricPrimitiveType templateTime = treatEventTimeRequest(times, template);
+        final AbstractTimeGeometricPrimitiveType templateTime = treatEventTimeRequest(times, template, localOmFilter);
 
         //we treat the restriction on the feature of interest
         if (requestObservation.getFeatureOfInterest() != null) {
@@ -884,7 +890,7 @@ public class SOSworker {
                         throw new CstlServiceException("the feature of interest "+ samplingFeatureName + " is not registered",
                                                          INVALID_PARAMETER_VALUE, "featureOfInterest");
                 }
-                omFilter.setFeatureOfInterest(foiRequest.getObjectID());
+                localOmFilter.setFeatureOfInterest(foiRequest.getObjectID());
 
             // if the request is a spatial operator
             } else {
@@ -898,8 +904,8 @@ public class SOSworker {
                         final EnvelopeEntry e = foiRequest.getBBOX().getEnvelope();
                         boolean add     = false;
                         final List<String> matchingFeatureOfInterest = new ArrayList<String>();
-                        if (omFilter.isBoundedObservation()) {
-                            omFilter.setBoundingBox(e);
+                        if (localOmFilter.isBoundedObservation()) {
+                            localOmFilter.setBoundingBox(e);
                         } else {
                             for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
                                 final SamplingPoint station = (SamplingPoint) omReader.getFeatureOfInterest(refStation.getHref());
@@ -927,7 +933,7 @@ public class SOSworker {
                                 }
                             }
                             if (add) {
-                                omFilter.setFeatureOfInterest(matchingFeatureOfInterest);
+                                localOmFilter.setFeatureOfInterest(matchingFeatureOfInterest);
                             }
                         }
                         
@@ -1021,15 +1027,15 @@ public class SOSworker {
             List<Observation> matchingResult = new ArrayList<Observation>();
 
             // case (1)
-            if (!(omFilter instanceof ObservationFilterReader)) {
-                final List<String> observationIDs = omFilter.filterObservation();
+            if (!(localOmFilter instanceof ObservationFilterReader)) {
+                final List<String> observationIDs = localOmFilter.filterObservation();
                 for (String observationID : observationIDs) {
                     matchingResult.add(omReader.getObservation(observationID, resultModel));
                 }
 
             // case (2)
             } else {
-                final ObservationFilterReader omFR = (ObservationFilterReader) omFilter;
+                final ObservationFilterReader omFR = (ObservationFilterReader) localOmFilter;
                 if (template) {
                     matchingResult = omFR.getObservationTemplates();
                 } else {
@@ -1070,8 +1076,8 @@ public class SOSworker {
             response = ocResponse;
         } else {
             String sReponse = "";
-            if (omFilter instanceof ObservationFilterReader) {
-                sReponse = ((ObservationFilterReader)omFilter).getOutOfBandResults();
+            if (localOmFilter instanceof ObservationFilterReader) {
+                sReponse = ((ObservationFilterReader)localOmFilter).getOutOfBandResults();
             } else {
                 throw new CstlServiceException("Out of band response mode has been implemented only for ObservationFilterReader for now", NO_APPLICABLE_CODE, Parameters.RESPONSE_MODE);
             }
@@ -1091,6 +1097,9 @@ public class SOSworker {
         
         //we verify the base request attribute
         verifyBaseRequest(requestResult);
+
+        // we clone the filter for this request
+        ObservationFilter localOmFilter = sosFactory.cloneObservationFilter(omFilter);
         
         ObservationEntry template = null;
         if (requestResult.getObservationTemplateId() != null) {
@@ -1113,7 +1122,7 @@ public class SOSworker {
         }
         
         //we begin to create the sql request
-        omFilter.initFilterGetResult(((ProcessEntry)template.getProcedure()).getHref(), resultModel);
+        localOmFilter.initFilterGetResult(((ProcessEntry)template.getProcedure()).getHref(), resultModel);
         
         //we treat the time constraint
         final List<EventTime> times = requestResult.getEventTime();
@@ -1153,16 +1162,16 @@ public class SOSworker {
         }
         
         //we treat the time constraint
-        treatEventTimeRequest(times, false);
+        treatEventTimeRequest(times, false, localOmFilter);
         
         //we prepare the response document
         
         String values;
-        if (omFilter instanceof ObservationFilterReader) {
-            values = ((ObservationFilterReader)omFilter).getResults();
+        if (localOmFilter instanceof ObservationFilterReader) {
+            values = ((ObservationFilterReader)localOmFilter).getResults();
             
         } else {
-            final List<ObservationResult> results = omFilter.filterResult();
+            final List<ObservationResult> results = localOmFilter.filterResult();
             final StringBuilder datablock         = new StringBuilder();
             
             for (ObservationResult result: results) {
@@ -1539,7 +1548,7 @@ public class SOSworker {
      * 
      * @return true if there is no errors in the time constraint else return false.
      */
-    private AbstractTimeGeometricPrimitiveType treatEventTimeRequest(List<EventTime> times, boolean template) throws CstlServiceException {
+    private AbstractTimeGeometricPrimitiveType treatEventTimeRequest(List<EventTime> times, boolean template, ObservationFilter localOmFilter) throws CstlServiceException {
         
         //In template mode  his method return a temporal Object.
         AbstractTimeGeometricPrimitiveType templateTime = null;
@@ -1556,7 +1565,7 @@ public class SOSworker {
                     final Object timeFilter   = time.getTEquals().getRest().get(0);
                     
                     if (!template) {
-                        omFilter.setTimeEquals(timeFilter);
+                        localOmFilter.setTimeEquals(timeFilter);
                         
                     } else if (timeFilter instanceof TimePeriodType || timeFilter instanceof TimeInstantType) {
                         templateTime = (AbstractTimeGeometricPrimitiveType) timeFilter;
@@ -1574,7 +1583,7 @@ public class SOSworker {
                     final Object timeFilter   = time.getTBefore().getRest().get(0);
 
                     if (!template) {
-                        omFilter.setTimeBefore(timeFilter);
+                        localOmFilter.setTimeBefore(timeFilter);
                     } else if (timeFilter instanceof TimeInstantType) {
                         final TimeInstantType ti = (TimeInstantType)timeFilter;
                         templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getTimePosition());
@@ -1591,7 +1600,7 @@ public class SOSworker {
                     final Object timeFilter   = time.getTAfter().getRest().get(0);
 
                     if (!template) {
-                        omFilter.setTimeAfter(timeFilter);
+                        localOmFilter.setTimeAfter(timeFilter);
                     } else if (timeFilter instanceof TimeInstantType) {
                         final TimeInstantType ti = (TimeInstantType)timeFilter;
                         templateTime = new TimePeriodType(ti.getTimePosition());
@@ -1609,7 +1618,7 @@ public class SOSworker {
                     final Object timeFilter   = time.getTDuring().getRest().get(0);
 
                     if (!template) {
-                        omFilter.setTimeDuring(timeFilter);
+                        localOmFilter.setTimeDuring(timeFilter);
                     }
                     if (timeFilter instanceof TimePeriodType) {
                         templateTime = (TimePeriodType)timeFilter;

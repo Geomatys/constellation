@@ -89,6 +89,14 @@ public class GenericObservationFilter implements ObservationFilter {
      */
     private final Connection connection;
 
+    public GenericObservationFilter(GenericObservationFilter omFilter) {
+        this.observationIdBase         = omFilter.observationIdBase;
+        this.observationTemplateIdBase = omFilter.observationTemplateIdBase;
+        this.map                       = omFilter.map;
+        this.configurationQuery        = omFilter.configurationQuery;
+        this.connection                = omFilter.connection;
+    }
+
     public GenericObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
         this.observationIdBase         = observationIdBase;
         this.observationTemplateIdBase = observationTemplateIdBase;

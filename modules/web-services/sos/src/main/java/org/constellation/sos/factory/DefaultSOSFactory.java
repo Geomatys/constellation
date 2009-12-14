@@ -70,6 +70,22 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
+    public ObservationFilter cloneObservationFilter(ObservationFilter omFilter) throws CstlServiceException {
+        if (omFilter instanceof DefaultObservationFilter) {
+            return new DefaultObservationFilter((DefaultObservationFilter)omFilter);
+
+        } else if (omFilter instanceof LuceneObservationFilter) {
+            return new LuceneObservationFilter((LuceneObservationFilter) omFilter);
+        
+        } else if (omFilter instanceof GenericObservationFilter) {
+            return new GenericObservationFilter((GenericObservationFilter) omFilter);
+
+        } else {
+            throw new IllegalArgumentException("Unknow observationFilter type: " + omFilter);
+        }
+    }
+
+    @Override
     public ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase) throws CstlServiceException {
         if (type == null) {
             return null;

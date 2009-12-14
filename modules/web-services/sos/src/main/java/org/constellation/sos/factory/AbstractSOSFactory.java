@@ -43,6 +43,8 @@ public abstract class AbstractSOSFactory extends Factory {
 
     public abstract ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException;
 
+    public abstract ObservationFilter cloneObservationFilter(ObservationFilter omFilter) throws CstlServiceException;
+    
     public abstract ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase) throws CstlServiceException;
 
     public abstract ObservationWriter getObservationWriter(ObservationWriterType type, Automatic configuration) throws CstlServiceException;

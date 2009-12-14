@@ -57,6 +57,11 @@ public class LuceneObservationFilter implements ObservationFilter {
 
     private static final String OR_OPERATOR = " OR ";
 
+    public LuceneObservationFilter(LuceneObservationFilter omFilter) throws CstlServiceException {
+        this.map      = omFilter.map;
+        this.searcher = omFilter.searcher;
+    }
+
     public LuceneObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
         this.map                       = map;
         try {

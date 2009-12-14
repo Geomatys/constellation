@@ -79,6 +79,13 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     protected String observationTemplateIdBase;
 
+    public DefaultObservationFilter(DefaultObservationFilter omFilter) {
+        this.connection                = omFilter.connection;
+        this.map                       = omFilter.map;
+        this.observationIdBase         = omFilter.observationIdBase;
+        this.observationTemplateIdBase = omFilter.observationTemplateIdBase;
+    }
+
     /**
      *
      */
