@@ -481,8 +481,6 @@ public class WCSService extends GridWebService {
                     throw new IllegalArgumentException(
                             Errors.format(Errors.Keys.BAD_RANGE_$2, minimumLat, maximumLat));
                 }
-                pos.add(new DirectPositionType(minimumLon, maximumLon));
-                pos.add(new DirectPositionType(minimumLat, maximumLat));
                 if (bboxValues.size() > 4) {
                     final double minimumDepth = StringUtilities.toDouble(bboxValues.get(4));
                     final double maximumDepth = StringUtilities.toDouble(bboxValues.get(5));
@@ -490,7 +488,11 @@ public class WCSService extends GridWebService {
                         throw new IllegalArgumentException(
                                 Errors.format(Errors.Keys.BAD_RANGE_$2, minimumDepth, maximumDepth));
                     }
-                    pos.add(new DirectPositionType(minimumDepth, maximumDepth));
+                    pos.add(new DirectPositionType(minimumLon, minimumLat, minimumDepth));
+                    pos.add(new DirectPositionType(maximumLon, maximumLat, maximumDepth));
+                } else {
+                    pos.add(new DirectPositionType(minimumLon, minimumLat));
+                    pos.add(new DirectPositionType(maximumLon, maximumLat));
                 }
             } catch (IllegalArgumentException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);

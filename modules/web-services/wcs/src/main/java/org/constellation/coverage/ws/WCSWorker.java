@@ -493,7 +493,7 @@ public final class WCSWorker {
             supportedFormats.add(MimeType.IMAGE_GIF);
             supportedFormats.add(MimeType.IMAGE_JPEG);
             supportedFormats.add(MimeType.IMAGE_BMP);
-            supportedFormats.add("application/matrix");
+            supportedFormats.add("matrix");
             supportedFormats.add("ascii-grid");
 
             final CoverageDescriptionType coverageDescription = new CoverageDescriptionType(title, abstractt,

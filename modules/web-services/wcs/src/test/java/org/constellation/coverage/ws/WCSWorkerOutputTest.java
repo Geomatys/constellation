@@ -16,25 +16,36 @@
  */
 package org.constellation.coverage.ws;
 
+import java.awt.image.RenderedImage;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.GridLimitsType;
+import org.geotoolkit.gml.xml.v311.GridType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.gui.swing.image.OperationTreeBrowser;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCapabilities;
 import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
+import org.geotoolkit.wcs.xml.GetCoverage;
 import org.geotoolkit.wcs.xml.v100.CoverageDescription;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingType;
 import org.geotoolkit.wcs.xml.v100.DescribeCoverageType;
+import org.geotoolkit.wcs.xml.v100.DomainSubsetType;
 import org.geotoolkit.wcs.xml.v100.GetCapabilitiesType;
+import org.geotoolkit.wcs.xml.v100.GetCoverageType;
+import org.geotoolkit.wcs.xml.v100.OutputType;
 import org.geotoolkit.wcs.xml.v100.SpatialDomainType;
+import org.geotoolkit.wcs.xml.v100.SpatialSubsetType;
 import org.geotoolkit.wcs.xml.v100.TimeSequenceType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
 import org.junit.Test;
@@ -137,5 +148,50 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
             }
         }
         fail("Unable to find the layer "+ LAYER_TEST +" in the DescribeCoverage document.");
+    }
+
+    /**
+     * Ensures that a PostGRID layer preconfigured can be requested with a GetCoverage request.
+     *
+     * TODO: do a checksum on the output image.
+     *
+     * @throws JAXBException
+     * @throws CstlServiceException
+     */
+    @Test
+    public void testGetCoverage() throws JAXBException, CstlServiceException {
+        // Ensures that the test layer is really present.
+        assumeTrue(containsTestLayer());
+
+        // Builds the GetCoverage request
+        final List<String> axis = new ArrayList<String>();
+        axis.add("width");
+        axis.add("height");
+        final List<BigInteger> low  = new ArrayList<BigInteger>();
+        low.add(BigInteger.ZERO);
+        low.add(BigInteger.ZERO);
+        final List<BigInteger> high = new ArrayList<BigInteger>();
+        high.add(new BigInteger("1024"));
+        high.add(new BigInteger("512"));
+        final GridLimitsType limits = new GridLimitsType(low, high);
+        final GridType grid = new GridType(limits, axis);
+        final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+        pos.add(new DirectPositionType(-180.0, -90.0));
+        pos.add(new DirectPositionType(180.0, 90.0));
+        final EnvelopeEntry envelope = new EnvelopeEntry(pos, "CRS:84");
+        final DomainSubsetType domain = new DomainSubsetType(null, new SpatialSubsetType(envelope, grid));
+        final GetCoverage request = new GetCoverageType(
+                LAYER_TEST, domain, null, null, new OutputType(MimeType.IMAGE_PNG, "CRS:84"));
+
+        // Finally execute the request on the worker.
+        final RenderedImage image = WORKER.getCoverage(request);
+        OperationTreeBrowser.show(image);
+        // Test on the returned image.
+        assertEquals(image.getWidth(), 1024);
+        assertEquals(image.getHeight(), 512);
+        // Test the checksum of the image, if the image is indexed (and its values of type byte).
+        // TODO: the image should have indexed colors. Find the origin of the conversion from
+        //       indexed color to RGB (int values).
+//        assertEquals(Commons.checksum(image), 3183786073L);
     }
 }
