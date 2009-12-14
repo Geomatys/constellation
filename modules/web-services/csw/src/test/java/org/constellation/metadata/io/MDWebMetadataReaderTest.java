@@ -18,7 +18,6 @@
 
 package org.constellation.metadata.io;
 
-import java.io.File;
 import java.sql.Connection;
 import java.util.Arrays;
 import javax.xml.bind.Unmarshaller;
@@ -58,7 +57,7 @@ public class MDWebMetadataReaderTest {
 
         Connection con = ds.getConnection();
 
-        Util.executeSQLScript("org/constellation/metadata/sql/structure-mdweb.sql", con);
+        Util.executeSQLScript("org/constellation/sql/structure-mdweb.sql", con);
         Util.executeSQLScript("org/constellation/metadata/sql/ISO19115-data.sql", con);
         Util.executeSQLScript("org/constellation/metadata/sql/csw-data.sql", con);
 

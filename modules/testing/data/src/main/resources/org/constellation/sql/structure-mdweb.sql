@@ -286,7 +286,7 @@ CREATE TABLE "Storage"."TextValues" (
     "type" character varying(50),
     "typeStandard" character varying(50),
     "id_value" character varying(200) NOT NULL,
-    "value" character varying(200)
+    "value" character varying(500)
 );
 
 

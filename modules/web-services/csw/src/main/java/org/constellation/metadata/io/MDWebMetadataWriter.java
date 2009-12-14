@@ -718,7 +718,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 throw e;
                 //return false;*/
             } catch (MD_IOException e) {
-                throw new CstlServiceException("The service has throw an SQLException while writing the metadata: " + e.getMessage(),
+                throw new CstlServiceException("The service has throw an SQLException while writing the metadata :" + e.getMessage(), e, 
                         NO_APPLICABLE_CODE);
             }
             
