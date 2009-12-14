@@ -38,12 +38,13 @@ import org.constellation.provider.om.OMProvider;
 import org.constellation.provider.om.OMProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
+import org.constellation.provider.sml.SMLProvider;
+import org.constellation.provider.sml.SMLProviderService;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.data.collection.FeatureCollection;
-import org.geotoolkit.data.store.EmptyFeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureWriter;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
@@ -83,6 +84,8 @@ public class WFSWorkerTest {
     private static MarshallerPool pool;
 
     private static DefaultDataSource ds = null;
+
+    private static DefaultDataSource ds2 = null;
     
     private XmlFeatureWriter featureWriter;
     
@@ -99,11 +102,14 @@ public class WFSWorkerTest {
         if (ds != null) {
             ds.shutdown();
         }
+        if (ds2 != null) {
+            ds2.shutdown();
+        }
     }
 
     @Before
     public void setUp() throws Exception {
-        featureWriter     = new JAXPEventFeatureWriter();
+        featureWriter     = new JAXPStreamFeatureWriter();
     }
 
     @After
@@ -147,6 +153,7 @@ public class WFSWorkerTest {
         String xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
         assertEquals(xmlExpResult, xmlResult);
@@ -165,30 +172,36 @@ public class WFSWorkerTest {
         xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 3 : query on typeName sml:component
-         
+         * Test 4 : query on typeName sml:System
+         */
 
         queries = new ArrayList<QueryType>();
-        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "Component")), null));
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null));
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"));
+
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
-        assertEquals(xmlExpResult, xmlResult);*/
+        // to see
+        xmlExpResult = xmlExpResult.replaceAll("srsName=\"\"", "srsName=\"urn:ogc:def:crs:epsg:7.1:27582\"");
+
+        assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 4 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
+         * Test 5 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
          */
 
         queries = new ArrayList<QueryType>();
@@ -203,6 +216,7 @@ public class WFSWorkerTest {
         xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
         assertEquals(xmlExpResult, xmlResult);
@@ -281,6 +295,19 @@ public class WFSWorkerTest {
         result = worker.describeFeatureType(request);
 
         ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/sampling.xsd"));
+
+        assertEquals(ExpResult, result);
+
+        /**
+         * Test 3 : describe Feature type System
+         */
+        typeNames = new ArrayList<QName>();
+        typeNames.add(new QName("http://www.opengis.net/sml/1.0", "System"));
+        request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.describeFeatureType(request);
+
+        ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system.xsd"));
 
         assertEquals(ExpResult, result);
     }
@@ -378,36 +405,38 @@ public class WFSWorkerTest {
          *                                      *
          *    Defines a SML data provider       *
          *                                      *
-         ***************************************
+         ****************************************/
 
-        final String url = "jdbc:derby:memory:TestWFSWorker";
-        ds = new DefaultDataSource(url + ";create=true");
+        final String url2 = "jdbc:derby:memory:TestWFSWorkerSMl";
+        ds2 = new DefaultDataSource(url2 + ";create=true");
 
-        Connection con = ds.getConnection();
+        con = ds2.getConnection();
 
-        Util.executeSQLScript("org/constellation/sql/structure-observations.sql", con);
-        Util.executeSQLScript("org/constellation/sql/sos-data.sql", con);
+        Util.executeSQLScript("org/constellation/sql/structure-mdweb.sql", con);
+        Util.executeSQLScript("org/constellation/sql/sml-schema.sql", con);
+        Util.executeSQLScript("org/constellation/sql/sml-data.sql", con);
+
 
         con.close();
 
-        final ProviderSource sourceOM = new ProviderSource();
-        sourceOM.loadAll = true;
-        sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
-        sourceOM.parameters.put(OMProvider.KEY_DERBYURL, url);
+        final ProviderSource sourceSML = new ProviderSource();
+        sourceSML.loadAll = true;
+        sourceSML.parameters.put(SMLProvider.KEY_SGBDTYPE, "derby");
+        sourceSML.parameters.put(SMLProvider.KEY_DERBYURL, url2);
 
-        final ProviderConfig configOM = new ProviderConfig();
-        configOM.sources.add(sourceOM);
+        final ProviderConfig configSML = new ProviderConfig();
+        configSML.sources.add(sourceSML);
 
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             // Here we should have the shapefile data provider defined previously
-            if (service instanceof OMProviderService) {
-                service.setConfiguration(configOM);
+            if (service instanceof SMLProviderService) {
+                service.setConfiguration(configSML);
                 if (service.getProviders().isEmpty()) {
                     return;
                 }
                 break;
             }
-        }*/
+        }
     }
     /**
      * Initialises the data directory in unzipping the jar containing the resources

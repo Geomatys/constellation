@@ -65,6 +65,8 @@ public class SMLProvider extends AbstractLayerProvider {
     private static final Logger LOGGER         = Logger.getLogger("org.constellation.provider.postgis");
     private static final String KEY_SML_CONFIG = "sml_config";
     public  static final String KEY_DBTYPE     = SMLDataStoreFactory.DBTYPE.getName().toString();
+    public  static final String KEY_SGBDTYPE   = SMLDataStoreFactory.SGBDTYPE.getName().toString();
+    public  static final String KEY_DERBYURL   = SMLDataStoreFactory.DERBYURL.getName().toString();
     public  static final String KEY_HOST       = SMLDataStoreFactory.HOST.getName().toString();
     public  static final String KEY_PORT       = SMLDataStoreFactory.PORT.getName().toString();
     public  static final String KEY_DATABASE   = SMLDataStoreFactory.DATABASE.getName().toString();
@@ -82,34 +84,44 @@ public class SMLProvider extends AbstractLayerProvider {
         this.source = source;
         params.put(KEY_DBTYPE, "SML");
 
-        // HOST ----------------------------------------------------------------
-        final String host = source.parameters.get(KEY_HOST);
-        params.put(KEY_HOST, (host != null) ? host : "localhost");
+        final String sgbdType = source.parameters.get(KEY_SGBDTYPE);
+        if (sgbdType != null && sgbdType.equals("derby"))  {
 
-        // PORT ----------------------------------------------------------------
-        final String port = source.parameters.get(KEY_PORT);
-        if (port != null) {
-            try{
-                final Integer iport = Integer.valueOf(port);
-                params.put(KEY_PORT, iport);
-            } catch (NumberFormatException ex) {
-                //just log it, use the default port
-                params.put(KEY_PORT, 5432);
-                LOGGER.log(Level.SEVERE, null, ex);
-            }
+            params.put(KEY_SGBDTYPE,"derby");
+
+            final String derbyUrl = source.parameters.get(KEY_DERBYURL);
+            params.put(KEY_DERBYURL, (derbyUrl != null) ? derbyUrl : "localhost");
+
         } else {
-            //this parameter is needed
-            params.put(KEY_PORT, 5432);
+            // HOST ----------------------------------------------------------------
+            final String host = source.parameters.get(KEY_HOST);
+            params.put(KEY_HOST, (host != null) ? host : "localhost");
+
+            // PORT ----------------------------------------------------------------
+            final String port = source.parameters.get(KEY_PORT);
+            if (port != null) {
+                try{
+                    final Integer iport = Integer.valueOf(port);
+                    params.put(KEY_PORT, iport);
+                } catch (NumberFormatException ex) {
+                    //just log it, use the default port
+                    params.put(KEY_PORT, 5432);
+                    LOGGER.log(Level.SEVERE, null, ex);
+                }
+            } else {
+                //this parameter is needed
+                params.put(KEY_PORT, 5432);
+            }
+
+            // OTHERS --------------------------------------------------------------
+            final String database = source.parameters.get(KEY_DATABASE);
+            final String user       = source.parameters.get(KEY_USER);
+            final String passwd     = source.parameters.get(KEY_PASSWD);
+            params.put(KEY_DATABASE, database);
+            params.put(KEY_USER, user);
+            params.put(KEY_PASSWD, passwd);
         }
-
-        // OTHERS --------------------------------------------------------------
-        final String database = source.parameters.get(KEY_DATABASE);
-        final String user       = source.parameters.get(KEY_USER);
-        final String passwd     = source.parameters.get(KEY_PASSWD);
-        params.put(KEY_DATABASE, database);
-        params.put(KEY_USER, user);
-        params.put(KEY_PASSWD, passwd);
-
+        
         store = DataStoreFinder.getDataStore(params);
         if (store == null) {
             final StringBuilder sb = new StringBuilder("Could not connect to SML : \n");
