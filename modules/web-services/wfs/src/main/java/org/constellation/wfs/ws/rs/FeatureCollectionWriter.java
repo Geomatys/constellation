@@ -43,7 +43,7 @@ public class FeatureCollectionWriter<T extends FeatureCollection> implements Mes
 
     @Override
     public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
-        return true;
+        return FeatureCollection.class.isAssignableFrom(type);
     }
 
     @Override

@@ -76,9 +76,9 @@ public class SMLFeatureXmlBindingTest {
 
         Connection con = ds.getConnection();
 
-        Util.executeSQLScript("org/constellation/wfs/sql/structure-mdweb.sql", con);
-        Util.executeSQLScript("org/constellation/wfs/sql/sml-schema.sql", con);
-        Util.executeSQLScript("org/constellation/wfs/sql/sml-data.sql", con);
+        Util.executeSQLScript("org/constellation/sql/structure-mdweb.sql", con);
+        Util.executeSQLScript("org/constellation/sql/sml-schema.sql", con);
+        Util.executeSQLScript("org/constellation/sql/sml-data.sql", con);
 
         FeatureReader fr = PostgisUtils.createEmbeddedSMLLayer(url, "System");
         featureType      = fr.getFeatureType();

@@ -54,9 +54,9 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
         Connection con2 = ds2.getConnection();
 
-        Util.executeSQLScript("org/constellation/sos/sql/structure-mdweb.sql", con2);
-        Util.executeSQLScript("org/constellation/sos/sql/sml-schema.sql", con2);
-        Util.executeSQLScript("org/constellation/sos/sql/sml-data.sql", con2);
+        Util.executeSQLScript("org/constellation/sql/structure-mdweb.sql", con2);
+        Util.executeSQLScript("org/constellation/sql/sml-schema.sql", con2);
+        Util.executeSQLScript("org/constellation/sql/sml-data.sql", con2);
 
         final String url = "jdbc:derby:memory:Test1;create=true";
         ds = new DefaultDataSource(url);

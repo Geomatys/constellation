@@ -455,7 +455,7 @@ public class WFSService extends OGCWebService {
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
                 if (token.indexOf("xmlns(") != -1 && token.indexOf(')') != -1 && token.indexOf('=') != -1) {
-                    String tmp = token.substring(token.indexOf("xmlns(") + 6, token.indexOf(')'));
+                    String tmp    = token.substring(token.indexOf("xmlns(") + 6, token.indexOf(')'));
                     String prefix = tmp.substring(0, tmp.indexOf('='));
                     String namesp = tmp.substring(tmp.indexOf('=') + 1);
                     mapping.put(prefix, namesp);
@@ -473,9 +473,9 @@ public class WFSService extends OGCWebService {
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
                 if (token.indexOf(':') != -1) {
-                    String prefix    = token.substring(0, token.indexOf(':'));
-                    String localPart = token.substring(token.indexOf(':') + 1);
-                    String namesp = mapping.get(prefix);
+                    String prefix    = token.substring(0, token.lastIndexOf(':'));
+                    String localPart = token.substring(token.lastIndexOf(':') + 1);
+                    String namesp    = mapping.get(prefix);
                     if (namesp != null) {
                         typeNames.add(new QName(namesp, localPart, prefix));
                     } else {

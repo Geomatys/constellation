@@ -170,6 +170,24 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
+         * Test 3 : query on typeName sml:component
+         
+
+        queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "Component")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        xmlResult    = featureWriter.write((FeatureCollection)result);
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        assertEquals(xmlExpResult, xmlResult);*/
+
+        /**
          * Test 4 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
          */
 
@@ -355,6 +373,41 @@ public class WFSWorkerTest {
                 break;
             }
         }
+
+        /****************************************
+         *                                      *
+         *    Defines a SML data provider       *
+         *                                      *
+         ***************************************
+
+        final String url = "jdbc:derby:memory:TestWFSWorker";
+        ds = new DefaultDataSource(url + ";create=true");
+
+        Connection con = ds.getConnection();
+
+        Util.executeSQLScript("org/constellation/sql/structure-observations.sql", con);
+        Util.executeSQLScript("org/constellation/sql/sos-data.sql", con);
+
+        con.close();
+
+        final ProviderSource sourceOM = new ProviderSource();
+        sourceOM.loadAll = true;
+        sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
+        sourceOM.parameters.put(OMProvider.KEY_DERBYURL, url);
+
+        final ProviderConfig configOM = new ProviderConfig();
+        configOM.sources.add(sourceOM);
+
+        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
+            // Here we should have the shapefile data provider defined previously
+            if (service instanceof OMProviderService) {
+                service.setConfiguration(configOM);
+                if (service.getProviders().isEmpty()) {
+                    return;
+                }
+                break;
+            }
+        }*/
     }
     /**
      * Initialises the data directory in unzipping the jar containing the resources
