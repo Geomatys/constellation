@@ -30,7 +30,6 @@ import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.GridLimitsType;
 import org.geotoolkit.gml.xml.v311.GridType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
-import org.geotoolkit.gui.swing.image.OperationTreeBrowser;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCapabilities;
@@ -185,7 +184,6 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
 
         // Finally execute the request on the worker.
         final RenderedImage image = WORKER.getCoverage(request);
-        OperationTreeBrowser.show(image);
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
         assertEquals(image.getHeight(), 512);
