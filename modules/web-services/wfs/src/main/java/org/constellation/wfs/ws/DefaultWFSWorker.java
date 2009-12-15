@@ -206,9 +206,17 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     if (type.getGeometryDescriptor() != null && type.getGeometryDescriptor().getCoordinateReferenceSystem() != null) {
                         //todo wait for martin fix
                         String id  = CRS.lookupIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
-                        defaultCRS = "urn:x-ogc:def:crs:" + id.replaceAll(":", ":7.01:");
-    //                    final String defaultCRS = CRS.lookupIdentifier(Citations.URN_OGC,
-    //                            type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+                        if (id == null) {
+                            id = CRS.getDeclaredIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem());
+                        }
+
+                        if (id != null) {
+                            defaultCRS = "urn:x-ogc:def:crs:" + id.replaceAll(":", ":7.01:");
+        //                    final String defaultCRS = CRS.lookupIdentifier(Citations.URN_OGC,
+        //                            type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+                        } else {
+                            defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
+                        }
                     } else {
                         defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
                     }

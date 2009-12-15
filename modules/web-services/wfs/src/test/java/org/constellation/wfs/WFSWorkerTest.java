@@ -178,7 +178,28 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 4 : query on typeName sml:System
+         * Test 4 : query on typeName samplingPoint with propertyName = {gml:name}
+         */
+
+        queries = new ArrayList<QueryType>();
+        QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
+        query.getPropertyNameOrXlinkPropertyNameOrFunction().add("gml:name");
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        xmlResult    = featureWriter.write((FeatureCollection)result);
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-5.xml"));
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        assertEquals(xmlExpResult, xmlResult);
+
+        /**
+         * Test 5 : query on typeName sml:System
          */
 
         queries = new ArrayList<QueryType>();
@@ -201,7 +222,59 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 5 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
+         * Test 6 : query on typeName sml:System avec srsName = EPSG:4326
+         */
+
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+        query.setSrsName("EPSG:4326");
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        xmlResult    = featureWriter.write((FeatureCollection)result);
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"));
+
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        // to see
+        xmlExpResult = xmlExpResult.replaceAll("srsName=\"\"", "srsName=\"urn:ogc:def:crs:epsg:7.1:27582\"");
+
+        assertEquals(xmlExpResult, xmlResult);
+
+        /**
+         * Test 7 : query on typeName sml:System with propertyName = {sml:keywords, sml:phenomenons}
+         */
+
+        queries = new ArrayList<QueryType>();
+        query   = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sml/1.0", "System")), null);
+        query.getPropertyNameOrXlinkPropertyNameOrFunction().add("sml:keywords");
+        query.getPropertyNameOrXlinkPropertyNameOrFunction().add("sml:phenomenons");
+        queries.add(query);
+
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, null);
+
+        result = worker.getFeature(request);
+
+        xmlResult    = featureWriter.write((FeatureCollection)result);
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.systemCollection-2.xml"));
+
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        // to see
+        xmlExpResult = xmlExpResult.replaceAll("srsName=\"\"", "srsName=\"urn:ogc:def:crs:epsg:7.1:27582\"");
+
+        assertEquals(xmlExpResult, xmlResult);
+
+        /**
+         * Test 8 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
          */
 
         queries = new ArrayList<QueryType>();
@@ -222,7 +295,7 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 6 : query on typeName samplingPoint whith a filter with unexpected property
+         * Test 9 : query on typeName samplingPoint whith a filter with unexpected property
          */
 
         queries = new ArrayList<QueryType>();
