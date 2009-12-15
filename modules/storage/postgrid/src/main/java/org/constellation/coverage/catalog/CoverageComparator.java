@@ -19,6 +19,7 @@ package org.constellation.coverage.catalog;
 
 import java.util.Comparator;
 import java.rmi.RemoteException;
+import javax.measure.converter.ConversionException;
 import javax.measure.unit.Unit;
 import javax.measure.unit.NonSI;
 
@@ -170,11 +171,15 @@ final class CoverageComparator implements Comparator<CoverageReference> {
         final CoordinateSystem cs = crs.getCoordinateSystem();
         final Unit<?> xUnit = cs.getAxis(xDim).getUnit();
         final Unit<?> yUnit = cs.getAxis(yDim).getUnit();
-        xmin = xUnit.getConverterTo(NonSI.DEGREE_ANGLE).convert(xmin);
-        xmax = xUnit.getConverterTo(NonSI.DEGREE_ANGLE).convert(xmax);
-        ymin = yUnit.getConverterTo(NonSI.DEGREE_ANGLE).convert(ymin);
-        ymax = yUnit.getConverterTo(NonSI.DEGREE_ANGLE).convert(ymax);
-
+        try {
+            xmin = xUnit.getConverterToAny(NonSI.DEGREE_ANGLE).convert(xmin);
+            xmax = xUnit.getConverterToAny(NonSI.DEGREE_ANGLE).convert(xmax);
+            ymin = yUnit.getConverterToAny(NonSI.DEGREE_ANGLE).convert(ymin);
+            ymax = yUnit.getConverterToAny(NonSI.DEGREE_ANGLE).convert(ymax);
+        } catch (ConversionException e) {
+            // TODO: choose a better exception.
+            throw new IllegalStateException(e.getLocalizedMessage(), e);
+        }
         if (xmin<xmax && ymin<ymax) {
             final double centerX = 0.5*(xmin+xmax);
             final double centerY = 0.5*(ymin+ymax);

@@ -429,7 +429,7 @@ public class WritableGridCoverageEntry {
         if (metadata == null) {
             return null;
         }
-        double[] verticalOrdinates = metadata.getVerticalValues(SI.METER);
+        double[] verticalOrdinates = metadata.getVerticalValues(SI.METRE);
         if (verticalOrdinates == null) {
             /*
              * We tried to get the vertical coordinates in meters if possible, so conversions

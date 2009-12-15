@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOInvalidTreeException;
 import javax.imageio.metadata.IIOMetadata;
+import javax.measure.converter.ConversionException;
 import javax.measure.unit.Unit;
 import javax.measure.unit.SI;
 import javax.measure.unit.NonSI;
@@ -50,6 +51,7 @@ import org.geotoolkit.util.Ranks;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.CatalogException;
 import org.geotoolkit.image.io.metadata.Identification;
+import org.geotoolkit.measure.Units;
 
 
 /**
@@ -135,23 +137,7 @@ final class MetadataParser {
      * Returns the units for the specified axis, or {@code null} if none.
      */
     private static Unit<?> getUnits(final Axis axis) {
-        final String symbol = axis.getUnits();
-        if (symbol == null) {
-            return null;
-        }
-        if (symbol.equalsIgnoreCase("days")) {
-            return NonSI.DAY;
-        }
-        if (symbol.equalsIgnoreCase("seconds")) {
-            return SI.SECOND;
-        }
-        if (symbol.equalsIgnoreCase("psu")) { // Pratical Salinity Scale
-            return Unit.ONE;
-        }
-        if (symbol.equalsIgnoreCase("level")) { // Sigma level
-            return Unit.ONE;
-        }
-        return Unit.valueOf(symbol);
+        return Units.valueOf(axis.getUnits());
     }
 
     /**
@@ -270,8 +256,10 @@ final class MetadataParser {
                 final MeasurementRange<Double>[] ranges = getCoordinateRanges(i);
                 if (ranges != null) {
                     final DateRange[] dates = new DateRange[ranges.length];
-                    for (int j=0; j<dates.length; j++) {
+                    for (int j=0; j<dates.length; j++) try {
                         dates[j] = new DateRange(ranges[j], origin);
+                    } catch (ConversionException e) {
+                        throw new CatalogException(e.getLocalizedMessage(), e);
                     }
                     timeOrigin = origin;
                     timeUnit = getUnits(axis, Duration.class);
@@ -487,7 +475,7 @@ final class MetadataParser {
         if (metadata.getReferencing().getDimension() > 2) {
             final Unit<?> units = getVerticalUnits();
             if (units != null) {
-                if (units.isCompatible(SI.METER)) {
+                if (units.isCompatible(SI.METRE)) {
                     return 5714; // Mean Sea Level
                 }
                 if (units.isCompatible(Unit.ONE)) {
@@ -534,12 +522,15 @@ final class MetadataParser {
                         values[j] *= sign;
                     }
                 }
-                if (convert) {
+                if (convert) try {
                     // TODO: Should convert the whole array in one method call (JSR-275)
-                    final UnitConverter converter = axisUnits.getConverterTo(units);
+                    final UnitConverter converter = axisUnits.getConverterToAny(units);
                     for (int j=0; j<values.length; j++) {
                         values[j] = converter.convert(values[j]);
                     }
+                } catch (ConversionException e) {
+                    throw new IllegalArgumentException(Errors.format(
+                            Errors.Keys.INCOMPATIBLE_UNIT_$1, units), e);
                 }
                 return values;
             }
