@@ -258,9 +258,9 @@
         <version>1.2</version>
       </dependency>
       <dependency>
-        <groupId>net.java.dev.jsr-275</groupId>
+        <groupId>javax.measure</groupId>
         <artifactId>jsr-275</artifactId>
-        <version>1.0-beta-2</version>
+        <version>0.9.3</version>
       </dependency>
       <dependency>
         <groupId>net.java.dev.opensso</groupId>
