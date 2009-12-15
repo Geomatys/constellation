@@ -1442,7 +1442,11 @@ public class ServicesBean {
     public List<String> getLayerProviders(){
         final List<String> names = new ArrayList<String>();
         for(Name n : LayerProviderProxy.getInstance().getKeys()){
-            names.add("{"+ n.getNamespaceURI() + "}" + n.getLocalPart());
+            if (n.getNamespaceURI() != null) {
+                names.add("{"+ n.getNamespaceURI() + "}" + n.getLocalPart());
+            } else {
+                names.add("{}" + n.getLocalPart());
+            }
         }
         return names;
     }

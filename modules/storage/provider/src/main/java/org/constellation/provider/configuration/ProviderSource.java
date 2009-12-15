@@ -40,6 +40,8 @@ public class ProviderSource {
     public final Map<String,String> parameters = new HashMap<String, String>();
     
     public final List<ProviderLayer> layers = new ArrayList<ProviderLayer>();
+
+    public final List<String> services = new ArrayList<String>();
     
     public ProviderLayer getLayer(final String key){
         for (final ProviderLayer layer : layers) {

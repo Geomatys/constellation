@@ -38,19 +38,20 @@ import org.xml.sax.SAXException;
  */
 public class ProviderConfig {
 
-    private static final String TAG_SOURCE = "Source";
+    private static final String TAG_SOURCE    = "Source";
     private static final String TAG_PARAMETER = "Parameter";
-    private static final String TAG_LAYER = "Layer";
-    private static final String ATT_NAME = "name";
+    private static final String TAG_LAYER     = "Layer";
+    private static final String ATT_NAME      = "name";
     
-    private static final String PARAM_STYLE = "style";
-    private static final String PARAM_PERIODE_START = "periode_start";
-    private static final String PARAM_PERIODE_END = "periode_end";
-    private static final String PARAM_ELEVATION_START = "elevation_start";
-    private static final String PARAM_ELEVATION_END = "elevation_end";
-    private static final String PARAM_ELEVATION_MODEL = "elevation_model";
-    private static final String PARAM_IS_ELEVATION_MODEL = "is_elevation_model";
-    private static final String PARAM_LOAD_ALL = "load_all";
+    private static final String PARAM_STYLE               = "style";
+    private static final String PARAM_PERIODE_START       = "periode_start";
+    private static final String PARAM_PERIODE_END         = "periode_end";
+    private static final String PARAM_ELEVATION_START     = "elevation_start";
+    private static final String PARAM_ELEVATION_END       = "elevation_end";
+    private static final String PARAM_ELEVATION_MODEL     = "elevation_model";
+    private static final String PARAM_IS_ELEVATION_MODEL  = "is_elevation_model";
+    private static final String PARAM_LOAD_ALL            = "load_all";
+    private static final String PARAM_SERVICE_RESTRICTION = "service";
     
     public final List<ProviderSource> sources = new ArrayList<ProviderSource>();
     
@@ -88,6 +89,16 @@ public class ProviderConfig {
             source.loadAll = true;
         }
 
+        // parse properties
+        final String serviceRestrictions = element.getAttribute(PARAM_SERVICE_RESTRICTION);
+        if (serviceRestrictions != null) {
+            final StringTokenizer tokens = new StringTokenizer(serviceRestrictions, ",;");
+            while (tokens.hasMoreTokens()) {
+                final String token = tokens.nextToken().trim();
+                source.services.add(token);
+            }
+        }
+        
         //parse parameters
         for(int i=0, n=paramNodes.getLength(); i<n; i++){
             final Element paramNode = (Element)paramNodes.item(i);

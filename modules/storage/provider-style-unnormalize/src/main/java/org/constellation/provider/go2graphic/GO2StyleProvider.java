@@ -67,6 +67,11 @@ public class GO2StyleProvider extends AbstractStyleProvider{
         return index.keySet();
     }
 
+    @Override
+    public Set<String> getKeys(String service) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     /**
      * {@inheritDoc }
      */
@@ -83,6 +88,10 @@ public class GO2StyleProvider extends AbstractStyleProvider{
         return index.get(key);
     }
 
+    @Override
+    public MutableStyle get(String key, String service) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
     /**
      * {@inheritDoc }
      */
@@ -107,5 +116,5 @@ public class GO2StyleProvider extends AbstractStyleProvider{
         final Symbolizer symbol = new VectorFieldSymbolizer();
         index.put("GO2:VectorField", sf.style(symbol));
     }
-    
+
 }

@@ -85,6 +85,11 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
         return keys;
     }
 
+    @Override
+    public Set<String> getKeys(String service) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     /**
      * {@inheritDoc }
      */
@@ -114,6 +119,11 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
         }
 
         return null;
+    }
+
+    @Override
+    public MutableStyle get(String key, String service) {
+       throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public Collection<StyleProviderService> getServices() {
@@ -188,5 +198,5 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
         }
         return INSTANCE;
     }
-    
+
 }

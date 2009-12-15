@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -109,6 +110,17 @@ public class SLDProvider extends AbstractStyleProvider{
     @Override
     public Set<String> getKeys() {
         return index.keySet();
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public Set<String> getKeys(String service) {
+        if (source.services.contains(service) || source.services.isEmpty()) {
+            return index.keySet();
+        }
+        return new HashSet();
     }
 
     /**
@@ -205,6 +217,14 @@ public class SLDProvider extends AbstractStyleProvider{
         return value;
     }
 
+    @Override
+    public MutableStyle get(String key, String service) {
+       if (source.services.contains(service) || source.services.isEmpty()) {
+           return get(key);
+       }
+       return null;
+    }
+
     /**
      * {@inheritDoc }
      */
@@ -277,5 +297,5 @@ public class SLDProvider extends AbstractStyleProvider{
         }
         return null;
     }
-     
+
 }

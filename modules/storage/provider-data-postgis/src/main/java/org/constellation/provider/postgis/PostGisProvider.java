@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -156,6 +157,18 @@ public class PostGisProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
+    public Set<Name> getKeys(String service) {
+        if (source.services.contains(service) || source.services.isEmpty()) {
+            return new ArraySet<Name>(index);
+        } else {
+            return new HashSet<Name>();
+        }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public boolean contains(Name key) {
         return index.contains(key);
     }
@@ -195,6 +208,14 @@ public class PostGisProvider extends AbstractLayerProvider{
                     layer.elevationStartField, layer.elevationEndField);
         }
         return null;
+    }
+
+    @Override
+    public LayerDetails get(Name key, String service) {
+       if (source.services.contains(service) || source.services.isEmpty()) {
+           return get(key);
+       }
+       return null;
     }
 
     /**

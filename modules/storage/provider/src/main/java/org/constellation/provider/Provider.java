@@ -44,6 +44,12 @@ public interface Provider<K,V> {
      * If you are just searching if a special key exists than you should use the contains method.
      */
     Set<K> getKeys();
+
+     /**
+     * Use this method if you need the complete list of entries in this data provider for the specified service.
+     * If you are just searching if a special key exists than you should use the contains method.
+     */
+    Set<K> getKeys(String service);
     
     /**
      * If you want to intend to get the related data, you should use the
@@ -66,6 +72,12 @@ public interface Provider<K,V> {
      * @return V object if it is in the dataprovider, or null if not.
      */
     V get(K key);
+
+    /**
+     * Get the data related to the given key and specified service.
+     * @return V object if it is in the dataprovider and it allowed for the specified service, or null if not.
+     */
+    V get(K key, String service);
     
     /**
      * Reload data provider. this may be usefull if new entries on disk have been

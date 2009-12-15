@@ -37,6 +37,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
+import org.constellation.ServiceDef;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
@@ -193,7 +194,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
          *  layer providers
          */
         final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
-        for (final Name layerName : namedProxy.getKeys()) {
+        for (final Name layerName : namedProxy.getKeys(ServiceDef.Specification.WFS.fullName)) {
             final LayerDetails layer = namedProxy.get(layerName);
             if (layer instanceof FeatureLayerDetails){
                 final FeatureLayerDetails fld = (FeatureLayerDetails) layer;
@@ -355,13 +356,13 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             throw new CstlServiceException(ex);
         }
         final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
-        final List<QName> names                  = request.getTypeName();
-        final List<FeatureType> types            = new ArrayList<FeatureType>();
+        final List<QName> names             = request.getTypeName();
+        final List<FeatureType> types       = new ArrayList<FeatureType>();
 
         if (names.isEmpty()) {
             //search all types
-            for (final Name name : namedProxy.getKeys()) {
-                final LayerDetails layer = namedProxy.get(name);
+            for (final Name name : namedProxy.getKeys(ServiceDef.Specification.WFS.fullName)) {
+                final LayerDetails layer = namedProxy.get(name, ServiceDef.Specification.WFS.fullName);
                 if (layer == null || !(layer instanceof FeatureLayerDetails)) continue;
 
                 final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
@@ -371,7 +372,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         } else {
             //search only the given list
             for (final QName name : names) {
-                LayerDetails layer = namedProxy.get(Utils.getNameFromQname(name));
+                LayerDetails layer = namedProxy.get(Utils.getNameFromQname(name), ServiceDef.Specification.WFS.fullName);
                 
                 if(layer == null || !(layer instanceof FeatureLayerDetails)) {
                     throw new CstlServiceException("The specified TypeNames does not exist:" + name);
@@ -484,7 +485,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
             for (QName typeName : typeNames) {
 
-                FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(typeName));
+                FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(typeName), ServiceDef.Specification.WFS.fullName);
 
                 if (layer == null) {
                     throw new CstlServiceException("The specified TypeNames does not exist:" + typeName);

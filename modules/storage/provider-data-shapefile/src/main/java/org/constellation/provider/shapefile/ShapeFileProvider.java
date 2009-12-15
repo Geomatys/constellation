@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -114,6 +115,17 @@ public class ShapeFileProvider extends AbstractLayerProvider {
      * {@inheritDoc }
      */
     @Override
+    public Set<Name> getKeys(String service) {
+        if (source.services.contains(service) || source.services.isEmpty()) {
+            return index.keySet();
+        }
+        return new HashSet();
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public boolean contains(final Name key) {
         return index.containsKey(key);
     }
@@ -166,6 +178,14 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         return null;
     }
 
+    @Override
+    public LayerDetails get(Name key, String service) {
+       if (source.services.contains(service) || source.services.isEmpty()) {
+           return get(key);
+       }
+       return null;
+    }
+    
     /**
      * {@inheritDoc }
      */

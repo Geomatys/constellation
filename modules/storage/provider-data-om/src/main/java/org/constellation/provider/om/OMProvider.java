@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.naming.NamingException;
@@ -169,6 +170,17 @@ public class OMProvider extends AbstractLayerProvider {
      * {@inheritDoc }
      */
     @Override
+    public Set<Name> getKeys(String service) {
+        if (source.services.contains(service) || source.services.isEmpty()) {
+            return new ArraySet<Name>(index);
+        }
+        return new HashSet();
+    }
+    
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public boolean contains(Name key) {
         return index.contains(key);
     }
@@ -216,6 +228,14 @@ public class OMProvider extends AbstractLayerProvider {
         
     }
 
+    @Override
+    public LayerDetails get(Name key, String service) {
+       if (source.services.contains(service) || source.services.isEmpty()) {
+           return get(key);
+       }
+       return null;
+    }
+    
     /**
      * {@inheritDoc }
      */

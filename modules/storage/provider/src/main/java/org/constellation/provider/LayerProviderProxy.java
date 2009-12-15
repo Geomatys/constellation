@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 
@@ -75,6 +74,23 @@ public class LayerProviderProxy extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
+    public Set<Name> getKeys(String serviceRestrictions) {
+
+        final Set<Name> keys = new HashSet<Name>();
+
+        for(LayerProviderService service : SERVICES) {
+            for(LayerProvider provider : service.getProviders()){
+                keys.addAll( provider.getKeys(serviceRestrictions) );
+            }
+        }
+
+        return keys;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public boolean contains(Name key) {
 
         for(LayerProviderService service : SERVICES){
@@ -95,6 +111,22 @@ public class LayerProviderProxy extends AbstractLayerProvider{
         for(LayerProviderService service : SERVICES){
             for(LayerProvider provider : service.getProviders()){
                 final LayerDetails layer = provider.get(key);
+                if(layer != null) return layer;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public LayerDetails get(Name key, String webService) {
+
+        for(LayerProviderService service : SERVICES){
+            for(LayerProvider provider : service.getProviders()){
+                final LayerDetails layer = provider.get(key, webService);
                 if(layer != null) return layer;
             }
         }

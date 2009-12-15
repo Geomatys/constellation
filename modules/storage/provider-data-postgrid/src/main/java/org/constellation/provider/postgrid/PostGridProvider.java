@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -157,6 +158,14 @@ public class PostGridProvider extends AbstractLayerProvider{
         return index.keySet();
     }
 
+    @Override
+    public Set<Name> getKeys(String service) {
+        if (source.services.contains(service) || source.services.isEmpty()) {
+            return index.keySet();
+        }
+        return new HashSet();
+    }
+
     /**
      * {@inheritDoc }
      */
@@ -204,6 +213,14 @@ public class PostGridProvider extends AbstractLayerProvider{
         return detail;
     }
 
+    @Override
+    public LayerDetails get(Name key, String service) {
+       if (source.services.contains(service) || source.services.isEmpty()) {
+           return get(key);
+       }
+       return null;
+    }
+    
     /**
      * {@inheritDoc }
      */

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -151,6 +152,17 @@ public class SMLProvider extends AbstractLayerProvider {
         return new ArraySet<Name>(index);
     }
 
+     /**
+     * {@inheritDoc }
+     */
+    @Override
+    public Set<Name> getKeys(String service) {
+        if (source.services.contains(service) || source.services.isEmpty()) {
+            return new ArraySet<Name>(index);
+        }
+        return new HashSet();
+    }
+
     /**
      * {@inheritDoc }
      */
@@ -200,6 +212,14 @@ public class SMLProvider extends AbstractLayerProvider {
         }
         return new SMLLayerDetails(key.getLocalPart(), fs, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
         
+    }
+
+    @Override
+    public LayerDetails get(Name key, String service) {
+       if (source.services.contains(service) || source.services.isEmpty()) {
+           return get(key);
+       }
+       return null;
     }
 
     /**
