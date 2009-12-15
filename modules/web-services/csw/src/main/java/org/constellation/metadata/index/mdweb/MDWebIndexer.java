@@ -580,10 +580,11 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                             String value = tv.getValue();
                             if (value != null) {
                                 value = value.replaceAll("-", "");
-                            }
-                            // TODO use time
-                            if (value.indexOf('T') != -1) {
-                                value = value.substring(0, value.indexOf('T'));
+                            
+                                // TODO use time
+                                if (value.indexOf('T') != -1) {
+                                    value = value.substring(0, value.indexOf('T'));
+                                }
                             }
                             response.append(value).append(',');
                         // else we write the text value.
