@@ -403,9 +403,10 @@ public class WFSService extends OGCWebService {
 
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid.
+        SectionsType sections;
         String section = getParameter("Sections", false);
-        List<String> requestedSections = new ArrayList<String>();
         if (section != null && !section.equalsIgnoreCase("All")) {
+            List<String> requestedSections = new ArrayList<String>();
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
@@ -416,11 +417,12 @@ public class WFSService extends OGCWebService {
                                                   INVALID_PARAMETER_VALUE, "Sections");
                 }
             }
+            sections = new SectionsType(requestedSections);
         } else {
-            //if there is no requested Sections we add all the sections
-            requestedSections = SectionsType.getExistingSections();
+            sections = null;
+            
         }
-        SectionsType sections       = new SectionsType(requestedSections);
+        
         return new GetCapabilitiesType(versions,
                                        sections,
                                        formats,
