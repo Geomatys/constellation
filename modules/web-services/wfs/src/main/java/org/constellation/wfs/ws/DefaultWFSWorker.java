@@ -134,6 +134,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     private Map<String, String> schemaLocations;
 
     private String outputFormat = "text/xml";
+
+    private Level logLevel = Level.INFO;
     
     public DefaultWFSWorker(final MarshallerPool marshallerPool) {
         this.marshallerPool = marshallerPool;
@@ -161,93 +163,114 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public WFSCapabilitiesType getCapabilities(final GetCapabilitiesType getCapab) throws CstlServiceException {
-        LOGGER.info("GetCapabilities request proccesing");
+    public WFSCapabilitiesType getCapabilities(final GetCapabilitiesType request) throws CstlServiceException {
+        LOGGER.log(logLevel, "GetCapabilities request proccesing");
         long start = System.currentTimeMillis();
 
         // we verify the base attribute
-        verifyBaseRequest(getCapab, false, true);
+        verifyBaseRequest(request, false, true);
 
-        if (getCapab.getAcceptFormats() != null && getCapab.getAcceptFormats().getOutputFormat() != null && getCapab.getAcceptFormats().getOutputFormat().size() > 0) {
-            outputFormat =  getCapab.getAcceptFormats().getOutputFormat().get(0);
+        if (request.getAcceptFormats() != null && request.getAcceptFormats().getOutputFormat() != null && request.getAcceptFormats().getOutputFormat().size() > 0) {
+            outputFormat =  request.getAcceptFormats().getOutputFormat().get(0);
         } else {
             outputFormat = "application/xml";
         }
         
         final WFSCapabilitiesType inCapabilities;
         try {
-            inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(
-                    getServletContext().getRealPath("WEB-INF"), actingVersion.toString());
+            String deployedDir = null;
+            if (getServletContext() != null) {
+                deployedDir = getServletContext().getRealPath("WEB-INF");
+            }
+            inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(deployedDir, actingVersion.toString());
         } catch (IOException e) {
             throw new CstlServiceException(e, NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
 
-        final String url = getUriContext().getBaseUri().toString();
+        if (getUriContext() != null) {
+            final String url = getUriContext().getBaseUri().toString();
+            OGCWebService.updateOWSURL(inCapabilities.getOperationsMetadata().getOperation(), url, "WFS");
+        }
 
-        OGCWebService.updateOWSURL(inCapabilities.getOperationsMetadata().getOperation(), url, "WFS");
+        final WFSCapabilitiesType result = new WFSCapabilitiesType("1.1.0");
 
-        final List<FeatureTypeType> types = new ArrayList<FeatureTypeType>();
 
-        /*
-         *  layer providers
-         */
-        final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
-        for (final Name layerName : namedProxy.getKeys(ServiceDef.Specification.WFS.fullName)) {
-            final LayerDetails layer = namedProxy.get(layerName);
-            if (layer instanceof FeatureLayerDetails){
-                final FeatureLayerDetails fld = (FeatureLayerDetails) layer;
-                final SimpleFeatureType type  = fld.getSource().getSchema();
-                final FeatureTypeType ftt;
-                try {
+        if (request.getSections() == null || request.getSections().getSection().contains("featureTypeList")) {
+            final List<FeatureTypeType> types = new ArrayList<FeatureTypeType>();
 
-                    final String defaultCRS;
-                    if (type.getGeometryDescriptor() != null && type.getGeometryDescriptor().getCoordinateReferenceSystem() != null) {
-                        //todo wait for martin fix
-                        String id  = CRS.lookupIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
-                        if (id == null) {
-                            id = CRS.getDeclaredIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem());
-                        }
+            /*
+             *  layer providers
+             */
+            final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
+            for (final Name layerName : namedProxy.getKeys(ServiceDef.Specification.WFS.fullName)) {
+                final LayerDetails layer = namedProxy.get(layerName);
+                if (layer instanceof FeatureLayerDetails){
+                    final FeatureLayerDetails fld = (FeatureLayerDetails) layer;
+                    final SimpleFeatureType type  = fld.getSource().getSchema();
+                    final FeatureTypeType ftt;
+                    try {
 
-                        if (id != null) {
-                            defaultCRS = "urn:x-ogc:def:crs:" + id.replaceAll(":", ":7.01:");
-        //                    final String defaultCRS = CRS.lookupIdentifier(Citations.URN_OGC,
-        //                            type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+                        final String defaultCRS;
+                        if (type.getGeometryDescriptor() != null && type.getGeometryDescriptor().getCoordinateReferenceSystem() != null) {
+                            //todo wait for martin fix
+                            String id  = CRS.lookupIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+                            if (id == null) {
+                                id = CRS.getDeclaredIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem());
+                            }
+
+                            if (id != null) {
+                                defaultCRS = "urn:x-ogc:def:crs:" + id.replaceAll(":", ":7.01:");
+            //                    final String defaultCRS = CRS.lookupIdentifier(Citations.URN_OGC,
+            //                            type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+                            } else {
+                                defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
+                            }
                         } else {
                             defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
                         }
-                    } else {
-                        defaultCRS = "urn:x-ogc:def:crs:EPSG:7.01:4326";
+                        ftt = new FeatureTypeType(
+                                Utils.getQnameFromName(layerName),
+                                fld.getName(),
+                                defaultCRS,
+                                standardCRS,
+                                UnmodifiableArrayList.wrap(new WGS84BoundingBoxType[]{toBBox(fld.getSource())}));
+                        types.add(ftt);
+                    } catch (FactoryException ex) {
+                        LOGGER.log(Level.SEVERE, null, ex);
                     }
-                    ftt = new FeatureTypeType(
-                            Utils.getQnameFromName(layerName),
-                            fld.getName(),
-                            defaultCRS,
-                            standardCRS,
-                            UnmodifiableArrayList.wrap(new WGS84BoundingBoxType[]{toBBox(fld.getSource())}));
-                    types.add(ftt);
-                } catch (FactoryException ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
+
                 }
-
             }
+
+            result.setFeatureTypeList(new FeatureTypeListType(null, types));
+        } else {
+            result.setFeatureTypeList(null);
         }
-
-        inCapabilities.setFeatureTypeList(new FeatureTypeListType(null, types));
-
         //todo ...etc...--------------------------------------------------------
-        inCapabilities.getOperationsMetadata();
-        //inCapabilities.setFilterCapabilities(null);
-        inCapabilities.setServesGMLObjectTypeList(null);
-        inCapabilities.setSupportsGMLObjectTypeList(null);
-        inCapabilities.getSupportsGMLObjectTypeList();
-        inCapabilities.getUpdateSequence();
-        inCapabilities.getVersion();
+        if (request.getSections() != null && !request.getSections().getSection().contains("operationsMetadata")) {
+            result.setOperationsMetadata(null);
+        } else {
+            result.setOperationsMetadata(inCapabilities.getOperationsMetadata());
+        }
+        if (request.getSections() != null && !request.getSections().getSection().contains("serviceProvider")) {
+            result.setServiceProvider(null);
+        } else {
+            result.setServiceProvider(inCapabilities.getServiceProvider());
+        }
+        if (request.getSections() != null && !request.getSections().getSection().contains("serviceIdentification")) {
+            result.setServiceIdentification(null);
+        } else {
+            result.setServiceIdentification(inCapabilities.getServiceIdentification());
+        }
+        result.setServesGMLObjectTypeList(null);
+        result.setSupportsGMLObjectTypeList(null);
 
+        result.setFilterCapabilities(inCapabilities.getFilterCapabilities());
 
-        LOGGER.info("GetCapabilities treated in " + (System.currentTimeMillis() - start) + "ms");
-        return inCapabilities;
+        LOGGER.log(logLevel, "GetCapabilities treated in " + (System.currentTimeMillis() - start) + "ms");
+        return result;
     }
 
     /**
@@ -281,7 +304,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
         if (response == null || update) {
             if (update) {
-                LOGGER.info("updating metadata");
+                LOGGER.log(logLevel, "updating metadata");
             }
 
             final File f = getFile(fileName, home);
@@ -345,7 +368,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      */
     @Override
     public Schema describeFeatureType(final DescribeFeatureTypeType request) throws CstlServiceException {
-        LOGGER.info("DecribeFeatureType request proccesing");
+        LOGGER.log(logLevel, "DecribeFeatureType request proccesing");
         long start = System.currentTimeMillis();
 
         // we verify the base attribute
@@ -392,7 +415,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             }
         }
 
-        LOGGER.info("DescribeFeatureType treated in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "DescribeFeatureType treated in " + (System.currentTimeMillis() - start) + "ms");
         return writer.getSchemaFromFeatureType(types);
     }
 
@@ -401,7 +424,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      */
     @Override
     public Object getFeature(final GetFeatureType request) throws CstlServiceException {
-        LOGGER.info("GetFeature request proccesing");
+        LOGGER.log(logLevel, "GetFeature request proccesing");
         long start = System.currentTimeMillis();
 
         // we verify the base attribute
@@ -581,7 +604,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             return collection;
 
         }
-        LOGGER.info("GetFeature treated in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "GetFeature treated in " + (System.currentTimeMillis() - start) + "ms");
         return response;
     }
 
@@ -624,21 +647,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     private static WGS84BoundingBoxType toBBox(FeatureSource source) throws CstlServiceException{
         try {
             final JTSEnvelope2D env = source.getBounds();
-//            if (env != null) {
-//                if(CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), EPSG4326)){
-//                Envelope enveloppe = CRS.transform(env, EPSG4326);
-//                WGS84BoundingBoxType bbox =  new WGS84BoundingBoxType(
-//                           env.getMinimum(0),
-//                           env.getMinimum(1),
-//                           env.getMaximum(0),
-//                           env.getMaximum(1));
-//                // fixed value by the standard
-//                bbox.setCrs("urn:ogc:def:crs:OGC:2:84");
-//                return bbox;
-//            } else {
-//                return new WGS84BoundingBoxType(-180, -90, 180, 90);
-//            }
-
             final CoordinateReferenceSystem EPSG4326 = CRS.decode("urn:ogc:def:crs:OGC:2:84");
             if (env != null && !env.isEmpty()) {
                 if (CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), EPSG4326)) {
@@ -717,5 +725,12 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     @Override
     public Map<String, String> getSchemaLocations() {
         return schemaLocations;
+    }
+
+    /**
+     * @param logLevel the logLevel to set
+     */
+    public void setLogLevel(Level logLevel) {
+        this.logLevel = logLevel;
     }
 }

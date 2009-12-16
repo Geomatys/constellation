@@ -27,6 +27,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
@@ -1596,9 +1597,9 @@ public final class Util {
      */
     public static void executeSQLScript(String path, Connection connection) {
         try {
-            final InputStream in  = getResourceAsStream(path);
-            final StringWriter sw = new StringWriter();
-            final byte[] buffer   = new byte[1024];
+            final BufferedReader in = new BufferedReader(new InputStreamReader(getResourceAsStream(path), "UTF-8"));
+            final StringWriter sw   = new StringWriter();
+            final char[] buffer     = new char[1024];
             int size;
             while ((size = in.read(buffer, 0, 1024)) > 0) {
                 sw.append(new String(buffer, 0, size));

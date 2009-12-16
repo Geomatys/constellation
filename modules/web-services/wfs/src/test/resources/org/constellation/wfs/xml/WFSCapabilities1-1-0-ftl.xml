@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<wfs:WFS_Capabilities version="1.1.0" xmlns:wfs="http://www.opengis.net/wfs" xmlns:ows="http://www.opengis.net/ows" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ins="http://www.inspire.org">
+    <wfs:FeatureTypeList>
+        <wfs:FeatureType>
+            <wfs:Name >Forests</wfs:Name>
+            <wfs:Title>Forests</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-0.0024 -0.0014</ows:LowerCorner>
+                <ows:UpperCorner>0.0018 0.0042</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >sml:System</wfs:Name>
+            <wfs:Title>System</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:27582</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-4.1441104685037145 42.384870135541846</ows:LowerCorner>
+                <ows:UpperCorner>-4.1441104685037145 42.384870135541846</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >MapNeatline</wfs:Name>
+            <wfs:Title>MapNeatline</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-0.0024 -0.0042</ows:LowerCorner>
+                <ows:UpperCorner>0.0024 0.0042</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >Ponds</wfs:Name>
+            <wfs:Title>Ponds</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>0.0016 -0.0020</ows:LowerCorner>
+                <ows:UpperCorner>0.0020 -0.0014</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >Streams</wfs:Name>
+            <wfs:Title>Streams</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-0.0024 -4.0E-4</ows:LowerCorner>
+                <ows:UpperCorner>0.0024 0.0036</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >BuildingCenters</wfs:Name>
+            <wfs:Title>BuildingCenters</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>6.0E-4 0.0010</ows:LowerCorner>
+                <ows:UpperCorner>9.0E-4 0.0022</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >NamedPlaces</wfs:Name>
+            <wfs:Title>NamedPlaces</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-0.0011 0.0014</ows:LowerCorner>
+                <ows:UpperCorner>0.0024 0.0042</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >sml:Component</wfs:Name>
+            <wfs:Title>Component</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:27582</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >sml:DataSourceType</wfs:Name>
+            <wfs:Title>DataSourceType</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:27582</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >sampling:SamplingPoint</wfs:Name>
+            <wfs:Title>SamplingPoint</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:27582</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-4.1441104685037145 42.384870135541846</ows:LowerCorner>
+                <ows:UpperCorner>-4.1441104685037145 42.384870135541846</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >DividedRoutes</wfs:Name>
+            <wfs:Title>DividedRoutes</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-0.0024 -0.0032</ows:LowerCorner>
+                <ows:UpperCorner>0.0024 -0.0026</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >Buildings</wfs:Name>
+            <wfs:Title>Buildings</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>5.0E-4 8.0E-4</ows:LowerCorner>
+                <ows:UpperCorner>0.0010 0.0024</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >sml:ProcessModel</wfs:Name>
+            <wfs:Title>ProcessModel</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:27582</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >Bridges</wfs:Name>
+            <wfs:Title>Bridges</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>7.0E-4 2.0E-4</ows:LowerCorner>
+                <ows:UpperCorner>7.0E-4 2.0E-4</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >sml:ProcessChain</wfs:Name>
+            <wfs:Title>ProcessChain</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:27582</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >RoadSegments</wfs:Name>
+            <wfs:Title>RoadSegments</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-0.0024 -0.0042</ows:LowerCorner>
+                <ows:UpperCorner>0.0024 0.0042</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >Lakes</wfs:Name>
+            <wfs:Title>Lakes</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-0.0018 6.0E-4</ows:LowerCorner>
+                <ows:UpperCorner>-1.0E-4 0.0031</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name >BasicPolygons</wfs:Name>
+            <wfs:Title>BasicPolygons</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-1.0 -2.0</ows:LowerCorner>
+                <ows:UpperCorner>6.0 2.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+    </wfs:FeatureTypeList>
+    <ogc:Filter_Capabilities>
+        <ogc:Spatial_Capabilities>
+            <ogc:GeometryOperands>
+                <ogc:GeometryOperand>gml:Envelope</ogc:GeometryOperand>
+                <ogc:GeometryOperand>gml:Point</ogc:GeometryOperand>
+                <ogc:GeometryOperand>gml:LineString</ogc:GeometryOperand>
+                <ogc:GeometryOperand>gml:Polygon</ogc:GeometryOperand>
+            </ogc:GeometryOperands>
+            <ogc:SpatialOperators>
+                <ogc:SpatialOperator name="Disjoint"/>
+                <ogc:SpatialOperator name="Equals"/>
+                <ogc:SpatialOperator name="DWithin"/>
+                <ogc:SpatialOperator name="Beyond"/>
+                <ogc:SpatialOperator name="Intersects"/>
+                <ogc:SpatialOperator name="Touches"/>
+                <ogc:SpatialOperator name="Crosses"/>
+                <ogc:SpatialOperator name="Contains"/>
+                <ogc:SpatialOperator name="Overlaps"/>
+                <ogc:SpatialOperator name="BBOX"/>
+            </ogc:SpatialOperators>
+        </ogc:Spatial_Capabilities>
+        <ogc:Scalar_Capabilities>
+            <ogc:LogicalOperators/>
+            <ogc:ComparisonOperators>
+                <ogc:ComparisonOperator>LessThan</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>GreaterThan</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>LessThanEqualTo</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>GreaterThanEqualTo</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>EqualTo</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>NotEqualTo</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>Like</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>Between</ogc:ComparisonOperator>
+                <ogc:ComparisonOperator>NullCheck</ogc:ComparisonOperator>
+            </ogc:ComparisonOperators>
+            <ogc:ArithmeticOperators>
+                <ogc:SimpleArithmetic/>
+            </ogc:ArithmeticOperators>
+        </ogc:Scalar_Capabilities>
+        <ogc:Id_Capabilities>
+            <ogc:EID/>
+            <ogc:FID/>
+        </ogc:Id_Capabilities>
+    </ogc:Filter_Capabilities>
+</wfs:WFS_Capabilities>

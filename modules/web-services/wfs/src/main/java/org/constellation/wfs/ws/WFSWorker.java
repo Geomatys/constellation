@@ -20,6 +20,7 @@ package org.constellation.wfs.ws;
 
 // Constellation dependencies
 import java.util.Map;
+import java.util.logging.Level;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
@@ -69,5 +70,7 @@ public interface WFSWorker extends Worker {
     String getOutputFormat();
 
     Map<String, String> getSchemaLocations();
+
+    void setLogLevel(Level logLevel);
 
 }
