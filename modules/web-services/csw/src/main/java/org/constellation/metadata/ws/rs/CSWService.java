@@ -43,6 +43,7 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.jaxb.MarshallWarnings;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.Parameters;
@@ -78,6 +79,7 @@ import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
+import org.geotoolkit.xml.Catching;
 import org.geotoolkit.xml.Namespaces;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -132,10 +134,12 @@ public class CSWService extends OGCWebService {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
-        Marshaller marshaller = null;
-        ServiceDef serviceDef = null;
+        Catching.Marshaller marshaller = null;
+        ServiceDef serviceDef          = null;
+        MarshallWarnings warnings       = new MarshallWarnings();
         try {
             marshaller = getMarshallerPool().acquireMarshaller();
+            marshaller.setObjectConverters(warnings);
 
             if (worker != null) {
             
@@ -305,6 +309,11 @@ public class CSWService extends OGCWebService {
         } finally {
             if (marshaller != null) {
                 getMarshallerPool().release(marshaller);
+            }
+            if (!warnings.isEmpty()) {
+               for (String message : warnings.getMessages()) {
+                   LOGGER.warning(message);
+               }
             }
         }
     }

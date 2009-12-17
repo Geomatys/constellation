@@ -18,6 +18,7 @@
 package org.constellation.ws;
 
 import com.sun.jersey.api.core.HttpContext;
+import java.util.logging.Level;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
@@ -49,4 +50,5 @@ public interface Worker {
      */
     void initSecurityContext(final SecurityContext secCtxt);
 
+    void setLogLevel(Level logLevel);
 }

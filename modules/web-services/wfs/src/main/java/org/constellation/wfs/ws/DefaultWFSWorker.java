@@ -135,8 +135,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
     private String outputFormat = "text/xml";
 
-    private Level logLevel = Level.INFO;
-    
     public DefaultWFSWorker(final MarshallerPool marshallerPool) {
         this.marshallerPool = marshallerPool;
 
@@ -725,12 +723,5 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     @Override
     public Map<String, String> getSchemaLocations() {
         return schemaLocations;
-    }
-
-    /**
-     * @param logLevel the logLevel to set
-     */
-    public void setLogLevel(Level logLevel) {
-        this.logLevel = logLevel;
     }
 }

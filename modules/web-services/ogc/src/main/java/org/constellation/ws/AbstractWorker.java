@@ -18,6 +18,7 @@ package org.constellation.ws;
 
 //J2SE dependencies
 import com.sun.jersey.api.core.HttpContext;
+import java.util.logging.Level;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
@@ -51,6 +52,11 @@ public abstract class AbstractWorker implements Worker{
      * Contains the request URI and therefore any  KVP parameters it may contain.
      */
     private UriInfo uriContext = null;
+
+    /**
+     * The log level off al the informations log.
+     */
+    protected Level logLevel = Level.INFO;
     
     /**
      * {@inheritDoc }
@@ -98,6 +104,14 @@ public abstract class AbstractWorker implements Worker{
 
     protected synchronized UriInfo getUriContext(){
         return uriContext;
+    }
+
+    /**
+     * @param logLevel the logLevel to set
+     */
+    @Override
+    public void setLogLevel(Level logLevel) {
+        this.logLevel = logLevel;
     }
 
 }

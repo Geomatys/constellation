@@ -71,6 +71,4 @@ public interface WFSWorker extends Worker {
 
     Map<String, String> getSchemaLocations();
 
-    void setLogLevel(Level logLevel);
-
 }

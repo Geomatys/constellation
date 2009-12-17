@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -461,8 +461,14 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 if(crs == null || "null".equalsIgnoreCase(crs)){
                     crs = "CRS:84";
                 }
-
-                addBoundingBox(doc, minx, maxx, miny, maxy, SRIDGenerator.toSRID(crs, Version.V1));
+                int srid = 4326;
+                try {
+                    srid = SRIDGenerator.toSRID(crs, Version.V1);
+                } catch(IllegalArgumentException ex) {
+                    LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+                
+                addBoundingBox(doc, minx, maxx, miny, maxy, srid);
 
             } catch (NumberFormatException e) {
                 if (!coord.equals("null"))
