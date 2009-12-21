@@ -98,6 +98,7 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
 
     private static final class IDFieldSelector implements FieldSelector {
 
+        @Override
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {
                 if (fieldName.equals("id")) {

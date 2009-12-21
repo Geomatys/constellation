@@ -50,6 +50,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
+import org.apache.lucene.store.SimpleFSDirectory;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.generic.database.Automatic;
 import org.constellation.util.Util;
@@ -148,7 +149,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         IndexWriter writer;
         int nbEntries = 0;
         try {
-            writer = new IndexWriter(getFileDirectory(), analyzer, true);
+            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
             String serviceID = getServiceID();
             
             // TODO getting the objects list and index avery item in the IndexWriter.
@@ -205,7 +206,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         IndexWriter writer;
         int nbEntries = 0;
         try {
-            writer = new IndexWriter(getFileDirectory(), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
+            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
             String serviceID = getServiceID();
             
             nbEntries = toIndex.size();
@@ -283,7 +284,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     @Override
     public void indexDocument(Object meta) {
         try {
-            final IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false,IndexWriter.MaxFieldLength.UNLIMITED);
+            final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, false,IndexWriter.MaxFieldLength.UNLIMITED);
 
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));

@@ -35,6 +35,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
+import org.apache.lucene.store.SimpleFSDirectory;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 
@@ -149,7 +150,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             final int nbCatalogs = 0;
             int nbForms    = 0;
             try {
-                writer  = new IndexWriter(getFileDirectory(), analyzer, true);
+                writer  = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
                 nbForms =  forms.size();
                 for (Form form : forms) {
                    // if (form.isFullyValidated()) {
@@ -192,7 +193,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         int nbCatalogs = 0;
         int nbForms = 0;
         try {
-            writer = new IndexWriter(getFileDirectory(), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
+            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
 
             // getting the objects list and index avery item in the IndexWriter.
             final List<Catalog> cats = mdWebReader.getCatalogs();
@@ -241,7 +242,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         final int nbCatalogs = 0;
         int nbForms = 0;
         try {
-            writer = new IndexWriter(getFileDirectory(), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
+            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
 
             nbForms = forms.size();
             for (Object form : forms) {
@@ -308,7 +309,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
     @Override
     public void indexDocument(Form form) {
         try {
-            final IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false,IndexWriter.MaxFieldLength.UNLIMITED);
+            final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, false,IndexWriter.MaxFieldLength.UNLIMITED);
 
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(form));

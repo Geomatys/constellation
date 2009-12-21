@@ -350,7 +350,7 @@ public class CSWworker {
      * In some implementations there is no sicade directory.
      * So if we don't find The .constellation/csw_configuration directory
      * IFREMER hack
-     * we search the CATALINA_HOME/webapps/sdn-csw_WS/WEB-INF/csw_configuration
+     * we search the deployed war directory /WEB-INF/classes/csw_configuration
      */
     private File getConfigDirectory() {
         final String configUrl = "csw_configuration";
@@ -361,7 +361,7 @@ public class CSWworker {
         } else {
 
             /* Ifremer's server does not contain any default config directory, so the
-             * configuration files are put under the WEB-INF/classes/configuration directory of the WAR file.
+             * configuration files are put under the WEB-INF/classes/csw_configuration directory of the WAR file.
              */
             return Util.getDirectoryFromResource(configUrl);
         }

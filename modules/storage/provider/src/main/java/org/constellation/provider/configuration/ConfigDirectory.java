@@ -168,10 +168,10 @@ public final class ConfigDirectory {
      * Returns the file named "config.xml" under the folder "WEB-INF/classes" of the
      * Constellation' web archive, or {@code null} if no config file was found.
      */
-    public static File getWarPackagedConfig() {
+    public static File getWarPackagedConfig(String fileName) {
         LOGGER.warning("Try to find the file config.xml into the web archive of Constellation !");
 
-        final InputStream is = Util.getResourceAsStream("/config.xml");
+        final InputStream is = Util.getResourceAsStream("/" + fileName);
         if (is != null) {
             int i;
             try {
@@ -190,7 +190,7 @@ public final class ConfigDirectory {
             }
 
         } else {
-            LOGGER.info("No config.xml resource found in the archive.");
+            LOGGER.info("No " + fileName + " resource found in the archive.");
         }
         return null;
     }

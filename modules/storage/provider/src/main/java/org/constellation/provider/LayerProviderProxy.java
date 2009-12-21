@@ -211,7 +211,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
              * HACK for ifremer.
              */
             if (!configFile.exists() && name.equals("postgrid")) {
-                File warFile = ConfigDirectory.getWarPackagedConfig();
+                File warFile = ConfigDirectory.getWarPackagedConfig("config.xml");
                 if(warFile != null){
                     configFile = warFile;
                 }
