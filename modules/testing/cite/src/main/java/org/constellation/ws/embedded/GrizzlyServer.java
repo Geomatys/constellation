@@ -95,11 +95,11 @@ public final class GrizzlyServer {
         final ProviderSource sourcePostGrid = new ProviderSource();
         sourcePostGrid.parameters.put(PostGridProvider.KEY_DATABASE, "jdbc:postgresql://atlas.geomatys.com/coverages-test");
         sourcePostGrid.parameters.put(PostGridProvider.KEY_DRIVER,   "org.postgresql.Driver");
-        sourcePostGrid.parameters.put(PostGridProvider.KEY_PASSWORD, "g3ouser");
+        sourcePostGrid.parameters.put(PostGridProvider.KEY_PASSWORD, "test");
         sourcePostGrid.parameters.put(PostGridProvider.KEY_READONLY, "true");
         final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
         sourcePostGrid.parameters.put(PostGridProvider.KEY_ROOT_DIRECTORY, rootDir);
-        sourcePostGrid.parameters.put(PostGridProvider.KEY_USER,     "geouser");
+        sourcePostGrid.parameters.put(PostGridProvider.KEY_USER,     "test");
 
         final ProviderConfig configPostGrid = new ProviderConfig();
         configPostGrid.sources.add(sourcePostGrid);
@@ -188,8 +188,8 @@ public final class GrizzlyServer {
         sourcePostGis.parameters.put(PostGisProvider.KEY_DATABASE, "cite-wfs");
         sourcePostGis.parameters.put(PostGisProvider.KEY_HOST,     "atlas.geomatys.com");
         sourcePostGis.parameters.put(PostGisProvider.KEY_SCHEMA,   "public");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_USER,     "geouser");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_PASSWD,   "g3ouser");
+        sourcePostGis.parameters.put(PostGisProvider.KEY_USER,     "test");
+        sourcePostGis.parameters.put(PostGisProvider.KEY_PASSWD,   "test");
         sourcePostGis.parameters.put(PostGisProvider.KEY_NAMESPACE,"http://cite.opengeospatial.org/gmlsf");
 
         final ProviderConfig configPostGis = new ProviderConfig();

@@ -89,11 +89,11 @@ public abstract class AbstractGrizzlyServer extends PostgridTestCase {
         final ProviderSource source = new ProviderSource();
         source.parameters.put(PostGridProvider.KEY_DATABASE, "jdbc:postgresql://atlas.geomatys.com/coverages-test");
         source.parameters.put(PostGridProvider.KEY_DRIVER,   "org.postgresql.Driver");
-        source.parameters.put(PostGridProvider.KEY_PASSWORD, "g3ouser");
+        source.parameters.put(PostGridProvider.KEY_PASSWORD, "test");
         source.parameters.put(PostGridProvider.KEY_READONLY, "true");
         final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
         source.parameters.put(PostGridProvider.KEY_ROOT_DIRECTORY, rootDir);
-        source.parameters.put(PostGridProvider.KEY_USER,     "geouser");
+        source.parameters.put(PostGridProvider.KEY_USER,     "test");
 
         final ProviderConfig config = new ProviderConfig();
         config.sources.add(source);
