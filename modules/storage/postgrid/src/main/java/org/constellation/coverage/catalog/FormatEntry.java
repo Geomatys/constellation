@@ -738,9 +738,12 @@ final class FormatEntry extends Entry implements Format {
      */
     @Override
     public BufferedImage getLegend(final Dimension dimension) {
-        final GridSampleDimension band = getSampleDimensions()[0];
+        final GridSampleDimension[] bands = getSampleDimensions();
+        if (bands.length == 0) {
+            return null;
+        }
         final ColorRamp legend = new ColorRamp();
-        legend.setColors(band);
+        legend.setColors(bands[0]);
         legend.setSize(dimension);
         /* TODO: since Constellation WMS is not aware of the dim_range parameter for
          * a GetLegendGraphic request, the label graduation is disabled in order to not

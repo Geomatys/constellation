@@ -69,7 +69,8 @@ public interface Format extends Element {
      * with gratuation on it.
      *
      * @param  dimension The dimension of the image to be returned.
-     * @return The color ramp as an image of the specified dimension.
+     * @return The color ramp as an image of the specified dimension, or {@code null}
+     *         if there is no sample dimensions.
      */
     BufferedImage getLegend(Dimension dimension);
 

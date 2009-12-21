@@ -735,7 +735,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
      * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
      * @return a file containing the legend graphic image.
      *
-     * @throws CstlServiceException
+     * @throws CstlServiceException if the layer does not support GetLegendGraphic requests.
      */
     @Override
     public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
@@ -748,7 +748,13 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         final Integer height = getLegend.getHeight();
         final Dimension dims = new Dimension((width == null) ? LEGEND_WIDTH : width,
                                              (height == null) ? LEGEND_HEIGHT : height);
-        return layer.getLegendGraphic(dims);
+        final BufferedImage image = layer.getLegendGraphic(dims);
+        if (image == null) {
+            throw new CstlServiceException("The requested layer \""+ layer.getName() +
+                    "\" does not support GetLegendGraphic request",
+                    NO_APPLICABLE_CODE, KEY_LAYER);
+        }
+        return image;
     }
 
     /**
