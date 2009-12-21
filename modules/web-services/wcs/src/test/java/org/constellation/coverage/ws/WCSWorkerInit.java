@@ -89,7 +89,7 @@ public class WCSWorkerInit extends PostgridTestCase {
 
         // Defines a PostGrid data provider
         final ProviderSource source = new ProviderSource();
-        source.parameters.put(PostGridProvider.KEY_DATABASE, "jdbc:postgresql://hyperion.geomatys.com/coverages-test");
+        source.parameters.put(PostGridProvider.KEY_DATABASE, "jdbc:postgresql://atlas.geomatys.com/coverages-test");
         source.parameters.put(PostGridProvider.KEY_DRIVER,   "org.postgresql.Driver");
         source.parameters.put(PostGridProvider.KEY_PASSWORD, "g3ouser");
         source.parameters.put(PostGridProvider.KEY_READONLY, "true");
