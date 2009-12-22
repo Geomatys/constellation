@@ -259,7 +259,7 @@ public class MDWebMetadataReader extends MetadataReader {
     private void initPackage() {
 
         this.geotoolsPackage    = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
-                                                        "org.geotools.service", "org.geotoolkit.naming", "org.geotools.feature.catalog",
+                                                        "org.geotoolkit.service", "org.geotoolkit.naming", "org.geotoolkit.feature.catalog",
                                                         "org.geotoolkit.metadata.fra", "org.geotoolkit.temporal.object");
         this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                         "org.opengis.service", "org.opengis.feature.catalog");
