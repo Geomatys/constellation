@@ -41,6 +41,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
 // constellation dependencies
+import org.apache.lucene.util.Version;
 import org.constellation.sos.io.ObservationResult;
 import static org.constellation.sos.ws.Utils.*;
 
@@ -107,7 +108,7 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
             }
 
             final String field       = "Title";
-            final QueryParser parser = new QueryParser(field, analyzer);
+            final QueryParser parser = new QueryParser(Version.LUCENE_CURRENT, field, analyzer);
             parser.setDefaultOperator(Operator.AND);
 
             // we enable the leading wildcard mode if the first character of the query is a '*'

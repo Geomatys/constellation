@@ -31,6 +31,7 @@ import org.constellation.util.Util;
 // lucene dependencies
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 
 // geotools dependencies
 import org.constellation.generic.database.Automatic;
@@ -364,7 +365,8 @@ public class MdwebIndexTest {
          * Test 1 sorted search: all orderBy identifier ASC
          */
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        spatialQuery.setSort(new Sort("identifier_sort", false));
+        SortField sf = new SortField("identifier_sort", SortField.STRING, false);
+        spatialQuery.setSort(new Sort(sf));
 
         List<String> result = indexSearcher.doSearch(spatialQuery);
 
@@ -388,7 +390,8 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        spatialQuery.setSort(new Sort("identifier_sort", true));
+        sf = new SortField("identifier_sort", SortField.STRING, true);
+        spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
 
@@ -413,7 +416,8 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        spatialQuery.setSort(new Sort("Abstract_sort", false));
+        sf = new SortField("Abstract_sort", SortField.STRING, false);
+        spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
 
@@ -438,7 +442,8 @@ public class MdwebIndexTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        spatialQuery.setSort(new Sort("Abstract_sort", true));
+        sf = new SortField("Abstract_sort", SortField.STRING, true);
+        spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
 

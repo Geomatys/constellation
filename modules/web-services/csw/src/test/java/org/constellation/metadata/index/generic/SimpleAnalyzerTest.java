@@ -28,6 +28,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.constellation.util.Util;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
@@ -308,7 +309,8 @@ public class SimpleAnalyzerTest {
          * Test 1 sorted search: all orderBy identifier ASC
          */
         SpatialQuery spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        spatialQuery.setSort(new Sort("identifier_sort", false));
+        SortField sf = new SortField("identifier_sort", SortField.STRING, false);
+        spatialQuery.setSort(new Sort(sf));
 
         List<String> result = indexSearcher.doSearch(spatialQuery);
 
@@ -332,7 +334,8 @@ public class SimpleAnalyzerTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        spatialQuery.setSort(new Sort("identifier_sort", true));
+        sf = new SortField("identifier_sort", SortField.STRING, true);
+        spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
 
@@ -356,7 +359,8 @@ public class SimpleAnalyzerTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        spatialQuery.setSort(new Sort("Abstract_sort", false));
+         sf = new SortField("Abstract_sort", SortField.STRING, false);
+        spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
 
@@ -380,7 +384,8 @@ public class SimpleAnalyzerTest {
          */
         resultReport = "";
         spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
-        spatialQuery.setSort(new Sort("Abstract_sort", true));
+        sf = new SortField("Abstract_sort", SortField.STRING, true);
+        spatialQuery.setSort(new Sort(sf));
 
         result = indexSearcher.doSearch(spatialQuery);
 

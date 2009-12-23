@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
@@ -248,7 +249,8 @@ public class LuceneObservationFilter implements ObservationFilter {
         List<ObservationResult> results = new ArrayList<ObservationResult>();
         try {
             SpatialQuery query = new SpatialQuery(luceneRequest.toString());
-            query.setSort(new Sort("sampling_time_begin"));
+            SortField sf       = new SortField("sampling_time_begin", SortField.STRING, false);
+            query.setSort(new Sort(sf));
             results = searcher.doResultSearch(query);
         } catch(SearchingException ex) {
             throw new CstlServiceException("Search exception while filtering the observation", ex, NO_APPLICABLE_CODE);

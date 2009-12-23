@@ -31,6 +31,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.LockObtainFailedException;
+import org.apache.lucene.store.SimpleFSDirectory;
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.ws.Utils;
 import org.constellation.ws.CstlServiceException;
@@ -105,7 +106,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
         Unmarshaller unmarshaller = null;
         try {
             unmarshaller = marshallerPool.acquireUnmarshaller();
-            writer = new IndexWriter(getFileDirectory(), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
+            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
 
             // getting the objects list and index avery item in the IndexWriter.
             for (File observationFile : observationDirectory.listFiles()) {
@@ -169,7 +170,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
         IndexWriter writer;
         final int nbObservations = observations.size();
         try {
-            writer = new IndexWriter(getFileDirectory(), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
+            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
 
             for (Object observation : observations) {
                 if (observation instanceof ObservationEntry) {
@@ -215,7 +216,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
     @Override
     public void indexDocument(ObservationEntry observation) {
         try {
-            final IndexWriter writer = new IndexWriter(getFileDirectory(), analyzer, false,IndexWriter.MaxFieldLength.UNLIMITED);
+            final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, false,IndexWriter.MaxFieldLength.UNLIMITED);
 
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(observation));

@@ -48,6 +48,7 @@ import javax.xml.namespace.QName;
 
 // Apache Lucene dependencies
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 
 //Constellation dependencies
 import org.constellation.filter.FilterParser;
@@ -788,10 +789,13 @@ public class CSWworker {
             
                 Sort sortFilter;
                 if (first.getSortOrder().equals(SortOrder.ASCENDING)) {
-                    sortFilter = new Sort(propertyName, false);
+                    SortField sf = new SortField(propertyName, SortField.STRING, false);
+
+                    sortFilter = new Sort(sf);
                     LOGGER.info("sort ASC");
                 } else {
-                    sortFilter = new Sort(propertyName, true);
+                    SortField sf = new SortField(propertyName, SortField.STRING, true);
+                    sortFilter = new Sort(sf);
                     LOGGER.info("sort DSC");
                 }
                 luceneQuery.setSort(sortFilter);
