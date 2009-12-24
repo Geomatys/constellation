@@ -17,23 +17,16 @@
 
 package org.constellation.wfs.ws;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
@@ -41,7 +34,6 @@ import org.constellation.ServiceDef;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ServiceType;
@@ -108,23 +100,7 @@ import org.opengis.util.CodeList;
  */
 public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
-    /**
-     * The default logger.
-     */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.wfs");
-
     private final List<String> standardCRS = new ArrayList<String>();
-
-    /**
-     * The web service unmarshaller, which will use the web service name space.
-     */
-    private final MarshallerPool marshallerPool;
-
-    /**
-     * A map containing the Capabilities Object already loaded from file.
-     */
-    private final Map<String,Object> capabilities = new HashMap<String,Object>();
-
 
     /**
      * The current version of the service.
@@ -136,7 +112,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     private String outputFormat = "text/xml";
 
     public DefaultWFSWorker(final MarshallerPool marshallerPool) {
-        this.marshallerPool = marshallerPool;
+        super(marshallerPool);
 
         //todo wait for martin fix
         standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:4326");
@@ -154,6 +130,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     }
 
     public DefaultWFSWorker() {
+        super(null);
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
@@ -180,7 +157,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             if (getServletContext() != null) {
                 deployedDir = getServletContext().getRealPath("WEB-INF");
             }
-            inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(deployedDir, actingVersion.toString());
+            inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(deployedDir, actingVersion.toString(), "WFS");
         } catch (IOException e) {
             throw new CstlServiceException(e, NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
@@ -269,96 +246,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
         LOGGER.log(logLevel, "GetCapabilities treated in " + (System.currentTimeMillis() - start) + "ms");
         return result;
-    }
-
-    /**
-     * Returns the file where to read the capabilities document for each service.
-     * If no such file is found, then this method returns {@code null}.
-     *
-     * @param home    The home directory, where to search for configuration files.
-     * @param version The version of the GetCapabilities.
-     * @return The capabilities Object, or {@code null} if none.
-     *
-     * @throws JAXBException
-     * @throws IOException
-     */
-    private Object getStaticCapabilitiesObject(final String home, final String version) throws JAXBException, IOException {
-        final String fileName = "WFSCapabilities" + version + ".xml";
-        final File changeFile = getFile("change.properties", home);
-        final Properties p = new Properties();
-
-        // if the flag file is present we load the properties
-        if (changeFile != null && changeFile.exists()) {
-            final FileInputStream in = new FileInputStream(changeFile);
-            p.load(in);
-            in.close();
-        } else {
-            p.put("update", "false");
-        }
-
-        //Look if the template capabilities is already in cache.
-        Object response = capabilities.get(fileName);
-        final boolean update = p.getProperty("update").equals("true");
-
-        if (response == null || update) {
-            if (update) {
-                LOGGER.log(logLevel, "updating metadata");
-            }
-
-            final File f = getFile(fileName, home);
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
-                // If the file is not present in the configuration directory, take the one in resource.
-                if (!f.exists()) {
-                    final InputStream in = getClass().getResourceAsStream(fileName);
-                    response = unmarshaller.unmarshal(in);
-                    in.close();
-                } else {
-                    response = unmarshaller.unmarshal(f);
-                }
-
-                if(response instanceof JAXBElement){
-                    response = ((JAXBElement)response).getValue();
-                }
-
-                capabilities.put(fileName, response);
-
-            } finally {
-                if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
-                }
-            }
-
-            //this.setLastUpdateSequence(System.currentTimeMillis());
-            p.put("update", "false");
-
-            // if the flag file is present we store the properties
-            if (changeFile != null && changeFile.exists()) {
-                final FileOutputStream out = new FileOutputStream(changeFile);
-                p.store(out, "updated from WebService");
-                out.close();
-            }
-        }
-
-        return response;
-    }
-
-    /**
-     * Return a file located in the home directory. In this implementation, it should be
-     * the WEB-INF directory of the deployed service.
-     *
-     * @param fileName The name of the file requested.
-     * @return The specified file.
-     */
-    private File getFile(final String fileName, final String home) {
-         File path;
-         if (home == null || !(path = new File(home)).isDirectory()) {
-            path = ConfigDirectory.getConfigDirectory();
-         }
-         if (fileName != null)
-            return new File(path, fileName);
-         else return path;
     }
 
     /**

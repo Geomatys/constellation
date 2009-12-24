@@ -21,11 +21,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -35,15 +31,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 //Constellation dependencies
 import org.constellation.Cstl;
@@ -57,7 +50,6 @@ import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.StyleProviderProxy;
-import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.query.wms.DescribeLayer;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
@@ -90,7 +82,6 @@ import org.geotoolkit.sld.xml.v110.TypeNameType;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
-import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.wms.xml.AbstractDCP;
 import org.geotoolkit.wms.xml.AbstractDimension;
@@ -131,20 +122,6 @@ import static org.constellation.query.wms.WMSQuery.*;
  * @since 0.3
  */
 public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
-    /**
-     * The default debugging logger for the WMS service.
-     */
-    private static final Logger LOGGER = Logging.getLogger(DefaultWMSWorker.class);
-
-    /**
-     * A map containing the Capabilities Object already loaded from file.
-     */
-    private final Map<String,Object> capabilities = new HashMap<String,Object>();
-
-    /**
-     * The web service unmarshaller, which will use the web service name space.
-     */
-    private final MarshallerPool marshallerPool;
 
     /**
      * Default size of the legend graphic.
@@ -156,7 +133,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
      * Initializes the marshaller pool for the WMS.
      */
     public DefaultWMSWorker(final MarshallerPool marshallerPool) {
-        this.marshallerPool = marshallerPool;
+        super(marshallerPool);
     }
 
     /**
@@ -211,15 +188,15 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         //Generate the correct URL in the static part. ?TODO: clarify this.
         final AbstractWMSCapabilities inCapabilities;
         try {
-            inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(
-                    getServletContext().getRealPath("WEB-INF"), queryVersion);
+            inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(getServletContext().getRealPath("WEB-INF"), queryVersion, "WMS");
         } catch (IOException e) {
             throw new CstlServiceException(e, NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
         final String url = getUriContext().getBaseUri().toString();
-        //inCapabilities.getService().getOnlineResource().setHref(url + "wms");//No, this is to "refer to the web site of the service provider."
+        //inCapabilities.getService().getOnlineResource().setHref(url + "wms");
+        //No, this is to "refer to the web site of the service provider."
         final AbstractRequest request = inCapabilities.getCapability().getRequest();
 
         updateURL(request.getGetCapabilities().getDCPType(), url);
@@ -472,91 +449,6 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
 
         inCapabilities.getCapability().setLayer(mainLayer);
         return inCapabilities;
-    }
-
-    /**
-     * Returns the file where to read the capabilities document for each service.
-     * If no such file is found, then this method returns {@code null}.
-     *
-     * @param home    The home directory, where to search for configuration files.
-     * @param version The version of the GetCapabilities.
-     * @return The capabilities Object, or {@code null} if none.
-     *
-     * @throws JAXBException
-     * @throws IOException
-     */
-    private Object getStaticCapabilitiesObject(final String home, final String version) throws JAXBException, IOException {
-        final String fileName = "WMSCapabilities" + version + ".xml";
-        final File changeFile = getFile("change.properties", home);
-        final Properties p = new Properties();
-
-        // if the flag file is present we load the properties
-        if (changeFile != null && changeFile.exists()) {
-            final FileInputStream in = new FileInputStream(changeFile);
-            p.load(in);
-            in.close();
-        } else {
-            p.put("update", "false");
-        }
-
-        //Look if the template capabilities is already in cache.
-        Object response = capabilities.get(fileName);
-        final boolean update = p.getProperty("update").equals("true");
-
-        if (response == null || update) {
-            if (update) {
-                LOGGER.info("updating metadata");
-            }
-
-            final File f = getFile(fileName, home);
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
-                // If the file is not present in the configuration directory, take the one in resource.
-                if (!f.exists()) {
-                    final InputStream in = getClass().getResourceAsStream(fileName);
-                    response = unmarshaller.unmarshal(in);
-                    in.close();
-                } else {
-                    response = unmarshaller.unmarshal(f);
-                }
-                capabilities.put(fileName, response);
-
-            } finally {
-                if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
-                }
-            }
-
-            //this.setLastUpdateSequence(System.currentTimeMillis());
-            p.put("update", "false");
-
-            // if the flag file is present we store the properties
-            if (changeFile != null && changeFile.exists()) {
-                final FileOutputStream out = new FileOutputStream(changeFile);
-                p.store(out, "updated from WebService");
-                out.close();
-            }
-        }
-
-        return response;
-    }
-
-    /**
-     * Return a file located in the home directory. In this implementation, it should be
-     * the WEB-INF directory of the deployed service.
-     *
-     * @param fileName The name of the file requested.
-     * @return The specified file.
-     */
-    private File getFile(final String fileName, final String home) {
-         File path;
-         if (home == null || !(path = new File(home)).isDirectory()) {
-            path = ConfigDirectory.getConfigDirectory();
-         }
-         if (fileName != null)
-            return new File(path, fileName);
-         else return path;
     }
 
     /**

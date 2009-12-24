@@ -20,12 +20,10 @@ package org.constellation.wfs.ws;
 
 // Constellation dependencies
 import java.util.Map;
-import java.util.logging.Level;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
 // Geotoolkit dependencies
-import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.gml.xml.v311.AbstractGMLEntry;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
