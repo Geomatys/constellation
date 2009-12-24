@@ -129,11 +129,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
     }
 
-    public DefaultWFSWorker() {
-        super(null);
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
     /**
      * {@inheritDoc }
      */

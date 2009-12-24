@@ -50,5 +50,10 @@ public interface Worker {
      */
     void initSecurityContext(final SecurityContext secCtxt);
 
+    /**
+     * Set The Logging level for all the info message in the worker
+     * 
+     * @param logLevel
+     */
     void setLogLevel(Level logLevel);
 }

@@ -139,6 +139,11 @@ public class WCSService extends GridWebService {
 
         Marshaller marshaller = null;
         ServiceDef serviceDef = null;
+
+        worker.initHTTPContext(getHttpContext());
+        worker.initSecurityContext(null);
+        worker.initServletContext(getServletContext());
+        worker.initUriContext(getUriContext());
         try {
 
             marshaller = getMarshallerPool().acquireMarshaller();
@@ -168,10 +173,7 @@ public class WCSService extends GridWebService {
                     getcaps = adaptKvpGetCapabilitiesRequest();
                 }
                 serviceDef = getVersionFromNumber(getcaps.getVersion().toString());
-                //TODO: is this necessary?
-                worker.internalInitServletContext(getServletContext());
-                worker.internalInitUriContext(uriContext);
-
+               
                 final GetCapabilitiesResponse capsResponse = worker.getCapabilities(getcaps);
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(capsResponse, sw);

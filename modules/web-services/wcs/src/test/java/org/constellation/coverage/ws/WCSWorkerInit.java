@@ -79,8 +79,8 @@ public class WCSWorkerInit extends PostgridTestCase {
                     "org.geotoolkit.gml.xml.v311");
         WORKER = new WCSWorker(POOL);
         // Default instanciation of the worker' servlet context and uri context.
-        WORKER.internalInitServletContext(new ServletContextImpl());
-        WORKER.internalInitUriContext(new WebApplicationContext(
+        WORKER.initServletContext(new ServletContextImpl());
+        WORKER.initUriContext(new WebApplicationContext(
                 new WebApplicationImpl(),
                 new ContainerRequest(new WebApplicationImpl(), "GET", new URI("http://localhost:9090/"),
                                      new URI("http://localhost:9090/wcs?request=GetCapabilities&service=WCS&version=1.0.0"),

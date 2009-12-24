@@ -20,11 +20,7 @@ package org.constellation.coverage.ws;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,16 +30,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
-import java.util.logging.Logger;
-import javax.servlet.ServletContext;
-import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.Cstl;
@@ -54,11 +45,11 @@ import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.StyleProviderProxy;
-import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.register.RegisterException;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.StyleUtils;
 import org.constellation.util.Util;
+import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.ServiceType;
@@ -88,7 +79,6 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.resources.Errors;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCoverage;
@@ -150,12 +140,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public final class WCSWorker {
-    /**
-     * The default debugging logger for the WCS service.
-     */
-    private static final Logger LOGGER = Logging.getLogger(WCSWorker.class);
-
+public final class WCSWorker extends AbstractWorker {
     /**
      * The date format to match.
      */
@@ -167,30 +152,10 @@ public final class WCSWorker {
     private static final boolean CITE_TESTING = false;
 
     /**
-     * The web service marshaller, which will use the web service name space.
-     */
-    private final MarshallerPool marshallerPool;
-
-    /**
-     * Defines a set of methods that a servlet uses to communicate with its servlet container,
-     * for example, to get the MIME type of a file, dispatch requests, or write to a log file.
-     */
-    private ServletContext servletContext = null;
-    /**
-     * Contains the request URI and therefore any  KVP parameters it may contain.
-     */
-    private UriInfo uriContext = null;
-
-    /**
-     * A map containing the Capabilities Object already loaded from file.
-     */
-    private Map<String,Object> capabilities = new HashMap<String,Object>();
-
-    /**
      * Initializes the marshaller pool for the WCS.
      */
     public WCSWorker(final MarshallerPool marshallerPool) {
-        this.marshallerPool = marshallerPool;
+        super(marshallerPool);
     }
 
     /**
@@ -587,8 +552,7 @@ public final class WCSWorker {
         // We unmarshall the static capabilities document.
         final WCSCapabilitiesType staticCapabilities;
         try {
-            staticCapabilities = (WCSCapabilitiesType) ((JAXBElement<?>) getStaticCapabilitiesObject(
-                    servletContext.getRealPath("WEB-INF"), ServiceDef.WCS_1_0_0.version.toString())).getValue();
+            staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(getServletContext().getRealPath("WEB-INF"), ServiceDef.WCS_1_0_0.version.toString(), "WCS");
         } catch (IOException e) {
             throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
                     NO_APPLICABLE_CODE);
@@ -721,8 +685,7 @@ public final class WCSWorker {
         // We unmarshall the static capabilities document.
         final Capabilities staticCapabilities;
         try {
-            staticCapabilities = (Capabilities) getStaticCapabilitiesObject(
-                    servletContext.getRealPath("WEB-INF"), ServiceDef.WCS_1_1_1.version.toString());
+            staticCapabilities = (Capabilities) getStaticCapabilitiesObject(getServletContext().getRealPath("WEB-INF"), ServiceDef.WCS_1_1_1.version.toString(), "WCS");
         } catch (IOException e) {
             throw new CstlServiceException(e, NO_APPLICABLE_CODE);
         }
@@ -740,7 +703,7 @@ public final class WCSWorker {
         if (requestedSections.contains("OperationsMetadata") || requestedSections.contains("All")) {
             om = staticCapabilities.getOperationsMetadata();
             //we update the url in the static part.
-            OGCWebService.updateOWSURL(om.getOperation(), uriContext.getBaseUri().toString(), "WCS");
+            OGCWebService.updateOWSURL(om.getOperation(), getUriContext().getBaseUri().toString(), "WCS");
         }
         final Capabilities responsev111 = new Capabilities(si, sp, om, ServiceDef.WCS_1_1_1.version.toString(), null, null);
 
@@ -1007,86 +970,6 @@ public final class WCSWorker {
         }
     }
 
-    /**
-     * Returns the file where to read the capabilities document for each serviceType.
-     * If no such file is found, then this method returns {@code null}.
-     *
-     * @param home The home directory, where to search for configuration files.
-     * @param version The version of the GetCapabilities.
-     * @return The capabilities Object, or {@code null} if none.
-     */
-    private Object getStaticCapabilitiesObject(final String home, final String version) throws JAXBException, IOException {
-       final String fileName = "WCSCapabilities" + version + ".xml";
-       final File changeFile = getFile("change.properties", home);
-       final Properties p = new Properties();
-
-       // if the flag file is present we load the properties
-       if (changeFile != null && changeFile.exists()) {
-           final FileInputStream in    = new FileInputStream(changeFile);
-           p.load(in);
-           in.close();
-       } else {
-           p.put("update", "false");
-       }
-
-       //we get the capabilities file and unmarshalls it
-        //we look if we have already put it in cache
-        Object response = capabilities.get(fileName);
-        final boolean update = p.getProperty("update").equals("true");
-
-        if (response == null || update) {
-            if (update) {
-                LOGGER.info("updating metadata");
-            }
-
-            final File f = getFile(fileName, home);
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
-                // If the file is not present in the configuration directory, take the one in resource.
-                if (!f.exists()) {
-                    final InputStream in = getClass().getResourceAsStream(fileName);
-                    response = unmarshaller.unmarshal(in);
-                    in.close();
-                } else {
-                    response = unmarshaller.unmarshal(f);
-                }
-                capabilities.put(fileName, response);
-            } finally {
-                if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
-                }
-            }
-                p.put("update", "false");
-
-            // if the flag file is present we store the properties
-            if (changeFile != null && changeFile.exists()) {
-                final FileOutputStream out = new FileOutputStream(changeFile);
-                p.store(out, "updated from WebService");
-                out.close();
-            }
-        }
-
-        return response;
-    }
-
-    /**
-     * Return a file located in the home directory. In this implementation, it should be
-     * the WEB-INF directory of the deployed service.
-     *
-     * @param fileName The name of the file requested.
-     * @return The specified file.
-     */
-    private File getFile(final String fileName, final String home) {
-         File path;
-         if (home == null || !(path = new File(home)).isDirectory()) {
-            path = ConfigDirectory.getConfigDirectory();
-         }
-         if (fileName != null)
-            return new File(path, fileName);
-         else return path;
-    }
-
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
     private List<LayerDetails> getAllLayerReferences(final String version) throws CstlServiceException {
@@ -1144,29 +1027,12 @@ public final class WCSWorker {
            for (Object obj: dcp.getHTTP().getGetOrPost()){
                if (obj instanceof Get){
                    final Get getMethod = (Get)obj;
-                   getMethod.getOnlineResource().setHref(uriContext.getBaseUri().toString() + "wcs?SERVICE=WCS&");
+                   getMethod.getOnlineResource().setHref(getUriContext().getBaseUri().toString() + "wcs?SERVICE=WCS&");
                } else if (obj instanceof Post){
                    final Post postMethod = (Post)obj;
-                   postMethod.getOnlineResource().setHref(uriContext.getBaseUri().toString() + "wcs?SERVICE=WCS&");
+                   postMethod.getOnlineResource().setHref(getUriContext().getBaseUri().toString() + "wcs?SERVICE=WCS&");
                }
            }
         }
     }
-
-    /**
-     * This method should be considered private.
-     */
-    public void internalInitServletContext(final ServletContext servletContext) {
-        this.servletContext = servletContext;
-    }
-
-    /**
-     * This method should be considered private.
-     */
-    public void internalInitUriContext(final UriInfo uriContext) {
-        this.uriContext = uriContext;
-    }
-
-
-
 }

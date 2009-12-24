@@ -48,7 +48,7 @@ import org.geotoolkit.xml.MarshallerPool;
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
-public abstract class AbstractWorker implements Worker{
+public abstract class AbstractWorker implements Worker {
 
      /**
      * The default logger.
@@ -142,7 +142,7 @@ public abstract class AbstractWorker implements Worker{
     }
 
     /**
-     * @param logLevel the logLevel to set
+     * {@inheritDoc }
      */
     @Override
     public void setLogLevel(Level logLevel) {
@@ -201,7 +201,7 @@ public abstract class AbstractWorker implements Worker{
         return response;
     }
 
-    protected boolean getUpdateCapabilitiesFlag(String home) throws FileNotFoundException, IOException {
+    private boolean getUpdateCapabilitiesFlag(String home) throws FileNotFoundException, IOException {
         final Properties p = new Properties();
 
         // if the flag file is present we load the properties
@@ -217,7 +217,7 @@ public abstract class AbstractWorker implements Worker{
         return  p.getProperty("update").equals("true");
     }
 
-    protected void storeUpdateCapabilitiesFlag(final String home) throws FileNotFoundException, IOException {
+    private void storeUpdateCapabilitiesFlag(final String home) throws FileNotFoundException, IOException {
         final Properties p = new Properties();
         final File changeFile = getFile("change.properties", home);
         p.put("update", "false");

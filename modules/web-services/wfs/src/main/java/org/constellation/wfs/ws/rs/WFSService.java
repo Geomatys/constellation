@@ -136,7 +136,7 @@ public class WFSService extends OGCWebService {
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
 
         Marshaller marshaller = null;
-        ServiceDef version = null;
+        ServiceDef version    = null;
 
         worker.initHTTPContext(getHttpContext());
         worker.initSecurityContext(null);
