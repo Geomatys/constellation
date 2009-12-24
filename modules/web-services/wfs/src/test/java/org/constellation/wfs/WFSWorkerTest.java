@@ -62,6 +62,7 @@ import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
+import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
@@ -351,10 +352,22 @@ public class WFSWorkerTest {
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
-        assertEquals(xmlExpResult, xmlResult);
+        /**
+         * Test 5 : query on typeName NamedPlaces with resultType = HITS
+         */
+
+        queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://geotoolkit.org", "NamedPlaces")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        FeatureCollectionType resultHits = (FeatureCollectionType) worker.getFeature(request);
+
+        assertTrue(resultHits.getNumberOfFeatures() == 2);
 
         /**
-         * Test 5 : query on typeName NamedPlaces with srsName = EPSG:27582
+         * Test 6 : query on typeName NamedPlaces with srsName = EPSG:27582
          */
 
         queries = new ArrayList<QueryType>();
@@ -375,7 +388,7 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 5 : query on typeName NamedPlaces with DESC sortBy on NAME property
+         * Test 7 : query on typeName NamedPlaces with DESC sortBy on NAME property
          
 
         queries = new ArrayList<QueryType>();
@@ -397,7 +410,7 @@ public class WFSWorkerTest {
        */
 
         /**
-         * Test 6 : query on typeName samplingPoint
+         * Test 8 : query on typeName samplingPoint
          */
 
         queries = new ArrayList<QueryType>();
@@ -416,7 +429,20 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 7 : query on typeName samplingPoint with propertyName = {gml:name}
+         * Test 9 : query on typeName samplingPoint whith HITS result type
+         */
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
+
+        resultHits = (FeatureCollectionType) worker.getFeature(request);
+
+        assertTrue(resultHits.getNumberOfFeatures() == 2);
+
+
+        /**
+         * Test 10 : query on typeName samplingPoint with propertyName = {gml:name}
          */
 
         queries = new ArrayList<QueryType>();
@@ -437,7 +463,7 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 8 : query on typeName sml:System
+         * Test 11 : query on typeName sml:System
          */
 
         queries = new ArrayList<QueryType>();
@@ -460,7 +486,7 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 9 : query on typeName sml:System avec srsName = EPSG:4326
+         * Test 12 : query on typeName sml:System avec srsName = EPSG:4326
          */
 
         queries = new ArrayList<QueryType>();
@@ -485,7 +511,7 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 10 : query on typeName sml:System with propertyName = {sml:keywords, sml:phenomenons}
+         * Test 13 : query on typeName sml:System with propertyName = {sml:keywords, sml:phenomenons}
          */
 
         queries = new ArrayList<QueryType>();
@@ -512,7 +538,7 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 11 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
+         * Test 14 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
          */
 
         queries = new ArrayList<QueryType>();
@@ -533,7 +559,7 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 12 : query on typeName samplingPoint with sort on gml:name
+         * Test 15 : query on typeName samplingPoint with sort on gml:name
          
 
         queries = new ArrayList<QueryType>();
@@ -553,9 +579,22 @@ public class WFSWorkerTest {
 
         assertEquals(xmlExpResult, xmlResult);
         */
-        
+
         /**
-         * Test 13 : query on typeName samplingPoint whith a filter with unexpected property
+         * Test 16 : query on typeName samplingPoint whith HITS result type
+         */
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
+
+        resultHits = (FeatureCollectionType) worker.getFeature(request);
+
+        assertTrue(resultHits.getNumberOfFeatures() == 2);
+
+
+        /**
+         * Test 17 : query on typeName samplingPoint whith a filter with unexpected property
          */
 
         queries = new ArrayList<QueryType>();
@@ -574,7 +613,7 @@ public class WFSWorkerTest {
         assertTrue(exLaunched);
 
         /**
-         * Test 13 : query on typeName samplingPoint whith a an unexpected property in propertyNames
+         * Test 18 : query on typeName samplingPoint whith a an unexpected property in propertyNames
          */
 
         queries = new ArrayList<QueryType>();
@@ -592,8 +631,8 @@ public class WFSWorkerTest {
         }
 
         assertTrue(exLaunched);
-        
 
+        
     }
 
     /**

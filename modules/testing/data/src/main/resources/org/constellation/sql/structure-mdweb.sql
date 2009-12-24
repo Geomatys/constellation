@@ -519,40 +519,20 @@ ALTER TABLE  "Storage"."Forms"
     ADD CONSTRAINT "Forms_fk3" FOREIGN KEY ("validationLogin") REFERENCES "Users"."Users"("login");
 
 
-ALTER TABLE  "Storage"."ImportForms"
-    ADD CONSTRAINT "ImportForms_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
+ALTER TABLE  "Storage"."ImportForms" ADD CONSTRAINT "ImportForms_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
+ALTER TABLE  "Storage"."InputLevelCompletions" ADD CONSTRAINT "InputLevelCompletions_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
-ALTER TABLE  "Storage"."InputLevelCompletions"
-    ADD CONSTRAINT "InputLevelCompletions_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
+ALTER TABLE  "Storage"."LinkedValues" ADD CONSTRAINT "LinkedValues_fk" FOREIGN KEY ("linkedForm") REFERENCES "Storage"."Forms"("identifier");
 
+ALTER TABLE  "Storage"."LinkedValues" ADD CONSTRAINT "LinkedValues_fk1" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
-ALTER TABLE  "Storage"."LinkedValues"
-    ADD CONSTRAINT "LinkedValues_fk" FOREIGN KEY ("linkedForm") REFERENCES "Storage"."Forms"("identifier");
+ALTER TABLE  "Storage"."PredefinedValues" ADD CONSTRAINT "PredefinedValues_fk" FOREIGN KEY ("linkedForm") REFERENCES "Storage"."Forms"("identifier");
 
+ALTER TABLE  "Storage"."TextValues" ADD CONSTRAINT "TextValues_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
-ALTER TABLE  "Storage"."LinkedValues"
-    ADD CONSTRAINT "LinkedValues_fk1" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
+ALTER TABLE  "Storage"."Values" ADD CONSTRAINT "Values_fk1" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
+ALTER TABLE  "Users"."UserGroups" ADD CONSTRAINT "UserGroups_fk" FOREIGN KEY ("role") REFERENCES "Users"."Roles"("name");
 
-ALTER TABLE  "Storage"."PredefinedValues"
-    ADD CONSTRAINT "PredefinedValues_fk" FOREIGN KEY ("linkedForm") REFERENCES "Storage"."Forms"("identifier");
-
-
-
-ALTER TABLE  "Storage"."TextValues"
-    ADD CONSTRAINT "TextValues_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
-
-
-ALTER TABLE  "Storage"."Values"
-    ADD CONSTRAINT "Values_fk1" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
-
-
-ALTER TABLE  "Users"."UserGroups"
-    ADD CONSTRAINT "UserGroups_fk" FOREIGN KEY ("role") REFERENCES "Users"."Roles"("name");
-
-
-ALTER TABLE  "Users"."Users"
-    ADD CONSTRAINT "Users_fk1" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
-
-
+ALTER TABLE  "Users"."Users" ADD CONSTRAINT "Users_fk1" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");

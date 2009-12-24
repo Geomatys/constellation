@@ -1609,13 +1609,14 @@ public final class Util {
             final Statement stmt  = connection.createStatement();
             String SQLQuery       = sw.toString();
             int end               = SQLQuery.indexOf(';');
+            int nbQuery           = 0;
             while (end != -1) {
                 final String singleQuery = SQLQuery.substring(0, end);
                 try {
                     stmt.execute(singleQuery);
-
+                    nbQuery++;
                 } catch (SQLException ex) {
-                    LOGGER.severe("SQLException while executing: " + singleQuery + '\n' + ex.getMessage());
+                    LOGGER.severe("SQLException while executing: " + singleQuery + '\n' + ex.getMessage() + '\n' + " in file:" + path + " instruction n° " + nbQuery);
                 }
                 SQLQuery = SQLQuery.substring(end + 1);
                 end      = SQLQuery.indexOf(';');

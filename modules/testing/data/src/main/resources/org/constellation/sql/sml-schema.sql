@@ -1218,18 +1218,3 @@ INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "own
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:parameters:parameter:uom:code', 'code', 'Sensor Web Enablement', 'Uom', 'SensorML:SensorML:member:parameters:parameter:uom', 'Sensor Web Enablement');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:boundedBy', 'boundedBy', 'ISO 19108', 'AbstractSML', 'SensorML:SensorML:member', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:boundedBy:nil', 'nil', 'XML Schema', 'Envelope', 'SensorML:SensorML:member:boundedBy', 'Sensor Web Enablement');
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

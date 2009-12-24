@@ -539,4 +539,3 @@ ALTER TABLE "sos"."offering_sampling_features"
 
 INSERT INTO "observation"."phenomenons" VALUES ('', '', 'phenomenon null');
 INSERT INTO "observation"."composite_phenomenons" VALUES ('', '', 'composite phenomenon null', 0);
-
