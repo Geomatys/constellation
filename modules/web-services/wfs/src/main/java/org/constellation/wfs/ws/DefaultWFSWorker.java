@@ -371,8 +371,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 
                 if (obj instanceof String) {
                     String pName = (String) obj;
-                    if (pName.indexOf(":") != -1) {
-                        pName = pName.substring(pName.indexOf(":") + 1);
+                    int pos = pName.indexOf(':');
+                    if (pos != -1) {
+                        pName = pName.substring(pos + 1);
                     }
                     requestPropNames.add(pName);
                 }

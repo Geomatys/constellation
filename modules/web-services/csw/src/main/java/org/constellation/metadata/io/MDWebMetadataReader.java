@@ -623,6 +623,12 @@ public class MDWebMetadataReader extends MetadataReader {
 
                     if (setter != null) {
                         Util.invokeMethod(setter, result, param);
+                    } else {
+                        String paramDesc = "null";
+                        if (param != null) {
+                            paramDesc = param.getClass() + "";
+                        }
+                        LOGGER.warning("No setter have been found for attribute " + qn.getLocalPart() +" of type " + paramDesc + " in the class RecordType");
                     }
 
                 } catch (IllegalArgumentException ex) {
@@ -791,6 +797,12 @@ public class MDWebMetadataReader extends MetadataReader {
                     }
                     if (setter != null) {
                         Util.invokeMethod(setter, filtredResult, param);
+                    } else {
+                        String paramDesc = "null";
+                        if (param != null) {
+                            paramDesc = param.getClass() + "";
+                        }
+                        LOGGER.warning("No setter have been found for attribute " + qn.getLocalPart() +" of type " + paramDesc + " in the class " + recordClass);
                     }
 
                 } catch (IllegalArgumentException ex) {

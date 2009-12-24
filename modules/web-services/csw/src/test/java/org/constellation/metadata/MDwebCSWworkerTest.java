@@ -21,6 +21,7 @@ package org.constellation.metadata;
 import java.io.File;
 import java.sql.Connection;
 import java.util.Arrays;
+import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
@@ -107,6 +108,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         worker = new CSWworker("", pool, configDir);
         Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
         worker.setSkeletonCapabilities(stcapa);
+        worker.setLogLevel(Level.FINER);
 
         pool.release(unmarshaller);
     }

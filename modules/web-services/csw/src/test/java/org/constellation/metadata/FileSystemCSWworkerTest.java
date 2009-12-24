@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
@@ -108,6 +109,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         worker = new CSWworker("", pool, configDir);
         Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
         worker.setSkeletonCapabilities(stcapa);
+        worker.setLogLevel(Level.FINER);
         pool.release(unmarshaller);
     }
 

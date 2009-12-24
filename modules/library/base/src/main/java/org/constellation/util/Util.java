@@ -1334,8 +1334,6 @@ public final class Util {
                 }
             }
         }
-        LOGGER.severe("No setter have been found for attribute " + propertyName +
-                      " of type " + paramClass.getName() + " in the class " + rootClass.getName());
         return null;
     }
     

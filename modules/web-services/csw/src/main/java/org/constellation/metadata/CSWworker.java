@@ -255,6 +255,11 @@ public class CSWworker {
     private ServiceVersion actingVersion = new ServiceVersion(ServiceType.CSW, Parameters.CSW_202_VERSION);
 
     /**
+     * The log level off al the informations log.
+     */
+    private Level logLevel = Level.INFO;
+    
+    /**
      * Default constructor for CSW worker.
      *
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
@@ -456,7 +461,7 @@ public class CSWworker {
      */
     public Capabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
         isWorking();
-        LOGGER.info("getCapabilities request processing" + '\n');
+        LOGGER.log(logLevel, "getCapabilities request processing" + '\n');
         final long startTime = System.currentTimeMillis();
         
         //we verify the base request attribute
@@ -637,7 +642,7 @@ public class CSWworker {
             
         c = new Capabilities(si, sp, om, Parameters.CSW_202_VERSION, null, fc);
 
-        LOGGER.info("GetCapabilities request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "GetCapabilities request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         return c;
     }
     
@@ -650,7 +655,7 @@ public class CSWworker {
      *         an AcknowledgementType if the resultType is set to VALIDATE.
      */
     public Object getRecords(final GetRecordsRequest request) throws CstlServiceException {
-        LOGGER.info("GetRecords request processing" + '\n');
+        LOGGER.log(logLevel, "GetRecords request processing" + '\n');
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         
@@ -713,7 +718,6 @@ public class CSWworker {
                     }
                     //we verify that the typeName is supported        
                     if (!supportedTypeNames.contains(type)) {
-                        LOGGER.info("TYPE:" + type + " LIST:" + supportedTypeNames);
                         String typeName = "null";
                         if (type != null)
                             typeName = type.getLocalPart();
@@ -733,7 +737,7 @@ public class CSWworker {
                 for (Entry<String, String> entry : prefixs.entrySet()) {
                     report.append(entry.getKey()).append(" = ").append(entry.getValue()).append('\n');
                 }
-                LOGGER.info(report.toString());
+                LOGGER.log(logLevel, report.toString());
             }
             
         } else {
@@ -768,7 +772,7 @@ public class CSWworker {
            final SQLQuery sqlQuery = (SQLQuery) sqlFilterParser.getQuery(query.getConstraint(), variables, prefixs);
            
            // TODO sort not yet implemented
-           LOGGER.info("ebrim SQL query obtained:" + sqlQuery);
+           LOGGER.log(logLevel, "ebrim SQL query obtained:" + sqlQuery);
            
            // we try to execute the query
            results = mdReader.executeEbrimSQLQuery(sqlQuery.getQuery());
@@ -792,11 +796,11 @@ public class CSWworker {
                     SortField sf = new SortField(propertyName, SortField.STRING, false);
 
                     sortFilter = new Sort(sf);
-                    LOGGER.info("sort ASC");
+                    LOGGER.log(logLevel, "sort ASC");
                 } else {
                     SortField sf = new SortField(propertyName, SortField.STRING, true);
                     sortFilter = new Sort(sf);
-                    LOGGER.info("sort DSC");
+                    LOGGER.log(logLevel, "sort DSC");
                 }
                 luceneQuery.setSort(sortFilter);
             }
@@ -834,7 +838,7 @@ public class CSWworker {
         if (max > results.size()) {
             max = results.size();
         }
-        LOGGER.info("local max = " + max + " distributed max = " + maxDistributed);
+        LOGGER.log(logLevel, "local max = " + max + " distributed max = " + maxDistributed);
 
         int mode;
         if (outputSchema.equals(Namespaces.GMD) || outputSchema.equals(Namespaces.GFC)) {
@@ -909,7 +913,7 @@ public class CSWworker {
         }
         
         response = new GetRecordsResponseType(id, System.currentTimeMillis(), request.getVersion(), searchResults);
-        LOGGER.info("GetRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "GetRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         return response;
     }
     
@@ -921,7 +925,7 @@ public class CSWworker {
      * @throws CstlServiceException
      */
     private List<String> executeLuceneQuery(final SpatialQuery query) throws CstlServiceException {
-        LOGGER.info("Lucene query obtained:" + query);
+        LOGGER.log(logLevel, "Lucene query obtained:" + query);
         try {
             return indexSearcher.doSearch(query);
         
@@ -956,7 +960,7 @@ public class CSWworker {
      * @return A GetRecordByIdResponse containing a list of records.
      */
     public GetRecordByIdResponse getRecordById(final GetRecordById request) throws CstlServiceException {
-        LOGGER.info("GetRecordById request processing" + '\n');
+        LOGGER.log(logLevel, "GetRecordById request processing" + '\n');
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         
@@ -1131,7 +1135,7 @@ public class CSWworker {
             response = null;
         }
         
-        LOGGER.info("GetRecordById request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "GetRecordById request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         return response;
     }
     
@@ -1167,7 +1171,7 @@ public class CSWworker {
      * @return
      */
     public DescribeRecordResponseType describeRecord(final DescribeRecord request) throws CstlServiceException{
-        LOGGER.info("DescribeRecords request processing" + '\n');
+        LOGGER.log(logLevel, "DescribeRecords request processing" + '\n');
         final long startTime = System.currentTimeMillis();
         DescribeRecordResponseType response;
         Unmarshaller unmarshaller;
@@ -1230,7 +1234,7 @@ public class CSWworker {
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB Exception when trying to parse xsd file", ex, NO_APPLICABLE_CODE);
         }
-        LOGGER.info("DescribeRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "DescribeRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         return response;
     }
     
@@ -1241,7 +1245,7 @@ public class CSWworker {
      * @return
      */
     public GetDomainResponse getDomain(final GetDomain request) throws CstlServiceException{
-        LOGGER.info("GetDomain request processing" + '\n');
+        LOGGER.log(logLevel, "GetDomain request processing" + '\n');
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         // we prepare the response
@@ -1308,7 +1312,7 @@ public class CSWworker {
             throw new CstlServiceException("One of propertyName or parameterName must be filled",
                                           MISSING_PARAMETER_VALUE, "parameterName, propertyName");
         }
-        LOGGER.info("GetDomain request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "GetDomain request processed in " + (System.currentTimeMillis() - startTime) + " ms");
 
         return CswXmlFactory.getDomainResponse(actingVersion.toString(), responseList);
     }
@@ -1320,7 +1324,7 @@ public class CSWworker {
      * @return
      */
     public TransactionResponseType transaction(final Transaction request) throws CstlServiceException {
-        LOGGER.info("Transaction request processing" + '\n');
+        LOGGER.log(logLevel, "Transaction request processing" + '\n');
         
         if (profile == DISCOVERY) {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
@@ -1444,7 +1448,7 @@ public class CSWworker {
                                                                           totalDeleted,
                                                                           requestID);
         final TransactionResponseType response = new TransactionResponseType(summary, null, request.getVersion());
-        LOGGER.info("Transaction request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "Transaction request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         return response;
     }
     
@@ -1455,7 +1459,7 @@ public class CSWworker {
      * @return
      */
     public HarvestResponseType harvest(final Harvest request) throws CstlServiceException {
-        LOGGER.info("Harvest request processing" + '\n');
+        LOGGER.log(logLevel, "Harvest request processing" + '\n');
         if (profile == DISCOVERY) {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
                                           OPERATION_NOT_SUPPORTED, "Request");
@@ -1548,7 +1552,7 @@ public class CSWworker {
                                               MISSING_PARAMETER_VALUE, Parameters.SOURCE);
         }
         
-        LOGGER.info("Harvest operation finished");
+        LOGGER.log(logLevel, "Harvest operation finished");
         return response;
     }
     
@@ -1717,5 +1721,9 @@ public class CSWworker {
         if (catalogueHarvester != null) {
             catalogueHarvester.destroy();
         }
+    }
+
+    public void setLogLevel(Level logLevel) {
+        this.logLevel = logLevel;
     }
 }

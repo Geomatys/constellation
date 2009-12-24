@@ -237,7 +237,7 @@ public abstract class AbstractWorker implements Worker {
      * @param fileName The name of the file requested.
      * @return The specified file.
      */
-    protected File getFile(final String fileName, final String home) {
+    private File getFile(final String fileName, final String home) {
          File path;
          if (home == null || !(path = new File(home)).isDirectory()) {
             path = ConfigDirectory.getConfigDirectory();

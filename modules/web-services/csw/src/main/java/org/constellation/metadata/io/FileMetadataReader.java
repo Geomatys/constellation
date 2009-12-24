@@ -212,6 +212,8 @@ public class FileMetadataReader extends MetadataReader {
 
                         if (setter != null) {
                             Util.invokeMethod(setter, customRecord, param);
+                        } else {
+                            LOGGER.warning("No setter have been found for attribute " + qn.getLocalPart() +" of type " + param.getClass() + " in the class RecordType");
                         }
 
                     } catch (IllegalArgumentException ex) {

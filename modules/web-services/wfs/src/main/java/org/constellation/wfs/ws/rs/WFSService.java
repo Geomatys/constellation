@@ -563,9 +563,9 @@ public class WFSService extends OGCWebService {
             }
             //we get the order
             SortOrder order;
-            if (sortByParam.indexOf(" ") != -1) {
+            if (sortByParam.indexOf(' ') != -1) {
                 char cOrder = sortByParam.charAt(sortByParam.length() -1);
-                sortByParam = sortByParam.substring(0, sortByParam.indexOf(" "));
+                sortByParam = sortByParam.substring(0, sortByParam.indexOf(' '));
                 if (cOrder == 'D') {
                     order = SortOrder.DESCENDING;
                 } else {
