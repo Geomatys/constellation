@@ -74,8 +74,13 @@ import org.geotoolkit.data.store.EmptyFeatureCollection;
 import org.geotoolkit.filter.accessor.Accessors;
 import org.geotoolkit.filter.accessor.PropertyAccessor;
 import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
+import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
+import org.geotoolkit.wfs.xml.v110.IdentifierGenerationOptionType;
+import org.geotoolkit.wfs.xml.v110.InsertElementType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
+import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
+import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
@@ -509,7 +514,72 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      * {@inheritDoc }
      */
     @Override
-    public TransactionResponseType transaction(TransactionType t) throws CstlServiceException {
+    public TransactionResponseType transaction(TransactionType request) throws CstlServiceException {
+        LOGGER.log(logLevel, "Transaction request processing" + '\n');
+        final long startTime = System.currentTimeMillis();
+        verifyBaseRequest(request, true, false);
+        // we prepare the report
+        int totalInserted       = 0;
+        int totalUpdated        = 0;
+        int totalDeleted        = 0;
+
+        final List<Object> transactions = request.getInsertOrUpdateOrDelete();
+        for (Object transaction: transactions) {
+            if (transaction instanceof InsertElementType) {
+                final InsertElementType insertRequest = (InsertElementType)transaction;
+                
+                // we verify the input format
+                if (insertRequest.getInputFormat() != null && !insertRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1")) {
+                    throw new CstlServiceException("This only input format supported is: text/xml; subtype=gml/3.1.1",
+                            INVALID_PARAMETER_VALUE, "inputFormat");
+                }
+
+                // what to do with the SRSName ?
+                String srsName = insertRequest.getSrsName();
+
+                // what to do with that, whitch ones are supported ??
+                IdentifierGenerationOptionType idGen = insertRequest.getIdgen();
+
+                System.out.println("here" + insertRequest.getFeature().size());
+                for (Object feature : insertRequest.getFeature()) {
+                    System.out.println("feature:" + feature);
+                    // TODO datastore.storeFeature(feature);
+                    totalInserted++;
+                }
+
+            } else if (transaction instanceof DeleteElementType) {
+                
+                final DeleteElementType deleteRequest = (DeleteElementType) transaction;
+
+                totalDeleted++;
+
+
+            } else if (transaction instanceof UpdateElementType) {
+
+                UpdateElementType updateRequest = (UpdateElementType) transaction;
+                totalUpdated++;
+                    
+                    
+                
+            } else {
+                String className = " null object";
+                if (transaction != null) {
+                    className = transaction.getClass().getName();
+                }
+                throw new CstlServiceException("This kind of transaction is not supported by the service: " + className,
+                                              INVALID_PARAMETER_VALUE, "transaction");
+            }
+
+        }
+        // todo
+
+        final TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
+                                                                          totalUpdated,
+                                                                          totalDeleted);
+
+        final TransactionResponseType response = new TransactionResponseType(summary, null, null, actingVersion.toString());
+        LOGGER.log(logLevel, "Transaction request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        
         throw new CstlServiceException("WFS-T is not supported on this Constellation version.");
     }
 

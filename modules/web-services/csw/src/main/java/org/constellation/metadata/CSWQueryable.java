@@ -194,7 +194,7 @@ public final class CSWQueryable {
         paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:distance");
         ISO_QUERYABLE.put("DistanceValue", paths);
         
-        //TODO not existing path in MDWeb or geotools (Distance is treated as a primitive type)
+        //TODO not existing path in MDWeb or geotoolkit (Distance is treated as a primitive type)
         paths = new ArrayList<String>();
         //paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:distance:uom");
         ISO_QUERYABLE.put("DistanceUOM", paths);

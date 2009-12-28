@@ -245,11 +245,11 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     }
 
     /**
-     * This method add to index of lucene a new document based on a geotools Metadata object.
+     * This method add to index of lucene a new document based on a geotoolkit Metadata object.
      * (implements AbstractIndex.indexDocument() )
      * 
      * @param writer A lucene Index Writer.
-     * @param meta A geotools Metadata object.
+     * @param meta A geotoolkit Metadata object.
      */
     @Override
     public void indexDocument(IndexWriter writer, Object meta) {
@@ -276,10 +276,10 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     }
 
    /**
-     * This method add to index of lucene a new document based on a geotools Metadata object.
+     * This method add to index of lucene a new document based on a geotoolkit Metadata object.
      * (implements AbstractIndex.indexDocument() )
      *
-     * @param meta A geotools Metadata object.
+     * @param meta A geotoolkit Metadata object.
      */
     @Override
     public void indexDocument(Object meta) {

@@ -847,7 +847,7 @@ public class SOSworker {
         //we get the list of phenomenon
         //TODO verifier que les pheno appartiennent a l'offering
         final List<String> observedProperties = requestObservation.getObservedProperty();
-        if (observedProperties.size() != 0 ) {
+        if (observedProperties != null && observedProperties.size() != 0) {
             final List<String> singlePhenomenons    = new ArrayList<String>();
             final List<String> compositePhenomenons = new ArrayList<String>();
             for (String phenomenonName : observedProperties) {

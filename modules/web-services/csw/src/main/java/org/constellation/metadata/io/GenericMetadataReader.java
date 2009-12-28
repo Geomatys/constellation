@@ -60,7 +60,7 @@ import org.constellation.generic.database.Single;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
-// Geotools dependencies
+// Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
@@ -548,6 +548,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         for (final PreparedStatement stmt : subSingleStmts) {
             cs.submit(new Callable() {
 
+                @Override
                 public Object call() throws CstlServiceException {
                     try {
                         fillStatement(stmt, identifier);
@@ -583,6 +584,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
         for (final PreparedStatement stmt : subMultiStmts) {
             cs.submit(new Callable() {
 
+                @Override
                 public Object call() throws CstlServiceException {
                     try {
                         fillStatement(stmt, identifier);
@@ -664,11 +666,12 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @param mode An output schema mode: ISO_19115 and DUBLINCORE supported.
      * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
      * @param elementName A list of QName describing the requested fields. (implies type == null)
-     * @return A metadata Object (dublin core Record / geotools metadata)
+     * @return A metadata Object (dublin core Record / geotoolkit metadata)
      * 
      * @throws java.sql.SQLException
      * @throws CstlServiceException
      */
+    @Override
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
         Object result = null;
         
@@ -943,6 +946,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * @return
      * @throws java.sql.SQLException
      */
+    @Override
     public List<DefaultMetadata> getAllEntries() throws CstlServiceException {
         final List<DefaultMetadata> result = new ArrayList<DefaultMetadata>();
         final List<String> identifiers  = getAllIdentifiers();
@@ -957,6 +961,7 @@ public abstract class GenericMetadataReader extends MetadataReader {
      * 
      * @return
      */
+    @Override
     public List<String> getAllIdentifiers() throws CstlServiceException {
         final List<String> result = new ArrayList<String>();
         try {

@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -340,7 +339,7 @@ public class FileMetadataWriter extends MetadataWriter {
     private void updateObject(String propertyName, Object parent, Object value, Class parameterType, int ordinal) throws CstlServiceException {
         Method setter = Util.getSetterFromName(propertyName, parameterType, parent.getClass());
 
-        // with the geotools implementation we sometimes have to used InternationalString instead of String.
+        // with the geotoolkit implementation we sometimes have to used InternationalString instead of String.
         if (setter == null && parameterType.equals(String.class)) {
             setter = Util.getSetterFromName(propertyName, InternationalString.class, parent.getClass());
             value = new SimpleInternationalString((String) value);

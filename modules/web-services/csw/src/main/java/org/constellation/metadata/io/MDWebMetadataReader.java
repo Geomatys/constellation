@@ -88,7 +88,7 @@ import org.opengis.util.CodeList;
 /**
  * A database Reader designed for an MDweb database.
  * 
- * It read The mdweb forms into the database and instanciate them into geotools object.
+ * It read The mdweb forms into the database and instanciate them into geotoolkit object.
  * When an object have been read it is stored in cache.
  * 
  * @author Guilhem legal
@@ -113,7 +113,7 @@ public class MDWebMetadataReader extends MetadataReader {
     /**
      * A list of package containing the ISO 19115 implementation.
      */
-    private List<String> geotoolsPackage;
+    private List<String> geotoolkitPackage;
     
     /**
      * A list of package containing the CSW and dublinCore implementation
@@ -258,7 +258,7 @@ public class MDWebMetadataReader extends MetadataReader {
      */
     private void initPackage() {
 
-        this.geotoolsPackage    = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
+        this.geotoolkitPackage    = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
                                                         "org.geotoolkit.service", "org.geotoolkit.naming", "org.geotoolkit.feature.catalog",
                                                         "org.geotoolkit.metadata.fra", "org.geotoolkit.temporal.object");
         this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
@@ -310,7 +310,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @param mode An output schema mode: EBRIM, ISO_19115 and DUBLINCORE supported.
      * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
      * @param elementName A list of QName describing the requested fields. (implies type == null)
-     * @return A metadata Object (dublin core Record / geotools metadata / ebrim registry object)
+     * @return A metadata Object (dublin core Record / geotoolkit metadata / ebrim registry object)
      * 
      * @throws java.sql.CstlServiceException
      */
@@ -716,7 +716,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @param type An elementSet : BRIEF, SUMMARY, FULL. (default is FULL);
      * @param elementName 
      * 
-     * @return a geotools/constellation object representing the metadata.
+     * @return a geotoolkit/constellation object representing the metadata.
      */
     private Object getObjectFromForm(String identifier, Form form) {
 
@@ -814,13 +814,13 @@ public class MDWebMetadataReader extends MetadataReader {
     }
     
     /**
-     * Return an geotools object from a MDWeb value (this value can be see as a tree).
+     * Return an geotoolkit object from a MDWeb value (this value can be see as a tree).
      * This method build the value and all is attribute recursivly.
      * 
      * @param form the MDWeb formular containg this value.
      * @param value The value to build.
      * 
-     * @return a geotools metadat object.
+     * @return a geotoolkit metadat object.
      */
     private Object getObjectFromValue(Form form, Value value) {
         String className;
@@ -1108,7 +1108,7 @@ public class MDWebMetadataReader extends MetadataReader {
                                 tryAgain = false;
                         }
                     } catch (ClassCastException ex) {
-                        LOGGER.severe("Exception while putting in geotools metadata: " + '\n' +
+                        LOGGER.severe("Exception while putting in geotoolkit metadata: " + '\n' +
                                       "cause: " + ex.getMessage());
                         tryAgain = false;
                     }
@@ -1182,7 +1182,7 @@ public class MDWebMetadataReader extends MetadataReader {
             return result;
         }
 
-        //special case TODO delete when geotools/api will be updated.
+        //special case TODO delete when geotoolkit/api will be updated.
         if (className.equals("CI_Date")) {
             className = "CitationDate";
         } else if (className.equals("RS_Identifier")) {
@@ -1204,7 +1204,7 @@ public class MDWebMetadataReader extends MetadataReader {
             
         } else {
             if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType") && !className.equals("AxisDirection")) {
-                packagesName = geotoolsPackage;
+                packagesName = geotoolkitPackage;
             } else {
                 packagesName = opengisPackage;
             }
@@ -1219,7 +1219,7 @@ public class MDWebMetadataReader extends MetadataReader {
             else if (className.equals("MD_ScopeCode"))
                 packageName = "org.opengis.metadata.maintenance";
             else if (className.equals("SV_ServiceIdentification")) 
-                packageName = "org.geotools.service";
+                packageName = "org.geotoolkit.service";
             else if (className.startsWith("FRA_")) 
                 packageName = "org.geotoolkit.metadata.fra";
             else if (className.equals("ReferenceSystemMetadata"))

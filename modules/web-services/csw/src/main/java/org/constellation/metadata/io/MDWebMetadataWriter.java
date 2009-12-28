@@ -453,7 +453,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             return result;
         }
 
-        //special case TODO delete when geotools/api will be updated.
+        //special case TODO delete when geotoolkit/api will be updated.
         if (className.equals("DefaultMetadata")) {
             className = "Metadata";
         } else if (className.equals("DefaultOnlineResource")) {
@@ -534,7 +534,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
             /* to avoid some confusion between to classes with the same name
              * we affect the standard in some special case
              */
-            if (packageName.equals("org.geotools.service")) {
+            if (packageName.equals("org.geotoolkit.service")) {
                 standard = mdWriter.getStandard("ISO 19119");
             } else if (packageName.equals("org.constellation.metadata.fra")) {
                 standard = Standard.ISO_19115_FRA;

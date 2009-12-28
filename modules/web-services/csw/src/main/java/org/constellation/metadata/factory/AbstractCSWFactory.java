@@ -26,7 +26,7 @@ import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.CstlServiceException;
 
-// Geotools dependencies
+// Geotoolkit dependencies
 import org.geotoolkit.factory.Factory;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;

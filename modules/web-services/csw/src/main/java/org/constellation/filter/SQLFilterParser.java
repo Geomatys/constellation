@@ -35,7 +35,7 @@ import org.constellation.metadata.Parameters;
 import org.geotoolkit.csw.xml.QueryConstraint;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
-// Geotools dependencies
+// Geotoolkit dependencies
 
 // MDWeb dependencies
 

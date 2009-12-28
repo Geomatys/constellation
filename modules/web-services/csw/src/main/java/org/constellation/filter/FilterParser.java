@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
+import java.util.logging.Level;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
@@ -36,13 +37,8 @@ import org.apache.lucene.search.Filter;
 // constellation dependencies
 import org.constellation.metadata.Parameters;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.csw.xml.QueryConstraint;
-import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.factory.Hints;
-import org.geotoolkit.filter.FilterFactoryImpl;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
-// Geotools dependencies
+// Geotoolkit dependencies
 import org.geotoolkit.filter.text.cql2.CQL;
 import org.geotoolkit.filter.text.cql2.CQLException;
 import org.geotoolkit.geometry.GeneralDirectPosition;
@@ -66,7 +62,13 @@ import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.csw.xml.QueryConstraint;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
+import org.geotoolkit.filter.FilterFactoryImpl;
+import org.geotoolkit.lucene.filter.SerialChainFilter;
 
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.lucene.filter.LuceneOGCFilter.*;
 
 // GeoAPI dependencies
@@ -75,9 +77,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+// JTS dependencies
 import com.vividsolutions.jts.geom.Geometry;
-import java.util.logging.Level;
-import org.geotoolkit.lucene.filter.SerialChainFilter;
 
 /**
  *
@@ -110,7 +111,7 @@ public abstract class FilterParser {
         FilterType result;
         final Object newFilter = CQL.toFilter(cqlQuery, new FilterFactoryImpl());
         /*
-         * here we put a temporary patch consisting in using the geotools filterFactory implementation
+         * here we put a temporary patch consisting in using the geotoolkit filterFactory implementation
          * instead of our own implementation.
          * Then we unmarshaller the xml to get a constellation Filter object.
          *

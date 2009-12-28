@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 // constellation dependencies
 import org.constellation.ws.CstlServiceException;
 
-//geotools dependencies
+//geotoolkit dependencies
 import org.geotoolkit.csw.xml.Record;
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.dublincore.xml.AbstractSimpleLiteral;
@@ -42,7 +42,7 @@ import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
-// geotools dependencies
+// geoAPI dependencies
 import org.opengis.metadata.identification.Identification;
 
 /**
