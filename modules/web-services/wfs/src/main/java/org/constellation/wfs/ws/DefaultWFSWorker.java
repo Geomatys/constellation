@@ -74,10 +74,14 @@ import org.geotoolkit.data.store.EmptyFeatureCollection;
 import org.geotoolkit.filter.accessor.Accessors;
 import org.geotoolkit.filter.accessor.PropertyAccessor;
 import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
+import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.IdentifierGenerationOptionType;
 import org.geotoolkit.wfs.xml.v110.InsertElementType;
+import org.geotoolkit.wfs.xml.v110.InsertResultsType;
+import org.geotoolkit.wfs.xml.v110.InsertedFeatureType;
+import org.geotoolkit.wfs.xml.v110.PropertyType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
@@ -338,35 +342,14 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             final List<QName> typeNames   = query.getTypeName();
             final List<Object> properties = query.getPropertyNameOrXlinkPropertyNameOrFunction();
             
-            final Filter filter;
-            final CoordinateReferenceSystem crs;
             final List<String> requestPropNames = new ArrayList<String>();
             final List<SortBy> sortBys          = new ArrayList<SortBy>();
 
             //decode filter-----------------------------------------------------
-            try {
-                if (jaxbFilter != null) {
-                    filter = util.getTransformer110().visitFilter(jaxbFilter);
-                } else {
-                    filter = Filter.INCLUDE;
-                }
-            } catch(Exception ex) {
-                throw new CstlServiceException(ex);
-            }
+            final Filter filter = extractJAXBFilter(jaxbFilter);
 
             //decode crs--------------------------------------------------------
-            if (srs != null){
-                try {
-                    crs = CRS.decode(srs, true);
-                    //todo use other properties to filter properly
-                } catch (NoSuchAuthorityCodeException ex) {
-                    throw new CstlServiceException(ex);
-                } catch (FactoryException ex) {
-                    throw new CstlServiceException(ex);
-                }
-            } else {
-                crs = null;
-            }
+            final CoordinateReferenceSystem crs = extractCRS(srs);
 
             //decode property names---------------------------------------------
             for (Object obj : properties) {
@@ -396,7 +379,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             if (!sortBys.isEmpty()) {
                 queryBuilder.setSortBy(sortBys.toArray(new SortBy[sortBys.size()]));
             }
-            if(maxFeatures != null){
+            if (maxFeatures != null){
                 queryBuilder.setMaxFeatures(maxFeatures);
             }
 
@@ -518,16 +501,25 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         LOGGER.log(logLevel, "Transaction request processing" + '\n');
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request, true, false);
-        // we prepare the report
-        int totalInserted       = 0;
-        int totalUpdated        = 0;
-        int totalDeleted        = 0;
 
-        final List<Object> transactions = request.getInsertOrUpdateOrDelete();
+        // we prepare the report
+        int totalInserted                   = 0;
+        int totalUpdated                    = 0;
+        int totalDeleted                    = 0;
+        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
+        InsertResultsType insertResults     = null;
+        final List<Object> transactions     = request.getInsertOrUpdateOrDelete();
+
         for (Object transaction: transactions) {
+
+            /**
+             * Features insertion.
+             */
             if (transaction instanceof InsertElementType) {
                 final InsertElementType insertRequest = (InsertElementType)transaction;
-                
+
+                String handle = insertRequest.getHandle();
+
                 // we verify the input format
                 if (insertRequest.getInputFormat() != null && !insertRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1")) {
                     throw new CstlServiceException("This only input format supported is: text/xml; subtype=gml/3.1.1",
@@ -540,27 +532,99 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 // what to do with that, whitch ones are supported ??
                 IdentifierGenerationOptionType idGen = insertRequest.getIdgen();
 
-                System.out.println("here" + insertRequest.getFeature().size());
+                List<InsertedFeatureType> inserted = new ArrayList<InsertedFeatureType>();
                 for (Object feature : insertRequest.getFeature()) {
                     System.out.println("feature:" + feature);
                     // TODO datastore.storeFeature(feature);
+                    String fid = null; // get the id of the inserted feature
+                    inserted.add(new InsertedFeatureType(new FeatureIdType(fid), handle));
                     totalInserted++;
                 }
+                insertResults = new InsertResultsType(inserted);
 
+            /**
+             * Features remove.
+             */
             } else if (transaction instanceof DeleteElementType) {
                 
                 final DeleteElementType deleteRequest = (DeleteElementType) transaction;
 
+                //decode filter-----------------------------------------------------
+                final Filter filter = extractJAXBFilter(deleteRequest.getFilter());
+
+                final QueryBuilder queryBuilder = new QueryBuilder();
+                queryBuilder.setFilter(filter);
+
+                FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(deleteRequest.getTypeName()), ServiceDef.Specification.WFS.fullName);
+                if (layer == null) {
+                    throw new CstlServiceException("The specified TypeNames does not exist:" + deleteRequest.getTypeName());
+                }
+
+                FeatureType ft = layer.getSource().getSchema();
+                queryBuilder.setTypeName(ft.getName());
+                
+                FeatureCollection fc;
+                try {
+                    fc = layer.getSource().getFeatures(queryBuilder.buildQuery());
+                } catch (IOException ex) {
+                    throw new CstlServiceException(ex);
+                }
+
+                // todo delete the selected feature
                 totalDeleted++;
 
 
+            /**
+             * Features updates.
+             */
             } else if (transaction instanceof UpdateElementType) {
 
                 UpdateElementType updateRequest = (UpdateElementType) transaction;
+
+                // we verify the input format
+                if (updateRequest.getInputFormat() != null && !updateRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1")) {
+                    throw new CstlServiceException("This only input format supported is: text/xml; subtype=gml/3.1.1",
+                            INVALID_PARAMETER_VALUE, "inputFormat");
+                }
+                
+                //decode filter-----------------------------------------------------
+                final Filter filter = extractJAXBFilter(updateRequest.getFilter());
+
+                //decode crs--------------------------------------------------------
+                final CoordinateReferenceSystem crs = extractCRS(updateRequest.getSrsName());
+
+                final QueryBuilder queryBuilder = new QueryBuilder();
+                queryBuilder.setFilter(filter);
+                queryBuilder.setCRS(crs);
+
+                FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(updateRequest.getTypeName()), ServiceDef.Specification.WFS.fullName);
+
+                if (layer == null) {
+                    throw new CstlServiceException("The specified TypeNames does not exist:" + updateRequest.getTypeName());
+                }
+
+                FeatureType ft = layer.getSource().getSchema();
+
+                queryBuilder.setTypeName(ft.getName());
+                
+                for (PropertyType updateProperty : updateRequest.getProperty()) {
+                    String updatePropertyValue = updateProperty.getName().getLocalPart();
+                    PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, updatePropertyValue, null);
+                    if (pa == null || pa.get(ft, updatePropertyValue, null) == null) {
+                        throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property:" + updatePropertyValue, INVALID_PARAMETER_VALUE);
+                    }
+                }
+                FeatureCollection fc;
+                try {
+                    fc = layer.getSource().getFeatures(queryBuilder.buildQuery());
+                } catch (IOException ex) {
+                    throw new CstlServiceException(ex);
+                }
+
+                // TODO update the selected feature
+
                 totalUpdated++;
                     
-                    
-                
             } else {
                 String className = " null object";
                 if (transaction != null) {
@@ -577,7 +641,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                                                                           totalUpdated,
                                                                           totalDeleted);
 
-        final TransactionResponseType response = new TransactionResponseType(summary, null, null, actingVersion.toString());
+        final TransactionResponseType response = new TransactionResponseType(summary, null, insertResults, actingVersion.toString());
         LOGGER.log(logLevel, "Transaction request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         
         throw new CstlServiceException("WFS-T is not supported on this Constellation version.");
@@ -591,6 +655,53 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         return outputFormat;
     }
 
+    /**
+     * Extract an OGC filter usable by the datastore from the request filter
+     * unmarshalled by JAXB.
+     *
+     * @param jaxbFilter an OGC JAXB filter.
+     * @return
+     * @throws CstlServiceException
+     */
+    private Filter extractJAXBFilter(FilterType jaxbFilter) throws CstlServiceException {
+        final XMLUtilities util = new XMLUtilities();
+        final Filter filter;
+        try {
+            if (jaxbFilter != null) {
+                filter = util.getTransformer110().visitFilter(jaxbFilter);
+            } else {
+                filter = Filter.INCLUDE;
+            }
+        } catch (Exception ex) {
+            throw new CstlServiceException(ex);
+        }
+        return filter;
+    }
+
+    /**
+     * Return a coordinate reference system from an identifier.
+     *
+     * @param srsName a CRS identifier.
+     * @return
+     * @throws CstlServiceException
+     */
+    private CoordinateReferenceSystem extractCRS(String srsName) throws CstlServiceException {
+        final CoordinateReferenceSystem crs;
+        if (srsName != null) {
+            try {
+                crs = CRS.decode(srsName, true);
+                //todo use other properties to filter properly
+            } catch (NoSuchAuthorityCodeException ex) {
+                throw new CstlServiceException(ex);
+            } catch (FactoryException ex) {
+                throw new CstlServiceException(ex);
+            }
+        } else {
+            crs = null;
+        }
+        return crs;
+    }
+    
     /**
      * Extract the WGS84 BBOx from a featureSource.
      * what ? may not be wgs84 exactly ? why is there a crs attribut on a wgs84 bbox ?
@@ -676,5 +787,22 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     @Override
     public Map<String, String> getSchemaLocations() {
         return schemaLocations;
+    }
+
+    @Override
+    public List<FeatureType> getFeatureTypes() {
+        final List<FeatureType> types       = new ArrayList<FeatureType>();
+        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
+
+        //search all types
+        for (final Name name : namedProxy.getKeys(ServiceDef.Specification.WFS.fullName)) {
+            final LayerDetails layer = namedProxy.get(name, ServiceDef.Specification.WFS.fullName);
+            if (layer == null || !(layer instanceof FeatureLayerDetails)) continue;
+
+            final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
+            final SimpleFeatureType sft   = fld.getSource().getSchema();
+            types.add(sft);
+        }
+        return types;
     }
 }

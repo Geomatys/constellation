@@ -37,12 +37,20 @@ import javax.xml.namespace.QName;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 // constellation dependencies
+import javax.xml.bind.UnmarshalException;
 import org.constellation.ServiceDef;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
@@ -51,10 +59,13 @@ import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.ws.CstlServiceException;
 //import org.constellation.ws.ExceptionReport;
 //import org.constellation.ws.ExceptionType;
+import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
 import org.geotoolkit.data.collection.FeatureCollection;
+import org.geotoolkit.feature.xml.XmlFeatureReader;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.GmlObjectIdType;
@@ -64,18 +75,22 @@ import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v100.SectionsType;
+import org.geotoolkit.util.Versioned;
 import org.geotoolkit.wfs.xml.v110.AllSomeType;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.GetGmlObjectType;
+import org.geotoolkit.wfs.xml.v110.InsertElementType;
 import org.geotoolkit.wfs.xml.v110.LockFeatureType;
 import org.geotoolkit.wfs.xml.v110.LockType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 
+import org.geotoolkit.xml.MarshallerPool;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.sort.SortOrder;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.query.wfs.WFSQuery.*;
@@ -265,6 +280,106 @@ public class WFSService extends OGCWebService {
             return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
         } else {
             return Response.ok("The WFS server is not running cause: unable to create JAXB context!", "text/plain").build();
+        }
+    }
+
+    /**
+     * Treat the incoming POST request encoded in xml.
+     *
+     * @return an image or xml response.
+     * @throw JAXBException
+     */
+    @POST
+    @Consumes("*/xml")
+    @Override
+    public Response doPOSTXml(InputStream is) throws JAXBException  {
+        final MarshallerPool marshallerPool = getMarshallerPool();
+        if (marshallerPool != null) {
+            Object request = null;
+            Unmarshaller unmarshaller = null;
+            try {
+                unmarshaller = marshallerPool.acquireUnmarshaller();
+                
+                // we made a pre-reading to extract the feature to insert in transaction request.
+                final BufferedReader in;
+                List<SimpleFeature> featuresToInsert = null;
+                try {
+                    in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                    in.mark(8192);
+                    final StringWriter sw = new StringWriter();
+                    final char[] buffer   = new char[1024];
+                    int size;
+                    while ((size = in.read(buffer, 0, 1024)) > 0) {
+                        sw.append(new String(buffer, 0, size));
+                    }
+                    in.reset();
+                    String xml = sw.toString();
+                    if (xml.contains("<wfs:Transaction")) {
+                        XmlFeatureReader featureReader = new JAXPStreamFeatureReader(worker.getFeatureTypes());
+                        featuresToInsert =  (List<SimpleFeature>) featureReader.read(xml);
+                    }
+
+                } catch (UnsupportedEncodingException ex) {
+                    return launchException("Error while pre-reading the request.\nCause:" + ex.getMessage(), "NO_APPLICABLE_CODE", null);
+                } catch (IOException ex) {
+                    return launchException("Error while pre-reading the request.\nCause:" + ex.getMessage(), "NO_APPLICABLE_CODE", null);
+                }
+
+                request = unmarshaller.unmarshal(in);
+                if (request instanceof JAXBElement) {
+                    request = ((JAXBElement<?>)request).getValue();
+                }
+
+                // we replace the feature to insert unmarshalled by JAXB with the feature read by JAXP.
+                if (request instanceof TransactionType && featuresToInsert != null) {
+                    TransactionType transaction = (TransactionType) request;
+                    for (Object obj : transaction.getInsertOrUpdateOrDelete()) {
+                        if (obj instanceof InsertElementType) {
+                            InsertElementType insert = (InsertElementType) obj;
+                            insert.getFeature().clear();
+                            insert.getFeature().addAll(featuresToInsert);
+                        }
+                    }
+                }
+            } catch (UnmarshalException e) {
+                String errorMsg = e.getMessage();
+                if (errorMsg == null) {
+                    if (e.getCause() != null && e.getCause().getMessage() != null) {
+                        errorMsg = e.getCause().getMessage();
+                    } else if (e.getLinkedException() != null && e.getLinkedException().getMessage() != null) {
+                        errorMsg = e.getLinkedException().getMessage();
+                    }
+                }
+                String codeName;
+                if (errorMsg != null && errorMsg.startsWith("unexpected element")) {
+                    codeName = OPERATION_NOT_SUPPORTED.name();
+                } else {
+                    codeName = INVALID_REQUEST.name();
+                }
+
+                return launchException("The XML request is not valid.\nCause:" + errorMsg, codeName, null);
+            } finally {
+                if (unmarshaller != null)  {
+                    marshallerPool.release(unmarshaller);
+                }
+            }
+
+            if (request instanceof Versioned) {
+                final Versioned ar = (Versioned) request;
+                if (ar.getVersion() != null)
+                    getUriContext().getQueryParameters().add("VERSION", ar.getVersion().toString());
+            } if (request != null) {
+                String type = "";
+                if (request instanceof JAXBElement) {
+                    type = ((JAXBElement)request).getDeclaredType().getName();
+                } else {
+                    type = request.getClass().getName();
+                }
+                LOGGER.finer("request type:" + type);
+            }
+            return treatIncomingRequest(request);
+        } else {
+            return Response.ok("This service is not running", MimeType.TEXT_PLAIN).build();
         }
     }
 

@@ -61,12 +61,18 @@ import org.geotoolkit.ogc.xml.v110.SortOrderType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
+import org.geotoolkit.wfs.xml.v110.AllSomeType;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
+import org.geotoolkit.wfs.xml.v110.InsertElementType;
+import org.geotoolkit.wfs.xml.v110.PropertyType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
+import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
+import org.geotoolkit.wfs.xml.v110.TransactionType;
+import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -683,6 +689,97 @@ public class WFSWorkerTest {
         assertEquals(ExpResult, result);
     }
 
+     /**
+     *
+     *
+     */
+    @Test
+    public void TransactionUpdateTest() throws Exception {
+
+        /**
+         * Test 1 : transaction update for Feature type bridges with a bad inputFormat
+         */
+
+        QName typeName = new QName("http://geotoolkit.org", "Bridges");
+        TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
+
+        List<PropertyType> properties = new ArrayList<PropertyType>();
+        UpdateElementType update = new UpdateElementType(properties, null, typeName, null);
+        update.setInputFormat("bod inputFormat");
+        request.getInsertOrUpdateOrDelete().add(update);
+
+        boolean exLanched = false;
+        try {
+            worker.transaction(request);
+        } catch (CstlServiceException ex) {
+            exLanched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "inputFormat");
+        }
+
+        assertTrue(exLanched);
+
+        /**
+         * Test 2 : transaction update for Feature type bridges with a bad property
+         */
+
+        typeName = new QName("http://geotoolkit.org", "Bridges");
+        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
+
+        properties = new ArrayList<PropertyType>();
+        properties.add(new PropertyType(new QName("whatever"), "someValue"));
+        request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, null, typeName, null));
+
+        exLanched = false;
+        try {
+            worker.transaction(request);
+        } catch (CstlServiceException ex) {
+            exLanched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+
+        assertTrue(exLanched);
+        
+        /*TransactionResponseType ExpResult = new TransactionResponseType(null, null, null, null)
+
+        assertEquals(ExpResult, result);*/
+    }
+
+
+    /**
+     *
+     *
+     */
+    @Test
+    public void TransactionInsertTest() throws Exception {
+
+        /**
+         * Test 1 : transaction insert for Feature type bridges with a bad inputFormat
+         */
+
+        QName typeName = new QName("http://geotoolkit.org", "Bridges");
+        TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
+
+        InsertElementType insert = new InsertElementType();
+        insert.setInputFormat("bod inputFormat");
+        request.getInsertOrUpdateOrDelete().add(insert);
+
+        boolean exLanched = false;
+        try {
+            worker.transaction(request);
+        } catch (CstlServiceException ex) {
+            exLanched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "inputFormat");
+        }
+
+        assertTrue(exLanched);
+
+       
+        /*TransactionResponseType ExpResult = new TransactionResponseType(null, null, null, null)
+
+        assertEquals(ExpResult, result);*/
+    }
 
     private static void initFeatureSource() throws Exception {
 

@@ -19,6 +19,7 @@ package org.constellation.wfs.ws;
 
 
 // Constellation dependencies
+import java.util.List;
 import java.util.Map;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
@@ -37,6 +38,7 @@ import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 
 // GeoAPI dependencies
+import org.opengis.feature.type.FeatureType;
 import org.opengis.webservice.capability.GetCapabilities;
 
 /**
@@ -68,5 +70,7 @@ public interface WFSWorker extends Worker {
     String getOutputFormat();
 
     Map<String, String> getSchemaLocations();
+
+    List<FeatureType> getFeatureTypes();
 
 }
