@@ -41,8 +41,10 @@ import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
+import org.geotoolkit.data.FeatureCollectionUtilities;
 import org.geotoolkit.wfs.xml.RequestBase;
 import org.geotoolkit.data.FeatureSource;
+import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.collection.FeatureCollection;
 import org.geotoolkit.data.collection.FeatureCollectionGroup;
 import org.geotoolkit.data.query.QueryBuilder;
@@ -89,16 +91,17 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
+import org.opengis.filter.identity.FeatureId;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.CodeList;
 
@@ -319,7 +322,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         // we verify the base attribute
         verifyBaseRequest(request, false, false);
 
-        String requestOutputFormat                = request.getOutputFormat();
+        // we verify the outputFormat requested (default text/xml; subtype=gml/3.1.1)
+        String requestOutputFormat = request.getOutputFormat();
         if (requestOutputFormat == null) {
             requestOutputFormat = "text/xml; subtype=gml/3.1.1";
         }
@@ -393,6 +397,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 
                 FeatureType ft = layer.getSource().getSchema();
 
+                // we ensure that the property names are contained in the feature type and add the mandatory attribute to the list
                 if (!requestPropNames.isEmpty()) {
                     List<String> propertyNames = new ArrayList<String>();
                     for (PropertyDescriptor pdesc : ft.getDescriptors()) {
@@ -421,13 +426,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 }
 
                 queryBuilder.setTypeName(ft.getName());
-                Collection<String> filterProperties =  (Collection<String>) filter.accept(ListingPropertyVisitor.VISITOR, null);
-                for (String filterProperty : filterProperties) {
-                    PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, filterProperty, null);
-                    if (pa == null || pa.get(ft, filterProperty, null) == null) {
-                        throw new CstlServiceException("The feature Type " + typeName + " does not has such a property:" + filterProperty, INVALID_PARAMETER_VALUE);
-                    }
-                }
+
+                // we verify that all the properties contained in the filter are known by the feature type.
+                verifyFilterProperty(ft, filter);
 
                 try {
                     collections.add(layer.getSource().getFeatures(queryBuilder.buildQuery()));
@@ -533,12 +534,27 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 IdentifierGenerationOptionType idGen = insertRequest.getIdgen();
 
                 List<InsertedFeatureType> inserted = new ArrayList<InsertedFeatureType>();
-                for (Object feature : insertRequest.getFeature()) {
-                    System.out.println("feature:" + feature);
-                    // TODO datastore.storeFeature(feature);
-                    String fid = null; // get the id of the inserted feature
-                    inserted.add(new InsertedFeatureType(new FeatureIdType(fid), handle));
-                    totalInserted++;
+                for (Object featureObject : insertRequest.getFeature()) {
+                    if (featureObject instanceof SimpleFeature) {
+                        SimpleFeature feature     = (SimpleFeature) featureObject;
+                        Name typeName             = feature.getFeatureType().getName();
+                        FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(typeName, ServiceDef.Specification.WFS.fullName);
+                        if (layer == null) {
+                            throw new CstlServiceException("The specified TypeNames does not exist:" + feature.getFeatureType().getName());
+                        }
+                        try {
+                            List<FeatureId> features = ((FeatureStore)layer.getSource()).addFeatures(FeatureCollectionUtilities.collection(feature));
+
+                            String fid = features.get(0).getID(); // get the id of the inserted feature
+                            inserted.add(new InsertedFeatureType(new FeatureIdType(fid), handle));
+                            totalInserted++;
+                        } catch (IOException ex) {
+                            LOGGER.log(Level.SEVERE, null, ex);
+                        } catch (ClassCastException ex) {
+                            LOGGER.log(Level.SEVERE, null, ex);
+                            throw new CstlServiceException("The specified Datastore does not suport the write operations.");
+                        }
+                    }
                 }
                 insertResults = new InsertResultsType(inserted);
 
@@ -552,27 +568,27 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 //decode filter-----------------------------------------------------
                 final Filter filter = extractJAXBFilter(deleteRequest.getFilter());
 
-                final QueryBuilder queryBuilder = new QueryBuilder();
-                queryBuilder.setFilter(filter);
-
                 FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(deleteRequest.getTypeName()), ServiceDef.Specification.WFS.fullName);
                 if (layer == null) {
                     throw new CstlServiceException("The specified TypeNames does not exist:" + deleteRequest.getTypeName());
                 }
 
                 FeatureType ft = layer.getSource().getSchema();
-                queryBuilder.setTypeName(ft.getName());
-                
-                FeatureCollection fc;
+
+                // we verify that all the properties contained in the filter are known by the feature type.
+                verifyFilterProperty(ft, filter);
+
                 try {
-                    fc = layer.getSource().getFeatures(queryBuilder.buildQuery());
+                    ((FeatureStore)layer.getSource()).removeFeatures(filter);
                 } catch (IOException ex) {
                     throw new CstlServiceException(ex);
+                } catch (ClassCastException ex) {
+                    LOGGER.log(Level.SEVERE, null, ex);
+                    throw new CstlServiceException("The specified Datastore does not suport the delete operations.");
                 }
 
                 // todo delete the selected feature
                 totalDeleted++;
-
 
             /**
              * Features updates.
@@ -583,7 +599,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
                 // we verify the input format
                 if (updateRequest.getInputFormat() != null && !updateRequest.getInputFormat().equals("text/xml; subtype=gml/3.1.1")) {
-                    throw new CstlServiceException("This only input format supported is: text/xml; subtype=gml/3.1.1",
+                    throw new CstlServiceException("The only input format supported is: text/xml; subtype=gml/3.1.1",
                             INVALID_PARAMETER_VALUE, "inputFormat");
                 }
                 
@@ -606,14 +622,19 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 FeatureType ft = layer.getSource().getSchema();
 
                 queryBuilder.setTypeName(ft.getName());
-                
+
+                // we verify that the update property are contained in the feature type
                 for (PropertyType updateProperty : updateRequest.getProperty()) {
                     String updatePropertyValue = updateProperty.getName().getLocalPart();
                     PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, updatePropertyValue, null);
                     if (pa == null || pa.get(ft, updatePropertyValue, null) == null) {
-                        throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property:" + updatePropertyValue, INVALID_PARAMETER_VALUE);
+                        throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyValue, INVALID_PARAMETER_VALUE);
                     }
                 }
+
+                // we verify that all the properties contained in the filter are known by the feature type.
+                verifyFilterProperty(ft, filter);
+
                 FeatureCollection fc;
                 try {
                     fc = layer.getSource().getFeatures(queryBuilder.buildQuery());
@@ -624,7 +645,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 // TODO update the selected feature
 
                 totalUpdated++;
-                    
+                throw new CstlServiceException("WFS-Transaction update is not supported on this Constellation version.");
             } else {
                 String className = " null object";
                 if (transaction != null) {
@@ -635,7 +656,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             }
 
         }
-        // todo
 
         final TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
                                                                           totalUpdated,
@@ -644,7 +664,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         final TransactionResponseType response = new TransactionResponseType(summary, null, insertResults, actingVersion.toString());
         LOGGER.log(logLevel, "Transaction request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         
-        throw new CstlServiceException("WFS-T is not supported on this Constellation version.");
+        return response;
     }
 
     /**
@@ -700,6 +720,24 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             crs = null;
         }
         return crs;
+    }
+
+    /**
+     * Verify that all the property contained in the filter are known by the featureType
+     *
+     * @param ft A featureType.
+     * @param filter An OGC filter.
+     *
+     * @throws CstlServiceException if one of the propertyName in the filter is not present in the featureType.
+     */
+    private void verifyFilterProperty(FeatureType ft, Filter filter) throws CstlServiceException {
+        Collection<String> filterProperties = (Collection<String>) filter.accept(ListingPropertyVisitor.VISITOR, null);
+        for (String filterProperty : filterProperties) {
+            PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, filterProperty, null);
+            if (pa == null || pa.get(ft, filterProperty, null) == null) {
+                throw new CstlServiceException("The feature Type " + ft.getName() + " does not has such a property: " + filterProperty, INVALID_PARAMETER_VALUE, "filter");
+            }
+        }
     }
     
     /**

@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -62,6 +63,7 @@ import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.wfs.xml.v110.AllSomeType;
+import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.GetCapabilitiesType;
@@ -70,7 +72,6 @@ import org.geotoolkit.wfs.xml.v110.InsertElementType;
 import org.geotoolkit.wfs.xml.v110.PropertyType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
-import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
@@ -705,7 +706,7 @@ public class WFSWorkerTest {
 
         List<PropertyType> properties = new ArrayList<PropertyType>();
         UpdateElementType update = new UpdateElementType(properties, null, typeName, null);
-        update.setInputFormat("bod inputFormat");
+        update.setInputFormat("bad inputFormat");
         request.getInsertOrUpdateOrDelete().add(update);
 
         boolean exLanched = false;
@@ -736,6 +737,31 @@ public class WFSWorkerTest {
         } catch (CstlServiceException ex) {
             exLanched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getMessage(), "The feature Type {http://geotoolkit.org}Bridges does not has such a property: whatever");
+        }
+
+        assertTrue(exLanched);
+
+        /**
+         * Test 3 : transaction update for Feature type bridges with a bad property in filter
+         */
+
+        typeName = new QName("http://geotoolkit.org", "Bridges");
+        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
+
+        properties = new ArrayList<PropertyType>();
+        properties.add(new PropertyType(new QName("NAME"), "someValue"));
+        ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("bad"), Boolean.TRUE);
+        FilterType filter        = new FilterType(pe);
+        request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, filter, typeName, null));
+
+        exLanched = false;
+        try {
+            worker.transaction(request);
+        } catch (CstlServiceException ex) {
+            exLanched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getMessage(), "The feature Type http://www.opengis.net/gml:Bridges does not has such a property: bad");
         }
 
         assertTrue(exLanched);
@@ -746,13 +772,41 @@ public class WFSWorkerTest {
     }
 
 
+     /**
+     *
+     *
+     */
+    @Test
+    public void TransactionDeleteTest() throws Exception {
+
+        /**
+         * Test 1 : transaction delete for Feature type bridges with a property in filter
+         */
+
+        QName typeName           = new QName("http://geotoolkit.org", "Bridges");
+        ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("bad"), Boolean.TRUE);
+        FilterType filter        = new FilterType(pe);
+        DeleteElementType delete = new DeleteElementType(filter, null, typeName);
+        TransactionType request  = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, delete);
+
+        boolean exLanched = false;
+        try {
+            worker.transaction(request);
+        } catch (CstlServiceException ex) {
+            exLanched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getMessage(), "The feature Type http://www.opengis.net/gml:Bridges does not has such a property: bad");
+        }
+
+        assertTrue(exLanched);
+    }
     /**
      *
      *
      */
     @Test
     public void TransactionInsertTest() throws Exception {
-
+       
         /**
          * Test 1 : transaction insert for Feature type bridges with a bad inputFormat
          */
@@ -761,7 +815,7 @@ public class WFSWorkerTest {
         TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
 
         InsertElementType insert = new InsertElementType();
-        insert.setInputFormat("bod inputFormat");
+        insert.setInputFormat("bad inputFormat");
         request.getInsertOrUpdateOrDelete().add(insert);
 
         boolean exLanched = false;
@@ -775,10 +829,6 @@ public class WFSWorkerTest {
 
         assertTrue(exLanched);
 
-       
-        /*TransactionResponseType ExpResult = new TransactionResponseType(null, null, null, null)
-
-        assertEquals(ExpResult, result);*/
     }
 
     private static void initFeatureSource() throws Exception {

@@ -150,6 +150,7 @@ public class CstlEmbeddedService extends CommandLine {
         this(args, new String[] {
             "org.constellation.map.ws.rs",
             "org.constellation.coverage.ws.rs",
+            "org.constellation.wfs.ws.rs",
             "org.constellation.ws.rs.provider"
         });
     }

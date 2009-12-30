@@ -18,11 +18,16 @@ package org.constellation.ws.embedded;
 
 // J2SE dependencies
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
@@ -34,10 +39,14 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
+import org.constellation.provider.om.OMProvider;
+import org.constellation.provider.om.OMProviderService;
 import org.constellation.provider.postgrid.PostGridProvider;
 import org.constellation.provider.postgrid.PostGridProviderService;
 
 // JUnit dependencies
+import org.constellation.util.Util;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.junit.*;
 import static org.junit.Assume.*;
 
@@ -67,6 +76,9 @@ public abstract class AbstractGrizzlyServer extends PostgridTestCase {
      */
     protected static final String LAYER_TEST = "SST_tests";
 
+    private static DefaultDataSource ds;
+    
+    private static Logger LOGGER = Logger.getLogger("org.constellation.ws.embedded");
     /**
      * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
      * and defines a PostGrid data provider.
@@ -110,6 +122,44 @@ public abstract class AbstractGrizzlyServer extends PostgridTestCase {
             }
         }
 
+        /****************************************
+         *                                      *
+         *    Defines a O&M data provider       *
+         *                                      *
+         ****************************************/
+         try {
+            final String url = "jdbc:derby:memory:TestWFSWorker";
+            ds = new DefaultDataSource(url + ";create=true");
+
+            Connection con = ds.getConnection();
+
+            Util.executeSQLScript("org/constellation/sql/structure-observations.sql", con);
+            Util.executeSQLScript("org/constellation/sql/sos-data.sql", con);
+
+            con.close();
+
+            final ProviderSource sourceOM = new ProviderSource();
+            sourceOM.loadAll = true;
+            sourceOM.parameters.put(OMProvider.KEY_SGBDTYPE, "derby");
+            sourceOM.parameters.put(OMProvider.KEY_DERBYURL, url);
+
+            final ProviderConfig configOM = new ProviderConfig();
+            configOM.sources.add(sourceOM);
+
+            for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
+                // Here we should have the shapefile data provider defined previously
+                if (service instanceof OMProviderService) {
+                    service.setConfiguration(configOM);
+                    if (service.getProviders().isEmpty()) {
+                        return;
+                    }
+                    break;
+                }
+            }
+
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, rootDir, ex);
+        }
         // Starting the grizzly server
         grizzly.start();
 
@@ -128,6 +178,13 @@ public abstract class AbstractGrizzlyServer extends PostgridTestCase {
     public static void finish() {
         if (grizzly.isAlive()) {
             grizzly.interrupt();
+        }
+        if (ds != null) {
+            ds.shutdown();
+        }
+        File f = new File("derby.log");
+        if (f.exists()) {
+            f.delete();
         }
     }
 
