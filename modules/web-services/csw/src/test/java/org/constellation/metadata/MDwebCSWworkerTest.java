@@ -60,6 +60,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             Util.executeSQLScript("org/constellation/metadata/sql/DC-data.sql", con);
             Util.executeSQLScript("org/constellation/metadata/sql/csw-data.sql", con);
             Util.executeSQLScript("org/constellation/metadata/sql/csw-data-3.sql", con);
+            Util.executeSQLScript("org/constellation/metadata/sql/csw-data-4.sql", con);
 
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");

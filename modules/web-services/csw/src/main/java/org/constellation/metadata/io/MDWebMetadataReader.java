@@ -1305,27 +1305,32 @@ public class MDWebMetadataReader extends MetadataReader {
         
         while (tokens.hasMoreTokens()) {
             final String token       = tokens.nextToken().trim();
-            final List<String> paths = ISO_QUERYABLE.get(token);
-            if (paths != null) {
-                if (paths.size() != 0) {
-                    try {
-                        final List<String> values         = mdReader.getDomainOfValuesFromPaths(paths);
-                        final ListOfValuesType listValues = new ListOfValuesType(values);
-                        final DomainValuesType value      = new DomainValuesType(null, token, listValues, METADATA_QNAME);
-                        responseList.add(value);
-
-                    } catch (MD_IOException e) {
-                        throw new CstlServiceException("The service has launch an SQL exeption:" + e.getMessage(),
-                                NO_APPLICABLE_CODE);
-                    }
-                } else {
-                    throw new CstlServiceException("The property " + token + " is not queryable for now",
-                            INVALID_PARAMETER_VALUE, "propertyName");
-                }
+            final List<String> paths;
+            if (ISO_QUERYABLE.get(token) != null) {
+                paths = ISO_QUERYABLE.get(token);
+            } else if (DUBLIN_CORE_QUERYABLE.get(token) != null) {
+                paths = DUBLIN_CORE_QUERYABLE.get(token);
             } else {
                 throw new CstlServiceException("The property " + token + " is not queryable",
                         INVALID_PARAMETER_VALUE, "propertyName");
             }
+            
+            if (paths.size() != 0) {
+                try {
+                    final List<String> values         = mdReader.getDomainOfValuesFromPaths(paths);
+                    final ListOfValuesType listValues = new ListOfValuesType(values);
+                    final DomainValuesType value      = new DomainValuesType(null, token, listValues, METADATA_QNAME);
+                    responseList.add(value);
+
+                } catch (MD_IOException e) {
+                    throw new CstlServiceException("The service has launch an SQL exeption:" + e.getMessage(),
+                            NO_APPLICABLE_CODE);
+                }
+            } else {
+                throw new CstlServiceException("The property " + token + " is not queryable for now",
+                        INVALID_PARAMETER_VALUE, "propertyName");
+            }
+            
         }
         return responseList;
     }

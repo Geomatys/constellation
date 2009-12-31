@@ -859,7 +859,7 @@ public class CSWworkerTest {
         /*
          *  TEST 3 : getDomain 2.0.2 propertyName = "Identifier"
          */
-        request = new GetDomainType("CSW", "2.0.2", "Identifier", null);
+        request = new GetDomainType("CSW", "2.0.2", "identifier", null);
 
         result = worker.getDomain(request);
 
@@ -867,14 +867,16 @@ public class CSWworkerTest {
 
         domainValues = new ArrayList<DomainValues>();
         list = new ArrayList<String>();
+        list.add("000068C3-3B49-C671-89CF-10A39BB1B652");
         list.add("11325_158_19640418141800");
         list.add("39727_22_19750113062500");
         list.add("40510_145_19930221211500");
         list.add("42292_5p_19900609195600");
         list.add("42292_9s_19900610041000");
         list.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
+        list.add("urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
         values = new ListOfValuesType(list);
-        value  = new DomainValuesType(null, "Identifier", values, METADATA_QNAME);
+        value  = new DomainValuesType(null, "identifier", values, METADATA_QNAME);
         domainValues.add(value);
         expResult = new GetDomainResponseType(domainValues);
 

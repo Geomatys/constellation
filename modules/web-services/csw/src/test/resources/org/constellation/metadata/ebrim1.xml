@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<rim:ExtrinsicObject xmlns:rim='urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5' id='000068C3-3B49-C671-89CF-10A39BB1B652' objectType='Geometry' majorVersion='1' minorVersion='0' status='urn:oasis:names:tc:ebxml-regrep:StatusType:Submitted' mimeType='' isOpaque='F' userVersion='' stability='' accessControlPolicy='' expiration=''>
+    <rim:Name>
+        <rim:LocalizedString lang='EN-US' charset='UTF-8' value=""/>
+    </rim:Name>
+    <rim:Description>
+        <rim:LocalizedString lang='EN-US' charset='UTF-8' value=""/>
+    </rim:Description>
+    <rim:Slot name='Rank'>
+        <rim:ValueList>
+            <rim:Value>0.0</rim:Value>
+        </rim:ValueList>
+    </rim:Slot>
+    <rim:Slot name='Content Start Date'>
+        <rim:ValueList>
+            <rim:Value></rim:Value>
+        </rim:ValueList>
+    </rim:Slot>
+    <rim:Slot name='Content End Date'>
+        <rim:ValueList>
+            <rim:Value></rim:Value>
+        </rim:ValueList>
+    </rim:Slot>
+    <rim:Slot name='Modification Date'>
+        <rim:ValueList>
+            <rim:Value></rim:Value>
+        </rim:ValueList>
+    </rim:Slot>
+</rim:ExtrinsicObject>

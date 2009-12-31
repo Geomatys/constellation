@@ -64,6 +64,7 @@ import org.geotoolkit.temporal.object.DefaultInstant;
 import org.geotoolkit.temporal.object.DefaultPosition;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.RecordType;
+import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
@@ -329,6 +330,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             identifier = ((DefaultMetadata)metadata).getFileIdentifier();
         } else if (metadata instanceof RecordType) {
             identifier = ((RecordType)metadata).getIdentifier().getContent().get(0);
+        } else if (metadata instanceof RegistryObjectType) {
+            identifier = ((RegistryObjectType)metadata).getId();
         } else {
             String type = "null type";
             if (metadata != null) {
@@ -576,7 +579,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         if (paths != null) {
             for (String fullPathID: paths) {
                if ((fullPathID.startsWith("ISO 19115:MD_Metadata:") && !(metadata instanceof DefaultMetadata)) ||
-                   (fullPathID.startsWith("Catalog Web Service:Record:") && !(metadata instanceof RecordType))) {
+                   (fullPathID.startsWith("Catalog Web Service:Record:") && !(metadata instanceof RecordType)) ||
+                   (fullPathID.startsWith("Ebrim v2.5:ExtrinsicObject:") && !(metadata instanceof RegistryObjectType))) {
                    continue;
                }
                 String pathID;
@@ -633,12 +637,15 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     private static String getValuesFromPath(String pathID, Object metadata) {
         String result = "";
         if ((pathID.startsWith("ISO 19115:MD_Metadata:") && metadata instanceof DefaultMetadata) ||
-            (pathID.startsWith("Catalog Web Service:Record:") && metadata instanceof RecordType)) {
+            (pathID.startsWith("Catalog Web Service:Record:") && metadata instanceof RecordType) ||
+            (pathID.startsWith("Ebrim v2.5:ExtrinsicObject:") && metadata instanceof RegistryObjectType)) {
             
             // we remove the prefix path part
             if (pathID.startsWith("ISO 19115:MD_Metadata:")) {
                 pathID = pathID.substring(22);
             } else if (pathID.startsWith("Catalog Web Service:Record:")) {
+                pathID = pathID.substring(27);
+            } else if (pathID.startsWith("Ebrim v2.5:ExtrinsicObject:")) {
                 pathID = pathID.substring(27);
             }
             
