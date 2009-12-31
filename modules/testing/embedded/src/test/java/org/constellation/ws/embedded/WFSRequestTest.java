@@ -113,8 +113,8 @@ public class WFSRequestTest {
 
         TransactionSummaryType sum        = new TransactionSummaryType(2, 0, 0);
         List<InsertedFeatureType> insertedFeatures = new ArrayList<InsertedFeatureType>();
-        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("sampling-point-2"), null));
         insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("sampling-point-3"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("sampling-point-4"), null));
         InsertResultsType insertResult    = new InsertResultsType(insertedFeatures);
         TransactionResponseType ExpResult = new TransactionResponseType(sum, null, insertResult, "1.1.0");
 

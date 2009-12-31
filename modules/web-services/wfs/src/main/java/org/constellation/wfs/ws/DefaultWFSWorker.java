@@ -92,6 +92,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // GeoAPI dependencies
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
@@ -587,7 +588,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     throw new CstlServiceException("The specified Datastore does not suport the delete operations.");
                 }
 
-                // todo delete the selected feature
+                // todo find the number of deleted feature
                 totalDeleted++;
 
             /**
@@ -621,12 +622,13 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
                 FeatureType ft = layer.getSource().getSchema();
 
-                queryBuilder.setTypeName(ft.getName());
-
+                AttributeDescriptor[] ads = new AttributeDescriptor[0];
+                Object[] values           = new Object[0];
+                
                 // we verify that the update property are contained in the feature type
                 for (PropertyType updateProperty : updateRequest.getProperty()) {
                     String updatePropertyValue = updateProperty.getName().getLocalPart();
-                    PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, updatePropertyValue, null);
+                    PropertyAccessor pa        = Accessors.getAccessor(FeatureType.class, updatePropertyValue, null);
                     if (pa == null || pa.get(ft, updatePropertyValue, null) == null) {
                         throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyValue, INVALID_PARAMETER_VALUE);
                     }
@@ -635,17 +637,16 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 // we verify that all the properties contained in the filter are known by the feature type.
                 verifyFilterProperty(ft, filter);
 
-                FeatureCollection fc;
+                
                 try {
-                    fc = layer.getSource().getFeatures(queryBuilder.buildQuery());
+                    ((FeatureStore)layer.getSource()).updateFeatures(ads, values, filter);
                 } catch (IOException ex) {
                     throw new CstlServiceException(ex);
                 }
 
-                // TODO update the selected feature
-
+                // TODO find the good number of updated feature
                 totalUpdated++;
-                throw new CstlServiceException("WFS-Transaction update is not supported on this Constellation version.");
+                
             } else {
                 String className = " null object";
                 if (transaction != null) {

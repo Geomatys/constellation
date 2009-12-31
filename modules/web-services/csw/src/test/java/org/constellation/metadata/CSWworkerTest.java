@@ -872,6 +872,7 @@ public class CSWworkerTest {
         list.add("40510_145_19930221211500");
         list.add("42292_5p_19900609195600");
         list.add("42292_9s_19900610041000");
+        list.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         values = new ListOfValuesType(list);
         value  = new DomainValuesType(null, "Identifier", values, METADATA_QNAME);
         domainValues.add(value);
@@ -1246,7 +1247,7 @@ public class CSWworkerTest {
         assertTrue(response != null);
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
-        assertEquals(1, response.getSearchResults().getAny().size());
+        assertEquals(2, response.getSearchResults().getAny().size());
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -1255,6 +1256,7 @@ public class CSWworkerTest {
         }
 
         expResult = new ArrayList<String>();
+        expResult.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         expResult.add("11325_158_19640418141800");
 
         assertEquals(expResult, results);
@@ -1361,7 +1363,7 @@ public class CSWworkerTest {
         assertTrue(response != null);
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
-        assertTrue(response.getSearchResults().getAny().size() == 1);
+        assertTrue(response.getSearchResults().getAny().size() == 2);
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -1370,6 +1372,7 @@ public class CSWworkerTest {
         }
 
         expResult = new ArrayList<String>();
+        expResult.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         expResult.add("39727_22_19750113062500");
 
         assertEquals(expResult, results);
@@ -1430,7 +1433,7 @@ public class CSWworkerTest {
         assertTrue(response != null);
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
-        assertEquals(1, response.getSearchResults().getAny().size());
+        assertEquals(2, response.getSearchResults().getAny().size());
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -1440,6 +1443,7 @@ public class CSWworkerTest {
 
         expResult = new ArrayList<String>();
         expResult.add("11325_158_19640418141800");
+        expResult.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
 
         assertEquals(expResult, results);
 
@@ -1467,7 +1471,7 @@ public class CSWworkerTest {
         assertTrue(response != null);
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
-        assertTrue(response.getSearchResults().getAny().size() == 1);
+        assertTrue(response.getSearchResults().getAny().size() == 2);
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -1477,6 +1481,7 @@ public class CSWworkerTest {
 
         expResult = new ArrayList<String>();
         expResult.add("11325_158_19640418141800");
+        expResult.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         assertEquals(expResult, results);
 
         /*
@@ -1510,7 +1515,7 @@ public class CSWworkerTest {
         assertTrue(response != null);
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
-        assertTrue(response.getSearchResults().getAny().size() == 1);
+        assertTrue(response.getSearchResults().getAny().size() == 2);
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -1519,6 +1524,7 @@ public class CSWworkerTest {
         }
 
         expResult = new ArrayList<String>();
+        expResult.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
         expResult.add("39727_22_19750113062500");
 
         assertEquals(expResult, results);

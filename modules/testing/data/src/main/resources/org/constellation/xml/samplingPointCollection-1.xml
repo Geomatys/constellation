@@ -7,7 +7,7 @@
         </gml:Envelope>
     </gml:boundedBy>
     <gml:featureMember>
-        <sampling:SamplingPoint gml:id="sampling-point-2">
+        <sampling:SamplingPoint gml:id="sampling-point-3">
             <gml:description>station de test 4</gml:description>
             <gml:name>666-999</gml:name>
             <sampling:sampledFeature>urn:blablabla:4</sampling:sampledFeature>
@@ -19,7 +19,7 @@
         </sampling:SamplingPoint>
     </gml:featureMember>
     <gml:featureMember>
-        <sampling:SamplingPoint gml:id="sampling-point-3">
+        <sampling:SamplingPoint gml:id="sampling-point-4">
             <gml:description>station de test 5</gml:description>
             <gml:name>r2d2-xoupi</gml:name>
             <sampling:sampledFeature>urn:blablabla:5</sampling:sampledFeature>
