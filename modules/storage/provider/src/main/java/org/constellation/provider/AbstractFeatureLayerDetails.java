@@ -35,16 +35,16 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.ws.ServiceType;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.data.FeatureSource;
+import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.query.Query;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.DefaultGlyphService;
-import org.geotoolkit.data.collection.FeatureCollection;
-import org.geotoolkit.data.collection.FeatureIterator;
+import org.geotoolkit.data.FeatureCollection;
+import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.filter.text.cql2.CQL;
 import org.geotoolkit.filter.text.cql2.CQLException;
-import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.CRS;
@@ -55,6 +55,7 @@ import org.geotoolkit.util.MeasurementRange;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
@@ -78,7 +79,8 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
      */
     protected static final int MARGIN = 4;
 
-    protected final FeatureSource<SimpleFeatureType,SimpleFeature> fs;
+    protected final DataStore store;
+    protected final Name groupName;
     protected final List<String> favorites;
     protected final String name;
     protected final String dateStartField;
@@ -86,20 +88,21 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     protected final String elevationStartField;
     protected final String elevationEndField;
 
-    protected AbstractFeatureLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites){
-        this(name,fs,favorites,null,null,null,null);
+    protected AbstractFeatureLayerDetails(String name, DataStore store, Name groupName, List<String> favorites){
+        this(name,store, groupName,favorites,null,null,null,null);
         
     }
     
-    protected AbstractFeatureLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites,
+    protected AbstractFeatureLayerDetails(String name, DataStore store, Name groupName, List<String> favorites,
             String dateStart, String dateEnd, String elevationStart, String elevationEnd){
         
-        if(fs == null){
+        if(store == null){
             throw new NullPointerException("FeatureSource can not be null.");
         }
         
         this.name = name;
-        this.fs = fs;
+        this.store = store;
+        this.groupName = groupName;
 
         if(favorites == null){
             this.favorites = Collections.emptyList();
@@ -129,8 +132,8 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
      * {@inheritDoc }
      */
     @Override
-    public FeatureSource<SimpleFeatureType,SimpleFeature> getSource(){
-        return fs;
+    public DataStore getStore(){
+        return store;
     }
 
     /**
@@ -140,7 +143,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) throws PortrayalException{
         try {
             return createMapLayer(style, params);
-        } catch (IOException ex) {
+        } catch (DataStoreException ex) {
             throw new PortrayalException(ex);
         }
     }
@@ -152,6 +155,13 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     public String getName() {
         return name;
     }
+
+    @Override
+    public Name getGroupName() {
+        return groupName;
+    }
+
+
 
     /**
      * {@inheritDoc}
@@ -176,7 +186,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
         //TODO handle this correctly
         try{
-            final JTSEnvelope2D env = fs.getBounds();
+            final Envelope env = store.getEnvelope(QueryBuilder.all(groupName));
 
             Envelope renv = null;
             if(env.getCoordinateReferenceSystem().equals(DefaultGeographicCRS.WGS84)){
@@ -201,30 +211,28 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     @Override
     public SortedSet<Date> getAvailableTimes() throws CatalogException {
         final SortedSet<Date> dates = new TreeSet<Date>();
-        
+        FeatureIterator<SimpleFeature> features = null;
         if(dateStartField != null){
-            
-            final AttributeDescriptor desc = fs.getSchema().getDescriptor(dateStartField);
-            if(desc == null){
-                LOGGER.log(Level.WARNING , "Invalide field : "+ dateStartField + " Doesnt exists in layer :" + name);
-                return dates;
-            }
-            
-            final Class type = desc.getType().getBinding();
-            if( !(Date.class.isAssignableFrom(type)) ){
-                LOGGER.log(Level.WARNING , "Invalide field type for dates, layer " + name +", must be a Date, found a " + type);
-                return dates;
-            }
-            
-            final QueryBuilder builder = new QueryBuilder();
-            builder.setTypeName(fs.getSchema().getName());
-            builder.setProperties(new String[]{dateStartField});
-            final Query query = builder.buildQuery();
-            
-            FeatureIterator<SimpleFeature> features = null;
             try{
-                final FeatureCollection<SimpleFeatureType,SimpleFeature> coll = fs.getFeatures(query);
-                features = coll.features();
+                final AttributeDescriptor desc = ((SimpleFeatureType)store.getFeatureType(groupName)).getDescriptor(dateStartField);
+                if(desc == null){
+                    LOGGER.log(Level.WARNING , "Invalide field : "+ dateStartField + " Doesnt exists in layer :" + name);
+                    return dates;
+                }
+
+                final Class type = desc.getType().getBinding();
+                if( !(Date.class.isAssignableFrom(type)) ){
+                    LOGGER.log(Level.WARNING , "Invalide field type for dates, layer " + name +", must be a Date, found a " + type);
+                    return dates;
+                }
+
+                final QueryBuilder builder = new QueryBuilder();
+                builder.setTypeName(groupName);
+                builder.setProperties(new String[]{dateStartField});
+                final Query query = builder.buildQuery();
+
+                final FeatureCollection<SimpleFeature> coll = store.createSession(false).getFeatureCollection(query);
+                features = coll.iterator();
                 while(features.hasNext()){
                     final SimpleFeature sf = features.next();
                     final Date date = (Date) sf.getAttribute(dateStartField);
@@ -234,9 +242,9 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
                     
                 }
                 
-            }catch(IOException ex){
+            } catch(DataStoreException ex) {
                 LOGGER.log(Level.WARNING , "Could not evaluate dates",ex);
-            }finally{
+            } finally {
                 if(features != null) features.close();
             }
             
@@ -251,30 +259,29 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     @Override
     public SortedSet<Number> getAvailableElevations() throws CatalogException {
         final SortedSet<Number> elevations = new TreeSet<Number>();
-        
-        if(elevationStartField != null){
+        FeatureIterator<SimpleFeature> features = null;
+        if (elevationStartField != null) {
 
-            final AttributeDescriptor desc = fs.getSchema().getDescriptor(elevationStartField);
-            if(desc == null){
-                LOGGER.log(Level.WARNING , "Invalide field : "+ elevationStartField + " Doesnt exists in layer :" + name);
-                return elevations;
-            }
-            
-            final Class type = desc.getType().getBinding();
-            if( !(Number.class.isAssignableFrom(type)) ){
-                LOGGER.log(Level.WARNING , "Invalide field type for elevations, layer " + name +", must be a Number, found a " + type);
-                return elevations;
-            }
+            try {
+                final AttributeDescriptor desc = ((SimpleFeatureType)store.getFeatureType(groupName)).getDescriptor(elevationStartField);
+                if(desc == null){
+                    LOGGER.log(Level.WARNING , "Invalide field : "+ elevationStartField + " Doesnt exists in layer :" + name);
+                    return elevations;
+                }
 
-            final QueryBuilder builder = new QueryBuilder();
-            builder.setTypeName(fs.getSchema().getName());
-            builder.setProperties(new String[]{elevationStartField});
-            final Query query = builder.buildQuery();
-            
-            FeatureIterator<SimpleFeature> features = null;
-            try{
-                final FeatureCollection<SimpleFeatureType,SimpleFeature> coll = fs.getFeatures(query);
-                features = coll.features();
+                final Class type = desc.getType().getBinding();
+                if (!(Number.class.isAssignableFrom(type)) ){
+                    LOGGER.log(Level.WARNING , "Invalide field type for elevations, layer " + name +", must be a Number, found a " + type);
+                    return elevations;
+                }
+
+                final QueryBuilder builder = new QueryBuilder();
+                builder.setTypeName(groupName);
+                builder.setProperties(new String[]{elevationStartField});
+                final Query query = builder.buildQuery();
+
+                final FeatureCollection<SimpleFeature> coll = store.createSession(false).getFeatureCollection(query);
+                features = coll.iterator();
                 while(features.hasNext()){
                     final SimpleFeature sf = features.next();
                     final Number date = (Number) sf.getAttribute(elevationStartField);
@@ -284,9 +291,9 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
                     
                 }
                 
-            }catch(IOException ex){
+            } catch(DataStoreException ex) {
                 LOGGER.log(Level.WARNING , "Could not evaluate elevationss",ex);
-            }finally{
+            } finally {
                 if(features != null) features.close();
             }
             
@@ -334,7 +341,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
 
     protected Query createQuery(final Date date, final Number elevation){
         final QueryBuilder queryBuilder = new QueryBuilder();
-        queryBuilder.setTypeName(fs.getSchema().getName());
+        queryBuilder.setTypeName(groupName);
         
         final StringBuilder builder = new StringBuilder();
         
@@ -369,5 +376,5 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
         return queryBuilder.buildQuery();
     }
     
-    protected abstract MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws IOException;
+    protected abstract MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws DataStoreException;
 }

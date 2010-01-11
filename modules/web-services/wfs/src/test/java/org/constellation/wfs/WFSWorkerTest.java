@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -47,7 +46,7 @@ import org.constellation.provider.sml.SMLProvider;
 import org.constellation.provider.sml.SMLProviderService;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.data.collection.FeatureCollection;
+import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.internal.io.IOUtilities;
@@ -306,7 +305,7 @@ public class WFSWorkerTest {
          */
 
         List<QueryType> queries = new ArrayList<QueryType>();
-        queries.add(new QueryType(null, Arrays.asList(new QName("http://geotoolkit.org", "Bridges")), null));
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "Bridges")), null));
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
         result = worker.getFeature(request);
@@ -325,7 +324,7 @@ public class WFSWorkerTest {
          */
 
         queries = new ArrayList<QueryType>();
-        QueryType query = new QueryType(null, Arrays.asList(new QName("http://geotoolkit.org", "Bridges")), null);
+        QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "Bridges")), null);
         query.getPropertyNameOrXlinkPropertyNameOrFunction().add("FID");
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
@@ -347,7 +346,7 @@ public class WFSWorkerTest {
          */
 
         queries = new ArrayList<QueryType>();
-        queries.add(new QueryType(null, Arrays.asList(new QName("http://geotoolkit.org", "NamedPlaces")), null));
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
         result = worker.getFeature(request);
@@ -364,7 +363,7 @@ public class WFSWorkerTest {
          */
 
         queries = new ArrayList<QueryType>();
-        queries.add(new QueryType(null, Arrays.asList(new QName("http://geotoolkit.org", "NamedPlaces")), null));
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
 
         result = worker.getFeature(request);
@@ -378,7 +377,7 @@ public class WFSWorkerTest {
          */
 
         queries = new ArrayList<QueryType>();
-        query = new QueryType(null, Arrays.asList(new QName("http://geotoolkit.org", "NamedPlaces")), null);
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null);
         query.setSrsName("EPSG:27582");
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
@@ -399,7 +398,7 @@ public class WFSWorkerTest {
          
 
         queries = new ArrayList<QueryType>();
-        query = new QueryType(null, Arrays.asList(new QName("http://geotoolkit.org", "NamedPlaces")), null);
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null);
         query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.DESC))));
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
@@ -654,7 +653,7 @@ public class WFSWorkerTest {
          * Test 1 : describe Feature type bridges
          */
         List<QName> typeNames = new ArrayList<QName>();
-        typeNames.add(new QName("http://geotoolkit.org", "Bridges"));
+        typeNames.add(new QName("http://www.opengis.net/gml", "Bridges"));
         DescribeFeatureTypeType request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
 
         Schema result = worker.describeFeatureType(request);
@@ -701,7 +700,7 @@ public class WFSWorkerTest {
          * Test 1 : transaction update for Feature type bridges with a bad inputFormat
          */
 
-        QName typeName = new QName("http://geotoolkit.org", "Bridges");
+        QName typeName = new QName("http://www.opengis.net/gml", "Bridges");
         TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
 
         List<PropertyType> properties = new ArrayList<PropertyType>();
@@ -724,7 +723,7 @@ public class WFSWorkerTest {
          * Test 2 : transaction update for Feature type bridges with a bad property
          */
 
-        typeName = new QName("http://geotoolkit.org", "Bridges");
+        typeName = new QName("http://www.opengis.net/gml", "Bridges");
         request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
 
         properties = new ArrayList<PropertyType>();
@@ -737,7 +736,7 @@ public class WFSWorkerTest {
         } catch (CstlServiceException ex) {
             exLanched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-            assertEquals(ex.getMessage(), "The feature Type {http://geotoolkit.org}Bridges does not has such a property: whatever");
+            assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml}Bridges does not has such a property: whatever");
         }
 
         assertTrue(exLanched);
@@ -746,7 +745,7 @@ public class WFSWorkerTest {
          * Test 3 : transaction update for Feature type bridges with a bad property in filter
          */
 
-        typeName = new QName("http://geotoolkit.org", "Bridges");
+        typeName = new QName("http://www.opengis.net/gml", "Bridges");
         request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
 
         properties = new ArrayList<PropertyType>();
@@ -783,7 +782,7 @@ public class WFSWorkerTest {
          * Test 1 : transaction delete for Feature type bridges with a property in filter
          */
 
-        QName typeName           = new QName("http://geotoolkit.org", "Bridges");
+        QName typeName           = new QName("http://www.opengis.net/gml", "Bridges");
         ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("bad"), Boolean.TRUE);
         FilterType filter        = new FilterType(pe);
         DeleteElementType delete = new DeleteElementType(filter, null, typeName);
@@ -811,7 +810,7 @@ public class WFSWorkerTest {
          * Test 1 : transaction insert for Feature type bridges with a bad inputFormat
          */
 
-        QName typeName = new QName("http://geotoolkit.org", "Bridges");
+        QName typeName = new QName("http://www.opengis.net/gml", "Bridges");
         TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
 
         InsertElementType insert = new InsertElementType();
@@ -844,6 +843,9 @@ public class WFSWorkerTest {
         sourceShape.loadAll = true;
         sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
                 "/org/constellation/ws/embedded/wms111/shapefiles");
+
+        sourceShape.parameters.put(ShapeFileProvider.KEY_NAMESPACE, "http://www.opengis.net/gml");
+
         sourceShape.layers.add(new ProviderLayer("BasicPolygons", Collections.singletonList("cite_style_BasicPolygons"),
                                null, null, null, null, false, null));
         sourceShape.layers.add(new ProviderLayer("Bridges", Collections.singletonList("cite_style_Bridges"),

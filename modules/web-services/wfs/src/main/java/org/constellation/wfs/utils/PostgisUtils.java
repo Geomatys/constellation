@@ -19,7 +19,6 @@
 package org.constellation.wfs.utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,15 +27,17 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.data.FeatureReader;
 import org.geotoolkit.data.om.OMDataStoreFactory;
-import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
-import org.geotoolkit.data.collection.FeatureCollection;
+import org.geotoolkit.data.FeatureCollection;
 
+import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.data.sml.SMLDataStoreFactory;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.Name;
 
 /**
  *
@@ -48,7 +49,7 @@ public class PostgisUtils {
 
     private PostgisUtils() {}
 
-    public static FeatureReader createOMLayer(String host, int port, String databaseName, String user, String pass, String featureType) throws IOException {
+    public static FeatureReader createOMLayer(String host, int port, String databaseName, String user, String pass, Name featureType) throws DataStoreException {
 
        final Map params = new HashMap<String, Object>();
 
@@ -61,12 +62,12 @@ public class PostgisUtils {
 
        final DataStore store = DataStoreFinder.getDataStore(params);
        if (store != null) {
-            return store.getFeatureReader(featureType);
+            return store.getFeatureReader(QueryBuilder.all(featureType));
        }
        return null;
    }
 
-    public static FeatureReader createEmbeddedOMLayer(String url, String featureType) throws IOException {
+    public static FeatureReader createEmbeddedOMLayer(String url, Name featureType) throws DataStoreException {
 
        final Map params = new HashMap<String, Object>();
 
@@ -76,12 +77,12 @@ public class PostgisUtils {
 
        final DataStore store = DataStoreFinder.getDataStore(params);
        if (store != null) {
-            return store.getFeatureReader(featureType);
+            return store.getFeatureReader(QueryBuilder.all(featureType));
        }
        return null;
    }
 
-    public static FeatureReader createEmbeddedSMLLayer(String url, String featureType) throws IOException {
+    public static FeatureReader createEmbeddedSMLLayer(String url, Name featureType) throws DataStoreException {
 
        final Map params = new HashMap<String, Object>();
 
@@ -90,14 +91,13 @@ public class PostgisUtils {
        params.put(SMLDataStoreFactory.DERBYURL.getName().toString(), url);
 
        final DataStore store = DataStoreFinder.getDataStore(params);
-        System.out.println(store.getClass().getSimpleName());
        if (store != null) {
-            return store.getFeatureReader(featureType);
+            return store.getFeatureReader(QueryBuilder.all(featureType));
        }
        return null;
    }
 
-    public static FeatureSource createPostGISLayer(String host, int port, String schema, String databaseName, String user, String pass, String featureSource) throws IOException{
+    /*public static FeatureSource createPostGISLayer(String host, int port, String schema, String databaseName, String user, String pass, String featureSource) throws IOException{
 
        final Map params = new HashMap<String, Object>();
 
@@ -111,9 +111,9 @@ public class PostgisUtils {
 
        final DataStore store = DataStoreFinder.getDataStore(params);
        return store.getFeatureSource(featureSource);
-   }
+   }*/
 
-   public static SimpleFeature createPostGISFeature(String host, int port, String schema, String databaseName, String user, String pass, String featureSource, String toponyme) throws IOException{
+   public static SimpleFeature createPostGISFeature(String host, int port, String schema, String databaseName, String user, String pass, Name featureSource, String toponyme) throws DataStoreException{
 
        final Map params = new HashMap<String, Object>();
 
@@ -127,13 +127,9 @@ public class PostgisUtils {
 
        final DataStore store = DataStoreFinder.getDataStore(params);
 
-       final FeatureSource fs = store.getFeatureSource(featureSource);
-
-
-
        //fs.getBounds();
-       final FeatureCollection coll = fs.getFeatures();
-       final org.geotoolkit.data.collection.FeatureIterator ite = coll.features();
+       final FeatureCollection coll = store.createSession(false).getFeatureCollection(QueryBuilder.all(featureSource));
+       final org.geotoolkit.data.FeatureIterator ite = coll.iterator();
        try{
            while(ite.hasNext()) {
                final SimpleFeature f = (SimpleFeature) ite.next();
@@ -151,7 +147,7 @@ public class PostgisUtils {
        return null;
    }
 
-    public static FeatureCollection createShapeLayer(File file) throws MalformedURLException, IOException {
+    public static FeatureCollection createShapeLayer(File file) throws MalformedURLException, DataStoreException {
         Map<String, Serializable> params = new HashMap<String, Serializable>();
         if (!file.exists()) {
             System.out.println("the file does not exist");
@@ -161,22 +157,20 @@ public class PostgisUtils {
         params.put("url", file.toURI().toURL());
         DataStore store = DataStoreFinder.getDataStore(params);
         if (store != null) {
-            FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
-            return fs.getFeatures();
+            return store.createSession(false).getFeatureCollection(QueryBuilder.all(store.getNames().iterator().next()));
         } else {
             System.out.println("datastore null");
         }
         return null;
     }
 
-    public static FeatureCollection createShapeLayer(URL url) throws MalformedURLException, IOException {
+    public static FeatureCollection createShapeLayer(URL url) throws MalformedURLException, DataStoreException {
         Map<String, Serializable> params = new HashMap<String, Serializable>();
 
         params.put("url", url);
         DataStore store = DataStoreFinder.getDataStore(params);
         if (store != null) {
-            FeatureSource fs = store.getFeatureSource(store.getTypeNames()[0]);
-            return fs.getFeatures();
+            return store.createSession(false).getFeatureCollection(QueryBuilder.all(store.getNames().iterator().next()));
         } else {
             System.out.println("datastore null");
         }

@@ -24,8 +24,8 @@ import java.net.URL;
 import org.constellation.util.Util;
 import org.constellation.wfs.utils.PostgisUtils;
 
-import org.geotoolkit.data.collection.FeatureCollection;
-import org.geotoolkit.data.collection.FeatureIterator;
+import org.geotoolkit.data.FeatureCollection;
+import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.XmlFeatureTypeReader;
 import org.geotoolkit.feature.xml.XmlFeatureTypeWriter;
@@ -67,11 +67,17 @@ public class ShapeFeatureXmlBindingTest {
         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         URL url            = classloader.getResource("org/constellation/ws/embedded/wms111/shapefiles/Bridges.shp");
         fcollBridge        = PostgisUtils.createShapeLayer(url);
-        bridgeFeatureType  = fcollBridge.getSchema();
+        bridgeFeatureType  = fcollBridge.getFeatureType();
+        if (bridgeFeatureType == null) {
+            System.out.println("WARNING feature Type for bridge NULL");
+        }
 
         url                = classloader.getResource("org/constellation/ws/embedded/wms111/shapefiles/BasicPolygons.shp");
         fcollPolygons      = PostgisUtils.createShapeLayer(url);
-        polygonFeatureType = fcollPolygons.getSchema();
+        polygonFeatureType = fcollPolygons.getFeatureType();
+        if (bridgeFeatureType == null) {
+            System.out.println("WARNING feature Type for polygon NULL");
+        }
     }
 
     @AfterClass
@@ -98,7 +104,7 @@ public class ShapeFeatureXmlBindingTest {
      */
     @Test
     public void featureMarshallTest() throws Exception {
-        FeatureIterator ite = fcollBridge.features();
+        FeatureIterator ite = fcollBridge.iterator();
         SimpleFeature feature = null;
         if (ite.hasNext()) {
             feature = (SimpleFeature) ite.next();
@@ -115,7 +121,7 @@ public class ShapeFeatureXmlBindingTest {
 
         assertEquals(expresult, result);
 
-        ite = fcollPolygons.features();
+        ite = fcollPolygons.iterator();
         feature = null;
         if (ite.hasNext()) {
             feature = (SimpleFeature) ite.next();
@@ -172,7 +178,7 @@ public class ShapeFeatureXmlBindingTest {
     @Test
     public void featureUnMarshallTest() throws Exception {
         
-        FeatureIterator ite = fcollBridge.features();
+        FeatureIterator ite = fcollBridge.iterator();
         SimpleFeature expResult = null;
         if (ite.hasNext()) {
             expResult = (SimpleFeature) ite.next();
@@ -184,8 +190,8 @@ public class ShapeFeatureXmlBindingTest {
 
         featureEquals(expResult, result);
 
-        featureReader.setFeatureType(fcollPolygons.getSchema());
-        ite = fcollPolygons.features();
+        featureReader.setFeatureType(fcollPolygons.getFeatureType());
+        ite = fcollPolygons.iterator();
         expResult = null;
         if (ite.hasNext()) {
             expResult = (SimpleFeature) ite.next();
@@ -212,10 +218,10 @@ public class ShapeFeatureXmlBindingTest {
         assertEquals(fcollBridge.getID(), result.getID());
         assertEquals(fcollBridge.size(), result.size());
         // TODO assertTrue(fcoll.getBounds().equals(result.getBounds()));
-        assertEquals(fcollBridge.getSchema(), result.getSchema());
+        assertEquals(fcollBridge.getFeatureType(), result.getFeatureType());
         
-        FeatureIterator expIterator = fcollBridge.features();
-        FeatureIterator resIterator = result.features();
+        FeatureIterator expIterator = fcollBridge.iterator();
+        FeatureIterator resIterator = result.iterator();
         SimpleFeature temp          = null;
         while (expIterator.hasNext()) {
             SimpleFeature expFeature  = (SimpleFeature)expIterator.next();
@@ -224,7 +230,7 @@ public class ShapeFeatureXmlBindingTest {
             featureEquals(expFeature, resFeature);
         }
 
-        featureReader.setFeatureType(fcollPolygons.getSchema());
+        featureReader.setFeatureType(fcollPolygons.getFeatureType());
         
         stream = Util.getResourceAsStream("org/constellation/wfs/xml/polygonCollection.xml");
         result = (FeatureCollection) featureReader.read(stream);
@@ -233,10 +239,10 @@ public class ShapeFeatureXmlBindingTest {
         assertEquals(fcollPolygons.getID(), result.getID());
         assertEquals(fcollPolygons.size(), result.size());
         // TODO assertTrue(fcoll.getBounds().equals(result.getBounds()));
-        assertEquals(fcollPolygons.getSchema(), result.getSchema());
+        assertEquals(fcollPolygons.getFeatureType(), result.getFeatureType());
 
-        expIterator = fcollPolygons.features();
-        resIterator = result.features();
+        expIterator = fcollPolygons.iterator();
+        resIterator = result.iterator();
         temp          = null;
         while (expIterator.hasNext()) {
             SimpleFeature expFeature  = (SimpleFeature)expIterator.next();

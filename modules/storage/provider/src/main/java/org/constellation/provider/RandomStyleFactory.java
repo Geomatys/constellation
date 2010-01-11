@@ -33,15 +33,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geotoolkit.factory.Factory;
 import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.data.FeatureSource;
+//import org.geotoolkit.data.FeatureSource;
 
 import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.StyleConstants;
 import org.geotoolkit.style.MutableStyleFactory;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.AttributeType;
 import org.opengis.feature.type.FeatureType;
@@ -171,14 +169,13 @@ public class RandomStyleFactory extends Factory {
         return style;
     }
 
-    public MutableStyle createDefaultVectorStyle(FeatureSource<SimpleFeatureType, SimpleFeature> fs){
+   public MutableStyle createDefaultVectorStyle(FeatureType featureType){
         MutableStyle style = null;
 
         Symbolizer ps = sf.polygonSymbolizer();  //createPolygonSymbolizer(randomColor(), randomWidth());
 
         try {
-            final FeatureType typ = fs.getSchema();
-            final AttributeDescriptor att = typ.getGeometryDescriptor();
+            final AttributeDescriptor att = featureType.getGeometryDescriptor();
             final AttributeType type = att.getType();
 
             final Class cla = type.getBinding();
@@ -201,14 +198,13 @@ public class RandomStyleFactory extends Factory {
         return style;
     }
     
-    public MutableStyle createRandomVectorStyle(FeatureSource<SimpleFeatureType, SimpleFeature> fs) {
+    public MutableStyle createRandomVectorStyle(FeatureType featureType) {
         MutableStyle style = null;
 
         Symbolizer ps = sf.polygonSymbolizer();  //createPolygonSymbolizer(randomColor(), randomWidth());
 
         try {
-            final FeatureType typ = fs.getSchema();
-            final AttributeDescriptor att = typ.getGeometryDescriptor();
+            final AttributeDescriptor att = featureType.getGeometryDescriptor();
             final AttributeType type = att.getType();
 
             final Class cla = type.getBinding();

@@ -42,13 +42,11 @@ import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.resources.ArraySet;
 
 import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.DataStoreFinder;
-import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
 import org.geotoolkit.map.ElevationModel;
 
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 
 import org.xml.sax.SAXException;
@@ -83,11 +81,11 @@ public class PostGisProvider extends AbstractLayerProvider{
 
     private final Map<String,Serializable> params = new HashMap<String,Serializable>();
     private final List<Name> index = new ArrayList<Name>();
-    private final DataStore<SimpleFeatureType, SimpleFeature> store;
+    private final DataStore store;
     private final ProviderSource source;
 
 
-    protected PostGisProvider(ProviderSource source) throws IOException {
+    protected PostGisProvider(ProviderSource source) throws DataStoreException {
         this.source = source;
         params.put(KEY_DBTYPE, "postgisng");
 
@@ -123,7 +121,7 @@ public class PostGisProvider extends AbstractLayerProvider{
         params.put(KEY_PASSWD, passwd);
         params.put(KEY_NAMESPACE, namespace);
 
-        store = (DataStore<SimpleFeatureType, SimpleFeature>) DataStoreFinder.getDataStore(params);
+        store = (DataStore) DataStoreFinder.getDataStore(params);
 
         if (store == null) {
             final StringBuilder sb = new StringBuilder("Could not connect to PostGIS : \n");
@@ -134,7 +132,7 @@ public class PostGisProvider extends AbstractLayerProvider{
                     sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append('\n');
                 }
             }
-            throw new IOException(sb.toString());
+            throw new DataStoreException(sb.toString());
         } else {
             visit();
         }
@@ -181,33 +179,16 @@ public class PostGisProvider extends AbstractLayerProvider{
         if (!index.contains(key)) {
             return null;
         }
-        final FeatureSource<SimpleFeatureType, SimpleFeature> fs;
-        try {
-            fs = store.getFeatureSource(key);
-        } catch (IOException ex) {
-            //could not create the requested featuresource
-            LOGGER.log(Level.SEVERE, null, ex);
-            return null;
-        }
-        if (fs == null) {
-            return null;
-        }
         final ProviderLayer layer = source.getLayer(key.getLocalPart());
         if (layer == null) {
-            try {
-                return new PostGisLayerDetails(key.getLocalPart(), store.getFeatureSource(key), null,
-                        null, null, null, null);
-            } catch (IOException ex) {
-                //we could not create the feature source
-                LOGGER.log(Level.SEVERE, "we could not create the feature source", ex);
-            }
+            return new PostGisLayerDetails(key.getLocalPart(), store, key, null, null, null, null, null);
+
         } else {
             final List<String> styles = layer.styles;
-            return new PostGisLayerDetails(key.getLocalPart(), fs, styles,
+            return new PostGisLayerDetails(key.getLocalPart(), store, key, styles,
                     layer.dateStartField, layer.dateEndField,
                     layer.elevationStartField, layer.elevationEndField);
         }
-        return null;
     }
 
     @Override
@@ -249,7 +230,7 @@ public class PostGisProvider extends AbstractLayerProvider{
                     index.add(name);
                 }
             }
-        } catch (IOException ex) {
+        } catch (DataStoreException ex) {
             //Looks like we could not connect to the postgis database, the layers won't be indexed and the getCapability
             //won't be able to find thoses layers.
             LOGGER.log(Level.SEVERE, null, ex);
@@ -280,7 +261,7 @@ public class PostGisProvider extends AbstractLayerProvider{
         for(final ProviderSource ps : config.sources) {
             try {
                 dps.add(new PostGisProvider(ps));
-            } catch(IOException ex){
+            } catch(DataStoreException ex){
                 LOGGER.log(Level.WARNING, "Invalide postgis provider config", ex);
             }
         }

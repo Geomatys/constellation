@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import javax.naming.NamingException;
@@ -42,12 +43,11 @@ import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.resources.ArraySet;
 
 import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.DataStoreException;
+import org.geotoolkit.data.DataStoreFactory;
 import org.geotoolkit.data.DataStoreFinder;
-import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.om.OMDataStoreFactory;
 
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 import org.xml.sax.SAXException;
 
@@ -82,7 +82,7 @@ public class OMProvider extends AbstractLayerProvider {
     private final ProviderSource source;
 
 
-    protected OMProvider(ProviderSource source) throws IOException {
+    protected OMProvider(ProviderSource source) throws DataStoreException {
         this.source = source;
         params.put(KEY_DBTYPE, "OM");
 
@@ -131,7 +131,7 @@ public class OMProvider extends AbstractLayerProvider {
                     sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append('\n');
                 }
             }
-            throw new IOException(sb.toString());
+            throw new DataStoreException(sb.toString());
         } else {
             visit();
         }
@@ -213,18 +213,7 @@ public class OMProvider extends AbstractLayerProvider {
             elevationStartField = null;
             elevationEndField   = null;
         }
-        final FeatureSource<SimpleFeatureType, SimpleFeature> fs;
-        try {
-            fs = store.getFeatureSource(key);
-        } catch (IOException ex) {
-            //could not create the requested featuresource
-            LOGGER.log(Level.SEVERE, null, ex);
-            return null;
-        }
-        if (fs == null) {
-            return null;
-        }
-        return new OMLayerDetails(key.getLocalPart(), fs, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
+        return new OMLayerDetails(key.getLocalPart(), store, key, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
         
     }
 
@@ -262,10 +251,10 @@ public class OMProvider extends AbstractLayerProvider {
 
     private void visit() {
         try {
-            for (final Name name : (List<Name>)store.getNames()) {
+            for (final Name name : store.getNames()) {
                 index.add(name);
             }
-        } catch (IOException ex) {
+        } catch (DataStoreException ex) {
             //Looks like we could not connect to the postgis database, the layers won't be indexed and the getCapability
             //won't be able to find thoses layers.
             LOGGER.log(Level.SEVERE, null, ex);
@@ -296,7 +285,7 @@ public class OMProvider extends AbstractLayerProvider {
         for(final ProviderSource ps : config.sources) {
             try {
                 dps.add(new OMProvider(ps));
-            } catch(IOException ex){
+            } catch(DataStoreException ex){
                 LOGGER.log(Level.WARNING, "Invalide O&M provider config", ex);
             }
         }

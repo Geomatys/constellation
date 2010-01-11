@@ -20,6 +20,8 @@ package org.constellation.provider.shapefile;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,7 +35,9 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 
+import org.geotoolkit.data.shapefile.ShapefileDataStoreFactory;
 import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.ElevationModel;
@@ -64,6 +68,10 @@ public class ShapeFileProvider extends AbstractLayerProvider {
     public static final String KEY_FOLDER_PATH = "path";
 
     /**
+     * Key for the path of the directory which contains shapefiles.
+     */
+    public static final String KEY_NAMESPACE = "namespace";
+    /**
      * Mask to select only shape files.
      */
     private static final String MASK = ".shp";
@@ -85,13 +93,13 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         this.source = source;
         final String path = source.parameters.get(KEY_FOLDER_PATH);
 
-        if(path == null){
+        if (path == null) {
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
         }
 
         folder = new File(path);
 
-        if(folder == null || !folder.exists() || !folder.isDirectory()){
+        if (folder == null || !folder.exists() || !folder.isDirectory()) {
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
         }
 
@@ -139,12 +147,12 @@ public class ShapeFileProvider extends AbstractLayerProvider {
     public LayerDetails get(final Name key) {
         DataStore store = cache.get(key);
 
-        if(store == null) {
+        if (store == null) {
             //datastore is not in the cache, try to load it
             final File f = index.get(key);
             if (f != null) {
                 //we have this data source in the folder
-                store = loadDataStore(f);
+                store = loadDataStore(f,key.getNamespaceURI());
                 if (store != null) {
                     //cache the datastore
                     cache.put(key, store);
@@ -152,26 +160,16 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             }
         }
 
-        if(store != null) {
+        if (store != null) {
             final ProviderLayer layer = source.getLayer(key.getLocalPart());
             if (layer == null) {
-                try {
-                    return new ShapeFileLayerDetails(key.getLocalPart(), store.getFeatureSource(key.getLocalPart()), null,
-                            null, null, null, null);
-                } catch (IOException ex) {
-                    //we could not create the feature source
-                    LOGGER.log(Level.SEVERE, "we could not create the feature source", ex);
-                }
+                return new ShapeFileLayerDetails(key.getLocalPart(), store, key, null, null, null, null, null);
+                
             } else {
                 final List<String> styles = layer.styles;
-                try {
-                    return new ShapeFileLayerDetails(key.getLocalPart(), store.getFeatureSource(key.getLocalPart()), styles,
-                            layer.dateStartField, layer.dateEndField,
-                            layer.elevationStartField, layer.elevationEndField);
-                } catch (IOException ex) {
-                    //we could not create the feature source
-                    LOGGER.log(Level.SEVERE, "we could not create the feature source", ex);
-                }
+                return new ShapeFileLayerDetails(key.getLocalPart(), store, key, styles,
+                        layer.dateStartField, layer.dateEndField,
+                        layer.elevationStartField, layer.elevationEndField);
             }
         }
 
@@ -241,13 +239,17 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             if (fullName.toLowerCase().endsWith(MASK)){
                 final String name = fullName.substring(0, fullName.length()-4);
                 if (source.loadAll || source.containsLayer(name)){
-                    index.put(new DefaultName(DEFAULT_NAMESPACE,name), candidate);
+                    String nmsp = source.parameters.get(KEY_NAMESPACE);
+                    if (nmsp == null) {
+                        nmsp = DEFAULT_NAMESPACE;
+                    }
+                    index.put(new DefaultName(nmsp,name), candidate);
                 }
             }
         }
     }
 
-    private static DataStore loadDataStore(final File f) {
+    private static DataStore loadDataStore(final File f,String namespace) {
         if (f == null || !f.exists()) {
             return null;
         }
@@ -255,7 +257,14 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         final Map<String,Serializable> params = new HashMap<String,Serializable>();
         try {
             params.put("url", f.toURI().toURL());
+            params.put(ShapefileDataStoreFactory.NAMESPACEP.getName().toString(), new URI(namespace));
             return DataStoreFinder.getDataStore(params);
+        } catch (URISyntaxException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+            return null;
+        } catch (DataStoreException ex) {
+            LOGGER.log(Level.WARNING, null, ex);
+            return null;
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, null, ex);
             return null;

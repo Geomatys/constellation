@@ -42,11 +42,9 @@ import org.constellation.provider.configuration.ProviderSource;
 
 import org.constellation.resources.ArraySet;
 import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.DataStoreFinder;
-import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.data.sml.SMLDataStoreFactory;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 import org.xml.sax.SAXException;
 
@@ -81,7 +79,7 @@ public class SMLProvider extends AbstractLayerProvider {
     private final ProviderSource source;
 
 
-    protected SMLProvider(ProviderSource source) throws IOException {
+    protected SMLProvider(ProviderSource source) throws DataStoreException {
         this.source = source;
         params.put(KEY_DBTYPE, "SML");
 
@@ -133,7 +131,7 @@ public class SMLProvider extends AbstractLayerProvider {
                     sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append('\n');
                 }
             }
-            throw new IOException(sb.toString());
+            throw new DataStoreException(sb.toString());
         } else {
             visit();
         }
@@ -199,18 +197,7 @@ public class SMLProvider extends AbstractLayerProvider {
             elevationStartField = null;
             elevationEndField   = null;
         }
-        final FeatureSource<SimpleFeatureType, SimpleFeature> fs;
-        try {
-            fs = store.getFeatureSource(key);
-        } catch (IOException ex) {
-            //could not create the requested featuresource
-            LOGGER.log(Level.SEVERE, null, ex);
-            return null;
-        }
-        if (fs == null) {
-            return null;
-        }
-        return new SMLLayerDetails(key.getLocalPart(), fs, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
+        return new SMLLayerDetails(key.getLocalPart(), store, key, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
         
     }
 
@@ -248,10 +235,10 @@ public class SMLProvider extends AbstractLayerProvider {
 
     private void visit() {
         try {
-            for (final Name name : (List<Name>)store.getNames()) {
+            for (final Name name : store.getNames()) {
                 index.add(name);
             }
-        } catch (IOException ex) {
+        } catch (DataStoreException ex) {
             //Looks like we could not connect to the postgis database, the layers won't be indexed and the getCapability
             //won't be able to find thoses layers.
             LOGGER.log(Level.SEVERE, null, ex);
@@ -282,7 +269,7 @@ public class SMLProvider extends AbstractLayerProvider {
         for(final ProviderSource ps : config.sources) {
             try {
                 dps.add(new SMLProvider(ps));
-            } catch(IOException ex){
+            } catch(DataStoreException ex){
                 LOGGER.log(Level.WARNING, "Invalide SML provider config", ex);
             }
         }

@@ -18,7 +18,6 @@
 package org.constellation.provider.sml;
 
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -26,14 +25,16 @@ import java.util.Map;
 import org.constellation.provider.AbstractFeatureLayerDetails;
 import org.constellation.provider.StyleProviderProxy;
 
+import org.geotoolkit.data.DataStore;
+import org.geotoolkit.data.DataStoreException;
+import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.map.FeatureMapLayer;
-import org.geotoolkit.data.FeatureSource;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableStyle;
 
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.Name;
 
 
 /**
@@ -45,18 +46,18 @@ import org.opengis.feature.simple.SimpleFeatureType;
  */
 class SMLLayerDetails extends AbstractFeatureLayerDetails {
 
-    SMLLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites){
-        this(name,fs,favorites,null,null,null,null);
+    SMLLayerDetails(String name, DataStore store, Name groupName, List<String> favorites){
+        this(name,store,groupName,favorites,null,null,null,null);
     }
     
-    SMLLayerDetails(String name, FeatureSource<SimpleFeatureType,SimpleFeature> fs, List<String> favorites,
+    SMLLayerDetails(String name, DataStore store, Name groupName, List<String> favorites,
         String dateStart, String dateEnd, String elevationStart, String elevationEnd)
     {
-        super(name,fs,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
+        super(name,store,groupName,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
     }
     
     @Override
-    protected MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws IOException{
+    protected MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws DataStoreException{
         FeatureMapLayer layer = null;
 
         if(style == null && favorites.size() > 0){
@@ -65,13 +66,13 @@ class SMLLayerDetails extends AbstractFeatureLayerDetails {
             String namedStyle = favorites.get(0);
             style = StyleProviderProxy.getInstance().get(namedStyle);
         }
-
+        FeatureType featureType = store.getFeatureType(groupName);
         if(style == null){
             //no favorites defined, create a default one
-            style = RANDOM_FACTORY.createDefaultVectorStyle(fs);
+            style = RANDOM_FACTORY.createDefaultVectorStyle(featureType);
         }
 
-        layer = MapBuilder.createFeatureLayer(fs, style);
+        layer = MapBuilder.createFeatureLayer(store.createSession(false).getFeatureCollection(QueryBuilder.all(groupName)), style);
 
         if (params != null) {
             final Date date = (Date) params.get(KEY_TIME);

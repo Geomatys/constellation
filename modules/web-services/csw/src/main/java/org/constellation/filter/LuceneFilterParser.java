@@ -395,7 +395,7 @@ public class LuceneFilterParser extends FilterParser {
         return response.toString();
     }
     
-    private String treatIDOperator(final List<JAXBElement<? extends AbstractIdType>> jbIdsOps) {
+    private String treatIDOperator(final List<JAXBElement<AbstractIdType>> jbIdsOps) {
         final StringBuilder response = new StringBuilder();
         
         //TODO

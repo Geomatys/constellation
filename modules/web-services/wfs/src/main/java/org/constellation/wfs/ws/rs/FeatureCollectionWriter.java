@@ -30,7 +30,7 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
-import org.geotoolkit.data.collection.FeatureCollection;
+import org.geotoolkit.data.FeatureCollection;
 
 /**
  *

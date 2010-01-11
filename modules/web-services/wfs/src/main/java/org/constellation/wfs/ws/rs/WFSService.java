@@ -63,7 +63,7 @@ import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
-import org.geotoolkit.data.collection.FeatureCollection;
+import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.ogc.xml.v110.BBOXType;

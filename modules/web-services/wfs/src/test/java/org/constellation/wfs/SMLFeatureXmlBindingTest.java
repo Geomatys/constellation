@@ -28,8 +28,9 @@ import org.constellation.wfs.utils.PostgisUtils;
 
 import org.geotoolkit.data.DefaultFeatureCollection;
 import org.geotoolkit.data.FeatureReader;
-import org.geotoolkit.data.collection.FeatureCollection;
-import org.geotoolkit.data.collection.FeatureIterator;
+import org.geotoolkit.data.FeatureCollection;
+import org.geotoolkit.data.FeatureIterator;
+import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.XmlFeatureTypeReader;
 import org.geotoolkit.feature.xml.XmlFeatureTypeWriter;
@@ -42,7 +43,6 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 import org.junit.*;
 import org.opengis.feature.type.Name;
@@ -80,9 +80,11 @@ public class SMLFeatureXmlBindingTest {
         Util.executeSQLScript("org/constellation/sql/sml-schema.sql", con);
         Util.executeSQLScript("org/constellation/sql/sml-data.sql", con);
 
-        FeatureReader fr = PostgisUtils.createEmbeddedSMLLayer(url, "System");
+        FeatureReader fr = PostgisUtils.createEmbeddedSMLLayer(url, new DefaultName("http://www.opengis.net/sml/1.0", "System"));
         featureType      = fr.getFeatureType();
-        fcoll            = new DefaultFeatureCollection("collection-1", (SimpleFeatureType) featureType);
+        if (featureType == null)
+            System.out.println("WARNING: The featureType is null");
+        fcoll            = new DefaultFeatureCollection("collection-1", featureType, SimpleFeature.class);
         while (fr.hasNext()) {
             fcoll.add(fr.next());
         }
@@ -120,7 +122,7 @@ public class SMLFeatureXmlBindingTest {
      */
     @Test
     public void featureMarshallTest() throws Exception {
-        FeatureIterator ite = fcoll.features();
+        FeatureIterator ite = fcoll.iterator();
         SimpleFeature feature = null;
         if (ite.hasNext()) {
             feature = (SimpleFeature) ite.next();
@@ -163,7 +165,7 @@ public class SMLFeatureXmlBindingTest {
     @Test
     public void featureUnMarshallTest() throws Exception {
 
-        FeatureIterator ite = fcoll.features();
+        FeatureIterator ite = fcoll.iterator();
         SimpleFeature expResult = null;
         if (ite.hasNext()) {
             expResult = (SimpleFeature) ite.next();
@@ -191,10 +193,10 @@ public class SMLFeatureXmlBindingTest {
         assertEquals(fcoll.getID(), result.getID());
         assertEquals(fcoll.size(), result.size());
         // TODO assertTrue(fcoll.getBounds().equals(result.getBounds()));
-        assertEquals(fcoll.getSchema(), result.getSchema());
+        assertEquals(fcoll.getFeatureType(), result.getFeatureType());
 
-        FeatureIterator expIterator = fcoll.features();
-        FeatureIterator resIterator = result.features();
+        FeatureIterator expIterator = fcoll.iterator();
+        FeatureIterator resIterator = result.iterator();
         SimpleFeature temp          = null;
         while (expIterator.hasNext()) {
             SimpleFeature expFeature = (SimpleFeature)expIterator.next();
