@@ -80,7 +80,7 @@
       <modules>
         <module>data</module>
     	<module>embedded</module>
-	<module>cite</module>
+	<!--module>cite</module-->
       </modules>
     </profile>
     <profile>
