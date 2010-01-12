@@ -46,7 +46,6 @@ import org.constellation.provider.sml.SMLProvider;
 import org.constellation.provider.sml.SMLProviderService;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.DataStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
@@ -73,6 +72,8 @@ import org.geotoolkit.wfs.xml.v110.InsertElementType;
 import org.geotoolkit.wfs.xml.v110.PropertyType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
+import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
+import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
@@ -81,7 +82,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.junit.*;
-import org.opengis.filter.sort.SortOrder;
 import static org.junit.Assert.*;
 
 
@@ -822,10 +822,45 @@ public class WFSWorkerTest {
         }
 
         assertTrue(exLanched);
-        
-        /*TransactionResponseType ExpResult = new TransactionResponseType(null, null, null, null)
 
-        assertEquals(ExpResult, result);*/
+        /**
+         * Test 4 : transaction update for Feature type NamedPlaces with a property in filter
+         */
+
+        typeName = new QName("http://www.opengis.net/gml", "NamedPlaces");
+        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
+
+        properties = new ArrayList<PropertyType>();
+        properties.add(new PropertyType(new QName("FID"), "999"));
+        pe     = new PropertyIsEqualToType(new LiteralType("Ashton"), new PropertyNameType("NAME"), Boolean.TRUE);
+        filter = new FilterType(pe);
+        request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, filter, typeName, null));
+
+        
+        TransactionResponseType result = worker.transaction(request);
+        
+        TransactionSummaryType sum = new TransactionSummaryType(0, 1, 0);
+        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, null, "1.1.0");
+
+        assertEquals(ExpResult, result);
+
+        /**
+         * we verify that the feature have been updated
+         */
+         List<QueryType> queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
+        GetFeatureType requestGF = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        Object resultGF = worker.getFeature(requestGF);
+
+        String xmlResult    = featureWriter.write((FeatureCollection)resultGF);
+        String xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-3.xml"));
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        assertEquals(xmlExpResult, xmlResult);
     }
 
 
@@ -837,7 +872,7 @@ public class WFSWorkerTest {
     public void TransactionDeleteTest() throws Exception {
 
         /**
-         * Test 1 : transaction delete for Feature type bridges with a property in filter
+         * Test 1 : transaction delete for Feature type bridges with a bad property in filter
          */
 
         QName typeName           = new QName("http://www.opengis.net/gml", "Bridges");
@@ -856,6 +891,76 @@ public class WFSWorkerTest {
         }
 
         assertTrue(exLanched);
+
+        /**
+         * Test 2 : transaction delete for Feature type NamedPlaces with a property in filter
+         */
+
+        typeName = new QName("http://www.opengis.net/gml", "NamedPlaces");
+        pe       = new PropertyIsEqualToType(new LiteralType("Ashton"), new PropertyNameType("NAME"), Boolean.TRUE);
+        filter   = new FilterType(pe);
+        delete   = new DeleteElementType(filter, null, typeName);
+        request  = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, delete);
+
+        TransactionResponseType result = worker.transaction(request);
+
+        TransactionSummaryType sum = new TransactionSummaryType(0, 0, 1);
+        TransactionResponseType expresult = new TransactionResponseType(sum, null, null, "1.1.0");
+
+        assertEquals(expresult, result);
+
+        /**
+         * we verify that the feature have been deleted
+         */
+        List<QueryType> queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
+        GetFeatureType requestGF = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        Object resultGF = worker.getFeature(requestGF);
+
+        String xmlResult    = featureWriter.write((FeatureCollection)resultGF);
+        String xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-2.xml"));
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        assertEquals(xmlExpResult, xmlResult);
+
+        /**
+         * Test 3 : transaction delete for Feature type SamplingPoint with a property in filter
+         
+
+        typeName = new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint");
+        pe       = new PropertyIsEqualToType(new LiteralType("10972X0137-PLOUF"), new PropertyNameType("name"), Boolean.TRUE);
+        filter   = new FilterType(pe);
+        delete   = new DeleteElementType(filter, null, typeName);
+        request  = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, delete);
+
+        result = worker.transaction(request);
+
+        sum = new TransactionSummaryType(0, 0, 1);
+        expresult = new TransactionResponseType(sum, null, null, "1.1.0");
+
+        assertEquals(expresult, result);
+
+        /**
+         * we verify that the feature have been deleted
+         
+        queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
+        requestGF = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        resultGF = worker.getFeature(requestGF);
+
+        xmlResult    = featureWriter.write((FeatureCollection)resultGF);
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2.xml"));
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        assertEquals(xmlExpResult, xmlResult);*/
     }
     /**
      *
