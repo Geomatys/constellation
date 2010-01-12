@@ -46,6 +46,8 @@ import org.constellation.provider.sml.SMLProvider;
 import org.constellation.provider.sml.SMLProviderService;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.data.DataStoreException;
+import org.geotoolkit.data.DataStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
@@ -393,8 +395,8 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 7 : query on typeName NamedPlaces with DESC sortBy on NAME property
-         
+         * Test 7 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
+         */
 
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null);
@@ -402,9 +404,18 @@ public class WFSWorkerTest {
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
-        result = worker.getFeature(request);
+        exLaunched = false;
+        try {
+            result = worker.getFeature(request);
+            xmlResult    = featureWriter.write((FeatureCollection)result);
 
-        xmlResult    = featureWriter.write((FeatureCollection)result);
+        } catch (DataStoreRuntimeException ex) {
+            exLaunched = true;
+        }
+
+        assertTrue(exLaunched);
+        /*
+        
         xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
@@ -412,10 +423,40 @@ public class WFSWorkerTest {
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
         assertEquals(xmlExpResult, xmlResult);
-       */
+
+         /**
+         * Test 8 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
+         */
+
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null);
+        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.ASC))));
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        exLaunched = false;
+        try {
+            result = worker.getFeature(request);
+            xmlResult    = featureWriter.write((FeatureCollection)result);
+
+        } catch (DataStoreRuntimeException ex) {
+            exLaunched = true;
+        }
+
+        assertTrue(exLaunched);
+        
+        /*
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        assertEquals(xmlExpResult, xmlResult);
+       
 
         /**
-         * Test 8 : query on typeName samplingPoint
+         * Test 9 : query on typeName samplingPoint
          */
 
         queries = new ArrayList<QueryType>();
@@ -434,7 +475,7 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 9 : query on typeName samplingPoint whith HITS result type
+         * Test 10 : query on typeName samplingPoint whith HITS result type
          */
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
@@ -447,7 +488,7 @@ public class WFSWorkerTest {
 
 
         /**
-         * Test 10 : query on typeName samplingPoint with propertyName = {gml:name}
+         * Test 11 : query on typeName samplingPoint with propertyName = {gml:name}
          */
 
         queries = new ArrayList<QueryType>();
@@ -468,7 +509,7 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 11 : query on typeName sml:System
+         * Test 12 : query on typeName sml:System
          */
 
         queries = new ArrayList<QueryType>();
@@ -491,7 +532,7 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 12 : query on typeName sml:System avec srsName = EPSG:4326
+         * Test 13 : query on typeName sml:System avec srsName = EPSG:4326
          */
 
         queries = new ArrayList<QueryType>();
@@ -513,7 +554,7 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 13 : query on typeName sml:System with propertyName = {sml:keywords, sml:phenomenons}
+         * Test 14 : query on typeName sml:System with propertyName = {sml:keywords, sml:phenomenons}
          */
 
         queries = new ArrayList<QueryType>();
@@ -540,7 +581,7 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 14 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
+         * Test 15 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
          */
 
         queries = new ArrayList<QueryType>();
@@ -561,11 +602,11 @@ public class WFSWorkerTest {
         assertEquals(xmlExpResult, xmlResult);
 
         /**
-         * Test 15 : query on typeName samplingPoint with sort on gml:name
-         
+         * Test 16 : query on typeName samplingPoint with sort on gml:name
+         */
 
         queries = new ArrayList<QueryType>();
-        query = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("gml:name", SortOrderType.ASC))));
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
@@ -573,17 +614,38 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection.xml"));
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
         assertEquals(xmlExpResult, xmlResult);
-        */
 
         /**
-         * Test 16 : query on typeName samplingPoint whith HITS result type
+         * Test 17 : query on typeName samplingPoint with sort on gml:name
+         */
+
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
+        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("gml:name", SortOrderType.DESC))));
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        xmlResult    = featureWriter.write((FeatureCollection)result);
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7.xml"));
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        assertEquals(xmlExpResult, xmlResult);
+        
+
+        /**
+         * Test 18 : query on typeName samplingPoint whith HITS result type
          */
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
@@ -596,7 +658,7 @@ public class WFSWorkerTest {
 
 
         /**
-         * Test 17 : query on typeName samplingPoint whith a filter with unexpected property
+         * Test 19 : query on typeName samplingPoint whith a filter with unexpected property
          */
 
         queries = new ArrayList<QueryType>();
@@ -615,7 +677,7 @@ public class WFSWorkerTest {
         assertTrue(exLaunched);
 
         /**
-         * Test 18 : query on typeName samplingPoint whith a an unexpected property in propertyNames
+         * Test 20 : query on typeName samplingPoint whith a an unexpected property in propertyNames
          */
 
         queries = new ArrayList<QueryType>();
