@@ -338,7 +338,6 @@ public class WFSWorkerTest {
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-
         assertEquals(xmlExpResult, xmlResult);
 
         /**
@@ -504,15 +503,12 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"));
+        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.systemCollection-3.xml"));
 
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-
-        // to see
-        xmlExpResult = xmlExpResult.replaceAll("srsName=\"\"", "srsName=\"urn:ogc:def:crs:epsg:7.4:27582\"");
 
         assertEquals(xmlExpResult, xmlResult);
 

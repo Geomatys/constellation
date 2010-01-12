@@ -7,7 +7,7 @@
         </gml:Envelope>
     </gml:boundedBy>
     <gml:featureMember>
-        <gml:Bridges gml:id="Bridges_1">
+        <gml:Bridges gml:id="Bridges.1">
             <the_geom>
                 <gml:Point srsName="urn:ogc:def:crs:epsg:4326">
                     <gml:pos>2.0E-4 7.0E-4</gml:pos>

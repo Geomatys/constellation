@@ -424,7 +424,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         String propName = pdesc.getName().getLocalPart();
 
                         if (!pdesc.isNillable()) {
-                            System.out.println(propName + " is not nillable");
                             if (!propertyNames.contains(propName)) {
                                 propertyNames.add(propName);
                             }
@@ -434,7 +433,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         
                         requestPropNames.remove(propName);
                     }
-                    System.out.println("propName" + propertyNames);
                     // if the requestPropNames is not empty there is unKnown propertyNames
                     if (!requestPropNames.isEmpty()) {
                         throw new CstlServiceException("The feature Type " + typeName + " does not have such a property:" + requestPropNames.get(0), INVALID_PARAMETER_VALUE);

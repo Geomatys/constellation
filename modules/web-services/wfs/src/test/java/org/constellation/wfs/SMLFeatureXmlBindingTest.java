@@ -84,7 +84,7 @@ public class SMLFeatureXmlBindingTest {
         featureType      = fr.getFeatureType();
         if (featureType == null)
             System.out.println("WARNING: The featureType is null");
-        fcoll            = new DefaultFeatureCollection("collection-1", featureType, SimpleFeature.class);
+        fcoll            = new DefaultFeatureCollection("id", featureType, SimpleFeature.class);
         while (fr.hasNext()) {
             fcoll.add(fr.next());
         }

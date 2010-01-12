@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <wfs:FeatureCollection gml:id="id" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" xmlns:sml="http://www.opengis.net/sml/1.0">
     <gml:boundedBy>
-        <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.4:27582">
-            <gml:lowerCorner>65400.0 1731368.0</gml:lowerCorner>
-            <gml:upperCorner>65400.0 1731368.0</gml:upperCorner>
+        <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.4:4326">
+            <gml:lowerCorner>-4.14498462789604 42.387988622819975</gml:lowerCorner>
+            <gml:upperCorner>-4.14498462789604 42.387988622819975</gml:upperCorner>
         </gml:Envelope>
     </gml:boundedBy>
     <gml:featureMember>
@@ -14,8 +14,8 @@
             <sml:keywords>geosciences</sml:keywords>
             <sml:keywords>point d'eau</sml:keywords>
             <sml:location>
-                <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
-                    <gml:pos>65400.0 1731368.0</gml:pos>
+                <gml:Point srsName="EPSG:4326">
+                    <gml:pos>-4.14498462789604 42.387988622819975</gml:pos>
                 </gml:Point>
             </sml:location>
             <sml:phenomenons>time</sml:phenomenons>

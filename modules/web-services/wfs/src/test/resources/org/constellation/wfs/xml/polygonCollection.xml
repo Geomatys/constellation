@@ -7,7 +7,7 @@
         </gml:Envelope>
     </gml:boundedBy>
     <gml:featureMember>
-        <gml:BasicPolygons gml:id="BasicPolygons_1">
+        <gml:BasicPolygons gml:id="BasicPolygons.1">
             <the_geom>
                 <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
                     <gml:surfaceMember>
@@ -25,7 +25,7 @@
         </gml:BasicPolygons>
     </gml:featureMember>
     <gml:featureMember>
-        <gml:BasicPolygons gml:id="BasicPolygons_2">
+        <gml:BasicPolygons gml:id="BasicPolygons.2">
             <the_geom>
                 <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
                     <gml:surfaceMember>
@@ -43,7 +43,7 @@
         </gml:BasicPolygons>
     </gml:featureMember>
     <gml:featureMember>
-        <gml:BasicPolygons gml:id="BasicPolygons_3">
+        <gml:BasicPolygons gml:id="BasicPolygons.3">
             <the_geom>
                 <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
                     <gml:surfaceMember>
