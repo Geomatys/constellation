@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<sml:System gml:id="2" xmlns:gml="http://www.opengis.net/gml" xmlns:sml="http://www.opengis.net/sml/1.0">
+<sml:System gml:id="12" xmlns:gml="http://www.opengis.net/gml" xmlns:sml="http://www.opengis.net/sml/1.0">
     <gml:description>information about the piezometer</gml:description>
     <gml:name>Piezometer Test</gml:name>
     <sml:keywords>piezometer</sml:keywords>

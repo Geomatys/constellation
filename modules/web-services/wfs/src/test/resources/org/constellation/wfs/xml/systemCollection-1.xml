@@ -7,7 +7,7 @@
         </gml:Envelope>
     </gml:boundedBy>
     <gml:featureMember>
-        <sml:System gml:id="2">
+        <sml:System gml:id="12">
             <gml:description>information about the piezometer</gml:description>
             <gml:name>Piezometer Test</gml:name>
             <sml:keywords>piezometer</sml:keywords>
