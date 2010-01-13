@@ -57,6 +57,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         Util.executeSQLScript("org/constellation/sql/structure-mdweb.sql", con2);
         Util.executeSQLScript("org/constellation/sql/mdweb-base-data.sql", con2);
         Util.executeSQLScript("org/constellation/sql/ISO19115-base-data.sql", con2);
+        Util.executeSQLScript("org/constellation/sql/mdweb-user-data.sql", con2);
         Util.executeSQLScript("org/constellation/sql/sml-schema.sql", con2);
         Util.executeSQLScript("org/constellation/sql/sml-data.sql", con2);
 

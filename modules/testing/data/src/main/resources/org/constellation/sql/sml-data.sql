@@ -1,12 +1,5 @@
 
 INSERT INTO "Storage"."Catalogs" ("code", "name") VALUES ('SMLC', 'SensorML Data catalog');
-INSERT INTO "Storage"."Catalogs" ("code", "name") VALUES ('MDATA', 'MDWEB data');
-
-INSERT INTO "Users"."Users" ("login", "password", "form", "creationDate", "expirationDate") VALUES ('admin', 'adminadmin', NULL, '2008-01-01', '2010-01-01');
-
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (1, 'MDATA', 'description of admin', 'admin', NULL, NULL, '2008-04-16', 1, 1, 'templateForm');
-
-UPDATE "Users"."Users" SET "form"=1;
 
 INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (2, 'SMLC', 'urn:ogc:object:sensor:GEOM:1', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'normalForm');
 INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (3, 'SMLC', 'urn:ogc:object:sensor:GEOM:2', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'normalForm');
@@ -127,17 +120,6 @@ INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (3, 'SensorML:SensorML:member:parameters:parameter:uom', 1, 'Uom', 'Sensor Web Enablement', 'SensorML:SensorML.1:member.1:parameters.1:parameter.2:uom.1');
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (3, 'SensorML:SensorML:member:parameters:parameter', 3, 'QuantityRange', 'Sensor Web Enablement', 'SensorML:SensorML.1:member.1:parameters.1:parameter.3');
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (3, 'SensorML:SensorML:member:parameters:parameter:uom', 1, 'Uom', 'Sensor Web Enablement', 'SensorML:SensorML.1:member.1:parameters.1:parameter.3:uom.1');
-
-
-INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (1, 'ISO 19115:CI_ResponsibleParty', 1, 'CI_ResponsibleParty', 'ISO 19115', 'ISO 19115:CI_ResponsibleParty.1');
-INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:contactInfo', 1, 'CI_Contact', 'ISO 19115', 'ISO 19115:CI_ResponsibleParty.1:contactInfo.1');
-INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:contactInfo:phone', 1, 'CI_Telephone', 'ISO 19115', 'ISO 19115:CI_ResponsibleParty.1:contactInfo.1:phone.1');
-INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:contactInfo:address', 1, 'CI_Address', 'ISO 19115', 'ISO 19115:CI_ResponsibleParty.1:contactInfo.1:address.1');
-INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource', 1, 'CI_OnlineResource', 'ISO 19115', 'ISO 19115:CI_ResponsibleParty.1:contactInfo.1:onlineResource.1');
-
-INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:individualName', 1, NULL, NULL, 'ISO 19115:CI_ResponsibleParty.1:individualName.1', 'Barde-Julien');
-INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:contactInfo:address:electronicMailAddress', 1, NULL, NULL, 'ISO 19115:CI_ResponsibleParty.1:contactInfo.1:address.1:electronicMailAddress.1', 'juldebar@gmail.com');
-INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:contactInfo:address:country', 1, NULL, NULL, 'ISO 19115:CI_ResponsibleParty.1:contactInfo.1:address.1:country.1', 'FR');
 
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (2, 'SensorML:SensorML:member:role', 1, 'CharacterString', 'ISO 19103', 'SensorML:SensorML.1:member.1:role.1', 'urn:x-ogx:def:sensor:OGC:detector');
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (2, 'SensorML:SensorML:member:description', 1, 'CharacterString', 'ISO 19103', 'SensorML:SensorML.1:member.1:description.1', 'information about the piezometer');

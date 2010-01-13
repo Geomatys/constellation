@@ -59,6 +59,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             Util.executeSQLScript("org/constellation/sql/mdweb-base-data.sql", con);
             Util.executeSQLScript("org/constellation/sql/ISO19115-base-data.sql", con);
             Util.executeSQLScript("org/constellation/sql/ISO19115-data.sql", con);
+            Util.executeSQLScript("org/constellation/sql/mdweb-user-data.sql", con);
             Util.executeSQLScript("org/constellation/metadata/sql/DC-data.sql", con);
             Util.executeSQLScript("org/constellation/metadata/sql/csw-data.sql", con);
             Util.executeSQLScript("org/constellation/metadata/sql/csw-data-3.sql", con);

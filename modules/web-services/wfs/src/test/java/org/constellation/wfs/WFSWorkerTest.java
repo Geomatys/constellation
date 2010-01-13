@@ -1098,6 +1098,7 @@ public class WFSWorkerTest {
         Util.executeSQLScript("org/constellation/sql/structure-mdweb.sql", con);
         Util.executeSQLScript("org/constellation/sql/mdweb-base-data.sql", con);
         Util.executeSQLScript("org/constellation/sql/ISO19115-base-data.sql", con);
+        Util.executeSQLScript("org/constellation/sql/mdweb-user-data.sql", con);
         Util.executeSQLScript("org/constellation/sql/sml-schema.sql", con);
         Util.executeSQLScript("org/constellation/sql/sml-data.sql", con);
 

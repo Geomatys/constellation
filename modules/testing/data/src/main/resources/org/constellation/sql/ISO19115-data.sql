@@ -129,12 +129,6 @@ INSERT INTO "Schemas"."Classes"  VALUES ('FRA_IndirectReferenceSystem', 'RefSyst
 INSERT INTO "Schemas"."Classes"  VALUES ('QE_Usability', 'Usability', 'ISO 19115 FRA 1.0', 'QE_Usability', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('MD_LegalConstraints', 'LegConsts', 'ISO 19115', NULL, 0, 'MD_Constraints', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('FRA_LegalConstraints', 'LegConsts', 'ISO 19115 FRA 1.0', 'MD_LegalConstraints', 0, 'MD_LegalConstraints', 'ISO 19115', ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('SimpleLink', NULL, 'Xlink', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('EngineeringDatum', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('EngineeringCRS', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('TemporalCRS', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('Pos', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('Point', NULL, 'ISO 19108', 'A Point is defined by a single coordinate tuple.', 0, NULL, NULL, ' ');
 
 INSERT INTO "Schemas"."CodeLists"  VALUES ('AxisDirection', 'Axisdir', 'ISO 19108', NULL, 0, 'CodeList', NULL, ' ');
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('UP', NULL, 'ISO 19108', NULL, 0, 1, 'AxisDirection', 'AxisDirection', 'AxisDirection', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 1);
@@ -618,31 +612,6 @@ INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:role', 'role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:begin', 'begin', 'ISO 19108', 'TM_Period', 'ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent', 'ISO 19108');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:end', 'end', 'ISO 19108', 'TM_Period', 'ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent', 'ISO 19108');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty', 'CI_ResponsibleParty', 'ISO 19115', 'CI_ResponsibleParty', NULL, 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo', 'contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:CI_ResponsibleParty', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:phone', 'phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:CI_ResponsibleParty:contactInfo', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:address', 'address', 'ISO 19115', 'CI_Contact', 'ISO 19115:CI_ResponsibleParty:contactInfo', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource', 'onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:CI_ResponsibleParty:contactInfo', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:individualName', 'individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:CI_ResponsibleParty', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:organisationName', 'organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:CI_ResponsibleParty', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:positionName', 'positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:CI_ResponsibleParty', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:phone:voice', 'voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:CI_ResponsibleParty:contactInfo:phone', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:address:electronicMailAddress', 'electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:CI_ResponsibleParty:contactInfo:address', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:address:city', 'city', 'ISO 19115', 'CI_Address', 'ISO 19115:CI_ResponsibleParty:contactInfo:address', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:address:postalCode', 'postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:CI_ResponsibleParty:contactInfo:address', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:address:deliveryPoint', 'deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:CI_ResponsibleParty:contactInfo:address', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:address:country', 'country', 'ISO 19115', 'CI_Address', 'ISO 19115:CI_ResponsibleParty:contactInfo:address', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource:linkage', 'linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource:function', 'function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:role', 'role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:CI_ResponsibleParty', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:address:administrativeArea', 'administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:CI_ResponsibleParty:contactInfo:address', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:phone:facsimile', 'facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:CI_ResponsibleParty:contactInfo:phone', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource:protocol', 'protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource:name', 'name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource:description', 'description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:hoursOfService', 'hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:CI_ResponsibleParty:contactInfo', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:contactInstructions', 'contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:CI_ResponsibleParty:contactInfo', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource:applicationProfile', 'applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:relatedCitation', 'relatedCitation', 'ISO 19115 FRA 1.0', 'FRA_DataIdentification', 'ISO 19115:MD_Metadata:identificationInfo', 'ISO 19115 FRA 1.0');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:citation:alternateTitle', 'alternateTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:citation', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:citation:identifier', 'identifier', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:citation', 'ISO 19115');
@@ -3329,28 +3298,6 @@ INSERT INTO "Schemas"."Properties"  VALUES ('otherConstraints', 'othConsts', 'IS
 INSERT INTO "Schemas"."Properties"  VALUES ('citation', 'LegCit', 'ISO 19115 FRA 1.0', 'Citation of documents or information source', 0, 2147483647, 'FRA_LegalConstraints', 'CI_Citation', NULL, 'O', 5, 'ISO 19115', 'ISO 19115 FRA 1.0', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('position', NULL, 'ISO 19108', NULL, 1, 1, 'TimeInstant', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('position', NULL, 'ISO 19108', NULL, 1, 1, 'TimePosition', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('name', NULL, 'Xlink', NULL, 0, 1, 'SimpleLink', 'CharacterString', NULL, 'O', 0, 'ISO 19103', 'Xlink', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('href', NULL, 'Xlink', NULL, 0, 1, 'SimpleLink', 'CharacterString', NULL, 'O', 1, 'ISO 19103', 'Xlink', 'P');
-INSERT INTO "Schemas"."Properties"  VALUES ('role', NULL, 'Xlink', NULL, 0, 1, 'SimpleLink', 'CharacterString', NULL, 'O', 2, 'ISO 19103', 'Xlink', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('arcrole', NULL, 'Xlink', NULL, 0, 1, 'SimpleLink', 'CharacterString', NULL, 'O', 3, 'ISO 19103', 'Xlink', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('title', NULL, 'Xlink', NULL, 0, 1, 'SimpleLink', 'CharacterString', NULL, 'O', 4, 'ISO 19103', 'Xlink', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('actuate', NULL, 'Xlink', NULL, 0, 1, 'SimpleLink', 'CharacterString', NULL, 'O', 5, 'ISO 19103', 'Xlink', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('datumName', NULL, 'ISO 19108', NULL, 0, 1, 'EngineeringDatum', 'CharacterString', NULL, 'O', 1, 'ISO 19103', 'ISO 19108', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('anchorPoint', NULL, 'ISO 19108', NULL, 0, 1, 'EngineeringDatum', 'CharacterString', NULL, 'O', 2, 'ISO 19103', 'ISO 19108', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('srsName', NULL, 'ISO 19108', NULL, 0, 1, 'EngineeringCRS', 'CharacterString', NULL, 'O', 1, 'ISO 19103', 'ISO 19108', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('usesCS', NULL, 'ISO 19108', NULL, 0, 1, 'EngineeringCRS', 'SimpleLink', NULL, 'O', 2, 'Xlink', 'ISO 19108', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('usesEngineeringDatum', NULL, 'ISO 19108', NULL, 0, 1, 'EngineeringCRS', 'EngineeringDatum', NULL, 'O', 3, 'ISO 19108', 'ISO 19108', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('srsName', NULL, 'ISO 19108', NULL, 0, 1, 'TemporalCRS', 'CharacterString', NULL, 'O', 1, 'ISO 19103', 'ISO 19108', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('usesTemporalCS', NULL, 'ISO 19108', NULL, 0, 1, 'TemporalCRS', 'SimpleLink', NULL, 'O', 2, 'Xlink', 'ISO 19108', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('usesTemporalDatum', NULL, 'ISO 19108', NULL, 0, 1, 'TemporalCRS', 'SimpleLink', NULL, 'O', 3, 'Xlink', 'ISO 19108', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('srsDimension', NULL, 'ISO 19108', NULL, 0, 1, 'Pos', 'Integer', NULL, 'O', 1, 'ISO 19103', 'ISO 19108', 'P');
-INSERT INTO "Schemas"."Properties"  VALUES ('id', NULL, 'ISO 19108', NULL, 0, 1, 'EngineeringCRS', 'ID', NULL, 'O', 0, 'ISO 19103', 'ISO 19108', 'C');
-INSERT INTO "Schemas"."Properties"  VALUES ('id', NULL, 'ISO 19108', NULL, 0, 1, 'EngineeringDatum', 'ID', NULL, 'O', 0, 'ISO 19103', 'ISO 19108', 'C');
-INSERT INTO "Schemas"."Properties"  VALUES ('id', NULL, 'ISO 19108', NULL, 0, 1, 'TemporalCRS', 'ID', NULL, 'O', 0, 'ISO 19103', 'ISO 19108', 'C');
-INSERT INTO "Schemas"."Properties"  VALUES ('srsName', NULL, 'ISO 19108', NULL, 0, 1, 'Pos', 'CharacterString', NULL, 'O', 3, 'ISO 19103', 'ISO 19108', 'P');
-INSERT INTO "Schemas"."Properties"  VALUES ('id', NULL, 'ISO 19108', NULL, 0, 1, 'Point', 'ID', NULL, 'O', 1, 'ISO 19103', 'ISO 19108', 'C');
-INSERT INTO "Schemas"."Properties"  VALUES ('pos', NULL, 'ISO 19108', NULL, 0, 1, 'Point', 'Pos', NULL, 'O', 2, 'ISO 19108', 'ISO 19108', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('value', NULL, 'ISO 19108', NULL, 0, 1, 'Pos', 'CharacterString', NULL, 'O', 2, 'ISO 19103', 'ISO 19108', 'V');
 
 --
 -- Properties

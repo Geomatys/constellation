@@ -1,11 +1,6 @@
 
 
 INSERT INTO "Storage"."Catalogs" ("code", "name") VALUES ('CSWCat', 'CSW Data Catalog');
-INSERT INTO "Storage"."Catalogs" ("code", "name") VALUES ('MDATA', 'MDWEB data');
-
-INSERT INTO "Users"."Users" ("login", "password", "form", "creationDate", "expirationDate") VALUES ('admin', 'adminadmin', NULL, '2008-01-01', '2010-01-01');
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (1, 'MDATA', 'description of admin', 'admin', NULL, NULL, '2008-04-16', NULL, NULL, NULL);
-UPDATE "Users"."Users" SET "form"=1;
 
 INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (2, 'CSWCat', '90008411.ctd', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'normalForm');
 INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (3, 'CSWCat', '90008411-2.ctd', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'normalForm');
@@ -14,11 +9,6 @@ INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "
 INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (6, 'CSWCat', '92005711.ctd', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'normalForm');
 
 
-INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (1, 'ISO 19115:CI_ResponsibleParty', 1, 'CI_ResponsibleParty', 'ISO 19115', 'ISO 19115:CI_ResponsibleParty.1');
-INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:contactInfo', 1, 'CI_Contact', 'ISO 19115', 'ISO 19115:CI_ResponsibleParty.1:contactInfo.1');
-INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:contactInfo:phone', 1, 'CI_Telephone', 'ISO 19115', 'ISO 19115:CI_ResponsibleParty.1:contactInfo.1:phone.1');
-INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:contactInfo:address', 1, 'CI_Address', 'ISO 19115', 'ISO 19115:CI_ResponsibleParty.1:contactInfo.1:address.1');
-INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:contactInfo:onlineResource', 1, 'CI_OnlineResource', 'ISO 19115', 'ISO 19115:CI_ResponsibleParty.1:contactInfo.1:onlineResource.1');
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (2, 'ISO 19115:MD_Metadata', 1, 'MD_Metadata', 'ISO 19115', 'ISO 19115:MD_Metadata.1');
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (2, 'ISO 19115:MD_Metadata:contact', 1, 'CI_ResponsibleParty', 'ISO 19115', 'ISO 19115:MD_Metadata.1:contact.1');
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (2, 'ISO 19115:MD_Metadata:contact:contactInfo', 1, 'CI_Contact', 'ISO 19115', 'ISO 19115:MD_Metadata.1:contact.1:contactInfo.1');
@@ -282,11 +272,6 @@ INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (6, 'ISO 19115:MD_Metadata:distributionInfo:transferOptions', 1, 'MD_DigitalTransferOptions', 'ISO 19115', 'ISO 19115:MD_Metadata.1:distributionInfo.1:transferOptions.1');
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (6, 'ISO 19115:MD_Metadata:distributionInfo:transferOptions:onLine', 1, 'CI_OnlineResource', 'ISO 19115', 'ISO 19115:MD_Metadata.1:distributionInfo.1:transferOptions.1:onLine.1');
 
-
-
-INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:individualName', 1, 'Characterstring', 'ISO 19103', 'ISO 19115:CI_ResponsibleParty.1:individualName.1', 'Administrateur');
-INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:contactInfo:address:electronicMailAddress', 1, 'Characterstring', 'ISO 19103', 'ISO 19115:CI_ResponsibleParty.1:contactInfo.1:address.1:electronicMailAddress.1', 'admin@admin.fr');
-INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (1, 'ISO 19115:CI_ResponsibleParty:contactInfo:address:country', 1, NULL, NULL, 'ISO 19115:CI_ResponsibleParty.1:contactInfo.1:address.1:country.1', 'FR');
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (2, 'ISO 19115:MD_Metadata:fileIdentifier', 1, 'CharacterString', 'ISO 19103', 'ISO 19115:MD_Metadata.1:fileIdentifier.1', '42292_5p_19900609195600');
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (2, 'ISO 19115:MD_Metadata:language', 1, 'LanguageCode', 'ISO 19115', 'ISO 19115:MD_Metadata.1:language.1', 'eng');
 INSERT INTO "Storage"."TextValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "value") VALUES (2, 'ISO 19115:MD_Metadata:characterSet', 1, 'MD_CharacterSetCode', 'ISO 19115', 'ISO 19115:MD_Metadata.1:characterSet.1', '4');
