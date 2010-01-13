@@ -829,14 +829,14 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 final String xpath = property.getName();
                 final Object value = property.getValue();
                 final MixedPath mp = getMDWPathFromXPath(xpath);
-                LOGGER.info("IDValue: " + mp.idValue);
+                LOGGER.finer("IDValue: " + mp.idValue);
                 final List<Value> matchingValues = f.getValueFromNumberedPath(mp.path, mp.idValue);
 
                 if (matchingValues.size() == 0) {
                     throw new CstlServiceException("There is no value matching for the xpath:" + property.getName(), INVALID_PARAMETER_VALUE);
                 }
                 for (Value v : matchingValues) {
-                    LOGGER.info("value:" + v);
+                    LOGGER.finer("value:" + v);
                     if (v instanceof TextValue && value instanceof String) {
                         // TODO verify more Type
                         if (v.getType().equals(PrimitiveType.DATE)) {
@@ -846,14 +846,14 @@ public class MDWebMetadataWriter extends MetadataWriter {
                                 if (timeValue.indexOf('+') != -1) {
                                     timeValue    = timeValue.substring(0, timeValue.indexOf('+'));
                                 }
-                                LOGGER.info(timeValue);
+                                LOGGER.finer(timeValue);
                                 Timestamp.valueOf(timeValue);
                             } catch(IllegalArgumentException ex) {
                                 throw new CstlServiceException("The type of the replacement value does not match with the value type : Date",
                                     INVALID_PARAMETER_VALUE);
                             }
                         }
-                        LOGGER.info("textValue updated");
+                        LOGGER.finer("textValue updated");
                         mdWriter.updateTextValue((TextValue) v, (String) value);
                     } else {
                         final Classe requestType = getClasseFromObject(value);
@@ -863,7 +863,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
                                                            ") does not match with the value type :" + valueType.getName(),
                                     INVALID_PARAMETER_VALUE);
                         } else {
-                            LOGGER.info("value updated");
+                            LOGGER.finer("value updated");
                             mdWriter.deleteValue(v);
                             final List<Value> toInsert = addValueFromObject(f, value, mp.path, v.getParent());
                             for (Value ins : toInsert) {
@@ -939,7 +939,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
                 }
             }
 
-            LOGGER.info("propertyName:" + propertyName + " ordinal:" + ordinal);
+            LOGGER.finer("propertyName:" + propertyName + " ordinal:" + ordinal);
             idValue = idValue + ':' + propertyName + '.';
             if (ordinal == -1) {
                 idValue = idValue + '*';
@@ -973,7 +973,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
         } else {
             idValue = idValue + ordinal;
         }
-        LOGGER.info("last propertyName:" + xpath + " ordinal:" + ordinal);
+        LOGGER.finer("last propertyName:" + xpath + " ordinal:" + ordinal);
         final Property property = getProperty(type, xpath);
         p = new Path(p, property);
         return new MixedPath(p, idValue);

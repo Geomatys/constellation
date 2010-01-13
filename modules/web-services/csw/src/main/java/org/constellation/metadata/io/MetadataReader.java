@@ -39,6 +39,7 @@ public abstract class MetadataReader {
     public static final int DUBLINCORE = 0;
     public static final int ISO_19115  = 1;
     public static final int EBRIM      = 2;
+    public static final int SENSORML   = 3;
     
     /**
      * A debugging logger

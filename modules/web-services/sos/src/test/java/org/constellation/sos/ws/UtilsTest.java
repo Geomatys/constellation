@@ -102,15 +102,15 @@ public class UtilsTest {
     @Test
     public void getPhysicalIDTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-        AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
+        AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
         String phyID = Utils.getPhysicalID(sensor);
         assertEquals("00ARGLELES", phyID);
 
-        sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component.xml"));
+        sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component.xml"));
         phyID  = Utils.getPhysicalID(sensor);
         assertEquals("00ARGLELES_2000", phyID);
 
-        sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component2.xml"));
+        sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component2.xml"));
         phyID  = Utils.getPhysicalID(sensor);
         assertEquals(null, phyID);
 
@@ -124,14 +124,14 @@ public class UtilsTest {
     @Test
     public void getNetworkNamesTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-        AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
+        AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
         List<String> names      = Utils.getNetworkNames(sensor);
         List<String> expNames   = new ArrayList<String>();
         expNames.add("600000221");
         expNames.add("600000025");
         assertEquals(expNames, names);
 
-        sensor   = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component.xml"));
+        sensor   = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component.xml"));
         names    = Utils.getNetworkNames(sensor);
         expNames = new ArrayList<String>();
         assertEquals(expNames, names);
@@ -146,13 +146,13 @@ public class UtilsTest {
     @Test
     public void getSensorPositionTest() throws Exception {
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-        AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
+        AbstractSensorML sensor = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
         DirectPositionType result = Utils.getSensorPosition(sensor);
         DirectPositionType expResult = new DirectPositionType("urn:ogc:crs:EPSG:27582", 2, Arrays.asList(65400.0,1731368.0));
 
         assertEquals(expResult, result);
 
-        sensor    = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component.xml"));
+        sensor    = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component.xml"));
         result    = Utils.getSensorPosition(sensor);
         expResult = null;
 

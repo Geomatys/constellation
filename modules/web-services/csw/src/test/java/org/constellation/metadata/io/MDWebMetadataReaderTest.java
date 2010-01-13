@@ -19,7 +19,7 @@
 package org.constellation.metadata.io;
 
 import java.sql.Connection;
-import java.util.Arrays;
+import java.util.List;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -29,6 +29,7 @@ import org.constellation.metadata.CSWworkerTest;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -50,7 +51,10 @@ public class MDWebMetadataReaderTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        pool = new AnchorPool(Arrays.asList(CSWClassesContext.getAllClasses()));
+        List<Class> classes = CSWClassesContext.getAllClassesList();
+        classes.add(org.geotoolkit.sml.xml.v100.ObjectFactory.class);
+
+        pool = new AnchorPool(classes);
 
         final String url = "jdbc:derby:memory:MMRTest;create=true";
         ds               = new DefaultDataSource(url);
@@ -58,8 +62,13 @@ public class MDWebMetadataReaderTest {
         Connection con = ds.getConnection();
 
         Util.executeSQLScript("org/constellation/sql/structure-mdweb.sql", con);
-        Util.executeSQLScript("org/constellation/metadata/sql/ISO19115-data.sql", con);
+        Util.executeSQLScript("org/constellation/sql/mdweb-base-data.sql", con);
+        Util.executeSQLScript("org/constellation/sql/ISO19115-base-data.sql", con);
+        Util.executeSQLScript("org/constellation/sql/ISO19115-data.sql", con);
         Util.executeSQLScript("org/constellation/metadata/sql/csw-data.sql", con);
+        
+        Util.executeSQLScript("org/constellation/sql/sml-schema.sql", con);
+        Util.executeSQLScript("org/constellation/sql/sml-data.sql", con);
 
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
@@ -88,12 +97,12 @@ public class MDWebMetadataReaderTest {
     }
 
     /**
-     * Tests the getcapabilities method
+     * Tests the getMetadata method for ISO 19119 data
      *
      * @throws java.lang.Exception
      */
     @Test
-    public void getMetadataTest() throws Exception {
+    public void getMetadataISOTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object result = reader.getMetadata("2:CSWCat", MetadataReader.ISO_19115, null, null);
@@ -102,6 +111,26 @@ public class MDWebMetadataReaderTest {
 
         assertTrue(result instanceof DefaultMetadata);
         CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+        pool.release(unmarshaller);
+    }
+
+    /**
+     * Tests the getMetadata method for SML data
+     *
+     * @throws java.lang.Exception
+     */
+    @Ignore
+    public void getMetadataSMLTest() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object result = reader.getMetadata("2:SMLC", MetadataReader.SENSORML, null, null);
+
+        AbstractSensorML expResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
+
+        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + result.getClass().getName());
+        assertTrue(result != null);
+        assertTrue(result instanceof AbstractSensorML);
+        assertEquals(expResult, result);
         pool.release(unmarshaller);
     }
 }

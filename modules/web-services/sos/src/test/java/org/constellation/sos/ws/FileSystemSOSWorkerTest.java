@@ -69,8 +69,8 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
             File sensorDirectory = new File(configDir, "sensors");
             sensorDirectory.mkdir();
-            writeDataFile(sensorDirectory, "system.xml",    "urn:ogc:object:sensor:GEOM:1");
-            writeDataFile(sensorDirectory, "component.xml", "urn:ogc:object:sensor:GEOM:2");
+            writeCommonDataFile(sensorDirectory, "system.xml",    "urn:ogc:object:sensor:GEOM:1");
+            writeCommonDataFile(sensorDirectory, "component.xml", "urn:ogc:object:sensor:GEOM:2");
 
             File featureDirectory = new File(configDir, "features");
             featureDirectory.mkdir();
@@ -112,6 +112,22 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
         }
         pool.release(marshaller);
+    }
+
+    public static void writeCommonDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {
+
+        File dataFile = new File(dataDirectory, identifier + ".xml");
+        FileWriter fw = new FileWriter(dataFile);
+        InputStream in = Util.getResourceAsStream("org/constellation/xml/sml/" + resourceName);
+
+        byte[] buffer = new byte[1024];
+        int size;
+
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            fw.write(new String(buffer, 0, size));
+        }
+        in.close();
+        fw.close();
     }
 
     public static void writeDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {

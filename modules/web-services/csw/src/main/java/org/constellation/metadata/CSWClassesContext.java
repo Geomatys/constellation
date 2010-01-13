@@ -58,7 +58,7 @@ public final class CSWClassesContext {
      *
      * @return
      */
-    public static Class[] getAllClasses() {
+    public static List<Class> getAllClassesList() {
         final List<Class> classeList = new ArrayList<Class>();
 
         // configuration classes
@@ -118,7 +118,16 @@ public final class CSWClassesContext {
 
 
 
-           return Util.toArray(classeList);
+           return classeList;
+    }
+
+    /**
+     * Return the list of all the marshallable classes
+     *
+     * @return
+     */
+    public static Class[] getAllClasses() {
+           return Util.toArray(getAllClassesList());
     }
 
 }

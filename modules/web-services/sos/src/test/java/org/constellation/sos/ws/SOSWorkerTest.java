@@ -314,7 +314,7 @@ public class SOSWorkerTest {
         request  = new DescribeSensor("urn:ogc:object:sensor:GEOM:1", "text/xml;subtype=\"SensorML/1.0.0\"");
         AbstractSensorML absResult = (AbstractSensorML) worker.describeSensor(request);
 
-        AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
+        AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
 
         assertTrue(absResult instanceof SensorML);
         assertTrue(absExpResult instanceof SensorML);
@@ -422,7 +422,7 @@ public class SOSWorkerTest {
         request  = new DescribeSensor("urn:ogc:object:sensor:GEOM:2", "text/xml;subtype=\"SensorML/1.0.0\"");
         absResult = (AbstractSensorML) worker.describeSensor(request);
 
-        absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/component.xml"));
+        absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component.xml"));
 
         assertTrue(absResult instanceof SensorML);
         assertTrue(absExpResult instanceof SensorML);
@@ -1973,7 +1973,7 @@ public class SOSWorkerTest {
         /**
          * Test 1 we register a system sensor
          */
-        AbstractSensorML sensorDescription = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/system.xml"));
+        AbstractSensorML sensorDescription = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
         
         JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-6.xml"));
 

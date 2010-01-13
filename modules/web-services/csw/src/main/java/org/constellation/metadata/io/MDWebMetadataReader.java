@@ -339,7 +339,7 @@ public class MDWebMetadataReader extends MetadataReader {
 
             //we look for cached object
             Object result = getFromCache(identifier);
-            if (mode == ISO_19115 || mode == EBRIM) {
+            if (mode == ISO_19115 || mode == EBRIM || mode == SENSORML) {
 
                 if (result == null) {
                     final Form f = mdReader.getForm(catalog, id);
