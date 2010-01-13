@@ -1,34 +1,7 @@
 
-
-INSERT INTO "Schemas"."Standard" ("name", "namespace") VALUES ('ISO 19115', 'gmd');
-INSERT INTO "Schemas"."Standard" ("name", "namespace") VALUES ('MDWEB', NULL);
-INSERT INTO "Schemas"."Standard" ("name", "namespace") VALUES ('ISO 19103', 'gco');
-INSERT INTO "Schemas"."Standard" ("name", "namespace") VALUES ('ISO 636-2', NULL);
-INSERT INTO "Schemas"."Standard" ("name", "namespace") VALUES ('ISO 19115 FRA 1.0', 'fra');
-INSERT INTO "Schemas"."Standard" ("name", "namespace") VALUES ('ISO 19108', 'gml');
-INSERT INTO "Schemas"."Standard" ("name", "namespace") VALUES ('ISO 3166', NULL);
-INSERT INTO "Schemas"."Standard" ("name", "namespace") VALUES ('Xlink', 'xlink');
-
-
-INSERT INTO "Schemas"."Obligations" ("code", "name") VALUES ('O', 'Optionnal');
-INSERT INTO "Schemas"."Obligations" ("code", "name") VALUES ('M', 'Mandatory');
-INSERT INTO "Schemas"."Obligations" ("code", "name") VALUES ('C', 'Conditionnal');
-
-
-INSERT INTO "Schemas"."Classes"  VALUES ('Binary', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('Boolean', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('CharacterString', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('Date', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('DateTime', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('Decimal', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('Distance', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('Integer', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-
 INSERT INTO "Schemas"."Classes"  VALUES ('Measure', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('Real', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('RecordType', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('UomLength', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('URL', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('Anchor', NULL, 'MDWEB', NULL, 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('TM_PeriodDuration', NULL, 'MDWEB', NULL, 0, NULL, NULL, ' ');
 
@@ -162,10 +135,6 @@ INSERT INTO "Schemas"."Classes"  VALUES ('FRA_IndirectReferenceSystem', 'RefSyst
 INSERT INTO "Schemas"."Classes"  VALUES ('QE_Usability', 'Usability', 'ISO 19115 FRA 1.0', 'QE_Usability', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('MD_LegalConstraints', 'LegConsts', 'ISO 19115', NULL, 0, 'MD_Constraints', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('FRA_LegalConstraints', 'LegConsts', 'ISO 19115 FRA 1.0', 'MD_LegalConstraints', 0, 'MD_LegalConstraints', 'ISO 19115', ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('URI', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('ID', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('Double', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('UndefinedTime', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('SimpleLink', NULL, 'Xlink', NULL, 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('EngineeringDatum', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('EngineeringCRS', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
@@ -3664,7 +3633,6 @@ INSERT INTO "Schemas"."Properties"  VALUES ('accessConstraints', 'accessConsts',
 INSERT INTO "Schemas"."Properties"  VALUES ('useConstraints', 'useConsts', 'ISO 19115', 'Use constraints of the dataset', 0, 2147483647, 'MD_LegalConstraints', NULL, 'MD_RestrictionCode', 'O', 3, 'ISO 19115', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('otherConstraints', 'othConsts', 'ISO 19115', 'Others constraints of the dataset', 0, 2147483647, 'MD_LegalConstraints', 'CharacterString', NULL, 'C', 4, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('citation', 'LegCit', 'ISO 19115 FRA 1.0', 'Citation of documents or information source', 0, 2147483647, 'FRA_LegalConstraints', 'CI_Citation', NULL, 'O', 5, 'ISO 19115', 'ISO 19115 FRA 1.0', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('indeterminatePosition', NULL, 'ISO 19108', NULL, 1, 1, 'UndefinedTime', 'CharacterString', NULL, 'O', 0, 'ISO 19103', 'ISO 19108', 'P');
 INSERT INTO "Schemas"."Properties"  VALUES ('beginPosition', NULL, 'ISO 19108', NULL, 1, 1, 'TimePeriod', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('endPosition', NULL, 'ISO 19108', NULL, 0, 1, 'TimePeriod', 'UndefinedTime', NULL, 'O', 1, 'ISO 19108', 'ISO 19108', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('position', NULL, 'ISO 19108', NULL, 1, 1, 'TimeInstant', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ');
