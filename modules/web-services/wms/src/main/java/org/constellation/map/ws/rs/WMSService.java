@@ -576,12 +576,16 @@ public class WMSService extends GridWebService {
                         StyledLayerDescriptor.V_1_0_0);
             } catch (JAXBException ex) {
                 throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
-            }
+            } catch (FactoryException ex) {
+                    throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
+                }
             if (sld == null) {
                 try {
                     sld = sldparser.readSLD(in,
                             StyledLayerDescriptor.V_1_1_0);
                 } catch (JAXBException ex) {
+                    throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
+                } catch (FactoryException ex) {
                     throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
                 }
             }

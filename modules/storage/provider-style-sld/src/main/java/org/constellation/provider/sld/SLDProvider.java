@@ -44,6 +44,7 @@ import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.style.MutableStyleFactory;
+import org.opengis.referencing.FactoryException;
 
 /**
  * Style provider. index and cache MutableStyle whithin the given folder.
@@ -155,6 +156,7 @@ public class SLDProvider extends AbstractStyleProvider{
                                 return value;
                             }
                         } catch (JAXBException ex) { /* dont log*/ }
+                        catch (FactoryException ex) { /* dont log*/ }
 
                         //try SLD 1.0
                         try {
@@ -165,6 +167,7 @@ public class SLDProvider extends AbstractStyleProvider{
                                 return value;
                             }
                         } catch (JAXBException ex) { /*dont log*/ }
+                        catch (FactoryException ex) { /* dont log*/ }
 
                         //try UserStyle SLD 1.1
                         try {
@@ -174,6 +177,7 @@ public class SLDProvider extends AbstractStyleProvider{
                                 return value;
                             }
                         } catch (JAXBException ex) { /*dont log*/ }
+                        catch (FactoryException ex) { /* dont log*/ }
 
                         //try UserStyle SLD 1.0
                         try {
@@ -183,6 +187,7 @@ public class SLDProvider extends AbstractStyleProvider{
                                 return value;
                             }
                         } catch (JAXBException ex) { /*dont log*/ }
+                        catch (FactoryException ex) { /* dont log*/ }
 
                         //try FeatureTypeStyle SE 1.1
                         try {
@@ -194,6 +199,7 @@ public class SLDProvider extends AbstractStyleProvider{
                                 return value;
                             }
                         } catch (JAXBException ex) { /*dont log*/ }
+                        catch (FactoryException ex) { /* dont log*/ }
 
                         //try FeatureTypeStyle SLD 1.0
                         try {
@@ -205,6 +211,7 @@ public class SLDProvider extends AbstractStyleProvider{
                                 return value;
                             }
                         } catch (JAXBException ex) { /*dont log*/ }
+                        catch (FactoryException ex) { /* dont log*/ }
 
                         LOGGER.log(Level.WARNING, baseErrorMsg + key + " could not be parsed");
                     }

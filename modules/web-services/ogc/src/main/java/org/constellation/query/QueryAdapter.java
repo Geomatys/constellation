@@ -29,6 +29,7 @@ import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
+import org.opengis.referencing.FactoryException;
 
 
 /**
@@ -105,6 +106,8 @@ public final class QueryAdapter {
             sld = sldUtilities.readSLD(url, StyledLayerDescriptor.V_1_1_0);
         } catch (JAXBException ex) {
             Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FactoryException ex) {
+            Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         if(sld == null){
@@ -112,6 +115,8 @@ public final class QueryAdapter {
             try {
                 sld = sldUtilities.readSLD(url, StyledLayerDescriptor.V_1_0_0);
             } catch (JAXBException ex) {
+                Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (FactoryException ex) {
                 Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
