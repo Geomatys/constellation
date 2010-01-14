@@ -186,7 +186,7 @@
         <executions>
           <execution>
             <id>pre</id>
-            <phase>process-sources</phase>
+            <phase>initialize</phase>
             <configuration>
               <tasks>
                 <typedef resource="net/sf/antcontrib/antlib.xml">
@@ -205,7 +205,7 @@
           </execution>
           <execution>
             <id>post</id>
-            <phase>compile</phase>
+            <phase>process-resources</phase>
             <configuration>
               <tasks>
                 <typedef resource="net/sf/antcontrib/antlib.xml">
@@ -221,13 +221,13 @@
           </execution>
           <execution>
             <id>clean</id>
-            <phase>install</phase>
+            <phase>clean</phase>
             <configuration>
               <tasks>
                 <typedef resource="net/sf/antcontrib/antlib.xml">
                   <classpath refid="maven.dependency.classpath"/>
                 </typedef>
-
+				<echo message="Trying to delete the engine/components directory !"/>
                 <delete dir="${basedir}/engine/components"/>
               </tasks>
             </configuration>
@@ -243,7 +243,7 @@
         <executions>
           <execution>
             <id>copy</id>
-            <phase>process-resources</phase>
+            <phase>generate-resources</phase>
             <goals>
               <goal>copy</goal>
             </goals>
