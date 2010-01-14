@@ -227,7 +227,6 @@
                 <typedef resource="net/sf/antcontrib/antlib.xml">
                   <classpath refid="maven.dependency.classpath"/>
                 </typedef>
-				<echo message="Trying to delete the engine/components directory !"/>
                 <delete dir="${basedir}/engine/components"/>
               </tasks>
             </configuration>
