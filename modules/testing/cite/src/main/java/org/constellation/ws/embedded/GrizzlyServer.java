@@ -93,7 +93,7 @@ public final class GrizzlyServer {
 
         // Defines a PostGrid data provider
         final ProviderSource sourcePostGrid = new ProviderSource();
-        sourcePostGrid.parameters.put(PostGridProvider.KEY_DATABASE, "jdbc:postgresql://atlas.geomatys.com/coverages-test");
+        sourcePostGrid.parameters.put(PostGridProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
         sourcePostGrid.parameters.put(PostGridProvider.KEY_DRIVER,   "org.postgresql.Driver");
         sourcePostGrid.parameters.put(PostGridProvider.KEY_PASSWORD, "test");
         sourcePostGrid.parameters.put(PostGridProvider.KEY_READONLY, "true");
@@ -186,7 +186,7 @@ public final class GrizzlyServer {
         // Defines a PostGis data provider
         final ProviderSource sourcePostGis = new ProviderSource();
         sourcePostGis.parameters.put(PostGisProvider.KEY_DATABASE, "cite-wfs");
-        sourcePostGis.parameters.put(PostGisProvider.KEY_HOST,     "atlas.geomatys.com");
+        sourcePostGis.parameters.put(PostGisProvider.KEY_HOST,     "db.geomatys.com");
         sourcePostGis.parameters.put(PostGisProvider.KEY_SCHEMA,   "public");
         sourcePostGis.parameters.put(PostGisProvider.KEY_USER,     "test");
         sourcePostGis.parameters.put(PostGisProvider.KEY_PASSWD,   "test");
