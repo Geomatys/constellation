@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 // JAXB dependencies
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.JAXBElement;
@@ -38,9 +39,13 @@ import javax.xml.namespace.QName;
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import javax.ws.rs.Consumes;
@@ -297,34 +302,42 @@ public class WFSService extends OGCWebService {
         if (marshallerPool != null) {
             Object request = null;
             Unmarshaller unmarshaller = null;
+            InputStream in = null;
+            File temp = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
                 
-                // we made a pre-reading to extract the feature to insert in transaction request.
-                final BufferedReader in;
+                //copy the stream in a temp file, we will have to read it twice
+                temp = File.createTempFile("temp", "xml");
+                //For Overwrite the file.
+                OutputStream out = new FileOutputStream(temp);
+
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = is.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                is.close();
+                out.close();
+
+
+                //we made a pre-reading to extract the feature to insert in transaction request.
+                
                 List<SimpleFeature> featuresToInsert = null;
                 try {
-                    in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                    in.mark(8192);
-                    final StringWriter sw = new StringWriter();
-                    final char[] buffer   = new char[1024];
-                    int size;
-                    while ((size = in.read(buffer, 0, 1024)) > 0) {
-                        sw.append(new String(buffer, 0, size));
-                    }
-                    in.reset();
-                    String xml = sw.toString();
-                    if (xml.contains("<wfs:Transaction")) {
-                        XmlFeatureReader featureReader = new JAXPStreamFeatureReader(worker.getFeatureTypes());
-                        featuresToInsert =  (List<SimpleFeature>) featureReader.read(xml);
-                    }
-
-                } catch (UnsupportedEncodingException ex) {
-                    return launchException("Error while pre-reading the request.\nCause:" + ex.getMessage(), "NO_APPLICABLE_CODE", null);
+                    XmlFeatureReader featureReader = new JAXPStreamFeatureReader(worker.getFeatureTypes());
+                    in = new FileInputStream(temp);
+                    featuresToInsert =  (List<SimpleFeature>) featureReader.read(in);
                 } catch (IOException ex) {
+                    LOGGER.log(Level.SEVERE, ex.getMessage(),ex);
                     return launchException("Error while pre-reading the request.\nCause:" + ex.getMessage(), "NO_APPLICABLE_CODE", null);
+                } finally{
+                    if(in != null){
+                        in.close();
+                    }
                 }
 
+                in = new FileInputStream(temp);
                 request = unmarshaller.unmarshal(in);
                 if (request instanceof JAXBElement) {
                     request = ((JAXBElement<?>)request).getValue();
@@ -341,7 +354,9 @@ public class WFSService extends OGCWebService {
                         }
                     }
                 }
-            } catch (UnmarshalException e) {
+            }catch(IOException ex){
+                return launchException("Error while pre-reading the request.\nCause:" + ex.getMessage(), "NO_APPLICABLE_CODE", null);
+            }catch (UnmarshalException e) {
                 String errorMsg = e.getMessage();
                 if (errorMsg == null) {
                     if (e.getCause() != null && e.getCause().getMessage() != null) {
@@ -362,6 +377,18 @@ public class WFSService extends OGCWebService {
                 if (unmarshaller != null)  {
                     marshallerPool.release(unmarshaller);
                 }
+                
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(WFSService.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                if(temp != null){
+                    temp.delete();
+                }
+
             }
 
             if (request instanceof Versioned) {
