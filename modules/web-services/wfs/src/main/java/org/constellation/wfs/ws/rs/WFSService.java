@@ -302,7 +302,7 @@ public class WFSService extends OGCWebService {
                 
                 // we made a pre-reading to extract the feature to insert in transaction request.
                 final BufferedReader in;
-                List<SimpleFeature> featuresToInsert = null;
+                Object featuresToInsert = null;
                 try {
                     in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
                     in.mark(8192);
@@ -316,7 +316,7 @@ public class WFSService extends OGCWebService {
                     String xml = sw.toString();
                     if (xml.contains("<wfs:Transaction")) {
                         XmlFeatureReader featureReader = new JAXPStreamFeatureReader(worker.getFeatureTypes());
-                        featuresToInsert =  (List<SimpleFeature>) featureReader.read(xml);
+                        featuresToInsert =  featureReader.read(xml);
                     }
 
                 } catch (UnsupportedEncodingException ex) {
@@ -337,7 +337,13 @@ public class WFSService extends OGCWebService {
                         if (obj instanceof InsertElementType) {
                             InsertElementType insert = (InsertElementType) obj;
                             insert.getFeature().clear();
-                            insert.getFeature().addAll(featuresToInsert);
+
+                            if (featuresToInsert instanceof List) {
+                                insert.getFeature().addAll((List<SimpleFeature>)featuresToInsert);
+                            } else if (featuresToInsert instanceof FeatureCollection) {
+                                insert.getFeature().add(featuresToInsert);
+                            }
+                            
                         }
                     }
                 }

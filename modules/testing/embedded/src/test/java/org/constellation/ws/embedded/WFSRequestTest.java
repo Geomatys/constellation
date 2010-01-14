@@ -170,6 +170,93 @@ public class WFSRequestTest {
 
         assertEquals(xmlExpResult, xmlResult);
 
+        // for a POST request
+        conec = getCapsUrl.openConnection();
+
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", "text/xml");
+        wr = new OutputStreamWriter(conec.getOutputStream());
+        final InputStream is2  = Util.getResourceAsStream("org/constellation/xml/Insert-SamplingPoint-2.xml");
+        sw                     = new StringWriter();
+        in                     = new BufferedReader(new InputStreamReader(is2, "UTF-8"));
+        buffer                 = new char[1024];
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+
+        wr.write(sw.toString());
+        wr.flush();
+
+        // Try to unmarshall something from the response returned by the server.
+        unmarshaller = pool.acquireUnmarshaller();
+        obj          = unmarshaller.unmarshal(conec.getInputStream());
+        in.close();
+        pool.release(unmarshaller);
+
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        assertTrue(obj instanceof TransactionResponseType);
+
+        result = (TransactionResponseType) obj;
+
+        sum              = new TransactionSummaryType(2, 0, 0);
+        insertedFeatures = new ArrayList<InsertedFeatureType>();
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-005"), null));
+        insertedFeatures.add(new InsertedFeatureType(new FeatureIdType("station-006"), null));
+        insertResult    = new InsertResultsType(insertedFeatures);
+        ExpResult = new TransactionResponseType(sum, null, insertResult, "1.1.0");
+
+        assertEquals(ExpResult, result);
+
+        /**
+         * We verify that the 2 new samplingPoint are inserted
+         */
+        queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.1.1");
+
+        // for a POST request
+        conec = getCapsUrl.openConnection();
+
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", "text/xml");
+        wr = new OutputStreamWriter(conec.getOutputStream());
+        sw = new StringWriter();
+        marshaller = pool.acquireMarshaller();
+        marshaller.marshal(request, sw);
+
+        wr.write(sw.toString());
+        wr.flush();
+
+        // Try to unmarshall something from the response returned by the server.
+
+        sw     = new StringWriter();
+        in     = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
+        buffer = new char[1024];
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+
+        xmlResult    = sw.toString();
+        xmlResult = removeXmlns(xmlResult);
+        xmlResult = xmlResult.replaceAll("xsi:schemaLocation=\"[^\"]*\" ", "");
+
+        sw     = new StringWriter();
+        in     = new BufferedReader(new InputStreamReader(Util.getResourceAsStream("org/constellation/xml/samplingPointCollection-2.xml"), "UTF-8"));
+        buffer = new char[1024];
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+        xmlExpResult = sw.toString();
+
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+        xmlExpResult = removeXmlns(xmlExpResult);
+
+        assertEquals(xmlExpResult, xmlResult);
     }
 
     public String removeXmlns(String xml) {

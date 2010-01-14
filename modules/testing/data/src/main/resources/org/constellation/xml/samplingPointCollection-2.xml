@@ -1,0 +1,81 @@
+<?xml version='1.0'?>
+<wfs:FeatureCollection gml:id="id" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs" xmlns:sampling="http://www.opengis.net/sampling/1.0">
+    <gml:boundedBy>
+        <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.4:27582">
+            <gml:lowerCorner>21400.0 1591753.0</gml:lowerCorner>
+            <gml:upperCorner>95800.0 2521478.0</gml:upperCorner>
+        </gml:Envelope>
+    </gml:boundedBy>
+    <gml:featureMember>
+        <sampling:SamplingPoint gml:id="station-001">
+            <gml:description>Point d'eau BSSS</gml:description>
+            <gml:name>10972X0137-PONT</gml:name>
+            <sampling:sampledFeature>urn:-sandre:object:bdrhf:123X</sampling:sampledFeature>
+            <sampling:position>
+                <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                    <gml:pos>65400.0 1731368.0</gml:pos>
+                </gml:Point>
+            </sampling:position>
+        </sampling:SamplingPoint>
+    </gml:featureMember>
+    <gml:featureMember>
+        <sampling:SamplingPoint gml:id="station-002">
+            <gml:description>Point d'eau BSSS</gml:description>
+            <gml:name>10972X0137-PLOUF</gml:name>
+            <sampling:sampledFeature>urn:-sandre:object:bdrhf:123X</sampling:sampledFeature>
+            <sampling:position>
+                <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                    <gml:pos>65400.0 1731368.0</gml:pos>
+                </gml:Point>
+            </sampling:position>
+        </sampling:SamplingPoint>
+    </gml:featureMember>
+    <gml:featureMember>
+        <sampling:SamplingPoint gml:id="sampling-point-3">
+            <gml:description>station de test 4</gml:description>
+            <gml:name>666-999</gml:name>
+            <sampling:sampledFeature>urn:blablabla:4</sampling:sampledFeature>
+            <sampling:position>
+                <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                    <gml:pos>59563.0 2521478.0</gml:pos>
+                </gml:Point>
+            </sampling:position>
+        </sampling:SamplingPoint>
+    </gml:featureMember>
+    <gml:featureMember>
+        <sampling:SamplingPoint gml:id="sampling-point-4">
+            <gml:description>station de test 5</gml:description>
+            <gml:name>r2d2-xoupi</gml:name>
+            <sampling:sampledFeature>urn:blablabla:5</sampling:sampledFeature>
+            <sampling:position>
+                <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                    <gml:pos>95800.0 1591753.0</gml:pos>
+                </gml:Point>
+            </sampling:position>
+        </sampling:SamplingPoint>
+    </gml:featureMember>
+    <gml:featureMember>
+        <sampling:SamplingPoint gml:id="station-005">
+            <gml:description>some station 5</gml:description>
+            <gml:name>10972X0137-SLAPS</gml:name>
+            <sampling:sampledFeature>urn:-sandre:object:bdrhf:48X</sampling:sampledFeature>
+            <sampling:position>
+                <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                    <gml:pos>21400.0 2001368.0</gml:pos>
+                </gml:Point>
+            </sampling:position>
+        </sampling:SamplingPoint>
+    </gml:featureMember>
+    <gml:featureMember>
+        <sampling:SamplingPoint gml:id="station-006">
+            <gml:description>some station 6</gml:description>
+            <gml:name>10972X0137-SLIDE</gml:name>
+            <sampling:sampledFeature>urn:-sandre:object:bdrhf:560X</sampling:sampledFeature>
+            <sampling:position>
+                <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                    <gml:pos>23400.0 2001368.0</gml:pos>
+                </gml:Point>
+            </sampling:position>
+        </sampling:SamplingPoint>
+    </gml:featureMember>
+</wfs:FeatureCollection>

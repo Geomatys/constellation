@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wfs:Transaction
+          version="1.1.0"
+          service="WFS"
+          xmlns:gml="http://www.opengis.net/gml"
+          xmlns:ogc="http://www.opengis.net/ogc"
+          xmlns:wfs="http://www.opengis.net/wfs"
+          xmlns:sampling="http://www.opengis.net/sampling/1.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <wfs:Insert idgen="UseExisting">
+        <wfs:FeatureCollection gml:id="id">
+            <gml:boundedBy>
+                <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                    <gml:lowerCorner>21400.0 2001368.0</gml:lowerCorner>
+                    <gml:upperCorner>23400.0 2001368.0</gml:upperCorner>
+                </gml:Envelope>
+            </gml:boundedBy>
+            <gml:featureMember>
+                <sampling:SamplingPoint gml:id="station-005">
+                    <gml:description>some station 5</gml:description>
+                    <gml:name>10972X0137-SLAPS</gml:name>
+                    <sampling:sampledFeature>urn:-sandre:object:bdrhf:48X</sampling:sampledFeature>
+                    <sampling:position>
+                        <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                            <gml:pos>21400.0 2001368.0</gml:pos>
+                        </gml:Point>
+                    </sampling:position>
+                </sampling:SamplingPoint>
+            </gml:featureMember>
+            <gml:featureMember>
+                <sampling:SamplingPoint gml:id="station-006">
+                    <gml:description>some station 6</gml:description>
+                    <gml:name>10972X0137-SLIDE</gml:name>
+                    <sampling:sampledFeature>urn:-sandre:object:bdrhf:560X</sampling:sampledFeature>
+                    <sampling:position>
+                        <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                            <gml:pos>23400.0 2001368.0</gml:pos>
+                        </gml:Point>
+                    </sampling:position>
+                </sampling:SamplingPoint>
+            </gml:featureMember>
+        </wfs:FeatureCollection>
+    </wfs:Insert>
+</wfs:Transaction>

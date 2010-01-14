@@ -571,6 +571,27 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                             LOGGER.log(Level.SEVERE, null, ex);
                             throw new CstlServiceException("The specified Datastore does not suport the write operations.");
                         }
+                    } else if (featureObject instanceof FeatureCollection) {
+                        final FeatureCollection featureCollection = (FeatureCollection) featureObject;
+                        final Name typeName = featureCollection.getFeatureType().getName();
+                        final FeatureLayerDetails layer = (FeatureLayerDetails) namedProxy.get(typeName, ServiceDef.Specification.WFS.fullName);
+                        if (layer == null) {
+                            throw new CstlServiceException("The specified TypeNames does not exist:" + featureCollection.getFeatureType().getName());
+                        }
+                        try {
+                            final List<FeatureId> features = layer.getStore().addFeatures(typeName, featureCollection);
+
+                            for (FeatureId fid :features){
+                                final String id = fid.getID(); // get the id of the inserted feature
+                                inserted.add(new InsertedFeatureType(new FeatureIdType(id), handle));
+                                totalInserted++;
+                            }
+                        } catch (DataStoreException ex) {
+                            LOGGER.log(Level.SEVERE, null, ex);
+                        } catch (ClassCastException ex) {
+                            LOGGER.log(Level.SEVERE, null, ex);
+                            throw new CstlServiceException("The specified Datastore does not suport the write operations.");
+                        }
                     }
                 }
                 insertResults = new InsertResultsType(inserted);

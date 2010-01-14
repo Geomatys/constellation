@@ -124,11 +124,10 @@ public class MDWebMetadataReaderTest {
     public void getMetadataSMLTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object result = reader.getMetadata("2:SMLC", MetadataReader.SENSORML, null, null);
+        Object result = reader.getMetadata("12:SMLC", MetadataReader.SENSORML, null, null);
 
         AbstractSensorML expResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
 
-        System.out.println("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + result.getClass().getName());
         assertTrue(result != null);
         assertTrue(result instanceof AbstractSensorML);
         assertEquals(expResult, result);
