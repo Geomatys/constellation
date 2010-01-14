@@ -79,6 +79,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Geometry;
+import org.geotoolkit.geometry.isoonjts.GeometryUtils;
+import org.geotoolkit.gml.GeometrytoJTS;
 
 /**
  *
@@ -575,17 +577,17 @@ public abstract class FilterParser {
                 if (gml instanceof PointType) {
                     final PointType gmlPoint = (PointType) gml;
                     crsName  = gmlPoint.getSrsName();
-                    geometry = GMLUtilities.toJTS(gmlPoint);
+                    geometry = GeometrytoJTS.toJTS(gmlPoint);
 
                 } else if (gml instanceof LineStringType) {
                     final LineStringType gmlLine =  (LineStringType) gml;
                     crsName  = gmlLine.getSrsName();
-                    geometry = GMLUtilities.toJTS(gmlLine);
+                    geometry = GeometrytoJTS.toJTS(gmlLine);
 
                 } else if (gml instanceof EnvelopeEntry) {
                     final EnvelopeEntry gmlEnvelope = (EnvelopeEntry) gml;
                     crsName  = gmlEnvelope.getSrsName();
-                    geometry = GMLUtilities.toJTS(gmlEnvelope);
+                    geometry = GeometrytoJTS.toJTS(gmlEnvelope);
                 }
 
                 if (operator.equals("DWithin")) {
@@ -671,17 +673,17 @@ public abstract class FilterParser {
                     //we transform the EnvelopeEntry in GeneralEnvelope
                     final EnvelopeEntry gmlEnvelope = (EnvelopeEntry)gmlGeometry;
                     crsName                   = gmlEnvelope.getSrsName();
-                    filterGeometry            = GMLUtilities.toJTS(gmlEnvelope);
+                    filterGeometry            = GeometrytoJTS.toJTS(gmlEnvelope);
 
                 } else if (gmlGeometry instanceof PointType) {
                     final PointType gmlPoint  = (PointType) gmlGeometry;
                     crsName                   = gmlPoint.getSrsName();
-                    filterGeometry            = GMLUtilities.toJTS(gmlPoint);
+                    filterGeometry            = GeometrytoJTS.toJTS(gmlPoint);
 
                 } else if (gmlGeometry instanceof LineStringType) {
                     final LineStringType gmlLine =  (LineStringType) gmlGeometry;
                     crsName                = gmlLine.getSrsName();
-                    filterGeometry         = GMLUtilities.toJTS(gmlLine);
+                    filterGeometry         = GeometrytoJTS.toJTS(gmlLine);
                 }
 
                 final int srid = SRIDGenerator.toSRID(crsName, Version.V1);
