@@ -292,7 +292,7 @@ public final class GrizzlyServer {
                 "org.constellation.wfs.ws.rs",
                 "org.constellation.ws.rs.provider"
             });
-            cstlServer.duration = 20*60*1000;
+            cstlServer.duration = 2*60*60*1000;
             cstlServer.runREST();
         }
     }
