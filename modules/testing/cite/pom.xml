@@ -288,8 +288,8 @@
                 <service>wms-1.3.0</service>
                 <service>wcs-1.0.0</service>
 				<service>wfs-1.1.0</service>
-                <service>csw-2.0.2</service>
 				<service>sos-1.0.0</service>
+                <service>csw-2.0.2</service>
               </services>
             </configuration>
           </plugin>
