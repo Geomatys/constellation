@@ -26,11 +26,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
+import org.apache.xerces.dom.ElementNSImpl;
 import org.constellation.ServiceDef;
 import org.constellation.provider.FeatureLayerDetails;
 import org.constellation.provider.LayerDetails;
@@ -75,6 +77,10 @@ import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.filter.accessor.Accessors;
 import org.geotoolkit.filter.accessor.PropertyAccessor;
 import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
+import org.geotoolkit.geometry.isoonjts.spatialschema.geometry.JTSGeometry;
+import org.geotoolkit.gml.GMLUtilities;
+import org.geotoolkit.gml.GeometrytoJTS;
+import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
@@ -103,6 +109,9 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.CodeList;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 /**
@@ -666,9 +675,27 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         if (pa == null || pa.get(ft, updatePropertyValue, null) == null) {
                             throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyValue, INVALID_PARAMETER_VALUE);
                         }
-                        System.out.println(">> updating : "+ updatePropertyValue +"   => " + updateProperty.getValue());
-                        System.out.println("type : " + updateProperty.getValue().getClass());
-                        values.put(ft.getDescriptor(updatePropertyValue), updateProperty.getValue());
+                        Object value;
+                        if (updateProperty.getValue() instanceof ElementNSImpl) {
+                            String strValue = getXMLFromElementNSImpl((ElementNSImpl)updateProperty.getValue());
+                            value = null;
+                            System.out.println(">> updating : "+ updatePropertyValue +"   => " + strValue);
+                        } else {
+                            value = updateProperty.getValue();
+                            if (value instanceof AbstractGeometryType) {
+                                try {
+                                    value = GeometrytoJTS.toJTS((AbstractGeometryType) value);
+                                } catch (NoSuchAuthorityCodeException ex) {
+                                    LOGGER.log(Level.SEVERE, null, ex);
+                                } catch (FactoryException ex) {
+                                    LOGGER.log(Level.SEVERE, null, ex);
+                                }
+                            }
+                            System.out.println(">> updating : "+ updatePropertyValue +"   => " + value);
+                            System.out.println("type : " + value.getClass());
+                        }
+                        values.put(ft.getDescriptor(updatePropertyValue), value);
+                        
                     }
 
                     // we verify that all the properties contained in the filter are known by the feature type.
@@ -701,6 +728,39 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         LOGGER.log(logLevel, "Transaction request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         
         return response;
+    }
+
+    private  String getXMLFromElementNSImpl(ElementNSImpl elt) {
+        StringBuilder s = new StringBuilder();
+        s.append('<').append(elt.getLocalName()).append('>');
+        Node node = elt.getFirstChild();
+        s.append(getXMLFromNode(node)).toString();
+
+        s.append("</").append(elt.getLocalName()).append('>');
+        return s.toString();
+    }
+
+    private  StringBuilder getXMLFromNode(Node node) {
+        StringBuilder temp = new StringBuilder();
+        if (!node.getNodeName().equals("#text")){
+            temp.append("<" + node.getNodeName());
+            NamedNodeMap attrs = node.getAttributes();
+            for(int i=0;i<attrs.getLength();i++){
+                temp.append(" "+attrs.item(i).getNodeName()+"=\""+attrs.item(i).getTextContent()+"\" ");
+            }
+            temp.append(">");
+        }
+        if (node.hasChildNodes()) {
+            NodeList nodes = node.getChildNodes();
+            for (int i = 0; i < nodes.getLength(); i++) {
+                temp.append(getXMLFromNode(nodes.item(i)));
+            }
+        }
+        else{
+            temp.append(node.getTextContent());
+        }
+        if (!node.getNodeName().equals("#text")) temp.append("</" + node.getNodeName() + ">");
+        return temp;
     }
 
     /**

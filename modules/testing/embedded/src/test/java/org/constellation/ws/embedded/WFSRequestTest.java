@@ -70,8 +70,6 @@ public class WFSRequestTest {
 
     
     /**
-     * Ensures that a valid GetCapabilities request returns indeed a valid GetCapabilities
-     * document representing the server capabilities in the WCS version 1.0.0 standard.
      */
     @Test
     public void testWFSTransactionInsert() throws Exception {
@@ -249,6 +247,100 @@ public class WFSRequestTest {
             sw.append(new String(buffer, 0, size));
         }
         xmlExpResult = sw.toString();
+
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+        xmlExpResult = removeXmlns(xmlExpResult);
+
+        assertEquals(xmlExpResult, xmlResult);
+
+    }
+
+    @Test
+    public void testWFSTransactionUpdate() throws Exception {
+
+        // Creates a valid GetCapabilities url.
+        final URL getCapsUrl = new URL(WFS_POST_URL);
+        
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", "text/xml");
+        OutputStreamWriter wr  = new OutputStreamWriter(conec.getOutputStream());
+        final InputStream is3  = Util.getResourceAsStream("org/constellation/xml/Update-NamedPlaces-1.xml");
+        StringWriter sw        = new StringWriter();
+        BufferedReader in      = new BufferedReader(new InputStreamReader(is3, "UTF-8"));
+        char[] buffer          = new char[1024];
+        int size;
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+
+        wr.write(sw.toString());
+        wr.flush();
+
+        // Try to unmarshall something from the response returned by the server.
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object obj          = unmarshaller.unmarshal(conec.getInputStream());
+        in.close();
+        pool.release(unmarshaller);
+
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        assertTrue(obj instanceof TransactionResponseType);
+
+        TransactionResponseType result = (TransactionResponseType) obj;
+
+        TransactionSummaryType sum              = new TransactionSummaryType(0, 1, 0);
+        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, null, "1.1.0");
+
+        assertEquals(ExpResult, result);
+
+
+        /**
+         * We verify that the namedPlaces have been changed
+         */
+        List<QueryType> queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
+        GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/xml; subtype=gml/3.1.1");
+
+        // for a POST request
+        conec = getCapsUrl.openConnection();
+
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", "text/xml");
+        wr = new OutputStreamWriter(conec.getOutputStream());
+        sw = new StringWriter();
+        Marshaller marshaller = pool.acquireMarshaller();
+        marshaller.marshal(request, sw);
+
+        wr.write(sw.toString());
+        wr.flush();
+
+        // Try to unmarshall something from the response returned by the server.
+
+        sw     = new StringWriter();
+        in     = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
+        buffer = new char[1024];
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+
+        String xmlResult    = sw.toString();
+        xmlResult = removeXmlns(xmlResult);
+        xmlResult = xmlResult.replaceAll("xsi:schemaLocation=\"[^\"]*\" ", "");
+
+        sw     = new StringWriter();
+        in     = new BufferedReader(new InputStreamReader(Util.getResourceAsStream("org/constellation/xml/namedPlacesCollection-1.xml"), "UTF-8"));
+        buffer = new char[1024];
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+        String xmlExpResult = sw.toString();
 
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");

@@ -19,11 +19,13 @@ package org.constellation.ws.embedded;
 // J2SE dependencies
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,6 +40,7 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
+import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.provider.om.OMProvider;
 import org.constellation.provider.om.OMProviderService;
@@ -45,7 +48,10 @@ import org.constellation.provider.postgrid.PostGridProvider;
 import org.constellation.provider.postgrid.PostGridProviderService;
 
 // JUnit dependencies
+import org.constellation.provider.shapefile.ShapeFileProvider;
+import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.util.Util;
+import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.junit.*;
 import static org.junit.Assume.*;
@@ -160,6 +166,45 @@ public abstract class AbstractGrizzlyServer extends PostgridTestCase {
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, rootDir, ex);
         }
+
+
+        /****************************************
+         *                                      *
+         * Defines a ShapeFile data provider    *
+         *                                      *
+         ****************************************/
+        try {
+
+            final File outputDir = initDataDirectory();
+
+            final ProviderSource sourceShape = new ProviderSource();
+            sourceShape.loadAll = true;
+            sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
+                    "/org/constellation/ws/embedded/wms111/shapefiles");
+
+            sourceShape.parameters.put(ShapeFileProvider.KEY_NAMESPACE, "http://www.opengis.net/gml");
+
+            sourceShape.layers.add(new ProviderLayer("NamedPlaces", Collections.singletonList("cite_style_NamedPlaces"),
+                                   null, null, null, null, false, null));
+
+
+            final ProviderConfig configShape = new ProviderConfig();
+            configShape.sources.add(sourceShape);
+
+            for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
+                // Here we should have the shapefile data provider defined previously
+                if (service instanceof ShapeFileProviderService) {
+                    service.setConfiguration(configShape);
+                    if (service.getProviders().isEmpty()) {
+                        return;
+                    }
+                    break;
+                }
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+
         // Starting the grizzly server
         grizzly.start();
 
@@ -255,5 +300,36 @@ public abstract class AbstractGrizzlyServer extends PostgridTestCase {
             cstlServer.duration = 5*60*1000;
             cstlServer.runREST();
         }
+    }
+
+    /**
+     * Initialises the data directory in unzipping the jar containing the resources
+     * into a temporary directory.
+     *
+     * @return The root output directory where the data are unzipped.
+     * @throws IOException
+     */
+    private static File initDataDirectory() throws IOException {
+        final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        String styleResource = classloader.getResource("org/constellation/ws/embedded/wms111/styles").getFile();
+        if (styleResource.indexOf('!') != -1) {
+            styleResource = styleResource.substring(0, styleResource.indexOf('!'));
+        }
+        if (styleResource.startsWith("file:")) {
+            styleResource = styleResource.substring(5);
+        }
+        final File styleJar = new File(styleResource);
+        if (styleJar == null || !styleJar.exists()) {
+            throw new IOException("Unable to find the style folder: "+ styleJar);
+        }
+        final InputStream in = new FileInputStream(styleJar);
+        final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        final File outputDir = new File(tmpDir, "Constellation");
+        if (!outputDir.exists()) {
+            outputDir.mkdir();
+        }
+        IOUtilities.unzip(in, outputDir);
+        in.close();
+        return outputDir;
     }
 }
