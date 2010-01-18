@@ -8,7 +8,7 @@
     </gml:boundedBy>
     <gml:featureMember>
         <gml:BasicPolygons gml:id="BasicPolygons.1">
-            <the_geom>
+            <gml:the_geom>
                 <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
                     <gml:surfaceMember>
                         <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
@@ -20,13 +20,13 @@
                         </gml:Polygon>
                     </gml:surfaceMember>
                 </gml:MultiSurface>
-            </the_geom>
-            <ID> </ID>
+            </gml:the_geom>
+            <gml:ID> </gml:ID>
         </gml:BasicPolygons>
     </gml:featureMember>
     <gml:featureMember>
         <gml:BasicPolygons gml:id="BasicPolygons.2">
-            <the_geom>
+            <gml:the_geom>
                 <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
                     <gml:surfaceMember>
                         <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
@@ -38,13 +38,13 @@
                         </gml:Polygon>
                     </gml:surfaceMember>
                 </gml:MultiSurface>
-            </the_geom>
-            <ID> </ID>
+            </gml:the_geom>
+            <gml:ID> </gml:ID>
         </gml:BasicPolygons>
     </gml:featureMember>
     <gml:featureMember>
         <gml:BasicPolygons gml:id="BasicPolygons.3">
-            <the_geom>
+            <gml:the_geom>
                 <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
                     <gml:surfaceMember>
                         <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
@@ -56,8 +56,8 @@
                         </gml:Polygon>
                     </gml:surfaceMember>
                 </gml:MultiSurface>
-            </the_geom>
-            <ID> </ID>
+            </gml:the_geom>
+            <gml:ID> </gml:ID>
         </gml:BasicPolygons>
     </gml:featureMember>
 </wfs:FeatureCollection>

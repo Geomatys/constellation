@@ -20,8 +20,6 @@ package org.constellation.provider.shapefile;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,7 +33,6 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 
-import org.geotoolkit.data.shapefile.ShapefileDataStoreFactory;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.DataStoreFinder;
@@ -257,12 +254,9 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         final Map<String,Serializable> params = new HashMap<String,Serializable>();
         try {
             params.put("url", f.toURI().toURL());
-            params.put(ShapefileDataStoreFactory.NAMESPACEP.getName().toString(), new URI(namespace));
+            params.put("namespace", namespace);
             return DataStoreFinder.getDataStore(params);
-        } catch (URISyntaxException ex) {
-            LOGGER.log(Level.WARNING, null, ex);
-            return null;
-        } catch (DataStoreException ex) {
+       } catch (DataStoreException ex) {
             LOGGER.log(Level.WARNING, null, ex);
             return null;
         } catch (IOException ex) {

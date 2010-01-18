@@ -164,10 +164,11 @@ public class PostgisUtils {
         return null;
     }
 
-    public static FeatureCollection createShapeLayer(URL url) throws MalformedURLException, DataStoreException {
+    public static FeatureCollection createShapeLayer(URL url, String namespace) throws MalformedURLException, DataStoreException {
         Map<String, Serializable> params = new HashMap<String, Serializable>();
 
         params.put("url", url);
+        params.put("namespace", namespace);
         DataStore store = DataStoreFinder.getDataStore(params);
         if (store != null) {
             return store.createSession(false).getFeatureCollection(QueryBuilder.all(store.getNames().iterator().next()));

@@ -140,6 +140,9 @@ public class SMLFeatureXmlBindingTest {
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
 
+        expresult = removeXmlns(expresult);
+        result    = removeXmlns(result);
+
         assertEquals(expresult, result);
     }
 
@@ -157,6 +160,9 @@ public class SMLFeatureXmlBindingTest {
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
 
+        expresult = removeXmlns(expresult);
+        result    = removeXmlns(result);
+        
         // and we replace the space for the specified data
         assertEquals(expresult, result);
     }

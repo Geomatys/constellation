@@ -8,13 +8,13 @@
     </gml:boundedBy>
     <gml:featureMember>
         <gml:Bridges gml:id="Bridges.1">
-            <the_geom>
+            <gml:the_geom>
                 <gml:Point srsName="urn:ogc:def:crs:epsg:4326">
                     <gml:pos>2.0E-4 7.0E-4</gml:pos>
                 </gml:Point>
-            </the_geom>
-            <FID>110</FID>
-            <NAME>Cam Bridge</NAME>
+            </gml:the_geom>
+            <gml:FID>110</gml:FID>
+            <gml:NAME>Cam Bridge</gml:NAME>
         </gml:Bridges>
     </gml:featureMember>
 </wfs:FeatureCollection>

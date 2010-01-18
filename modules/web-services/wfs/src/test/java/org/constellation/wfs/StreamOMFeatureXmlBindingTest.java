@@ -132,6 +132,9 @@ public class StreamOMFeatureXmlBindingTest {
         expresult = expresult.replaceAll("> *<", "><");
         expresult = expresult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
 
+        expresult = removeXmlns(expresult);
+        result    = removeXmlns(result);
+        
         assertEquals(expresult, result);
     }
 
@@ -150,6 +153,9 @@ public class StreamOMFeatureXmlBindingTest {
         expresult = expresult.replaceAll("> *<", "><");
         expresult = expresult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
 
+        expresult = removeXmlns(expresult);
+        result    = removeXmlns(result);
+        
         // and we replace the space for the specified data
         assertEquals(expresult, result);
     }

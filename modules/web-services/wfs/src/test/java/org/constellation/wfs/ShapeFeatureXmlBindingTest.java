@@ -66,14 +66,14 @@ public class ShapeFeatureXmlBindingTest {
     public static void setUpClass() throws Exception {
         final ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         URL url            = classloader.getResource("org/constellation/ws/embedded/wms111/shapefiles/Bridges.shp");
-        fcollBridge        = PostgisUtils.createShapeLayer(url);
+        fcollBridge        = PostgisUtils.createShapeLayer(url, "http://www.opengis.net/gml");
         bridgeFeatureType  = fcollBridge.getFeatureType();
         if (bridgeFeatureType == null) {
             System.out.println("WARNING feature Type for bridge NULL");
         }
 
         url                = classloader.getResource("org/constellation/ws/embedded/wms111/shapefiles/BasicPolygons.shp");
-        fcollPolygons      = PostgisUtils.createShapeLayer(url);
+        fcollPolygons      = PostgisUtils.createShapeLayer(url, "http://www.opengis.net/gml");
         polygonFeatureType = fcollPolygons.getFeatureType();
         if (bridgeFeatureType == null) {
             System.out.println("WARNING feature Type for polygon NULL");
@@ -119,6 +119,9 @@ public class ShapeFeatureXmlBindingTest {
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
 
+        expresult = removeXmlns(expresult);
+        result    = removeXmlns(result);
+        
         assertEquals(expresult, result);
 
         ite = fcollPolygons.iterator();
@@ -136,7 +139,10 @@ public class ShapeFeatureXmlBindingTest {
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
-        expresult = expresult.replaceAll("ID></ID", "ID> </ID");
+        expresult = expresult.replaceAll("ID></gml:ID", "ID> </gml:ID");
+
+        expresult = removeXmlns(expresult);
+        result    = removeXmlns(result);
         
         assertEquals(expresult, result);
     }
@@ -155,6 +161,9 @@ public class ShapeFeatureXmlBindingTest {
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
 
+        expresult = removeXmlns(expresult);
+        result    = removeXmlns(result);
+        
         assertEquals(expresult, result);
 
         result = featureWriter.write(fcollPolygons);
@@ -165,8 +174,11 @@ public class ShapeFeatureXmlBindingTest {
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
 
-        expresult = expresult.replaceAll("ID></ID", "ID> </ID");
+        expresult = expresult.replaceAll("ID></gml:ID", "ID> </gml:ID");
 
+        expresult = removeXmlns(expresult);
+        result    = removeXmlns(result);
+        
         // and we replace the space for the specified data
         assertEquals(expresult, result);
     }

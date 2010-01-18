@@ -2,7 +2,7 @@
 <wfs:FeatureCollection gml:id="id" xmlns:gml="http://www.opengis.net/gml" xmlns:wfs="http://www.opengis.net/wfs">
     <gml:featureMember>
         <gml:Bridges gml:id="Bridges.1">
-            <FID>110</FID>
+            <gml:FID>110</gml:FID>
         </gml:Bridges>
     </gml:featureMember>
 </wfs:FeatureCollection>

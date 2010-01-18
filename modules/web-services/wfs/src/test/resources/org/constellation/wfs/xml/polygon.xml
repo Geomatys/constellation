@@ -1,6 +1,6 @@
 <?xml version='1.0'?>
 <gml:BasicPolygons gml:id="BasicPolygons.1" xmlns:gml="http://www.opengis.net/gml">
-    <the_geom>
+    <gml:the_geom>
         <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
             <gml:surfaceMember>
                 <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
@@ -12,6 +12,6 @@
                 </gml:Polygon>
             </gml:surfaceMember>
         </gml:MultiSurface>
-    </the_geom>
-    <ID> </ID>
+    </gml:the_geom>
+    <gml:ID> </gml:ID>
 </gml:BasicPolygons>
