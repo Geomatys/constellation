@@ -465,7 +465,7 @@ public class SQLFilterParser extends FilterParser {
      */
     private String transformSyntax(String s) {
         if (s.indexOf(':') != -1) {
-            final String prefix = s.substring(0, s.indexOf(':'));
+            final String prefix = s.substring(0, s.lastIndexOf(':'));
             s = s.replace(prefix, getStandardFromPrefix(prefix));
         }
         // we replace the variableName
@@ -478,24 +478,39 @@ public class SQLFilterParser extends FilterParser {
         s = s.replace("/@", ":");
         return s;
     }
-    
+
+    /**
+     * Return a MDweb standard representation from a namespace URI.
+     * 
+     * @param namespace
+     * @return
+     */
     private String getStandardFromNamespace(String namespace) {
-        if (namespace.equals("http://www.opengis.net/cat/wrs/1.0"))
+        if ("http://www.opengis.net/cat/wrs/1.0".equals(namespace))
             return Standard.WRS.getName();
-        else if (namespace.equals("http://www.opengis.net/cat/wrs"))
+        else if ("http://www.opengis.net/cat/wrs".equals(namespace))
             return Standard.WRS_V09.getName();
-        else if (namespace.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5"))
+        else if ("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5".equals(namespace))
             return Standard.EBRIM_V2_5.getName();
-        else if (namespace.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0"))
+        else if ("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0".equals(namespace))
             return Standard.EBRIM_V3.getName();
         else 
             throw new IllegalArgumentException("unexpected namespace: " + namespace);
     }
-    
+
+    /**
+     * Return a MDweb standard representation from a namespace URI or an abbreviated prefix.
+     * @param prefix
+     * @return
+     */
     private String getStandardFromPrefix(String prefix) {
         if (prefixs != null) {
             final String namespace = prefixs.get(prefix);
-            return getStandardFromNamespace(namespace);
+            if (namespace == null) {
+                return getStandardFromNamespace(prefix);
+            } else {
+                return getStandardFromNamespace(namespace);
+            }
         } 
         return null;
     }

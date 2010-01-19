@@ -18,17 +18,12 @@
 package org.constellation.filter;
 
 // J2SE dependencies
-import java.awt.geom.Line2D;
 import java.io.StringReader;
 import java.util.logging.Logger;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
-
-// geotools dependencies
-import org.geotoolkit.geometry.GeneralDirectPosition;
-import org.geotoolkit.geometry.GeneralEnvelope;
 
 // JUnit dependencies
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
@@ -88,7 +83,7 @@ public class FilterParserTest {
         /**
          * Test 1: a simple Filter propertyIsLike 
          */
-        String XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">"                                                               + 
+        String XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"                                                               +
 			   "    <ogc:PropertyIsLike escapeChar=\"\\\" singleChar=\"?\" wildCard=\"*\">" +
                            "        <ogc:PropertyName>apiso:Title</ogc:PropertyName>"                   +
 			   "        <ogc:Literal>*VM*</ogc:Literal>"                                    +
@@ -114,7 +109,7 @@ public class FilterParserTest {
         /**
          * Test 2: a simple Filter PropertyIsEqualTo
          */
-        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">"    + 
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"    +
 	            "    <ogc:PropertyIsEqualTo>"                              +
                     "        <ogc:PropertyName>apiso:Title</ogc:PropertyName>" +
                     "        <ogc:Literal>VM</ogc:Literal>"                    +
@@ -140,7 +135,7 @@ public class FilterParserTest {
         /**
          * Test 3: a simple Filter PropertyIsNotEqualTo
          */
-        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">"    + 
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"    +
 	            "    <ogc:PropertyIsNotEqualTo>"                           +
                     "        <ogc:PropertyName>apiso:Title</ogc:PropertyName>" +
                     "        <ogc:Literal>VM</ogc:Literal>"                    +
@@ -167,7 +162,7 @@ public class FilterParserTest {
         /**
          * Test 4: a simple Filter PropertyIsNull
          */
-        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">"    + 
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"    +
 	            "    <ogc:PropertyIsNull>"                           +
                     "        <ogc:PropertyName>apiso:Title</ogc:PropertyName>" +
                     "    </ogc:PropertyIsNull>"                          + 
@@ -192,7 +187,7 @@ public class FilterParserTest {
         /**
          * Test 5: a simple Filter PropertyIsGreaterThanOrEqualTo
          */
-        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">"           + 
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"           +
 	            "    <ogc:PropertyIsGreaterThanOrEqualTo>"                        +
                     "        <ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>" +
                     "        <ogc:Literal>2007-06-02</ogc:Literal>"                   +
@@ -218,7 +213,7 @@ public class FilterParserTest {
         /**
          * Test 6: a simple Filter PropertyIsGreaterThan
          */
-        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">"           + 
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"           +
 	            "    <ogc:PropertyIsGreaterThan>"                                 +
                     "        <ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>" +
                     "        <ogc:Literal>2007-06-02</ogc:Literal>"                   +
@@ -244,7 +239,7 @@ public class FilterParserTest {
         /**
          * Test 7: a simple Filter PropertyIsLessThan
          */
-        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">"           + 
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"           +
 	            "    <ogc:PropertyIsLessThan>"                                 +
                     "        <ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>" +
                     "        <ogc:Literal>2007-06-02</ogc:Literal>"                   +
@@ -271,7 +266,7 @@ public class FilterParserTest {
          /**
          * Test 8: a simple Filter PropertyIsLessThanOrEqualTo
          */
-        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">"           + 
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"           +
 	            "    <ogc:PropertyIsLessThanOrEqualTo>"                                 +
                     "        <ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>" +
                     "        <ogc:Literal>2007-06-02</ogc:Literal>"                   +
@@ -309,7 +304,7 @@ public class FilterParserTest {
         /**
          * Test 1: a simple Filter AND between two propertyIsEqualTo 
          */
-        String XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">"         +
+        String XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"         +
                            "    <ogc:And>                                        "         +
 			   "        <ogc:PropertyIsEqualTo>"                               +
                            "            <ogc:PropertyName>apiso:Title</ogc:PropertyName>"  +
@@ -340,7 +335,7 @@ public class FilterParserTest {
         /**
          * Test 2: a simple Filter OR between two propertyIsEqualTo 
          */
-        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">"                +
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"                +
                            "    <ogc:Or>                                        "         +
 			   "        <ogc:PropertyIsEqualTo>"                               +
                            "            <ogc:PropertyName>apiso:Title</ogc:PropertyName>"  +
@@ -372,7 +367,7 @@ public class FilterParserTest {
         /**
          * Test 3: a simple Filter OR between three propertyIsEqualTo 
          */
-        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">"                +
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"                +
                            "    <ogc:Or>                                        "          +
 			   "        <ogc:PropertyIsEqualTo>"                               +
                            "            <ogc:PropertyName>apiso:Title</ogc:PropertyName>"  +
@@ -409,7 +404,7 @@ public class FilterParserTest {
         /**
          * Test 4: a simple Filter Not propertyIsEqualTo 
          */
-        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\">"                 +
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"                 +
                            "    <ogc:Not>                                        "          +
 			   "        <ogc:PropertyIsEqualTo>"                                +
                            "            <ogc:PropertyName>apiso:Title</ogc:PropertyName>"   +
@@ -448,7 +443,8 @@ public class FilterParserTest {
          * Test 1: a simple spatial Filter Intersects 
          */
         String XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"          "  +
-                           "            xmlns:gml=\"http://www.opengis.net/gml\">         "  +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                           "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">         "  +
                            "    <ogc:Intersects>                                          "  +
                            "       <ogc:PropertyName>apiso:BoundingBox</ogc:PropertyName> "  +
                            "         <gml:Envelope srsName=\"EPSG:4326\">                 "  +
@@ -482,7 +478,8 @@ public class FilterParserTest {
          * Test 2: a simple Distance Filter DWithin
          */
         XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"          " +
-                    "            xmlns:gml=\"http://www.opengis.net/gml\">         " +
+                    "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                    "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">         " +
                     "    <ogc:DWithin>                                             " +
                     "      <ogc:PropertyName>apiso:BoundingBox</ogc:PropertyName>  " +
                     "        <gml:Point srsName=\"EPSG:4326\">                     " +
@@ -517,7 +514,8 @@ public class FilterParserTest {
          * Test 3: a simple spatial Filter Intersects 
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"          "  +
-                           "            xmlns:gml=\"http://www.opengis.net/gml\">         "  +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                           "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">         "  +
                            "    <ogc:Intersects>                                          "  +
                            "       <ogc:PropertyName>apiso:BoundingBox</ogc:PropertyName> "  +
                            "           <gml:LineString srsName=\"EPSG:4326\">             "  +
@@ -560,7 +558,8 @@ public class FilterParserTest {
          * Test 1: two spatial Filter with AND 
          */
         String XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                "  +
-                           "            xmlns:gml=\"http://www.opengis.net/gml\">               "  +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                           "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">"  +
                            "    <ogc:And>                                                       "  +
                            "        <ogc:Intersects>                                            "  +
                            "             <ogc:PropertyName>apiso:BoundingBox</ogc:PropertyName> "  +
@@ -606,7 +605,8 @@ public class FilterParserTest {
          * Test 2: three spatial Filter with OR 
          */
        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                "  +
-                   "            xmlns:gml=\"http://www.opengis.net/gml\">               "  +
+                   "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                   "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">               "  +
                    "    <ogc:Or>                                                        "  +
                    "        <ogc:Intersects>                                            "  +
                    "             <ogc:PropertyName>apiso:BoundingBox</ogc:PropertyName> "  +
@@ -669,7 +669,8 @@ public class FilterParserTest {
          * Test 3: three spatial Filter F1 AND (F2 OR F3)
          */
        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                   "  +
-                   "            xmlns:gml=\"http://www.opengis.net/gml\">                  "  +
+                   "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                   "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                  "  +
                    "    <ogc:And>                                                          "  +
                    "        <ogc:Intersects>                                               "  +
                    "             <ogc:PropertyName>apiso:BoundingBox</ogc:PropertyName>    "  +
@@ -739,7 +740,8 @@ public class FilterParserTest {
          * Test 4: three spatial Filter (NOT F1) AND F2 AND F3
          */
        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                   "  +
-                   "            xmlns:gml=\"http://www.opengis.net/gml\">                  "  +
+                   "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                   "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                  "  +
                    "    <ogc:And>                                                          "  +
                    "        <ogc:Not>                                                      "  +
                    "            <ogc:Intersects>                                           "  +
@@ -810,7 +812,8 @@ public class FilterParserTest {
          * Test 5: three spatial Filter NOT (F1 OR F2) AND F3
          */
        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                      "  +
-                   "            xmlns:gml=\"http://www.opengis.net/gml\">                     "  +
+                   "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                   "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                     "  +
                    "    <ogc:And>                                                             "  +
                    "        <ogc:Not>                                                         "  +
                    "            <ogc:Or>                                                      "  +
@@ -899,7 +902,8 @@ public class FilterParserTest {
          * Test 1: PropertyIsLike AND INTERSECT 
          */
         String XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                          " +
-                           "            xmlns:gml=\"http://www.opengis.net/gml\">                         " +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                           "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                         " +
                            "    <ogc:And>                                                                 " +
 			   "        <ogc:PropertyIsLike escapeChar=\"\\\" singleChar=\"?\" wildCard=\"*\">" +
                            "           <ogc:PropertyName>apiso:Title</ogc:PropertyName>                   " +
@@ -940,7 +944,8 @@ public class FilterParserTest {
          * Test 2: PropertyIsLike AND INTERSECT AND propertyIsEquals
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                          " +
-                           "            xmlns:gml=\"http://www.opengis.net/gml\">                         " +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                           "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                         " +
                            "    <ogc:And>                                                                 " +
 			   "        <ogc:PropertyIsLike escapeChar=\"\\\" singleChar=\"?\" wildCard=\"*\">" +
                            "           <ogc:PropertyName>apiso:Title</ogc:PropertyName>                   " +
@@ -985,7 +990,8 @@ public class FilterParserTest {
          * Test 3:  INTERSECT AND propertyIsEquals AND BBOX
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                          " +
-                           "            xmlns:gml=\"http://www.opengis.net/gml\">                         " +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                           "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                         " +
                            "    <ogc:And>                                                                 " +
                            "        <ogc:Intersects>                                                      " +
                            "           <ogc:PropertyName>apiso:BoundingBox</ogc:PropertyName>             " +
@@ -1041,7 +1047,8 @@ public class FilterParserTest {
          * Test 4: PropertyIsLike OR INTERSECT OR propertyIsEquals
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                          " +
-                           "            xmlns:gml=\"http://www.opengis.net/gml\">                         " +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                           "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                         " +
                            "    <ogc:Or>                                                                 " +
 			   "        <ogc:PropertyIsLike escapeChar=\"\\\" singleChar=\"?\" wildCard=\"*\">" +
                            "           <ogc:PropertyName>apiso:Title</ogc:PropertyName>                   " +
@@ -1087,7 +1094,8 @@ public class FilterParserTest {
          * Test 5:  INTERSECT OR propertyIsEquals OR BBOX
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                          " +
-                           "            xmlns:gml=\"http://www.opengis.net/gml\">                         " +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                           "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                         " +
                            "    <ogc:Or>                                                                 " +
                            "        <ogc:Intersects>                                                      " +
                            "           <ogc:PropertyName>apiso:BoundingBox</ogc:PropertyName>             " +
@@ -1144,7 +1152,8 @@ public class FilterParserTest {
          * Test 6:  INTERSECT AND (propertyIsEquals OR BBOX)
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                          " +
-                           "            xmlns:gml=\"http://www.opengis.net/gml\">                         " +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                           "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                         " +
                            "    <ogc:And>                                                                 " +
                            "        <ogc:Intersects>                                                      " +
                            "           <ogc:PropertyName>apiso:BoundingBox</ogc:PropertyName>             " +
@@ -1206,7 +1215,8 @@ public class FilterParserTest {
          * Test 7:  propertyIsNotEquals OR (propertyIsLike AND DWITHIN)
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                                  " +
-                           "            xmlns:gml=\"http://www.opengis.net/gml\">                                 " +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                           "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                                 " +
                            "        <ogc:Or>                                                                      " +
                            "            <ogc:PropertyIsNotEqualTo>                                                " +
                            "                <ogc:PropertyName>apiso:Title</ogc:PropertyName>                      " +
@@ -1261,7 +1271,8 @@ public class FilterParserTest {
          * Test 8:  propertyIsLike AND INTERSECT AND (propertyIsEquals OR BBOX) AND (propertyIsNotEquals OR (Beyond AND propertyIsLike))
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                                  " +
-                           "            xmlns:gml=\"http://www.opengis.net/gml\">                                 " +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                           "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                                 " +
                            "    <ogc:And>                                                                         " +
                            "        <ogc:PropertyIsLike escapeChar=\"\\\" singleChar=\"?\" wildCard=\"*\">        " +
                            "           <ogc:PropertyName>apiso:Title</ogc:PropertyName>                           " +
@@ -1365,7 +1376,8 @@ public class FilterParserTest {
          * Test 9:  NOT propertyIsLike AND NOT INTERSECT AND NOT (propertyIsEquals OR BBOX) AND (propertyIsNotEquals OR (Beyond AND propertyIsLike))
          */
         XMLrequest =       "<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                                  " +
-                           "            xmlns:gml=\"http://www.opengis.net/gml\">                                 " +
+                           "            xmlns:gml=\"http://www.opengis.net/gml\"" +
+                           "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                                 " +
                            "    <ogc:And>                                                                         " +
                            "        <ogc:Not>                                                                     " +
                            "            <ogc:PropertyIsLike escapeChar=\"\\\" singleChar=\"?\" wildCard=\"*\">    " +

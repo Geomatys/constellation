@@ -409,9 +409,11 @@ public class LuceneFilterParser extends FilterParser {
      * Remove the prefix on propertyName.
      */
     private String removePrefix(String s) {
-        final int i = s.indexOf(':');
-        if ( i != -1) {
-            s = s.substring(i + 1, s.length());
+        if (s != null) {
+            final int i = s.lastIndexOf(':');
+            if ( i != -1) {
+                s = s.substring(i + 1, s.length());
+            }
         }
         return s;
     }

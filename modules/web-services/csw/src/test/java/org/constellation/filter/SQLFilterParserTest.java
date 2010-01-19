@@ -83,7 +83,7 @@ public class SQLFilterParserTest {
         /**
          * Test 1: a simple Filter propertyIsLike 
          */
-        String XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"> " +'\n' +
+        String XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:rim=\"urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5\"> " +'\n' +
 			"	<ogc:And>" +'\n' +
 			 "		<ogc:PropertyIsEqualTo> " +'\n' +
 			"			<ogc:PropertyName>rim:ExtrinsicObject/@mimeType</ogc:PropertyName>" +'\n' +
@@ -123,7 +123,7 @@ public class SQLFilterParserTest {
         /**
          * Test 2: a simple Filter PropertyIsEqualTo
          */
-        XMLrequest ="<ogc:Filter  xmlns:ogc=\"http://www.opengis.net/ogc\"> " +'\n' +
+        XMLrequest ="<ogc:Filter  xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:rim=\"urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5\"> " +'\n' +
                            "    <ogc:Or>" +'\n' +
 			"	<ogc:And>" +'\n' +
 			 "		<ogc:PropertyIsEqualTo> " +'\n' +

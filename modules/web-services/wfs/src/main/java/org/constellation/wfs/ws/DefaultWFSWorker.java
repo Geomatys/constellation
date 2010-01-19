@@ -428,26 +428,25 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 }
                 // we ensure that the property names are contained in the feature type and add the mandatory attribute to the list
                 if (!requestPropNames.isEmpty()) {
-                    List<String> propertyNames = new ArrayList<String>();
+                    List<Name> propertyNames = new ArrayList<Name>();
                     for (PropertyDescriptor pdesc : ft.getDescriptors()) {
-                        String propName = pdesc.getName().getLocalPart();
+                        Name propName = pdesc.getName();
 
                         if (!pdesc.isNillable()) {
                             if (!propertyNames.contains(propName)) {
                                 propertyNames.add(propName);
                             }
-                        } else if (requestPropNames.contains(propName)) {
+                        } else if (requestPropNames.contains(propName.getLocalPart())) {
                             propertyNames.add(propName);
                         }
                         
-                        requestPropNames.remove(propName);
+                        requestPropNames.remove(propName.getLocalPart());
                     }
                     // if the requestPropNames is not empty there is unKnown propertyNames
                     if (!requestPropNames.isEmpty()) {
                         throw new CstlServiceException("The feature Type " + typeName + " does not have such a property:" + requestPropNames.get(0), INVALID_PARAMETER_VALUE);
                     }
-
-                    queryBuilder.setProperties(propertyNames.toArray(new String[propertyNames.size()]));
+                    queryBuilder.setProperties(propertyNames.toArray(new Name[propertyNames.size()]));
                 } else  {
                     queryBuilder.setProperties((Name[])null);
                 }
@@ -835,7 +834,10 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 //but it always exist on the features
                 continue;
             }
-
+            // we remove the prefix
+            if (filterProperty.indexOf(':') != -1) {
+                filterProperty = filterProperty.substring(filterProperty.lastIndexOf(':') + 1);
+            }
             PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, filterProperty, null);
             if (pa == null || pa.get(ft, filterProperty, null) == null) {
                 throw new CstlServiceException("The feature Type " + ft.getName() + " does not has such a property: " + filterProperty, INVALID_PARAMETER_VALUE, "filter");

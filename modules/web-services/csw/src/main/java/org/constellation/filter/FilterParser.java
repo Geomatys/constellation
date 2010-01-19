@@ -46,7 +46,6 @@ import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.gml.xml.v311.CoordinatesType;
 import org.geotoolkit.geometry.jts.SRIDGenerator;
 import org.geotoolkit.geometry.jts.SRIDGenerator.Version;
-import org.geotoolkit.gml.GMLUtilities;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.LineStringType;
@@ -79,7 +78,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Geometry;
-import org.geotoolkit.geometry.isoonjts.GeometryUtils;
 import org.geotoolkit.gml.GeometrytoJTS;
 
 /**
@@ -720,7 +718,10 @@ public abstract class FilterParser {
     
 
     protected boolean isDateField(String propertyName) {
-        return (propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")
-                 || propertyName.equalsIgnoreCase("TempExtent_begin") || propertyName.equalsIgnoreCase("TempExtent_end"));
+        if (propertyName != null) {
+            return (propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")
+                     || propertyName.equalsIgnoreCase("TempExtent_begin") || propertyName.equalsIgnoreCase("TempExtent_end"));
+        }
+        return false;
     }
 }
