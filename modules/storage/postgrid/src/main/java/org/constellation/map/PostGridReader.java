@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@ package org.constellation.map;
 import java.awt.geom.Dimension2D;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,6 +37,7 @@ import org.geotoolkit.coverage.processing.Operations;
 import org.geotoolkit.display.shape.DoubleDimension2D;
 import org.geotoolkit.geometry.DirectPosition2D;
 import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.internal.referencing.CRSUtilities;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
@@ -46,19 +48,25 @@ import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.cs.AxisDirection;
+import org.opengis.referencing.cs.CoordinateSystem;
+import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
 /**
  *
+ * @todo this has become a mess. Must wait for postgrid cleaning
+ * to revisit all this.
+ *
  * @author Johann Sorel (Geomatys)
  */
 public class PostGridReader implements CoverageReader {
-    
+
     private static final Logger LOGGER = Logging.getLogger(PostGridReader.class);
 
     private final GridCoverageTable table;
-    
+
     public PostGridReader(final GridCoverageTable table){
         this.table = table;
     }
@@ -83,7 +91,7 @@ public class PostGridReader implements CoverageReader {
     public synchronized GridCoverage2D read(final CoverageReadParam param) throws FactoryException, TransformException, IOException {
 
         if(param == null){
-            
+
             //no parameters, return the complete image
             GridCoverage2D coverage = null;
             try {
@@ -94,9 +102,9 @@ public class PostGridReader implements CoverageReader {
                     table.flush();
                     ref = table.getEntry();
                 }
-                
+
                 if(ref != null) coverage = ref.getCoverage(null);
-                
+
             } catch (CatalogException ex) {
             //TODO fix in postgrid
             //catch anything, looks like sometimes, postgrid throw an ArithmeticException
@@ -107,11 +115,11 @@ public class PostGridReader implements CoverageReader {
             } catch (SQLException ex){
                 throw new IOException(ex);
             }
-            
+
             return coverage;
         }
 
-        Envelope requestEnvelope = param.getEnveloppe();
+        final Envelope requestEnvelope = param.getEnveloppe();
         final CoordinateReferenceSystem requestCRS = requestEnvelope.getCoordinateReferenceSystem();
         final double[] objResolution = param.getResolution();
 
@@ -137,35 +145,64 @@ public class PostGridReader implements CoverageReader {
         //have unlinear resolution
         final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 
+        final CoordinateReferenceSystem requestCRS2D = CRSUtilities.getCRS2D(requestEnvelope.getCoordinateReferenceSystem());
+
         DirectPosition point1 = new DirectPosition2D(
-                    requestEnvelope.getCoordinateReferenceSystem(),
+                    requestCRS2D,
                     requestEnvelope.getMedian(0),
                     requestEnvelope.getMedian(1));
 
         DirectPosition point2 = new DirectPosition2D(
-                    requestEnvelope.getCoordinateReferenceSystem(),
+                    requestCRS2D,
                     requestEnvelope.getMedian(0) + objResolution[0],
                     requestEnvelope.getMedian(1) + objResolution[1]);
 
+        Envelope requestEnvelope2D = CRS.transform(requestEnvelope, requestCRS2D);
         if(!requestCRS.equals(crs)){
             //reproject requested enveloppe to dataCRS
-            final MathTransform objToData = CRS.findMathTransform(
-                    requestEnvelope.getCoordinateReferenceSystem(), crs, true);
-            requestEnvelope = CRS.transform(objToData, requestEnvelope);
+            final MathTransform objToData = CRS.findMathTransform(requestCRS2D, crs, true);
+            requestEnvelope2D = CRS.transform(objToData, requestEnvelope2D);
             point1 = objToData.transform(point1, point1);
             point2 = objToData.transform(point2, point2);
         }
 
-        final GeographicBoundingBox bbox = new DefaultGeographicBoundingBox(requestEnvelope);
+        final GeographicBoundingBox bbox = new DefaultGeographicBoundingBox(requestEnvelope2D);
         final Dimension2D resolution = new DoubleDimension2D(
                 Math.abs( Math.abs(point2.getOrdinate(0)) - Math.abs(point1.getOrdinate(0))),
                 Math.abs( Math.abs(point2.getOrdinate(1)) - Math.abs(point1.getOrdinate(1))) );
 
-        table.setGeographicBoundingBox(bbox);
-        table.setPreferredResolution(resolution);
+
 
         GridCoverage2D coverage = null;
         try {
+            //todo fix in postgrid, should be able to ask for a 4D envelope
+            //table.setEnvelope(requestEnvelope);
+
+            //todo hack to make it work for the time being
+            //postgrid assume the envelope in 4D, exept we can have a 3D or nD in our case
+            table.setGeographicBoundingBox(bbox);
+
+            final CoordinateReferenceSystem verticalCRS = CRS.getVerticalCRS(requestCRS);
+            final CoordinateReferenceSystem temporalCRS = CRS.getTemporalCRS(requestCRS);
+
+            if(verticalCRS != null){
+                final int verticalIndex = getVerticalAxiIndex(requestCRS);
+                table.setVerticalRange(requestEnvelope.getMinimum(verticalIndex), requestEnvelope.getMaximum(verticalIndex));
+            }
+
+            if(temporalCRS != null){
+                final int temporalIndex = getTemporalAxiIndex(requestCRS);
+                table.setTimeRange(
+                        new Date((long)requestEnvelope.getMinimum(temporalIndex)),
+                        new Date((long)requestEnvelope.getMaximum(temporalIndex)));
+            }
+
+
+
+
+
+            table.setPreferredResolution(resolution);
+
             CoverageReference ref = table.getEntry();
             if(ref == null){
                 //TODO sometimes the postgrid reader go a bit crazy and found no coveragreference
@@ -174,9 +211,13 @@ public class PostGridReader implements CoverageReader {
                 ref = table.getEntry();
             }
 
-            if(ref != null) coverage = ref.getCoverage(null);
-            else{
-                throw new CatalogException("No coverage reference found for layer : " + getTable().getLayer().getName());
+            if(ref != null){
+                coverage = ref.getCoverage(null);
+            }else{
+                LOGGER.log(Level.WARNING, "Requested a bbox " + requestEnvelope.getCoordinateReferenceSystem()
+                        +" \n"+ requestEnvelope
+                        + "\nfor coverage : "+getTable().getLayer().getName() +
+                        " but no coverage where found in this bbox.");
             }
 
         } catch (SQLException ex){
@@ -189,12 +230,12 @@ public class PostGridReader implements CoverageReader {
 //        at org.constellation.coverage.catalog.CoverageComparator.getArea(CoverageComparator.java:181)
 
             throw new IOException(ex);
-        } 
+        }
 
         if(coverage != null){
-            coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, requestCRS);
+            coverage = (GridCoverage2D) Operations.DEFAULT.resample(coverage, requestCRS2D);
         }
-        
+
         return coverage;
     }
 
@@ -224,6 +265,42 @@ public class PostGridReader implements CoverageReader {
 //            return new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
 //        }
 
+    }
+
+    /**
+     * return the first temporal axis index.
+     */
+    private static Integer getTemporalAxiIndex(CoordinateReferenceSystem crs){
+        final CoordinateSystem cs = crs.getCoordinateSystem();
+
+        for(int i=0, n= cs.getDimension(); i<n;i++){
+            final CoordinateSystemAxis axis = cs.getAxis(i);
+            final AxisDirection ad = axis.getDirection();
+            if(ad.equals(AxisDirection.FUTURE) || ad.equals(AxisDirection.PAST)){
+                //found a temporal axis
+                return i;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * return the first temporal axis index.
+     */
+    private static Integer getVerticalAxiIndex(CoordinateReferenceSystem crs){
+        final CoordinateSystem cs = crs.getCoordinateSystem();
+
+        for(int i=0, n= cs.getDimension(); i<n;i++){
+            final CoordinateSystemAxis axis = cs.getAxis(i);
+            final AxisDirection ad = axis.getDirection();
+            if(ad.equals(AxisDirection.UP) || ad.equals(AxisDirection.DOWN)){
+                //found a vertical axis
+                return i;
+            }
+        }
+
+        return null;
     }
 
 }
