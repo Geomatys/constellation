@@ -348,6 +348,16 @@ public class ConfigurationService extends AbstractWebService  {
      */
     private AcknowlegementType restartService(boolean forced) {
         LOGGER.info("\n restart requested \n");
+        // Reload the style and layer provider proxies if they already exist.
+        final StyleProviderProxy spp = StyleProviderProxy.getInstance(false);
+        if (spp != null) {
+            spp.reload();
+        }
+        final LayerProviderProxy lpp = LayerProviderProxy.getInstance(false);
+        if (lpp != null) {
+            lpp.reload();
+        }
+
         if (cn != null) {
             if (!isIndexing) {
                 cn.reload();
@@ -544,7 +554,13 @@ public class ConfigurationService extends AbstractWebService  {
         if (cswConfigurer != null) {
             cswConfigurer.destroy();
         }
-        StyleProviderProxy.getInstance(false).dispose();
-        LayerProviderProxy.getInstance(false).dispose();
+        final StyleProviderProxy spp = StyleProviderProxy.getInstance(false);
+        if (spp != null) {
+            spp.dispose();
+        }
+        final LayerProviderProxy lpp = LayerProviderProxy.getInstance(false);
+        if (lpp != null) {
+            lpp.dispose();
+        }
     }
 }

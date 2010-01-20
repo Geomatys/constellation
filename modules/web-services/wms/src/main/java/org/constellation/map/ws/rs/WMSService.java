@@ -616,7 +616,7 @@ public class WMSService extends GridWebService {
     @PreDestroy
     @Override
     public void destroy() {
-        LayerProviderProxy.getInstance().reload();
+//        LayerProviderProxy.getInstance().reload();
         LOGGER.info("Shutting down the REST WMS service facade.");
     }
 }
