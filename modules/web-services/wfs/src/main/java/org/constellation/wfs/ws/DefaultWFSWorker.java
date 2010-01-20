@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -128,6 +127,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     private ServiceVersion actingVersion = new ServiceVersion(ServiceType.WFS, "1.1.0");
 
     private Map<String, String> schemaLocations;
+
+    private Map<String, String> namespaceMapping;
 
     private String outputFormat = "text/xml";
 
@@ -783,7 +784,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         final Filter filter;
         try {
             if (jaxbFilter != null) {
-                filter = util.getTransformer110().visitFilter(jaxbFilter);
+                filter = util.getTransformer110(namespaceMapping).visitFilter(jaxbFilter);
             } else {
                 filter = defaultFilter;
             }
@@ -834,10 +835,10 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 //but it always exist on the features
                 continue;
             }
-            // we remove the prefix
+            /* we remove the prefix
             if (filterProperty.indexOf(':') != -1) {
                 filterProperty = filterProperty.substring(filterProperty.lastIndexOf(':') + 1);
-            }
+            }*/
             PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, filterProperty, null);
             if (pa == null || pa.get(ft, filterProperty, null) == null) {
                 throw new CstlServiceException("The feature Type " + ft.getName() + " does not has such a property: " + filterProperty, INVALID_PARAMETER_VALUE, "filter");
@@ -951,5 +952,10 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             }
         }
         return types;
+    }
+
+    @Override
+    public void setprefixMapping(Map<String, String> namespaceMapping) {
+       this.namespaceMapping = namespaceMapping;
     }
 }

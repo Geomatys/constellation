@@ -71,6 +71,8 @@ public interface WFSWorker extends Worker {
 
     Map<String, String> getSchemaLocations();
 
+    void setprefixMapping(Map<String, String> namespaceMapping);
+
     List<FeatureType> getFeatureTypes();
 
 }

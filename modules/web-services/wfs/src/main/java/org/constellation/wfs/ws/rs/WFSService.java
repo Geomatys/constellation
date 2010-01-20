@@ -301,6 +301,7 @@ public class WFSService extends OGCWebService {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
                 
                 // we made a pre-reading to extract the feature to insert in transaction request.
+                // we also extract the namespace mapping
                 final BufferedReader in;
                 Object featuresToInsert = null;
                 try {
@@ -314,10 +315,11 @@ public class WFSService extends OGCWebService {
                     }
                     in.reset();
                     String xml = sw.toString();
+                    XmlFeatureReader featureReader = new JAXPStreamFeatureReader(worker.getFeatureTypes());
                     if (xml.contains("<wfs:Transaction")) {
-                        XmlFeatureReader featureReader = new JAXPStreamFeatureReader(worker.getFeatureTypes());
                         featuresToInsert =  featureReader.read(xml);
                     }
+                    worker.setprefixMapping(featureReader.extractNamespace(xml));
 
                 } catch (UnsupportedEncodingException ex) {
                     return launchException("Error while pre-reading the request.\nCause:" + ex.getMessage(), "NO_APPLICABLE_CODE", null);
