@@ -550,7 +550,8 @@ public class ConfigurationService extends AbstractWebService  {
     @Override
     @PreDestroy
     public void destroy() {
-        LOGGER.info("Shutting down the REST Configuration service facade.");
+        LOGGER.info("Shutting down the REST Configuration service facade. Disposing " +
+                "all datastore instances.");
         if (cswConfigurer != null) {
             cswConfigurer.destroy();
         }
