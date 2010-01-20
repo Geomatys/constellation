@@ -16,10 +16,6 @@
  */
 package org.constellation.map;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.CoverageReader;
 import org.geotoolkit.coverage.processing.ColorMap;
@@ -49,11 +45,6 @@ import org.opengis.style.RasterSymbolizer;
 public class PostGridMapLayer extends AbstractMapLayer implements CoverageMapLayer {
 
     /**
-     * The requested elevation.
-     */
-    private double elevation;
-
-    /**
      * The envelope of current layer, including its CRS.
      */
     private GeneralEnvelope envelope;
@@ -63,11 +54,6 @@ public class PostGridMapLayer extends AbstractMapLayer implements CoverageMapLay
      * {@linkplain GridCoverage2D grid coverage}.
      */
     private MeasurementRange dimRange;
-
-    /**
-     * List of available dates for a request.
-     */
-    private final List<Date> times;
         
     /**
      * postgrid reader
@@ -82,7 +68,6 @@ public class PostGridMapLayer extends AbstractMapLayer implements CoverageMapLay
      */
     public PostGridMapLayer(final PostGridReader reader) {
         super(createDefaultRasterStyle());
-        this.times = new ArrayList<Date>();
         this.reader = reader;
         setName(reader.getTable().getLayer().getName());
     }
@@ -103,15 +88,6 @@ public class PostGridMapLayer extends AbstractMapLayer implements CoverageMapLay
 //                bbox.getSouthBoundLatitude(),
 //                bbox.getNorthBoundLatitude(),
 //                crs);
-    }
-
-    /**
-     * Returns a single time from the {@linkplain #times} list, or {@code null} if none.
-     * If there is more than one time, select the last one on the basis that it is typically
-     * the most recent one.
-     */
-    private Date getTime() {
-        return times.isEmpty() ? null : times.get(times.size() - 1);
     }
 
     /**
@@ -144,20 +120,6 @@ public class PostGridMapLayer extends AbstractMapLayer implements CoverageMapLay
         this.dimRange = dimRange;
     }
 
-    /**
-     * Fixes the elevation to request.
-     */
-    public void setElevation(final double elevation) {
-        this.elevation = elevation;
-    }
-
-    /**
-     * Returns a modifiable list of dates.
-     */
-    public List<Date> times() {
-        return times;
-    }
-
     @Override
     public Name getCoverageName() {
         return new DefaultName(reader.getTable().getLayer().getName());
@@ -165,8 +127,6 @@ public class PostGridMapLayer extends AbstractMapLayer implements CoverageMapLay
 
     @Override
     public CoverageReader getCoverageReader() {
-        reader.getTable().setTimeRange(getTime(), getTime());
-        reader.getTable().setVerticalRange(elevation, elevation);
         return reader;
     }
 

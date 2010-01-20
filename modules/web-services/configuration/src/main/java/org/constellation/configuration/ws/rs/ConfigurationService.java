@@ -52,6 +52,8 @@ import org.constellation.configuration.UpdatePropertiesFileType;
 import org.constellation.configuration.UpdateXMLFileType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.util.Util;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
@@ -346,6 +348,16 @@ public class ConfigurationService extends AbstractWebService  {
      */
     private AcknowlegementType restartService(boolean forced) {
         LOGGER.info("\n restart requested \n");
+        // Reload the style and layer provider proxies if they already exist.
+        final StyleProviderProxy spp = StyleProviderProxy.getInstance(false);
+        if (spp != null) {
+            spp.reload();
+        }
+        final LayerProviderProxy lpp = LayerProviderProxy.getInstance(false);
+        if (lpp != null) {
+            lpp.reload();
+        }
+
         if (cn != null) {
             if (!isIndexing) {
                 cn.reload();
@@ -538,8 +550,18 @@ public class ConfigurationService extends AbstractWebService  {
     @Override
     @PreDestroy
     public void destroy() {
-        LOGGER.info("Shutting down the REST Configuration service facade.");
-        if (cswConfigurer != null)
+        LOGGER.info("Shutting down the REST Configuration service facade. Disposing " +
+                "all datastore instances.");
+        if (cswConfigurer != null) {
             cswConfigurer.destroy();
+        }
+        final StyleProviderProxy spp = StyleProviderProxy.getInstance(false);
+        if (spp != null) {
+            spp.dispose();
+        }
+        final LayerProviderProxy lpp = LayerProviderProxy.getInstance(false);
+        if (lpp != null) {
+            lpp.dispose();
+        }
     }
 }

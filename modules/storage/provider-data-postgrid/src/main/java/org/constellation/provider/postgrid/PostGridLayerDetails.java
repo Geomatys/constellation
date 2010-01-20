@@ -44,7 +44,6 @@ import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display.shape.DoubleDimension2D;
 import org.geotoolkit.coverage.io.CoverageReader;
-import org.geotoolkit.display2d.ext.dimrange.DimRangeSymbolizer;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapLayer;
@@ -174,54 +173,27 @@ class PostGridLayerDetails implements CoverageLayerDetails {
             style = RANDOM_FACTORY.createRasterStyle();
         }
         
-//        MeasurementRange dimRange = null;
-//
-        if (params != null) {
-//            dimRange = (MeasurementRange) params.get(KEY_DIM_RANGE);
-//            if (dimRange == null) {
-//                final MeasurementRange<?>[] postgridRange = getSampleValueRanges();
-//                if (postgridRange.length > 0) {
-//                    dimRange = postgridRange[0];
-//                }
-//            }
-//            mapLayer.setDimRange(dimRange);
-            final Double elevation = (Double) params.get(KEY_ELEVATION);
-            if (elevation != null) {
-                mapLayer.setElevation(elevation);
-            }
-            final Date time = (Date) params.get(KEY_TIME);
-            if (time != null) {
-                mapLayer.times().add(time);
-            }
-        }
-//
-//        if(dimRange != null){
-//            //a dim range is define, it replace any given style.
-//            final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
-//            mapLayer.setStyle(STYLE_FACTORY.style(symbol));
-//        }else{
-            mapLayer.setStyle(style);
+        mapLayer.setStyle(style);
 
-            //search if we need an elevationmodel for style
-            search_loop:
-            for (FeatureTypeStyle fts : mapLayer.getStyle().featureTypeStyles()){
-                for (Rule rule : fts.rules()){
-                    for (Symbolizer symbol : rule.symbolizers()){
-                        if (symbol instanceof RasterSymbolizer){
-                            final RasterSymbolizer rs = (RasterSymbolizer) symbol;
-                            final ShadedRelief sr     = rs.getShadedRelief();
-                            if (sr.getReliefFactor().evaluate(null, Float.class) != 0){
-                                final ElevationModel model = LayerProviderProxy.getInstance().getElevationModel(elevationModel);
-                                if (model != null){
-                                    mapLayer.setElevationModel(model);
-                                }
-                                break search_loop;
+        //search if we need an elevationmodel for style
+        search_loop:
+        for (FeatureTypeStyle fts : mapLayer.getStyle().featureTypeStyles()){
+            for (Rule rule : fts.rules()){
+                for (Symbolizer symbol : rule.symbolizers()){
+                    if (symbol instanceof RasterSymbolizer){
+                        final RasterSymbolizer rs = (RasterSymbolizer) symbol;
+                        final ShadedRelief sr     = rs.getShadedRelief();
+                        if (sr.getReliefFactor().evaluate(null, Float.class) != 0){
+                            final ElevationModel model = LayerProviderProxy.getInstance().getElevationModel(elevationModel);
+                            if (model != null){
+                                mapLayer.setElevationModel(model);
                             }
+                            break search_loop;
                         }
                     }
                 }
             }
-//        }
+        }
 
         return mapLayer;
     }

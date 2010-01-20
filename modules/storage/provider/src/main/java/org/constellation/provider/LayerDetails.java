@@ -58,8 +58,6 @@ public interface LayerDetails {
     };
 
     String KEY_DIM_RANGE = "DIM_RANGE";
-    String KEY_ELEVATION = "ELEVATION";
-    String KEY_TIME      = "TIME";
 
     MutableStyleFactory STYLE_FACTORY = (MutableStyleFactory)FactoryFinder.getStyleFactory(
                             new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));

@@ -18,7 +18,6 @@
 package org.constellation.provider.postgis;
 
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -73,11 +72,8 @@ class PostGisLayerDetails extends AbstractFeatureLayerDetails {
 
         layer = MapBuilder.createFeatureLayer(store.createSession(false).getFeatureCollection(QueryBuilder.all(groupName)), style);
         
-        if (params != null) {
-            final Date date = (Date) params.get(KEY_TIME);
-            final Number elevation = (Number) params.get(KEY_ELEVATION);
-            layer.setQuery(createQuery(date, elevation));
-        }
+        layer.setElevationRange(elevationStartField, elevationEndField);
+        layer.setTemporalRange(dateStartField, dateEndField);
 
         layer.setName(getName());
         

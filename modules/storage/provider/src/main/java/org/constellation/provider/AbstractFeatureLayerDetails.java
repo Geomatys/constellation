@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -43,8 +43,7 @@ import org.geotoolkit.display2d.service.DefaultGlyphService;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.filter.text.cql2.CQL;
-import org.geotoolkit.filter.text.cql2.CQLException;
+import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.CRS;
@@ -56,6 +55,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.Name;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 
@@ -83,10 +84,10 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     protected final Name groupName;
     protected final List<String> favorites;
     protected final String name;
-    protected final String dateStartField;
-    protected final String dateEndField;
-    protected final String elevationStartField;
-    protected final String elevationEndField;
+    protected final PropertyName dateStartField;
+    protected final PropertyName dateEndField;
+    protected final PropertyName elevationStartField;
+    protected final PropertyName elevationEndField;
 
     protected AbstractFeatureLayerDetails(String name, DataStore store, Name groupName, List<String> favorites){
         this(name,store, groupName,favorites,null,null,null,null);
@@ -109,21 +110,19 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
         }else{
             this.favorites = Collections.unmodifiableList(favorites);
         }
-        
-        if(dateStart != null)       this.dateStartField = dateStart;
-        else if(dateEnd != null)    this.dateStartField = dateEnd;
+
+        final FilterFactory ff = FactoryFinder.getFilterFactory(null);
+
+        if(dateStart != null)       this.dateStartField = ff.property(dateStart);
         else                        this.dateStartField = null;
         
-        if(dateEnd != null)         this.dateEndField = dateEnd;
-        else if(dateStart != null)  this.dateEndField = dateStart;
+        if(dateEnd != null)         this.dateEndField = ff.property(dateEnd);
         else                        this.dateEndField = null;
         
-        if(elevationStart != null)      this.elevationStartField = elevationStart;
-        else if(elevationEnd != null)   this.elevationStartField = elevationEnd;
+        if(elevationStart != null)      this.elevationStartField = ff.property(elevationStart);
         else                            this.elevationStartField = null;
         
-        if(elevationEnd != null)        this.elevationEndField = elevationEnd;
-        else if(elevationStart != null) this.elevationEndField = elevationStart;
+        if(elevationEnd != null)        this.elevationEndField = ff.property(elevationEnd);
         else                            this.elevationEndField = null;
         
     }
@@ -214,7 +213,9 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
         FeatureIterator<SimpleFeature> features = null;
         if(dateStartField != null){
             try{
-                final AttributeDescriptor desc = ((SimpleFeatureType)store.getFeatureType(groupName)).getDescriptor(dateStartField);
+                final AttributeDescriptor desc = (AttributeDescriptor) 
+                        dateStartField.evaluate((SimpleFeatureType)store.getFeatureType(groupName));
+
                 if(desc == null){
                     LOGGER.log(Level.WARNING , "Invalide field : "+ dateStartField + " Doesnt exists in layer :" + name);
                     return dates;
@@ -228,14 +229,14 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
 
                 final QueryBuilder builder = new QueryBuilder();
                 builder.setTypeName(groupName);
-                builder.setProperties(new String[]{dateStartField});
+                builder.setProperties(new String[]{dateStartField.getPropertyName()});
                 final Query query = builder.buildQuery();
 
                 final FeatureCollection<SimpleFeature> coll = store.createSession(false).getFeatureCollection(query);
                 features = coll.iterator();
                 while(features.hasNext()){
                     final SimpleFeature sf = features.next();
-                    final Date date = (Date) sf.getAttribute(dateStartField);
+                    final Date date = dateStartField.evaluate(sf,Date.class);
                     if(date != null){
                         dates.add(date);
                     }
@@ -263,7 +264,8 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
         if (elevationStartField != null) {
 
             try {
-                final AttributeDescriptor desc = ((SimpleFeatureType)store.getFeatureType(groupName)).getDescriptor(elevationStartField);
+                final AttributeDescriptor desc = (AttributeDescriptor)
+                        elevationStartField.evaluate((SimpleFeatureType)store.getFeatureType(groupName));
                 if(desc == null){
                     LOGGER.log(Level.WARNING , "Invalide field : "+ elevationStartField + " Doesnt exists in layer :" + name);
                     return elevations;
@@ -277,16 +279,16 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
 
                 final QueryBuilder builder = new QueryBuilder();
                 builder.setTypeName(groupName);
-                builder.setProperties(new String[]{elevationStartField});
+                builder.setProperties(new String[]{elevationStartField.getPropertyName()});
                 final Query query = builder.buildQuery();
 
                 final FeatureCollection<SimpleFeature> coll = store.createSession(false).getFeatureCollection(query);
                 features = coll.iterator();
                 while(features.hasNext()){
                     final SimpleFeature sf = features.next();
-                    final Number date = (Number) sf.getAttribute(elevationStartField);
-                    if(date != null){
-                        elevations.add(date);
+                    final Number ele = elevationStartField.evaluate(sf,Number.class);
+                    if(ele != null){
+                        elevations.add(ele);
                     }
                     
                 }
@@ -338,43 +340,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     public TYPE getType() {
         return TYPE.FEATURE;
     }
-
-    protected Query createQuery(final Date date, final Number elevation){
-        final QueryBuilder queryBuilder = new QueryBuilder();
-        queryBuilder.setTypeName(groupName);
-        
-        final StringBuilder builder = new StringBuilder();
-        
-        if (date != null && this.dateStartField != null) {
-            //make the date CQL
-            builder.append("(").append(this.dateStartField).append(" <= '").append(date).append("'");
-            builder.append(" AND ");
-            builder.append(this.dateEndField).append(" >= '").append(date).append("'").append(")");
-        }
-        
-        if(elevation != null && this.elevationStartField != null){
-            //make the elevation CQL
-            
-            if(builder.length() >0){
-                builder.append(" AND ");
-            }
-            
-            builder.append("(").append(this.elevationStartField).append(" <= '").append(elevation.floatValue()).append("'");
-            builder.append(" AND ");
-            builder.append(this.elevationEndField).append(" >= '").append(elevation.floatValue()).append("'").append(")");
-        }
-        
-        final String cqlQuery = builder.toString();
-        if(cqlQuery != null && !cqlQuery.isEmpty()){
-            try {
-                queryBuilder.setFilter(CQL.toFilter(cqlQuery));
-            } catch (CQLException ex) {
-                LOGGER.log(Level.SEVERE, "Could not parse CQL query", ex);
-            }
-        }
-        
-        return queryBuilder.buildQuery();
-    }
     
     protected abstract MapLayer createMapLayer(MutableStyle style, final Map<String, Object> params) throws DataStoreException;
+    
 }

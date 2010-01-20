@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -191,11 +191,28 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
     }
 
 
+    /**
+     * Returns the current instance of {@link StyleProviderProxy}. It will create a new one
+     * if it does not already exist.
+     */
     public static synchronized StyleProviderProxy getInstance(){
-        if(INSTANCE == null){
+        return getInstance(true);
+    }
+
+    /**
+     * Returns the current instance of {@link StyleProviderProxy}. If there is no current
+     * instance, it will create and return a new one if the parameter {@code createIfNotExists}
+     * is {@code true}, or return {@code null} and do nothing if it is {@code false}.
+     *
+     * @param createIfNotExists {@code True} if we want to create a new instance if not already
+     *                          defined, {@code false} if we do not want.
+     */
+    public static synchronized StyleProviderProxy getInstance(final boolean createIfNotExists){
+        if(INSTANCE == null && createIfNotExists){
             init(ConfigDirectory.getConfigDirectory().getPath() + File.separator);
             INSTANCE = new StyleProviderProxy();
         }
+
         return INSTANCE;
     }
 
