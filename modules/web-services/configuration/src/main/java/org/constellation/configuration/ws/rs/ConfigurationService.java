@@ -52,6 +52,8 @@ import org.constellation.configuration.UpdatePropertiesFileType;
 import org.constellation.configuration.UpdateXMLFileType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.factory.AbstractConfigurerFactory;
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.util.Util;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
@@ -539,7 +541,10 @@ public class ConfigurationService extends AbstractWebService  {
     @PreDestroy
     public void destroy() {
         LOGGER.info("Shutting down the REST Configuration service facade.");
-        if (cswConfigurer != null)
+        if (cswConfigurer != null) {
             cswConfigurer.destroy();
+        }
+        StyleProviderProxy.getInstance(false).dispose();
+        LayerProviderProxy.getInstance(false).dispose();
     }
 }
