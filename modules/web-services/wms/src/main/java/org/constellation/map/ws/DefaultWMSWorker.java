@@ -66,6 +66,7 @@ import org.constellation.ws.MimeType;
 
 //Geotoolkit dependencies
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
@@ -96,7 +97,9 @@ import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
 import org.geotoolkit.wms.xml.v130.OperationType;
 
 //Geoapi dependencies
+import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.referencing.operation.TransformException;
 import org.opengis.sld.Layer;
 import org.opengis.sld.StyledLayerDescriptor;
 
@@ -694,13 +697,9 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
 
         final List<MutableStyle> styles = getStyles(layerRefs, sld, styleNames);
         //       -- create the rendering parameter Map
-        final Double elevation                 = getMap.getElevation();
-        final Date time                        = getMap.getTime();
         final MeasurementRange<?> dimRange     = getMap.getDimRange();
         final Map<String, Object> params       = new HashMap<String, Object>();
-        params.put(WMSQuery.KEY_ELEVATION, elevation);
         params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
-        params.put(WMSQuery.KEY_TIME, time);
         final SceneDef sdef = new SceneDef();
         sdef.extensions().add(WMSMapDecoration.getExtension());
 
@@ -717,8 +716,18 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
 
 
         // 2. VIEW
-        final JTSEnvelope2D refEnv             = new JTSEnvelope2D(getMap.getEnvelope());
-        final double azimuth                   = getMap.getAzimuth();
+        final Double elevation = getMap.getElevation();
+        final Date time        = getMap.getTime();
+        Envelope refEnv  = getMap.getEnvelope();
+        try {
+            refEnv = GO2Utilities.combine(
+                    refEnv, new Date[]{time, time}, new Double[]{elevation, elevation});
+        } catch (TransformException ex) {
+            throw new CstlServiceException(ex);
+        }
+
+        
+        final double azimuth = getMap.getAzimuth();
         final ViewDef vdef = new ViewDef(refEnv,azimuth);
 
 

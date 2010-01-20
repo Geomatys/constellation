@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -18,7 +18,6 @@
 package org.constellation.provider.shapefile;
 
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -74,11 +73,8 @@ class ShapeFileLayerDetails extends AbstractFeatureLayerDetails {
 
         layer = MapBuilder.createFeatureLayer(store.createSession(false).getFeatureCollection(QueryBuilder.all(groupName)), style);
 
-        if (params != null) {
-            final Date date = (Date) params.get(KEY_TIME);
-            final Number elevation = (Number) params.get(KEY_ELEVATION);
-            layer.setQuery(createQuery(date, elevation));
-        }
+        layer.setElevationRange(elevationStartField, elevationEndField);
+        layer.setTemporalRange(dateStartField, dateEndField);
 
         layer.setName(getName());
 
