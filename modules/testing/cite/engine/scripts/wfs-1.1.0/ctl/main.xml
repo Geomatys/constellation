@@ -119,6 +119,7 @@
 		<!-- Get user input: -->
 		<!--xsl:variable name="wfs.GetCapabilities.get.url" select="$capabilities-url"/-->
         <ctl:value key="profile">sf-1</ctl:value>
+        <ctl:value key="wfs-transaction">Transaction</ctl:value>
 		<xsl:variable name="gmlsf.profile.level" select="$profile"/>
 
 		<!--TODO: Get GMLSF profile level from DescribeFeatureType and XPath expression (gmlsf conformance level 0 or 1) rather than user input-->
