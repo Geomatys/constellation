@@ -91,6 +91,12 @@ public final class ResultsDatabase {
             "SELECT date FROM \"Suites\" WHERE date < ? AND service=? AND version=? ORDER BY date DESC;";
 
     /**
+     * Delete requests.
+     */
+    private static final String DELETE_SUITE = "DELETE FROM \"Suites\" "+
+                                                        "WHERE date=?;";
+
+    /**
      * The connection to the database of Cite Tests results.
      */
     private final Connection connection;
@@ -223,6 +229,22 @@ public final class ResultsDatabase {
         ps.close();
 
         return result;
+    }
+
+    /**
+     * Delete the specified suite of tests.
+     *
+     * @param date The date of the suite to delete.
+     * @throws SQLException if an error occurs in the delete request.
+     */
+    public void deleteSuite(final Date date) throws SQLException {
+        ensureConnectionOpened();
+
+        final PreparedStatement ps = connection.prepareStatement(DELETE_SUITE);
+        ps.setTimestamp(1, new Timestamp(date.getTime()));
+        ps.execute();
+
+        ps.close();
     }
 
     /**

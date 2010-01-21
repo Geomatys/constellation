@@ -89,6 +89,7 @@ public final class LaunchTests implements Runnable {
         // Launch the test suite.
         if (args.length == 0) {
             LOGGER.info("No argument have been given to the script. Usage run.sh [profile...]");
+            return;
         }
         final Runtime rt = Runtime.getRuntime();
         for (String arg : args) {

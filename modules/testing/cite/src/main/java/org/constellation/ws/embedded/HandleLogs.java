@@ -24,15 +24,11 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.maven.plugin.MojoFailureException;
 
 import org.constellation.sql.Result;
 import org.constellation.sql.ResultsDatabase;
-
-import org.geotoolkit.util.logging.Logging;
 
 
 /**
@@ -46,24 +42,19 @@ import org.geotoolkit.util.logging.Logging;
  */
 public final class HandleLogs {
     /**
-     * The default logger.
-     */
-    private static final Logger LOGGER = Logging.getLogger(HandleLogs.class);
-
-    /**
      * Prevents instanciation.
      */
     private HandleLogs() {}
 
     /**
-     * Displays the result of the process into the standard output.
+     * Inserts the result of the process into the database.
      *
      * @param in      The input stream to display.
      * @param service The service name.
      * @param version The service version.
      * @param date    The execution date of the tests suite.
      */
-    private static void copyResult(final InputStream in, final String service,
+    private static void insertResult(final InputStream in, final String service,
                                    final String version, final Date date)
     {
         ResultsDatabase resDB = null;
@@ -93,7 +84,7 @@ public final class HandleLogs {
             try {
                 resDB.close();
             } catch (SQLException ex) {
-                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                System.err.println(ex);
             }
         }
     }
@@ -122,7 +113,31 @@ public final class HandleLogs {
             try {
                 resDB.close();
             } catch (SQLException ex) {
-                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                System.err.println(ex);
+            }
+        }
+    }
+
+    /**
+     * Deletes from the database a specific session that contains new failures
+     * from the previous one.
+     *
+     * @param date The date of the session that will be deleted.
+     */
+    private static void deleteSessionWithNewFailures(final Date date) {
+        ResultsDatabase resDB = null;
+        try {
+            resDB = new ResultsDatabase();
+            resDB.deleteSuite(date);
+        } catch (SQLException ex) {
+            // May be normal if we killed the process. Prints only
+            // a summary of the exception, not the full stack trace.
+            System.err.println(ex);
+        } finally {
+            try {
+                resDB.close();
+            } catch (SQLException ex) {
+                System.err.println(ex);
             }
         }
     }
@@ -139,27 +154,29 @@ public final class HandleLogs {
      */
     public static void main(String[] args) throws IOException, MojoFailureException {
         if (args.length == 0) {
-            LOGGER.info("No argument have been given to the script. Usage log.sh [profile...]");
+            System.err.println("No argument have been given to the script. Usage log.sh [profile...]");
+            return;
         }
         final Runtime rt = Runtime.getRuntime();
         // Stores the date for each sessions in the map.
         final Map<String,Date> dateOfSessions = new HashMap<String,Date>();
         // Launches the log script, and copy the results into the database.
         for (String arg : args) {
+            if (!arg.contains("-")) {
+                System.err.println("The session argument should respect the syntax \"service-version\".");
+                continue;
+            }
             final Date date = new Date();
             dateOfSessions.put(arg, date);
-            if (!arg.contains("-")) {
-                LOGGER.severe("The session argument should respect the syntax \"service-version\".");
-            }
             final String[] argValue = arg.split("-");
             final String service = argValue[0];
             final String version = argValue[1];
             final Process process = rt.exec(new String[]{"../cite/log.sh", arg});
-            copyResult(process.getInputStream(), service, version, date);
+            insertResult(process.getInputStream(), service, version, date);
             try {
                 process.waitFor();
             } catch (InterruptedException ex) {
-                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                System.err.println(ex);
             }
         }
 
@@ -172,7 +189,14 @@ public final class HandleLogs {
             final String[] argValue = arg.split("-");
             final String service = argValue[0];
             final String version = argValue[1];
-            if (analyseResult(dateOfSessions.get(arg), service, version) == false) {
+            final Date currentSessionDate = dateOfSessions.get(arg);
+            if (analyseResult(currentSessionDate, service, version) == false) {
+                /* The session has already been writen in the database for comparison purpose,
+                 * but in fact we do not want to keep it there because there are new failures.
+                 * We do not want the next tests session to be compared to that one, this way
+                 * it is compulsory to correct newly-failing tests to fix the build.
+                 */
+                deleteSessionWithNewFailures(currentSessionDate);
                 successResults = false;
             }
         }
