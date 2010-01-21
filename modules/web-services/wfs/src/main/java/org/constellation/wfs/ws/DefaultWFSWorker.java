@@ -399,7 +399,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
             //decode sort by----------------------------------------------------
             if (jaxbSortBy != null) {
-                sortBys.addAll(util.getTransformer110().visitSortBy(jaxbSortBy));
+                sortBys.addAll(util.getTransformer110(namespaceMapping).visitSortBy(jaxbSortBy));
             }
 
             final QueryBuilder queryBuilder = new QueryBuilder();
