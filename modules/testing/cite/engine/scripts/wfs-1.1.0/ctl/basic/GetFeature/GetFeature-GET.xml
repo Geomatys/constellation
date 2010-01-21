@@ -1171,9 +1171,9 @@
 			    </xsl:when>
 				<xsl:otherwise>
                   <xsl:variable name="features" select="$request1//sf:PrimitiveGeoFeature" />
-				  <xsl:variable name="f1.int" select="$features[1]/sf:intProperty" />
-				  <xsl:variable name="f2.int" select="$features[2]/sf:intProperty" />
-				  <xsl:variable name="f3.int" select="$features[3]/sf:intProperty" />
+				  <xsl:variable name="f1.int" select="xsd:integer($features[1]/sf:intProperty)" />
+				  <xsl:variable name="f2.int" select="xsd:integer($features[2]/sf:intProperty)" />
+				  <xsl:variable name="f3.int" select="xsd:integer($features[3]/sf:intProperty)" />
 				  <xsl:if test="($f1.int lt $f2.int) or ($f2.int lt $f3.int)">
 					  <ctl:message>FAILURE: Features are not sorted by sf:intProperty in descending order.</ctl:message>
 					  <ctl:fail/>
@@ -1354,7 +1354,10 @@
 		            </parsers:HTTPParser>
 				</ctl:request>
 			</xsl:variable>	
-			<xsl:if test="not($RESPONSE//wfs:FeatureCollection/@numberOfFeatures = count($RESPONSE//gml:featureMember) + count($RESPONSE//gml:featureMembers/*))">
+			<xsl:if test="not(($RESPONSE//gml:featureMember) or ($RESPONSE//gml:featureMembers/*))">
+				<ctl:fail/>
+			</xsl:if>
+			<xsl:if test="$RESPONSE//wfs:FeatureCollection/@numberOfFeatures and not($RESPONSE//wfs:FeatureCollection/@numberOfFeatures = count($RESPONSE//gml:featureMember) + count($RESPONSE//gml:featureMembers/*))">
 				<ctl:fail/>
 			</xsl:if>
 		</ctl:code>
