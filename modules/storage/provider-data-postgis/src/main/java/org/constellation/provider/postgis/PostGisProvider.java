@@ -175,9 +175,12 @@ public class PostGisProvider extends AbstractLayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails get(final Name key) {
+    public LayerDetails get(Name key) {
         if (!index.contains(key)) {
-            return null;
+            key = containsOnlyLocalPart(index, key);
+            if (key == null) {
+                return null;
+            }
         }
         final ProviderLayer layer = source.getLayer(key.getLocalPart());
         if (layer == null) {
