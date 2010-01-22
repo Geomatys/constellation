@@ -397,7 +397,6 @@ public final class Util {
      * @throws java.io.IOException
      */
     public static File scanDir(final URI u, final String filePackageName) throws IOException {
-        System.out.println("u:" + u + " pname:" +filePackageName );
         final String scheme = u.getScheme();
         if (scheme.equals("file")) {
             final File f = new File(u.getPath());
