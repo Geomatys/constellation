@@ -208,16 +208,30 @@ public class FileMetadataReader extends MetadataReader {
                         Method setter = null;
                         if (param != null) {
                             setter = Util.getSetterFromName(qn.getLocalPart(), param.getClass(), RecordType.class);
+                        } else {
+                            continue;
                         }
 
                         if (setter != null) {
                             Util.invokeMethod(setter, customRecord, param);
                         } else {
-                            LOGGER.warning("No setter have been found for attribute " + qn.getLocalPart() +" of type " + param.getClass() + " in the class RecordType");
+                            String paramDesc = "null";
+                            String localPart = "null";
+                            if (param != null) {
+                                paramDesc = param.getClass() + "";
+                            }
+                            if (qn != null) {
+                                localPart = qn.getLocalPart();
+                            }
+                            LOGGER.warning("No setter have been found for attribute " + localPart +" of type " + paramDesc + " in the class RecordType");
                         }
 
                     } catch (IllegalArgumentException ex) {
-                        LOGGER.info("illegal argument exception while invoking the method for attribute" + qn.getLocalPart() + " in the classe RecordType");
+                        String localPart = "null";
+                        if (qn != null) {
+                            localPart = qn.getLocalPart();
+                        }
+                        LOGGER.info("illegal argument exception while invoking the method for attribute" + localPart + " in the classe RecordType");
                     }
                 } else {
                     LOGGER.severe("An elementName was null.");

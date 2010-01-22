@@ -127,7 +127,7 @@ public class LuceneFilterParser extends FilterParser {
         final LogicOpsType logicOps         = jbLogicOps.getValue();
         final String operator               = jbLogicOps.getName().getLocalPart();
         final List<Filter> filters          = new ArrayList<Filter>();
-        
+
         if (logicOps instanceof BinaryLogicOpType) {
             final BinaryLogicOpType binary = (BinaryLogicOpType) logicOps;
             queryBuilder.append('(');
@@ -227,8 +227,13 @@ public class LuceneFilterParser extends FilterParser {
             query = "";
         }
 
-        final int logicalOperand    = SerialChainFilter.valueOf(operator);
+        int logicalOperand        = SerialChainFilter.valueOf(operator);
         final Filter spatialFilter  = getSpatialFilterFromList(logicalOperand, filters, query);
+
+        // here the logical operand NOT is contained in the spatial filter
+        if (query.equals("") && logicalOperand == SerialChainFilter.NOT) {
+            logicalOperand = SerialChainFilter.AND;
+        }
         final SpatialQuery response = new SpatialQuery(query, spatialFilter, logicalOperand);
         response.setSubQueries(subQueries);
         return response;

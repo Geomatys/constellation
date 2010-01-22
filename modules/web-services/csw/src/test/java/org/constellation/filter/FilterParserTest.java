@@ -741,7 +741,7 @@ public class FilterParserTest {
          */
        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\"                   "  +
                    "            xmlns:gml=\"http://www.opengis.net/gml\"" +
-                   "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">                  "  +
+                   "            xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">  "  +
                    "    <ogc:And>                                                          "  +
                    "        <ogc:Not>                                                      "  +
                    "            <ogc:Intersects>                                           "  +
@@ -1472,7 +1472,7 @@ public class FilterParserTest {
         assertTrue  (subQuery2.getSpatialFilter() == null);
         assertEquals(subQuery2.getQuery(), "metafile:doc");
         assertEquals(subQuery2.getSubQueries().size(), 1);
-        assertEquals(subQuery2.getLogicalOperator(), SerialChainFilter.NOT);
+        assertEquals(subQuery2.getLogicalOperator(), SerialChainFilter.AND);
         
         // second subQuery => first subQuery
         subQuery2_1 = subQuery2.getSubQueries().get(0);

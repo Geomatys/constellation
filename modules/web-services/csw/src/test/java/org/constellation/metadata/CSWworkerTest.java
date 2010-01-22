@@ -786,8 +786,8 @@ public class CSWworkerTest {
         }
         assertTrue(exLaunched);
 
-         /*
-         * Test 12 : getRecord with bad statrt position
+        /*
+         * Test 12 : getRecord with bad start position
          */
         typeNames        = Arrays.asList(RECORD_QNAME);
         sortBy           = null;

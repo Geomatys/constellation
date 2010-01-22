@@ -489,9 +489,6 @@ public abstract class FilterParser {
             if (logicalOperand == SerialChainFilter.NOT) {
                 final int[] filterType = {SerialChainFilter.NOT};
                 spatialFilter = new SerialChainFilter(filters, filterType);
-                if (query.equals("")) {
-                    logicalOperand = SerialChainFilter.AND;
-                }
             } else {
                 spatialFilter = filters.get(0);
             }

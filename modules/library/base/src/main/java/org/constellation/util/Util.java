@@ -60,6 +60,7 @@ import java.util.Properties;
 import java.util.TimeZone;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,6 +70,7 @@ import javax.imageio.spi.ImageReaderSpi;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.geotoolkit.internal.io.IOUtilities;
 
 /**
  * Utility methods of general use.
@@ -395,6 +397,7 @@ public final class Util {
      * @throws java.io.IOException
      */
     public static File scanDir(final URI u, final String filePackageName) throws IOException {
+        System.out.println("u:" + u + " pname:" +filePackageName );
         final String scheme = u.getScheme();
         if (scheme.equals("file")) {
             final File f = new File(u.getPath());
@@ -404,6 +407,16 @@ public final class Util {
         } else if (scheme.equals("jar") || scheme.equals("zip")) {
             final File f = new File(System.getProperty("java.io.tmpdir") + "/Constellation");
             if (f != null && f.exists()) {
+                try {
+                    String cleanedUri = u.getSchemeSpecificPart();
+                    if (cleanedUri.indexOf('!') != -1)
+                        cleanedUri = cleanedUri.substring(0, cleanedUri.indexOf('!'));
+                    URI newUri = new URI(cleanedUri);
+                    InputStream i = newUri.toURL().openStream();
+                    IOUtilities.unzip(i, f);
+                } catch(URISyntaxException ex) {
+                    LOGGER.log(Level.WARNING, null, ex);
+                }
                 final File fConfig = new File(f, filePackageName);
                 if (fConfig.exists() && fConfig.isDirectory()) {
                     return fConfig;
