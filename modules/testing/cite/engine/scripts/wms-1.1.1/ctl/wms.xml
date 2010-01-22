@@ -3178,7 +3178,7 @@ longitude</td>
                <param name="VeRsIoN">
                   <xsl:value-of select="$VAR_WMS_VERSION"/>
                </param>
-               <wms:GMLValidatingParser/>
+               <!--wms:GMLValidatingParser/-->
             </request>
          </xsl:variable>
          <xsl:for-each select="$request1">
