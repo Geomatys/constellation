@@ -1337,8 +1337,7 @@ public class MDWebMetadataReader extends MetadataReader {
                     responseList.add(value);
 
                 } catch (MD_IOException e) {
-                    throw new CstlServiceException("The service has launch an SQL exeption:" + e.getMessage(),
-                            NO_APPLICABLE_CODE);
+                    throw new CstlServiceException(e, NO_APPLICABLE_CODE);
                 }
             } else {
                 throw new CstlServiceException("The property " + token + " is not queryable for now",

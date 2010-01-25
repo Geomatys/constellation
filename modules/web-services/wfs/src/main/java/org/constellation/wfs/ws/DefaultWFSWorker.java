@@ -426,7 +426,10 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
             for (QName typeName : typeNames) {
 
-                FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(typeName), ServiceDef.Specification.WFS.fullName);
+                LayerDetails layerD = namedProxy.get(Utils.getNameFromQname(typeName), ServiceDef.Specification.WFS.fullName);
+                if (!(layerD instanceof FeatureLayerDetails)) continue;
+
+                FeatureLayerDetails layer = (FeatureLayerDetails) layerD;
 
                 if (layer == null) {
                     throw new CstlServiceException("The specified TypeNames does not exist:" + typeName);
@@ -564,8 +567,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                             INVALID_PARAMETER_VALUE, "inputFormat");
                 }
 
-                // what to do with the SRSName ?
+                // what to do with the CRS ?
                 final String srsName = insertRequest.getSrsName();
+                final CoordinateReferenceSystem insertCRS = extractCRS(srsName);
 
                 // what to do with that, whitch ones are supported ??
                 final IdentifierGenerationOptionType idGen = insertRequest.getIdgen();
@@ -586,7 +590,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                             inserted.add(new InsertedFeatureType(new FeatureIdType(fid), handle));
                             totalInserted++;
                         } catch (DataStoreException ex) {
-                            LOGGER.log(Level.SEVERE, null, ex);
+                            throw new CstlServiceException("Error while inserting the Feature:" + ex.getMessage(), NO_APPLICABLE_CODE);
                         } catch (ClassCastException ex) {
                             LOGGER.log(Level.SEVERE, null, ex);
                             throw new CstlServiceException("The specified Datastore does not suport the write operations.");
@@ -624,6 +628,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 final DeleteElementType deleteRequest = (DeleteElementType) transaction;
 
                 //decode filter-----------------------------------------------------
+                if (deleteRequest.getFilter() == null) {
+                    throw new CstlServiceException("The filter must be specified.", MISSING_PARAMETER_VALUE, "filter");
+                }
                 final Filter filter = extractJAXBFilter(deleteRequest.getFilter(), Filter.EXCLUDE);
 
                 final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(deleteRequest.getTypeName()), ServiceDef.Specification.WFS.fullName);
@@ -636,7 +643,12 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
                     // we verify that all the properties contained in the filter are known by the feature type.
                     verifyFilterProperty(ft, filter);
-                
+
+                    // we extract the number of feature deleted
+                    final QueryBuilder queryBuilder = new QueryBuilder(layer.getGroupName());
+                    queryBuilder.setFilter(filter);
+                    totalDeleted = totalDeleted + (int) layer.getStore().getCount(queryBuilder.buildQuery());
+
                     layer.getStore().removeFeatures(layer.getGroupName(), filter);
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
@@ -644,9 +656,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     LOGGER.log(Level.SEVERE, null, ex);
                     throw new CstlServiceException("The specified Datastore does not suport the delete operations.");
                 }
-
-                // todo find the number of deleted feature
-                totalDeleted++;
 
             /**
              * Features updates.
@@ -676,6 +685,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 }
                 try {
                     final FeatureType ft = layer.getStore().getFeatureType(layer.getGroupName());
+                    if (ft == null) {
+                        throw new CstlServiceException("Unable to find the featuretype:" + layer.getGroupName());
+                    }
 
                     final Map<PropertyDescriptor,Object> values = new HashMap<PropertyDescriptor, Object>();
 
@@ -703,7 +715,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                                 }
                             }
                             System.out.println(">> updating : "+ updatePropertyValue +"   => " + value);
-                            System.out.println("type : " + value.getClass());
+                            if (value != null) {
+                                System.out.println("type : " + value.getClass());
+                            }
                         }
                         values.put(ft.getDescriptor(updatePropertyValue), value);
                         
@@ -712,13 +726,16 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     // we verify that all the properties contained in the filter are known by the feature type.
                     verifyFilterProperty(ft, filter);
 
+                    // we extract the number of feature update
+                    final QueryBuilder queryBuilder = new QueryBuilder(layer.getGroupName());
+                    queryBuilder.setFilter(filter);
+                    totalUpdated = totalUpdated + (int) layer.getStore().getCount(queryBuilder.buildQuery());
+
                     layer.getStore().updateFeatures(layer.getGroupName(), filter, values);
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
                 }
 
-                // TODO find the good number of updated feature
-                totalUpdated++;
                 
             } else {
                 String className = " null object";
