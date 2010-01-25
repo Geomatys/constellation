@@ -391,7 +391,7 @@ public class WFSWorkerTest {
 
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
-        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("gml:name", SortOrderType.ASC))));
+        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.ASC))));
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
@@ -412,7 +412,7 @@ public class WFSWorkerTest {
 
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
-        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("gml:name", SortOrderType.DESC))));
+        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.DESC))));
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 

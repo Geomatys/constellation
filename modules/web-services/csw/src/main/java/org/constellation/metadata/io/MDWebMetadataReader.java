@@ -1331,7 +1331,7 @@ public class MDWebMetadataReader extends MetadataReader {
             
             if (paths.size() != 0) {
                 try {
-                    final List<String> values         = mdReader.getDomainOfValuesFromPaths(paths);
+                    final List<String> values         = mdReader.getDomainOfValuesFromPaths(paths, true);
                     final ListOfValuesType listValues = new ListOfValuesType(values);
                     final DomainValuesType value      = new DomainValuesType(null, token, listValues, METADATA_QNAME);
                     responseList.add(value);

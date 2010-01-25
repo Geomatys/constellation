@@ -452,7 +452,7 @@ public class SQLFilterParser extends FilterParser {
         return response.toString();
     }
     
-    private String treatIDOperator(final List<JAXBElement<AbstractIdType>> jbIdsOps) {
+    private String treatIDOperator(final List<JAXBElement<? extends AbstractIdType>> jbIdsOps) {
         //TODO
         if (true) {
             throw new UnsupportedOperationException("Not supported yet.");

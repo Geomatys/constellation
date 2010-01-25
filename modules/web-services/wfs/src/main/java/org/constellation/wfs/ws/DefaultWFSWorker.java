@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -76,8 +77,6 @@ import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.filter.accessor.Accessors;
 import org.geotoolkit.filter.accessor.PropertyAccessor;
 import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
-import org.geotoolkit.geometry.isoonjts.spatialschema.geometry.JTSGeometry;
-import org.geotoolkit.gml.GMLUtilities;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
@@ -356,6 +355,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         outputFormat = requestOutputFormat;
 
         final LayerProviderProxy namedProxy       = LayerProviderProxy.getInstance();
+        final String featureId                    = request.getFeatureId();
         final XMLUtilities util                   = new XMLUtilities();
         final Integer maxFeatures                 = request.getMaxFeatures();
         final List<FeatureCollection> collections = new ArrayList<FeatureCollection>();
@@ -369,14 +369,25 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             final FilterType jaxbFilter   = query.getFilter();
             final SortByType jaxbSortBy   = query.getSortBy();
             final String srs              = query.getSrsName();
-            final List<QName> typeNames   = query.getTypeName();
             final List<Object> properties = query.getPropertyNameOrXlinkPropertyNameOrFunction();
+
+            final List<QName> typeNames;
+            if (featureId != null && query.getTypeName().isEmpty()) {
+                typeNames = getQNameListFromNameSet(namedProxy.getKeys(ServiceDef.Specification.WFS.fullName));
+            } else {
+                typeNames = query.getTypeName();
+            }
             
             final List<String> requestPropNames = new ArrayList<String>();
             final List<SortBy> sortBys          = new ArrayList<SortBy>();
 
             //decode filter-----------------------------------------------------
-            final Filter filter = extractJAXBFilter(jaxbFilter, Filter.INCLUDE);
+            final Filter filter;
+            if (featureId == null) {
+                filter = extractJAXBFilter(jaxbFilter, Filter.INCLUDE);
+            } else {
+                filter = extractJAXBFilter(new FilterType(new FeatureIdType(featureId)), Filter.INCLUDE);
+            }
 
             //decode crs--------------------------------------------------------
             final CoordinateReferenceSystem crs = extractCRS(srs);
@@ -828,20 +839,22 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      */
     private void verifyFilterProperty(FeatureType ft, Filter filter) throws CstlServiceException {
         Collection<String> filterProperties = (Collection<String>) filter.accept(ListingPropertyVisitor.VISITOR, null);
-        for (String filterProperty : filterProperties) {
+        if (filterProperties != null) {
+            for (String filterProperty : filterProperties) {
 
-            if(filterProperty.startsWith("@")){
-                //this property in an id property, we won't find it in the feature type
-                //but it always exist on the features
-                continue;
-            }
-            /* we remove the prefix
-            if (filterProperty.indexOf(':') != -1) {
-                filterProperty = filterProperty.substring(filterProperty.lastIndexOf(':') + 1);
-            }*/
-            PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, filterProperty, null);
-            if (pa == null || pa.get(ft, filterProperty, null) == null) {
-                throw new CstlServiceException("The feature Type " + ft.getName() + " does not has such a property: " + filterProperty, INVALID_PARAMETER_VALUE, "filter");
+                if(filterProperty.startsWith("@")){
+                    //this property in an id property, we won't find it in the feature type
+                    //but it always exist on the features
+                    continue;
+                }
+                /* we remove the prefix
+                if (filterProperty.indexOf(':') != -1) {
+                    filterProperty = filterProperty.substring(filterProperty.lastIndexOf(':') + 1);
+                }*/
+                PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, filterProperty, null);
+                if (pa == null || pa.get(ft, filterProperty, null) == null) {
+                    throw new CstlServiceException("The feature Type " + ft.getName() + " does not has such a property: " + filterProperty, INVALID_PARAMETER_VALUE, "filter");
+                }
             }
         }
     }
@@ -957,5 +970,18 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     @Override
     public void setprefixMapping(Map<String, String> namespaceMapping) {
        this.namespaceMapping = namespaceMapping;
+    }
+
+    /**
+     * Return a List of QName from a Set Of Name.
+     * @param typeNames
+     * @return
+     */
+    private List<QName> getQNameListFromNameSet(Set<Name> typeNames) {
+        final List<QName> result = new ArrayList<QName>(typeNames.size());
+        for (Name typeName : typeNames) {
+            result.add(Utils.getQnameFromName(typeName));
+        }
+        return result;
     }
 }

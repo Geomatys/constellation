@@ -106,9 +106,26 @@ xmlns:ins="http://www.inspire.org">
                 <ows:Value>2</ows:Value>
             </ows:Constraint>
         </ows:Operation>
-
+        <ows:Operation name="Transaction">
+            <ows:DCP>
+                <ows:HTTP>
+                    <ows:Post xlink:href="http://www.BlueOx.org/wfs"/>
+                </ows:HTTP>
+            </ows:DCP>
+            <ows:Parameter name="inputFormat">
+                <ows:Value>text/xml; subtype=gml/3.1.1</ows:Value>
+            </ows:Parameter>
+            <ows:Parameter name="idgen">
+                <ows:Value>GenerateNew</ows:Value>
+                <ows:Value>UseExisting</ows:Value>
+                <ows:Value>ReplaceDuplicate</ows:Value>
+            </ows:Parameter>
+            <ows:Parameter name="releaseAction">
+                <ows:Value>ALL</ows:Value>
+                <ows:Value>SOME</ows:Value>
+            </ows:Parameter>
+        </ows:Operation>
     </ows:OperationsMetadata>
-
     <ogc:Filter_Capabilities>
         <ogc:Spatial_Capabilities>
             <ogc:GeometryOperands>

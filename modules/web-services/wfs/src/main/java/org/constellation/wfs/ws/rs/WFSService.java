@@ -315,11 +315,16 @@ public class WFSService extends OGCWebService {
                     }
                     in.reset();
                     String xml = sw.toString();
-                    XmlFeatureReader featureReader = new JAXPStreamFeatureReader(worker.getFeatureTypes());
-                    if (xml.contains("<wfs:Transaction")) {
-                        featuresToInsert =  featureReader.read(xml);
+                    try {
+                        XmlFeatureReader featureReader = new JAXPStreamFeatureReader(worker.getFeatureTypes());
+                        if (xml.contains("<wfs:Transaction")) {
+                            featuresToInsert =  featureReader.read(xml);
+                        }
+                        worker.setprefixMapping(featureReader.extractNamespace(xml));
+                    } catch (IllegalArgumentException ex) {
+                        LOGGER.log(Level.INFO, "", ex);
+                        return launchException(ex.getMessage(), INVALID_PARAMETER_VALUE.name() ,null);
                     }
-                    worker.setprefixMapping(featureReader.extractNamespace(xml));
 
                 } catch (UnsupportedEncodingException ex) {
                     return launchException("Error while pre-reading the request.\nCause:" + ex.getMessage(), "NO_APPLICABLE_CODE", null);
@@ -591,8 +596,23 @@ public class WFSService extends OGCWebService {
                 }
             }
         }
+
+        String result = getParameter("resultType", false);
+        ResultTypeType resultType = null;
+        if (result != null) {
+            resultType = ResultTypeType.fromValue(result.toLowerCase());
+        }
+        
+        String featureVersion = getParameter("featureVersion", false);
+
+        String featureId = getParameter("featureid", false);
+        boolean mandatory = true;
+        if (featureId != null) {
+            mandatory = false;
+        }
+        
         List<QName> typeNames = new ArrayList<QName>();
-        String typeName = getParameter("typeName", true);
+        String typeName = getParameter("typeName", mandatory);
         if (typeName != null) {
             final StringTokenizer tokens = new StringTokenizer(typeName, ",;");
             while (tokens.hasMoreTokens()) {
@@ -616,6 +636,12 @@ public class WFSService extends OGCWebService {
                                                   INVALID_PARAMETER_VALUE, "typeName");*/
                 }
             }
+        }
+
+        if (featureId != null) {
+            final QueryType query = new QueryType(null, typeNames, featureVersion);
+            return new GetFeatureType(service, version, handle, maxFeature, featureId, Arrays.asList(query), resultType, outputFormat);
+
         }
 
         String xmlFilter = getParameter("filter", false);
@@ -674,7 +700,6 @@ public class WFSService extends OGCWebService {
             }
         }
 
-        String featureVersion = getParameter("featureVersion", false);
         QueryType query = new QueryType(filter, typeNames, featureVersion);
 
 
@@ -714,15 +739,7 @@ public class WFSService extends OGCWebService {
             query.getPropertyNameOrXlinkPropertyNameOrFunction().addAll(propertyNames);
         }
         
-
-        String result = getParameter("resultType", false);
-        ResultTypeType resultType = null;
-        if (result != null) {
-            resultType = ResultTypeType.fromValue(result.toLowerCase());
-        }
         return new GetFeatureType(service, version, handle, maxFeature, Arrays.asList(query), resultType, outputFormat);
-
-
     }
 
     private GetGmlObjectType createNewGetGmlObjectRequest() throws CstlServiceException {
