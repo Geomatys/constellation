@@ -119,7 +119,12 @@ public class MDWebMetadataReader extends MetadataReader {
      * A list of package containing the CSW and dublinCore implementation
      */
     private List<String> cswPackage;
-    
+
+     /**
+     * A list of package containing the SensorML and SWE implementation
+     */
+    private List<String> sensorMLPackage;
+
     /**
      * A list of package containing the Ebrim V3.0 implementation
      */
@@ -258,9 +263,11 @@ public class MDWebMetadataReader extends MetadataReader {
      */
     private void initPackage() {
 
-        this.geotoolkitPackage    = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
+        this.geotoolkitPackage  = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
                                                         "org.geotoolkit.service", "org.geotoolkit.naming", "org.geotoolkit.feature.catalog",
                                                         "org.geotoolkit.metadata.fra", "org.geotoolkit.temporal.object");
+        this.sensorMLPackage    = Util.searchSubPackage("org.geotoolkit.sml.xml.v100", "org.geotoolkit.swe.xml.v100");
+        
         this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                         "org.opengis.service", "org.opengis.feature.catalog");
         this.cswPackage         = Util.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
@@ -1132,7 +1139,7 @@ public class MDWebMetadataReader extends MetadataReader {
             return String.class;
         } else if (className.equalsIgnoreCase("Date")) {
             return Date.class;
-        } else if (className.equalsIgnoreCase("Decimal")) {
+        } else if (className.equalsIgnoreCase("Decimal") || className.equalsIgnoreCase("Double")) {
             return Double.class;
         } else if (className.equalsIgnoreCase("Real")) {
             return Double.class;
@@ -1201,7 +1208,10 @@ public class MDWebMetadataReader extends MetadataReader {
             
         } else if (standardName.equals("Ebrim v2.5") || standardName.equals("Web Registry Service v0.9")) {
             packagesName = ebrimV25Package;
-            
+        
+        } else if (standardName.equals("SensorML") || standardName.equals("Sensor Web Enablement")) {
+            packagesName = sensorMLPackage;
+
         } else {
             if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType") && !className.equals("AxisDirection")) {
                 packagesName = geotoolkitPackage;
@@ -1305,12 +1315,16 @@ public class MDWebMetadataReader extends MetadataReader {
         
         while (tokens.hasMoreTokens()) {
             final String token       = tokens.nextToken().trim();
-            final List<String> paths;
+            List<String> paths = null;
             if (ISO_QUERYABLE.get(token) != null) {
                 paths = ISO_QUERYABLE.get(token);
-            } else if (DUBLIN_CORE_QUERYABLE.get(token) != null) {
+            }
+            
+            if (paths == null && DUBLIN_CORE_QUERYABLE.get(token) != null) {
                 paths = DUBLIN_CORE_QUERYABLE.get(token);
-            } else {
+            }
+
+            if (paths == null) {
                 throw new CstlServiceException("The property " + token + " is not queryable",
                         INVALID_PARAMETER_VALUE, "propertyName");
             }
