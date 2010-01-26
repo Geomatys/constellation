@@ -474,7 +474,10 @@ public class FileMetadataReader extends MetadataReader {
                     if (metadata instanceof JAXBElement) {
                         metadata = ((JAXBElement) metadata).getValue();
                     }
-                    result.add(GenericIndexer.getValues(metadata, paths));
+                    String value = GenericIndexer.getValues(metadata, paths);
+                    if (value != null && !value.equals("null")) {
+                        result.add(value);
+                    }
                 } catch (JAXBException ex) {
                     throw new CstlServiceException("The metadataFile : " + metadataFile.getName() + " can not be unmarshalled" + "\n" +
                             "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);

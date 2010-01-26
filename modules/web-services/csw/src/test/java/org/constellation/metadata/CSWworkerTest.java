@@ -857,7 +857,7 @@ public class CSWworkerTest {
         assertEquals(expResult200, result200);
 
         /*
-         *  TEST 3 : getDomain 2.0.2 propertyName = "Identifier"
+         *  TEST 3 : getDomain 2.0.2 propertyName = "identifier"
          */
         request = new GetDomainType("CSW", "2.0.2", "identifier", null);
 
@@ -883,7 +883,81 @@ public class CSWworkerTest {
         assertEquals(expResult, result);
 
         /*
-         *  TEST 4 : getDomain 2.0.2 propertyName = "Identifier" and parameterName = GetCapabilities.sections => error
+         *  TEST 4 : getDomain 2.0.2 propertyName = "Identifier"
+         */
+        request = new GetDomainType("CSW", "2.0.2", "Identifier", null);
+
+        result = worker.getDomain(request);
+
+        assertTrue(result instanceof GetDomainResponseType);
+
+        domainValues = new ArrayList<DomainValues>();
+        list = new ArrayList<String>();
+        // no ebrim list.add("000068C3-3B49-C671-89CF-10A39BB1B652");
+        list.add("11325_158_19640418141800");
+        list.add("39727_22_19750113062500");
+        list.add("40510_145_19930221211500");
+        list.add("42292_5p_19900609195600");
+        list.add("42292_9s_19900610041000");
+        list.add("mdweb_2_catalog_CSW Data Catalog_profile_inspire_core_service_4");
+        // no ebrim list.add("urn:uuid:3e195454-42e8-11dd-8329-00e08157d076");
+        values = new ListOfValuesType(list);
+        value  = new DomainValuesType(null, "Identifier", values, METADATA_QNAME);
+        domainValues.add(value);
+        expResult = new GetDomainResponseType(domainValues);
+
+        assertEquals(expResult, result);
+
+        /*
+         *  TEST 5 : getDomain 2.0.2 propertyName = "title"
+         */
+        request = new GetDomainType("CSW", "2.0.2", "title", null);
+
+        result = worker.getDomain(request);
+
+        assertTrue(result instanceof GetDomainResponseType);
+
+        domainValues = new ArrayList<DomainValues>();
+        list = new ArrayList<String>();
+        list.add("64061411.bot");
+        list.add("75000111.ctd");
+        list.add("90008411-2.ctd");
+        list.add("90008411.ctd");
+        list.add("92005711.ctd");
+        list.add("WMS Server for CORINE Land Cover France");
+        values = new ListOfValuesType(list);
+        value  = new DomainValuesType(null, "title", values, METADATA_QNAME);
+        domainValues.add(value);
+        expResult = new GetDomainResponseType(domainValues);
+
+        assertEquals(expResult, result);
+
+        /*
+         *  TEST 6 : getDomain 2.0.2 propertyName = "Title"
+         */
+        request = new GetDomainType("CSW", "2.0.2", "Title", null);
+
+        result = worker.getDomain(request);
+
+        assertTrue(result instanceof GetDomainResponseType);
+
+        domainValues = new ArrayList<DomainValues>();
+        list = new ArrayList<String>();
+        list.add("64061411.bot");
+        list.add("75000111.ctd");
+        list.add("90008411-2.ctd");
+        list.add("90008411.ctd");
+        list.add("92005711.ctd");
+        list.add("WMS Server for CORINE Land Cover France");
+        values = new ListOfValuesType(list);
+        value  = new DomainValuesType(null, "Title", values, METADATA_QNAME);
+        domainValues.add(value);
+        expResult = new GetDomainResponseType(domainValues);
+
+        assertEquals(expResult, result);
+
+        /*
+         *  TEST 7 : getDomain 2.0.2 propertyName = "Identifier" and parameterName = GetCapabilities.sections => error
 
         request = new GetDomainType("CSW", "2.0.2", "Identifier", "GetCapabilities.sections");
 
@@ -899,7 +973,7 @@ public class CSWworkerTest {
          */
 
         /*
-         *  TEST 5 : getDomain 2.0.2 with no propertyName or parameterName
+         *  TEST 8 : getDomain 2.0.2 with no propertyName or parameterName
          */
         request = new GetDomainType("CSW", "2.0.2", null, null);
 
@@ -914,7 +988,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
         /*
-         *  TEST 6 : getDomain 2.0.2 with a bad parameterName (missing '.')
+         *  TEST 9 : getDomain 2.0.2 with a bad parameterName (missing '.')
          */
         request = new GetDomainType("CSW", "2.0.2", null, "GetCapabilities sections");
 
@@ -929,7 +1003,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
         /*
-         *  TEST 7 : getDomain 2.0.2 with a bad parameterName (bad parameter)
+         *  TEST 10 : getDomain 2.0.2 with a bad parameterName (bad parameter)
          */
         request = new GetDomainType("CSW", "2.0.2", null, "GetCapabilities.whatever");
 
@@ -944,7 +1018,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
         /*
-         *  TEST 7 : getDomain 2.0.2 with a bad parameterName (bad request name)
+         *  TEST 11 : getDomain 2.0.2 with a bad parameterName (bad request name)
          */
         request = new GetDomainType("CSW", "2.0.2", null, "GetCapabilitos.sections");
 
