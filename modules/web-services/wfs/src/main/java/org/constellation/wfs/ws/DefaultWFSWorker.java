@@ -90,6 +90,7 @@ import org.geotoolkit.wfs.xml.v110.PropertyType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
+import org.opengis.feature.Feature;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
@@ -435,8 +436,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
                 FeatureLayerDetails layer = (FeatureLayerDetails) layerD;
 
-                
-                
                 FeatureType ft;
                 try {
                     ft = layer.getStore().getFeatureType(layer.getGroupName());
@@ -473,7 +472,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 // we verify that all the properties contained in the filter are known by the feature type.
                 verifyFilterProperty(ft, filter);
 
-                collections.add(layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery()));
+                FeatureCollection<Feature> collection = layer.getStore().createSession(false).getFeatureCollection(queryBuilder.buildQuery());
+                collections.add(collection);
                 
 
                 // we write The SchemaLocation
@@ -576,7 +576,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 // what to do with that, whitch ones are supported ??
                 final IdentifierGenerationOptionType idGen = insertRequest.getIdgen();
 
-                System.out.println("nb toinsert feature: " + insertRequest.getFeature().size());
                 for (Object featureObject : insertRequest.getFeature()) {
                     if (featureObject instanceof SimpleFeature) {
                         final SimpleFeature feature     = (SimpleFeature) featureObject;
@@ -586,7 +585,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                             throw new CstlServiceException("The specified TypeNames does not exist:" + feature.getFeatureType().getName());
                         }
                         try {
-                            //System.out.println(feature.getAttribute("multiCurveProperty"));
                             final List<FeatureId> features = layer.getStore().addFeatures(typeName, Collections.singleton(feature));
 
                             final String fid = features.get(0).getID(); // get the id of the inserted feature
@@ -717,6 +715,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                                     Logging.unexpectedException(LOGGER, ex);
                                 } catch (FactoryException ex) {
                                     Logging.unexpectedException(LOGGER, ex);
+                                } catch (IllegalArgumentException ex) {
+                                    throw new CstlServiceException(ex);
                                 }
                             }
                             LOGGER.info(">> updating : "+ updatePropertyValue +"   => " + value);
