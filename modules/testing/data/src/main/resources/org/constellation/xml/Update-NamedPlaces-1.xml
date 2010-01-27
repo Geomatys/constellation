@@ -8,7 +8,8 @@
     <wfs:Update typeName="gml:NamedPlaces">
         <wfs:Property>
             <wfs:Name>the_geom</wfs:Name>
-            <wfs:Value xsi:type="gml:MultiSurfaceType" srsName="urn:ogc:def:crs:epsg:4326">
+            <wfs:Value>
+                <gml:MultiSurface srsName="urn:ogc:def:crs:epsg:4326">
                 <gml:surfaceMember>
                     <gml:Polygon srsName="urn:ogc:def:crs:epsg:4326">
                         <gml:exterior>
@@ -18,6 +19,7 @@
                         </gml:exterior>
                     </gml:Polygon>
                 </gml:surfaceMember>
+                </gml:MultiSurface>
             </wfs:Value>
         </wfs:Property>
         <ogc:Filter>

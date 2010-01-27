@@ -350,7 +350,7 @@ public class WFSService extends OGCWebService {
                             } else if (featuresToInsert instanceof FeatureCollection) {
                                 insert.getFeature().add(featuresToInsert);
                             }
-                            
+                            break;
                         }
                     }
                 }

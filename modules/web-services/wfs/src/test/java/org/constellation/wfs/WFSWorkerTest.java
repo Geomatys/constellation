@@ -76,6 +76,7 @@ import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
+import org.geotoolkit.wfs.xml.v110.ValueType;
 import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -809,7 +810,7 @@ public class WFSWorkerTest {
         request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
 
         properties = new ArrayList<PropertyType>();
-        properties.add(new PropertyType(new QName("whatever"), "someValue"));
+        properties.add(new PropertyType(new QName("whatever"), new ValueType("someValue")));
         request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, null, typeName, null));
 
         exLanched = false;
@@ -831,7 +832,7 @@ public class WFSWorkerTest {
         request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
 
         properties = new ArrayList<PropertyType>();
-        properties.add(new PropertyType(new QName("NAME"), "someValue"));
+        properties.add(new PropertyType(new QName("NAME"), new ValueType("someValue")));
         ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("bad"), Boolean.TRUE);
         FilterType filter        = new FilterType(pe);
         request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, filter, typeName, null));
@@ -855,7 +856,7 @@ public class WFSWorkerTest {
         request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
 
         properties = new ArrayList<PropertyType>();
-        properties.add(new PropertyType(new QName("FID"), "999"));
+        properties.add(new PropertyType(new QName("FID"), new ValueType("999")));
         pe     = new PropertyIsEqualToType(new LiteralType("Ashton"), new PropertyNameType("NAME"), Boolean.TRUE);
         filter = new FilterType(pe);
         request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, filter, typeName, null));

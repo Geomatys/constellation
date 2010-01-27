@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -80,6 +79,7 @@ import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
+import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.IdentifierGenerationOptionType;
@@ -235,7 +235,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                                 UnmodifiableArrayList.wrap(new WGS84BoundingBoxType[]{toBBox(fld.getStore(), fld.getGroupName())}));
                         types.add(ftt);
                     } catch (FactoryException ex) {
-                        LOGGER.log(Level.SEVERE, null, ex);
+                        Logging.unexpectedException(LOGGER, ex);
                     }
 
                 }
@@ -427,13 +427,15 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             for (QName typeName : typeNames) {
 
                 LayerDetails layerD = namedProxy.get(Utils.getNameFromQname(typeName), ServiceDef.Specification.WFS.fullName);
+                if (layerD == null) {
+                    throw new CstlServiceException("The specified TypeNames does not exist:" + typeName);
+                }
+
                 if (!(layerD instanceof FeatureLayerDetails)) continue;
 
                 FeatureLayerDetails layer = (FeatureLayerDetails) layerD;
 
-                if (layer == null) {
-                    throw new CstlServiceException("The specified TypeNames does not exist:" + typeName);
-                }
+                
                 
                 FeatureType ft;
                 try {
@@ -544,13 +546,13 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         verifyBaseRequest(request, true, false);
 
         // we prepare the report
-        int totalInserted                   = 0;
-        int totalUpdated                    = 0;
-        int totalDeleted                    = 0;
-        final LayerProviderProxy namedProxy = LayerProviderProxy.getInstance();
-        InsertResultsType insertResults     = null;
-        final List<Object> transactions     = request.getInsertOrUpdateOrDelete();
-
+        int totalInserted                        = 0;
+        int totalUpdated                         = 0;
+        int totalDeleted                         = 0;
+        final LayerProviderProxy namedProxy      = LayerProviderProxy.getInstance();
+        InsertResultsType insertResults          = null;
+        final List<Object> transactions          = request.getInsertOrUpdateOrDelete();
+        final List<InsertedFeatureType> inserted = new ArrayList<InsertedFeatureType>();
         for (Object transaction: transactions) {
 
             /**
@@ -574,7 +576,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 // what to do with that, whitch ones are supported ??
                 final IdentifierGenerationOptionType idGen = insertRequest.getIdgen();
 
-                final List<InsertedFeatureType> inserted = new ArrayList<InsertedFeatureType>();
+                System.out.println("nb toinsert feature: " + insertRequest.getFeature().size());
                 for (Object featureObject : insertRequest.getFeature()) {
                     if (featureObject instanceof SimpleFeature) {
                         final SimpleFeature feature     = (SimpleFeature) featureObject;
@@ -584,15 +586,18 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                             throw new CstlServiceException("The specified TypeNames does not exist:" + feature.getFeatureType().getName());
                         }
                         try {
+                            //System.out.println(feature.getAttribute("multiCurveProperty"));
                             final List<FeatureId> features = layer.getStore().addFeatures(typeName, Collections.singleton(feature));
 
                             final String fid = features.get(0).getID(); // get the id of the inserted feature
                             inserted.add(new InsertedFeatureType(new FeatureIdType(fid), handle));
                             totalInserted++;
+                            System.out.println("simpleInsert fid inserted: " + fid + " total:" + totalInserted);
                         } catch (DataStoreException ex) {
+                            Logging.unexpectedException(LOGGER, ex);
                             throw new CstlServiceException("Error while inserting the Feature:" + ex.getMessage(), NO_APPLICABLE_CODE);
                         } catch (ClassCastException ex) {
-                            LOGGER.log(Level.SEVERE, null, ex);
+                            Logging.unexpectedException(LOGGER, ex);
                             throw new CstlServiceException("The specified Datastore does not suport the write operations.");
                         }
                     } else if (featureObject instanceof FeatureCollection) {
@@ -609,16 +614,16 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                                 final String id = fid.getID(); // get the id of the inserted feature
                                 inserted.add(new InsertedFeatureType(new FeatureIdType(id), handle));
                                 totalInserted++;
+                                System.out.println("collectionInsert fid inserted: " + fid + " total:" + totalInserted);
                             }
                         } catch (DataStoreException ex) {
-                            LOGGER.log(Level.SEVERE, null, ex);
+                            Logging.unexpectedException(LOGGER, ex);
                         } catch (ClassCastException ex) {
-                            LOGGER.log(Level.SEVERE, null, ex);
+                            Logging.unexpectedException(LOGGER, ex);
                             throw new CstlServiceException("The specified Datastore does not suport the write operations.");
                         }
                     }
                 }
-                insertResults = new InsertResultsType(inserted);
 
             /**
              * Features remove.
@@ -653,7 +658,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
                 } catch (ClassCastException ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
+                    Logging.unexpectedException(LOGGER, ex);
                     throw new CstlServiceException("The specified Datastore does not suport the delete operations.");
                 }
 
@@ -702,21 +707,21 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         if (updateProperty.getValue() instanceof ElementNSImpl) {
                             String strValue = getXMLFromElementNSImpl((ElementNSImpl)updateProperty.getValue());
                             value = null;
-                            System.out.println(">> updating : "+ updatePropertyValue +"   => " + strValue);
+                            LOGGER.info(">> updating : "+ updatePropertyValue +"   => " + strValue);
                         } else {
                             value = updateProperty.getValue();
                             if (value instanceof AbstractGeometryType) {
                                 try {
                                     value = GeometrytoJTS.toJTS((AbstractGeometryType) value);
                                 } catch (NoSuchAuthorityCodeException ex) {
-                                    LOGGER.log(Level.SEVERE, null, ex);
+                                    Logging.unexpectedException(LOGGER, ex);
                                 } catch (FactoryException ex) {
-                                    LOGGER.log(Level.SEVERE, null, ex);
+                                    Logging.unexpectedException(LOGGER, ex);
                                 }
                             }
-                            System.out.println(">> updating : "+ updatePropertyValue +"   => " + value);
+                            LOGGER.info(">> updating : "+ updatePropertyValue +"   => " + value);
                             if (value != null) {
-                                System.out.println("type : " + value.getClass());
+                                LOGGER.info("type : " + value.getClass());
                             }
                         }
                         values.put(ft.getDescriptor(updatePropertyValue), value);
@@ -747,7 +752,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             }
 
         }
-
+        if (inserted.size() > 0) {
+            insertResults = new InsertResultsType(inserted);
+        }
         final TransactionSummaryType summary = new TransactionSummaryType(totalInserted,
                                                                           totalUpdated,
                                                                           totalDeleted);
@@ -836,9 +843,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 crs = CRS.decode(srsName, true);
                 //todo use other properties to filter properly
             } catch (NoSuchAuthorityCodeException ex) {
-                throw new CstlServiceException(ex);
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             } catch (FactoryException ex) {
-                throw new CstlServiceException(ex);
+                throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
         } else {
             crs = null;
