@@ -63,12 +63,12 @@
   <dependencies>
     <!-- MDweb model (via thesaurus)-->
     <dependency>
-      <groupId>org.mdweb</groupId>
-      <artifactId>mdweb-lib-model</artifactId>
+      <groupId>org.mdweb.metamodel</groupId>
+      <artifactId>mdweb-metamodel-lib-model</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mdweb</groupId>
-      <artifactId>mdweb-lib-thesaurus</artifactId>
+      <groupId>org.mdweb.metamodel</groupId>
+      <artifactId>mdweb-metamodel-lib-thesaurus</artifactId>
     </dependency>
     <!-- Constellation dependencies -->
     <dependency>

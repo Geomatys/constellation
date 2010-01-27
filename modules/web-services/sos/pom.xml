@@ -62,8 +62,8 @@
   -->
   <dependencies>
     <dependency>
-      <groupId>org.mdweb</groupId>
-      <artifactId>mdweb-lib-model</artifactId>
+      <groupId>org.mdweb.metamodel</groupId>
+      <artifactId>mdweb-metamodel-lib-model</artifactId>
     </dependency>
     <dependency>
      <groupId>org.geotoolkit.pending</groupId>
