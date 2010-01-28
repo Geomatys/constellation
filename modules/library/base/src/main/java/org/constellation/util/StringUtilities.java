@@ -59,7 +59,17 @@ import org.opengis.referencing.crs.VerticalCRS;
 public final class StringUtilities {
 
     private StringUtilities() {}
-    
+
+    /**
+     * Converts all spaces from a string into the URL convention, %20
+     *
+     * @param s The initial string.
+     * @return A string with all spaces replaced by the matching URL character %20.
+     */
+    public static String convertSpacesForUrl(final String s) {
+        return s.replaceAll(" ", "%20");
+    }
+
     /**
      * Returns a string representation of the {@code Bounding Box}. It is a comma-separated
      * list matching with this pattern: minx,miny,maxx,maxy.
