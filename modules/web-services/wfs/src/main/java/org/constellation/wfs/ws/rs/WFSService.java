@@ -175,7 +175,7 @@ public class WFSService extends OGCWebService {
                 return Response.ok(sw.toString(), getOutputFormat()).build();
 
             } else if (STR_DESCRIBEFEATURETYPE.equalsIgnoreCase(request) || (objectRequest instanceof DescribeFeatureTypeType)) {
-                final DescribeFeatureTypeType model = adaptDescripbeFeatureType(objectRequest);
+                final DescribeFeatureTypeType model = adaptDescribeFeatureType(objectRequest);
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.describeFeatureType(model), sw);
                 return Response.ok(sw.toString(), getOutputFormat()).build();
@@ -405,7 +405,7 @@ public class WFSService extends OGCWebService {
         }
     }
 
-    private DescribeFeatureTypeType adaptDescripbeFeatureType(Object objectRequest) throws CstlServiceException {
+    private DescribeFeatureTypeType adaptDescribeFeatureType(Object objectRequest) throws CstlServiceException {
         if (objectRequest instanceof DescribeFeatureTypeType){
             return (DescribeFeatureTypeType)objectRequest;
         } else {

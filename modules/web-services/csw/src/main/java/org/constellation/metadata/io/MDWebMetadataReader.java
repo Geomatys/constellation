@@ -1324,6 +1324,10 @@ public class MDWebMetadataReader extends MetadataReader {
                 paths = DUBLIN_CORE_QUERYABLE.get(token);
             }
 
+            if (paths == null && INSPIRE_QUERYABLE.get(token) != null) {
+                paths = INSPIRE_QUERYABLE.get(token);
+            }
+
             if (paths == null) {
                 throw new CstlServiceException("The property " + token + " is not queryable",
                         INVALID_PARAMETER_VALUE, "propertyName");
