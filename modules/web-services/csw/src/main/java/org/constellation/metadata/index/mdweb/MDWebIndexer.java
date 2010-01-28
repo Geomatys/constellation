@@ -394,6 +394,11 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                                       "cause:  unable to parse double: " + coord);
                 }
 
+                for (String term :INSPIRE_QUERYABLE.keySet()) {
+                    doc.add(new Field(term, getValues(term,  form, INSPIRE_QUERYABLE, -1),   Field.Store.YES, Field.Index.ANALYZED));
+                    doc.add(new Field(term + "_sort", getValues(term,  form, INSPIRE_QUERYABLE, -1),   Field.Store.YES, Field.Index.NOT_ANALYZED));
+                }
+
              // For an ebrim v 3.0 form
             } else if (form.getTopValue().getType().isSubClassOf(identifiable)) {
                 LOGGER.finer("indexing Ebrim 3.0 Record");

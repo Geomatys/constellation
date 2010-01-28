@@ -820,6 +820,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         try {
             if (jaxbFilter != null) {
                 filter = util.getTransformer110(namespaceMapping).visitFilter(jaxbFilter);
+                //System.out.println("jaxbFIlter:" + filter);
             } else {
                 filter = defaultFilter;
             }
