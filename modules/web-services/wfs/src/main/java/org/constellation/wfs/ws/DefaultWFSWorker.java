@@ -825,7 +825,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 filter = defaultFilter;
             }
         } catch (Exception ex) {
-            throw new CstlServiceException(ex);
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
         return filter;
     }

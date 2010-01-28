@@ -28,6 +28,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
+import org.geotoolkit.data.DataStoreRuntimeException;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.data.FeatureCollection;
@@ -58,6 +59,8 @@ public class FeatureCollectionWriter<T extends FeatureCollection> implements Mes
             featureWriter.write(t, out);
         } catch (JAXBException ex) {
             LOGGER.severe("JAXB exception while writing the feature collection");
+        } catch (DataStoreRuntimeException ex) {
+            LOGGER.severe("DataStoreRuntimeException exception while writing the feature collection");
         }
     }
 
