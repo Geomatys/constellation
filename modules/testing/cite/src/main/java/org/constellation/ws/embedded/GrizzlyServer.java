@@ -280,7 +280,8 @@ public final class GrizzlyServer {
      */
     private static class GrizzlyThread extends Thread {
         /**
-         * Runs a Grizzly server for five minutes.
+         * Runs a Grizzly server for two hours. Of course this value is far too high,
+         * and the process will be killed as soon as the last test suite finishes.
          */
         @Override
         public void run() {
