@@ -662,8 +662,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
      */
     @Override
     public BufferedImage getMap(final GetMap getMap) throws CstlServiceException {
-        System.out.println("Layers: "+ getMap.getLayers());
-        System.out.println("Styles: "+ getMap.getStyles());
+
     	//
     	// Note this is almost the same logic as in getFeatureInfo
     	//

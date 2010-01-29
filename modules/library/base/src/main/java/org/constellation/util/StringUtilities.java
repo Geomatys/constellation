@@ -438,7 +438,6 @@ public final class StringUtilities {
             last = ++i;
         }
         strings.add(toSplit.substring(last).trim());
-        System.out.println(strings);
         return strings;
     }
 
