@@ -247,10 +247,10 @@ public class WFSService extends OGCWebService {
          * - if the version number is wrong.
          * - if the user have send a wrong request parameter
          */
-        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
+        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE) &&
+            !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED) &&
+            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE) &&
+            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)   && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED)) {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         } else {
             LOGGER.severe("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');

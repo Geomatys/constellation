@@ -76,6 +76,7 @@ import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.filter.accessor.Accessors;
 import org.geotoolkit.filter.accessor.PropertyAccessor;
 import org.geotoolkit.filter.visitor.ListingPropertyVisitor;
+import org.geotoolkit.filter.visitor.IsValidSpatialFilterVisitor;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
@@ -867,20 +868,20 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         if (filterProperties != null) {
             for (String filterProperty : filterProperties) {
 
-                if(filterProperty.startsWith("@")){
+                if (filterProperty.startsWith("@")){
                     //this property in an id property, we won't find it in the feature type
                     //but it always exist on the features
                     continue;
                 }
-                /* we remove the prefix
-                if (filterProperty.indexOf(':') != -1) {
-                    filterProperty = filterProperty.substring(filterProperty.lastIndexOf(':') + 1);
-                }*/
                 PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, filterProperty, null);
                 if (pa == null || pa.get(ft, filterProperty, null) == null) {
                     throw new CstlServiceException("The feature Type " + ft.getName() + " does not has such a property: " + filterProperty, INVALID_PARAMETER_VALUE, "filter");
                 }
             }
+        }
+        
+        if (!((Boolean)filter.accept(new IsValidSpatialFilterVisitor((SimpleFeatureType)ft), null))) {
+            throw new CstlServiceException("The filter try to apply spatial operators on non-spatial property", INVALID_PARAMETER_VALUE, "filter");
         }
     }
     

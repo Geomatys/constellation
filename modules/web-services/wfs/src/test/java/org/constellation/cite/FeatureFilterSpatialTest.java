@@ -93,6 +93,9 @@ public class FeatureFilterSpatialTest {
 
         final SimpleFeatureType aggregateGeoFeatureType = sftb.buildFeatureType();
 
+        /*********************************************************************************************
+         *                            AggregateGeoFeature 1                                          *
+         *********************************************************************************************/
         SimpleFeatureBuilder sfb = new SimpleFeatureBuilder(aggregateGeoFeatureType);
         sfb.set(description, "description-f005");
         sfb.set(name, "name-f005");
@@ -134,6 +137,9 @@ public class FeatureFilterSpatialTest {
 
         sfb = new SimpleFeatureBuilder(entiteGeneriqueType);
 
+        /*********************************************************************************************
+         *                            EntitéGénérique 1                                              *
+         *********************************************************************************************/
         sfb.set(description, "description-f004");
         sfb.set(name, "name-f004");
 
@@ -165,6 +171,10 @@ public class FeatureFilterSpatialTest {
         final SimpleFeature entiteGenerique1 = sfb.buildFeature("f004");
 
         sfb.reset();
+
+        /*********************************************************************************************
+         *                            EntitéGénérique 2                                              *
+         *********************************************************************************************/
 
         sfb.set(description, "description-f007");
         sfb.set(name, "name-f007");
@@ -201,6 +211,9 @@ public class FeatureFilterSpatialTest {
 
         sfb.reset();
 
+        /*********************************************************************************************
+         *                            EntitéGénérique 3                                              *
+         *********************************************************************************************/
         sfb.set(description, "description-f017");
         sfb.set(name, "name-f017");
 

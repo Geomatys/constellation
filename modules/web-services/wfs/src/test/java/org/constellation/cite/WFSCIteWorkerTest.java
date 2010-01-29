@@ -37,8 +37,13 @@ import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
+import org.geotoolkit.ogc.xml.v110.AndType;
+import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.EqualsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
+import org.geotoolkit.ogc.xml.v110.LiteralType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
+import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
@@ -81,6 +86,7 @@ public class WFSCIteWorkerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        initFeatureSource();
     }
 
 
@@ -91,7 +97,6 @@ public class WFSCIteWorkerTest {
 
     @Before
     public void setUp() throws Exception {
-        initFeatureSource();
         featureWriter     = new JAXPStreamFeatureWriter();
     }
 
@@ -107,7 +112,7 @@ public class WFSCIteWorkerTest {
     public void getFeatureShapeFileTest() throws Exception {
 
         /**
-         * Test 1 : query on typeName bridges
+         * Test 1 : query on typeName aggragateGeofeature
          */
 
         List<QueryType> queries = new ArrayList<QueryType>();
@@ -128,9 +133,34 @@ public class WFSCIteWorkerTest {
         FeatureCollection collection = (FeatureCollection)result;
 
         String xmlResult    = featureWriter.write(collection);
-        System.out.println(xmlResult);
         
         assertEquals(1, collection.size());
+
+        /**
+         * Test 1 : query on typeName aggragateGeofeature
+         
+
+        queries = new ArrayList<QueryType>();
+        BBOXType bbox = new BBOXType("http://cite.opengeospatial.org/gmlsf:pointProperty", 30, -12, 60, -6, "urn:x-ogc:def:crs:EPSG:4326");
+        PropertyIsEqualToType propEqual = new PropertyIsEqualToType(new LiteralType("name-f015"), new PropertyNameType("http://www.opengis.net/gml:name"), Boolean.TRUE);
+        AndType and = new AndType(bbox, propEqual);
+        f = new FilterType(and);
+        QueryType query = new QueryType(f, Arrays.asList(new QName("http://cite.opengeospatial.org/gmlsf", "PrimitiveGeoFeature")), "1.1.0");
+        query.setSrsName("urn:x-ogc:def:crs:EPSG:6.11:32629");
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        assertTrue(result instanceof FeatureCollection);
+
+        collection = (FeatureCollection)result;
+
+        xmlResult    = featureWriter.write(collection);
+        System.out.println(xmlResult);
+
+        assertEquals(1, collection.size());
+        */
 
         
          
