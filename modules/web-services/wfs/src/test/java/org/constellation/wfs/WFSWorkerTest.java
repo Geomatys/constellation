@@ -1022,6 +1022,7 @@ public class WFSWorkerTest {
 
          final File outputDir = initDataDirectory();
 
+         clearService();
         /****************************************
          *                                      *
          * Defines a ShapeFile data provider    *
@@ -1178,6 +1179,12 @@ public class WFSWorkerTest {
         IOUtilities.unzip(in, outputDir);
         in.close();
         return outputDir;
+    }
+
+    private static void clearService() {
+        for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
+            service.setConfiguration(new ProviderConfig());
+        }
     }
 
     public String removeXmlns(String xml) {
