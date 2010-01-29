@@ -408,17 +408,38 @@ public final class StringUtilities {
         return Integer.parseInt(value);
     }
 
-    public static List<String> toStringList(String strLayers) {
-        if (strLayers == null) {
+    /**
+     * Split a string on commas, and return it as a list.
+     *
+     * @param commaSeparatedString A string which contains comma(s).
+     * @return A list of elements that were contained in the string separated by comma(s).
+     */
+    public static List<String> toStringList(String commaSeparatedString) {
+        return toStringList(commaSeparatedString, ',');
+    }
+
+    /**
+     * Split a string on a special character, and return it as a list.
+     *
+     * @param toSplit   A string to split on a specific character.
+     * @param separator The special character on which the given string will be splitted.
+     * @return A list of elements that were contained in the string separated by the special
+     *         character.
+     */
+    public static List<String> toStringList(String toSplit, final char separator) {
+        if (toSplit == null) {
             return Collections.emptyList();
         }
-        strLayers = strLayers.trim();
-        final List<String> styles   = new ArrayList<String>();
-        final StringTokenizer token = new StringTokenizer(strLayers,",");
-        while(token.hasMoreTokens()){
-            styles.add(token.nextToken());
+        final List<String> strings = new ArrayList<String>();
+        int last = 0;
+        toSplit = toSplit.trim();
+        for (int i=toSplit.indexOf(separator); i>=0; i=toSplit.indexOf(separator, i)) {
+            strings.add(toSplit.substring(last, i).trim());
+            last = ++i;
         }
-        return styles;
+        strings.add(toSplit.substring(last).trim());
+        System.out.println(strings);
+        return strings;
     }
 
     /**

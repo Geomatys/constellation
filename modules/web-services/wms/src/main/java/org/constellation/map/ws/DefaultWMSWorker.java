@@ -662,7 +662,8 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
      */
     @Override
     public BufferedImage getMap(final GetMap getMap) throws CstlServiceException {
-
+        System.out.println("Layers: "+ getMap.getLayers());
+        System.out.println("Styles: "+ getMap.getStyles());
     	//
     	// Note this is almost the same logic as in getFeatureInfo
     	//
@@ -675,7 +676,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         final List<String> layerNames = getMap.getLayers();
         final List<LayerDetails> layerRefs;
         try{
-        	layerRefs = getLayerReferences(layerNames, getMap.getVersion().toString());
+            layerRefs = getLayerReferences(layerNames, getMap.getVersion().toString());
         } catch (CstlServiceException ex) {
         	//TODO: distinguish
             if (errorInImage) {
@@ -859,7 +860,8 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             if (sld != null) {
                 //try to use the provided SLD
                 style = extractStyle(layerRefs.get(i).getName(), sld);
-            } else if (styleNames != null && styleNames.size() > i) {
+            } else if (styleNames != null && styleNames.size() > i &&
+                       styleNames.get(i) != null && !styleNames.get(i).isEmpty()) {
                 //try to grab the style if provided
                 //a style has been given for this layer, try to use it
                 final String namedStyle = styleNames.get(i);

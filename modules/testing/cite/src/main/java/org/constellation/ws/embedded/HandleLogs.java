@@ -206,7 +206,7 @@ public final class HandleLogs {
              * A regression is detected, a mojo exception is thrown to make the build fail.
              */
             throw new MojoFailureException("Some tests are now failing, but not in the previous suite.\n" +
-                          "Please fix the service responsible of the failure of these tests !");
+                          "Please fix service(s) responsible for that building failure.");
         }
         System.exit(0);
     }
