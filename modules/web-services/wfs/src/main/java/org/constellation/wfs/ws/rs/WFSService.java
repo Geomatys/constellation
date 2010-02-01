@@ -51,6 +51,7 @@ import javax.ws.rs.core.Response;
 
 // constellation dependencies
 import javax.xml.bind.UnmarshalException;
+import javax.xml.bind.ValidationEvent;
 import org.constellation.ServiceDef;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
@@ -297,9 +298,10 @@ public class WFSService extends OGCWebService {
         if (marshallerPool != null) {
             Object request = null;
             Unmarshaller unmarshaller = null;
+            JAXBEventHandler handler = new JAXBEventHandler();
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
-                
+                unmarshaller.setEventHandler(handler);
                 // we made a pre-reading to extract the feature to insert in transaction request.
                 // we also extract the namespace mapping
                 final BufferedReader in;
@@ -365,7 +367,11 @@ public class WFSService extends OGCWebService {
                 }
                 String codeName;
                 if (errorMsg != null && errorMsg.startsWith("unexpected element")) {
-                    codeName = OPERATION_NOT_SUPPORTED.name();
+                    if (handler.level == ValidationEvent.ERROR) {
+                        codeName = INVALID_PARAMETER_VALUE.name();
+                    } else {
+                        codeName = OPERATION_NOT_SUPPORTED.name();
+                    }
                 } else {
                     codeName = INVALID_REQUEST.name();
                 }
