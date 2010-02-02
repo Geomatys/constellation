@@ -120,6 +120,7 @@ public class WFSService extends OGCWebService {
             		  ":org.geotoolkit.ogc.xml.v110"  +
             		  ":org.geotoolkit.gml.xml.v311"  +
                           ":org.geotoolkit.xsd.xml.v2001" +
+                          ":org.geotoolkit.sampling.xml.v100" +
                           ":org.constellation.ws"
                           , "");
             candidate       = new DefaultWFSWorker(getMarshallerPool());

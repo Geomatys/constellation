@@ -478,6 +478,11 @@
       </dependency>
       <dependency>
         <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-om</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-xml-xacml</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
