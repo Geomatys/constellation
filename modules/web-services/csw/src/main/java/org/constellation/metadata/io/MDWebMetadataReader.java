@@ -77,6 +77,7 @@ import org.geotoolkit.csw.xml.v202.SummaryRecordType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.internal.CodeLists;
+import org.geotoolkit.io.wkt.UnformattableObjectException;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
@@ -302,9 +303,9 @@ public class MDWebMetadataReader extends MetadataReader {
             }
 
         } catch (FileNotFoundException e) {
-            LOGGER.info("no class mapping found (optional)");
+            LOGGER.finer("no class mapping found (optional)");
         }  catch (IOException e) {
-            LOGGER.info("no class mapping found (optional) IOException");
+            LOGGER.warning("no class mapping found (optional) IOException");
         }
         return result;
     }
@@ -1078,7 +1079,15 @@ public class MDWebMetadataReader extends MetadataReader {
                                     } catch (IllegalAccessException ex) {
                                         LOGGER.severe("error while setting the parameter:" + param + " to the field:" + field + ":" + ex.getMessage());
                                     } catch (IllegalArgumentException ex) {
-                                        LOGGER.severe("error while setting the parameter:" + param + " to the field:" + field + ":" + ex.getMessage());
+                                        String objectStr = "null";
+                                        if (param != null) {
+                                            try {
+                                                objectStr = param.toString();
+                                            } catch (UnformattableObjectException ex2) {
+                                                objectStr = "(unformattableObject) " + param.getClass().getSimpleName();
+                                            }
+                                        }
+                                        LOGGER.severe("error while setting the parameter: " + objectStr + " to the field:" + field + ":" + ex.getMessage());
                                     }
                                 } else {
                                     LOGGER.severe("no field " + attribName);
@@ -1237,7 +1246,7 @@ public class MDWebMetadataReader extends MetadataReader {
             
             String name = className;
             int nameType = 0;
-            while (nameType < 7) {
+            while (nameType < 8) {
                 try {
                     LOGGER.finer("searching: " + packageName + '.' + name);
                     result = Class.forName(packageName + '.' + name);
@@ -1276,25 +1285,35 @@ public class MDWebMetadataReader extends MetadataReader {
                             nameType = 3;
                             break;
                         }
+                        // we put Type behind the className
                         case 3: {
                             name = name.substring(0, name.indexOf("Impl"));
                             name += "Type";
                             nameType = 4;
                             break;
                         }
+                        // we put Default before the className
                         case 4: {
                             name = name.substring(0, name.indexOf("Type"));
                             name = "Default" + name;
                             nameType = 5;
                             break;
                         }
+                        // we put FRA before the className
                         case 5: {
                             name = "FRA" + name;
                             nameType = 6;
                             break;
                         }
-                        default:
+                        // we put PropertyType behind the className
+                        case 6: {
+                            name = name.substring(10, name.length());
+                            name += "PropertyType";
                             nameType = 7;
+                            break;
+                        }
+                        default:
+                            nameType = 8;
                             break;
                     }
 
@@ -1302,7 +1321,7 @@ public class MDWebMetadataReader extends MetadataReader {
             }
         }
         if (!classeNotFound.contains(classNameSave)) {
-            LOGGER.severe("class no found: " + classNameSave);
+            LOGGER.severe("class not found: " + classNameSave);
             classeNotFound.add(classNameSave);
         }
         return null;

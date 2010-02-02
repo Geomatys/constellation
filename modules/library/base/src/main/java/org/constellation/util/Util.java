@@ -864,7 +864,7 @@ public final class Util {
         } catch (IllegalArgumentException ex) {
             LOGGER.severe("Illegal Argument in string constructor for class: " + classe.getName());
         } catch (InvocationTargetException ex) {
-            LOGGER.severe("Invocation target exception in string constructor for class: " + classe.getName());
+            LOGGER.severe("Invocation target exception in string constructor for class: " + classe.getName() + " for parameter: " + parameter);
         } catch (NoSuchMethodException ex) {
             LOGGER.severe("No single string constructor in class: " + classe.getName());
         } catch (SecurityException ex) {

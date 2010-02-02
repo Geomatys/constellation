@@ -58,6 +58,7 @@ import org.geotoolkit.sos.xml.v100.ObservationTemplate;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.geotoolkit.swe.xml.v100.DataRecordType;
 import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
 import org.geotoolkit.swe.xml.v101.DataArrayEntry;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
@@ -344,6 +345,14 @@ public class SOSWorkerTest {
 
         assertEquals(expProcess.getBoundedBy(), resProcess.getBoundedBy());
 
+        if (expProcess.getCapabilities().size() > 0 && resProcess.getCapabilities().size() > 0) {
+            assertTrue(resProcess.getCapabilities().get(0).getAbstractDataRecord().getValue() instanceof DataRecordType);
+            DataRecordType expRecord = (DataRecordType) expProcess.getCapabilities().get(0).getAbstractDataRecord().getValue();
+            DataRecordType resRecord = (DataRecordType) resProcess.getCapabilities().get(0).getAbstractDataRecord().getValue();
+            assertEquals(expRecord.getField(), resRecord.getField());
+            assertEquals(expProcess.getCapabilities().get(0).getAbstractDataRecord().getValue(), resProcess.getCapabilities().get(0).getAbstractDataRecord().getValue());
+            assertEquals(expProcess.getCapabilities().get(0), resProcess.getCapabilities().get(0));
+        }
         assertEquals(expProcess.getCapabilities(), resProcess.getCapabilities());
 
         assertEquals(expProcess.getClassification().size(), resProcess.getClassification().size());
