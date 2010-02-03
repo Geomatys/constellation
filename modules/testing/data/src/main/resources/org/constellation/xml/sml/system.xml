@@ -120,7 +120,6 @@
             <capabilities>
                 <swe:DataRecord definition="urn:x-ogc:def:property:measurementProperties">
                     <gml:description>Toutes les informations sur les  contraintes sur les donnees</gml:description>
-
                     <swe:field name="resolution" xlink:role="urn:x-ogc:def:property:resolution">
                         <swe:Quantity definition="urn:x-ogc:def:property:temperature">
                             <swe:uom xlink:href="urn:ogc:unit:degree:celsius"/>

@@ -837,7 +837,7 @@ public class MDWebMetadataReader extends MetadataReader {
             className    = value.getType().getName();
             standardName = value.getType().getStandard().getName();
         } else {
-            LOGGER.severe("Error the type of the value is null");
+            LOGGER.severe("Error null type for value:" + value.getIdValue());
             return null;
         }
         Class classe = null;
