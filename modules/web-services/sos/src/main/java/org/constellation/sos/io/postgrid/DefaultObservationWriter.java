@@ -24,7 +24,6 @@ import java.sql.Statement;
 // constellation dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sql.DataSource;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
@@ -37,7 +36,6 @@ import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
@@ -49,8 +47,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.opengis.observation.Measurement;
 import org.opengis.observation.Observation;
 
-// Postgres dependencies
-import org.postgresql.ds.PGSimpleDataSource;
 
 
 /**
@@ -113,20 +109,7 @@ public class DefaultObservationWriter implements ObservationWriter {
         }
         isPostgres = db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver");
         try {
-            final DataSource dataSourceOM;
-            if (isPostgres) {
-                final PGSimpleDataSource PGdataSourceOM = new PGSimpleDataSource();
-                PGdataSourceOM.setServerName(db.getHostName());
-                PGdataSourceOM.setPortNumber(db.getPortNumber());
-                PGdataSourceOM.setDatabaseName(db.getDatabaseName());
-                PGdataSourceOM.setUser(db.getUser());
-                PGdataSourceOM.setPassword(db.getPassword());
-                dataSourceOM = PGdataSourceOM;
-            } else {
-                dataSourceOM = new DefaultDataSource(db.getConnectURL());
-            }
-
-            omDatabase   = new Database(dataSourceOM);
+            omDatabase = DatabasePool.getDatabase(db);
             omDatabase.setProperty(ConfigurationKey.READONLY, "false");
             if (!isPostgres) {
                 omDatabase.setProperty(ConfigurationKey.ISPOSTGRES, "false");

@@ -32,7 +32,6 @@ import java.util.Set;
 // Constellation dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
@@ -56,7 +55,6 @@ import org.constellation.swe.v101.CompositePhenomenonTable;
 import org.constellation.swe.v101.PhenomenonTable;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
-import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
@@ -64,7 +62,6 @@ import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
-import org.postgresql.ds.PGSimpleDataSource;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -148,20 +145,7 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException("The configuration file does not contains a BDD object (DefaultObservationReader)", NO_APPLICABLE_CODE);
         }
         try {
-            final DataSource dataSourceOM;
-            if (db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver")) {
-                final PGSimpleDataSource PGdataSourceOM = new PGSimpleDataSource();
-                PGdataSourceOM.setServerName(db.getHostName());
-                PGdataSourceOM.setPortNumber(db.getPortNumber());
-                PGdataSourceOM.setDatabaseName(db.getDatabaseName());
-                PGdataSourceOM.setUser(db.getUser());
-                PGdataSourceOM.setPassword(db.getPassword());
-                dataSourceOM = PGdataSourceOM;
-            } else {
-                dataSourceOM = new DefaultDataSource(db.getConnectURL());
-            }
-
-            omDatabase = new Database(dataSourceOM);
+            omDatabase = DatabasePool.getDatabase(db);
             omDatabase.setProperty(ConfigurationKey.READONLY, "false");
             
             //we build the database table frequently used.

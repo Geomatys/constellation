@@ -21,6 +21,8 @@ package org.constellation.generic.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -35,6 +37,7 @@ import org.geotoolkit.util.Utilities;
 @XmlRootElement(name = "BDD")
 public class BDD {
 
+    private final static Map<BDD, Connection> CONNECTION_MAP = new HashMap<BDD, Connection>();
     /**
      * The className of the driver
      */
@@ -157,17 +160,22 @@ public class BDD {
      * @todo The call to Class.forName(...) is not needed anymore since Java 6 and should be removed.
      */
     public Connection getConnection() throws SQLException {
-        // by Default  we use the postgres driver.
-        if (className == null) {
-            className = "org.postgresql.Driver";
+        Connection conec = CONNECTION_MAP.get(this);
+        if (conec == null) {
+            // by Default  we use the postgres driver.
+            if (className == null) {
+                className = "org.postgresql.Driver";
+            }
+            try {
+                Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                // Non-fatal exception, ignore. If there is really a problem, the
+                // following line is expected to throw the appropriate SQLException.
+            }
+            conec = DriverManager.getConnection(connectURL, user, password);
+            CONNECTION_MAP.put(this, conec);
         }
-        try {
-            Class.forName(className);
-        } catch (ClassNotFoundException e) {
-            // Non-fatal exception, ignore. If there is really a problem, the
-            // following line is expected to throw the appropriate SQLException.
-        }
-        return DriverManager.getConnection(connectURL, user, password);
+        return conec;
     }
     
     @Override

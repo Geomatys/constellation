@@ -103,7 +103,10 @@ public class DefaultObservationFilter implements ObservationFilter {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
         try {
-            this.connection = db.getConnection();
+            this.connection = DatabasePool.getDatabaseConnection(db);
+            if (this.connection == null) {
+                db.getConnection();
+            }
         } catch (SQLException ex) {
             throw new CstlServiceException("SQLException while initializing the observation filter:" +'\n'+
                                            "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
