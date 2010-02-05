@@ -40,7 +40,6 @@ import org.geotoolkit.referencing.crs.DefaultTemporalCRS;
 import org.geotoolkit.referencing.crs.DefaultVerticalCRS;
 import org.geotoolkit.resources.Errors;
 import org.opengis.geometry.Envelope;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.crs.TemporalCRS;
@@ -149,21 +148,6 @@ public final class StringUtilities {
         return null;
     }
 
-    /**
-     * Converts a string like "EPSG:xxxx" into a {@link CoordinateReferenceSystem}.
-     *
-     * @param epsg An EPSG code.
-     * @return The {@link CoordinateReferenceSystem} for this code, or {@code null}
-     *         if the espg parameter is {@code null}.
-     * @throws FactoryException if an error occurs during the decoding of the CRS code.
-     */
-    public static CoordinateReferenceSystem toCRS(final String epsg) throws FactoryException {
-        if (epsg == null) {
-            return null;
-        }
-        return CRS.decode(epsg);
-    }
-    
     /**
      * Convert a string containing a date into a {@link Date}, respecting the ISO 8601 standard.
      *
@@ -547,6 +531,86 @@ public final class StringUtilities {
         return str;
     }
 
+    /**
+     * A utility method whitch replace the special character (é, è, à, É).
+     *
+     * @param s the string to clean.
+     * @return a String without special character.
+     */
+    public static String cleanSpecialCharacter(String s) {
+        if (s != null) {
+            s = s.replace('é', 'e');
+            s = s.replace('è', 'e');
+            s = s.replace('à', 'a');
+            s = s.replace('É', 'E');
+        }
+        return s;
+    }
+
+    /**
+     * Remove the prefix on propertyName.
+     * example : removePrefix(csw:GetRecords) return "GetRecords".
+     */
+    public static String removePrefix(String s) {
+        final int i = s.indexOf(':');
+        if ( i != -1) {
+            s = s.substring(i + 1, s.length());
+        }
+        return s;
+    }
+
+    /**
+     * Clean a list of String by removing all the white space, tabulation and carriage in all the strings.
+     *
+     * @param list
+     * @return
+     */
+    public static List<String> cleanStrings(final List<String> list) {
+        final List<String> result = new ArrayList<String>();
+        for (String s : list) {
+            //we remove the bad character before the real value
+           s = s.replace(" ", "");
+           s = s.replace("\t", "");
+           s = s.replace("\n", "");
+           result.add(s);
+        }
+        return result;
+    }
+
+    /**
+    * Replace all the <ns**:localPart and </ns**:localPart by <prefix:localPart and </prefix:localPart
+    *
+    * @param s
+    * @param localPart
+    * @return
+    */
+    public static String replacePrefix(final String s, final String localPart, final String prefix) {
+
+        return s.replaceAll("[a-zA-Z0-9]*:" + localPart, prefix + ":" + localPart);
+    }
+
+    /**
+     * Returns true if one of the {@code String} elements in a {@code List}
+     * matches the given {@code String}, insensitive to case.
+     *
+     * @param list A {@code List<String>} with elements to be tested.
+     * @param str  The {@code String} to evaluate.
+     *
+     * @return {@code true}, if at least one element of the list matches the
+     *           parameter, {@code false} otherwise.
+     */
+    public static boolean matchesStringfromList(final List<String> list,final String str) {
+        boolean strAvailable = false;
+        for (String s : list) {
+            final Pattern pattern = Pattern.compile(str,Pattern.CASE_INSENSITIVE | Pattern.CANON_EQ);
+            final Matcher matcher = pattern.matcher(s);
+            if (matcher.find()) {
+                strAvailable = true;
+            }
+        }
+        return strAvailable;
+    }
+    
     /**
      * This method sort alphabeticely a list of String
      * 

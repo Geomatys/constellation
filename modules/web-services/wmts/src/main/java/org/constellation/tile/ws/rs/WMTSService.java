@@ -35,6 +35,7 @@ import javax.xml.bind.Marshaller;
 import org.constellation.ServiceDef;
 import org.constellation.tile.ws.AbstractWMTSWorker;
 import org.constellation.tile.ws.WMTSWorker;
+import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -463,7 +464,7 @@ public class WMTSService extends GridWebService {
                     getMarshallerPool().release(marshaller);
                 }
             }
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
+            return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
         } else {
             return Response.ok("The WMTS server is not running cause: unable to create JAXB context!", MimeType.TEXT_PLAIN).build();
         }

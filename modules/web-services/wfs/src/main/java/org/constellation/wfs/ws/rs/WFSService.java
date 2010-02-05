@@ -279,7 +279,7 @@ public class WFSService extends OGCWebService {
                     getMarshallerPool().release(marshaller);
                 }
             }
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), "text/xml").build();
+            return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), "text/xml").build();
         } else {
             return Response.ok("The WFS server is not running cause: unable to create JAXB context!", "text/plain").build();
         }

@@ -60,8 +60,6 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.imageio.IIOException;
 import javax.imageio.spi.IIORegistry;
 import javax.imageio.spi.ImageReaderSpi;
@@ -91,28 +89,6 @@ public final class Util {
     private static final Logger LOGGER = Logger.getLogger("org.constellation.util");
     
     private Util() {}
-    
-    /**
-     * Returns true if one of the {@code String} elements in a {@code List} 
-     * matches the given {@code String}, insensitive to case.
-     * 
-     * @param list A {@code List<String>} with elements to be tested. 
-     * @param str  The {@code String} to evaluate.
-     * 
-     * @return {@code true}, if at least one element of the list matches the 
-     *           parameter, {@code false} otherwise.
-     */
-    public static boolean matchesStringfromList(final List<String> list,final String str) {
-        boolean strAvailable = false;
-        for (String s : list) {
-            final Pattern pattern = Pattern.compile(str,Pattern.CASE_INSENSITIVE | Pattern.CANON_EQ);
-            final Matcher matcher = pattern.matcher(s);
-            if (matcher.find()) {
-                strAvailable = true;
-            }
-        }
-        return strAvailable;
-    }
     
     /**
      * Generate a {@code Date} object from a {@code String} which represents an 
@@ -673,56 +649,6 @@ public final class Util {
     }
 
     /**
-     * Transform a {@code List<Class<?>>} to an array of {@code Class<?>}.
-     * 
-     * <p>
-     * TODO: Parameterizing this list needs to fix other code as well.
-     * </p>
-     * 
-     * @param classeList A {@code List<Class<?>>}, must not be null.
-     * @return An array of {@code Class<?>}.
-     */
-    public static Class<?>[] toArray(final List<Class> classeList) {
-        final Class<?>[] result = new Class<?>[classeList.size()];
-        int i = 0;
-        for (Class<?> classe : classeList) {
-            result[i] = classe;
-            i++;
-        }
-        return result;
-    }
-    
-    /**
-     * Clean a list of String by removing all the white space, tabulation and carriage in all the strings.
-     * 
-     * @param list
-     * @return
-     */
-    public static List<String> cleanStrings(final List<String> list) {
-        final List<String> result = new ArrayList<String>();
-        for (String s : list) {
-            //we remove the bad character before the real value
-           s = s.replace(" ", "");
-           s = s.replace("\t", "");
-           s = s.replace("\n", "");
-           result.add(s);
-        }
-        return result;
-    }
-    
-    /**
-    * Replace all the <ns**:localPart and </ns**:localPart by <prefix:localPart and </prefix:localPart
-    * 
-    * @param s
-    * @param localPart
-    * @return
-    */ 
-    public static String replacePrefix(final String s, final String localPart, final String prefix) {
-
-        return s.replaceAll("[a-zA-Z0-9]*:" + localPart, prefix + ":" + localPart);
-    }
-    
-    /**
      * Return an marshallable Object from an url
      */
     public static Object getUrlContent(final String url, final Unmarshaller unmarshaller) throws MalformedURLException, IOException {
@@ -810,18 +736,6 @@ public final class Util {
         return cl.getResourceAsStream(url);
     }
 
-    /**
-     * Remove the prefix on propertyName.
-     * example : removePrefix(csw:GetRecords) return "GetRecords".
-     */
-    public static String removePrefix(String s) {
-        final int i = s.indexOf(':');
-        if ( i != -1) {
-            s = s.substring(i + 1, s.length());
-        }
-        return s;
-    }
-    
     /**
      * Load the properties from a properies file. 
      * 
@@ -941,22 +855,6 @@ public final class Util {
             }
         }
         throw new IIOException("No available image reader able to handle the mime type specified: "+ mimeType);
-    }
-
-    /**
-     * A utility method whitch replace the special character.
-     *
-     * @param s the string to clean.
-     * @return a String without special character.
-     */
-    public static String cleanSpecialCharacter(String s) {
-        if (s != null) {
-            s = s.replace('é', 'e');
-            s = s.replace('è', 'e');
-            s = s.replace('à', 'a');
-            s = s.replace('É', 'E');
-        }
-        return s;
     }
 
     /**

@@ -41,8 +41,8 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.metadata.io.MetadataWriter;
+import org.constellation.util.StringUtilities;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.util.Util;
 import org.constellation.ws.MimeType;
 
 // Geotoolkit dependencies
@@ -514,7 +514,7 @@ public class CatalogueHarvester {
             }
             
             if (outputDomain != null) {
-                final List<String> availableOutputSchema = Util.cleanStrings(outputDomain.getValue());
+                final List<String> availableOutputSchema = StringUtilities.cleanStrings(outputDomain.getValue());
                 final String defaultValue                = outputDomain.getDefaultValue();
                 
                 if (defaultValue != null && !defaultValue.equals("") && !availableOutputSchema.contains(defaultValue))
@@ -769,7 +769,7 @@ public class CatalogueHarvester {
        s = s.replace("MD_Metadata ", "MD_Metadata xmlns:gco=\"http://www.isotc211.org/2005/gco\" ");
        s = s.replace("http://schemas.opengis.net/iso19115full", Namespaces.GMD);
        s = s.replace("http://metadata.dgiwg.org/smXML", Namespaces.GMD);
-       s = Util.replacePrefix(s, "CharacterString", "gco");
+       s = StringUtilities.replacePrefix(s, "CharacterString", "gco");
        return s;
    } 
    

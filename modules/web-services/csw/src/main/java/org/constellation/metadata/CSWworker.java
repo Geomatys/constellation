@@ -61,6 +61,7 @@ import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.CstlServiceException;
@@ -791,7 +792,7 @@ public class CSWworker {
                 if (first.getPropertyName() == null || first.getPropertyName().getPropertyName() == null || first.getPropertyName().getPropertyName().equals(""))
                     throw new CstlServiceException("A SortBy filter must specify a propertyName.",
                                                   NO_APPLICABLE_CODE);
-                final String propertyName = Util.removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
+                final String propertyName = StringUtilities.removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
             
                 Sort sortFilter;
                 if (first.getSortOrder().equals(SortOrder.ASCENDING)) {

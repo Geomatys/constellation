@@ -53,7 +53,6 @@ import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
-import org.constellation.util.Util;
 import org.constellation.util.StringUtilities;
 import org.constellation.writer.CapabilitiesFilterWriter;
 import org.constellation.writer.ExceptionFilterWriter;
@@ -66,6 +65,7 @@ import org.constellation.ws.rs.GridWebService;
 
 //GeotoolKit dependencies
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
+import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
@@ -321,7 +321,7 @@ public class WMSService extends GridWebService {
         }
         final String mimeException = (serviceDef.version.equals(ServiceDef.WMS_1_1_1_SLD.version)) ?
                                                                 MimeType.APP_SE_XML : MimeType.TEXT_XML;
-        return Response.ok(Util.cleanSpecialCharacter(sw.toString()), mimeException).build();
+        return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), mimeException).build();
     }
 
     /**
@@ -516,8 +516,11 @@ public class WMSService extends GridWebService {
                 //we must replace it by CRS:84 which is the correct match
                 strCRS = "CRS:84";
             }
-
-            crs = StringUtilities.toCRS(strCRS);
+            if (strCRS != null) {
+                crs = CRS.decode(strCRS);
+            } else {
+                crs = null;
+            }
         } catch (FactoryException ex) {
             throw new CstlServiceException(ex, INVALID_CRS);
         }

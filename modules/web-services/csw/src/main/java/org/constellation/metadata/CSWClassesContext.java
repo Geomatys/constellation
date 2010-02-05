@@ -127,7 +127,8 @@ public final class CSWClassesContext {
      * @return
      */
     public static Class[] getAllClasses() {
-           return Util.toArray(getAllClassesList());
+        List<Class> classes =getAllClassesList();
+        return classes.toArray(new Class[classes.size()]);
     }
 
 }

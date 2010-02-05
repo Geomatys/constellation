@@ -48,7 +48,6 @@ import org.constellation.provider.StyleProviderProxy;
 import org.constellation.register.RegisterException;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.StyleUtils;
-import org.constellation.util.Util;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -271,7 +270,7 @@ public final class WCSWorker extends AbstractWorker {
                         NO_APPLICABLE_CODE);
             }
             final Keywords keywords = new Keywords("WCS", coverageRef.getName(),
-                    Util.cleanSpecialCharacter(coverageRef.getThematic()));
+                    StringUtilities.cleanSpecialCharacter(coverageRef.getThematic()));
 
             //Spatial metadata
             final org.geotoolkit.wcs.xml.v100.SpatialDomainType spatialDomain =
@@ -328,7 +327,7 @@ public final class WCSWorker extends AbstractWorker {
 
             //we build the coverage offering for this layer/coverage
             final CoverageOfferingType coverageOffering = new CoverageOfferingType(null, coverageRef.getName(),
-                    coverageRef.getName(), Util.cleanSpecialCharacter(coverageRef.getRemarks()), llenvelope,
+                    coverageRef.getName(), StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks()), llenvelope,
                     keywords, domainSet, rangeSet, supCRS, supForm, supInt);
             coverageOfferings.add(coverageOffering);
         }
@@ -408,7 +407,7 @@ public final class WCSWorker extends AbstractWorker {
             final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
             title.add(new LanguageStringType(coverageRef.getName()));
             final List<LanguageStringType> abstractt = new ArrayList<LanguageStringType>();
-            abstractt.add(new LanguageStringType(Util.cleanSpecialCharacter(coverageRef.getRemarks())));
+            abstractt.add(new LanguageStringType(StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks())));
             final List<KeywordsType> keywords = new ArrayList<KeywordsType>();
             keywords.add(new KeywordsType(new LanguageStringType("WCS"),
                     new LanguageStringType(coverageRef.getName())));
@@ -445,7 +444,7 @@ public final class WCSWorker extends AbstractWorker {
                     org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
             final InterpolationMethods interpolations = new InterpolationMethods(
                     intList, org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
-            final RangeType range = new RangeType(new FieldType(Util.cleanSpecialCharacter(coverageRef.getThematic()),
+            final RangeType range = new RangeType(new FieldType(StringUtilities.cleanSpecialCharacter(coverageRef.getThematic()),
                     null, new org.geotoolkit.ows.xml.v110.CodeType("0.0"), interpolations));
 
             //supported CRS
@@ -732,7 +731,7 @@ public final class WCSWorker extends AbstractWorker {
                 final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
                 title.add(new LanguageStringType(coverageLayer.getName()));
                 final List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
-                remark.add(new LanguageStringType(Util.cleanSpecialCharacter(coverageLayer.getRemarks())));
+                remark.add(new LanguageStringType(StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks())));
 
                 final CoverageSummaryType cs = new CoverageSummaryType(title, remark);
 

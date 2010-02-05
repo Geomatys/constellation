@@ -53,7 +53,6 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.lang.reflect.Constructor;
 
 import org.geotoolkit.io.TableWriter;
-import org.geotoolkit.internal.sql.JDBC;
 import org.geotoolkit.util.converter.Classes;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -401,7 +400,6 @@ public class Database {
             } else {
                 final String database = getProperty(ConfigurationKey.DATABASE);
                 if (database != null) {
-                    JDBC.loadDriver(getProperty(ConfigurationKey.DRIVER));
                     connection = DriverManager.getConnection(database, user, password);
                 } else {
                     connection = null;

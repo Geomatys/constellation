@@ -47,10 +47,10 @@ import org.constellation.jaxb.MarshallWarnings;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.Parameters;
-import org.constellation.util.Util;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.metadata.CSWClassesContext;
+import org.constellation.util.StringUtilities;
 
 import org.geotoolkit.csw.xml.DescribeRecord;
 import org.geotoolkit.csw.xml.GetCapabilities;
@@ -353,7 +353,7 @@ public class CSWService extends OGCWebService {
                     getMarshallerPool().release(marshaller);
                 }
             }
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
+            return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
         } else {
             return Response.ok("The CSW server is not running cause: unable to create JAXB context!", MimeType.TEXT_PLAIN).build();
         }

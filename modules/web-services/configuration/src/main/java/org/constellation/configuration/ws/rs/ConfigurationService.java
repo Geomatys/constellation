@@ -55,6 +55,7 @@ import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
@@ -285,7 +286,7 @@ public class ConfigurationService extends AbstractWebService  {
             }
             final StringWriter sw = new StringWriter();
             marshaller.marshal(report, sw);
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
+            return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
             
         } finally {
             if (marshaller != null) {

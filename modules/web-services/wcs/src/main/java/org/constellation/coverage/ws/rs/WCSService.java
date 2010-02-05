@@ -320,7 +320,7 @@ public class WCSService extends GridWebService {
             }
         }
 
-        return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.APP_SE_XML).build();
+        return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), MimeType.APP_SE_XML).build();
     }
 
     /**

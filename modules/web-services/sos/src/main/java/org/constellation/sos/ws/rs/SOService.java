@@ -49,7 +49,7 @@ import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.constellation.sos.ws.SOSworker;
-import org.constellation.util.Util;
+import org.constellation.util.StringUtilities;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
@@ -271,7 +271,7 @@ public class SOService extends OGCWebService {
                     getMarshallerPool().release(marshaller);
                 }
             }
-            return Response.ok(Util.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
+            return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
         } else {
             return Response.ok("The SOS server is not running cause: unable to create JAXB context!", MimeType.TEXT_PLAIN).build();
         }

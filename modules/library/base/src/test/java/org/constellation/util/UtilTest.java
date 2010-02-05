@@ -55,7 +55,7 @@ public class UtilTest {
     public void cleanSpecialCharacterTest() throws Exception {
 
         String dirty = "lé oiseaux chantè à l'aube OLÉÉÉÉÉÉÉ";
-        String result = Util.cleanSpecialCharacter(dirty);
+        String result = StringUtilities.cleanSpecialCharacter(dirty);
         String expresult = "le oiseaux chante a l'aube OLEEEEEEE";
         assertEquals(expresult, result);
     }
@@ -84,12 +84,12 @@ public class UtilTest {
     public void removePrefixTest() throws Exception {
 
         String dirty = "ns2:what_ever";
-        String result = Util.removePrefix(dirty);
+        String result = StringUtilities.removePrefix(dirty);
         String expresult = "what_ever";
         assertEquals(expresult, result);
 
         dirty = "csw:GetRecord";
-        result = Util.removePrefix(dirty);
+        result = StringUtilities.removePrefix(dirty);
         expresult = "GetRecord";
         assertEquals(expresult, result);
     }
@@ -110,7 +110,7 @@ public class UtilTest {
         expResults.add("boouutcmach");
         expResults.add("bcbcbcbcbcbcbcbcbc");
 
-        List<String> results = Util.cleanStrings(dirtys);
+        List<String> results = StringUtilities.cleanStrings(dirtys);
         assertEquals(expResults, results);
 
     }
@@ -125,28 +125,28 @@ public class UtilTest {
         dirtys.add("SOMeTHING");
         dirtys.add("oTher");
 
-        assertTrue(Util.matchesStringfromList(dirtys, "something"));
+        assertTrue(StringUtilities.matchesStringfromList(dirtys, "something"));
 
         dirtys = new ArrayList<String>();
         dirtys.add("whatever");
         dirtys.add("oTher");
         dirtys.add("SOMeTHING and other things");
 
-        assertTrue(Util.matchesStringfromList(dirtys, "something"));
+        assertTrue(StringUtilities.matchesStringfromList(dirtys, "something"));
 
         dirtys = new ArrayList<String>();
         dirtys.add("whatever");
         dirtys.add("oTher");
         dirtys.add("SOMeTHING and other things");
 
-        assertTrue(Util.matchesStringfromList(dirtys, "othe"));
+        assertTrue(StringUtilities.matchesStringfromList(dirtys, "othe"));
 
         dirtys = new ArrayList<String>();
         dirtys.add("whatever");
         dirtys.add("oTher");
         dirtys.add("SOMeTHING and other things");
 
-        assertFalse(Util.matchesStringfromList(dirtys, "whateveri"));
+        assertFalse(StringUtilities.matchesStringfromList(dirtys, "whateveri"));
 
     }
 
@@ -199,14 +199,14 @@ public class UtilTest {
         String tmp = "<ns2:Mark1>something<ns2:Mark1>" + '\n' +
                      "<ns2:Mark2>otherthing<ns2:Mark2>";
 
-        String result = Util.replacePrefix(tmp, "Mark1", "csw");
+        String result = StringUtilities.replacePrefix(tmp, "Mark1", "csw");
 
         String expResult = "<csw:Mark1>something<csw:Mark1>" + '\n' +
                            "<ns2:Mark2>otherthing<ns2:Mark2>";
 
         assertEquals(expResult, result);
 
-        result = Util.replacePrefix(tmp, "Mark3", "csw");
+        result = StringUtilities.replacePrefix(tmp, "Mark3", "csw");
 
         assertEquals(tmp, result);
 
@@ -218,7 +218,7 @@ public class UtilTest {
                     "<ns2:Mark2>otherthing<ns2:Mark2>" + '\n' +
                     "<csw:Mark1>stuff<csw:Mark1>";
 
-        result = Util.replacePrefix(tmp, "Mark1", "csw");
+        result = StringUtilities.replacePrefix(tmp, "Mark1", "csw");
         assertEquals(expResult, result);
     }
 

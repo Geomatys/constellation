@@ -58,6 +58,7 @@ import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.register.RegisterException;
 import org.constellation.util.PeriodUtilities;
+import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.ServiceType;
@@ -375,13 +376,12 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                 if (layer instanceof CoverageLayerDetails) {
                     final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
                     outputLayer = new org.geotoolkit.wms.xml.v111.Layer(layerName,
-                            Util.cleanSpecialCharacter(coverageLayer.getRemarks()),
-                            Util.cleanSpecialCharacter(coverageLayer.getThematic()), crs,
+                            StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks()),
+                            StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic()), crs,
                             bbox, outputBBox, queryable, dimensions, styles);
                 } else {
                     outputLayer = new org.geotoolkit.wms.xml.v111.Layer(layerName,
-                            Util.cleanSpecialCharacter("Vector data"),
-                            Util.cleanSpecialCharacter("Vector data"), crs, bbox,
+                            "Vector data", "Vector data", crs, bbox,
                             outputBBox, queryable, dimensions, styles);
                 }
             } else {
@@ -428,13 +428,12 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                 if (layer instanceof CoverageLayerDetails) {
                     final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
                     outputLayer = new org.geotoolkit.wms.xml.v130.Layer(layerName,
-                            Util.cleanSpecialCharacter(coverageLayer.getRemarks()),
-                            Util.cleanSpecialCharacter(coverageLayer.getThematic()), crs,
+                            StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks()),
+                            StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic()), crs,
                             bbox, outputBBox, queryable, dimensions, styles);
                 } else {
                     outputLayer = new org.geotoolkit.wms.xml.v130.Layer(layerName,
-                            Util.cleanSpecialCharacter("Vector data"),
-                            Util.cleanSpecialCharacter("Vector data"), crs, bbox,
+                            "Vector data", "Vector data", crs, bbox,
                             outputBBox, queryable, dimensions, styles);
                 }
             }
