@@ -161,7 +161,7 @@ public class BDD {
      */
     public Connection getConnection() throws SQLException {
         Connection conec = CONNECTION_MAP.get(this);
-        if (conec == null) {
+        if (conec == null || conec.isClosed()) {
             // by Default  we use the postgres driver.
             if (className == null) {
                 className = "org.postgresql.Driver";
