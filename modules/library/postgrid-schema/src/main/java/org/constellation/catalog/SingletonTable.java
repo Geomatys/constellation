@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import org.geotoolkit.util.collection.WeakValueHashMap;
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.Util;
 
 
@@ -305,8 +306,8 @@ public abstract class SingletonTable<E> extends Table {
         if (entry instanceof Element) {
             name = ((Element)entry).getName();
         } else {
-            final Method m = Util.getGetterFromName("name", entry.getClass());
-            name = (String) Util.invokeMethod(entry, m);
+            final Method m =ReflectionUtilities.getGetterFromName("name", entry.getClass());
+            name = (String) ReflectionUtilities.invokeMethod(entry, m);
         }
         
         if (key.equals(name)) {
@@ -436,8 +437,8 @@ public abstract class SingletonTable<E> extends Table {
                     if (entry instanceof Element) {
                         name = ((Element) entry).getName();
                     } else {
-                        final Method m = Util.getGetterFromName("name", entry.getClass());
-                        name = (String) Util.invokeMethod(entry, m);
+                        final Method m = ReflectionUtilities.getGetterFromName("name", entry.getClass());
+                        name = (String) ReflectionUtilities.invokeMethod(entry, m);
                     }
                     /*
                      * Si une entrée existait déjà dans la cache, réutilise cette entrée en se

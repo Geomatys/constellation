@@ -40,6 +40,7 @@ import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
 import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
@@ -359,9 +360,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
 
                     final Method getter;
                     if (propName.equals("axis")) {
-                        getter = Util.getMethod("get" + StringUtilities.firstToUpper(propName), object.getClass(), int.class);
+                        getter = ReflectionUtilities.getMethod("get" + StringUtilities.firstToUpper(propName), object.getClass(), int.class);
                     } else {
-                        getter = Util.getGetterFromName(propName, object.getClass());
+                        getter = ReflectionUtilities.getGetterFromName(propName, object.getClass());
                     }
                     if (getter != null) {
                         try {

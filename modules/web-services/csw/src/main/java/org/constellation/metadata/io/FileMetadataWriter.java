@@ -44,6 +44,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWClassesContext;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
@@ -229,17 +230,17 @@ public class FileMetadataWriter extends MetadataWriter {
                     }
 
                     //we try to find a getter for this property
-                    final Method getter = Util.getGetterFromName(propertyName, parentClass);
+                    final Method getter = ReflectionUtilities.getGetterFromName(propertyName, parentClass);
                     if (getter == null) {
                         throw new CstlServiceException("There is no getter for the property:" + propertyName + " in the class:" + type.getSimpleName(), INVALID_PARAMETER_VALUE);
                     } else {
                         // we execute the getter
                         if (!(parent instanceof Collection)) {
-                            parent = Util.invokeMethod(parent, getter);
+                            parent = ReflectionUtilities.invokeMethod(parent, getter);
                         } else {
                             final Collection tmp = new ArrayList();
                             for (Object child : (Collection) parent) {
-                                tmp.add(Util.invokeMethod(child, getter));
+                                tmp.add(ReflectionUtilities.invokeMethod(child, getter));
                             }
                             parent = tmp;
                         }
@@ -337,21 +338,21 @@ public class FileMetadataWriter extends MetadataWriter {
     }
 
     private void updateObject(String propertyName, Object parent, Object value, Class parameterType, int ordinal) throws CstlServiceException {
-        Method setter = Util.getSetterFromName(propertyName, parameterType, parent.getClass());
+        Method setter = ReflectionUtilities.getSetterFromName(propertyName, parameterType, parent.getClass());
 
         // with the geotoolkit implementation we sometimes have to used InternationalString instead of String.
         if (setter == null && parameterType.equals(String.class)) {
-            setter = Util.getSetterFromName(propertyName, InternationalString.class, parent.getClass());
+            setter = ReflectionUtilities.getSetterFromName(propertyName, InternationalString.class, parent.getClass());
             value = new SimpleInternationalString((String) value);
         }
 
         //if there is an ordinal we must get the existant Collection
         if (ordinal != -1) {
-            final Method getter = Util.getGetterFromName(propertyName, parent.getClass());
+            final Method getter = ReflectionUtilities.getGetterFromName(propertyName, parent.getClass());
             if (getter == null) {
                 throw new CstlServiceException("There is no getter for the property:" + propertyName + " in the class:" + parent.getClass(), INVALID_PARAMETER_VALUE);
             }
-            final Object existant = Util.invokeMethod(parent, getter);
+            final Object existant = ReflectionUtilities.invokeMethod(parent, getter);
 
             if (!(existant instanceof Collection)) {
                 throw new CstlServiceException("The property:" + propertyName + " in the class:" + parent.getClass() + " is not a collection", INVALID_PARAMETER_VALUE);
@@ -403,10 +404,10 @@ public class FileMetadataWriter extends MetadataWriter {
                             c = new ArrayList(1);
                             c.add(value);
                         }
-                        Util.invokeMethodEx(setter, parent, c);
+                        ReflectionUtilities.invokeMethodEx(setter, parent, c);
                     }
                 } else {
-                    Util.invokeMethodEx(setter, parent, value);
+                    ReflectionUtilities.invokeMethodEx(setter, parent, value);
                 }
             } catch (IllegalAccessException ex) {
                 throw new CstlServiceException(baseMessage + "the class is not accessible.", NO_APPLICABLE_CODE);

@@ -55,6 +55,7 @@ import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.generic.database.Automatic;
 import org.constellation.util.Util;
 import org.constellation.metadata.io.MetadataReader;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
 
@@ -69,6 +70,7 @@ import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
 // geoAPI dependencies
+import org.geotoolkit.resources.NIOUtilities;
 import org.opengis.util.InternationalString;
 
 
@@ -165,7 +167,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                      LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
                      writer.optimize();
                      writer.close();
-                     Util.deleteDirectory(getFileDirectory());
+                     NIOUtilities.deleteDirectory(getFileDirectory());
                      if (indexationToStop.contains(serviceID)) {
                         indexationToStop.remove(serviceID);
                     }
@@ -218,7 +220,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                      LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
                      writer.optimize();
                      writer.close();
-                     Util.deleteDirectory(getFileDirectory());
+                     NIOUtilities.deleteDirectory(getFileDirectory());
                      if (indexationToStop.contains(serviceID)) {
                         indexationToStop.remove(serviceID);
                      }
@@ -849,15 +851,15 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             final String getterId = object.getClass().getName() + ':' + attributeName;
             Method getter         = GETTERS.get(getterId);
             if (getter != null) {
-                result = Util.invokeMethod(object, getter);
+                result = ReflectionUtilities.invokeMethod(object, getter);
             } else {
                 if (attributeName.equalsIgnoreCase("referenceSystemIdentifier")) {
                     attributeName = "name";
                 }
-                getter = Util.getGetterFromName(attributeName, object.getClass());
+                getter = ReflectionUtilities.getGetterFromName(attributeName, object.getClass());
                 if (getter != null) {
                     GETTERS.put(object.getClass().getName() + ':' + attributeName, getter);
-                    result = Util.invokeMethod(object, getter);
+                    result = ReflectionUtilities.invokeMethod(object, getter);
                 }
             }
         }

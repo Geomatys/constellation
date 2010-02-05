@@ -36,8 +36,8 @@ import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWClassesContext;
 import org.constellation.metadata.index.generic.GenericIndexer;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.StringUtilities;
-import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
 
@@ -202,18 +202,18 @@ public class FileMetadataReader extends MetadataReader {
             for (QName qn : elementName) {
                 if (qn != null) {
                     try {
-                        final Method getter = Util.getGetterFromName(qn.getLocalPart(), RecordType.class);
-                        final Object param  = Util.invokeMethod(record, getter);
+                        final Method getter = ReflectionUtilities.getGetterFromName(qn.getLocalPart(), RecordType.class);
+                        final Object param  = ReflectionUtilities.invokeMethod(record, getter);
 
                         Method setter = null;
                         if (param != null) {
-                            setter = Util.getSetterFromName(qn.getLocalPart(), param.getClass(), RecordType.class);
+                            setter = ReflectionUtilities.getSetterFromName(qn.getLocalPart(), param.getClass(), RecordType.class);
                         } else {
                             continue;
                         }
 
                         if (setter != null) {
-                            Util.invokeMethod(setter, customRecord, param);
+                            ReflectionUtilities.invokeMethod(setter, customRecord, param);
                         } else {
                             String paramDesc = "null";
                             String localPart = "null";

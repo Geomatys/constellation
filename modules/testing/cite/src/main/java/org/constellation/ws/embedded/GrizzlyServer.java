@@ -41,8 +41,8 @@ import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.provider.sld.SLDProvider;
 import org.constellation.provider.sld.SLDProviderService;
-import org.constellation.util.Util;
 import org.geotoolkit.internal.io.IOUtilities;
+import org.geotoolkit.resources.NIOUtilities;
 import org.geotoolkit.util.logging.Logging;
 
 
@@ -250,12 +250,12 @@ public final class GrizzlyServer {
     /**
      * Delete the data directory at the end of the process.
      */
-    private static void deleteDataDirectory() {
+    private static void deleteDataDirectory() throws IOException {
         final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         final File outputDir = new File(tmpDir, "Constellation");
         if (outputDir != null && outputDir.exists()) {
             if (outputDir.canWrite()) {
-                if (!Util.deleteDirectory(outputDir)) {
+                if (!NIOUtilities.deleteDirectory(outputDir)) {
                     LOGGER.info("Unable to delete folder "+ outputDir.getAbsolutePath());
                 }
             } else {
@@ -267,7 +267,7 @@ public final class GrizzlyServer {
     /**
      * Stop the grizzly server if it is still alive and delete the temporary data directory.
      */
-    public static synchronized void finish() {
+    public static synchronized void finish() throws IOException {
         if (grizzly != null && grizzly.isAlive()) {
             grizzly.interrupt();
         }

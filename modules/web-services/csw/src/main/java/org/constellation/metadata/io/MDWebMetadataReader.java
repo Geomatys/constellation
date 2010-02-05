@@ -45,6 +45,7 @@ import javax.xml.namespace.QName;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.Util;
 import org.constellation.util.StringUtilities;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -621,16 +622,16 @@ public class MDWebMetadataReader extends MetadataReader {
             for (QName qn : elementName) {
 
                 try {
-                    final Method getter = Util.getGetterFromName(qn.getLocalPart(), RecordType.class);
-                    final Object param  = Util.invokeMethod(fullResult, getter);
+                    final Method getter = ReflectionUtilities.getGetterFromName(qn.getLocalPart(), RecordType.class);
+                    final Object param  = ReflectionUtilities.invokeMethod(fullResult, getter);
 
                     Method setter = null;
                     if (param != null) {
-                        setter = Util.getSetterFromName(qn.getLocalPart(), param.getClass(), RecordType.class);
+                        setter =ReflectionUtilities.getSetterFromName(qn.getLocalPart(), param.getClass(), RecordType.class);
                     }
 
                     if (setter != null) {
-                        Util.invokeMethod(setter, result, param);
+                        ReflectionUtilities.invokeMethod(setter, result, param);
                     } else {
                         String paramDesc = "null";
                         if (param != null) {
@@ -785,14 +786,14 @@ public class MDWebMetadataReader extends MetadataReader {
         // for an element name mode    
         } else {
             final Class recordClass    = result.getClass();
-            final Object filtredResult = Util.newInstance(recordClass);
+            final Object filtredResult = ReflectionUtilities.newInstance(recordClass);
 
             for (QName qn : elementName) {
                 String currentMethodType = "";
                 try {
                     currentMethodType   = "get";
-                    final Method getter = Util.getGetterFromName(qn.getLocalPart(), recordClass);
-                    final Object param  = Util.invokeMethod(result, getter);
+                    final Method getter = ReflectionUtilities.getGetterFromName(qn.getLocalPart(), recordClass);
+                    final Object param  = ReflectionUtilities.invokeMethod(result, getter);
 
                     Method setter = null;
                     if (param != null) {
@@ -801,10 +802,10 @@ public class MDWebMetadataReader extends MetadataReader {
                         if (paramClass.equals(ArrayList.class)) {
                             paramClass = List.class;
                         }
-                        setter = Util.getSetterFromName(qn.getLocalPart(), paramClass, recordClass);
+                        setter = ReflectionUtilities.getSetterFromName(qn.getLocalPart(), paramClass, recordClass);
                     }
                     if (setter != null) {
-                        Util.invokeMethod(setter, filtredResult, param);
+                        ReflectionUtilities.invokeMethod(setter, filtredResult, param);
                     } else {
                         String paramDesc = "null";
                         if (param != null) {
@@ -872,8 +873,8 @@ public class MDWebMetadataReader extends MetadataReader {
                             result = CodeLists.valueOf(classe, element.getName());
                             
                         } else if (classe.isEnum()) {
-                            method = Util.getMethod("fromValue", classe, String.class);
-                            result = Util.invokeMethod(method, null, classe, element.getName());
+                            method = ReflectionUtilities.getMethod("fromValue", classe, String.class);
+                            result = ReflectionUtilities.invokeMethod(method, null, classe, element.getName());
                         } else {
                             LOGGER.severe("unknow codelist type");
                             return null;
@@ -901,7 +902,7 @@ public class MDWebMetadataReader extends MetadataReader {
                 // else we use a String constructor
                 } else {
                     //we execute the constructor
-                    result = Util.newInstance(classe, textValue);
+                    result = ReflectionUtilities.newInstance(classe, textValue);
                     
                     //fix a bug in MDWeb with the value attribute TODO remove
                     if (!form.asMoreChild(value)) {
@@ -937,7 +938,7 @@ public class MDWebMetadataReader extends MetadataReader {
                     }
                     if (child != null) {
                         final CharSequence cs = child.getValue();
-                        return Util.newInstance(classe, cs);
+                        return ReflectionUtilities.newInstance(classe, cs);
                     } else {
                         LOGGER.severe("The localName is mal-formed");
                         return null;
@@ -961,7 +962,7 @@ public class MDWebMetadataReader extends MetadataReader {
                         }
                     }
                     if (localPart != null && namespaceURI != null) {
-                        result = Util.newInstance(classe, namespaceURI, localPart);
+                        result = ReflectionUtilities.newInstance(classe, namespaceURI, localPart);
                         return result;
                     } else {
                         LOGGER.severe("The QName is mal-formed");
@@ -972,7 +973,7 @@ public class MDWebMetadataReader extends MetadataReader {
                  * normal case
                  * we get the empty constructor
                  */ 
-                result = Util.newInstance(classe);
+                result = ReflectionUtilities.newInstance(classe);
                 alreadyRead.put(value, result);
             }
 
@@ -1025,9 +1026,9 @@ public class MDWebMetadataReader extends MetadataReader {
                         if (isMeta) {
                               metaMap.put(attribName, param);
                         } else {
-                            final Method setter = Util.getSetterFromName(attribName, param.getClass(), classe);
+                            final Method setter = ReflectionUtilities.getSetterFromName(attribName, param.getClass(), classe);
                             if (setter != null && result != null) {
-                                Util.invokeMethod(setter, result, param);
+                                ReflectionUtilities.invokeMethod(setter, result, param);
                             } else {
                                 // special case
                                 if (attribName.equalsIgnoreCase("identifier")) {
