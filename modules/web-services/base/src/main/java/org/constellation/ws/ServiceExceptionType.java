@@ -77,8 +77,7 @@ public final class ServiceExceptionType {
      * @param code A standard code for exception (OWS).
      */
     public ServiceExceptionType(final String message, final CodeList code) {
-        this.message = message;
-        this.code    = code.name();
+        this(message, code.name());
     }
 
     /**
@@ -89,8 +88,30 @@ public final class ServiceExceptionType {
      * @param locator The method where the error occured.
      */
     public ServiceExceptionType(final String message, final CodeList code, final String locator) {
+        this(message, code.name(), locator);
+    }
+
+    /**
+     * Builds a new exception with the specified message and code.
+     *
+     * @param message The message of the exception.
+     * @param code A standard code for exception (OWS).
+     */
+    public ServiceExceptionType(final String message, final String code) {
         this.message = message;
-        this.code    = code.name();
+        this.code    = code;
+    }
+
+    /**
+     * Build a new exception with the specified message, code and locator.
+     *
+     * @param message The message of the exception.
+     * @param code A standard code for exception (OWS).
+     * @param locator The method where the error occured.
+     */
+    public ServiceExceptionType(final String message, final String code, final String locator) {
+        this.message = message;
+        this.code    = code;
         this.locator = locator;
     }
 

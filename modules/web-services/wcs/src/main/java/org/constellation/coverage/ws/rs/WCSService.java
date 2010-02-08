@@ -301,13 +301,13 @@ public class WCSService extends GridWebService {
             //serviceDef = getBestVersion(null);
         }
         final String locator = ex.getLocator();
+        final String code = Util.transformCodeName(ex.getExceptionCode().name());
         if (isOWS(serviceDef)) {
-            final String code = Util.transformCodeName(ex.getExceptionCode().name());
             report = new ExceptionReport(ex.getMessage(), code, locator, serviceDef.exceptionVersion.toString());
         } else {
             report = new ServiceExceptionReport(serviceDef.exceptionVersion,
-                         (locator == null) ? new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode()) :
-                                             new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode(), locator));
+                         (locator == null) ? new ServiceExceptionType(ex.getMessage(), code) :
+                                             new ServiceExceptionType(ex.getMessage(), code, locator));
         }
         final StringWriter sw = new StringWriter();
         Marshaller marshaller = null;
