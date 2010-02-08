@@ -381,7 +381,7 @@ public class WCSService extends GridWebService {
             }
             final SectionsType sections = new SectionsType(requestedSections);
             final AcceptVersionsType versions = new AcceptVersionsType(ServiceDef.WCS_1_1_1.version.toString());
-            return (GetCapabilities) new org.geotoolkit.wcs.xml.v111.GetCapabilitiesType(versions, sections, formats, null);
+            return new org.geotoolkit.wcs.xml.v111.GetCapabilitiesType(versions, sections, formats, null);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());

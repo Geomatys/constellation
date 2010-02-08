@@ -99,6 +99,7 @@ import org.geotoolkit.wcs.xml.v100.SupportedCRSsType;
 import org.geotoolkit.wcs.xml.v100.SupportedFormatsType;
 import org.geotoolkit.wcs.xml.v100.SupportedInterpolationsType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
+import org.geotoolkit.wcs.xml.v100.WCSCapabilityType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilityType.Request;
 import org.geotoolkit.wcs.xml.v111.Capabilities;
 import org.geotoolkit.wcs.xml.v111.Contents;
@@ -571,11 +572,15 @@ public final class WCSWorker extends AbstractWorker {
             responsev100 = staticCapabilities;
         } else {
             if (requestedSection.equals("/WCS_Capabilities/Capability")) {
-                return new WCSCapabilitiesType(staticCapabilities.getCapability());
+                final WCSCapabilityType getStaticCapa = staticCapabilities.getCapability();
+                getStaticCapa.setVersion(ServiceDef.WCS_1_0_0.version.toString());
+                return new WCSCapabilitiesType(getStaticCapa);
             } else if (requestedSection.equals("/WCS_Capabilities/Service")) {
-                return new WCSCapabilitiesType(staticCapabilities.getService());
+                final org.geotoolkit.wcs.xml.v100.ServiceType getStaticService = staticCapabilities.getService();
+                getStaticService.setVersion(ServiceDef.WCS_1_0_0.version.toString());
+                return new WCSCapabilitiesType(getStaticService);
             } else {
-                throw new CstlServiceException("Not a valid section requested: "+ requestedSection,
+                throw new CstlServiceException("Not a valid section requested: " + requestedSection,
                         INVALID_PARAMETER_VALUE, KEY_SECTION.toLowerCase());
             }
         }
@@ -639,13 +644,14 @@ public final class WCSWorker extends AbstractWorker {
 
                 offBrief.add(co);
             }
-            contentMetadata = new ContentMetadata(ServiceDef.WCS_1_0_0.version.toString(), offBrief);
+            contentMetadata = new ContentMetadata(offBrief);
         } catch (CatalogException exception) {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
 
         // The ContentMetadata has finally been filled, we can now return the response.
         if (contentMeta) {
+            contentMetadata.setVersion(ServiceDef.WCS_1_0_0.version.toString());
             return new WCSCapabilitiesType(contentMetadata);
         } else {
             responsev100.setContentMetadata(contentMetadata);
