@@ -818,18 +818,18 @@ public final class WCSWorker extends AbstractWorker {
         } catch (FactoryException ex) {
             throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, KEY_BBOX.toLowerCase());
         }
-        // Ensures the bbox specified is inside the range of the CRS.
-        final CoordinateReferenceSystem objectiveCrs;
-        try {
-            objectiveCrs = request.getCRS();
-        } catch (FactoryException ex) {
-            throw new CstlServiceException(ex, INVALID_CRS, KEY_CRS.toLowerCase());
-        }
         /*
          * Here the envelope can be null, if we have specified a TIME parameter. In this case we
          * do not have to test whether the bbox parameter are into the CRS axes definition.
          */
         if (envelope != null) {
+            // Ensures the bbox specified is inside the range of the CRS.
+            final CoordinateReferenceSystem objectiveCrs;
+            try {
+                objectiveCrs = request.getCRS();
+            } catch (FactoryException ex) {
+                throw new CstlServiceException(ex, INVALID_CRS, KEY_CRS.toLowerCase());
+            }
             for (int i = 0; i < objectiveCrs.getCoordinateSystem().getDimension(); i++) {
                 final CoordinateSystemAxis axis = objectiveCrs.getCoordinateSystem().getAxis(i);
                 if (envelope.getMaximum(i) < axis.getMinimumValue() ||
