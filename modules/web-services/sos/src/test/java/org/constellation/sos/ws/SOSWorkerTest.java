@@ -733,7 +733,7 @@ public class SOSWorkerTest {
         obsResult =  (ObservationEntry) result.getMember().iterator().next();
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
         obsR      = (DataArrayPropertyType) obsResult.getResult();
-        assertEquals(obsR.getDataArray().getElementCount().getCount().getValue(), 15);
+        assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 15.0);
 
         /**
          *  Test 7: getObservation with procedure urn:ogc:object:sensor:GEOM:3
@@ -786,7 +786,7 @@ public class SOSWorkerTest {
         obsResult =  (ObservationEntry) result.getMember().iterator().next();
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
         obsR      = (DataArrayPropertyType) obsResult.getResult();
-        assertEquals(obsR.getDataArray().getElementCount().getCount().getValue(), 15);
+        assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 15);
 
         /**
          *  Test 9: getObservation with procedure urn:ogc:object:sensor:GEOM:3
@@ -815,7 +815,7 @@ public class SOSWorkerTest {
         obsResult =  (ObservationEntry) result.getMember().iterator().next();
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
         obsR      = (DataArrayPropertyType) obsResult.getResult();
-        assertEquals(obsR.getDataArray().getElementCount().getCount().getValue(), 10);
+        assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 10);
 
         /**
          *  Test 10: getObservation with procedure urn:ogc:object:sensor:GEOM:3
@@ -844,7 +844,7 @@ public class SOSWorkerTest {
         obsResult =  (ObservationEntry) result.getMember().iterator().next();
         assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
         obsR      = (DataArrayPropertyType) obsResult.getResult();
-        assertEquals(obsR.getDataArray().getElementCount().getCount().getValue(), 5);
+        assertTrue(obsR.getDataArray().getElementCount().getCount().getValue() == 5);
 
         /**
          *  Test 11: getObservation with procedure urn:ogc:object:sensor:GEOM:3

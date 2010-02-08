@@ -132,7 +132,7 @@ public class PostgisUtils {
        final org.geotoolkit.data.FeatureIterator ite = coll.iterator();
        try{
            while(ite.hasNext()) {
-               final SimpleFeature f = (SimpleFeature) ite.next();
+               final SimpleFeature f =  (SimpleFeature) ite.next();
 
                final String identifier = (String) f.getAttribute(featureSource);
                if (identifier.equals(toponyme)) {

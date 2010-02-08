@@ -43,7 +43,6 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.naming.NamingException;
 import org.constellation.provider.configuration.ConfigDirectory;
-import org.constellation.ws.rs.WebService;
 
 /**
  * Utility class to send mails

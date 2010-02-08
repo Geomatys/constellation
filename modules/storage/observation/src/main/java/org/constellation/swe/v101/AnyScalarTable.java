@@ -186,10 +186,11 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
             statement.setString(indexOf(query.idDataRecord), dataRecordId);
             statement.setString(indexOf(query.idDataBlock),  blockId);
             statement.setString(indexOf(query.name),         id);
-            if (field.getComponent() != null)
-                statement.setString(indexOf(query.definition),   field.getComponent().getDefinition());
-            else
+            if (field.getComponent() != null && field.getComponent().getDefinition() != null) {
+                statement.setString(indexOf(query.definition),   field.getComponent().getDefinition().toString());
+            } else {
                 statement.setNull(indexOf(query.definition), java.sql.Types.VARCHAR);   
+            }
             
             if (field.getComponent() instanceof QuantityType) {
                 final QuantityType q = (QuantityType) field.getComponent();

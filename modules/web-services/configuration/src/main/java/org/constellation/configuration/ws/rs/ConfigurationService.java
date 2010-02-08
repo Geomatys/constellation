@@ -107,7 +107,6 @@ public class ConfigurationService extends AbstractWebService  {
     static {
         SERVCE_DIRECTORY.put("CSW",      new File(ConfigDirectory.getConfigDirectory(), "csw_configuration"));
         SERVCE_DIRECTORY.put("SOS",      new File(ConfigDirectory.getConfigDirectory(), "sos_configuration"));
-        SERVCE_DIRECTORY.put("MDSEARCH", new File(ConfigDirectory.getConfigDirectory(), "mdweb/search"));
     }
     
     /**
@@ -183,7 +182,6 @@ public class ConfigurationService extends AbstractWebService  {
             if ("RefreshIndex".equalsIgnoreCase(request)) {
                 if (cswFunctionEnabled) {
                     final boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
-                    final String service     = getParameter("SERVICE", false);
                     final String id          = getParameter("ID", false);
                     boolean forced           = Boolean.parseBoolean((String) getParameter("FORCED", false));
 
@@ -198,7 +196,7 @@ public class ConfigurationService extends AbstractWebService  {
                     startIndexation(id);
                     AcknowlegementType ack;
                     try {
-                        ack = cswConfigurer.refreshIndex(asynchrone, service, id);
+                        ack = cswConfigurer.refreshIndex(asynchrone, id);
                     } finally {
                         endIndexation(id);
                     }

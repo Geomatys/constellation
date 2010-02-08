@@ -260,13 +260,12 @@ public abstract class AbstractCSWConfigurer {
      * Destroy the CSW index directory in order that it will be recreated.
      * 
      * @param asynchrone a flag for indexation mode.
-     * @param service The service type (CSW, MDSearch, ...)
      * @param id The service identifier.
      * 
      * @return
      * @throws CstlServiceException
      */
-    public AcknowlegementType refreshIndex(boolean asynchrone, String service, String id) throws CstlServiceException {
+    public AcknowlegementType refreshIndex(boolean asynchrone, String id) throws CstlServiceException {
         LOGGER.info("refresh index requested");
         try {
             refreshServiceConfiguration();
@@ -379,51 +378,44 @@ public abstract class AbstractCSWConfigurer {
      */
     public AcknowlegementType addToIndex(String service, String id, List<String> identifiers) throws CstlServiceException {
         LOGGER.info("Add to index requested");
-        String msg;
-
-        if (service != null && service.equalsIgnoreCase("MDSEARCH")) {
-            throw new CstlServiceException("This method is not yet available for this service.", OPERATION_NOT_SUPPORTED);
 
         // CSW indexation
-        } else {
-
-            final File cswConfigDir = getConfigurationDirectory();
-            /*
-             * then we create all the nextIndex directory and create the indexes
-             * if there is a specific id in parameter we only index the specified profile
-             */
-            for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(id))) {
-                final String currentId        = getConfigID(configFile);
-                AbstractIndexer indexer = null;
-                MetadataReader reader   = null;
-                try {
-                    reader  = initReader(currentId);
-                    final List<Object> objectToIndex = new ArrayList<Object>();
-                    if (reader != null) {
-                        for (String identifier : identifiers) {
-                            objectToIndex.add(reader.getMetadata(identifier, MetadataReader.ISO_19115, ElementSetType.FULL, null));
-                        }
-                    } else {
-                        throw new CstlServiceException("Unable to create a reader for the id:" + id, NO_APPLICABLE_CODE);
+        final File cswConfigDir = getConfigurationDirectory();
+        /*
+         * then we create all the nextIndex directory and create the indexes
+         * if there is a specific id in parameter we only index the specified profile
+         */
+        for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(id))) {
+            final String currentId        = getConfigID(configFile);
+            AbstractIndexer indexer = null;
+            MetadataReader reader   = null;
+            try {
+                reader  = initReader(currentId);
+                final List<Object> objectToIndex = new ArrayList<Object>();
+                if (reader != null) {
+                    for (String identifier : identifiers) {
+                        objectToIndex.add(reader.getMetadata(identifier, MetadataReader.ISO_19115, ElementSetType.FULL, null));
                     }
+                } else {
+                    throw new CstlServiceException("Unable to create a reader for the id:" + id, NO_APPLICABLE_CODE);
+                }
 
-                    indexer = initIndexer(currentId, reader);
-                    if (indexer != null) {
-                        for (Object obj : objectToIndex) {
-                            indexer.indexDocument(obj);
-                        }
-                    } else {
-                        throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
+                indexer = initIndexer(currentId, reader);
+                if (indexer != null) {
+                    for (Object obj : objectToIndex) {
+                        indexer.indexDocument(obj);
                     }
+                } else {
+                    throw new CstlServiceException("Unable to create an indexer for the id:" + id, NO_APPLICABLE_CODE);
+                }
 
-                } finally {
-                    if (indexer != null) {
-                        indexer.destroy();
-                    }
+            } finally {
+                if (indexer != null) {
+                    indexer.destroy();
                 }
             }
-            msg = "The specified record have been added to the CSW index";
         }
+        String msg = "The specified record have been added to the CSW index";
         return new AcknowlegementType("success", msg);
     }
 

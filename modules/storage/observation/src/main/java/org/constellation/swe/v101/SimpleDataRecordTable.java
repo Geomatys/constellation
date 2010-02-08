@@ -162,7 +162,11 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
             final PreparedStatement statement = getStatement(QueryType.INSERT);
             statement.setString(indexOf(query.idDataRecord), id);
             statement.setString(indexOf(query.idBlock),      dataBlockId);
-            statement.setString(indexOf(query.definition),   datarecord.getDefinition());
+            if (datarecord.getDefinition() != null) {
+                statement.setString(indexOf(query.definition),   datarecord.getDefinition().toString());
+            } else {
+                statement.setNull(indexOf(query.definition),  java.sql.Types.VARCHAR);
+            }
             statement.setBoolean(indexOf(query.fixed),       datarecord.isFixed());
             updateSingleton(statement);
          

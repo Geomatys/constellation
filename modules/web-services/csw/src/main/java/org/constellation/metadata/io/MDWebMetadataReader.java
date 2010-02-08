@@ -1091,7 +1091,7 @@ public class MDWebMetadataReader extends MetadataReader {
                                         LOGGER.severe("error while setting the parameter: " + objectStr + " to the field:" + field + ":" + ex.getMessage());
                                     }
                                 } else {
-                                    LOGGER.severe("no field " + attribName);
+                                    LOGGER.warning("no field " + attribName + " in class:" + classe.getName());
                                 }
                             }
                         }
