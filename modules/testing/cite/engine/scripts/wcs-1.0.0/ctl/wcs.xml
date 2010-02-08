@@ -257,8 +257,9 @@ offering. Enter the grid resolutions below.</p>
                <ctl:param name="version">1.0.0</ctl:param>
             </ctl:request>
          </xsl:variable>
-         <xsl:variable name="VAR_WCS_COVERAGE_1_RESX">3</xsl:variable>
-         <xsl:variable name="VAR_WCS_COVERAGE_1_RESX">5</xsl:variable>
+         <xsl:variable name="VAR_WCS_COVERAGE_1_RESX">10</xsl:variable>
+         <xsl:variable name="VAR_WCS_COVERAGE_1_RESY">10</xsl:variable>
+         <xsl:variable name="VAR_WCS_FORMAT_1_HEADER">image/png</xsl:variable>
          <xsl:variable name="parser">
             <xsl:choose>
                <xsl:when test="$schemas = 'original'">
@@ -1836,7 +1837,8 @@ offering. Enter the grid resolutions below.</p>
          <xsl:if test="not(normalize-space(substring-before(concat($request1/response/headers/header[translate(@name, 'CONTYPE', 'contype') = 'content-type'], ';'), ';'))='application/vnd.ogc.se_xml')" xmlns="">
             <ctl:fail/>
          </xsl:if>
-         <xsl:if test="$request1/response/content/ogc:ServiceExceptionReport/ogc:ServiceException" xmlns="">
+		 <!-- Add a not condition for this test. Indeed, the response should be a service exception report, and the test should fail if the response is not of kind Service Exception Report. -->
+         <xsl:if test="not($request1/response/content/ogc:ServiceExceptionReport/ogc:ServiceException)" xmlns="">
             <ctl:fail/>
          </xsl:if>
       </ctl:code>
