@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -135,7 +135,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  * to the worker methods as a parameter.
  * </p>
  *
- * @version $Id$
+ * @version 0.5
  *
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
@@ -144,12 +144,16 @@ public final class WCSWorker extends AbstractWorker {
     /**
      * The date format to match.
      */
-    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     /*
      * Set to true for CITE tests.
      */
     private static final boolean CITE_TESTING = false;
+
+    static {
+        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
 
     /**
      * Initializes the marshaller pool for the WCS.
@@ -227,14 +231,15 @@ public final class WCSWorker extends AbstractWorker {
                         LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
             }
             final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
+            final String coverageName = coverageRef.getName();
             if (!coverageRef.isQueryable(ServiceType.WCS)) {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
-                        coverageRef.getName() + "\".", LAYER_NOT_QUERYABLE, KEY_COVERAGE.toLowerCase());
+                        coverageName + "\".", LAYER_NOT_QUERYABLE, KEY_COVERAGE.toLowerCase());
             }
 
             final Set<Series> series = coverageRef.getSeries();
             if (series == null || series.isEmpty()) {
-                throw new CstlServiceException("The coverage " + coverageRef.getName() + " is not defined.",
+                throw new CstlServiceException("The coverage " + coverageName + " is not defined.",
                         LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
             }
             final GeographicBoundingBox inputGeoBox;
@@ -270,7 +275,7 @@ public final class WCSWorker extends AbstractWorker {
                 throw new CstlServiceException("The geographic bbox for the layer is null !",
                         NO_APPLICABLE_CODE);
             }
-            final Keywords keywords = new Keywords("WCS", coverageRef.getName(),
+            final Keywords keywords = new Keywords("WCS", coverageName,
                     StringUtilities.cleanSpecialCharacter(coverageRef.getThematic()));
 
             //Spatial metadata
@@ -278,24 +283,26 @@ public final class WCSWorker extends AbstractWorker {
                     new org.geotoolkit.wcs.xml.v100.SpatialDomainType(llenvelope);
 
             // temporal metadata
-            final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
-            final List<Object> times = new ArrayList<Object>();
             final SortedSet<Date> dates;
             try {
                 dates = coverageRef.getAvailableTimes();
             } catch (CatalogException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
-            for (Date d : dates) {
-                times.add(new TimePositionType(df.format(d)));
+            final org.geotoolkit.wcs.xml.v100.TimeSequenceType temporalDomain;
+            if (dates == null || dates.isEmpty()) {
+                temporalDomain = null;
+            } else {
+                final List<Object> times = new ArrayList<Object>();
+                for (Date d : dates) {
+                    times.add(new TimePositionType(DATE_FORMAT.format(d)));
+                }
+                temporalDomain = new org.geotoolkit.wcs.xml.v100.TimeSequenceType(times);
             }
-            final org.geotoolkit.wcs.xml.v100.TimeSequenceType temporalDomain =
-                    new org.geotoolkit.wcs.xml.v100.TimeSequenceType(times);
             final DomainSetType domainSet = new DomainSetType(spatialDomain, temporalDomain);
             //TODO complete
-            final RangeSetType rangeSetT = new RangeSetType(null, coverageRef.getName(),
-                    coverageRef.getName(), null, null, null, null);
+            final RangeSetType rangeSetT = new RangeSetType(null, coverageName,
+                    coverageName, null, null, null, null);
             final RangeSet rangeSet = new RangeSet(rangeSetT);
             //supported CRS
             final SupportedCRSsType supCRS = new SupportedCRSsType(new CodeListType("EPSG:4326"));
@@ -327,8 +334,8 @@ public final class WCSWorker extends AbstractWorker {
                     org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
 
             //we build the coverage offering for this layer/coverage
-            final CoverageOfferingType coverageOffering = new CoverageOfferingType(null, coverageRef.getName(),
-                    coverageRef.getName(), StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks()), llenvelope,
+            final CoverageOfferingType coverageOffering = new CoverageOfferingType(null, coverageName,
+                    coverageName, StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks()), llenvelope,
                     keywords, domainSet, rangeSet, supCRS, supForm, supInt);
             coverageOfferings.add(coverageOffering);
         }
@@ -368,14 +375,15 @@ public final class WCSWorker extends AbstractWorker {
                         LAYER_NOT_DEFINED, KEY_IDENTIFIER.toLowerCase());
             }
             final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
+            final String coverageName = coverageRef.getName();
             if (!coverageRef.isQueryable(ServiceType.WCS)) {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
-                        coverageRef.getName() + "\".", INVALID_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
+                        coverageName + "\".", INVALID_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
             }
             final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory =
                     new org.geotoolkit.ows.xml.v110.ObjectFactory();
             if (coverageRef.getSeries().size() == 0) {
-                throw new CstlServiceException("the coverage " + coverageRef.getName() +
+                throw new CstlServiceException("the coverage " + coverageName +
                         " is not defined", LAYER_NOT_DEFINED, KEY_IDENTIFIER.toLowerCase());
             }
             final GeographicBoundingBox inputGeoBox;
@@ -406,20 +414,18 @@ public final class WCSWorker extends AbstractWorker {
 
             //general metadata
             final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
-            title.add(new LanguageStringType(coverageRef.getName()));
+            title.add(new LanguageStringType(coverageName));
             final List<LanguageStringType> abstractt = new ArrayList<LanguageStringType>();
             abstractt.add(new LanguageStringType(StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks())));
             final List<KeywordsType> keywords = new ArrayList<KeywordsType>();
             keywords.add(new KeywordsType(new LanguageStringType("WCS"),
-                    new LanguageStringType(coverageRef.getName())));
+                    new LanguageStringType(coverageName)));
 
             // spatial metadata
             final org.geotoolkit.wcs.xml.v111.SpatialDomainType spatial =
                     new org.geotoolkit.wcs.xml.v111.SpatialDomainType(bboxs);
 
             // temporal metadata
-            final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-            df.setTimeZone(TimeZone.getTimeZone("UTC"));
             final List<Object> times = new ArrayList<Object>();
             final SortedSet<Date> dates;
             try {
@@ -428,7 +434,7 @@ public final class WCSWorker extends AbstractWorker {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
             for (Date d : dates) {
-                times.add(new TimePositionType(df.format(d)));
+                times.add(new TimePositionType(DATE_FORMAT.format(d)));
             }
             final org.geotoolkit.wcs.xml.v111.TimeSequenceType temporalDomain =
                     new org.geotoolkit.wcs.xml.v111.TimeSequenceType(times);
@@ -462,7 +468,7 @@ public final class WCSWorker extends AbstractWorker {
             supportedFormats.add("ascii-grid");
 
             final CoverageDescriptionType coverageDescription = new CoverageDescriptionType(title, abstractt,
-                    keywords, coverageRef.getName(), domain, range, supportedCRS, supportedFormats);
+                    keywords, coverageName, domain, range, supportedCRS, supportedFormats);
             coverageDescriptions.add(coverageDescription);
         }
 
@@ -634,10 +640,8 @@ public final class WCSWorker extends AbstractWorker {
                          */
                         final Date firstDate = dates.first();
                         final Date lastDate = dates.last();
-                        final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-                        df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                        outputBBox.getTimePosition().add(new TimePositionType(df.format(firstDate)));
-                        outputBBox.getTimePosition().add(new TimePositionType(df.format(lastDate)));
+                        outputBBox.getTimePosition().add(new TimePositionType(DATE_FORMAT.format(firstDate)));
+                        outputBBox.getTimePosition().add(new TimePositionType(DATE_FORMAT.format(lastDate)));
                     }
                     co.setLonLatEnvelope(outputBBox);
                 }
