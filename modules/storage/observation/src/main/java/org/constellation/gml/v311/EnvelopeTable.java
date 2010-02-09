@@ -68,13 +68,13 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
         List<Double> value = new ArrayList<Double>();
         value.add(results.getDouble(indexOf(query.lowerCornerX)));
         value.add(results.getDouble(indexOf(query.lowerCornerY)));
-        final DirectPositionType lc = new DirectPositionType(null,-1, null, value);
+        final DirectPositionType lc = new DirectPositionType(value);
         
         //puis le second
         value = new ArrayList<Double>();
         value.add(results.getDouble(indexOf(query.upperCornerX)));
         value.add(results.getDouble(indexOf(query.upperCornerY)));
-        final DirectPositionType uc = new DirectPositionType(null,-1, null, value);
+        final DirectPositionType uc = new DirectPositionType(value);
         return new EnvelopeEntry(results.getString(indexOf(query.id)),
                                  lc, uc,
                                  results.getString(indexOf(query.srsName)));

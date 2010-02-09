@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <om:Observation xmlns:swe="http://www.opengis.net/swe/1.0.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:sa="http://www.opengis.net/sampling/1.0" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <gml:name>urn:ogc:object:observation:template:GEOM:6</gml:name>
+    <gml:name>urn:ogc:object:observation:template:GEOM:8</gml:name>
     <om:samplingTime/>
-    <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:6"/>
+    <om:procedure xlink:href="urn:ogc:object:sensor:GEOM:8"/>
     <om:observedProperty>
         <swe:CompositePhenomenon dimension="2" gml:id="aggregatePhenomenon">
             <gml:name>urn:ogc:def:phenomenon:GEOM:aggregate</gml:name>
@@ -21,28 +21,37 @@
         </swe:CompositePhenomenon>
     </om:observedProperty>
     <om:featureOfInterest>
-        <sa:SamplingPoint gml:id="station-002">
-            <gml:description>Point d'eau BSSS</gml:description>
-            <gml:name>10972X0137-PLOUF</gml:name>
+        <sa:SamplingCurve gml:id="station-003">
+            <gml:description>Geology traverse</gml:description>
+            <gml:name>cycle1</gml:name>
             <gml:boundedBy>
-                <gml:Null>not_bounded</gml:Null>
+                <gml:Envelope gml:id="bound-1" srsName="urn:ogc:def:crs:EPSG:6.8:4283">
+                    <gml:lowerCorner>-30.711 134.196</gml:lowerCorner>
+                    <gml:upperCorner>-30.702 134.205</gml:upperCorner>
+                </gml:Envelope>
             </gml:boundedBy>
-            <sa:sampledFeature  xlink:href="urn:-sandre:object:bdrhf:123X"/>
-            <sa:position>
-                <gml:Point gml:id="STATION-LOCALISATION">
-                    <gml:pos srsName="urn:ogc:def:crs:EPSG:27582" srsDimension="2">65400.0 1731368.0</gml:pos>
-                </gml:Point>
-            </sa:position>
-        </sa:SamplingPoint>
+            <sa:shape>
+                <gml:LineString gml:id="pr1_ls1" srsName="urn:ogc:def:crs:EPSG:27582">
+                    <gml:pos>-30.711 134.205</gml:pos>
+                    <gml:pos>-30.710 134.204</gml:pos>
+                    <gml:pos>-30.709 134.203</gml:pos>
+                    <gml:pos>-30.708 134.201</gml:pos>
+                    <gml:pos>-30.706 134.196</gml:pos>
+                    <gml:pos>-30.703 134.197</gml:pos>
+                    <gml:pos>-30.702 134.199</gml:pos>
+                </gml:LineString>
+            </sa:shape>
+            <sa:length uom="m">750</sa:length>
+        </sa:SamplingCurve>
     </om:featureOfInterest>
     <om:result xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="swe:DataArrayPropertyType">
-        <swe:DataArray gml:id="dataArray-2">
+        <swe:DataArray gml:id="dataArray-3">
             <swe:elementCount>
                 <swe:Count>
                     <swe:value>0</swe:value>
                 </swe:Count>
             </swe:elementCount>
-             <swe:elementType name="dataArray-2">
+            <swe:elementType name="dataArray-3">
                 <swe:SimpleDataRecord gml:id="datarecord">
                     <swe:field name="Time">
                         <swe:Time definition="urn:ogc:data:time:iso8601"/>
@@ -52,6 +61,11 @@
                             <swe:uom code="m"/>
                         </swe:Quantity>
                     </swe:field>
+                    <!-- TODO see swe:field name="temperature">
+                        <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:temperature">
+                            <swe:uom code="°C"/>
+                        </swe:Quantity>
+                    </swe:field-->
                 </swe:SimpleDataRecord>
             </swe:elementType>
             <swe:encoding>
@@ -61,5 +75,3 @@
         </swe:DataArray>
     </om:result>
 </om:Observation>
-
-

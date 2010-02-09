@@ -76,6 +76,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             featureDirectory.mkdir();
             writeDataFile(featureDirectory, "feature1.xml", "station-001");
             writeDataFile(featureDirectory, "feature2.xml", "station-002");
+            writeDataFile(featureDirectory, "feature3.xml", "station-003");
 
             File observationsDirectory = new File(configDir, "observations");
             observationsDirectory.mkdir();
@@ -84,6 +85,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             writeDataFile(observationsDirectory, "observation3.xml", "urn:ogc:object:observation:GEOM:406");
             writeDataFile(observationsDirectory, "observation4.xml", "urn:ogc:object:observation:GEOM:307");
             writeDataFile(observationsDirectory, "observation5.xml", "urn:ogc:object:observation:GEOM:507");
+            writeDataFile(observationsDirectory, "observation6.xml", "urn:ogc:object:observation:GEOM:701");
 
             File observationTemplatesDirectory = new File(configDir, "observationTemplates");
             observationTemplatesDirectory.mkdir();
@@ -91,6 +93,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             writeDataFile(observationTemplatesDirectory, "observationTemplate-4.xml", "urn:ogc:object:observation:template:GEOM:4");
             writeDataFile(observationTemplatesDirectory, "observationTemplate-5.xml", "urn:ogc:object:observation:template:GEOM:5");
             writeDataFile(observationTemplatesDirectory, "observationTemplate-7.xml", "urn:ogc:object:observation:template:GEOM:7");
+            writeDataFile(observationTemplatesDirectory, "observationTemplate-8.xml", "urn:ogc:object:observation:template:GEOM:8");
 
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");

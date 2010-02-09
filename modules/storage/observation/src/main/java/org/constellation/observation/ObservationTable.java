@@ -29,6 +29,7 @@ import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.catalog.QueryType;
 import org.constellation.catalog.SingletonTable;
+import org.constellation.sampling.SamplingCurveTable;
 import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointTable;
 import org.constellation.swe.v101.AnyResultTable;
@@ -43,6 +44,7 @@ import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.observation.xml.v100.ProcessEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 import org.geotoolkit.swe.xml.v101.AnyResultEntry;
@@ -99,6 +101,16 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
      * ensuite.
      */
     protected SamplingPointTable stationPoints;
+
+    /**
+     * Connexion vers la table des stations.
+     * <p>
+     * <strong>NOTE:</strong> {@link StationTable} garde elle-même une référence vers cette instance
+     * de {@code ObservationTable}, mais seule {@link StationEntry} l'utilise. L'ordre d'acquisition
+     * des verrous devrait toujours être {@code ObservationTable} d'abord, et {@code StationTable}
+     * ensuite.
+     */
+    protected SamplingCurveTable stationCurves;
     
     /**
      * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
@@ -275,6 +287,11 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
             stationPoints = getDatabase().getTable(SamplingPointTable.class);
         }
         final SamplingPointEntry stationPoint = stationPoints.getEntry(result.getString(indexOf(query.featureOfInterestPoint)));
+
+        if (stationCurves == null) {
+            stationCurves = getDatabase().getTable(SamplingCurveTable.class);
+        }
+        final SamplingCurveType stationCurve = stationCurves.getEntry(result.getString(indexOf(query.featureOfInterestCurve)));
         
         if (procedures == null) {
             procedures = getDatabase().getTable(ProcessTable.class);
@@ -295,7 +312,8 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
         }
         
         if(pheno == null) pheno     = compoPheno;
-        if(station == null) station =  stationPoint;
+        if(station == null && stationCurve == null) station =  stationPoint;
+        if(station == null && stationPoint == null) station =  stationCurve;
 
         final String name                               = result.getString(indexOf(query.name));
         final Timestamp begin                           = result.getTimestamp(indexOf(query.samplingTimeBegin));
@@ -385,7 +403,16 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 }
                 statement.setString(indexOf(query.featureOfInterestPoint),stationPoints.getIdentifier(station));
                 statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
-            
+                statement.setNull(indexOf(query.featureOfInterestCurve),    java.sql.Types.VARCHAR);
+            } else if (obs.getFeatureOfInterest() instanceof SamplingCurveType){
+                final SamplingCurveType station = (SamplingCurveType)obs.getFeatureOfInterest();
+                if (stationCurves == null) {
+                    stationCurves = getDatabase().getTable(SamplingCurveTable.class);
+                }
+                statement.setString(indexOf(query.featureOfInterestCurve),stationCurves.getIdentifier(station));
+                statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
+                statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
+
             } else if (obs.getFeatureOfInterest() instanceof SamplingFeatureEntry){
                 final SamplingFeatureEntry station = (SamplingFeatureEntry)obs.getFeatureOfInterest();
                 if (stations == null) {
@@ -393,9 +420,11 @@ public class ObservationTable<EntryType extends Observation> extends SingletonTa
                 }
                 statement.setString(indexOf(query.featureOfInterest),stations.getIdentifier(station));
                 statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
+                statement.setNull(indexOf(query.featureOfInterestCurve),    java.sql.Types.VARCHAR);
             } else {
                 statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
                 statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
+                statement.setNull(indexOf(query.featureOfInterestCurve),    java.sql.Types.VARCHAR);
             }
         
             // on insere le phenomene observé

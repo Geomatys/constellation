@@ -50,7 +50,7 @@ public class EnvelopeQuery extends Query {
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         id           = addColumn("id",             slie);
         srsName      = addColumn("srs_name",       sli);
-        lowerCornerX = addColumn("corner_x", sli);
+        lowerCornerX = addColumn("lower_corner_x", sli);
         lowerCornerY = addColumn("lower_corner_y", sli);
         upperCornerX = addColumn("upper_corner_x", sli);
         upperCornerY = addColumn("upper_corner_y", sli);

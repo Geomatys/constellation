@@ -157,7 +157,6 @@ public class MDWebSensorReader implements SensorReader {
             }
             //we transform the form into an XML string
             final String xml      = xmlWriter.writeForm(f);
-            System.out.println("XML:" + xml);
             final StringReader sr = new StringReader(xml);
             unmarshaller          = marshallerPool.acquireUnmarshaller();
            

@@ -33,7 +33,7 @@ public class MeasurementQuery extends Query{
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, featureOfInterest, featureOfInterestPoint, procedure, observedProperty, observedPropertyComposite,
+    protected final Column name, featureOfInterest, featureOfInterestPoint, featureOfInterestCurve, procedure, observedProperty, observedPropertyComposite,
             distribution, samplingTimeBegin, samplingTimeEnd, result, resultDefinition, description;
     // quality, , observationMetadata, procedureTime, procedureParameter,
  
@@ -56,6 +56,7 @@ public class MeasurementQuery extends Query{
         description               = addColumn("description",                 si);
         featureOfInterest         = addColumn("feature_of_interest",         si);
         featureOfInterestPoint    = addColumn("feature_of_interest_point",   si);
+        featureOfInterestCurve    = addColumn("feature_of_interest_curve",   si);
         procedure                 = addColumn("procedure",                   si);
         observedProperty          = addColumn("observed_property",           si);
         observedPropertyComposite = addColumn("observed_property_composite", si);

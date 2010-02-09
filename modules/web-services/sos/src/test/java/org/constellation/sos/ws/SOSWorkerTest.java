@@ -44,6 +44,7 @@ import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
+import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.v100.ComponentPropertyType;
 import org.geotoolkit.sml.xml.v100.ComponentType;
@@ -1117,7 +1118,69 @@ public class SOSWorkerTest {
         assertEquals(expResult, obsResult);
 
         /**
-         *  Test 19: getObservation with procedure urn:ogc:object:sensor:GEOM:4
+         *  Test 19: getObservation with procedure urn:ogc:object:sensor:GEOM:8
+         *           with resultTemplate mode
+         */
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:8"),
+                                      null,
+                                      null,
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.RESULT_TEMPLATE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-8.xml"));
+
+        expResult = (ObservationEntry)obj.getValue();
+
+        //for template the sampling time is 1970 to now
+        period = new TimePeriodType(new TimePositionType("1900-01-01T00:00:00"));
+        expResult.setSamplingTime(period);
+
+        // and we empty the result object
+        arrayP = (DataArrayPropertyType) expResult.getResult();
+        array = arrayP.getDataArray();
+        array.setElementCount(0);
+        array.setValues("");
+
+        expResult.setName("urn:ogc:object:observation:template:GEOM:8-0");
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult = (ObservationEntry) result.getMember().iterator().next();
+
+        assertTrue(obsResult != null);
+        assertEquals(expResult.getName(), obsResult.getName());
+        assertTrue(obsResult.getFeatureOfInterest() instanceof SamplingCurveType);
+        SamplingCurveType sampCurveResult    = (SamplingCurveType) obsResult.getFeatureOfInterest();
+        SamplingCurveType sampCurveRxpResult = (SamplingCurveType) expResult.getFeatureOfInterest();
+        assertEquals(sampCurveResult.getLength(), sampCurveRxpResult.getLength());
+        assertEquals(sampCurveResult.getShape(), sampCurveRxpResult.getShape());
+        assertEquals(sampCurveResult.getBoundedBy(), sampCurveRxpResult.getBoundedBy());
+        assertEquals(sampCurveResult.getSampledFeatures(), sampCurveRxpResult.getSampledFeatures());
+        assertEquals(sampCurveResult.getLocation(), sampCurveRxpResult.getLocation());
+        assertEquals(sampCurveResult.getId(), sampCurveRxpResult.getId());
+        assertEquals(sampCurveResult, sampCurveRxpResult);
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertTrue(obsResult.getResult() instanceof DataArrayPropertyType);
+        DataArrayPropertyType arrayPropResult    = (DataArrayPropertyType) obsResult.getResult();
+        DataArrayPropertyType arrayPropExpResult = (DataArrayPropertyType) expResult.getResult();
+        assertEquals(arrayPropResult.getDataArray().getEncoding(), arrayPropExpResult.getDataArray().getEncoding());
+        assertEquals(arrayPropResult.getDataArray().getElementType(), arrayPropExpResult.getDataArray().getElementType());
+        assertEquals(arrayPropResult.getDataArray(), arrayPropExpResult.getDataArray());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
+        /**
+         *  Test 20: getObservation with procedure urn:ogc:object:sensor:GEOM:4
          *           with resultTemplate mode
          *           with timeFilter TEquals
          */
@@ -1168,7 +1231,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, obsResult);
 
         /**
-         *  Test 20: getObservation with procedure urn:ogc:object:sensor:GEOM:4
+         *  Test 21: getObservation with procedure urn:ogc:object:sensor:GEOM:4
          *           with resultTemplate mode
          *           with timeFilter Tafter
          */
@@ -1220,7 +1283,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, obsResult);
 
         /**
-         *  Test 21: getObservation with procedure urn:ogc:object:sensor:GEOM:4
+         *  Test 22: getObservation with procedure urn:ogc:object:sensor:GEOM:4
          *           with resultTemplate mode
          *           with timeFilter Tbefore
          */
@@ -1272,7 +1335,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, obsResult);
 
         /**
-         *  Test 22: getObservation with procedure urn:ogc:object:sensor:GEOM:4
+         *  Test 23: getObservation with procedure urn:ogc:object:sensor:GEOM:4
          *           with observedproperties = urn:ogc:def:phenomenon:GEOM:depth
          */
         request  = new GetObservation("1.0.0",
@@ -1306,7 +1369,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, obsResult);
 
         /**
-         *  Test 23: getObservation with procedure urn:ogc:object:sensor:GEOM:4
+         *  Test 24: getObservation with procedure urn:ogc:object:sensor:GEOM:4
          *          and with wrong observed prop
          */
         request  = new GetObservation("1.0.0",
@@ -1332,7 +1395,7 @@ public class SOSWorkerTest {
         assertTrue(exLaunched);
 
         /**
-         *  Test 24: getObservation with procedure urn:ogc:object:sensor:GEOM:5
+         *  Test 25: getObservation with procedure urn:ogc:object:sensor:GEOM:5
          *           with observedproperties = urn:ogc:def:phenomenon:GEOM:aggreagtePhenomenon
          */
         request  = new GetObservation("1.0.0",
@@ -1366,7 +1429,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, obsResult);
 
         /**
-         *  Test 25: getObservation with procedure urn:ogc:object:sensor:GEOM:5
+         *  Test 26: getObservation with procedure urn:ogc:object:sensor:GEOM:5
          *           with observedproperties = urn:ogc:def:phenomenon:GEOM:aggreagtePhenomenon
          *           with foi                =  10972X0137-PLOUF
          */
@@ -1401,7 +1464,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, obsResult);
 
         /**
-         *  Test 26: getObservation with procedure urn:ogc:object:sensor:GEOM:5
+         *  Test 27: getObservation with procedure urn:ogc:object:sensor:GEOM:5
          *          and with wrong foi
          */
         request  = new GetObservation("1.0.0",
@@ -1427,7 +1490,7 @@ public class SOSWorkerTest {
         assertTrue(exLaunched);
 
         /**
-         *  Test 27: getObservation with procedure urn:ogc:object:sensor:GEOM:3
+         *  Test 28: getObservation with procedure urn:ogc:object:sensor:GEOM:3
          *           with observedproperties = urn:ogc:def:phenomenon:GEOM:aggregatePhenomenon
          *           => no error but no result
          */
@@ -1449,7 +1512,7 @@ public class SOSWorkerTest {
         assertEquals(collExpResult, result);
 
         /**
-         *  Test 28: getObservation with procedure urn:ogc:object:sensor:GEOM:7
+         *  Test 29: getObservation with procedure urn:ogc:object:sensor:GEOM:7
          *           with resultTemplate mode
          *  => measurement type
          */
