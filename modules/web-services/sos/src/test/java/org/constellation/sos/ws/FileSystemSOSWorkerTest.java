@@ -85,7 +85,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
             writeDataFile(observationsDirectory, "observation3.xml", "urn:ogc:object:observation:GEOM:406");
             writeDataFile(observationsDirectory, "observation4.xml", "urn:ogc:object:observation:GEOM:307");
             writeDataFile(observationsDirectory, "observation5.xml", "urn:ogc:object:observation:GEOM:507");
-            writeDataFile(observationsDirectory, "observation6.xml", "urn:ogc:object:observation:GEOM:701");
+            writeDataFile(observationsDirectory, "observation6.xml", "urn:ogc:object:observation:GEOM:801");
 
             File observationTemplatesDirectory = new File(configDir, "observationTemplates");
             observationTemplatesDirectory.mkdir();
@@ -267,8 +267,30 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    public void GetObservationErrorTest() throws Exception {
+        super.GetObservationErrorTest();
+    }
+
+    /**
+     * Tests the GetObservation method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
     public void GetObservationTest() throws Exception {
         super.GetObservationTest();
+    }
+
+    /**
+     * Tests the GetObservation method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetObservationSamplingCurveTest() throws Exception {
+        super.GetObservationSamplingCurveTest();
     }
 
     /**

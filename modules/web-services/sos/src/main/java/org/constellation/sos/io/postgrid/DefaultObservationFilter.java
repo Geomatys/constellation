@@ -207,7 +207,7 @@ public class DefaultObservationFilter implements ObservationFilter {
     public void setFeatureOfInterest(List<String> fois) {
         sqlRequest.append(" AND (");
         for (String foi : fois) {
-            sqlRequest.append("\"feature_of_interest_point\"='").append(foi).append("' OR");
+            sqlRequest.append("(\"feature_of_interest_point\"='").append(foi).append("' OR \"feature_of_interest\"='").append(foi).append("' OR \"feature_of_interest_curve\"='").append(foi).append("') OR");
         }
         sqlRequest.delete(sqlRequest.length() - 3, sqlRequest.length());
         sqlRequest.append(") ");

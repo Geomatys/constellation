@@ -45,6 +45,7 @@ import org.constellation.observation.MeasureTable;
 import org.constellation.observation.MeasurementTable;
 import org.constellation.observation.ObservationTable;
 import org.constellation.observation.ProcessTable;
+import org.constellation.sampling.SamplingCurveTable;
 import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointTable;
 import org.constellation.sos.ObservationOfferingTable;
@@ -305,6 +306,9 @@ public class DefaultObservationReader implements ObservationReader {
             final SamplingPointTable pointTable     = omDatabase.getTable(SamplingPointTable.class);
             final Set<String> pointNames            = pointTable.getIdentifiers();
             featureNames.addAll(pointNames);
+            final SamplingCurveTable curveTable     = omDatabase.getTable(SamplingCurveTable.class);
+            final Set<String> curveNames            = curveTable.getIdentifiers();
+            featureNames.addAll(curveNames);
             return featureNames;
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);

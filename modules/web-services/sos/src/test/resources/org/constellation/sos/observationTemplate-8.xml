@@ -61,11 +61,11 @@
                             <swe:uom code="m"/>
                         </swe:Quantity>
                     </swe:field>
-                    <!-- TODO see swe:field name="temperature">
+                    <swe:field name="temperature">
                         <swe:Quantity definition="urn:x-ogc:def:phenonmenon:GEOM:temperature">
                             <swe:uom code="°C"/>
                         </swe:Quantity>
-                    </swe:field-->
+                    </swe:field>
                 </swe:SimpleDataRecord>
             </swe:elementType>
             <swe:encoding>
