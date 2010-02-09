@@ -322,13 +322,45 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    /**
+     * TODO remove those duplicated catch block
+     * @param samplingFeatureName
+     * @return
+     * @throws CstlServiceException
+     */
     @Override
     public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException {
         try {
-            final SamplingPointTable foiTable = omDatabase.getTable(SamplingPointTable.class);
-            return foiTable.getEntry(samplingFeatureName);
+            final SamplingPointTable pointTable = omDatabase.getTable(SamplingPointTable.class);
+            return pointTable.getEntry(samplingFeatureName);
         } catch (NoSuchRecordException ex) {
-            return null;
+            try {
+                final SamplingFeatureTable foiTable = omDatabase.getTable(SamplingFeatureTable.class);
+                return foiTable.getEntry(samplingFeatureName);
+            } catch (NoSuchRecordException ex2) {
+                try {
+                    final SamplingCurveTable curveTable = omDatabase.getTable(SamplingCurveTable.class);
+                    return curveTable.getEntry(samplingFeatureName);
+                } catch (NoSuchRecordException ex3) {
+                    return null;
+                }  catch (CatalogException ex3) {
+                    LOGGER.log(Level.SEVERE, ex3.getMessage(), ex3);
+                    throw new CstlServiceException("Catalog exception while getting the feature of interest",
+                        NO_APPLICABLE_CODE, "featureOfInterest");
+                } catch (SQLException ex3) {
+                    LOGGER.log(Level.SEVERE, ex3.getMessage(), ex3);
+                    throw new CstlServiceException(SQL_ERROR_MSG + ex3.getMessage(),
+                        NO_APPLICABLE_CODE);
+                }
+            } catch (CatalogException ex2) {
+                LOGGER.log(Level.SEVERE, ex2.getMessage(), ex2);
+                throw new CstlServiceException("Catalog exception while getting the feature of interest",
+                    NO_APPLICABLE_CODE, "featureOfInterest");
+            } catch (SQLException ex2) {
+                LOGGER.log(Level.SEVERE, ex2.getMessage(), ex2);
+                throw new CstlServiceException(SQL_ERROR_MSG + ex2.getMessage(),
+                    NO_APPLICABLE_CODE);
+            }
         } catch (CatalogException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("Catalog exception while getting the feature of interest",

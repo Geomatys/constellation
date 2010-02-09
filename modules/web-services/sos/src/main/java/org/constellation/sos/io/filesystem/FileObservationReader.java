@@ -236,7 +236,10 @@ public class FileObservationReader implements ObservationReader {
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
-                final Object obj = unmarshaller.unmarshal(samplingFeatureFile);
+                Object obj = unmarshaller.unmarshal(samplingFeatureFile);
+                if (obj instanceof JAXBElement) {
+                    obj = ((JAXBElement)obj).getValue();
+                }
                 if (obj instanceof SamplingFeatureEntry) {
                     return (SamplingFeatureEntry) obj;
                 }

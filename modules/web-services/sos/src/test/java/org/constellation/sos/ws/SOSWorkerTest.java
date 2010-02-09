@@ -43,6 +43,7 @@ import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
+import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
@@ -1492,7 +1493,42 @@ public class SOSWorkerTest {
         assertEquals(expResult.getName(), measResult.getName());
         assertEquals(expResult.getResult(), measResult.getResult());
         assertEquals(expResult, measResult);
-        
+
+
+        /**
+         *  Test 18: getObservation with procedure urn:ogc:object:sensor:GEOM:4 AND BBOX Filter
+         */
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
+                                      null,
+                                      new GetObservation.FeatureOfInterest(new BBOXType(null, 64000.0, 1730000.0, 65000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582")),
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.INLINE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observation3.xml"));
+
+        expResult = (ObservationEntry)obj.getValue();
+
+        assertEquals(result.getMember().size(), 1);
+
+        obsResult = (ObservationEntry) result.getMember().iterator().next();
+
+
+        assertTrue(obsResult != null);
+        assertEquals(expResult.getName(), obsResult.getName());
+        assertEquals(expResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
+        assertEquals(expResult.getObservedProperty(), obsResult.getObservedProperty());
+        assertEquals(expResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(expResult.getResult(), obsResult.getResult());
+        assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
+        assertEquals(expResult, obsResult);
+
         marshallerPool.release(unmarshaller);
     }
 
@@ -1597,7 +1633,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, obsResult);
 
         /**
-         *  Test 2: getObservation with no procedure And FID = station-003
+         *  Test 3: getObservation with no procedure And FID = station-003
          *
          */
         request  = new GetObservation("1.0.0",

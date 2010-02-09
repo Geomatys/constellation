@@ -73,7 +73,6 @@ import org.constellation.ws.rs.OGCWebService;
 import org.opengis.observation.Observation;
 import org.opengis.observation.CompositePhenomenon;
 import org.opengis.observation.Phenomenon;
-import org.opengis.observation.sampling.SamplingPoint;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
@@ -132,6 +131,7 @@ import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.geotoolkit.util.logging.MonolineFormatter;
 
 import org.opengis.observation.Measure;
+import org.opengis.observation.sampling.SamplingFeature;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
 import static org.constellation.sos.ws.Utils.*;
@@ -908,7 +908,7 @@ public class SOSworker {
                             localOmFilter.setBoundingBox(e);
                         } else {
                             for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
-                                final SamplingPoint station = (SamplingPoint) omReader.getFeatureOfInterest(refStation.getHref());
+                                final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation.getHref());
                                 if (station == null)
                                     throw new CstlServiceException("the feature of interest is not registered",
                                             INVALID_PARAMETER_VALUE);

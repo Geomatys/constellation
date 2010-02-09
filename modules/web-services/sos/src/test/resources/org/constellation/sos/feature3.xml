@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<sa:SamplingCurve xmlns:sa="http://www.opengis.net/sampling/1.0" xmlns:gml="http://www.opengis.net/gml" gml:id="station-003">
+<sa:SamplingCurve xmlns:sa="http://www.opengis.net/sampling/1.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" gml:id="station-003">
     <gml:description>Geology traverse</gml:description>
     <gml:name>cycle1</gml:name>
     <gml:boundedBy>
