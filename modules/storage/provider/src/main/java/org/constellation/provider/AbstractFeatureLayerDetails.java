@@ -343,9 +343,9 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
                         10),
                     5,
                     new Dimension(30, 24),
-                    new Font("Arial", 10, Font.PLAIN),
+                    new Font("Arial", Font.PLAIN, 10),
                     false,
-                    new Font("Arial", 12, Font.BOLD));
+                    new Font("Arial", Font.BOLD, 12));
 
             return DefaultLegendService.portray(template, context, dimension);
 
