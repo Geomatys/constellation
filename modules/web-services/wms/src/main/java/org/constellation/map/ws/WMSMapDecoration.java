@@ -163,17 +163,17 @@ public final class WMSMapDecoration {
             try {
                 EXTENSION = read(f);
             } catch (ParserConfigurationException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.WARNING, null, ex);
             } catch (SAXException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.WARNING, null, ex);
             } catch (IOException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.WARNING, null, ex);
             }
         }
 
         //no configuration available, make an empty
         if(EXTENSION == null){
-            LOGGER.log(Level.INFO, "No WMS portrayal extension found, will create an empty extension");
+            LOGGER.log(Level.FINE, "No WMS portrayal extension found, will create an empty extension");
             EXTENSION = new DecorationExtension();
         }
 
