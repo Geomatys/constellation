@@ -60,6 +60,7 @@ import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
+import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.gml.xml.v311.CodeListType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
@@ -843,6 +844,28 @@ public final class WCSWorker extends AbstractWorker {
                             envelope.getMinimum(i), envelope.getMaximum(i)),
                             INVALID_DIMENSION_VALUE, KEY_BBOX.toLowerCase());
                 }
+            }
+            // Ensures the requested envelope has, at least, a part that intersects the valid envelope
+            // for the coverage.
+            try {
+                final GeographicBoundingBox geoBbox = layerRef.getGeographicBoundingBox();
+                final GeneralEnvelope validGeoEnv = new GeneralEnvelope(geoBbox);
+                Envelope requestGeoEnv = envelope;
+                // We have to transform the objective envelope into an envelope that uses a geographic CRS,
+                // in order to be able to verify the intersection between those two envelopes.
+                if (!CRS.equalsIgnoreMetadata(envelope.getCoordinateReferenceSystem(), DefaultGeographicCRS.WGS84)) {
+                    try {
+                        requestGeoEnv = CRS.transform(envelope, DefaultGeographicCRS.WGS84);
+                    } catch (TransformException ex) {
+                        throw new CstlServiceException(ex, NO_APPLICABLE_CODE, KEY_BBOX.toLowerCase());
+                    }
+                }
+                if (!(validGeoEnv.intersects(requestGeoEnv, false))) {
+                    throw new CstlServiceException("The requested bbox is outside the domain of validity " +
+                            "for this coverage", NO_APPLICABLE_CODE, KEY_BBOX.toLowerCase());
+                }
+            } catch (CatalogException ex) {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE, KEY_BBOX.toLowerCase());
             }
         } else {
             // We take the envelope from the data provider. That envelope can be a little bit imprecise.
