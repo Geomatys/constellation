@@ -60,7 +60,7 @@
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-go2</artifactId>
+      <artifactId>geotk-go2-style-extension</artifactId>
     </dependency>
   </dependencies>
 

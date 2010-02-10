@@ -640,8 +640,16 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         }
         final Integer width  = getLegend.getWidth();
         final Integer height = getLegend.getHeight();
-        final Dimension dims = new Dimension((width == null) ? LEGEND_WIDTH : width,
-                                             (height == null) ? LEGEND_HEIGHT : height);
+
+
+        final Dimension dims;
+        if(width != null && height != null){
+            dims = new Dimension(width, height);
+        }else{
+            //layers will calculate the best size
+            dims = null;
+        }
+        
         final BufferedImage image = layer.getLegendGraphic(dims);
         if (image == null) {
             throw new CstlServiceException("The requested layer \""+ layer.getName() +

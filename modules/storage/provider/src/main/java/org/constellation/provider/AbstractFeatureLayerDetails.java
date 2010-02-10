@@ -18,8 +18,12 @@
 package org.constellation.provider;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
+import java.awt.BasicStroke;
+import java.awt.Color;
 
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collections;
@@ -43,7 +47,14 @@ import org.geotoolkit.display2d.service.DefaultGlyphService;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.query.QueryBuilder;
+import org.geotoolkit.display2d.ext.BackgroundTemplate;
+import org.geotoolkit.display2d.ext.DefaultBackgroundTemplate;
+import org.geotoolkit.display2d.ext.legend.DefaultLegendService;
+import org.geotoolkit.display2d.ext.legend.DefaultLegendTemplate;
+import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.map.MapBuilder;
+import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.CRS;
@@ -318,7 +329,31 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     @Override
     public BufferedImage getLegendGraphic(final Dimension dimension) {
         final MutableStyle style = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
-        return DefaultGlyphService.create(style, dimension);
+        try {
+            final MapLayer layer = getMapLayer(style, null);
+            final MapContext context = MapBuilder.createContext(DefaultGeographicCRS.WGS84);
+            context.layers().add(layer);
+
+            final LegendTemplate template = new DefaultLegendTemplate(
+                    new DefaultBackgroundTemplate(
+                        new BasicStroke(1),
+                        Color.LIGHT_GRAY,
+                        Color.WHITE,
+                        new Insets(4, 4, 4, 4),
+                        10),
+                    5,
+                    new Dimension(30, 24),
+                    new Font("Arial", 10, Font.PLAIN),
+                    false,
+                    new Font("Arial", 12, Font.BOLD));
+
+            return DefaultLegendService.portray(template, context, dimension);
+
+        } catch (PortrayalException ex) {
+            Logger.getLogger(AbstractFeatureLayerDetails.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return DefaultGlyphService.create(style, dimension,null);
     }
 
     /**
