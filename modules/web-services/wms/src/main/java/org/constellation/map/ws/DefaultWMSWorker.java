@@ -59,7 +59,6 @@ import org.constellation.query.wms.WMSQuery;
 import org.constellation.register.RegisterException;
 import org.constellation.util.PeriodUtilities;
 import org.constellation.util.StringUtilities;
-import org.constellation.util.Util;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.CstlServiceException;
@@ -510,7 +509,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
      * @throws CstlServiceException
      */
     @Override
-    public synchronized String getFeatureInfo(final GetFeatureInfo getFI) throws CstlServiceException {
+    public String getFeatureInfo(final GetFeatureInfo getFI) throws CstlServiceException {
 
     	//
     	// Note this is almost the same logic as in getMap
