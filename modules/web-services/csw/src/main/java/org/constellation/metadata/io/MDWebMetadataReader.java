@@ -1271,7 +1271,7 @@ public class MDWebMetadataReader extends MetadataReader {
                         //for the code list we delete the "code" suffix
                         //for the temporal element we remove "Time" prefix
                         case 1: {
-                            if (name.indexOf("Code") != -1) {
+                            if (name.indexOf("Code") != -1 && name.indexOf("CodeSpace") == -1) {
                                 name = name.substring(0, name.indexOf("Code"));
                             }
                             if (name.startsWith("Time")) {
