@@ -139,7 +139,7 @@ public class LuceneObservationFilter implements ObservationFilter {
     public void setFeatureOfInterest(List<String> fois) {
         luceneRequest.append(" AND (");
         for (String foi : fois) {
-            luceneRequest.append("feature_of_interest:").append(foi).append(" OR");
+            luceneRequest.append("feature_of_interest:").append(foi).append(" OR ");
         }
         luceneRequest.delete(luceneRequest.length() - 3, luceneRequest.length());
         luceneRequest.append(") ");

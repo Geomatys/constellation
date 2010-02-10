@@ -1503,7 +1503,7 @@ public class SOSWorkerTest {
                                       null,
                                       Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
                                       null,
-                                      new GetObservation.FeatureOfInterest(new BBOXType(null, 64000.0, 1730000.0, 65000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582")),
+                                      new GetObservation.FeatureOfInterest(new BBOXType(null, 64000.0, 1730000.0, 66000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582")),
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
                                       Parameters.OBSERVATION_QNAME,
@@ -1529,6 +1529,26 @@ public class SOSWorkerTest {
         assertEquals(expResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(expResult, obsResult);
 
+        /**
+         *  Test 18: getObservation with procedure urn:ogc:object:sensor:GEOM:4 AND BBOX Filter (no result expected)
+         */
+        request  = new GetObservation("1.0.0",
+                                      "offering-allSensor",
+                                      null,
+                                      Arrays.asList("urn:ogc:object:sensor:GEOM:4"),
+                                      null,
+                                      new GetObservation.FeatureOfInterest(new BBOXType(null, 66000.0, 1730000.0, 67000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582")),
+                                      null,
+                                      "text/xml; subtype=\"om/1.0.0\"",
+                                      Parameters.OBSERVATION_QNAME,
+                                      ResponseModeType.INLINE,
+                                      null);
+        result = (ObservationCollectionEntry) worker.getObservation(request);
+
+        collExpResult = new ObservationCollectionEntry("urn:ogc:def:nil:OGC:inapplicable");
+        assertEquals(collExpResult, result);
+
+        
         marshallerPool.release(unmarshaller);
     }
 

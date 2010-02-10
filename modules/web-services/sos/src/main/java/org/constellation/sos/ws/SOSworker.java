@@ -266,6 +266,9 @@ public class SOSworker {
      */
     private static FactoryRegistry factory = new FactoryRegistry(AbstractSOSFactory.class);
 
+    /**
+     * The factory to instanciate the Readers / Writers / Filters
+     */
     private AbstractSOSFactory sosFactory;
 
     /**
@@ -915,35 +918,43 @@ public class SOSworker {
                                 if (station instanceof SamplingPointEntry) {
                                     final SamplingPointEntry sp = (SamplingPointEntry) station;
                                     if (sp.getPosition() != null && sp.getPosition().getPos() != null && sp.getPosition().getPos().getValue().size() >= 2) {
-                                        if (sp.getPosition().getPos().getValue().get(0) > e.getUpperCorner().getValue().get(0) &&
-                                            sp.getPosition().getPos().getValue().get(0) < e.getLowerCorner().getValue().get(0) &&
-                                            sp.getPosition().getPos().getValue().get(1) > e.getUpperCorner().getValue().get(1) &&
-                                            sp.getPosition().getPos().getValue().get(1) < e.getLowerCorner().getValue().get(1)) {
+
+                                        double station_x = sp.getPosition().getPos().getValue().get(0);
+                                        double station_y = sp.getPosition().getPos().getValue().get(1);
+                                        double minx      = e.getLowerCorner().getValue().get(0);
+                                        double maxx      = e.getUpperCorner().getValue().get(0);
+                                        double miny      = e.getLowerCorner().getValue().get(1);
+                                        double maxy      = e.getUpperCorner().getValue().get(1);
+                                        
+                                        // we look if the station if contained in the BBOX
+                                        if (station_x < maxx && station_x > minx &&
+                                            station_y < maxy && station_y > miny) {
 
                                             matchingFeatureOfInterest.add(sp.getId());
                                             add = true;
                                         } else {
-                                            LOGGER.info(" the feature of interest " + sp.getId() + " is not in the BBOX");
+                                            LOGGER.finer(" the feature of interest " + sp.getId() + " is not in the BBOX");
                                         }
                                     } else {
-                                        LOGGER.severe(" the feature of interest " + sp.getId() + " does not have proper position");
+                                        LOGGER.warning(" the feature of interest " + sp.getId() + " does not have proper position");
                                     }
                                 } else {
-                                    LOGGER.severe("unknow implementation:" + station.getClass().getName());
+                                    LOGGER.warning("unknow implementation:" + station.getClass().getName());
                                 }
                             }
                             if (add) {
                                 localOmFilter.setFeatureOfInterest(matchingFeatureOfInterest);
+                            // if there is no matching FOI we must return an empty result
+                            } else {
+                                return new ObservationCollectionEntry("urn:ogc:def:nil:OGC:inapplicable");
                             }
                         }
                         
                     } else {
-                        throw new CstlServiceException("the envelope is not build correctly",
-                                                     INVALID_PARAMETER_VALUE);
+                        throw new CstlServiceException("the envelope is not build correctly", INVALID_PARAMETER_VALUE);
                     }
                 } else {
-                    throw new CstlServiceException(Parameters.NOT_SUPPORTED,
-                                                 OPERATION_NOT_SUPPORTED);
+                    throw new CstlServiceException(Parameters.NOT_SUPPORTED, OPERATION_NOT_SUPPORTED);
                 }
             }
 
@@ -988,7 +999,6 @@ public class SOSworker {
 
             } else if (result.getPropertyIsBetween() != null) {
 
-                LOGGER.info("PROP IS BETWEEN");
                 if (result.getPropertyIsBetween().getPropertyName() == null) {
                     throw new CstlServiceException("To use the operation Between you must specify the propertyName and the litteral",
                                                   MISSING_PARAMETER_VALUE, "propertyIsBetween");
