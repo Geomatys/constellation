@@ -67,6 +67,7 @@ import org.constellation.ws.MimeType;
 //Geotoolkit dependencies
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.GO2Utilities;
+import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
@@ -125,13 +126,6 @@ import static org.constellation.query.wms.WMSQuery.*;
  * @since 0.3
  */
 public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
-
-    /**
-     * Default size of the legend graphic.
-     */
-    private static final int LEGEND_WIDTH = 140;
-    private static final int LEGEND_HEIGHT = 15;
-
     /**
      * Initializes the marshaller pool for the WMS.
      */
@@ -348,19 +342,29 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                 // we build The Style part
                 org.geotoolkit.wms.xml.v111.OnlineResource or =
                         new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlPng);
-                final org.geotoolkit.wms.xml.v111.LegendURL legendURL1 =
-                        new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_PNG, or,
-                        BigInteger.valueOf(LEGEND_WIDTH), BigInteger.valueOf(LEGEND_HEIGHT));
-
-                or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlGif);
-                final org.geotoolkit.wms.xml.v111.LegendURL legendURL2 =
-                        new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_GIF, or,
-                        BigInteger.valueOf(LEGEND_WIDTH), BigInteger.valueOf(LEGEND_HEIGHT));
 
                 final List<String> stylesName = layer.getFavoriteStyles();
                 final List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
                 if (stylesName != null && stylesName.size() != 0) {
+                    // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
                     for (String styleName : stylesName) {
+                        final MutableStyle ms = StyleProviderProxy.getInstance().get(styleName);
+                        final LegendTemplate lt = WMSMapDecoration.getDefaultLegendTemplate();
+                        final Dimension dimLegend;
+                        try {
+                            dimLegend = layer.getPreferredLegendSize(lt, ms);
+                        } catch (PortrayalException ex) {
+                            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+                        }
+                        final org.geotoolkit.wms.xml.v111.LegendURL legendURL1 =
+                                new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_PNG, or,
+                                BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height));
+
+                        or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlGif);
+                        final org.geotoolkit.wms.xml.v111.LegendURL legendURL2 =
+                                new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_GIF, or,
+                                BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height));
+
                         final org.geotoolkit.wms.xml.v111.Style style = new org.geotoolkit.wms.xml.v111.Style(
                                 styleName, styleName, null, null, null, legendURL1, legendURL2);
                         styles.add(style);
@@ -400,19 +404,28 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                 // we build a Style Object
                 org.geotoolkit.wms.xml.v130.OnlineResource or =
                         new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlPng);
-                final org.geotoolkit.wms.xml.v130.LegendURL legendURL1 =
-                        new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_PNG, or,
-                        BigInteger.valueOf(LEGEND_WIDTH), BigInteger.valueOf(LEGEND_HEIGHT));
-
-                or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlGif);
-                final org.geotoolkit.wms.xml.v130.LegendURL legendURL2 =
-                        new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_GIF, or,
-                        BigInteger.valueOf(LEGEND_WIDTH), BigInteger.valueOf(LEGEND_HEIGHT));
 
                 final List<String> stylesName = layer.getFavoriteStyles();
                 final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
                 if (stylesName != null && stylesName.size() != 0) {
+                    // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
                     for (String styleName : stylesName) {
+                        final MutableStyle ms = StyleProviderProxy.getInstance().get(styleName);
+                        final LegendTemplate lt = WMSMapDecoration.getDefaultLegendTemplate();
+                        final Dimension dimLegend;
+                        try {
+                            dimLegend = layer.getPreferredLegendSize(lt, ms);
+                        } catch (PortrayalException ex) {
+                            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+                        }
+                        final org.geotoolkit.wms.xml.v130.LegendURL legendURL1 =
+                                new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_PNG, or,
+                                BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height));
+
+                        or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlGif);
+                        final org.geotoolkit.wms.xml.v130.LegendURL legendURL2 =
+                                new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_GIF, or,
+                                BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height));
                         final org.geotoolkit.wms.xml.v130.Style style = new org.geotoolkit.wms.xml.v130.Style(
                         styleName, styleName, null, null, null, legendURL1, legendURL2);
                         styles.add(style);
@@ -649,7 +662,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             dims = null;
         }
         
-        final BufferedImage image = layer.getLegendGraphic(dims);
+        final BufferedImage image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate());
         if (image == null) {
             throw new CstlServiceException("The requested layer \""+ layer.getName() +
                     "\" does not support GetLegendGraphic request",

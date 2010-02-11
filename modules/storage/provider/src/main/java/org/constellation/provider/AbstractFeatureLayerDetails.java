@@ -18,12 +18,8 @@
 package org.constellation.provider;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
-import java.awt.BasicStroke;
-import java.awt.Color;
 
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Insets;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collections;
@@ -47,10 +43,7 @@ import org.geotoolkit.display2d.service.DefaultGlyphService;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.display2d.ext.BackgroundTemplate;
-import org.geotoolkit.display2d.ext.DefaultBackgroundTemplate;
 import org.geotoolkit.display2d.ext.legend.DefaultLegendService;
-import org.geotoolkit.display2d.ext.legend.DefaultLegendTemplate;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.map.MapBuilder;
@@ -327,26 +320,14 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
      * {@inheritDoc}
      */
     @Override
-    public BufferedImage getLegendGraphic(final Dimension dimension) {
+    public BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template) {
         final MutableStyle style = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
         try {
             final MapLayer layer = getMapLayer(style, null);
             final MapContext context = MapBuilder.createContext(DefaultGeographicCRS.WGS84);
             context.layers().add(layer);
-
-            final LegendTemplate template = new DefaultLegendTemplate(
-                    new DefaultBackgroundTemplate(
-                        new BasicStroke(1),
-                        Color.LIGHT_GRAY,
-                        Color.WHITE,
-                        new Insets(4, 4, 4, 4),
-                        10),
-                    5,
-                    new Dimension(30, 24),
-                    new Font("Arial", Font.PLAIN, 10),
-                    false,
-                    new Font("Arial", Font.BOLD, 12));
-
+//
+//            final LegendTemplate template = WMSMapDecoration.getDefaultLegendTemplate();
             return DefaultLegendService.portray(template, context, dimension);
 
         } catch (PortrayalException ex) {
@@ -354,6 +335,17 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
         }
 
         return DefaultGlyphService.create(style, dimension,null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Dimension getPreferredLegendSize(final LegendTemplate template, final MutableStyle ms) throws PortrayalException {
+        final MapLayer ml = getMapLayer(ms, null);
+        final MapContext mc = MapBuilder.createContext(DefaultGeographicCRS.WGS84);
+        mc.layers().add(ml);
+        return DefaultLegendService.legendPreferredSize(template, mc);
     }
 
     /**

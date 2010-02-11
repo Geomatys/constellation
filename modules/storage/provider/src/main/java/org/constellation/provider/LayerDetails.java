@@ -32,6 +32,7 @@ import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
@@ -107,7 +108,17 @@ public interface LayerDetails {
     /**
      * @see Layer#getLegend(Dimension)
      */
-    BufferedImage getLegendGraphic(final Dimension dimension);
+    BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template);
+
+    /**
+     * Returns the preferred size for the legend.
+     *
+     * @param template The legend template to apply for the legend response.
+     * @param ms The layer style.
+     * @return The preferred dimensions for the legend response.
+     * @throws PortrayalException if an error occurs in getting the {@link MapLayer}.
+     */
+    Dimension getPreferredLegendSize(final LegendTemplate template, final MutableStyle ms) throws PortrayalException;
 
     /**
      * Create a MapLayer with the given style and parameters.

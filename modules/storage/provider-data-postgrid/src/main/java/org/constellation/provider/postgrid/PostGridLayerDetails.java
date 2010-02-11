@@ -42,8 +42,10 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display.shape.DoubleDimension2D;
 import org.geotoolkit.coverage.io.CoverageReader;
+import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapLayer;
@@ -250,8 +252,21 @@ class PostGridLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public BufferedImage getLegendGraphic(final Dimension dimension) {
+    public BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template) {
         return reader.getTable().getLayer().getLegend((dimension != null) ? dimension : LEGEND_SIZE);
+    }
+
+    /**
+     * Returns the default legend size for all postgrid layers.
+     *
+     * @param template Not used in this implementation.
+     * @param ms Not used in this implementation.
+     * @return The default legend size.
+     * @throws PortrayalException never thrown in this implementation.
+     */
+    @Override
+    public Dimension getPreferredLegendSize(final LegendTemplate template, final MutableStyle ms) throws PortrayalException {
+        return LEGEND_SIZE;
     }
 
     /**

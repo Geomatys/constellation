@@ -143,7 +143,23 @@ public final class WMSMapDecoration {
      * Decoration extension for map queries.
      */
     private static PortrayalExtension EXTENSION = null;
-    
+
+    /**
+     * The default legend template.
+     */
+    private static final LegendTemplate LEGEND_TEMPLATE = new DefaultLegendTemplate(
+                    new DefaultBackgroundTemplate(
+                        new BasicStroke(1),
+                        Color.LIGHT_GRAY,
+                        Color.WHITE,
+                        new Insets(4, 4, 4, 4),
+                        10),
+                    5,
+                    new Dimension(30, 24),
+                    new Font("Arial", Font.PLAIN, 10),
+                    false,
+                    new Font("Arial", Font.BOLD, 12));
+
     private WMSMapDecoration(){}
 
     /**
@@ -203,6 +219,13 @@ public final class WMSMapDecoration {
         return ext;
     }
 
+    /**
+     * Returns the default legend template.
+     */
+    public static LegendTemplate getDefaultLegendTemplate(){
+        //TODO: must link with wms portrayal template
+        return LEGEND_TEMPLATE;
+    }
 
     private static void parseDecoration(final DecorationExtension deco, final Element decoNode){
         final String type = decoNode.getAttribute(ATT_NAME);
