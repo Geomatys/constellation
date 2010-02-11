@@ -123,9 +123,19 @@ public class MDWebMetadataReader extends MetadataReader {
     private List<String> cswPackage;
 
      /**
-     * A list of package containing the SensorML and SWE implementation
+     * A list of package containing the SensorML implementation
      */
     private List<String> sensorMLPackage;
+
+    /**
+     * A list of package containing the SWE implementation
+     */
+    private List<String> swePackage;
+
+    /**
+     * A list of package containing the GML implementation (JAXB binding not referencing)
+     */
+    private List<String> gmlPackage;
 
     /**
      * A list of package containing the Ebrim V3.0 implementation
@@ -268,8 +278,10 @@ public class MDWebMetadataReader extends MetadataReader {
         this.geotoolkitPackage  = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
                                                         "org.geotoolkit.service", "org.geotoolkit.naming", "org.geotoolkit.feature.catalog",
                                                         "org.geotoolkit.metadata.fra", "org.geotoolkit.temporal.object");
-        this.sensorMLPackage    = Util.searchSubPackage("org.geotoolkit.sml.xml.v100", "org.geotoolkit.swe.xml.v100");
-        
+        this.sensorMLPackage    = Util.searchSubPackage("org.geotoolkit.sml.xml.v100");
+        this.swePackage         = Util.searchSubPackage("org.geotoolkit.swe.xml.v100");
+        this.gmlPackage         = Util.searchSubPackage("org.geotoolkit.gml.xml.v311");
+
         this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                         "org.opengis.service", "org.opengis.feature.catalog");
         this.cswPackage         = Util.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
@@ -352,7 +364,7 @@ public class MDWebMetadataReader extends MetadataReader {
 
                 if (result == null) {
                     final Form f = mdReader.getForm(catalog, id);
-                    result = getObjectFromForm(identifier, f);
+                    result = getObjectFromForm(identifier, f, mode);
                 } else {
                     LOGGER.finer("getting from cache: " + identifier);
                 }
@@ -403,7 +415,7 @@ public class MDWebMetadataReader extends MetadataReader {
             return transformMDFormInRecord(form, type, elementName);
         
         } else {
-            final Object obj =  getObjectFromForm(identifier, form);
+            final Object obj =  getObjectFromForm(identifier, form, DUBLINCORE);
             
             if (obj instanceof AbstractRecordType) {
                 return (AbstractRecordType) obj;
@@ -727,11 +739,11 @@ public class MDWebMetadataReader extends MetadataReader {
      * 
      * @return a geotoolkit/constellation object representing the metadata.
      */
-    private Object getObjectFromForm(String identifier, Form form) {
+    private Object getObjectFromForm(String identifier, Form form, int mode) {
 
         if (form != null && form.getTopValue() != null && form.getTopValue().getType() != null) {
             final Value topValue = form.getTopValue();
-            final Object result  = getObjectFromValue(form, topValue);
+            final Object result  = getObjectFromValue(form, topValue, mode);
             
             //we put the full object in the already read metadatas.
             if (result != null) {
@@ -831,7 +843,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * 
      * @return a geotoolkit metadat object.
      */
-    private Object getObjectFromValue(Form form, Value value) {
+    private Object getObjectFromValue(Form form, Value value, int mode) {
         String className;
         String standardName;
         if (value.getType() != null) {
@@ -846,7 +858,7 @@ public class MDWebMetadataReader extends MetadataReader {
         
         try {
             // we get the value's class
-            classe = getClassFromName(className, standardName);
+            classe = getClassFromName(className, standardName, mode);
             if (classe == null) {
                 return null;
             }
@@ -917,7 +929,7 @@ public class MDWebMetadataReader extends MetadataReader {
                 if (tempobj != null) {
                     return tempobj;
                 } else {
-                    return getObjectFromValue(lv.getLinkedForm(), lv.getLinkedValue());
+                    return getObjectFromValue(lv.getLinkedForm(), lv.getLinkedValue(), mode);
                 }
                 
             // else if the value is a complex object    
@@ -1002,7 +1014,7 @@ public class MDWebMetadataReader extends MetadataReader {
                 LOGGER.finer("new childValue:" + path.getName());
 
                 // we get the object from the child Value
-                final Object param = getObjectFromValue(form, childValue);
+                final Object param = getObjectFromValue(form, childValue, mode);
                 if (param == null) {
                     continue;
                 }
@@ -1078,7 +1090,7 @@ public class MDWebMetadataReader extends MetadataReader {
                                             field.set(result, param);
                                         }
                                     } catch (IllegalAccessException ex) {
-                                        LOGGER.severe("error while setting the parameter:" + param + " to the field:" + field + ":" + ex.getMessage());
+                                        LOGGER.severe("error while setting the parameter:" + param + "\n to the field:" + field + ":" + ex.getMessage());
                                     } catch (IllegalArgumentException ex) {
                                         String objectStr = "null";
                                         if (param != null) {
@@ -1088,7 +1100,9 @@ public class MDWebMetadataReader extends MetadataReader {
                                                 objectStr = "(unformattableObject) " + param.getClass().getSimpleName();
                                             }
                                         }
-                                        LOGGER.severe("error while setting the parameter: " + objectStr + " to the field:" + field + ":" + ex.getMessage());
+                                        LOGGER.severe("IllegalArgumentException:" + ex.getMessage() + '\n' +
+                                                      "while setting the parameter: " + objectStr   + '\n' +
+                                                      "to the field: " + field + ".");
                                     }
                                 } else {
                                     LOGGER.warning("no field " + attribName + " in class:" + classe.getName());
@@ -1182,7 +1196,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * 
      * @return a class object corresponding to the specified name.
      */
-    private Class getClassFromName(String className, String standardName) {
+    private Class getClassFromName(String className, String standardName, int mode) {
         Class result = classBinding.get(standardName + ':' + className);
         if (result == null) {
             LOGGER.finer("search for class " + className);
@@ -1219,8 +1233,14 @@ public class MDWebMetadataReader extends MetadataReader {
         } else if (standardName.equals("Ebrim v2.5") || standardName.equals("Web Registry Service v0.9")) {
             packagesName = ebrimV25Package;
         
-        } else if (standardName.equals("SensorML") || standardName.equals("Sensor Web Enablement")) {
+        } else if (standardName.equals("SensorML")) {
             packagesName = sensorMLPackage;
+
+        } else if (standardName.equals("Sensor Web Enablement")) {
+            packagesName = swePackage;
+
+        } else if (standardName.equals("ISO 19108") && mode == SENSORML) {
+            packagesName = gmlPackage;
 
         } else {
             if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType") && !className.equals("AxisDirection")) {
@@ -1400,7 +1420,7 @@ public class MDWebMetadataReader extends MetadataReader {
             final List<Catalog> catalogs = mdReader.getCatalogs();
             final List<Form> forms       = mdReader.getAllForm(catalogs);
             for (Form f: forms) {
-                results.add(getObjectFromForm("no cache", f));
+                results.add(getObjectFromForm("no cache", f, -1));
             }
         } catch (MD_IOException ex) {
             throw new CstlServiceException("SQL Exception while getting all the entries: " +ex.getMessage(), NO_APPLICABLE_CODE);
