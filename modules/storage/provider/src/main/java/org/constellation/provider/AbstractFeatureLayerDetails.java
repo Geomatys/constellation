@@ -326,8 +326,6 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
             final MapLayer layer = getMapLayer(style, null);
             final MapContext context = MapBuilder.createContext(DefaultGeographicCRS.WGS84);
             context.layers().add(layer);
-//
-//            final LegendTemplate template = WMSMapDecoration.getDefaultLegendTemplate();
             return DefaultLegendService.portray(template, context, dimension);
 
         } catch (PortrayalException ex) {

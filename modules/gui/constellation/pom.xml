@@ -268,6 +268,10 @@
           <groupId>batik</groupId>
           <artifactId>batik-awt-util</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>jstl</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -289,11 +293,17 @@
     </dependency>
 
     <!-- ajax4jsf -->
-            <dependency>
-                <groupId>org.ajax4jsf</groupId>
-                <artifactId>ajax4jsf</artifactId>
-                <version>1.1.2-GEOMATYS</version>
-            </dependency>
+    <dependency>
+      <groupId>org.ajax4jsf</groupId>
+      <artifactId>ajax4jsf</artifactId>
+      <version>1.1.2-GEOMATYS</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>jstl</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
   </dependencies>
 
