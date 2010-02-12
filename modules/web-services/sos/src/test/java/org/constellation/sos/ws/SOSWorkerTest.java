@@ -17,6 +17,7 @@
 
 package org.constellation.sos.ws;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -403,6 +404,18 @@ public class SOSWorkerTest {
         assertEquals(expProcess.getPosition().getPosition().getOrientation(), resProcess.getPosition().getPosition().getOrientation());
         assertEquals(expProcess.getPosition().getPosition(), resProcess.getPosition().getPosition());*/
         assertEquals(expProcess.getPosition(), resProcess.getPosition());
+
+        /**
+         * TODO this issue will be corrected when sos core move to MDWEb metadataReader from CSW
+         */
+        URI s = null;
+        expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().setDefinition(s);
+        resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().setDefinition(s);
+
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getDefinition(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getDefinition());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getCoordinate(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getCoordinate());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getVector(), resProcess.getPositions().getPositionList().getPosition().get(0).getVector());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getName(), resProcess.getPositions().getPositionList().getPosition().get(0).getName());
@@ -2278,6 +2291,14 @@ public class SOSWorkerTest {
         assertEquals(expProcess.getOutputs(), resProcess.getOutputs());
         assertEquals(expProcess.getParameters(), resProcess.getParameters());
         assertEquals(expProcess.getPosition(), resProcess.getPosition());
+       
+        /**
+         * TODO this issue will be corrected when sos core move to MDWEb metadataReader from CSW
+         */
+        URI s = null;
+        expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().setDefinition(s);
+        resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().setDefinition(s);
+        
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getVector(), resProcess.getPositions().getPositionList().getPosition().get(0).getVector());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getName(), resProcess.getPositions().getPositionList().getPosition().get(0).getName());

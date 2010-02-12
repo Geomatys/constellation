@@ -247,7 +247,7 @@
                     <position name="piezoPosition">
                         <swe:Position localFrame="#PIEZOMETER_FRAME" referenceFrame="#REFERENCE_POINT">
                             <swe:location>
-                                <swe:Vector> <!-- issues with mdweb definition="urn:ogc:def:phenomenon:location" -->
+                                <swe:Vector definition="urn:ogc:def:phenomenon:location">
                                     <swe:coordinate name="x">
                                         <swe:Quantity definition="urn:ogc:def:phenomenon:distance" axisID="X">
                                             <swe:uom code="m"/>

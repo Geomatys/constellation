@@ -19,6 +19,7 @@
 package org.constellation.metadata.io;
 
 import java.sql.Connection;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
@@ -30,6 +31,7 @@ import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.v100.IoComponentPropertyType;
 import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.sml.xml.v100.SystemType;
 import org.geotoolkit.swe.xml.v100.DataRecordType;
@@ -157,7 +159,20 @@ public class MDWebMetadataReaderTest {
         assertTrue(result.getMember().iterator().next().getProcess().getValue() instanceof SystemType);
         SystemType resProcess = (SystemType) result.getMember().iterator().next().getProcess().getValue();
 
+        assertEquals(expProcess.getOutputs().getOutputList().getOutput().size(), resProcess.getOutputs().getOutputList().getOutput().size());
+        Iterator<IoComponentPropertyType> expIt = expProcess.getOutputs().getOutputList().getOutput().iterator();
+        Iterator<IoComponentPropertyType> resIt = resProcess.getOutputs().getOutputList().getOutput().iterator();
+        for (int i = 0; i < expProcess.getOutputs().getOutputList().getOutput().size(); i++) {
+            IoComponentPropertyType resio = resIt.next();
+            IoComponentPropertyType expio = expIt.next();
+            assertEquals(expio.getAbstractDataRecord().getValue(), resio.getAbstractDataRecord().getValue());
+            assertEquals(expio, resio);
+        }
 
+        assertEquals(expProcess.getOutputs().getOutputList().getOutput(), resProcess.getOutputs().getOutputList().getOutput());
+        assertEquals(expProcess.getOutputs().getOutputList(), resProcess.getOutputs().getOutputList());
+        assertEquals(expProcess.getOutputs(), resProcess.getOutputs());
+        
         assertEquals(expProcess.getBoundedBy(), resProcess.getBoundedBy());
 
         if (expProcess.getCapabilities().size() > 0 && resProcess.getCapabilities().size() > 0) {
@@ -169,6 +184,7 @@ public class MDWebMetadataReaderTest {
             assertEquals(expProcess.getCapabilities().get(0), resProcess.getCapabilities().get(0));
         }
         assertEquals(expProcess.getCapabilities(), resProcess.getCapabilities());
+        assertEquals(expProcess.getCharacteristics(), resProcess.getCharacteristics());
 
         assertEquals(expProcess.getClassification().size(), resProcess.getClassification().size());
         assertEquals(resProcess.getClassification().size(), 1);
@@ -206,7 +222,7 @@ public class MDWebMetadataReaderTest {
         assertEquals(expProcess.getLocation(), resProcess.getLocation());
         assertEquals(expProcess.getName(), resProcess.getName());
         assertEquals(expProcess.getComponents(), resProcess.getComponents());
-        assertEquals(expProcess.getOutputs(), resProcess.getOutputs());
+        
         assertEquals(expProcess.getParameters(), resProcess.getParameters());
         /*assertEquals(expProcess.getPosition().getVector(), resProcess.getPosition().getVector());
         assertEquals(expProcess.getPosition().getPosition().getLocation().getVector().getCoordinate().get(0), resProcess.getPosition().getPosition().getLocation().getVector().getCoordinate().get(0));
@@ -216,6 +232,10 @@ public class MDWebMetadataReaderTest {
         assertEquals(expProcess.getPosition().getPosition().getOrientation(), resProcess.getPosition().getPosition().getOrientation());
         assertEquals(expProcess.getPosition().getPosition(), resProcess.getPosition().getPosition());*/
         assertEquals(expProcess.getPosition(), resProcess.getPosition());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getDefinition(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getDefinition());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getCoordinate(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getCoordinate());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getVector(), resProcess.getPositions().getPositionList().getPosition().get(0).getVector());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getName(), resProcess.getPositions().getPositionList().getPosition().get(0).getName());
@@ -224,6 +244,10 @@ public class MDWebMetadataReaderTest {
         assertEquals(expProcess.getPositions().getPositionList(), resProcess.getPositions().getPositionList());
         assertEquals(expProcess.getPositions(), resProcess.getPositions());
         assertEquals(expProcess.getSMLLocation(), resProcess.getSMLLocation());
+        assertEquals(expProcess.getSpatialReferenceFrame().getEngineeringCRS().getSrsName(), resProcess.getSpatialReferenceFrame().getEngineeringCRS().getSrsName());
+        assertEquals(expProcess.getSpatialReferenceFrame().getEngineeringCRS().getUsesCS(), resProcess.getSpatialReferenceFrame().getEngineeringCRS().getUsesCS());
+        assertEquals(expProcess.getSpatialReferenceFrame().getEngineeringCRS().getUsesEngineeringDatum(), resProcess.getSpatialReferenceFrame().getEngineeringCRS().getUsesEngineeringDatum());
+        assertEquals(expProcess.getSpatialReferenceFrame().getEngineeringCRS(), resProcess.getSpatialReferenceFrame().getEngineeringCRS());
         assertEquals(expProcess.getSpatialReferenceFrame(), resProcess.getSpatialReferenceFrame());
         assertEquals(expProcess.getSrsName(), resProcess.getSrsName());
         assertEquals(expProcess.getTemporalReferenceFrame(), resProcess.getTemporalReferenceFrame());

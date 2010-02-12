@@ -1,4 +1,12 @@
 
+ INSERT INTO "Schemas"."Classes"  VALUES ('Pos', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES ('srsDimension', NULL, 'ISO 19108', NULL, 0, 1, 'Pos', 'Integer', NULL, 'O', 1, 'ISO 19103', 'ISO 19108', 'P');
+ INSERT INTO "Schemas"."Properties"  VALUES ('srsName', NULL, 'ISO 19108', NULL, 0, 1, 'Pos', 'CharacterString', NULL, 'O', 3, 'ISO 19103', 'ISO 19108', 'P');
+ INSERT INTO "Schemas"."Properties"  VALUES ('value', NULL, 'ISO 19108', NULL, 0, 1, 'Pos', 'CharacterString', NULL, 'O', 2, 'ISO 19103', 'ISO 19108', 'V');
+
+ DELETE FROM "Schemas"."Properties" WHERE "name"='pos' AND "owner"='Point';
+ INSERT INTO "Schemas"."Properties"  VALUES ('pos', NULL, 'ISO 19108', NULL, 0, 1, 'Point', 'Pos', NULL, 'O', 2, 'ISO 19108', 'ISO 19108', ' ');
+
  INSERT INTO "Schemas"."Classes"  VALUES('OnlineResource',NULL,'SensorML','based on ISO 19115',0,NULL,NULL,' ');
  INSERT INTO "Schemas"."Properties"  VALUES('href', NULL, 'Xlink', NULL, 0, 1,'OnlineResource','CharacterString', NULL, 'O',0 , 'ISO 19103','SensorML','P');
 

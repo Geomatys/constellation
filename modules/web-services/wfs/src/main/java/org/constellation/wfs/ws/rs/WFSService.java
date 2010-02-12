@@ -698,7 +698,7 @@ public class WFSService extends OGCWebService {
             }
             
             if (coodinates != null) {
-                BBOXType bboxFilter = new BBOXType("", coodinates[0], coodinates[1], coodinates[2], coodinates[3], null);
+                BBOXType bboxFilter = new BBOXType("", coodinates[0], coodinates[1], coodinates[2], coodinates[3], crs);
                 if (filter == null) {
                     filter = new FilterType(bboxFilter);
                 } else {
@@ -706,9 +706,11 @@ public class WFSService extends OGCWebService {
                 }
             }
         }
-
+        
         QueryType query = new QueryType(filter, typeNames, featureVersion);
 
+        String srsName = getParameter("srsName", false);
+        query.setSrsName(srsName);
 
         // TODO handle multiple properties and handle prefixed properties
         String sortByParam = getParameter("sortBy", false);

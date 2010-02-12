@@ -1042,21 +1042,24 @@ public class MDWebMetadataReader extends MetadataReader {
                             if (setter != null && result != null) {
                                 ReflectionUtilities.invokeMethod(setter, result, param);
                             } else {
-                                // special case
-                                if (attribName.equalsIgnoreCase("identifier")) {
-                                    attribName = "name";
-                                } else if (attribName.equalsIgnoreCase("verticalCSProperty")) {
-                                    attribName = "coordinateSystem";
-                                } else if (attribName.equalsIgnoreCase("verticalDatumProperty")) {
-                                    attribName = "datum";
-                                } else if (attribName.equalsIgnoreCase("axisDirection")) {
-                                    attribName = "direction";
-                                } else if (attribName.equalsIgnoreCase("axisAbbrev")) {
-                                    attribName = "abbreviation";
-                                } else if (attribName.equalsIgnoreCase("uom")) {
-                                    attribName = "unit";
-                                } else if (attribName.equalsIgnoreCase("codeSpace")) {
-                                    attribName = "codespace";
+                                
+                                if (mode != SENSORML) {
+                                     // special case for geootoolkit referencing
+                                    if (attribName.equalsIgnoreCase("identifier")) {
+                                        attribName = "name";
+                                    } else if (attribName.equalsIgnoreCase("verticalCSProperty")) {
+                                        attribName = "coordinateSystem";
+                                    } else if (attribName.equalsIgnoreCase("verticalDatumProperty")) {
+                                        attribName = "datum";
+                                    } else if (attribName.equalsIgnoreCase("axisDirection")) {
+                                        attribName = "direction";
+                                    } else if (attribName.equalsIgnoreCase("axisAbbrev")) {
+                                        attribName = "abbreviation";
+                                    } else if (attribName.equalsIgnoreCase("uom")) {
+                                        attribName = "unit";
+                                    } else if (attribName.equalsIgnoreCase("codeSpace")) {
+                                        attribName = "codespace";
+                                    }
                                 }
 
                                 Field field      = null;
@@ -1157,7 +1160,7 @@ public class MDWebMetadataReader extends MetadataReader {
      * @param className the standard name of a class. 
      * @return a primitive class.
      */
-    private Class getPrimitiveTypeFromName(String className) {
+    private Class getPrimitiveTypeFromName(String className, String standardName) {
 
         if (className.equalsIgnoreCase("CharacterString")) {
             return String.class;
@@ -1169,7 +1172,7 @@ public class MDWebMetadataReader extends MetadataReader {
             return Double.class;
         } else if (className.equalsIgnoreCase("Integer")) {
             return Integer.class;
-        } else if (className.equalsIgnoreCase("Boolean")) {
+        } else if (className.equalsIgnoreCase("Boolean") && !standardName.equals("Sensor Web Enablement")) {
             return Boolean.class;
         } else if (className.equalsIgnoreCase("Distance")) {
             return Double.class;
@@ -1207,7 +1210,7 @@ public class MDWebMetadataReader extends MetadataReader {
         final String classNameSave = standardName + ':' + className;
         
         //for the primitive type we return java primitive type
-        result = getPrimitiveTypeFromName(className);
+        result = getPrimitiveTypeFromName(className, standardName);
         if (result != null) {
             classBinding.put(standardName + ':' + className, result);
             return result;
@@ -1294,7 +1297,7 @@ public class MDWebMetadataReader extends MetadataReader {
                             if (name.indexOf("Code") != -1 && name.indexOf("CodeSpace") == -1) {
                                 name = name.substring(0, name.indexOf("Code"));
                             }
-                            if (name.startsWith("Time")) {
+                            if (name.startsWith("Time") && mode != SENSORML) {
                                 name = name.substring(4);
                             }
                             nameType = 2;
