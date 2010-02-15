@@ -145,16 +145,12 @@ public final class WCSWorker extends AbstractWorker {
     /**
      * The date format to match.
      */
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     /*
      * Set to true for CITE tests.
      */
     private static final boolean CITE_TESTING = false;
-
-    static {
-        DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
 
     /**
      * Initializes the marshaller pool for the WCS.
@@ -295,8 +291,10 @@ public final class WCSWorker extends AbstractWorker {
                 temporalDomain = null;
             } else {
                 final List<Object> times = new ArrayList<Object>();
+                final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+                df.setTimeZone(TimeZone.getTimeZone("UTC"));
                 for (Date d : dates) {
-                    times.add(new TimePositionType(DATE_FORMAT.format(d)));
+                    times.add(new TimePositionType(df.format(d)));
                 }
                 temporalDomain = new org.geotoolkit.wcs.xml.v100.TimeSequenceType(times);
             }
@@ -434,8 +432,10 @@ public final class WCSWorker extends AbstractWorker {
             } catch (CatalogException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
+            final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
             for (Date d : dates) {
-                times.add(new TimePositionType(DATE_FORMAT.format(d)));
+                times.add(new TimePositionType(df.format(d)));
             }
             final org.geotoolkit.wcs.xml.v111.TimeSequenceType temporalDomain =
                     new org.geotoolkit.wcs.xml.v111.TimeSequenceType(times);
@@ -641,8 +641,10 @@ public final class WCSWorker extends AbstractWorker {
                          */
                         final Date firstDate = dates.first();
                         final Date lastDate = dates.last();
-                        outputBBox.getTimePosition().add(new TimePositionType(DATE_FORMAT.format(firstDate)));
-                        outputBBox.getTimePosition().add(new TimePositionType(DATE_FORMAT.format(lastDate)));
+                        final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+                        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                        outputBBox.getTimePosition().add(new TimePositionType(df.format(firstDate)));
+                        outputBBox.getTimePosition().add(new TimePositionType(df.format(lastDate)));
                     }
                     co.setLonLatEnvelope(outputBBox);
                 }
