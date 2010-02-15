@@ -234,7 +234,11 @@ public class ReflectionUtilities {
         final String baseMessage = "Unable to invoke the method " + method + ": ";
         try {
             if (method != null) {
-                result = method.invoke(object, parameter);
+                if (parameter.length == 1) {
+                    result = method.invoke(object, parameter[0]);
+                } else {
+                    result = method.invoke(object, parameter);
+                }
             } else {
                 LOGGER.warning(baseMessage + "the method reference is null.");
             }
@@ -245,7 +249,8 @@ public class ReflectionUtilities {
             String param = "null";
             if (parameter != null)
                 param = parameter.getClass().getSimpleName();
-            LOGGER.warning(baseMessage + "the given argument does not match that required by the method.( argument type was " + param + ")");
+            LOGGER.warning(baseMessage + "the given argument does not match that required by the method.( argument type was " + param + ")" + '\n' +
+                           "cause:" + ex.getMessage());
 
         } catch (InvocationTargetException ex) {
             String errorMsg = ex.getMessage();
@@ -450,13 +455,6 @@ public class ReflectionUtilities {
      */
     public static Method getSetterFromName(String propertyName, final Class<?> paramClass, final Class<?> rootClass) {
         LOGGER.finer("search for a setter in " + rootClass.getName() + " of type :" + paramClass.getName());
-
-        //special case
-        if (propertyName.equals("beginPosition")) {
-            propertyName = "begining";
-        } else if (propertyName.equals("endPosition")) {
-            propertyName = "ending";
-        }
 
         final String methodName = "set" + StringUtilities.firstToUpper(propertyName);
         int occurenceType = 0;

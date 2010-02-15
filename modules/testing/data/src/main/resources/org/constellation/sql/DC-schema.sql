@@ -59,34 +59,6 @@ INSERT INTO "Schemas"."Properties"  VALUES ('spatial', NULL, 'DublinCore-terms',
  INSERT INTO "Schemas"."Properties"  VALUES('localPart', NULL, 'OGC Filter', NULL, 0, 1,'QName','CharacterString', NULL, 'O',1 , 'ISO 19103','MDWEB', ' ');
 
 /*-------------------------------------------------*
- *--------------  Classe DirectPosition -----------*
- *-------------------------------------------------*/
- INSERT INTO "Schemas"."Classes"  VALUES('DirectPosition',NULL,'ISO 19108',NULL,0,NULL,NULL, ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('value', NULL, 'ISO 19108', NULL, 0, 2147483647,'DirectPosition','Double', NULL, 'O',0 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('srsDimension', NULL, 'ISO 19108', NULL, 0, 1,'DirectPosition','Integer', NULL, 'O',1 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('srsName', NULL, 'ISO 19108', NULL, 0, 1,'DirectPosition','CharacterString', NULL, 'O',2 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('axisLabels', NULL, 'ISO 19108', NULL, 0, 2147483647,'DirectPosition','CharacterString', NULL, 'O',3 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('uomLabels', NULL, 'ISO 19108', NULL, 0, 2147483647,'DirectPosition','CharacterString', NULL, 'O',4 , 'ISO 19103','ISO 19108', ' ');
-
-/*-------------------------------------------------*
- *--------------  CodeList TimeIndeterminateValue  ------------*
- *-------------------------------------------------*/
-INSERT INTO "Schemas"."CodeLists" VALUES ('TimeIndeterminateValue', NULL, 'ISO 19108', NULL, 0, 'CodeList', NULL, ' ');
-INSERT INTO "Schemas"."CodeListElements" VALUES ('after', NULL, 'ISO 19108', NULL, 0, 1, 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 1);
-INSERT INTO "Schemas"."CodeListElements" VALUES ('before', NULL, 'ISO 19108', NULL, 0, 1, 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'C', 0, 'ISO 19108', 'Catalog Web Service', ' ', 2);
-INSERT INTO "Schemas"."CodeListElements" VALUES ('now', NULL, 'ISO 19108', NULL, 0, 1, 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 3);
-INSERT INTO "Schemas"."CodeListElements" VALUES ('unknow', NULL, 'ISO 19108', NULL, 0, 1, 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 4);
-
-/*-------------------------------------------------*
- *--------------  Classe TimePosition -------------*
- *-------------------------------------------------*/
- INSERT INTO "Schemas"."Classes"  VALUES('TimePosition',NULL,'ISO 19108',NULL,0,NULL,NULL, ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('value', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition','CharacterString', NULL, 'O',0 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('calendarEraName', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition','CharacterString', NULL, 'O',1 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('frame', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition','CharacterString', NULL, 'O',2 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('indeterminatePosition', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition', NULL, 'TimeIndeterminateValue', 'O',3 , 'ISO 19108','ISO 19108', ' ');
-
-/*-------------------------------------------------*
  *--------------  Classe Envelope -----------------*
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Classes"  VALUES('Envelope',NULL,'ISO 19108',NULL,0,NULL,NULL, ' ');

@@ -886,7 +886,7 @@ public class MDWebMetadataReader extends MetadataReader {
                             
                         } else if (classe.isEnum()) {
                             method = ReflectionUtilities.getMethod("fromValue", classe, String.class);
-                            result = ReflectionUtilities.invokeMethod(method, null, classe, element.getName());
+                            result = ReflectionUtilities.invokeMethod(method, classe, element.getName());
                         } else {
                             LOGGER.severe("unknow codelist type");
                             return null;
@@ -1023,11 +1023,17 @@ public class MDWebMetadataReader extends MetadataReader {
                 boolean tryAgain = true;
                 String attribName = path.getName();
 
-                //special case due to a bug in mdweb
-                if (attribName.startsWith("geographicElement")) {
-                    attribName = "geographicElements";
-                } else if (attribName.equals("transformationParameterAvailability")) {
-                    attribName = "transformationParameterAvailable";
+                if (mode != SENSORML) {
+                    //special case due to a bug in mdweb
+                    if (attribName.startsWith("geographicElement")) {
+                        attribName = "geographicElements";
+                    } else if (attribName.equals("transformationParameterAvailability")) {
+                        attribName = "transformationParameterAvailable";
+                    } else if (attribName.equals("beginPosition")) {
+                        attribName = "begining";
+                    } else if (attribName.equals("endPosition")) {
+                        attribName = "ending";
+                    }
                 }
 
                 int casee = 0;

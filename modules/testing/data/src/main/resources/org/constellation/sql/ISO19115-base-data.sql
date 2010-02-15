@@ -302,7 +302,9 @@ INSERT INTO "Schemas"."CodeListElements"  VALUES ('processor', NULL, 'ISO 19115'
  INSERT INTO "Schemas"."Classes"  VALUES ('DirectPosition', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
  INSERT INTO "Schemas"."Properties"  VALUES ('srsDimension', NULL, 'ISO 19108', NULL, 0, 1, 'DirectPosition', 'Integer', NULL, 'O', 1, 'ISO 19103', 'ISO 19108', 'P');
  INSERT INTO "Schemas"."Properties"  VALUES ('srsName', NULL, 'ISO 19108', NULL, 0, 1, 'DirectPosition', 'CharacterString', NULL, 'O', 3, 'ISO 19103', 'ISO 19108', 'P');
- INSERT INTO "Schemas"."Properties"  VALUES ('value', NULL, 'ISO 19108', NULL, 0, 1, 'DirectPosition', 'CharacterString', NULL, 'O', 2, 'ISO 19103', 'ISO 19108', 'V');
+ INSERT INTO "Schemas"."Properties"  VALUES ('value', NULL, 'ISO 19108', NULL, 0, 1, 'DirectPosition', 'Double', NULL, 'O', 2, 'ISO 19103', 'ISO 19108', 'V');
+ INSERT INTO "Schemas"."Properties"  VALUES('axisLabels', NULL, 'ISO 19108', NULL, 0, 2147483647,'DirectPosition','CharacterString', NULL, 'O',3 , 'ISO 19103','ISO 19108', ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('uomLabels', NULL, 'ISO 19108', NULL, 0, 2147483647,'DirectPosition','CharacterString', NULL, 'O',4 , 'ISO 19103','ISO 19108', ' ');
 
  INSERT INTO "Schemas"."Classes"  VALUES ('Point', NULL, 'ISO 19108', 'A Point is defined by a single coordinate tuple.', 0, NULL, NULL, ' ');
  INSERT INTO "Schemas"."Properties"  VALUES ('id', NULL, 'ISO 19108', NULL, 0, 1, 'Point', 'ID', NULL, 'O', 1, 'ISO 19103', 'ISO 19108', 'C');
@@ -364,6 +366,15 @@ INSERT INTO "Schemas"."CodeListElements"  VALUES ('processor', NULL, 'ISO 19115'
  INSERT INTO "Schemas"."Properties"  VALUES ('usesCS', NULL, 'ISO 19108', NULL, 0, 1, 'EngineeringCRS', 'CoordinateSystemRef', NULL, 'O', 2, 'ISO 19108', 'ISO 19108', ' ');
  INSERT INTO "Schemas"."Properties"  VALUES ('usesEngineeringDatum', NULL, 'ISO 19108', NULL, 0, 1, 'EngineeringCRS', 'EngineeringDatumRef', NULL, 'O', 3, 'ISO 19108', 'ISO 19108', ' ');
  INSERT INTO "Schemas"."Properties"  VALUES ('id', NULL, 'ISO 19108', NULL, 0, 1, 'EngineeringCRS', 'ID', NULL, 'O', 0, 'ISO 19103', 'ISO 19108', 'C');
+
+/*-------------------------------------------------*
+ *--------------  Classe TimePosition -------------*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"  VALUES('TimePosition',NULL,'ISO 19108',NULL,0,NULL,NULL, ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('position', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition','Date', NULL, 'O',0 , 'ISO 19103','ISO 19108', ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('calendarEraName', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition','CharacterString', NULL, 'O',1 , 'ISO 19103','ISO 19108', ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('frame', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition','CharacterString', NULL, 'O',2 , 'ISO 19103','ISO 19108', ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('indeterminatePosition', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition', NULL, 'TimeIndeterminateValue', 'O',3 , 'ISO 19108','ISO 19108', ' ');
 
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('ISO 19115:CI_ResponsibleParty', 'CI_ResponsibleParty', 'ISO 19115', 'CI_ResponsibleParty', NULL, 'ISO 19115');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('ISO 19115:CI_ResponsibleParty:contactInfo', 'contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:CI_ResponsibleParty', 'ISO 19115');

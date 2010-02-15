@@ -334,146 +334,79 @@ CREATE TABLE "Markers" (
     "id_metadata" integer NOT NULL
 );
 
-ALTER TABLE  "Markers"
-    ADD CONSTRAINT "Markers_pkey" PRIMARY KEY ("idgeom", "idform", "id_metadata");
+ALTER TABLE  "Markers" ADD CONSTRAINT "Markers_pkey" PRIMARY KEY ("idgeom", "idform", "id_metadata");
 
+ALTER TABLE  "Profiles"."FieldElements"  ADD CONSTRAINT "FieldElements_pkey" PRIMARY KEY ("profileName", "path");
 
+ALTER TABLE  "Profiles"."ControlParameters" ADD CONSTRAINT pk_controlparameters PRIMARY KEY ("orderControl", "orderParameter", "profileName", "path");
 
-ALTER TABLE  "Profiles"."FieldElements"
-    ADD CONSTRAINT "FieldElements_pkey" PRIMARY KEY ("profileName", "path");
+ALTER TABLE  "Profiles"."FieldControls" ADD CONSTRAINT pk_fieldcontrol PRIMARY KEY ("orderControl", "profileName", "path");
 
+ALTER TABLE  "Profiles"."ProfileElements" ADD CONSTRAINT pk_profileelements PRIMARY KEY ("profileName", "path");
 
-ALTER TABLE  "Profiles"."ControlParameters"
-    ADD CONSTRAINT pk_controlparameters PRIMARY KEY ("orderControl", "orderParameter", "profileName", "path");
+ALTER TABLE  "Profiles"."ProfileHierarchies" ADD CONSTRAINT pk_profilehierarchies PRIMARY KEY ("parent", "child");
 
+ALTER TABLE  "Resources"."AttachedFiles" ADD CONSTRAINT pk_attachedfiles PRIMARY KEY ("fileName", "form");
 
-ALTER TABLE  "Profiles"."FieldControls"
-    ADD CONSTRAINT pk_fieldcontrol PRIMARY KEY ("orderControl", "profileName", "path");
+ALTER TABLE  "Resources"."ImageFiles"  ADD CONSTRAINT pk_imagefiles PRIMARY KEY ("fileName", "form");
 
+ALTER TABLE  "Schemas"."Obligations" ADD CONSTRAINT "Obligations_pkey" PRIMARY KEY ("code");
 
-ALTER TABLE  "Profiles"."ProfileElements"
-    ADD CONSTRAINT pk_profileelements PRIMARY KEY ("profileName", "path");
+ALTER TABLE  "Schemas"."Paths" ADD CONSTRAINT "Paths_pkey" PRIMARY KEY ("id");
 
+ALTER TABLE  "Schemas"."Standard" ADD CONSTRAINT "Standard_pkey" PRIMARY KEY ("name");
 
-ALTER TABLE  "Profiles"."ProfileHierarchies"
-    ADD CONSTRAINT pk_profilehierarchies PRIMARY KEY ("parent", "child");
+ALTER TABLE  "Schemas"."Classes" ADD CONSTRAINT classes_pkey PRIMARY KEY ("name", "standard");
 
+ALTER TABLE  "Schemas"."CodeListElements"  ADD CONSTRAINT codelistelements_pkey PRIMARY KEY ("name", "standard", "owner", "code");
 
-ALTER TABLE  "Resources"."AttachedFiles"
-    ADD CONSTRAINT pk_attachedfiles PRIMARY KEY ("fileName", "form");
+ALTER TABLE  "Schemas"."CodeLists" ADD CONSTRAINT codelists_pkey PRIMARY KEY ("name", "standard");
 
+ALTER TABLE  "Schemas"."Locales" ADD CONSTRAINT pk_locales PRIMARY KEY ("name");
 
-ALTER TABLE  "Resources"."ImageFiles"
-    ADD CONSTRAINT pk_imagefiles PRIMARY KEY ("fileName", "form");
+ALTER TABLE  "Schemas"."Properties" ADD CONSTRAINT pk_properties PRIMARY KEY ("name", "standard", "owner", "owner_standard");
 
+ALTER TABLE  "Schemas"."Paths" ADD CONSTRAINT unique_paths UNIQUE ("name", "standard", "owner", "parent");
 
-ALTER TABLE  "Schemas"."Obligations"
-    ADD CONSTRAINT "Obligations_pkey" PRIMARY KEY ("code");
+ALTER TABLE  "Storage"."Catalogs" ADD CONSTRAINT "Catalogs_pkey" PRIMARY KEY ("code");
 
+ALTER TABLE  "Storage"."DateValues" ADD CONSTRAINT "DateValues_pkey" PRIMARY KEY ("form", "ordinal", "path");
 
-ALTER TABLE  "Schemas"."Paths"
-    ADD CONSTRAINT "Paths_pkey" PRIMARY KEY ("id");
+ALTER TABLE  "Storage"."Forms" ADD CONSTRAINT "Forms_pkey" PRIMARY KEY ("identifier");
 
-ALTER TABLE  "Schemas"."Standard"
-    ADD CONSTRAINT "Standard_pkey" PRIMARY KEY ("name");
+ALTER TABLE  "Storage"."ImportForms" ADD CONSTRAINT "ImportForms_pkey" PRIMARY KEY ("form");
 
-ALTER TABLE  "Schemas"."Classes"
-    ADD CONSTRAINT classes_pkey PRIMARY KEY ("name", "standard");
+ALTER TABLE  "Storage"."TextValues"  ADD CONSTRAINT "TextValues_pkey" PRIMARY KEY ("form", "id_value");
 
+ALTER TABLE  "Storage"."InputLevelCompletions"  ADD CONSTRAINT pk_inputlevelcompletions PRIMARY KEY ("form", "inputLevel");
 
-ALTER TABLE  "Schemas"."CodeListElements"
-    ADD CONSTRAINT codelistelements_pkey PRIMARY KEY ("name", "standard", "owner", "code");
+ALTER TABLE  "Storage"."LinkedValues" ADD CONSTRAINT pk_linkedvalues PRIMARY KEY ("form", "id_value");
 
+ALTER TABLE  "Storage"."Values" ADD CONSTRAINT pk_values PRIMARY KEY ("form", "id_value");
 
-ALTER TABLE  "Schemas"."CodeLists"
-    ADD CONSTRAINT codelists_pkey PRIMARY KEY ("name", "standard");
+ALTER TABLE  "Storage"."Forms" ADD CONSTRAINT unique_forms UNIQUE ("catalog", "title", "inputLogin");
 
+ALTER TABLE  "Users"."Roles" ADD CONSTRAINT "Role_pkey" PRIMARY KEY ("name");
 
-ALTER TABLE  "Schemas"."Locales"
-    ADD CONSTRAINT pk_locales PRIMARY KEY ("name");
+ALTER TABLE  "Users"."UserGroups" ADD CONSTRAINT "UserGroups_pkey" PRIMARY KEY ("name", "catalog");
 
-ALTER TABLE  "Schemas"."Properties"
-    ADD CONSTRAINT pk_properties PRIMARY KEY ("name", "standard", "owner", "owner_standard");
+ALTER TABLE  "Users"."Users" ADD CONSTRAINT "Users_pkey" PRIMARY KEY ("login");
 
+ALTER TABLE  "Users"."Assignements" ADD CONSTRAINT pk_assignements PRIMARY KEY ("login", "group");
 
-ALTER TABLE  "Schemas"."Paths"
-    ADD CONSTRAINT unique_paths UNIQUE ("name", "standard", "owner", "parent");
+ALTER TABLE  "Resources"."AttachedFiles" ADD CONSTRAINT "AttachedFiles_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
+ALTER TABLE  "Resources"."Dependencies" ADD CONSTRAINT "Dependencies_fk" FOREIGN KEY ("dependant", "form") REFERENCES "Resources"."AttachedFiles"("fileName", "form");
 
-ALTER TABLE  "Storage"."Catalogs"
-    ADD CONSTRAINT "Catalogs_pkey" PRIMARY KEY ("code");
+ALTER TABLE  "Resources"."Dependencies" ADD CONSTRAINT "Dependencies_fk1" FOREIGN KEY ("dependency", "form") REFERENCES "Resources"."AttachedFiles"("fileName", "form");
 
-ALTER TABLE  "Storage"."DateValues"
-    ADD CONSTRAINT "DateValues_pkey" PRIMARY KEY ("form", "ordinal", "path");
+ALTER TABLE  "Resources"."ImageFiles" ADD CONSTRAINT "ImageFiles_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
-ALTER TABLE  "Storage"."Forms"
-    ADD CONSTRAINT "Forms_pkey" PRIMARY KEY ("identifier");
+ALTER TABLE  "Schemas"."Classes" ADD CONSTRAINT "Classes_fk1" FOREIGN KEY ("superClasse", "standard_superClasse") REFERENCES "Schemas"."Classes"("name", "standard");
 
+ALTER TABLE  "Schemas"."Elements" ADD CONSTRAINT "Elements_fk" FOREIGN KEY ("standard") REFERENCES "Schemas"."Standard"("name");
 
-ALTER TABLE  "Storage"."ImportForms"
-    ADD CONSTRAINT "ImportForms_pkey" PRIMARY KEY ("form");
-
-
-ALTER TABLE  "Storage"."TextValues"
-    ADD CONSTRAINT "TextValues_pkey" PRIMARY KEY ("form", "id_value");
-
-ALTER TABLE  "Storage"."InputLevelCompletions"
-    ADD CONSTRAINT pk_inputlevelcompletions PRIMARY KEY ("form", "inputLevel");
-
-
-ALTER TABLE  "Storage"."LinkedValues"
-    ADD CONSTRAINT pk_linkedvalues PRIMARY KEY ("form", "id_value");
-
-ALTER TABLE  "Storage"."Values"
-    ADD CONSTRAINT pk_values PRIMARY KEY ("form", "id_value");
-
-
-ALTER TABLE  "Storage"."Forms"
-    ADD CONSTRAINT unique_forms UNIQUE ("catalog", "title", "inputLogin");
-
-
-ALTER TABLE  "Users"."Roles"
-    ADD CONSTRAINT "Role_pkey" PRIMARY KEY ("name");
-
-
-ALTER TABLE  "Users"."UserGroups"
-    ADD CONSTRAINT "UserGroups_pkey" PRIMARY KEY ("name", "catalog");
-
-ALTER TABLE  "Users"."Users"
-    ADD CONSTRAINT "Users_pkey" PRIMARY KEY ("login");
-
-
-ALTER TABLE  "Users"."Assignements"
-    ADD CONSTRAINT pk_assignements PRIMARY KEY ("login", "group");
-
-
-
-ALTER TABLE  "Resources"."AttachedFiles"
-    ADD CONSTRAINT "AttachedFiles_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
-
-
-ALTER TABLE  "Resources"."Dependencies"
-    ADD CONSTRAINT "Dependencies_fk" FOREIGN KEY ("dependant", "form") REFERENCES "Resources"."AttachedFiles"("fileName", "form");
-
-
-ALTER TABLE  "Resources"."Dependencies"
-    ADD CONSTRAINT "Dependencies_fk1" FOREIGN KEY ("dependency", "form") REFERENCES "Resources"."AttachedFiles"("fileName", "form");
-
-ALTER TABLE  "Resources"."ImageFiles"
-    ADD CONSTRAINT "ImageFiles_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
-
-
-ALTER TABLE  "Schemas"."Classes"
-    ADD CONSTRAINT "Classes_fk1" FOREIGN KEY ("superClasse", "standard_superClasse") REFERENCES "Schemas"."Classes"("name", "standard");
-
-
-ALTER TABLE  "Schemas"."Elements"
-    ADD CONSTRAINT "Elements_fk" FOREIGN KEY ("standard") REFERENCES "Schemas"."Standard"("name");
-
-
-ALTER TABLE  "Schemas"."Paths"
-    ADD CONSTRAINT "Paths_fk" FOREIGN KEY ("standard") REFERENCES "Schemas"."Standard"("name");
-
+ALTER TABLE  "Schemas"."Paths" ADD CONSTRAINT "Paths_fk" FOREIGN KEY ("standard") REFERENCES "Schemas"."Standard"("name");
 
 ALTER TABLE  "Schemas"."Paths" ADD CONSTRAINT "Paths_fk1" FOREIGN KEY ("parent") REFERENCES "Schemas"."Paths"("id");
 
@@ -509,13 +442,17 @@ ALTER TABLE  "Storage"."LinkedValues" ADD CONSTRAINT "LinkedValues_fk1" FOREIGN 
 
 ALTER TABLE  "Storage"."PredefinedValues" ADD CONSTRAINT "PredefinedValues_fk" FOREIGN KEY ("linkedForm") REFERENCES "Storage"."Forms"("identifier");
 
-ALTER TABLE  "Storage"."TextValues" ADD CONSTRAINT "TextValues_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
+ALTER TABLE  "Storage"."TextValues" ADD CONSTRAINT "TextValues_fk1" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
---ALTER TABLE  "Storage"."TextValues" ADD CONSTRAINT "TV_Paths_fk" FOREIGN KEY ("path") REFERENCES "Schemas"."Paths"("id")
+ALTER TABLE  "Storage"."TextValues" ADD CONSTRAINT "TextValues_fk2" FOREIGN KEY ("path") REFERENCES "Schemas"."Paths"("id");
+
+--ALTER TABLE  "Storage"."TextValues" ADD CONSTRAINT "TextValues_fk3" FOREIGN KEY ("type", "typeStandard") REFERENCES "Schemas"."Classes"("name", "standard")
 
 ALTER TABLE  "Storage"."Values" ADD CONSTRAINT "Values_fk1" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
---ALTER TABLE  "Storage"."Values" ADD CONSTRAINT "V_Paths_fk1"  FOREIGN KEY ("path") REFERENCES "Schemas"."Paths"("id")
+ALTER TABLE  "Storage"."Values" ADD CONSTRAINT "Values_fk2"  FOREIGN KEY ("path") REFERENCES "Schemas"."Paths"("id");
+
+--ALTER TABLE  "Storage"."Values" ADD CONSTRAINT "Values_fk3" FOREIGN KEY ("type", "typeStandard") REFERENCES "Schemas"."Classes"("name", "standard")
 
 ALTER TABLE  "Users"."UserGroups" ADD CONSTRAINT "UserGroups_fk" FOREIGN KEY ("role") REFERENCES "Users"."Roles"("name");
 

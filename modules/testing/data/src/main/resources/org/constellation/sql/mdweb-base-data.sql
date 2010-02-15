@@ -16,6 +16,7 @@ INSERT INTO "Schemas"."Obligations" ("code", "name") VALUES ('C', 'Conditionnal'
 
 INSERT INTO "Schemas"."Classes"  VALUES ('DateTime',NULL,'ISO 19108',NULL,0,NULL,NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('Date',NULL,'ISO 19103',NULL,0,NULL,NULL, ' ');
+INSERT INTO "Schemas"."Classes"  VALUES ('Duration',NULL,'ISO 19103',NULL,0,NULL,NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('Integer',NULL,'ISO 19103',NULL,0,NULL,NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('Double',NULL,'ISO 19103',NULL,0,NULL,NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('CharacterString',NULL,'ISO 19103',NULL,0,NULL,NULL, ' ');
@@ -28,9 +29,12 @@ INSERT INTO "Schemas"."Classes"  VALUES ('Decimal', NULL, 'ISO 19103', NULL, 0, 
 INSERT INTO "Schemas"."Classes"  VALUES ('Distance', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('Real', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
 
-INSERT INTO "Schemas"."Classes"  VALUES ('UndefinedTime', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('indeterminatePosition', NULL, 'ISO 19108', NULL, 1, 1, 'UndefinedTime', 'CharacterString', NULL, 'O', 0, 'ISO 19103', 'ISO 19108', 'P');
+INSERT INTO "Schemas"."CodeLists"  VALUES ('TimeIndeterminateValue', null, 'ISO 19108', NULL, 0, 'CodeList', NULL, ' ');
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('after', NULL, 'ISO 19108', NULL, 0, 1, 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 1);
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('before', NULL, 'ISO 19108', NULL, 0, 1, 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 2);
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('now', NULL, 'ISO 19108', NULL, 0, 1, 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 3);
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('unknown', NULL, 'ISO 19108', NULL, 0, 1, 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 4);
 
 INSERT INTO "Schemas"."Classes"  VALUES ('TimePeriod', 'TimePeriod', 'ISO 19108', 'TimePeriod', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('beginPosition', NULL, 'ISO 19108', NULL, 1, 1, 'TimePeriod', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('endPosition', NULL, 'ISO 19108', NULL, 0, 1, 'TimePeriod', 'UndefinedTime', NULL, 'O', 1, 'ISO 19108', 'ISO 19108', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('endPosition', NULL, 'ISO 19108', NULL, 0, 1, 'TimePeriod', NULL, 'TimeIndeterminateValue', 'O', 1, 'ISO 19108', 'ISO 19108', ' ');
