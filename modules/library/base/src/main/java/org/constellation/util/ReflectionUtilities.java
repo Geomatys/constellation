@@ -373,12 +373,12 @@ public class ReflectionUtilities {
 
 
         //special case and corrections
-        if (propertyName.equals("beginPosition")) {
+        if (propertyName.equals("beginPosition") && !rootClass.getName().equals("org.geotoolkit.gml.xml.v311.TimePeriodType")) {
             if (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultInstant"))
                 return null;
             else
                 propertyName = "beginning";
-        } else if (propertyName.equals("endPosition")) {
+        } else if (propertyName.equals("endPosition")  && !rootClass.getName().equals("org.geotoolkit.gml.xml.v311.TimePeriodType")) {
             if (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultInstant"))
                 return null;
             else
@@ -398,14 +398,17 @@ public class ReflectionUtilities {
             return null;
         } else if (propertyName.equals("geographicIdentifier") && rootClass.getName().equals("org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox")) {
             return null;
-        } if (propertyName.equals("position") && (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultPeriod"))) {
+        } else if (propertyName.equals("position") && (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultPeriod"))) {
             return null;
+        } else if (propertyName.equals("value") && (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultPosition"))) {
+            propertyName = "date";
         }
 
         String methodName = "get" + StringUtilities.firstToUpper(propertyName);
+        String methodName2 = "is" + StringUtilities.firstToUpper(propertyName);
         int occurenceType = 0;
 
-        while (occurenceType < 4) {
+        while (occurenceType < 5) {
 
             try {
                 Method getter = null;
@@ -428,6 +431,10 @@ public class ReflectionUtilities {
                             methodName = methodName.substring(0, methodName.length() - 1) + 'i';
                         }
                         getter = rootClass.getMethod(methodName + "es");
+                        break;
+                    }
+                    case 4: {
+                        getter = rootClass.getMethod(methodName2);
                         break;
                     }
                     default: break;

@@ -1033,6 +1033,8 @@ public class MDWebMetadataReader extends MetadataReader {
                         attribName = "begining";
                     } else if (attribName.equals("endPosition")) {
                         attribName = "ending";
+                    } else if (attribName.equals("value") && classe.getSimpleName().equals("DefaultPosition")) {
+                        attribName = "position";
                     }
                 }
 

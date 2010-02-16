@@ -159,7 +159,6 @@ public class MDWebMetadataWriter extends MetadataWriter {
             
             final Date creationDate = new Date(System.currentTimeMillis());
             final String className  = object.getClass().getSimpleName();
-            
             // ISO 19115 types
             if (className.equals("DefaultMetadata")      ||
             
@@ -181,6 +180,12 @@ public class MDWebMetadataWriter extends MetadataWriter {
             } else if (className.equals("RecordType")) {
                 mainStandard = Standard.CSW;
             
+            // SML Types
+            } else if (className.equals("SensorML")) {
+                mainStandard = Standard.SENSORML;
+
+            // unkow types
+
             // unkow types
             } else {
                 final String msg = "Can't register ths kind of object:" + object.getClass().getName();
@@ -350,7 +355,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
                         propName = "direction";
                     } else if (prop.getName().equalsIgnoreCase("axisAbbrev")) {
                         propName = "abbreviation";
-                    } else if (prop.getName().equalsIgnoreCase("uom")) {
+                    } else if (prop.getName().equalsIgnoreCase("uom") && !object.getClass().getSimpleName().equals("QuantityType")
+                                                                      && !object.getClass().getSimpleName().equals("QuantityRange")
+                                                                      && !object.getClass().getSimpleName().equals("TimeRange")) {
                         propName = "unit";
                     } else if (prop.getName().equalsIgnoreCase("position") && object.getClass().getSimpleName().equals("DefaultPosition")) {
                         propName = "date";
@@ -517,13 +524,20 @@ public class MDWebMetadataWriter extends MetadataWriter {
             availableStandards.add(Standard.OGC_FILTER);
             availableStandards.add(Standard.MDWEB);
             
-        // Ebrim v2.5 tandard    
+        // Ebrim v2.5 standard
         } else if (Standard.EBRIM_V2_5.equals(mainStandard)) {
             availableStandards.add(Standard.EBRIM_V2_5);
             availableStandards.add(Standard.CSW);
             availableStandards.add(Standard.OGC_FILTER);
             availableStandards.add(Standard.MDWEB);
         
+        // Ebrim v2.5 tandard
+        } else if (Standard.SENSORML.equals(mainStandard)) {
+            availableStandards.add(Standard.SENSORML);
+            availableStandards.add(mdWriter.getStandard("Sensor Web Enablement"));
+            availableStandards.add(Standard.ISO_19108);
+            
+
         } else {
             throw new IllegalArgumentException("Unexpected Main standard: " + mainStandard);
         }
@@ -537,8 +551,10 @@ public class MDWebMetadataWriter extends MetadataWriter {
              */
             if (packageName.equals("org.geotoolkit.service")) {
                 standard = mdWriter.getStandard("ISO 19119");
-            } else if (packageName.equals("org.constellation.metadata.fra")) {
-                standard = Standard.ISO_19115_FRA;
+            } else if (packageName.equals("org.geotoolkit.sml.xml.v100")) {
+                standard = Standard.SENSORML;
+            } else if (packageName.equals("org.geotoolkit.gml.xml.v311")) {
+                standard = Standard.ISO_19108;
             }
                 
             String name = className;
@@ -654,6 +670,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
             return mdWriter.getClasse("CharacterString", Standard.ISO_19103);
         } else if (className.equalsIgnoreCase("Date")) {
             return mdWriter.getClasse(className, Standard.ISO_19103);
+        } else if (className.equalsIgnoreCase("URI")) {
+            return mdWriter.getClasse(className, Standard.ISO_19103);
         }  else if (className.equalsIgnoreCase("Integer")) {
             return mdWriter.getClasse(className, Standard.ISO_19103);
         }  else if (className.equalsIgnoreCase("Long")) {
@@ -725,7 +743,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
             
             final long time = System.currentTimeMillis() - start;
             LOGGER.info("inserted new Form: " + f.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " +  writeTime + ")");
-            indexer.indexDocument(f);
+            if (indexer != null) {
+                indexer.indexDocument(f);
+            }
             return true;
         }
         return false;

@@ -371,7 +371,7 @@ INSERT INTO "Schemas"."CodeListElements"  VALUES ('processor', NULL, 'ISO 19115'
  *--------------  Classe TimePosition -------------*
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Classes"  VALUES('TimePosition',NULL,'ISO 19108',NULL,0,NULL,NULL, ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('position', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition','Date', NULL, 'O',0 , 'ISO 19103','ISO 19108', ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('value', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition','Date', NULL, 'O',0 , 'ISO 19103','ISO 19108', ' ');
  INSERT INTO "Schemas"."Properties"  VALUES('calendarEraName', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition','CharacterString', NULL, 'O',1 , 'ISO 19103','ISO 19108', ' ');
  INSERT INTO "Schemas"."Properties"  VALUES('frame', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition','CharacterString', NULL, 'O',2 , 'ISO 19103','ISO 19108', ' ');
  INSERT INTO "Schemas"."Properties"  VALUES('indeterminatePosition', NULL, 'ISO 19108', NULL, 0, 1,'TimePosition', NULL, 'TimeIndeterminateValue', 'O',3 , 'ISO 19108','ISO 19108', ' ');

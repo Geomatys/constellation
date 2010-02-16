@@ -52,6 +52,18 @@ public class UtilTest {
      * @throws java.lang.Exception
      */
     @Test
+    public void md5EncoderTest() throws Exception {
+
+        String unencoded = "adminadmin";
+        String result = StringUtilities.MD5encode(unencoded);
+        String expresult = "f6fdffe48c908deb0f4c3bd36c032e72";
+        assertEquals(expresult, result);
+    }
+
+    /**
+     * @throws java.lang.Exception
+     */
+    @Test
     public void cleanSpecialCharacterTest() throws Exception {
 
         String dirty = "lé oiseaux chantè à l'aube OLÉÉÉÉÉÉÉ";
