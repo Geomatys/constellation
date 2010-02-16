@@ -149,7 +149,7 @@ public class MDWebSensorWriter implements SensorWriter {
 
             //and we write it in the sensorML Database
 
-            final Form f = xmlReader.readForm(sensorMLCatalog, mainUser, "source", id, Standard.SENSORML);
+            final Form f = xmlReader.readForm(sensorMLCatalog, mainUser, id, Standard.SENSORML);
             sensorMLWriter.writeForm(f, false, true);
 
         } catch (ParserConfigurationException ex) {

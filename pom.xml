@@ -160,6 +160,7 @@
   -->
   <properties>
     <geotoolkit.version>SNAPSHOT</geotoolkit.version>
+    <mdweb-meta.version>2.1-SNAPSHOT</mdweb-meta.version>
     <constellation.config>org.constellation.configuration.ws</constellation.config>
     <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
     <constellation.map>org.constellation.map.ws.rs</constellation.map>
@@ -307,12 +308,12 @@
       <dependency>
         <groupId>org.mdweb.metamodel</groupId>
        <artifactId>mdweb-metamodel-lib-model</artifactId>
-        <version>2.0-SNAPSHOT</version>
+        <version>${mdweb-meta.version}</version>
       </dependency>
       <dependency>
         <groupId>org.mdweb.metamodel</groupId>
        <artifactId>mdweb-metamodel-lib-thesaurus</artifactId>
-        <version>2.0-SNAPSHOT</version>
+        <version>${mdweb-meta.version}</version>
       </dependency>
       <!-- geoapi -->
       <dependency>

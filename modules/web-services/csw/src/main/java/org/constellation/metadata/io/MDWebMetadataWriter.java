@@ -32,6 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 
 // JAXB dependencies
+import java.util.UUID;
 import javax.xml.bind.JAXBElement;
 
 // constellation dependencies
@@ -197,7 +198,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
             if  (className.equals("DefaultMetadata")) {
                 defaultProfile = mdWriter.getProfile("ISO_19115");
             }
-            final Form form = new Form(-1, mdCatalog, title, user, null, defaultProfile, creationDate, false, false, "normalForm");
+            UUID identifier = UUID.randomUUID();
+            final Form form = new Form(-1, identifier, mdCatalog, title, user, null, defaultProfile, creationDate, creationDate, null, false, false, "normalForm");
             
             final Classe rootClasse = getClasseFromObject(object);
             if (rootClasse != null) {
