@@ -27,9 +27,11 @@ import java.util.logging.Logger;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class ReflectionUtilities {
+public final class ReflectionUtilities {
 
     private static final Logger LOGGER = Logger.getLogger("org.constellation.util");
+
+    private ReflectionUtilities() {}
 
     /**
      * Call the empty constructor on the specified class and return the result,

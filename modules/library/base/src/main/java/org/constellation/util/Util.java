@@ -448,9 +448,9 @@ public final class Util {
     public static File scanFile(final URI u, final String filePackageName) throws IOException {
         final String scheme = u.getScheme();
         if (scheme.equals("file")) {
-            final File f = new File(u.getPath());
-            return f;
-        } else if (scheme.equals("jar") || scheme.equals("zip")) {
+            return new File(u.getPath());
+        }
+        if (scheme.equals("jar") || scheme.equals("zip")) {
             final File f = new File(System.getProperty("java.io.tmpdir") + "/Constellation");
             if (f != null && f.exists()) {
                 final File fConfig = new File(f, filePackageName);
@@ -461,7 +461,7 @@ public final class Util {
                 }
             } else {
                 LOGGER.info("The Constellation directory was not present in the temporary folder.");
-        }
+            }
         }
         return null;
     }
@@ -745,12 +745,11 @@ public final class Util {
      * 
      * @return a Properties Object.
      */
-    public static Properties getPropertiesFromFile(final File f) throws  IOException {
+    public static Properties getPropertiesFromFile(final File f) throws IOException {
         if (f != null) {
             final Properties prop = new Properties();
             if (f.exists()) {
-                FileInputStream in = null;
-                in = new FileInputStream(f);
+                final FileInputStream in = new FileInputStream(f);
                 prop.load(in);
                 in.close();
             } else {
@@ -931,19 +930,19 @@ public final class Util {
             in.close();
 
             final Statement stmt  = connection.createStatement();
-            String SQLQuery       = sw.toString();
-            int end               = SQLQuery.indexOf(';');
+            String SqlQuery       = sw.toString();
+            int end               = SqlQuery.indexOf(';');
             int nbQuery           = 0;
             while (end != -1) {
-                final String singleQuery = SQLQuery.substring(0, end);
+                final String singleQuery = SqlQuery.substring(0, end);
                 try {
                     stmt.execute(singleQuery);
                     nbQuery++;
                 } catch (SQLException ex) {
                     LOGGER.severe("SQLException while executing: " + singleQuery + '\n' + ex.getMessage() + '\n' + " in file:" + path + " instruction n° " + nbQuery);
                 }
-                SQLQuery = SQLQuery.substring(end + 1);
-                end      = SQLQuery.indexOf(';');
+                SqlQuery = SqlQuery.substring(end + 1);
+                end      = SqlQuery.indexOf(';');
             }
         } catch (IOException ex) {
             LOGGER.severe("IOException creating statement:" + '\n' + ex.getMessage());
