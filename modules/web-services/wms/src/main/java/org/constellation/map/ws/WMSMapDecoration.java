@@ -142,7 +142,7 @@ public final class WMSMapDecoration {
     /**
      * Decoration extension for map queries.
      */
-    private static PortrayalExtension EXTENSION = null;
+    private static PortrayalExtension extension = null;
 
     /**
      * The default legend template.
@@ -169,7 +169,7 @@ public final class WMSMapDecoration {
      */
     public static synchronized PortrayalExtension getExtension() {
 
-        if(EXTENSION != null) return EXTENSION;
+        if(extension != null) return extension;
 
         //load the portrayal extension
         final String path = ConfigDirectory.getConfigDirectory().getPath() + File.separator + "WMSPortrayal.xml";
@@ -177,7 +177,7 @@ public final class WMSMapDecoration {
         final File f = new File(path);
         if(f.exists()){
             try {
-                EXTENSION = read(f);
+                extension = read(f);
             } catch (ParserConfigurationException ex) {
                 LOGGER.log(Level.WARNING, null, ex);
             } catch (SAXException ex) {
@@ -188,13 +188,13 @@ public final class WMSMapDecoration {
         }
 
         //no configuration available, make an empty
-        if(EXTENSION == null){
+        if(extension == null){
             LOGGER.log(Level.FINE, "No WMS portrayal extension found, will create an empty extension");
-            EXTENSION = new DecorationExtension();
+            extension = new DecorationExtension();
         }
 
 
-        return EXTENSION;
+        return extension;
     }
 
     public static PortrayalExtension read(File configFile)

@@ -395,10 +395,6 @@ public class WMSService extends GridWebService {
      */
     private GetFeatureInfo adaptGetFeatureInfo(final String version, final QueryContext queryContext) throws CstlServiceException, NumberFormatException {
         final GetMap getMap  = adaptGetMap(version, false, queryContext);
-        ServiceDef serviceDef = getVersionFromNumber(version);
-        if (serviceDef == null) {
-            serviceDef = getBestVersion(null);
-        }
         isVersionSupported(version);
         final String strX    = getParameter(version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_I_V111 : KEY_I_V130, true);
         final String strY    = getParameter(version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_J_V111 : KEY_J_V130, true);
@@ -511,7 +507,7 @@ public class WMSService extends GridWebService {
 
         final CoordinateReferenceSystem crs;
         try {
-            if(version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) && strCRS.toLowerCase().equals("epsg:4326")){
+            if(version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) && strCRS.equalsIgnoreCase("epsg:4326")){
                 //if we are in 1.1.1 that mean EPSG:4326 define a false EPSG:4326
                 //we must replace it by CRS:84 which is the correct match
                 strCRS = "CRS:84";

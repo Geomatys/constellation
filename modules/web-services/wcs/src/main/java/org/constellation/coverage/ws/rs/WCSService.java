@@ -63,6 +63,7 @@ import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.resources.Errors;
+import org.geotoolkit.util.Utilities;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCapabilities;
@@ -543,7 +544,7 @@ public class WCSService extends GridWebService {
             final List<Double[]> ranges = StringUtilities.toCategoriesRange(categories);
             final List<Object> objects = new ArrayList<Object>();
             for (Double[] range : ranges) {
-                if (range[0] == range[1]) {
+                if (Utilities.equals(range[0], range[1])) {
                     objects.add(new org.geotoolkit.wcs.xml.v100.TypedLiteralType(String.valueOf(range[0]), "xs:double"));
                 } else {
                     objects.add(new org.geotoolkit.wcs.xml.v100.IntervalType(
