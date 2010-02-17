@@ -34,89 +34,89 @@ public interface WCSQuery extends Query {
     /**
      * WCS Query service
      */
-    public static final QueryService WCS_SERVICE = new DefaultQueryService("WCS");
+    static final QueryService WCS_SERVICE = new DefaultQueryService("WCS");
 
     /**
      * Request parameters.
      */
-    public static final String DESCRIBECOVERAGE = "DescribeCoverage";
-    public static final String GETCOVERAGE = "GetCoverage";
-    public static final String GETCAPABILITIES = "GetCapabilities";
+    static final String DESCRIBECOVERAGE = "DescribeCoverage";
+    static final String GETCOVERAGE = "GetCoverage";
+    static final String GETCAPABILITIES = "GetCapabilities";
 
     /** Parameter used in getCoverage 1.1.1 */ 
-    public static final String KEY_IDENTIFIER = "IDENTIFIER";
+    static final String KEY_IDENTIFIER = "IDENTIFIER";
     /** Parameter used in getCoverage 1.0.0 */ 
-    public static final String KEY_COVERAGE   = "COVERAGE";
+    static final String KEY_COVERAGE   = "COVERAGE";
 
     /** BBOX for getCoverage in version 1.1.1 */ 
-    public static final String KEY_BOUNDINGBOX = "BOUNDINGBOX";
+    static final String KEY_BOUNDINGBOX = "BOUNDINGBOX";
     /** BBOX for getCoverage in version 1.1.1 */
-    public static final String KEY_STORE = "STORE";
+    static final String KEY_STORE = "STORE";
     /** Parameter used in getCapabilities 1.0.0 */ 
-    public static final String KEY_SECTION = "SECTION";
+    static final String KEY_SECTION = "SECTION";
     /** Parameter used in getCoverage 1.0.0 */ 
-    public static final String KEY_TIME = "TIME";
+    static final String KEY_TIME = "TIME";
     /** Parameter used in getCoverage 1.1.1 */ 
-    public static final String KEY_TIMESEQUENCE = "TIMESEQUENCE";
+    static final String KEY_TIMESEQUENCE = "TIMESEQUENCE";
     /** Parameter used in getCoverage 1.0.0 */ 
-    public static final String KEY_BBOX = "BBOX";
+    static final String KEY_BBOX = "BBOX";
     /** Parameter used in getCoverage 1.0.0 and 1.1.1 */ 
-    public static final String KEY_CRS = "CRS";
+     static final String KEY_CRS = "CRS";
     /** Parameter used in getCoverage 1.0.0 */ 
-    public static final String KEY_RESPONSE_CRS = "RESPONSE_CRS";
+     static final String KEY_RESPONSE_CRS = "RESPONSE_CRS";
     /** Parameter used in getCoverage */
-    public static final String KEY_WIDTH  = "WIDTH";
+     static final String KEY_WIDTH  = "WIDTH";
     /** Parameter used in getCoverage */
-    public static final String KEY_HEIGHT = "HEIGHT";
+     static final String KEY_HEIGHT = "HEIGHT";
     /** Parameter used in getCoverage */
-    public static final String KEY_DEPTH  = "DEPTH";
+     static final String KEY_DEPTH  = "DEPTH";
     /** Parameter used in getCoverage */
-    public static final String KEY_RESX   = "RESX";
+     static final String KEY_RESX   = "RESX";
     /** Parameter used in getCoverage */
-    public static final String KEY_RESY   = "RESY";
+     static final String KEY_RESY   = "RESY";
     /** Parameter used in getCoverage */
-    public static final String KEY_RESZ   = "RESZ";
+     static final String KEY_RESZ   = "RESZ";
     /** Parameter used in getCoverage */
-    public static final String KEY_INTERPOLATION = "INTERPOLATION";
+     static final String KEY_INTERPOLATION = "INTERPOLATION";
     /** Specific Geomatys parameter used in getCoverage */
-    public static final String KEY_CATEGORIES = "CATEGORIES";
+     static final String KEY_CATEGORIES = "CATEGORIES";
 
     /** Parameter used in getCoverage 1.1.1 */
-    public static final String KEY_GRIDCS      = "GRIDCS";
+     static final String KEY_GRIDCS      = "GRIDCS";
     /** Parameter used in getCoverage 1.1.1 */
-    public static final String KEY_GRIDOFFSETS = "GRIDOFFSETS";
+     static final String KEY_GRIDOFFSETS = "GRIDOFFSETS";
     /** Parameter used in getCoverage 1.1.1 */
-    public static final String KEY_GRIDORIGIN  = "GRIDORIGIN";
+     static final String KEY_GRIDORIGIN  = "GRIDORIGIN";
     /** Parameter used in getCoverage 1.1.1 */
-    public static final String KEY_GRIDTYPE    = "GRIDTYPE";
+     static final String KEY_GRIDTYPE    = "GRIDTYPE";
     /** Parameter used in getCoverage 1.1.1 */
-    public static final String KEY_GRIDBASECRS = "GRIDBASECRS";
+     static final String KEY_GRIDBASECRS = "GRIDBASECRS";
     /** Parameter used in getCoverage 1.1.1 */
-    public static final String KEY_RANGESUBSET = "RANGESUBSET";
+     static final String KEY_RANGESUBSET = "RANGESUBSET";
 
     /** Parameter used in getCoverage */
-    public static final String KEY_FORMAT = "FORMAT";
+     static final String KEY_FORMAT = "FORMAT";
     /** Format value used in getCoverage */
-    public static final String MATRIX     = "MATRIX";
+     static final String MATRIX     = "MATRIX";
     /** Format value used in getCoverage */
-    public static final String ASCII_GRID = "ASCII-GRID";
+     static final String ASCII_GRID = "ASCII-GRID";
     /** Format value used in getCoverage */
-    public static final String GEOTIFF    = "GEOTIFF";
+     static final String GEOTIFF    = "GEOTIFF";
     /** Format value used in getCoverage */
-    public static final String NETCDF     = "NETCDF";
+     static final String NETCDF     = "NETCDF";
     /** Format value used in getCoverage */
-    public static final String PNG        = "PNG";
+     static final String PNG        = "PNG";
     /** Format value used in getCoverage */
-    public static final String GIF        = "GIF";
+     static final String GIF        = "GIF";
     /** Format value used in getCoverage */
-    public static final String JPG        = "JPG";
+     static final String JPG        = "JPG";
     /** Format value used in getCoverage */
-    public static final String JPEG       = "JPEG";
+     static final String JPEG       = "JPEG";
     /** Format value used in getCoverage */
-    public static final String BMP        = "BMP";
+     static final String BMP        = "BMP";
     /** Format value used in getCoverage */
-    public static final String TIF        = "TIF";
+     static final String TIF        = "TIF";
     /** Format value used in getCoverage */
-    public static final String TIFF       = "TIFF";
+     static final String TIFF       = "TIFF";
 
 }

@@ -29,6 +29,7 @@ import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
+import org.geotoolkit.util.logging.Logging;
 import org.opengis.referencing.FactoryException;
 
 
@@ -44,7 +45,7 @@ public final class QueryAdapter {
     /**
      * The default logger.
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.query");
+    private static final Logger LOGGER = Logging.getLogger(QueryAdapter.class);
 
     private QueryAdapter() {}
     
@@ -115,9 +116,9 @@ public final class QueryAdapter {
             try {
                 sld = sldUtilities.readSLD(url, StyledLayerDescriptor.V_1_0_0);
             } catch (JAXBException ex) {
-                Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             } catch (FactoryException ex) {
-                Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             }
         }
 
