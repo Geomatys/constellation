@@ -44,7 +44,7 @@ public abstract class MetadataReader {
     /**
      * A debugging logger
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.io");
     
     /**
      * A flag indicating if the cache mecanism is enabled or not.
@@ -66,6 +66,12 @@ public abstract class MetadataReader {
      */
     protected DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
+    /**
+     * Initialize the metadata reader base attribute.
+     * 
+     * @param isCacheEnabled A flag indicating if the cache mecanism is enabled or not.
+     * @param isThreadEnabled A flag indicating if the multi thread mecanism is enabled or not.
+     */
     public MetadataReader(boolean isCacheEnabled, boolean isThreadEnabled) {
         this.isCacheEnabled  = isCacheEnabled;
         this.isThreadEnabled = isThreadEnabled;
@@ -75,12 +81,12 @@ public abstract class MetadataReader {
      * Return a metadata object from the specified identifier.
      * 
      * @param identifier The metadata identifier.
-     * @param mode An output schema mode: EBRIM, ISO_19115 and DUBLINCORE supported.
+     * @param mode An output schema mode: EBRIM, ISO_19115, DUBLINCORE and SENSORML supported.
      * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
      * @param elementName A list of QName describing the requested fields. (implies type == null)
      * 
      * @return A marshallable metadata object.
-     * @throws java.sql.SQLException
+     * @throws CstlServiceException
      */
     public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException;
     
@@ -134,9 +140,9 @@ public abstract class MetadataReader {
     public abstract void destroy();
 
     /**
-     * Add a metadata to the cache.
+     * Remove a metadata from the cache.
+     * 
      * @param identifier The metadata identifier.
-     * @param metadata The object to put in cache.
      */
     public void removeFromCache(String identifier) {
         if (isCacheEnabled)
@@ -145,6 +151,7 @@ public abstract class MetadataReader {
 
     /**
      * Add a metadata to the cache.
+     *
      * @param identifier The metadata identifier.
      * @param metadata The object to put in cache.
      */
@@ -163,14 +170,14 @@ public abstract class MetadataReader {
     }
     
     /**
-     * Return true is the cache mecanism is enbled.
+     * Return true is the cache mecanism is enabled.
      */
     public boolean isCacheEnabled() {
         return isCacheEnabled;
     }
 
     /**
-     * Return true is the cache mecanism is enbled.
+     * Return true is the cache mecanism is enabled.
      */
     public boolean isThreadEnabled() {
         return isThreadEnabled;

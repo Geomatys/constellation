@@ -697,10 +697,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
     
     
     /**
-     * Record an object in the metadata database.
-     * 
-     * @param obj The object to store in the database.
-     * @return true if the storage succeed, false else.
+     * {@inheritDoc}
      */
     @Override
     public boolean storeMetadata(Object obj) throws CstlServiceException {
@@ -754,7 +751,7 @@ public class MDWebMetadataWriter extends MetadataWriter {
     }
     
     /**
-     * Destoy all the resource and close connection.
+     * {@inheritDoc}
      */
     @Override
     public void destroy() {
@@ -771,16 +768,25 @@ public class MDWebMetadataWriter extends MetadataWriter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteSupported() {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean updateSupported() {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteMetadata(String identifier) throws CstlServiceException {
         LOGGER.info("metadata to delete:" + identifier);
@@ -812,6 +818,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean replaceMetadata(String metadataID, Object any) throws CstlServiceException {
         final boolean succeed = deleteMetadata(metadataID);
@@ -820,6 +829,9 @@ public class MDWebMetadataWriter extends MetadataWriter {
         return storeMetadata(any);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws CstlServiceException {
         LOGGER.info("metadataID: " + metadataID);

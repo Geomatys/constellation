@@ -54,7 +54,7 @@ public abstract class MetadataWriter {
     /**
      * A debugging logger.
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.io");
     
     /**
      * Record the date format in the metadata.
@@ -82,11 +82,11 @@ public abstract class MetadataWriter {
     }
 
     /**
-     * This method try to find a title to this object.
+     * This method try to find a title for this object.
      * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
-     * else we try to find a getName() method.
+     * else we try to find a getName(), getTitle(), or getId() method.
      * 
-     * @param obj the object for wich we want a title
+     * @param obj the object for which we want a title.
      * 
      * @return the founded title or UNKNOW_TITLE
      */
@@ -147,7 +147,7 @@ public abstract class MetadataWriter {
                 
                 
                 } catch (NoSuchMethodException ex) {
-                    LOGGER.finer("not " + methodName + " method in " + obj.getClass().getSimpleName());
+                    LOGGER.finer("There is no " + methodName + " method in " + obj.getClass().getSimpleName());
                 } catch (SecurityException ex) {
                     LOGGER.severe(" security exception while getting the title of the object.");
                 }
@@ -177,32 +177,32 @@ public abstract class MetadataWriter {
                     if (title == null)
                         title = UNKNOW_TITLE;
                 } catch (IllegalAccessException ex) {
-                    LOGGER.severe("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' + 
+                    LOGGER.warning("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' +
                                   "cause: " + ex.getMessage());
                 } catch (IllegalArgumentException ex) {
-                    LOGGER.severe("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
+                    LOGGER.warning("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
                                   "cause: " + ex.getMessage());
                 } catch (InvocationTargetException ex) {
-                    LOGGER.severe("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
+                    LOGGER.warning("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
                                   "cause: " + ex.getMessage());
                 }
             }
             
             if (title.equals(UNKNOW_TITLE))
-                LOGGER.severe("unknow type: " + obj.getClass().getName() + " unable to find a title");
+                LOGGER.warning("unknow type: " + obj.getClass().getName() + " unable to find a title, using default then.");
         }
         return title;
     }
 
 
     /**
-     * This method try to find a title to this object.
-     * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
-     * else we try to find a getName() method.
+     * This method try to find an Identifier for this object.
+     * if the object is a ISO19115:Metadata or CSW:Record we know were to search the identifier,
+     * else we try to find a getId(), getIdentifier() or getFileIdentifier() method.
      *
-     * @param obj the object for wich we want a title
+     * @param obj the object for wich we want a identifier.
      *
-     * @return the founded title or UNKNOW_TITLE
+     * @return the founded identifier or UNKNOW_IDENTIFIER
      */
     protected String findIdentifier(Object obj) {
 
@@ -250,7 +250,7 @@ public abstract class MetadataWriter {
                 } catch (NoSuchMethodException ex) {
                     LOGGER.finer("there is no " + methodName + " method in " + obj.getClass().getSimpleName());
                 } catch (SecurityException ex) {
-                    LOGGER.severe(" security exception while getting the identifier of the object.");
+                    LOGGER.warning(" security exception while getting the identifier of the object.");
                 }
                 if (nameGetter != null) {
                     i = 3;
@@ -278,19 +278,19 @@ public abstract class MetadataWriter {
                     if (identifier == null)
                         identifier = UNKNOW_IDENTIFIER;
                 } catch (IllegalAccessException ex) {
-                    LOGGER.severe("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' +
+                    LOGGER.warning("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' +
                                   "cause: " + ex.getMessage());
                 } catch (IllegalArgumentException ex) {
-                    LOGGER.severe("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
+                    LOGGER.warning("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
                                   "cause: " + ex.getMessage());
                 } catch (InvocationTargetException ex) {
-                    LOGGER.severe("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
+                    LOGGER.warning("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
                                   "cause: " + ex.getMessage());
                 }
             }
 
             if (identifier.equals(UNKNOW_IDENTIFIER))
-                LOGGER.severe("unknow type: " + obj.getClass().getName() + " unable to find an identifier");
+                LOGGER.warning("unknow type: " + obj.getClass().getName() + " unable to find an identifier, using default then.");
         }
         return identifier;
     }
@@ -332,9 +332,9 @@ public abstract class MetadataWriter {
     }
     
     /**
-     * Record an object in the metadata database.
+     * Record an object in the metadata datasource.
      * 
-     * @param obj The object to store in the database.
+     * @param obj The object to store in the datasource.
      * @return true if the storage succeed, false else.
      */
     public abstract boolean storeMetadata(Object obj) throws CstlServiceException;
@@ -342,12 +342,13 @@ public abstract class MetadataWriter {
     /**
      * Delete an object in the metadata database.
      * @param metadataID The identifier of the metadata to delete.
+     * @return true if the delete succeed, false else.
      */
     public abstract boolean deleteMetadata(String metadataID) throws CstlServiceException;
 
 
     /**
-     * Replace an object in the metadata database.
+     * Replace an object in the metadata datasource.
      *
      * @param metadataID The identifier of the metadata to Replace.
      * @param any The object to replace the matching metadata.
