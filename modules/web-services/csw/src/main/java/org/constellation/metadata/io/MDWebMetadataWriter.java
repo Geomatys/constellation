@@ -359,7 +359,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
                         propName = "abbreviation";
                     } else if (prop.getName().equalsIgnoreCase("uom") && !object.getClass().getSimpleName().equals("QuantityType")
                                                                       && !object.getClass().getSimpleName().equals("QuantityRange")
-                                                                      && !object.getClass().getSimpleName().equals("TimeRange")) {
+                                                                      && !object.getClass().getSimpleName().equals("TimeRange")
+                                                                      && !object.getClass().getSimpleName().equals("TimeType")) {
                         propName = "unit";
                     } else if (prop.getName().equalsIgnoreCase("position") && object.getClass().getSimpleName().equals("DefaultPosition")) {
                         propName = "date";
@@ -497,7 +498,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
                                        && !className.equals("GeometricObjectType")
                                        && !className.equals("SpatialRepresentationType")
                                        && !className.equals("AssociationType")
-                                       && !className.equals("InitiativeType")) {
+                                       && !className.equals("InitiativeType")
+                                       && !className.equals("CodeType")) {
             className = className.substring(0, className.length() - 4);
         }
         
@@ -509,8 +511,8 @@ public class MDWebMetadataWriter extends MetadataWriter {
             availableStandards.add(mainStandard);
             availableStandards.add(Standard.ISO_19108);
             availableStandards.add(Standard.ISO_19103);
-            availableStandards.add(mdWriter.getStandard("ISO 19119"));
-            availableStandards.add(mdWriter.getStandard("ISO 19110"));
+            availableStandards.add(Standard.ISO_19119);
+            availableStandards.add(Standard.ISO_19110);
         
         // CSW standard    
         } else if (Standard.CSW.equals(mainStandard)) {
@@ -552,9 +554,11 @@ public class MDWebMetadataWriter extends MetadataWriter {
              * we affect the standard in some special case
              */
             if (packageName.equals("org.geotoolkit.service")) {
-                standard = mdWriter.getStandard("ISO 19119");
+                standard = Standard.ISO_19119;
             } else if (packageName.equals("org.geotoolkit.sml.xml.v100")) {
                 standard = Standard.SENSORML;
+            } else if (packageName.equals("org.geotoolkit.swe.xml.v100")) {
+                standard = mdWriter.getStandard("Sensor Web Enablement");
             } else if (packageName.equals("org.geotoolkit.gml.xml.v311")) {
                 standard = Standard.ISO_19108;
             }

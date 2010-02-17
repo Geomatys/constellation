@@ -243,6 +243,8 @@ public class MDWebMetadataReaderTest {
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getCoordinate(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector().getCoordinate());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation().getVector());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocation());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getReferenceFrame(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getReferenceFrame());
+        assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocalFrame(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition().getLocalFrame());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getPosition(), resProcess.getPositions().getPositionList().getPosition().get(0).getPosition());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getVector(), resProcess.getPositions().getPositionList().getPosition().get(0).getVector());
         assertEquals(expProcess.getPositions().getPositionList().getPosition().get(0).getName(), resProcess.getPositions().getPositionList().getPosition().get(0).getName());

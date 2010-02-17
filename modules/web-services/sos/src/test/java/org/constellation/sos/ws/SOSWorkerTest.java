@@ -929,7 +929,7 @@ public class SOSWorkerTest {
         assertEquals(expT.getUom(), obsT.getUom());
         assertEquals(expT, obsT);
         assertEquals(i1.next(), i2.next());
-        //assertEquals(expSdr.getField(), obsSdr.getField());
+
         assertEquals(expSdr, obsSdr);
         assertEquals(expR.getDataArray().getElementType(),     obsR.getDataArray().getElementType());
         assertEquals(expR.getDataArray().getEncoding(),        obsR.getDataArray().getEncoding());
