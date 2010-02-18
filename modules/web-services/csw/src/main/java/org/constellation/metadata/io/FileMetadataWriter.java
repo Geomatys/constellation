@@ -39,17 +39,19 @@ import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.csw.xml.Record;
+import org.geotoolkit.dublincore.xml.AbstractSimpleLiteral;
+import org.geotoolkit.ebrim.xml.RegistryObject;
+import org.geotoolkit.lucene.index.AbstractIndexer;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWClassesContext;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
 // GeoApi dependencies
-import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.opengis.util.InternationalString;
 
 
@@ -68,7 +70,9 @@ public class FileMetadataWriter extends MetadataWriter {
      * A directory in witch the metadata files are stored.
      */
     private final File dataDirectory;
-    
+
+    private static final String UNKNOW_IDENTIFIER = "unknow_identifier";
+     
     /**
      * 
      * @param index
@@ -93,6 +97,106 @@ public class FileMetadataWriter extends MetadataWriter {
             throw new CstlServiceException("JAXB exception while creating unmarshaller", NO_APPLICABLE_CODE);
         }
         
+    }
+
+    /**
+     * This method try to find an Identifier for this object.
+     * if the object is a ISO19115:Metadata or CSW:Record we know were to search the identifier,
+     * else we try to find a getId(), getIdentifier() or getFileIdentifier() method.
+     *
+     * @param obj the object for wich we want a identifier.
+     *
+     * @return the founded identifier or UNKNOW_IDENTIFIER
+     */
+    protected static String findIdentifier(Object obj) {
+
+        //here we try to get the identifier
+        AbstractSimpleLiteral identifierSL = null;
+        String identifier = UNKNOW_IDENTIFIER;
+        if (obj instanceof Record) {
+            identifierSL = ((Record) obj).getIdentifier();
+
+            if (identifierSL == null) {
+                identifier = UNKNOW_IDENTIFIER;
+            } else {
+                if (identifierSL.getContent().size() > 0)
+                    identifier = identifierSL.getContent().get(0);
+            }
+
+        } else if (obj instanceof DefaultMetadata) {
+            identifier = ((DefaultMetadata) obj).getFileIdentifier();
+
+        } else if (obj instanceof RegistryObject) {
+            identifier = ((RegistryObject) obj).getId();
+
+        } else {
+            Method nameGetter = null;
+            String methodName = "";
+            int i = 0;
+            while (i < 3) {
+                try {
+                    switch (i) {
+                        case 0: methodName = "getId";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+
+                        case 1: methodName = "getIdentifier";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+
+                        case 2: methodName = "getFileIdentifier";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+                        default: break;
+                    }
+
+
+                } catch (NoSuchMethodException ex) {
+                    LOGGER.finer("there is no " + methodName + " method in " + obj.getClass().getSimpleName());
+                } catch (SecurityException ex) {
+                    LOGGER.warning(" security exception while getting the identifier of the object.");
+                }
+                if (nameGetter != null) {
+                    i = 3;
+                } else {
+                    i++;
+                }
+            }
+
+            if (nameGetter != null) {
+                try {
+                    final Object objT = nameGetter.invoke(obj);
+                    if (objT instanceof String) {
+                        identifier = (String) obj;
+
+                    } else if (objT instanceof AbstractSimpleLiteral) {
+                        identifierSL = (AbstractSimpleLiteral) objT;
+                        if (identifierSL.getContent().size() > 0)
+                            identifier = identifierSL.getContent().get(0);
+                        else identifier = UNKNOW_IDENTIFIER;
+
+                    } else {
+                        identifier = UNKNOW_IDENTIFIER;
+                    }
+
+                    if (identifier == null)
+                        identifier = UNKNOW_IDENTIFIER;
+                } catch (IllegalAccessException ex) {
+                    LOGGER.warning("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' +
+                                  "cause: " + ex.getMessage());
+                } catch (IllegalArgumentException ex) {
+                    LOGGER.warning("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
+                                  "cause: " + ex.getMessage());
+                } catch (InvocationTargetException ex) {
+                    LOGGER.warning("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
+                                  "cause: " + ex.getMessage());
+                }
+            }
+
+            if (identifier.equals(UNKNOW_IDENTIFIER))
+                LOGGER.warning("unknow type: " + obj.getClass().getName() + " unable to find an identifier, using default then.");
+        }
+        return identifier;
     }
 
     @Override

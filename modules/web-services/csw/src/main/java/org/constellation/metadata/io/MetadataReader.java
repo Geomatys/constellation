@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,8 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+
+/// geotoolkit dependencies
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
+
+// Constellation dependencies
 import org.constellation.ws.CstlServiceException;
 
 /**
@@ -110,7 +114,7 @@ public abstract class MetadataReader {
     public abstract List<? extends Object> getAllEntries() throws CstlServiceException;
 
      /**
-     * Return all the entries from the database
+     * Return all the entries identifiers from the database
      */
     public abstract List<String> getAllIdentifiers() throws CstlServiceException;
     
@@ -120,12 +124,12 @@ public abstract class MetadataReader {
     public abstract List<Integer> getSupportedDataTypes();
 
     /**
-     * Return the list of QName for Additional queryable element.
+     * Return the list of QName for additional queryable element.
      */
     public abstract List<QName> getAdditionalQueryableQName();
 
     /**
-     * Return the list of Additional queryable element.
+     * Return the list of path for the additional queryable element.
      */
     public abstract Map<String, List<String>> getAdditionalQueryablePathMap();
 
