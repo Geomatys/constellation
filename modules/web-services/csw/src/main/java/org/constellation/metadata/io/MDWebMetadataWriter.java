@@ -42,7 +42,6 @@ import org.constellation.generic.database.BDD;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
-import org.constellation.ws.CstlServiceException;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
@@ -122,15 +121,15 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
      * Build a new metadata writer.
      * 
      */
-    public MDWebMetadataWriter(Automatic configuration, AbstractIndexer index) throws CstlServiceException {
+    public MDWebMetadataWriter(Automatic configuration, AbstractIndexer index) throws MetadataIoException {
         super(index);
         if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration object is null", NO_APPLICABLE_CODE);
         }
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
         try {
 
@@ -145,10 +144,10 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
             this.user     = mdWriter.getUser("admin");
 
         } catch (MD_IOException ex) {
-            throw new CstlServiceException("MD_IOException while initializing the MDWeb writer:" +'\n'+
+            throw new MetadataIoException("MD_IOException while initializing the MDWeb writer:" +'\n'+
                                            "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
-            throw new CstlServiceException("SQLException while initializing the MDWeb writer:" +'\n'+
+            throw new MetadataIoException("SQLException while initializing the MDWeb writer:" +'\n'+
                                            "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
         
@@ -830,7 +829,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean storeMetadata(Object obj) throws CstlServiceException {
+    public boolean storeMetadata(Object obj) throws MetadataIoException {
         // profiling operation
         final long start = System.currentTimeMillis();
         long transTime   = 0;
@@ -848,10 +847,10 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
             transTime = System.currentTimeMillis() - startTrans;
             
         } catch (IllegalArgumentException e) {
-             throw new CstlServiceException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
+             throw new MetadataIoException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
                                            "cause: " + e.getMessage(),NO_APPLICABLE_CODE);
         } catch (MD_IOException e) {
-             throw new CstlServiceException("The service has throw an SQLException while writing the metadata: " + e.getMessage(),
+             throw new MetadataIoException("The service has throw an SQLException while writing the metadata: " + e.getMessage(),
                                             NO_APPLICABLE_CODE);
         }
         
@@ -866,7 +865,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
                 throw e;
                 //return false;*/
             } catch (MD_IOException e) {
-                throw new CstlServiceException("The service has throw an SQLException while writing the metadata :" + e.getMessage(), e, 
+                throw new MetadataIoException("The service has throw an SQLException while writing the metadata :" + e.getMessage(), e,
                         NO_APPLICABLE_CODE);
             }
             
@@ -918,7 +917,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean deleteMetadata(String identifier) throws CstlServiceException {
+    public boolean deleteMetadata(String identifier) throws MetadataIoException {
         LOGGER.info("metadata to delete:" + identifier);
 
         int id;
@@ -933,7 +932,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
                 throw new NumberFormatException();
             }
         } catch (NumberFormatException e) {
-             throw new CstlServiceException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id");
+             throw new MetadataIoException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id");
         }
         try {
             final Catalog catalog = mdWriter.getCatalog(catalogCode);
@@ -941,7 +940,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
 
             mdWriter.deleteForm(f.getId());
         } catch (MD_IOException ex) {
-            throw new CstlServiceException("The service has throw an SQLException while deleting the metadata: " + ex.getMessage(),
+            throw new MetadataIoException("The service has throw an SQLException while deleting the metadata: " + ex.getMessage(),
                         NO_APPLICABLE_CODE);
         }
         indexer.removeDocument(identifier);
@@ -952,7 +951,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean replaceMetadata(String metadataID, Object any) throws CstlServiceException {
+    public boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException {
         final boolean succeed = deleteMetadata(metadataID);
         if (!succeed)
             return false;
@@ -963,7 +962,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
      * {@inheritDoc}
      */
     @Override
-    public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws CstlServiceException {
+    public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException {
         LOGGER.info("metadataID: " + metadataID);
         int id;
         String catalogCode = "";
@@ -978,14 +977,14 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
                 throw new NumberFormatException();
             }
         } catch (NumberFormatException e) {
-             throw new CstlServiceException("Unable to parse: " + metadataID, NO_APPLICABLE_CODE, "id");
+             throw new MetadataIoException("Unable to parse: " + metadataID, NO_APPLICABLE_CODE, "id");
         }
         try {
             final Catalog catalog = mdWriter.getCatalog(catalogCode);
             f                     = mdWriter.getForm(catalog, id);
 
         } catch (MD_IOException ex) {
-            throw new CstlServiceException("The service has throw an SQLException while updating the metadata: " + ex.getMessage(),
+            throw new MetadataIoException("The service has throw an SQLException while updating the metadata: " + ex.getMessage(),
                         NO_APPLICABLE_CODE);
         }
 
@@ -998,7 +997,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
                 final List<Value> matchingValues = f.getValueFromNumberedPath(mp.path, mp.idValue);
 
                 if (matchingValues.size() == 0) {
-                    throw new CstlServiceException("There is no value matching for the xpath:" + property.getName(), INVALID_PARAMETER_VALUE);
+                    throw new MetadataIoException("There is no value matching for the xpath:" + property.getName(), INVALID_PARAMETER_VALUE);
                 }
                 for (Value v : matchingValues) {
                     LOGGER.finer("value:" + v);
@@ -1014,7 +1013,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
                                 LOGGER.finer(timeValue);
                                 Timestamp.valueOf(timeValue);
                             } catch(IllegalArgumentException ex) {
-                                throw new CstlServiceException("The type of the replacement value does not match with the value type : Date",
+                                throw new MetadataIoException("The type of the replacement value does not match with the value type : Date",
                                     INVALID_PARAMETER_VALUE);
                             }
                         }
@@ -1024,7 +1023,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
                         final Classe requestType = getClasseFromObject(value);
                         final Classe valueType   = v.getType();
                         if (!Utilities.equals(requestType, valueType)) {
-                            throw new CstlServiceException("The type of the replacement value (" + requestType.getName() +
+                            throw new MetadataIoException("The type of the replacement value (" + requestType.getName() +
                                                            ") does not match with the value type :" + valueType.getName(),
                                     INVALID_PARAMETER_VALUE);
                         } else {
@@ -1038,9 +1037,9 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
                     }
                 }
             } catch (MD_IOException ex) {
-                throw new CstlServiceException(ex);
+                throw new MetadataIoException(ex);
             } catch (IllegalArgumentException ex) {
-                throw new CstlServiceException(ex);
+                throw new MetadataIoException(ex);
             }
             indexer.removeDocument(metadataID);
             indexer.indexDocument(f);
@@ -1055,9 +1054,9 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
      *
      * @return An MDWeb path
      * @throws java.sql.SQLException
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws org.constellation.ws.MetadataIoException
      */
-    private MixedPath getMDWPathFromXPath(String xpath) throws MD_IOException, CstlServiceException {
+    private MixedPath getMDWPathFromXPath(String xpath) throws MD_IOException, MetadataIoException {
         String idValue = "";
         //we remove the first '/'
         if (xpath.startsWith("/")) {
@@ -1079,7 +1078,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
             mainStandard = Standard.CSW;
             type = mdWriter.getClasse("Record", mainStandard);
         } else {
-            throw new CstlServiceException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
+            throw new MetadataIoException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
         }
 
         Path p  = new Path(mainStandard, type);
@@ -1096,11 +1095,11 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
                         final String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
                         ordinal = Integer.parseInt(ordinalValue);
                     } catch (NumberFormatException ex) {
-                        throw new CstlServiceException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
+                        throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
                     }
                     propertyName = propertyName.substring(0, propertyName.indexOf('['));
                 } else {
-                    throw new CstlServiceException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
+                    throw new MetadataIoException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
                 }
             }
 
@@ -1125,11 +1124,11 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
                     final String ordinalValue = xpath.substring(xpath.indexOf('[') + 1, xpath.indexOf(']'));
                     ordinal = Integer.parseInt(ordinalValue);
                 } catch (NumberFormatException ex) {
-                    throw new CstlServiceException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
+                    throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
                 }
                 xpath = xpath.substring(0, xpath.indexOf('['));
             } else {
-                throw new CstlServiceException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
+                throw new MetadataIoException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
             }
         }
         idValue = idValue + ':' + xpath + '.';
@@ -1144,7 +1143,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
         return new MixedPath(p, idValue);
     }
 
-    private Property getProperty(final Classe type, String propertyName) throws MD_IOException, CstlServiceException {
+    private Property getProperty(final Classe type, String propertyName) throws MD_IOException, MetadataIoException {
         // Special case for a bug in MDWeb
         if (propertyName.equals("geographicElement")) {
             propertyName = "geographicElement2";
@@ -1160,7 +1159,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
                 }
             }
             if (property == null) {
-                throw new CstlServiceException("There is no property:" + propertyName + " in the class " + type.getName(), INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException("There is no property:" + propertyName + " in the class " + type.getName(), INVALID_PARAMETER_VALUE);
             }
         }
         return property;

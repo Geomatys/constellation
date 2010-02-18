@@ -1944,7 +1944,7 @@ public class SOSworker {
      * In some implementations there is no sicade directory.
      * So if we don't find The .constellation/sos_configuration directory
      * IFREMER hack
-     * we search the deployed war directory /WEB-INF/classes/sos_configuration
+     * we search the deployed war directory /WEB-INF/classes/configuration
      */
     private File getConfigDirectory() {
         final String configUrl = "sos_configuration";
@@ -1955,9 +1955,9 @@ public class SOSworker {
         } else {
 
             /* Ifremer's server does not contain any .constellation directory, so the
-             * configuration files are put under the WEB-INF/classes/sos_configuration directory of the WAR file.
+             * configuration files are put under the WEB-INF/classes/configuration/sos_configuration directory of the WAR file.
              */
-            return Util.getDirectoryFromResource(configUrl);
+            return Util.getDirectoryFromResource("configuration");
         }
     }
 

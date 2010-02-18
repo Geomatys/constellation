@@ -49,7 +49,6 @@ import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.constellation.concurrent.BoundedCompletionService;
-import org.constellation.ws.CstlServiceException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.Column;
@@ -159,18 +158,18 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
      * Build a new Generic metadata reader and initialize the statement.
      * @param configuration
      */
-    public GenericMetadataReader(Automatic configuration) throws CstlServiceException {
+    public GenericMetadataReader(Automatic configuration) throws MetadataIoException {
         super(false, true);
         if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration object is null", NO_APPLICABLE_CODE);
         }
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
         if (configuration.getConfigurationDirectory() == null || !configuration.getConfigurationDirectory().exists()) {
-            throw new CstlServiceException("The configuration file does not contains a configuration directory", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration file does not contains a configuration directory", NO_APPLICABLE_CODE);
         }
         this.configuration = configuration;
         try {
@@ -181,10 +180,10 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
             marshallerPool   = new MarshallerPool(getJAXBContext());
             contacts         = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
         } catch (SQLException ex) {
-            throw new CstlServiceException("SQLException while initializing the Generic reader:" + '\n' +
+            throw new MetadataIoException("SQLException while initializing the Generic reader:" + '\n' +
                     "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
-            throw new CstlServiceException("JAXBException while initializing the Generic reader:" + '\n' +
+            throw new MetadataIoException("JAXBException while initializing the Generic reader:" + '\n' +
                     "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
@@ -193,18 +192,18 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
      * Build a new Generic metadata reader and initialize the statement (with a flag for filling the Anchors).
      * @param configuration
      */
-    public GenericMetadataReader(Automatic configuration, boolean fillAnchor) throws CstlServiceException {
+    public GenericMetadataReader(Automatic configuration, boolean fillAnchor) throws MetadataIoException {
         super(false, true);
         if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration object is null", NO_APPLICABLE_CODE);
         }
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
         if (configuration.getConfigurationDirectory() == null || !configuration.getConfigurationDirectory().exists()) {
-            throw new CstlServiceException("The configuration file does not contains a configuration directory", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration file does not contains a configuration directory", NO_APPLICABLE_CODE);
         }
         this.configuration = configuration;
         try {
@@ -216,10 +215,10 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
             marshallerPool   = new MarshallerPool(getJAXBContext());
             contacts         = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
         } catch (SQLException ex) {
-            throw new CstlServiceException("SQLException while initializing the Generic reader:" + '\n' +
+            throw new MetadataIoException("SQLException while initializing the Generic reader:" + '\n' +
                     "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
-            throw new CstlServiceException("JAXBException while initializing the Generic reader:" + '\n' +
+            throw new MetadataIoException("JAXBException while initializing the Generic reader:" + '\n' +
                     "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
@@ -231,10 +230,10 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
      *
      * @param genericConfiguration
      */
-    protected GenericMetadataReader(Automatic configuration, Map<String, ResponsibleParty> contacts) throws CstlServiceException {
+    protected GenericMetadataReader(Automatic configuration, Map<String, ResponsibleParty> contacts) throws MetadataIoException {
         super(false, true);
         if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration object is null", NO_APPLICABLE_CODE);
         }
         this.configuration = configuration;
         try {
@@ -247,7 +246,7 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
             marshallerPool     = new MarshallerPool(getJAXBContext());
 
         } catch (JAXBException ex) {
-            throw new CstlServiceException("JAXBException while initializing the Generic reader:" + '\n' +
+            throw new MetadataIoException("JAXBException while initializing the Generic reader:" + '\n' +
                     "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
@@ -432,7 +431,7 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    private void loadData(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
+    private void loadData(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
         LOGGER.finer("loading data for " + identifier);
         singleValue.clear();
         multipleValue.clear();
@@ -481,9 +480,9 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
     /**
      * Try to reconnect to the database if the connection have been lost.
      * 
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws org.constellation.ws.MetadataIoException
      */
-    public void reloadConnection() throws CstlServiceException {
+    public void reloadConnection() throws MetadataIoException {
         if (!isReconnecting) {
             try {
                LOGGER.info("refreshing the connection");
@@ -497,7 +496,7 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
                 isReconnecting = false;
             }
         }
-        throw new CstlServiceException("The database connection has been lost, the service is trying to reconnect", NO_APPLICABLE_CODE);
+        throw new MetadataIoException("The database connection has been lost, the service is trying to reconnect", NO_APPLICABLE_CODE);
     }
 
     /**
@@ -507,7 +506,7 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
      * @param subSingleStmts
      * @param subMultiStmts
      */
-    private void sequentialLoading(String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) throws CstlServiceException {
+    private void sequentialLoading(String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) throws MetadataIoException {
         //we extract the single values
         for (PreparedStatement stmt : subSingleStmts) {
             try {
@@ -542,14 +541,14 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
      *
      * @param identifier
      */
-    private void paraleleLoading(final String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) throws CstlServiceException {
+    private void paraleleLoading(final String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) throws MetadataIoException {
         //we extract the single values
         CompletionService cs = new BoundedCompletionService(this.pool, 5);
         for (final PreparedStatement stmt : subSingleStmts) {
             cs.submit(new Callable() {
 
                 @Override
-                public Object call() throws CstlServiceException {
+                public Object call() throws MetadataIoException {
                     try {
                         fillStatement(stmt, identifier);
                         fillSingleValues(stmt);
@@ -572,8 +571,8 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
             } catch (InterruptedException ex) {
                LOGGER.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-                if (ex.getCause() instanceof CstlServiceException) {
-                    throw (CstlServiceException) ex.getCause();
+                if (ex.getCause() instanceof MetadataIoException) {
+                    throw (MetadataIoException) ex.getCause();
                 } else {
                     LOGGER.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
                 }
@@ -585,7 +584,7 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
             cs.submit(new Callable() {
 
                 @Override
-                public Object call() throws CstlServiceException {
+                public Object call() throws MetadataIoException {
                     try {
                         fillStatement(stmt, identifier);
                         fillMultipleValues(stmt);
@@ -607,8 +606,8 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
             } catch (InterruptedException ex) {
                LOGGER.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
-                if (ex.getCause() instanceof CstlServiceException) {
-                    throw (CstlServiceException) ex.getCause();
+                if (ex.getCause() instanceof MetadataIoException) {
+                    throw (MetadataIoException) ex.getCause();
                 } else {
                     LOGGER.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
                 }
@@ -669,10 +668,10 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
      * @return A metadata Object (dublin core Record / geotoolkit metadata)
      * 
      * @throws java.sql.SQLException
-     * @throws CstlServiceException
+     * @throws MetadataIoException
      */
     @Override
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
         Object result = null;
         
         //TODO we verify that the identifier exists
@@ -947,7 +946,7 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
      * @throws java.sql.SQLException
      */
     @Override
-    public List<DefaultMetadata> getAllEntries() throws CstlServiceException {
+    public List<DefaultMetadata> getAllEntries() throws MetadataIoException {
         final List<DefaultMetadata> result = new ArrayList<DefaultMetadata>();
         final List<String> identifiers  = getAllIdentifiers();
         for (String id : identifiers) {
@@ -962,7 +961,7 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
      * @return
      */
     @Override
-    public List<String> getAllIdentifiers() throws CstlServiceException {
+    public List<String> getAllIdentifiers() throws MetadataIoException {
         final List<String> result = new ArrayList<String>();
         try {
             final ResultSet res = mainStatement.executeQuery();
@@ -970,7 +969,7 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
                 result.add(res.getString(1));
             }
         } catch (SQLException ex) {
-            throw new CstlServiceException("SQL Exception while getting all the identifiers: " + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new MetadataIoException("SQL Exception while getting all the identifiers: " + ex.getMessage(), NO_APPLICABLE_CODE);
         }
         return result;
     }
@@ -979,9 +978,9 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
      * Return all the contact identifiers used in this database
      * 
      * @return
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws org.constellation.ws.MetadataIoException
      */
-    public List<String> getAllContactID() throws CstlServiceException {
+    public List<String> getAllContactID() throws MetadataIoException {
         final List<String> results = new ArrayList<String>();
         final List<String> identifiers = getAllIdentifiers();
         for (String id : identifiers) {
@@ -1006,12 +1005,12 @@ public abstract class GenericMetadataReader extends CSWMetadataReader {
     }
     
     @Override
-    public List<DomainValues> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
+    public List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException {
          throw new UnsupportedOperationException("Not supported yet.");
     }
     
     @Override
-    public List<String> executeEbrimSQLQuery(String sqlQuery) throws CstlServiceException {
+    public List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     

@@ -60,6 +60,7 @@ import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
@@ -135,6 +136,7 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // GeoAPI dependencies
 import org.opengis.filter.sort.SortOrder;
+import org.opengis.util.CodeList;
 
 
 /**
@@ -337,7 +339,7 @@ public class CSWworker {
             LOGGER.severe(notWorkingMsg + '\n' +
                     "cause: JAXBException while getting configuration");
             isStarted = false;
-        } catch (CstlServiceException e) {
+        } catch (MetadataIoException e) {
             LOGGER.severe(notWorkingMsg + '\n' +
                     "cause:" + e.getMessage());
             isStarted = false;
@@ -776,9 +778,16 @@ public class CSWworker {
            
            // TODO sort not yet implemented
            LOGGER.log(logLevel, "ebrim SQL query obtained:" + sqlQuery);
-           
-           // we try to execute the query
-           results = mdReader.executeEbrimSQLQuery(sqlQuery.getQuery());
+           try {
+            // we try to execute the query
+            results = mdReader.executeEbrimSQLQuery(sqlQuery.getQuery());
+           } catch (MetadataIoException ex) {
+               CodeList execptionCode = ex.getExceptionCode();
+               if (execptionCode == null) {
+                   execptionCode = NO_APPLICABLE_CODE;
+               }
+               throw new CstlServiceException(ex, execptionCode);
+           }
             
         } else {
             
@@ -863,20 +872,26 @@ public class CSWworker {
 
             final List<AbstractRecordType> abstractRecords = new ArrayList<AbstractRecordType>();
             final List<Object> records                     = new ArrayList<Object>();
+            try {
+                for (int i = startPos -1; i < max; i++) {
+                    final Object obj = mdReader.getMetadata(results.get(i), mode, set, elementName);
+                    if (obj == null && (max + 1) < results.size()) {
+                        max++;
 
-            for (int i = startPos -1; i < max; i++) {
-                final Object obj = mdReader.getMetadata(results.get(i), mode, set, elementName);
-                if (obj == null && (max + 1) < results.size()) {
-                    max++;
-
-                } else {
-                    if (mode == DUBLINCORE)
-                        abstractRecords.add((AbstractRecordType)obj);
-                    else
-                        records.add(obj);
+                    } else {
+                        if (mode == DUBLINCORE)
+                            abstractRecords.add((AbstractRecordType)obj);
+                        else
+                            records.add(obj);
+                    }
                 }
-            }
-
+            } catch (MetadataIoException ex) {
+               CodeList execptionCode = ex.getExceptionCode();
+               if (execptionCode == null) {
+                   execptionCode = NO_APPLICABLE_CODE;
+               }
+               throw new CstlServiceException(ex, execptionCode);
+           }
             //we add additional distributed result
             for (int i = 0; i < maxDistributed; i++) {
 
@@ -1009,9 +1024,17 @@ public class CSWworker {
                     continue;
                 }
                 //we get the metadata object
-                final Object o = mdReader.getMetadata(id, DUBLINCORE, set, null);
-                if (o instanceof AbstractRecordType)
-                    records.add((AbstractRecordType)o);
+                try {
+                    final Object o = mdReader.getMetadata(id, DUBLINCORE, set, null);
+                    if (o instanceof AbstractRecordType)
+                        records.add((AbstractRecordType)o);
+                } catch (MetadataIoException ex) {
+                    CodeList execptionCode = ex.getExceptionCode();
+                    if (execptionCode == null) {
+                        execptionCode = NO_APPLICABLE_CODE;
+                    }
+                    throw new CstlServiceException(ex, execptionCode);
+                }
             }
             if (records.size() == 0) {
                 throwUnexistingIdentifierException(unexistingID);
@@ -1033,12 +1056,20 @@ public class CSWworker {
                 }
                 
                 //we get the metadata object
-                final Object o = mdReader.getMetadata(id, ISO_19115, set, null);
-                if (o instanceof DefaultMetadata) {
-                    records.add((DefaultMetadata)o);
-                } else {
-                    LOGGER.severe("the form " + id + " is not a ISO object");
-                }
+                try {
+                    final Object o = mdReader.getMetadata(id, ISO_19115, set, null);
+                    if (o instanceof DefaultMetadata) {
+                        records.add((DefaultMetadata)o);
+                    } else {
+                        LOGGER.severe("the form " + id + " is not a ISO object");
+                    }
+               } catch (MetadataIoException ex) {
+                   CodeList execptionCode = ex.getExceptionCode();
+                   if (execptionCode == null) {
+                       execptionCode = NO_APPLICABLE_CODE;
+                   }
+                   throw new CstlServiceException(ex, execptionCode);
+               }
            }
            if (records.size() == 0) {
                 throwUnexistingIdentifierException(unexistingID);
@@ -1059,14 +1090,22 @@ public class CSWworker {
                     LOGGER.severe("unexisting id:" + saved);
                     continue;
                 }
-                
-                //we get the metadata object 
-                final Object o = mdReader.getMetadata(id, ISO_19115, set, null);
-                if (o != null) {
-                    records.add(o);
-                } else {
-                    LOGGER.severe("GFC object is null");
-                }
+
+                try {
+                    //we get the metadata object
+                    final Object o = mdReader.getMetadata(id, ISO_19115, set, null);
+                    if (o != null) {
+                        records.add(o);
+                    } else {
+                        LOGGER.severe("GFC object is null");
+                    }
+                } catch (MetadataIoException ex) {
+                   CodeList execptionCode = ex.getExceptionCode();
+                   if (execptionCode == null) {
+                       execptionCode = NO_APPLICABLE_CODE;
+                   }
+                   throw new CstlServiceException(ex, execptionCode);
+               }
            }
            if (records.size() == 0) {
                 throwUnexistingIdentifierException(unexistingID);
@@ -1088,13 +1127,21 @@ public class CSWworker {
                     continue;
                 }
                 
-                //we get the metadata object 
-                final Object o = mdReader.getMetadata(id, EBRIM, set, null);
-                if (o instanceof IdentifiableType) {
-                    records.add(o);
-                } else {
-                    LOGGER.severe("The form " + id + " is not a EBRIM v3.0 object");
-                }
+                //we get the metadata object
+                try {
+                    final Object o = mdReader.getMetadata(id, EBRIM, set, null);
+                    if (o instanceof IdentifiableType) {
+                        records.add(o);
+                    } else {
+                        LOGGER.severe("The form " + id + " is not a EBRIM v3.0 object");
+                    }
+                } catch (MetadataIoException ex) {
+                   CodeList execptionCode = ex.getExceptionCode();
+                   if (execptionCode == null) {
+                       execptionCode = NO_APPLICABLE_CODE;
+                   }
+                   throw new CstlServiceException(ex, execptionCode);
+               }
            }
            if (records.size() == 0) {
                 throwUnexistingIdentifierException(unexistingID);
@@ -1116,16 +1163,24 @@ public class CSWworker {
                     continue;
                 }
                 
-                //we get the metadata object 
-                final Object o = mdReader.getMetadata(id, EBRIM, set, null);
-                if (o instanceof org.geotoolkit.ebrim.xml.v250.RegistryObjectType) {
-                    records.add(o);
-                } else {
-                    if (o == null)
-                        LOGGER.severe("The form " + id + " has not be read is null.");
-                    else
-                        LOGGER.severe("The form " + id + " is not a EBRIM v2.5 object.");
-                }
+                //we get the metadata object
+                try {
+                    final Object o = mdReader.getMetadata(id, EBRIM, set, null);
+                    if (o instanceof org.geotoolkit.ebrim.xml.v250.RegistryObjectType) {
+                        records.add(o);
+                    } else {
+                        if (o == null)
+                            LOGGER.severe("The form " + id + " has not be read is null.");
+                        else
+                            LOGGER.severe("The form " + id + " is not a EBRIM v2.5 object.");
+                    }
+               } catch (MetadataIoException ex) {
+                   CodeList execptionCode = ex.getExceptionCode();
+                   if (execptionCode == null) {
+                       execptionCode = NO_APPLICABLE_CODE;
+                   }
+                   throw new CstlServiceException(ex, execptionCode);
+               }
            }
            if (records.size() == 0) {
                 throwUnexistingIdentifierException(unexistingID);
@@ -1308,7 +1363,15 @@ public class CSWworker {
          * "PropertyName" return a list of metadata for a specific field.
          */  
         } else if (propertyName != null) {
-            responseList = mdReader.getFieldDomainofValues(propertyName);
+            try {
+                responseList = mdReader.getFieldDomainofValues(propertyName);
+            } catch (MetadataIoException ex) {
+                CodeList execptionCode = ex.getExceptionCode();
+                if (execptionCode == null) {
+                    execptionCode = NO_APPLICABLE_CODE;
+                }
+                throw new CstlServiceException(ex, execptionCode);
+            }
             
         // if no parameter have been filled we launch an exception    
         } else {
@@ -1356,6 +1419,12 @@ public class CSWworker {
                     } catch (IllegalArgumentException e) {
                         LOGGER.severe("already that title.");
                         totalUpdated++;
+                    } catch (MetadataIoException ex) {
+                        CodeList execptionCode = ex.getExceptionCode();
+                        if (execptionCode == null) {
+                            execptionCode = NO_APPLICABLE_CODE;
+                        }
+                        throw new CstlServiceException(ex, execptionCode);
                     }
                 }
 
@@ -1374,14 +1443,22 @@ public class CSWworker {
                     // we try to execute the query
                     final List<String> results = executeLuceneQuery(luceneQuery);
 
-                    for (String metadataID : results) {
-                       final boolean deleted = mdWriter.deleteMetadata(metadataID);
-                       if (!deleted) {
-                           throw new CstlServiceException("The service does not succeed to delete the metadata:" + metadataID,
+                    try {
+                        for (String metadataID : results) {
+                            final boolean deleted = mdWriter.deleteMetadata(metadataID);
+                            if (!deleted) {
+                                throw new CstlServiceException("The service does not succeed to delete the metadata:" + metadataID,
                                                   NO_APPLICABLE_CODE);
-                       } else {
-                           totalDeleted++;
-                       }
+                            } else {
+                                totalDeleted++;
+                            }
+                        }
+                    } catch (MetadataIoException ex) {
+                        CodeList execptionCode = ex.getExceptionCode();
+                        if (execptionCode == null) {
+                            execptionCode = NO_APPLICABLE_CODE;
+                        }
+                        throw new CstlServiceException(ex, execptionCode);
                     }
                 } else {
                     throw new CstlServiceException("This kind of transaction (delete) is not supported by this Writer implementation.",
@@ -1408,21 +1485,29 @@ public class CSWworker {
                     final SpatialQuery luceneQuery = (SpatialQuery) luceneFilterParser.getQuery(updateRequest.getConstraint(), null, null);
 
                     // we try to execute the query
-                    final List<String> results = executeLuceneQuery(luceneQuery);
-                    for (String metadataID : results) {
-                        boolean updated;
-                        if (updateRequest.getAny() != null) {
-                            updated = mdWriter.replaceMetadata(metadataID, updateRequest.getAny());
-                        } else {
-                            updated = mdWriter.updateMetadata(metadataID, updateRequest.getRecordProperty());
+                    try {
+                        final List<String> results = executeLuceneQuery(luceneQuery);
+                        for (String metadataID : results) {
+                            boolean updated;
+                            if (updateRequest.getAny() != null) {
+                                updated = mdWriter.replaceMetadata(metadataID, updateRequest.getAny());
+                            } else {
+                                updated = mdWriter.updateMetadata(metadataID, updateRequest.getRecordProperty());
+                            }
+                            if (!updated) {
+                                throw new CstlServiceException("The service does not succeed to update the metadata:" + metadataID,
+                                        NO_APPLICABLE_CODE);
+                            } else {
+                                mdReader.removeFromCache(metadataID);
+                                totalUpdated++;
+                            }
                         }
-                        if (!updated) {
-                            throw new CstlServiceException("The service does not succeed to update the metadata:" + metadataID,
-                                    NO_APPLICABLE_CODE);
-                        } else {
-                            mdReader.removeFromCache(metadataID);
-                            totalUpdated++;
+                    } catch (MetadataIoException ex) {
+                        CodeList execptionCode = ex.getExceptionCode();
+                        if (execptionCode == null) {
+                            execptionCode = NO_APPLICABLE_CODE;
                         }
+                        throw new CstlServiceException(ex, execptionCode);
                     }
                 } else {
                     throw new CstlServiceException("This kind of transaction (update) is not supported by this Writer implementation.",

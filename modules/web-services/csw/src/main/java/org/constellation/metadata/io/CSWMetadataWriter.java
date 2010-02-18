@@ -16,13 +16,9 @@
  */
 package org.constellation.metadata.io;
 
-import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
-import org.constellation.ws.CstlServiceException;
 
 //geotoolkit dependencies
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
@@ -42,7 +38,7 @@ public abstract class CSWMetadataWriter extends MetadataWriter {
      *
      * @param MDReader an MDWeb database reader.
      */
-    public CSWMetadataWriter(AbstractIndexer indexer) throws CstlServiceException {
+    public CSWMetadataWriter(AbstractIndexer indexer) throws MetadataIoException {
         super();
         this.indexer        = indexer;
     }
@@ -53,43 +49,8 @@ public abstract class CSWMetadataWriter extends MetadataWriter {
      * @param metadataID The identifier of the metadata to Replace.
      * @param properties A List of property-value to replace in the specified metadata.
      */
-    public abstract boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws CstlServiceException;
+    public abstract boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException;
 
-    /**
-     * Try to parse a date in a string.
-     * If the string can not be parsed a CstlServiceException will be throw.
-     *
-     * @param dateValue the string representation of the date.
-     * @return a Date object.
-     *
-     * @throws CstlServiceException if the string can not be parsed.
-     */
-    protected Date parseDate(String dateValue) throws CstlServiceException {
-        // in the case of a timezone expressed like this +01:00 we must transform it in +0100
-        if (dateValue.indexOf('.') != -1) {
-            String msNtz = dateValue.substring(dateValue.indexOf('.'));
-            if (msNtz.indexOf(':') != -1) {
-                msNtz = msNtz.replace(":", "");
-                dateValue = dateValue.substring(0, dateValue.indexOf('.'));
-                dateValue = dateValue + msNtz;
-            }
-        }
-        Date result = null;
-        boolean success = true;
-        try {
-            result = dateFormat.get(0).parse((String) dateValue);
-        } catch (ParseException ex) {
-            success = false;
-        }
-        if (!success) {
-            try {
-               result = dateFormat.get(1).parse((String) dateValue);
-            } catch (ParseException ex) {
-                throw new CstlServiceException("There service was unable to parse the date:" + dateValue, INVALID_PARAMETER_VALUE);
-            }
-        }
-        return result;
-    }
     
     /**
      * Destoy all the resource and close connection.

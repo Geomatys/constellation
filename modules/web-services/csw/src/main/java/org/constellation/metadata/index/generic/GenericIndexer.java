@@ -53,6 +53,7 @@ import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
@@ -187,7 +188,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         } catch (IOException ex) {
             LOGGER.severe("IOException while indexing document: " + ex.getMessage());
             throw new IndexingException("IOException while indexing documents.", ex);
-        } catch (CstlServiceException ex) {
+        } catch (MetadataIoException ex) {
             LOGGER.severe("CstlServiceException while indexing document: " + ex.getMessage());
             throw new IndexingException("CstlServiceException while indexing documents.", ex);
         }

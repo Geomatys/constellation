@@ -40,7 +40,6 @@ import org.constellation.metadata.CSWClassesContext;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.StringUtilities;
-import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // geoAPI dependencies
@@ -109,11 +108,11 @@ public class FileMetadataReader extends CSWMetadataReader {
      * @param configuration A generic configuration object containing a directory path
      * in the configuration.dataDirectory field.
      *
-     * @throws org.constellation.ws.CstlServiceException If the configuration object does
+     * @throws org.constellation.ws.MetadataIoException If the configuration object does
      * not contains an existing directory path in the configuration.dataDirectory field.
      * If the creation of a MarshallerPool throw a JAXBException.
      */
-    public FileMetadataReader(Automatic configuration) throws CstlServiceException {
+    public FileMetadataReader(Automatic configuration) throws MetadataIoException {
         super(true, false);
         File dataDir = configuration.getDataDirectory();
         if (dataDir == null || !dataDir.exists()) {
@@ -122,12 +121,12 @@ public class FileMetadataReader extends CSWMetadataReader {
         }
         dataDirectory = dataDir;
         if (dataDirectory == null || !dataDirectory.exists() || !dataDirectory.isDirectory()) {
-            throw new CstlServiceException("cause: unable to find the data directory", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("cause: unable to find the data directory", NO_APPLICABLE_CODE);
         }
         try {
             marshallerPool = new MarshallerPool(CSWClassesContext.getAllClasses());
         } catch (JAXBException ex) {
-            throw new CstlServiceException("cause: JAXB exception while creating unmarshaller", ex, NO_APPLICABLE_CODE);
+            throw new MetadataIoException("cause: JAXB exception while creating unmarshaller", ex, NO_APPLICABLE_CODE);
         }
     }
     
@@ -142,7 +141,7 @@ public class FileMetadataReader extends CSWMetadataReader {
      * @return A marshallable metadata object.
      */
     @Override
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException {
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
         Object obj = getObjectFromFile(identifier);
         if (obj instanceof DefaultMetadata && mode == DUBLINCORE) {
             obj = translateISOtoDC((DefaultMetadata)obj, type, elementName);
@@ -158,9 +157,9 @@ public class FileMetadataReader extends CSWMetadataReader {
      *
      * @param identifier
      * @return
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws org.constellation.ws.MetadataIoException
      */
-    private Object getObjectFromFile(String identifier) throws CstlServiceException {
+    private Object getObjectFromFile(String identifier) throws MetadataIoException {
         final File metadataFile = new File (dataDirectory,  identifier + ".xml");
         if (metadataFile.exists()) {
             Unmarshaller unmarshaller = null;
@@ -173,7 +172,7 @@ public class FileMetadataReader extends CSWMetadataReader {
                 addInCache(identifier, metadata);
                 return metadata;
             } catch (JAXBException ex) {
-                throw new CstlServiceException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
+                throw new MetadataIoException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             } finally {
                 if (unmarshaller != null) {
@@ -181,7 +180,7 @@ public class FileMetadataReader extends CSWMetadataReader {
                 }
             }
         } else {
-            throw new CstlServiceException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
+            throw new MetadataIoException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
         }
     }
 
@@ -192,9 +191,9 @@ public class FileMetadataReader extends CSWMetadataReader {
      * @param type
      * @param elementName
      * @return
-     * @throws CstlServiceException If the type and the element name are null.
+     * @throws MetadataIoException If the type and the element name are null.
      */
-    private AbstractRecordType applyElementSet(RecordType record, ElementSetType type, List<QName> elementName) throws CstlServiceException {
+    private AbstractRecordType applyElementSet(RecordType record, ElementSetType type, List<QName> elementName) throws MetadataIoException {
         
         if (type != null) {
             if (type.equals(ElementSetType.SUMMARY)) {
@@ -246,7 +245,7 @@ public class FileMetadataReader extends CSWMetadataReader {
             }
             return customRecord;
         } else {
-            throw new CstlServiceException("No ElementSet or Element name specified");
+            throw new MetadataIoException("No ElementSet or Element name specified");
         }
     }
     /**
@@ -438,7 +437,7 @@ public class FileMetadataReader extends CSWMetadataReader {
     }
 
     @Override
-    public List<DomainValues> getFieldDomainofValues(String propertyNames) throws CstlServiceException {
+    public List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException {
         final List<DomainValues> responseList = new ArrayList<DomainValues>();
         final StringTokenizer tokens          = new StringTokenizer(propertyNames, ",");
 
@@ -450,7 +449,7 @@ public class FileMetadataReader extends CSWMetadataReader {
             } else if (DUBLIN_CORE_QUERYABLE.get(token) != null) {
                 paths = DUBLIN_CORE_QUERYABLE.get(token);
             } else {
-                throw new CstlServiceException("The property " + token + " is not queryable",
+                throw new MetadataIoException("The property " + token + " is not queryable",
                         INVALID_PARAMETER_VALUE, "propertyName");
             }
 
@@ -462,7 +461,7 @@ public class FileMetadataReader extends CSWMetadataReader {
                 responseList.add(value);
 
             } else {
-                throw new CstlServiceException("The property " + token + " is not queryable for now",
+                throw new MetadataIoException("The property " + token + " is not queryable for now",
                         INVALID_PARAMETER_VALUE, "propertyName");
             }
             
@@ -470,7 +469,7 @@ public class FileMetadataReader extends CSWMetadataReader {
         return responseList;
     }
 
-    private List<String> getAllValuesFromPaths(List<String> paths) throws CstlServiceException {
+    private List<String> getAllValuesFromPaths(List<String> paths) throws MetadataIoException {
         final List<String> result = new ArrayList<String>();
         Unmarshaller unmarshaller = null;
         try {
@@ -486,7 +485,7 @@ public class FileMetadataReader extends CSWMetadataReader {
                         result.add(value);
                     }
                 } catch (JAXBException ex) {
-                    throw new CstlServiceException("The metadataFile : " + metadataFile.getName() + " can not be unmarshalled" + "\n" +
+                    throw new MetadataIoException("The metadataFile : " + metadataFile.getName() + " can not be unmarshalled" + "\n" +
                             "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
                 }
             }
@@ -504,12 +503,12 @@ public class FileMetadataReader extends CSWMetadataReader {
     }
 
     @Override
-    public List<String> executeEbrimSQLQuery(String sqlQuery) throws CstlServiceException {
-        throw new CstlServiceException("Ebrim query are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
+    public List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException {
+        throw new MetadataIoException("Ebrim query are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
     }
 
     @Override
-    public List<? extends Object> getAllEntries() throws CstlServiceException {
+    public List<? extends Object> getAllEntries() throws MetadataIoException {
         final List<Object> results = new ArrayList<Object>();
         for (File f : dataDirectory.listFiles()) {
             if (f.getName().endsWith(".xml")) {
@@ -524,7 +523,7 @@ public class FileMetadataReader extends CSWMetadataReader {
                     addInCache(identifier, metadata);
                     results.add(metadata);
                 } catch (JAXBException ex) {
-                    throw new CstlServiceException("The metadataFile : " + f.getPath() + " can not be unmarshalled" + "\n" +
+                    throw new MetadataIoException("The metadataFile : " + f.getPath() + " can not be unmarshalled" + "\n" +
                             "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
                 } finally {
                     if (unmarshaller != null) {
@@ -532,21 +531,21 @@ public class FileMetadataReader extends CSWMetadataReader {
                     }
                 }
             } else {
-                throw new CstlServiceException("The metadataFile : " + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException("The metadataFile : " + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
             }
         }
         return results;
     }
 
     @Override
-    public List<String> getAllIdentifiers() throws CstlServiceException {
+    public List<String> getAllIdentifiers() throws MetadataIoException {
         final List<String> results = new ArrayList<String>();
         for (File f : dataDirectory.listFiles()) {
             if (f.getName().endsWith(".xml")) {
                 final String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
                 results.add(identifier);
             } else {
-                throw new CstlServiceException("The metadataFile : " + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException("The metadataFile : " + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
             }
         }
         return results;

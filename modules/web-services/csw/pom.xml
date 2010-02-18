@@ -81,6 +81,11 @@
       <artifactId>cstl-web-ogc</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-metadata</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Geotoolkit dependencies -->
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>

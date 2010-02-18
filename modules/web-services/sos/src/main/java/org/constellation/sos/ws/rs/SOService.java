@@ -72,8 +72,14 @@ public class SOService extends OGCWebService {
     public SOService() throws JAXBException, CstlServiceException {
         super(ServiceDef.SOS_1_0_0);
         worker = new SOSworker(null);
-        setXMLContext("org.geotoolkit.sos.xml.v100:org.geotoolkit.gml.xml.v311:org.geotoolkit.swe.xml.v100:org.geotoolkit.swe.xml.v101:" +
-                "org.geotoolkit.observation.xml.v100:org.geotoolkit.sampling.xml.v100:org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101", "",
+        setXMLContext("org.geotoolkit.sos.xml.v100:" +
+                      "org.geotoolkit.gml.xml.v311:" +
+                      "org.geotoolkit.swe.xml.v100:" +
+                      "org.geotoolkit.swe.xml.v101:" +
+                      "org.geotoolkit.observation.xml.v100:" +
+                      "org.geotoolkit.sampling.xml.v100:" +
+                      "org.geotoolkit.sml.xml.v100:" +
+                      "org.geotoolkit.sml.xml.v101", "",
                 "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd",
                 "http://www.opengis.net/ows/1.1 http://schemas.opengis.net/ows/1.1.0/owsExceptionReport.xsd");
     }

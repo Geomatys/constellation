@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -49,7 +50,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWClassesContext;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.ws.CstlServiceException;
 
 // GeoApi dependencies
 import org.opengis.util.InternationalString;
@@ -79,7 +79,7 @@ public class FileMetadataWriter extends CSWMetadataWriter {
      * @param marshaller
      * @throws java.sql.SQLException
      */
-    public FileMetadataWriter(Automatic configuration, AbstractIndexer index) throws CstlServiceException {
+    public FileMetadataWriter(Automatic configuration, AbstractIndexer index) throws MetadataIoException {
         super(index);
         File dataDir = configuration.getDataDirectory();
         if (dataDir == null || !dataDir.exists()) {
@@ -88,13 +88,13 @@ public class FileMetadataWriter extends CSWMetadataWriter {
         }
         dataDirectory = dataDir;
         if (dataDirectory == null || !dataDirectory.exists()) {
-            throw new CstlServiceException("Unable to find the data directory", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("Unable to find the data directory", NO_APPLICABLE_CODE);
         }
         
         try {
             marshallerPool = new MarshallerPool(CSWClassesContext.getAllClasses());
         } catch (JAXBException ex) {
-            throw new CstlServiceException("JAXB exception while creating unmarshaller", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("JAXB exception while creating unmarshaller", NO_APPLICABLE_CODE);
         }
         
     }
@@ -200,7 +200,7 @@ public class FileMetadataWriter extends CSWMetadataWriter {
     }
 
     @Override
-    public boolean storeMetadata(Object obj) throws CstlServiceException {
+    public boolean storeMetadata(Object obj) throws MetadataIoException {
         File f = null;
         Marshaller marshaller = null;
         try {
@@ -212,9 +212,9 @@ public class FileMetadataWriter extends CSWMetadataWriter {
             indexer.indexDocument(obj);
             
         } catch (JAXBException ex) {
-            throw new CstlServiceException("Unable to marshall the object: " + obj, NO_APPLICABLE_CODE);
+            throw new MetadataIoException("Unable to marshall the object: " + obj, NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-            throw new CstlServiceException("Unable to write the file: " + f.getPath(), NO_APPLICABLE_CODE);
+            throw new MetadataIoException("Unable to write the file: " + f.getPath(), NO_APPLICABLE_CODE);
         } finally {
             if (marshaller != null) {
                 marshallerPool.release(marshaller);
@@ -239,7 +239,7 @@ public class FileMetadataWriter extends CSWMetadataWriter {
     }
 
     @Override
-    public boolean deleteMetadata(String metadataID) throws CstlServiceException {
+    public boolean deleteMetadata(String metadataID) throws MetadataIoException {
         final File metadataFile = new File (dataDirectory,  metadataID + ".xml");
         if (metadataFile.exists()) {
            final boolean suceed =  metadataFile.delete();
@@ -250,12 +250,12 @@ public class FileMetadataWriter extends CSWMetadataWriter {
            }
            return suceed;
         } else {
-            throw new CstlServiceException("The metadataFile : " + metadataID + ".xml is not present", INVALID_PARAMETER_VALUE);
+            throw new MetadataIoException("The metadataFile : " + metadataID + ".xml is not present", INVALID_PARAMETER_VALUE);
         }
     }
 
     @Override
-    public boolean replaceMetadata(String metadataID, Object any) throws CstlServiceException {
+    public boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException {
         final boolean succeed = deleteMetadata(metadataID);
         if (!succeed)
             return false;
@@ -263,7 +263,7 @@ public class FileMetadataWriter extends CSWMetadataWriter {
     }
 
     @Override
-    public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws CstlServiceException {
+    public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException {
         final Object metadata = getObjectFromFile(metadataID);
         for (RecordPropertyType property : properties) {
             String xpath = property.getName();
@@ -286,13 +286,13 @@ public class FileMetadataWriter extends CSWMetadataWriter {
                 } else if (typeName.equals("Record")) {
                     type = RecordType.class;
                 } else {
-                    throw new CstlServiceException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
+                    throw new MetadataIoException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
                 }
                 LOGGER.finer("update type:" + type);
                 
                 // we verify that the metadata to update has the same type that the Xpath type
                 if (!metadata.getClass().equals(type)) {
-                    throw new CstlServiceException("The metadata :" + findIdentifier(metadata) + "is not of the same type that the one describe in Xpath expression", INVALID_PARAMETER_VALUE);
+                    throw new MetadataIoException("The metadata :" + findIdentifier(metadata) + "is not of the same type that the one describe in Xpath expression", INVALID_PARAMETER_VALUE);
                 }
 
                 //we remove the type name from the xpath
@@ -312,11 +312,11 @@ public class FileMetadataWriter extends CSWMetadataWriter {
                                 final String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
                                 ordinal = Integer.parseInt(ordinalValue);
                             } catch (NumberFormatException ex) {
-                                throw new CstlServiceException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
+                                throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
                             }
                             propertyName = propertyName.substring(0, propertyName.indexOf('['));
                         } else {
-                            throw new CstlServiceException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
+                            throw new MetadataIoException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
                         }
                     }
                     LOGGER.finer("propertyName:" + propertyName + " ordinal=" + ordinal);
@@ -327,7 +327,7 @@ public class FileMetadataWriter extends CSWMetadataWriter {
                         if (parentCollection.size() > 0) {
                             parentClass = parentCollection.iterator().next().getClass();
                         } else  {
-                            throw new CstlServiceException("An unresolved programmation issue occurs: TODO find the type of an empty collection", NO_APPLICABLE_CODE);
+                            throw new MetadataIoException("An unresolved programmation issue occurs: TODO find the type of an empty collection", NO_APPLICABLE_CODE);
                         }
                     } else {
                         parentClass = parent.getClass();
@@ -336,7 +336,7 @@ public class FileMetadataWriter extends CSWMetadataWriter {
                     //we try to find a getter for this property
                     final Method getter = ReflectionUtilities.getGetterFromName(propertyName, parentClass);
                     if (getter == null) {
-                        throw new CstlServiceException("There is no getter for the property:" + propertyName + " in the class:" + type.getSimpleName(), INVALID_PARAMETER_VALUE);
+                        throw new MetadataIoException("There is no getter for the property:" + propertyName + " in the class:" + type.getSimpleName(), INVALID_PARAMETER_VALUE);
                     } else {
                         // we execute the getter
                         if (!(parent instanceof Collection)) {
@@ -353,7 +353,7 @@ public class FileMetadataWriter extends CSWMetadataWriter {
                     if (ordinal != -1) {
 
                         if (!(parent instanceof Collection)) {
-                            throw new CstlServiceException("The property:" + propertyName + " in the class:" + parentClass + " is not a collection", INVALID_PARAMETER_VALUE);
+                            throw new MetadataIoException("The property:" + propertyName + " in the class:" + parentClass + " is not a collection", INVALID_PARAMETER_VALUE);
                         }
                         Object tmp = null;
                         for (Object child : (Collection) parent) {
@@ -391,9 +391,9 @@ public class FileMetadataWriter extends CSWMetadataWriter {
      * @param parent
      * @param propertyName
      * @param value
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws org.constellation.ws.MetadataIoException
      */
-    private void updateObjects(Object parent, String propertyName, Object value) throws CstlServiceException {
+    private void updateObjects(Object parent, String propertyName, Object value) throws MetadataIoException {
 
         Class parameterType = value.getClass();
         LOGGER.finer("parameter type:" + parameterType);
@@ -407,11 +407,11 @@ public class FileMetadataWriter extends CSWMetadataWriter {
                     final String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
                     ordinal = Integer.parseInt(ordinalValue);
                 } catch (NumberFormatException ex) {
-                    throw new CstlServiceException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
+                    throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
                 }
                 propertyName = propertyName.substring(0, propertyName.indexOf('['));
             } else {
-                throw new CstlServiceException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
+                throw new MetadataIoException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
             }
         }
 
@@ -421,7 +421,7 @@ public class FileMetadataWriter extends CSWMetadataWriter {
             if (value instanceof String) {
                 value = new Locale((String) value);
             } else {
-                throw new CstlServiceException("The value's type of the recordProperty does not match the specified property type language accept only string type",
+                throw new MetadataIoException("The value's type of the recordProperty does not match the specified property type language accept only string type",
                         INVALID_PARAMETER_VALUE);
             }
         }
@@ -441,7 +441,7 @@ public class FileMetadataWriter extends CSWMetadataWriter {
         }
     }
 
-    private void updateObject(String propertyName, Object parent, Object value, Class parameterType, int ordinal) throws CstlServiceException {
+    private void updateObject(String propertyName, Object parent, Object value, Class parameterType, int ordinal) throws MetadataIoException {
         Method setter = ReflectionUtilities.getSetterFromName(propertyName, parameterType, parent.getClass());
 
         // with the geotoolkit implementation we sometimes have to used InternationalString instead of String.
@@ -454,17 +454,17 @@ public class FileMetadataWriter extends CSWMetadataWriter {
         if (ordinal != -1) {
             final Method getter = ReflectionUtilities.getGetterFromName(propertyName, parent.getClass());
             if (getter == null) {
-                throw new CstlServiceException("There is no getter for the property:" + propertyName + " in the class:" + parent.getClass(), INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException("There is no getter for the property:" + propertyName + " in the class:" + parent.getClass(), INVALID_PARAMETER_VALUE);
             }
             final Object existant = ReflectionUtilities.invokeMethod(parent, getter);
 
             if (!(existant instanceof Collection)) {
-                throw new CstlServiceException("The property:" + propertyName + " in the class:" + parent.getClass() + " is not a collection", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException("The property:" + propertyName + " in the class:" + parent.getClass() + " is not a collection", INVALID_PARAMETER_VALUE);
             } 
 
             final Collection c = (Collection) existant;
             if (c.size() < ordinal) {
-                throw new CstlServiceException("The property:" + propertyName + " in the class:" + parent.getClass() + " got only" + c.size() + " elements", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException("The property:" + propertyName + " in the class:" + parent.getClass() + " got only" + c.size() + " elements", INVALID_PARAMETER_VALUE);
             }
 
             if (parameterType.equals(String.class) && c.iterator().hasNext() && c.iterator().next() instanceof InternationalString) {
@@ -492,7 +492,7 @@ public class FileMetadataWriter extends CSWMetadataWriter {
         }
 
         if (setter == null) {
-            throw new CstlServiceException("There is no setter for the property:" + propertyName + " in the class:" + parent.getClass(), INVALID_PARAMETER_VALUE);
+            throw new MetadataIoException("There is no setter for the property:" + propertyName + " in the class:" + parent.getClass(), INVALID_PARAMETER_VALUE);
         } else {
             final String baseMessage = "Unable to invoke the method " + setter + ": ";
             try {
@@ -514,14 +514,14 @@ public class FileMetadataWriter extends CSWMetadataWriter {
                     ReflectionUtilities.invokeMethodEx(setter, parent, value);
                 }
             } catch (IllegalAccessException ex) {
-                throw new CstlServiceException(baseMessage + "the class is not accessible.", NO_APPLICABLE_CODE);
+                throw new MetadataIoException(baseMessage + "the class is not accessible.", NO_APPLICABLE_CODE);
 
             } catch (IllegalArgumentException ex) {
                 String param = "null";
                 if (value != null) {
                     param = value.getClass().getSimpleName();
                 }
-                throw new CstlServiceException(baseMessage + "the given argument does not match that required by the method.( argument type was " + param + ")");
+                throw new MetadataIoException(baseMessage + "the given argument does not match that required by the method.( argument type was " + param + ")");
 
             } catch (InvocationTargetException ex) {
                 String errorMsg = ex.getMessage();
@@ -531,12 +531,12 @@ public class FileMetadataWriter extends CSWMetadataWriter {
                 if (errorMsg == null && ex.getTargetException() != null) {
                     errorMsg = ex.getTargetException().getMessage();
                 }
-                throw new CstlServiceException(baseMessage + "an Exception was thrown in the invoked method:" + errorMsg);
+                throw new MetadataIoException(baseMessage + "an Exception was thrown in the invoked method:" + errorMsg);
             }
         }
     }
 
-    public static Object invokeMethodStrColl(final Method method, final Object object, final String parameter) throws CstlServiceException {
+    public static Object invokeMethodStrColl(final Method method, final Object object, final String parameter) throws MetadataIoException {
         final String baseMessage = "Unable to invoke the method " + method + ": ";
         Object result = null;
         if (method != null) {
@@ -553,11 +553,11 @@ public class FileMetadataWriter extends CSWMetadataWriter {
                     return result;
 
                 } catch (IllegalAccessException ex) {
-                    throw new CstlServiceException(baseMessage + "the class is not accessible.", NO_APPLICABLE_CODE);
+                    throw new MetadataIoException(baseMessage + "the class is not accessible.", NO_APPLICABLE_CODE);
 
                 } catch (IllegalArgumentException ex) {
 
-                    throw new CstlServiceException(baseMessage + "the given argument does not match that required by the method.( argument type was String)");
+                    throw new MetadataIoException(baseMessage + "the given argument does not match that required by the method.( argument type was String)");
 
                 } catch (InvocationTargetException ex) {
                     String errorMsg = ex.getMessage();
@@ -568,7 +568,7 @@ public class FileMetadataWriter extends CSWMetadataWriter {
                         errorMsg = ex.getTargetException().getMessage();
                     }
                     if (i == 1) {
-                        throw new CstlServiceException(baseMessage + "an Exception was thrown in the invoked method:" + errorMsg);
+                        throw new MetadataIoException(baseMessage + "an Exception was thrown in the invoked method:" + errorMsg);
                     }
                     i++;
                 }
@@ -585,9 +585,9 @@ public class FileMetadataWriter extends CSWMetadataWriter {
      *
      * @param identifier
      * @return
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws org.constellation.ws.MetadataIoException
      */
-    private Object getObjectFromFile(String identifier) throws CstlServiceException {
+    private Object getObjectFromFile(String identifier) throws MetadataIoException {
         final File metadataFile = new File (dataDirectory,  identifier + ".xml");
         if (metadataFile.exists()) {
             Unmarshaller unmarshaller = null;
@@ -599,7 +599,7 @@ public class FileMetadataWriter extends CSWMetadataWriter {
                 }
                 return metadata;
             } catch (JAXBException ex) {
-                throw new CstlServiceException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
+                throw new MetadataIoException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             } finally {
                 if (unmarshaller != null) {
@@ -607,7 +607,43 @@ public class FileMetadataWriter extends CSWMetadataWriter {
                 }
             }
         } else {
-            throw new CstlServiceException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
+            throw new MetadataIoException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
         }
+    }
+
+    /**
+     * Try to parse a date in a string.
+     * If the string can not be parsed a MetadataIoException will be throw.
+     *
+     * @param dateValue the string representation of the date.
+     * @return a Date object.
+     *
+     * @throws MetadataIoException if the string can not be parsed.
+     */
+    private Date parseDate(String dateValue) throws MetadataIoException {
+        // in the case of a timezone expressed like this +01:00 we must transform it in +0100
+        if (dateValue.indexOf('.') != -1) {
+            String msNtz = dateValue.substring(dateValue.indexOf('.'));
+            if (msNtz.indexOf(':') != -1) {
+                msNtz = msNtz.replace(":", "");
+                dateValue = dateValue.substring(0, dateValue.indexOf('.'));
+                dateValue = dateValue + msNtz;
+            }
+        }
+        Date result = null;
+        boolean success = true;
+        try {
+            result = dateFormat.get(0).parse((String) dateValue);
+        } catch (ParseException ex) {
+            success = false;
+        }
+        if (!success) {
+            try {
+               result = dateFormat.get(1).parse((String) dateValue);
+            } catch (ParseException ex) {
+                throw new MetadataIoException("There service was unable to parse the date:" + dateValue, INVALID_PARAMETER_VALUE);
+            }
+        }
+        return result;
     }
 }

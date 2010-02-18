@@ -24,9 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-// constellation dependencies
-import org.constellation.ws.CstlServiceException;
-
 /**
  *
  * @author Guilhem Legal (Geomatys)
@@ -48,7 +45,7 @@ public abstract class MetadataWriter {
      * 
      * @param MDReader an MDWeb database reader.
      */
-    public MetadataWriter() throws CstlServiceException {
+    public MetadataWriter() throws MetadataIoException {
         dateFormat.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
         dateFormat.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
     }
@@ -59,14 +56,14 @@ public abstract class MetadataWriter {
      * @param obj The object to store in the datasource.
      * @return true if the storage succeed, false else.
      */
-    public abstract boolean storeMetadata(Object obj) throws CstlServiceException;
+    public abstract boolean storeMetadata(Object obj) throws MetadataIoException;
 
     /**
      * Delete an object in the metadata database.
      * @param metadataID The identifier of the metadata to delete.
      * @return true if the delete succeed, false else.
      */
-    public abstract boolean deleteMetadata(String metadataID) throws CstlServiceException;
+    public abstract boolean deleteMetadata(String metadataID) throws MetadataIoException;
 
 
     /**
@@ -75,7 +72,7 @@ public abstract class MetadataWriter {
      * @param metadataID The identifier of the metadata to Replace.
      * @param any The object to replace the matching metadata.
      */
-    public abstract boolean replaceMetadata(String metadataID, Object any) throws CstlServiceException;
+    public abstract boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException;
 
     /**
      * Return true if the Writer supports the delete mecanism.

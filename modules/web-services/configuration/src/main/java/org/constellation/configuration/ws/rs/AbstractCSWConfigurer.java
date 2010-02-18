@@ -42,6 +42,7 @@ import org.constellation.configuration.filter.IndexDirectoryFilter;
 import org.constellation.configuration.filter.NextIndexDirectoryFilter;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.factory.AbstractCSWFactory;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
@@ -170,7 +171,7 @@ public abstract class AbstractCSWConfigurer {
             try {
                 return cswfactory.getMetadataReader(config);
 
-            } catch (CstlServiceException ex) {
+            } catch (MetadataIoException ex) {
                 throw new CstlServiceException("JAXBException while initializing the reader!", NO_APPLICABLE_CODE);
             }
 
@@ -393,8 +394,12 @@ public abstract class AbstractCSWConfigurer {
                 reader  = initReader(currentId);
                 final List<Object> objectToIndex = new ArrayList<Object>();
                 if (reader != null) {
-                    for (String identifier : identifiers) {
-                        objectToIndex.add(reader.getMetadata(identifier, MetadataReader.ISO_19115, null));
+                    try {
+                        for (String identifier : identifiers) {
+                            objectToIndex.add(reader.getMetadata(identifier, MetadataReader.ISO_19115, null));
+                        }
+                    } catch (MetadataIoException ex) {
+                        throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                     }
                 } else {
                     throw new CstlServiceException("Unable to create a reader for the id:" + id, NO_APPLICABLE_CODE);

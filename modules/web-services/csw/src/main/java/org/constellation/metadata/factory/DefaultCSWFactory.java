@@ -33,9 +33,9 @@ import org.constellation.metadata.io.FileMetadataReader;
 import org.constellation.metadata.io.FileMetadataWriter;
 import org.constellation.metadata.io.MDWebMetadataReader;
 import org.constellation.metadata.io.MDWebMetadataWriter;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataReader;
 import static org.constellation.generic.database.Automatic.*;
-import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
@@ -57,10 +57,10 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
     /**
      * Return a Metadata reader for the specified database type.
      * 
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     @Override
-    public CSWMetadataReader getMetadataReader(Automatic configuration) throws CstlServiceException {
+    public CSWMetadataReader getMetadataReader(Automatic configuration) throws MetadataIoException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
@@ -79,10 +79,10 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * 
      * @param configuration
      * @return
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     @Override
-    public CSWMetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer) throws CstlServiceException {
+    public CSWMetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer) throws MetadataIoException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
@@ -122,7 +122,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @param MDConnection A connecton to the database (used only for MDWeb database).
      * @param configDir
      * @return
-     * @throws org.constellation.ws.CstlServiceException
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     @Override
     public AbstractIndexer getIndexer(Automatic configuration, MetadataReader reader, String serviceID) throws IndexingException {

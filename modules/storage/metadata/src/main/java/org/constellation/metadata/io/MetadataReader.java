@@ -27,9 +27,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
-// Constellation dependencies
-import org.constellation.ws.CstlServiceException;
-
 /**
  *
  * @author Guilhem Legal (Geomatys)
@@ -80,28 +77,28 @@ public abstract class MetadataReader {
      * @param elementName A list of QName describing the requested fields. (implies type == null)
      * 
      * @return A marshallable metadata object.
-     * @throws CstlServiceException
+     * @throws MetadataIoException
      */
-    public abstract Object getMetadata(String identifier, int mode, List<QName> elementName) throws CstlServiceException;
+    public abstract Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException;
     
     /**
      * Execute a SQL query and return the result as a List of identifier;
      * 
      * @param query
      * @return
-     * @throws CstlServiceException
+     * @throws MetadataIoException
      */
-    public abstract List<String> executeEbrimSQLQuery(String sqlQuery) throws CstlServiceException;
+    public abstract List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException;
     
     /**
      * Return all the entries from the database
      */
-    public abstract List<? extends Object> getAllEntries() throws CstlServiceException;
+    public abstract List<? extends Object> getAllEntries() throws MetadataIoException;
 
      /**
      * Return all the entries identifiers from the database
      */
-    public abstract List<String> getAllIdentifiers() throws CstlServiceException;
+    public abstract List<String> getAllIdentifiers() throws MetadataIoException;
     
     /**
      * Return the list of supported data types.

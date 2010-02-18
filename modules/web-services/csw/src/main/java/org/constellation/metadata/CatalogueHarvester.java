@@ -40,6 +40,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.util.StringUtilities;
 import org.constellation.ws.CstlServiceException;
@@ -309,6 +310,8 @@ public class CatalogueHarvester {
                                 nbRecordInserted++;
                         } catch (IllegalArgumentException e) {
                             nbRecordUpdated++;
+                        }  catch (MetadataIoException ex) {
+                            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                         }
                     }
                     
@@ -325,6 +328,8 @@ public class CatalogueHarvester {
                                 nbRecordInserted++;
                         } catch (IllegalArgumentException e) {
                             nbRecordUpdated++;
+                        } catch (MetadataIoException ex) {
+                            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                         }
                     }
                 
@@ -353,6 +358,8 @@ public class CatalogueHarvester {
                                 nbRecordInserted++;
                         } catch (IllegalArgumentException e) {
                             nbRecordUpdated++;
+                        }  catch (MetadataIoException ex) {
+                            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                         }
                     }
                 
@@ -367,6 +374,8 @@ public class CatalogueHarvester {
                                 nbRecordInserted++;
                         } catch (IllegalArgumentException e) {
                             nbRecordUpdated++;
+                        }  catch (MetadataIoException ex) {
+                            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                         }
                     }
                     
@@ -923,6 +932,8 @@ public class CatalogueHarvester {
                     }
                 } catch (IllegalArgumentException e) {
                     result[1] = 1;
+                }  catch (MetadataIoException ex) {
+                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                 }
             } else {
                 throw new CstlServiceException("unexpected resourceType: " + resourceType, NO_APPLICABLE_CODE);

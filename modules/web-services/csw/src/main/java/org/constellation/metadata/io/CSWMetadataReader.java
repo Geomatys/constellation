@@ -22,7 +22,6 @@ import java.util.List;
 
 /// geotoolkit dependencies
 import javax.xml.namespace.QName;
-import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
 
@@ -40,7 +39,7 @@ public abstract class CSWMetadataReader extends MetadataReader {
     /**
      * Return a list of values for each specific fields specified as a coma separated String.
      */
-    public abstract List<DomainValues> getFieldDomainofValues(String propertyNames) throws CstlServiceException;
+    public abstract List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException;
 
     /**
      * Return a metadata object from the specified identifier.
@@ -51,13 +50,13 @@ public abstract class CSWMetadataReader extends MetadataReader {
      * @param elementName A list of QName describing the requested fields. (implies type == null)
      *
      * @return A marshallable metadata object.
-     * @throws CstlServiceException
+     * @throws MetadataIoException
      */
-    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException;
+    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException;
 
 
     @Override
-    public Object getMetadata(String identifier, int mode, List<QName> elementName) throws CstlServiceException {
+    public Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, elementName);
     }
 }
