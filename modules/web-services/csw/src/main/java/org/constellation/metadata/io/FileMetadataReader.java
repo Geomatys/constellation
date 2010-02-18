@@ -84,7 +84,7 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FileMetadataReader extends MetadataReader {
+public class FileMetadataReader extends CSWMetadataReader {
 
     /**
      * The directory containing the data XML files.

@@ -57,8 +57,8 @@ import org.constellation.filter.SQLFilterParser;
 import org.constellation.filter.SQLQuery;
 import org.constellation.generic.database.Automatic;
 import org.constellation.jaxb.AnchoredMarshallerPool;
-import org.constellation.metadata.io.MetadataReader;
-import org.constellation.metadata.io.MetadataWriter;
+import org.constellation.metadata.io.CSWMetadataReader;
+import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.util.StringUtilities;
@@ -162,12 +162,12 @@ public class CSWworker {
     /**
      * A Database reader.
      */
-    private MetadataReader mdReader;
+    private CSWMetadataReader mdReader;
     
     /**
      * An Database Writer.
      */
-    private MetadataWriter mdWriter;
+    private CSWMetadataWriter mdWriter;
     
     /**
      * The current MIME type of return

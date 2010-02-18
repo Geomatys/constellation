@@ -23,7 +23,8 @@ import java.io.File;
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataReader;
-import org.constellation.metadata.io.MetadataWriter;
+import org.constellation.metadata.io.CSWMetadataReader;
+import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.ws.CstlServiceException;
 
 // Geotoolkit dependencies
@@ -42,9 +43,9 @@ public abstract class AbstractCSWFactory extends Factory {
         super();
     }
     
-    public abstract MetadataReader getMetadataReader(Automatic configuration) throws CstlServiceException;
+    public abstract CSWMetadataReader getMetadataReader(Automatic configuration) throws CstlServiceException;
 
-    public abstract MetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer index) throws CstlServiceException;
+    public abstract CSWMetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer index) throws CstlServiceException;
     
     public abstract int getProfile(int dbType);
     

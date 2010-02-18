@@ -59,7 +59,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FileMetadataWriter extends MetadataWriter {
+public class FileMetadataWriter extends CSWMetadataWriter {
 
     /**
      * A marshaller to store object from harvested resource.

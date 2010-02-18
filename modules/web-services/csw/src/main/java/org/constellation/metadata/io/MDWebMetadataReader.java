@@ -95,7 +95,7 @@ import org.opengis.util.CodeList;
  * 
  * @author Guilhem legal
  */
-public class MDWebMetadataReader extends MetadataReader {
+public class MDWebMetadataReader extends CSWMetadataReader {
 
     /**
      * A reader to the MDWeb database.

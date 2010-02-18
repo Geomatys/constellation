@@ -27,22 +27,18 @@ import java.util.Map;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
-/// geotoolkit dependencies
-import org.geotoolkit.csw.xml.DomainValues;
-import org.geotoolkit.csw.xml.ElementSetType;
-
 // Constellation dependencies
 import org.constellation.ws.CstlServiceException;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public abstract class MetadataReader {
     
     public static final int DUBLINCORE = 0;
-    public static final int ISO_19115  = 1;
-    public static final int EBRIM      = 2;
+    public static final int ISO_19115   = 1;
+    public static final int EBRIM       = 2;
     public static final int SENSORML   = 3;
     
     /**
@@ -86,18 +82,12 @@ public abstract class MetadataReader {
      * 
      * @param identifier The metadata identifier.
      * @param mode An output schema mode: EBRIM, ISO_19115, DUBLINCORE and SENSORML supported.
-     * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
      * @param elementName A list of QName describing the requested fields. (implies type == null)
      * 
      * @return A marshallable metadata object.
      * @throws CstlServiceException
      */
-    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws CstlServiceException;
-    
-    /**
-     * Return a list of values for each specific fields specified as a coma separated String.
-     */
-    public abstract List<DomainValues> getFieldDomainofValues(String propertyNames) throws CstlServiceException;
+    public abstract Object getMetadata(String identifier, int mode, List<QName> elementName) throws CstlServiceException;
     
     /**
      * Execute a SQL query and return the result as a List of identifier;

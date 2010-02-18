@@ -83,7 +83,7 @@ import org.opengis.metadata.identification.Identification;
  *
  * @author Guilhem Legal
  */
-public class MDWebMetadataWriter extends MetadataWriter {
+public class MDWebMetadataWriter extends CSWMetadataWriter {
     
     /**
      * A MDWeb catalogs where write the form.

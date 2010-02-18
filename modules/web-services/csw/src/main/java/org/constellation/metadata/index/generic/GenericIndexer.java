@@ -53,7 +53,6 @@ import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.generic.database.Automatic;
-import org.constellation.util.Util;
 import org.constellation.metadata.io.MetadataReader;
 import org.constellation.util.ReflectionUtilities;
 import org.constellation.ws.CstlServiceException;
@@ -63,7 +62,6 @@ import static org.constellation.metadata.CSWQueryable.*;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.temporal.object.DefaultInstant;
 import org.geotoolkit.temporal.object.DefaultPosition;
-import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
 import org.geotoolkit.lucene.IndexingException;
@@ -161,7 +159,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             LOGGER.info( nbEntries + " metadata to index (light memory mode)");
             for (String id : ids) {
                 if (!stopIndexing && !indexationToStop.contains(serviceID)) {
-                    final Object entry = reader.getMetadata(id, MetadataReader.ISO_19115, ElementSetType.FULL, null);
+                    final Object entry = reader.getMetadata(id, MetadataReader.ISO_19115, null);
                     indexDocument(writer, entry);
                 } else {
                      LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);

@@ -394,7 +394,7 @@ public abstract class AbstractCSWConfigurer {
                 final List<Object> objectToIndex = new ArrayList<Object>();
                 if (reader != null) {
                     for (String identifier : identifiers) {
-                        objectToIndex.add(reader.getMetadata(identifier, MetadataReader.ISO_19115, ElementSetType.FULL, null));
+                        objectToIndex.add(reader.getMetadata(identifier, MetadataReader.ISO_19115, null));
                     }
                 } else {
                     throw new CstlServiceException("Unable to create a reader for the id:" + id, NO_APPLICABLE_CODE);

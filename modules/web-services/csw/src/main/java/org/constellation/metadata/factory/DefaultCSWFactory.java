@@ -27,12 +27,13 @@ import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.index.generic.GenericIndexSearcher;
 import org.constellation.metadata.index.mdweb.MDWebIndexer;
 import org.constellation.metadata.index.mdweb.MDWebIndexSearcher;
+import org.constellation.metadata.io.CSWMetadataReader;
+import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.FileMetadataReader;
 import org.constellation.metadata.io.FileMetadataWriter;
 import org.constellation.metadata.io.MDWebMetadataReader;
 import org.constellation.metadata.io.MDWebMetadataWriter;
 import org.constellation.metadata.io.MetadataReader;
-import org.constellation.metadata.io.MetadataWriter;
 import static org.constellation.generic.database.Automatic.*;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.lucene.IndexingException;
@@ -59,7 +60,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @throws org.constellation.ws.CstlServiceException
      */
     @Override
-    public MetadataReader getMetadataReader(Automatic configuration) throws CstlServiceException {
+    public CSWMetadataReader getMetadataReader(Automatic configuration) throws CstlServiceException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
@@ -81,7 +82,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @throws org.constellation.ws.CstlServiceException
      */
     @Override
-    public MetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer) throws CstlServiceException {
+    public CSWMetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer) throws CstlServiceException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();
