@@ -44,18 +44,11 @@ import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.TimeZone;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -89,247 +82,7 @@ public final class Util {
     private static final Logger LOGGER = Logger.getLogger("org.constellation.util");
     
     private Util() {}
-    
-    /**
-     * Generate a {@code Date} object from a {@code String} which represents an 
-     * instant encoded in the ISO-8601 format, e.g. {@code 2009.01.20T17:04Z}.
-     * <p>
-     * The {@code String} can be defined in the pattern 
-     *   yyyy-MM-dd'T'HH:mm:ss.SSSZ 
-     * or 
-     *   yyyy-MM-dd.
-     * </p>
-     * @param dateString An instant encoded in the ISO-8601 format.
-     * @return A {@code java.util.Date} object representing the same instant.
-     * @see TimeParser
-     */
-    public static Date getDateFromString(String dateString) throws ParseException {
-        final String dateFormat     = "yyyy-MM-dd'T'HH:mm:ssZ";
-        final String dateFormat2    = "yyyy-MM-dd";
-        final String dateFormat3    = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-        final SimpleDateFormat sdf  = new java.text.SimpleDateFormat(dateFormat);
-        final SimpleDateFormat sdf2 = new java.text.SimpleDateFormat(dateFormat2);
-        final SimpleDateFormat sdf3 = new java.text.SimpleDateFormat(dateFormat3);
-
-        if (dateString.contains("T")) {
-            String timezoneStr;
-            int index = dateString.lastIndexOf('+');
-            if (index == -1) {
-                index = dateString.lastIndexOf('-');
-            }
-            if (index > dateString.indexOf('T')) {
-                timezoneStr = dateString.substring(index + 1);
-
-                if (timezoneStr.contains(":")) {
-                    //e.g : 1985-04-12T10:15:30+04:00
-                    timezoneStr = timezoneStr.replace(":", "");
-                    dateString = dateString.substring(0, index + 1).concat(timezoneStr);
-                } else if (timezoneStr.length() == 2) {
-                    //e.g : 1985-04-12T10:15:30-04
-                    dateString = dateString.concat("00");
-                }
-            } else if (dateString.endsWith("Z")) {
-                //e.g : 1985-04-12T10:15:30Z
-                dateString = dateString.substring(0, dateString.length() - 1).concat("+0000");
-            }else {
-                //e.g : 1985-04-12T10:15:30
-                dateString = dateString + "+0000";
-            }
-            final String timezone = getTimeZone(dateString);
-            sdf.setTimeZone(TimeZone.getTimeZone(timezone));
-
-            if (dateString.contains(".")) {
-                return sdf3.parse(dateString);
-            }
-            return sdf.parse(dateString);
-        }
-        if (dateString.contains("-")) {
-            return sdf2.parse(dateString);
-        }
-        return null;
-    }
-    
-    /**
-     * Extract a description of the offset from GMT for an instant encoded in 
-     * ISO-8601 format (e.g. an input of {@code 2009-01-20T12:04:00Z-05} would
-     * yield the {@code String} "GMT-05").
-     * 
-     * @param dateString An instant encoded in ISO-8601 format, must not be 
-     *                     {@code null}.
-     * @return The offset from GMT for the parameter.
-     */
-    public static String getTimeZone(final String dateString) {
-    	
-        if (dateString.endsWith("Z")) {
-            return "GMT+" + 0;
-        }
-        int index = dateString.lastIndexOf('+');
-        if (index == -1) {
-            index = dateString.lastIndexOf('-');
-        }
-        if (index > dateString.indexOf('T')) {
-            return "GMT" + dateString.substring(index);
-        }
-        return TimeZone.getDefault().getID();
-    }
-    
-    /**
-     * Create a {@link Date} object from a date represented in a {@String} 
-     * object and a formatting rule described in a {@link DateFormat} object.
-     * <p>
-     * The input date parameter can have any of several different formats.
-     * </p>
-     * <p>
-     * TODO: Explain these formats.
-     * TODO: This is out of date since we no longer use the {@code DateFormat}
-     * objects to format the {@code Date}.
-     * </p>
-     * 
-     * @param date A date representation, e.g. 2002, 02-2007, 2004-03-04, which 
-     *               may be null.
-     * @return A formated date (example 2002 -> 01-01-2002,  2004-03-04 -> 04-03-2004, ...) 
-     */
-    public static Date createDate(String date, final DateFormat dateFormat) throws ParseException {
         
-        final Map<String, String> pool = new HashMap<String, String>();
-        pool.put("janvier",   "01");
-        pool.put("février",   "02");
-        pool.put("mars",      "03");
-        pool.put("avril",     "04");
-        pool.put("mai",       "05");
-        pool.put("juin",      "06");
-        pool.put("juillet",   "07");
-        pool.put("août",      "08");
-        pool.put("septembre", "09");
-        pool.put("octobre",   "10");
-        pool.put("novembre",  "11");
-        pool.put("décembre",  "12");
-
-        final Map<String, String> poolCase = new HashMap<String, String>();
-        poolCase.put("Janvier",   "01");
-        poolCase.put("Février",   "02");
-        poolCase.put("Mars",      "03");
-        poolCase.put("Avril",     "04");
-        poolCase.put("Mai",       "05");
-        poolCase.put("Juin",      "06");
-        poolCase.put("Juillet",   "07");
-        poolCase.put("Août",      "08");
-        poolCase.put("Septembre", "09");
-        poolCase.put("Octobre",   "10");
-        poolCase.put("Novembre",  "11");
-        poolCase.put("Décembre",  "12");
-
-        String year;
-        String month;
-        String day;
-        Date tmp = getDateFromString("1900" + "-" + "01" + "-" + "01");
-        if (date != null) {
-            if (date.contains("/")) {
-                if (getOccurenceFrequency(date, "/") == 2) {
-                    day = date.substring(0, date.indexOf('/'));
-                    date = date.substring(date.indexOf('/') + 1);
-                    month = date.substring(0, date.indexOf('/'));
-                    year = date.substring(date.indexOf('/') + 1);
-
-                    tmp = getDateFromString(year + "-" + month + "-" + day);
-                } else {
-                    if (getOccurenceFrequency(date, "/") == 1) {
-                        month = date.substring(0, date.indexOf('/'));
-                        year = date.substring(date.indexOf('/') + 1);
-                        tmp = getDateFromString(year + "-" + month + "-" + "01");
-                    }
-                }
-            } else if (getOccurenceFrequency(date, " ") == 2) {
-                if (!date.contains("?")) {
-
-                    day = date.substring(0, date.indexOf(' '));
-                    date = date.substring(date.indexOf(' ') + 1);
-                    month = pool.get(date.substring(0, date.indexOf(' ')));
-                    year = date.substring(date.indexOf(' ') + 1);
-
-                    tmp = getDateFromString(year + "-" + month + "-" + day);
-                } else {
-                    tmp = getDateFromString("2000" + "-" + "01" + "-" + "01");
-                }
-            } else if (getOccurenceFrequency(date, " ") == 1) {
-                try {
-                    Date d;
-                    synchronized(dateFormat) {
-                        d = dateFormat.parse(date);
-                    }
-                    return new Date(d.getTime());
-                } catch (ParseException ex) {
-                    LOGGER.info("parse exception for input:" + date);
-                }
-                month = poolCase.get(date.substring(0, date.indexOf(' ')));
-                year = date.substring(date.indexOf(' ') + 1);
-                tmp = getDateFromString(year + "-" + month + "-" + "01");
-
-
-            } else if (getOccurenceFrequency(date, "-") == 1) {
-
-                month = date.substring(0, date.indexOf('-'));
-                year = date.substring(date.indexOf('-') + 1);
-
-                tmp = getDateFromString(year + "-" + month + "-" + "01");
-
-            } else if (getOccurenceFrequency(date, "-") == 2) {
-
-                //if date is in format yyyy-mm-dd
-                if (date.substring(0, date.indexOf('-')).length() == 4) {
-                    year = date.substring(0, date.indexOf('-'));
-                    date = date.substring(date.indexOf('-') + 1); //mm-ddZ
-                    month = date.substring(0, date.indexOf('-'));
-                    date = date.substring(date.indexOf('-') + 1); // ddZ
-                    if (date.contains("Z")) {
-                        date = date.substring(0, date.indexOf('Z'));
-                    }
-                    day = date;
-
-                    tmp = getDateFromString(year + "-" + month + "-" + day);
-                } else {
-                    day = date.substring(0, date.indexOf('-'));
-                    date = date.substring(date.indexOf('-') + 1);
-                    month = date.substring(0, date.indexOf('-'));
-                    year = date.substring(date.indexOf('-') + 1);
-
-                    tmp = getDateFromString(year + "-" + month + "-" + day);
-                }
-
-            } else {
-                year = date;
-                tmp = getDateFromString(year + "-" + "01" + "-" + "01");
-            }
-        }
-        return tmp;
-    }
-    
-        
-    /**
-     * Counts the number of occurences of the second parameter within the first.
-     * For example, {@code getOccurenceFrequency("Constellation","ll") yields 
-     * {@code 1}.
-     * 
-     * @param s   The {@code String} against which matches should be made, must 
-     *              not be null.
-     * @param occ The {@code String} whose frequency of occurrence in the first 
-     *              parameter should be counted, must not be null.
-     * @return The frequency of occurrences of the second parameter characters 
-     *           in the character sequence of the first.
-     */
-    public static int getOccurenceFrequency (String s, final String occ){
-        if (! s.contains(occ))
-            return 0;
-        else {
-            int nbocc = 0;
-            while(s.indexOf(occ) != -1){
-                s = s.substring(s.indexOf(occ)+1);
-                nbocc++;
-            }
-            return nbocc;
-        }
-    }
-    
     /**
      * Searches in the Context ClassLoader for the named directory and returns it.
      *
@@ -466,7 +219,7 @@ public final class Util {
         return null;
     }
 
-/**
+    /**
      * Searches in the Context ClassLoader for the named files and returns a
      * {@code List<String>} with, for each named package,
      *

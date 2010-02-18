@@ -62,11 +62,6 @@ public abstract class MetadataReader {
     private final Map<String, Object> metadatas = new HashMap<String, Object>();
 
     /**
-     * A date formatter used to display the Date object for dublin core translation.
-     */
-    protected DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-
-    /**
      * Initialize the metadata reader base attribute.
      * 
      * @param isCacheEnabled A flag indicating if the cache mecanism is enabled or not.

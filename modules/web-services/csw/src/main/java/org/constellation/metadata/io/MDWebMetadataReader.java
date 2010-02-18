@@ -80,6 +80,7 @@ import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
+import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 
@@ -856,142 +857,136 @@ public class MDWebMetadataReader extends CSWMetadataReader {
         Class classe = null;
         Object result;
         
-        try {
-            // we get the value's class
-            classe = getClassFromName(className, standardName, mode);
-            if (classe == null) {
-                return null;
-            }
-
-            // if the value is a leaf => primitive type
-            if (value instanceof TextValue) {
-                String textValue = ((TextValue) value).getValue();
-                // in some special case (Date, double) we have to format the text value.
-                if (classe.equals(Double.class) && textValue != null) {
-                    textValue = textValue.replace(',', '.');
-                }
-
-                // if the value is a codeList element we call the static method valueOf 
-                // instead of a constructor
-                if ((classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) || classe.isEnum()) {
-                    // the textValue of a codelist is the code and not the value
-                    // so we must find the codeList element corrrespounding to this code.
-                    final org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList) value.getType();
-                    try {
-                        final CodeListElement element = codelist.getElementByCode(Integer.parseInt(textValue));
-                    
-                        Method method;
-                        if (classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) {
-                            result = CodeLists.valueOf(classe, element.getName());
-                            
-                        } else if (classe.isEnum()) {
-                            method = ReflectionUtilities.getMethod("fromValue", classe, String.class);
-                            result = ReflectionUtilities.invokeMethod(method, classe, element.getName());
-                        } else {
-                            LOGGER.severe("unknow codelist type");
-                            return null;
-                        }
-                        
-                        return result;
-                    } catch (NumberFormatException e) {
-                        LOGGER.severe("Format NumberException : unable to parse the code: " + textValue + " in the codelist: " + codelist.getName());
-                        return null;
-                    }
-
-                // if the value is a date we call the static method parse 
-                // instead of a constructor (temporary patch: createDate method)  
-                } else if (classe.equals(Date.class)) {
-                    return Util.createDate(textValue, formatter);
-
-                } else if (classe.equals(Locale.class)) {
-                    for (Locale candidate : Locale.getAvailableLocales()) {
-                        if (candidate.getISO3Language().equalsIgnoreCase(textValue)) {
-                            return candidate;
-                        }
-                    }
-                     return new Locale(textValue);
-
-                // else we use a String constructor
-                } else {
-                    //we execute the constructor
-                    result = ReflectionUtilities.newInstance(classe, textValue);
-                    
-                    //fix a bug in MDWeb with the value attribute TODO remove
-                    if (!form.asMoreChild(value)) {
-                        return result;
-                    } 
-                }
-
-            //if the value is a link
-            } else if (value instanceof LinkedValue) {
-                final LinkedValue lv = (LinkedValue) value;
-                final Object tempobj = alreadyRead.get(lv.getLinkedValue());
-                if (tempobj != null) {
-                    return tempobj;
-                } else {
-                    return getObjectFromValue(lv.getLinkedForm(), lv.getLinkedValue(), mode);
-                }
-                
-            // else if the value is a complex object    
-            } else {
-
-                /** 
-                 * Again another special case LocalName does not have a empty constructor (immutable) 
-                 * and no setters so we must call the normal constructor.
-                 */
-                if (classe.getSimpleName().equals("LocalName")) {
-                    TextValue child = null;
-                    
-                    //We search the child of the localName
-                    for (Value childValue : form.getValues()) {
-                        if (childValue.getParent() != null && childValue.getParent().equals(value) && childValue instanceof TextValue) {
-                            child = (TextValue) childValue;
-                        }
-                    }
-                    if (child != null) {
-                        final CharSequence cs = child.getValue();
-                        return ReflectionUtilities.newInstance(classe, cs);
-                    } else {
-                        LOGGER.severe("The localName is mal-formed");
-                        return null;
-                    }
-                
-                /** 
-                 * Again another special case QNAME does not have a empty constructor. 
-                 * and no setters so we must call the normal constructor.
-                 */    
-                } else if (classe.getSimpleName().equals("QName")) {
-                    String localPart    = null;
-                    String namespaceURI = null;
-                    
-                    //We search the children of the QName
-                    for (Value childValue : form.getValues()) {
-                        if (childValue.getParent() != null && childValue.getParent().equals(value) && childValue instanceof TextValue) {
-                            if (childValue.getPath().getName().equals("localPart"))
-                                localPart = ((TextValue)childValue).getValue();
-                            else  if (childValue.getPath().getName().equals("namespaceURI"))
-                                namespaceURI = ((TextValue)childValue).getValue();
-                        }
-                    }
-                    if (localPart != null && namespaceURI != null) {
-                        result = ReflectionUtilities.newInstance(classe, namespaceURI, localPart);
-                        return result;
-                    } else {
-                        LOGGER.severe("The QName is mal-formed");
-                        return null;
-                    }
-                }
-                /**
-                 * normal case
-                 * we get the empty constructor
-                 */ 
-                result = ReflectionUtilities.newInstance(classe);
-                alreadyRead.put(value, result);
-            }
-
-        } catch (ParseException e) {
-            LOGGER.severe("The date cannot be parsed ");
+        // we get the value's class
+        classe = getClassFromName(className, standardName, mode);
+        if (classe == null) {
             return null;
+        }
+
+        // if the value is a leaf => primitive type
+        if (value instanceof TextValue) {
+            String textValue = ((TextValue) value).getValue();
+            // in some special case (Date, double) we have to format the text value.
+            if (classe.equals(Double.class) && textValue != null) {
+                textValue = textValue.replace(',', '.');
+            }
+
+            // if the value is a codeList element we call the static method valueOf
+            // instead of a constructor
+            if ((classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) || classe.isEnum()) {
+                // the textValue of a codelist is the code and not the value
+                // so we must find the codeList element corrrespounding to this code.
+                final org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList) value.getType();
+                try {
+                    final CodeListElement element = codelist.getElementByCode(Integer.parseInt(textValue));
+
+                    Method method;
+                    if (classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) {
+                        result = CodeLists.valueOf(classe, element.getName());
+
+                    } else if (classe.isEnum()) {
+                        method = ReflectionUtilities.getMethod("fromValue", classe, String.class);
+                        result = ReflectionUtilities.invokeMethod(method, classe, element.getName());
+                    } else {
+                        LOGGER.severe("unknow codelist type");
+                        return null;
+                    }
+
+                    return result;
+                } catch (NumberFormatException e) {
+                    LOGGER.severe("Format NumberException : unable to parse the code: " + textValue + " in the codelist: " + codelist.getName());
+                    return null;
+                }
+
+            // if the value is a date we call the static method parse
+            // instead of a constructor (temporary patch: createDate method)
+            } else if (classe.equals(Date.class)) {
+                return TemporalUtilities.createDate(textValue);
+
+            } else if (classe.equals(Locale.class)) {
+                for (Locale candidate : Locale.getAvailableLocales()) {
+                    if (candidate.getISO3Language().equalsIgnoreCase(textValue)) {
+                        return candidate;
+                    }
+                }
+                 return new Locale(textValue);
+
+            // else we use a String constructor
+            } else {
+                //we execute the constructor
+                result = ReflectionUtilities.newInstance(classe, textValue);
+
+                //fix a bug in MDWeb with the value attribute TODO remove
+                if (!form.asMoreChild(value)) {
+                    return result;
+                }
+            }
+
+        //if the value is a link
+        } else if (value instanceof LinkedValue) {
+            final LinkedValue lv = (LinkedValue) value;
+            final Object tempobj = alreadyRead.get(lv.getLinkedValue());
+            if (tempobj != null) {
+                return tempobj;
+            } else {
+                return getObjectFromValue(lv.getLinkedForm(), lv.getLinkedValue(), mode);
+            }
+
+        // else if the value is a complex object
+        } else {
+
+            /**
+             * Again another special case LocalName does not have a empty constructor (immutable)
+             * and no setters so we must call the normal constructor.
+             */
+            if (classe.getSimpleName().equals("LocalName")) {
+                TextValue child = null;
+
+                //We search the child of the localName
+                for (Value childValue : form.getValues()) {
+                    if (childValue.getParent() != null && childValue.getParent().equals(value) && childValue instanceof TextValue) {
+                        child = (TextValue) childValue;
+                    }
+                }
+                if (child != null) {
+                    final CharSequence cs = child.getValue();
+                    return ReflectionUtilities.newInstance(classe, cs);
+                } else {
+                    LOGGER.severe("The localName is mal-formed");
+                    return null;
+                }
+
+            /**
+             * Again another special case QNAME does not have a empty constructor.
+             * and no setters so we must call the normal constructor.
+             */
+            } else if (classe.getSimpleName().equals("QName")) {
+                String localPart    = null;
+                String namespaceURI = null;
+
+                //We search the children of the QName
+                for (Value childValue : form.getValues()) {
+                    if (childValue.getParent() != null && childValue.getParent().equals(value) && childValue instanceof TextValue) {
+                        if (childValue.getPath().getName().equals("localPart"))
+                            localPart = ((TextValue)childValue).getValue();
+                        else  if (childValue.getPath().getName().equals("namespaceURI"))
+                            namespaceURI = ((TextValue)childValue).getValue();
+                    }
+                }
+                if (localPart != null && namespaceURI != null) {
+                    result = ReflectionUtilities.newInstance(classe, namespaceURI, localPart);
+                    return result;
+                } else {
+                    LOGGER.severe("The QName is mal-formed");
+                    return null;
+                }
+            }
+            /**
+             * normal case
+             * we get the empty constructor
+             */
+            result = ReflectionUtilities.newInstance(classe);
+            alreadyRead.put(value, result);
         }
 
         //if the result is a subClasses of MetaDataEntity

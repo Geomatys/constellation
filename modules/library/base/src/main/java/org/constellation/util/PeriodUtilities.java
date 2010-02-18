@@ -25,6 +25,9 @@ import java.util.SortedSet;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 
+import static org.geotoolkit.temporal.object.TemporalConstants.*;
+
+
 /**
  * 
  * 
@@ -32,42 +35,7 @@ import java.util.TreeSet;
  * @author Mehdi Sidhoum
  */
 public class PeriodUtilities {
-    
-    /**
-     * The number of millisecond in one year.
-     */
-    private static final long YEAR_MS = 31536000000L;
-    
-    /**
-     * The number of millisecond in one month.
-     */
-    private static final long MONTH_MS = 2628000000L;
-    
-    /**
-     * The number of millisecond in one week.
-     */
-    private static final long WEEK_MS = 604800000L;
-    
-    /**
-     * The number of millisecond in one day.
-     */
-    private static final long DAY_MS = 86400000L;
-    
-    /**
-     * The number of millisecond in one hour.
-     */
-    private static final long HOUR_MS = 3600000L;
-    
-    /**
-     * The number of millisecond in one minute.
-     */
-    private static final long MIN_MS = 60000;
-    
-    /**
-     * The number of millisecond in one second.
-     */
-    private static final long SECOND_MS = 1000;
-        
+            
     /**
      * The format of the dates. 
      */
@@ -235,10 +203,10 @@ public class PeriodUtilities {
         }
 
         //we look if the gap is more than one min (60000 ms)
-        temp = gap / MIN_MS;
+        temp = gap / MINUTE_MS;
         if (temp >= 1) {
             response.append(temp).append("M");
-            gap -= temp * MIN_MS;
+            gap -= temp * MINUTE_MS;
         }
 
         //we look if the gap is more than one week (1000 ms)
@@ -352,7 +320,7 @@ public class PeriodUtilities {
         //we look if the period contains minutes (60000 ms)
         if (periodDescription.indexOf('M') != -1) {
             final int nbMin = Integer.parseInt(periodDescription.substring(0, periodDescription.indexOf('M')));
-            time += nbMin * MIN_MS;
+            time += nbMin * MINUTE_MS;
             periodDescription = periodDescription.substring(periodDescription.indexOf('M') + 1);
         }
 

@@ -186,26 +186,6 @@ public class UtilTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void getOccurenceFrequencyTest() throws Exception {
-
-        String tmp = "this test is not useless";
-
-        assertEquals(2, Util.getOccurenceFrequency(tmp, "i"));
-        assertEquals(3, Util.getOccurenceFrequency(tmp, "e"));
-        assertEquals(2, Util.getOccurenceFrequency(tmp, "is"));
-        assertEquals(2, Util.getOccurenceFrequency(tmp, "es"));
-        assertEquals(1, Util.getOccurenceFrequency(tmp, "not"));
-        assertEquals(1, Util.getOccurenceFrequency(tmp, "this test"));
-
-        tmp = "this test is not useless, i repeat: this test is not useless";
-
-        assertEquals(2, Util.getOccurenceFrequency(tmp, "this test is not useless"));
-    }
-
-     /**
-     * @throws java.lang.Exception
-     */
-    @Test
     public void replacePrefixTest() throws Exception {
 
         String tmp = "<ns2:Mark1>something<ns2:Mark1>" + '\n' +

@@ -16,6 +16,8 @@
  */
 package org.constellation.metadata.io;
 
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -85,6 +87,11 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
  * @author Guilhem Legal (Geomatys)
  */
 public class FileMetadataReader extends CSWMetadataReader {
+
+    /**
+     * A date formatter used to display the Date object for dublin core translation.
+     */
+    private final DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     /**
      * The directory containing the data XML files.
