@@ -70,7 +70,7 @@ import org.constellation.ws.MimeType;
 import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceVersion;
 
-import static org.constellation.metadata.io.MetadataReader.*;
+import static org.constellation.metadata.io.AbstractMetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
 
 //geotoolkit dependencies

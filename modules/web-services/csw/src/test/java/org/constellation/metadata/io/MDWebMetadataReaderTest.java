@@ -115,7 +115,7 @@ public class MDWebMetadataReaderTest {
     public void getMetadataISOTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object result = reader.getMetadata("2:CSWCat", MetadataReader.ISO_19115, null, null);
+        Object result = reader.getMetadata("2:CSWCat", AbstractMetadataReader.ISO_19115, null);
 
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
 
@@ -133,7 +133,7 @@ public class MDWebMetadataReaderTest {
     public void getMetadataSystemSMLTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object absResult = reader.getMetadata("12:SMLC", MetadataReader.SENSORML, null, null);
+        Object absResult = reader.getMetadata("12:SMLC", AbstractMetadataReader.SENSORML, null);
 
         AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
 
@@ -284,7 +284,7 @@ public class MDWebMetadataReaderTest {
     public void getMetadataComponentSMLTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object absResult = reader.getMetadata("13:SMLC", MetadataReader.SENSORML, null, null);
+        Object absResult = reader.getMetadata("13:SMLC", AbstractMetadataReader.SENSORML, null);
 
         AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component.xml"));
         assertTrue(absResult != null);

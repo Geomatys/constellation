@@ -31,10 +31,9 @@ import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.FileMetadataReader;
 import org.constellation.metadata.io.FileMetadataWriter;
-import org.constellation.metadata.io.MDWebMetadataReader;
+import org.constellation.metadata.io.MDWebCSWMetadataReader;
 import org.constellation.metadata.io.MDWebMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.io.MetadataReader;
 import static org.constellation.generic.database.Automatic.*;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
@@ -66,7 +65,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             type = configuration.getType();
         switch (type) {
             case MDWEB:
-                return new MDWebMetadataReader(configuration);
+                return new MDWebCSWMetadataReader(configuration);
             case FILESYSTEM:
                 return new FileMetadataReader(configuration);
             default:
@@ -125,7 +124,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
      * @throws org.constellation.metadata.io.MetadataIoException
      */
     @Override
-    public AbstractIndexer getIndexer(Automatic configuration, MetadataReader reader, String serviceID) throws IndexingException {
+    public AbstractIndexer getIndexer(Automatic configuration, CSWMetadataReader reader, String serviceID) throws IndexingException {
         int type = -1;
         if (configuration != null)
             type = configuration.getType();

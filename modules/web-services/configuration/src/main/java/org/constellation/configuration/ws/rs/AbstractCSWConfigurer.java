@@ -33,7 +33,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 // constellation dependencies
-import org.geotoolkit.csw.xml.ElementSetType;
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.exception.ConfigurationException;
@@ -42,8 +41,9 @@ import org.constellation.configuration.filter.IndexDirectoryFilter;
 import org.constellation.configuration.filter.NextIndexDirectoryFilter;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.factory.AbstractCSWFactory;
+import org.constellation.metadata.io.AbstractMetadataReader;
+import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.io.MetadataReader;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
@@ -135,7 +135,7 @@ public abstract class AbstractCSWConfigurer {
      * @return A lucene Indexer
      * @throws org.constellation.ws.CstlServiceException
      */
-    protected AbstractIndexer initIndexer(String serviceID, MetadataReader currentReader) throws CstlServiceException {
+    protected AbstractIndexer initIndexer(String serviceID, CSWMetadataReader currentReader) throws CstlServiceException {
 
         // we get the CSW configuration file
         final Automatic config = serviceConfiguration.get(serviceID);
@@ -163,7 +163,7 @@ public abstract class AbstractCSWConfigurer {
      * @return A metadata reader.
      * @throws org.constellation.ws.CstlServiceException
      */
-    protected MetadataReader initReader(String serviceID) throws CstlServiceException {
+    protected CSWMetadataReader initReader(String serviceID) throws CstlServiceException {
 
         // we get the CSW configuration file
         final Automatic config = serviceConfiguration.get(serviceID);
@@ -389,14 +389,14 @@ public abstract class AbstractCSWConfigurer {
         for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(id))) {
             final String currentId        = getConfigID(configFile);
             AbstractIndexer indexer = null;
-            MetadataReader reader   = null;
+            CSWMetadataReader reader   = null;
             try {
                 reader  = initReader(currentId);
                 final List<Object> objectToIndex = new ArrayList<Object>();
                 if (reader != null) {
                     try {
                         for (String identifier : identifiers) {
-                            objectToIndex.add(reader.getMetadata(identifier, MetadataReader.ISO_19115, null));
+                            objectToIndex.add(reader.getMetadata(identifier, AbstractMetadataReader.ISO_19115, null));
                         }
                     } catch (MetadataIoException ex) {
                         throw new CstlServiceException(ex, NO_APPLICABLE_CODE);

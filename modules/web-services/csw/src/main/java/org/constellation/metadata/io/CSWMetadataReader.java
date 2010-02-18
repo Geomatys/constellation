@@ -18,9 +18,11 @@
 
 package org.constellation.metadata.io;
 
+import java.net.URI;
 import java.util.List;
 
 /// geotoolkit dependencies
+import java.util.Map;
 import javax.xml.namespace.QName;
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
@@ -29,17 +31,13 @@ import org.geotoolkit.csw.xml.ElementSetType;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class CSWMetadataReader extends MetadataReader {
+public interface CSWMetadataReader extends MetadataReader {
 
-
-    public CSWMetadataReader(boolean isCacheEnabled, boolean isThreadEnabled) {
-        super(isCacheEnabled, isThreadEnabled);
-    }
 
     /**
      * Return a list of values for each specific fields specified as a coma separated String.
      */
-    public abstract List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException;
+    public List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException;
 
     /**
      * Return a metadata object from the specified identifier.
@@ -52,11 +50,34 @@ public abstract class CSWMetadataReader extends MetadataReader {
      * @return A marshallable metadata object.
      * @throws MetadataIoException
      */
-    public abstract Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException;
+    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException;
 
+    /**
+     * Return the list of supported data types.
+     */
+    public List<Integer> getSupportedDataTypes();
 
-    @Override
-    public Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException {
-        return getMetadata(identifier, mode, ElementSetType.FULL, elementName);
-    }
+    /**
+     * Return the list of QName for additional queryable element.
+     */
+    public List<QName> getAdditionalQueryableQName();
+
+    /**
+     * Return the list of path for the additional queryable element.
+     */
+    public Map<String, List<String>> getAdditionalQueryablePathMap();
+
+    /**
+     * Return the list of Additional queryable element.
+     */
+    public abstract Map<String, URI> getConceptMap();
+
+    /**
+     * Execute a SQL query and return the result as a List of identifier;
+     *
+     * @param query
+     * @return
+     * @throws MetadataIoException
+     */
+    public abstract List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException;
 }

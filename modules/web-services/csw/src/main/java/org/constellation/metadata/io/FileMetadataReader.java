@@ -85,7 +85,7 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FileMetadataReader extends CSWMetadataReader {
+public class FileMetadataReader extends AbstractCSWMetadataReader {
 
     /**
      * A date formatter used to display the Date object for dublin core translation.

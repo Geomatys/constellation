@@ -121,7 +121,7 @@ public class MDWebMetadataWriterTest {
 
         writer.storeMetadata(absExpResult);
 
-        Object absResult = reader.getMetadata("14:SMLC", MetadataReader.SENSORML, null, null);
+        Object absResult = reader.getMetadata("14:SMLC", AbstractMetadataReader.SENSORML,  null);
 
         assertTrue(absResult != null);
         assertTrue(absResult instanceof SensorML);
@@ -234,7 +234,7 @@ public class MDWebMetadataWriterTest {
 
         writer.storeMetadata(absExpResult);
 
-        AbstractSensorML absResult = (AbstractSensorML) reader.getMetadata("15:SMLC", MetadataReader.SENSORML, null, null);
+        AbstractSensorML absResult = (AbstractSensorML) reader.getMetadata("15:SMLC", AbstractMetadataReader.SENSORML, null);
 
         assertTrue(absResult != null);
         assertTrue(absResult instanceof SensorML);

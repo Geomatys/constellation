@@ -81,7 +81,7 @@ import org.opengis.metadata.extent.GeographicExtent;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class GenericMetadataReader extends CSWMetadataReader {
+public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
     
     /**
      * A date Formater.

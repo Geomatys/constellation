@@ -53,10 +53,10 @@ import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.AbstractMetadataReader;
+import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.metadata.io.MetadataReader;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.ws.CstlServiceException;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // geotoolkit dependencies
@@ -82,7 +82,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     /**
      * The Reader of this lucene index (generic DB mode).
      */
-    private final MetadataReader reader;
+    private final CSWMetadataReader reader;
     
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
@@ -102,7 +102,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param reader A generic reader for read the metadata database.
      * @param configDirectory A directory where the index can write indexation file. 
      */
-    public GenericIndexer(MetadataReader reader, Automatic configuration, String serviceID) throws IndexingException {
+    public GenericIndexer(CSWMetadataReader reader, Automatic configuration, String serviceID) throws IndexingException {
         super(serviceID, configuration.getConfigurationDirectory());
         this.reader = reader;
         if (reader != null)
@@ -160,7 +160,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             LOGGER.info( nbEntries + " metadata to index (light memory mode)");
             for (String id : ids) {
                 if (!stopIndexing && !indexationToStop.contains(serviceID)) {
-                    final Object entry = reader.getMetadata(id, MetadataReader.ISO_19115, null);
+                    final Object entry = reader.getMetadata(id, AbstractMetadataReader.ISO_19115, null);
                     indexDocument(writer, entry);
                 } else {
                      LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);

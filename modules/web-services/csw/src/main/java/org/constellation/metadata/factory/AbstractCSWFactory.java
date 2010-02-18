@@ -22,7 +22,6 @@ import java.io.File;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.io.MetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
@@ -49,7 +48,7 @@ public abstract class AbstractCSWFactory extends Factory {
     
     public abstract int getProfile(int dbType);
     
-    public abstract AbstractIndexer getIndexer(Automatic configuration, MetadataReader reader, String serviceID) throws IndexingException;
+    public abstract AbstractIndexer getIndexer(Automatic configuration, CSWMetadataReader reader, String serviceID) throws IndexingException;
     
     public abstract AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws IndexingException;
 }
