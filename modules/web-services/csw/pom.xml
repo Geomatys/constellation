@@ -61,21 +61,12 @@
     in the JARs' list that maven will put in the directory "target/binaries".
   -->
   <dependencies>
-    <!-- MDweb model (via thesaurus)-->
-    <dependency>
-      <groupId>org.mdweb.metamodel</groupId>
-      <artifactId>mdweb-metamodel-lib-model</artifactId>
-    </dependency>
+    <!-- MDweb model -->
     <dependency>
       <groupId>org.mdweb.metamodel</groupId>
       <artifactId>mdweb-metamodel-lib-thesaurus</artifactId>
     </dependency>
     <!-- Constellation dependencies -->
-    <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-configuration</artifactId>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-ogc</artifactId>
