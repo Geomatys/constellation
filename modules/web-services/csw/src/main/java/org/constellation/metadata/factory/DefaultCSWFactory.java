@@ -32,7 +32,7 @@ import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.FileMetadataReader;
 import org.constellation.metadata.io.FileMetadataWriter;
 import org.constellation.metadata.io.MDWebCSWMetadataReader;
-import org.constellation.metadata.io.MDWebMetadataWriter;
+import org.constellation.metadata.io.MDWebCSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import static org.constellation.generic.database.Automatic.*;
 import org.geotoolkit.lucene.IndexingException;
@@ -87,7 +87,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             type = configuration.getType();
         switch (type) {
             case MDWEB:
-                return new MDWebMetadataWriter(configuration, indexer);
+                return new MDWebCSWMetadataWriter(configuration, indexer);
             case FILESYSTEM:
                 return new FileMetadataWriter(configuration, indexer);
             default:

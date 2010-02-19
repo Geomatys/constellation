@@ -98,7 +98,7 @@ public class MDWebMetadataWriterTest {
     public void setUp() throws Exception {
 
         reader = new MDWebMetadataReader(configuration);
-        writer = new MDWebMetadataWriter(configuration, null);
+        writer = new MDWebMetadataWriter(configuration);
     }
 
     @After

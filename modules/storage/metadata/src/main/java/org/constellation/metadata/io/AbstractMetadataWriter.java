@@ -17,11 +17,38 @@
  */
 package org.constellation.metadata.io;
 
+// J2SE dependencies
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface MetadataWriter {
+public abstract class AbstractMetadataWriter implements MetadataWriter {
+
+    /**
+     * A debugging logger.
+     */
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.io");
+    
+    /**
+     * Record the date format in the metadata.
+     */
+    protected final List<DateFormat> dateFormat = new ArrayList<DateFormat>();
+    
+    /**
+     * Build a new metadata writer.
+     * 
+     * @param MDReader an MDWeb database reader.
+     */
+    public AbstractMetadataWriter() throws MetadataIoException {
+        dateFormat.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
+        dateFormat.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+    }
 
     /**
      * Record an object in the metadata datasource.
@@ -29,14 +56,16 @@ public interface MetadataWriter {
      * @param obj The object to store in the datasource.
      * @return true if the storage succeed, false else.
      */
-    public boolean storeMetadata(Object obj) throws MetadataIoException;
+    @Override
+    public abstract boolean storeMetadata(Object obj) throws MetadataIoException;
 
     /**
      * Delete an object in the metadata database.
      * @param metadataID The identifier of the metadata to delete.
      * @return true if the delete succeed, false else.
      */
-    public boolean deleteMetadata(String metadataID) throws MetadataIoException;
+    @Override
+    public abstract boolean deleteMetadata(String metadataID) throws MetadataIoException;
 
 
     /**
@@ -45,20 +74,24 @@ public interface MetadataWriter {
      * @param metadataID The identifier of the metadata to Replace.
      * @param any The object to replace the matching metadata.
      */
-    public  boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException;
+    @Override
+    public abstract boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException;
 
     /**
      * Return true if the Writer supports the delete mecanism.
      */
-    public boolean deleteSupported();
+    @Override
+    public abstract boolean deleteSupported();
 
     /**
      * Return true if the Writer supports the update mecanism.
      */
-    public boolean updateSupported();
+    @Override
+    public abstract boolean updateSupported();
 
     /**
      * Destoy all the resource and close connection.
      */
-    public void destroy();
+    @Override
+    public abstract void destroy();
 }

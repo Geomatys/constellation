@@ -24,7 +24,6 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,16 +43,13 @@ import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 
 // Geotoolkit dependencies
-import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
 import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.geotoolkit.csw.xml.Record;
 import org.geotoolkit.dublincore.xml.AbstractSimpleLiteral;
 import org.geotoolkit.ebrim.xml.EbrimInternationalString;
 import org.geotoolkit.ebrim.xml.RegistryObject;
-import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.util.Utilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb dependencies
@@ -62,7 +58,6 @@ import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Path;
-import org.mdweb.model.schemas.PrimitiveType;
 import org.mdweb.model.schemas.Property;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
@@ -82,7 +77,7 @@ import org.opengis.metadata.identification.Identification;
  *
  * @author Guilhem Legal
  */
-public class MDWebMetadataWriter extends CSWMetadataWriter {
+public class MDWebMetadataWriter extends AbstractMetadataWriter {
     
     /**
      * A MDWeb catalogs where write the form.
@@ -97,7 +92,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
     /**
      * A writer to the MDWeb database.
      */
-    private Writer20 mdWriter;
+    protected Writer20 mdWriter;
     
     /**
      * The current main standard of the Object to create
@@ -121,8 +116,8 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
      * Build a new metadata writer.
      * 
      */
-    public MDWebMetadataWriter(Automatic configuration, AbstractIndexer index) throws MetadataIoException {
-        super(index);
+    public MDWebMetadataWriter(Automatic configuration) throws MetadataIoException {
+        super();
         if (configuration == null) {
             throw new MetadataIoException("The configuration object is null", NO_APPLICABLE_CODE);
         }
@@ -348,7 +343,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
      * @param form The created form.
      * 
      */
-    private List<Value> addValueFromObject(Form form, Object object, Path path, Value parentValue) throws MD_IOException {
+    protected List<Value> addValueFromObject(Form form, Object object, Path path, Value parentValue) throws MD_IOException {
 
         final List<Value> result = new ArrayList<Value>();
 
@@ -563,7 +558,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
      *
      * @throws java.sql.SQLException
      */
-    private Classe getClasseFromObject(Object object) throws MD_IOException {
+    protected Classe getClasseFromObject(Object object) throws MD_IOException {
         
         String className;
         String packageName;
@@ -840,11 +835,11 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
         }
         
         // we create a MDWeb form form the object
-        Form f = null;
+        Form form = null;
         try {
             final long startTrans = System.currentTimeMillis();
-            f = getFormFromObject(obj);
-            transTime = System.currentTimeMillis() - startTrans;
+            form                  = getFormFromObject(obj);
+            transTime             = System.currentTimeMillis() - startTrans;
             
         } catch (IllegalArgumentException e) {
              throw new MetadataIoException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
@@ -855,10 +850,10 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
         }
         
         // and we store it in the database
-        if (f != null) {
+        if (form != null) {
             try {
                 final long startWrite = System.currentTimeMillis();
-                mdWriter.writeForm(f, false, true);
+                mdWriter.writeForm(form, false, true);
                 writeTime = System.currentTimeMillis() - startWrite;
             /*} catch (IllegalArgumentException e) {
                 //TODO restore catching at this point
@@ -870,21 +865,22 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
             }
             
             final long time = System.currentTimeMillis() - start;
-            LOGGER.info("inserted new Form: " + f.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " +  writeTime + ")");
-            if (indexer != null) {
-                indexer.indexDocument(f);
-            }
+            LOGGER.info("inserted new Form: " + form.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " +  writeTime + ")");
+            indexDocument(form);
             return true;
         }
         return false;
     }
-    
+
+    protected void indexDocument(Form f) {
+        //need to be override by child
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void destroy() {
-        super.destroy();
         classBinding.clear();
         try {
             if (mdWriter != null)
@@ -943,7 +939,6 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
             throw new MetadataIoException("The service has throw an SQLException while deleting the metadata: " + ex.getMessage(),
                         NO_APPLICABLE_CODE);
         }
-        indexer.removeDocument(identifier);
         return true;
     }
 
@@ -959,95 +954,6 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException {
-        LOGGER.info("metadataID: " + metadataID);
-        int id;
-        String catalogCode = "";
-        Form f = null;
-        //we parse the identifier (Form_ID:Catalog_Code)
-        try  {
-            if (metadataID.indexOf(':') != -1) {
-                catalogCode    = metadataID.substring(metadataID.indexOf(':') + 1, metadataID.length());
-                metadataID = metadataID.substring(0, metadataID.indexOf(':'));
-                id         = Integer.parseInt(metadataID);
-            } else {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException e) {
-             throw new MetadataIoException("Unable to parse: " + metadataID, NO_APPLICABLE_CODE, "id");
-        }
-        try {
-            final Catalog catalog = mdWriter.getCatalog(catalogCode);
-            f                     = mdWriter.getForm(catalog, id);
-
-        } catch (MD_IOException ex) {
-            throw new MetadataIoException("The service has throw an SQLException while updating the metadata: " + ex.getMessage(),
-                        NO_APPLICABLE_CODE);
-        }
-
-        for (RecordPropertyType property : properties) {
-            try {
-                final String xpath = property.getName();
-                final Object value = property.getValue();
-                final MixedPath mp = getMDWPathFromXPath(xpath);
-                LOGGER.finer("IDValue: " + mp.idValue);
-                final List<Value> matchingValues = f.getValueFromNumberedPath(mp.path, mp.idValue);
-
-                if (matchingValues.size() == 0) {
-                    throw new MetadataIoException("There is no value matching for the xpath:" + property.getName(), INVALID_PARAMETER_VALUE);
-                }
-                for (Value v : matchingValues) {
-                    LOGGER.finer("value:" + v);
-                    if (v instanceof TextValue && value instanceof String) {
-                        // TODO verify more Type
-                        if (v.getType().equals(PrimitiveType.DATE)) {
-                            try {
-                                String timeValue = (String)value;
-                                timeValue        = timeValue.replaceAll("T", " ");
-                                if (timeValue.indexOf('+') != -1) {
-                                    timeValue    = timeValue.substring(0, timeValue.indexOf('+'));
-                                }
-                                LOGGER.finer(timeValue);
-                                Timestamp.valueOf(timeValue);
-                            } catch(IllegalArgumentException ex) {
-                                throw new MetadataIoException("The type of the replacement value does not match with the value type : Date",
-                                    INVALID_PARAMETER_VALUE);
-                            }
-                        }
-                        LOGGER.finer("textValue updated");
-                        mdWriter.updateTextValue((TextValue) v, (String) value);
-                    } else {
-                        final Classe requestType = getClasseFromObject(value);
-                        final Classe valueType   = v.getType();
-                        if (!Utilities.equals(requestType, valueType)) {
-                            throw new MetadataIoException("The type of the replacement value (" + requestType.getName() +
-                                                           ") does not match with the value type :" + valueType.getName(),
-                                    INVALID_PARAMETER_VALUE);
-                        } else {
-                            LOGGER.finer("value updated");
-                            mdWriter.deleteValue(v);
-                            final List<Value> toInsert = addValueFromObject(f, value, mp.path, v.getParent());
-                            for (Value ins : toInsert) {
-                                mdWriter.writeValue(ins);
-                            }
-                        }
-                    }
-                }
-            } catch (MD_IOException ex) {
-                throw new MetadataIoException(ex);
-            } catch (IllegalArgumentException ex) {
-                throw new MetadataIoException(ex);
-            }
-            indexer.removeDocument(metadataID);
-            indexer.indexDocument(f);
-        }
-        return true;
-    }
-
-    /**
      * Return an MDWeb path from a Xpath.
      *
      * @param xpath An XPath
@@ -1056,7 +962,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
      * @throws java.sql.SQLException
      * @throws org.constellation.ws.MetadataIoException
      */
-    private MixedPath getMDWPathFromXPath(String xpath) throws MD_IOException, MetadataIoException {
+    protected MixedPath getMDWPathFromXPath(String xpath) throws MD_IOException, MetadataIoException {
         String idValue = "";
         //we remove the first '/'
         if (xpath.startsWith("/")) {
@@ -1165,7 +1071,7 @@ public class MDWebMetadataWriter extends CSWMetadataWriter {
         return property;
     }
 
-    private static final class MixedPath {
+    protected static final class MixedPath {
 
         public Path path;
 

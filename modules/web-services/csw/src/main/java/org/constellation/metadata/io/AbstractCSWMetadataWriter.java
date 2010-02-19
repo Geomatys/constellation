@@ -14,18 +14,33 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
+
 package org.constellation.metadata.io;
 
 import java.util.List;
-
-//geotoolkit dependencies
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
+import org.geotoolkit.lucene.index.AbstractIndexer;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface CSWMetadataWriter extends MetadataWriter {
+public abstract class AbstractCSWMetadataWriter extends AbstractMetadataWriter implements CSWMetadataWriter{
+
+    /**
+     * An indexer lucene to add object into the index.
+     */
+    protected final AbstractIndexer indexer;
+
+     /**
+     * Build a new metadata writer.
+     *
+     * @param MDReader an MDWeb database reader.
+     */
+    public AbstractCSWMetadataWriter(AbstractIndexer indexer) throws MetadataIoException {
+        super();
+        this.indexer        = indexer;
+    }
 
     /**
      * Update an object in the metadata database.
@@ -33,6 +48,17 @@ public interface CSWMetadataWriter extends MetadataWriter {
      * @param metadataID The identifier of the metadata to Replace.
      * @param properties A List of property-value to replace in the specified metadata.
      */
-    public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException;
+    @Override
+    public abstract boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException;
 
+
+    /**
+     * Destoy all the resource and close connection.
+     */
+    @Override
+    public void destroy() {
+        if (indexer != null)
+            indexer.destroy();
+    }
 }
+
