@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -52,6 +53,7 @@ import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
+import org.constellation.util.TimeParser;
 import org.constellation.writer.CapabilitiesFilterWriter;
 import org.constellation.writer.ExceptionFilterWriter;
 import org.constellation.ws.ServiceType;
@@ -69,7 +71,6 @@ import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
-import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
@@ -543,7 +544,12 @@ public class WMSService extends GridWebService {
             throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, KEY_ELEVATION.toLowerCase());
         }
         final MeasurementRange dimRange = QueryAdapter.toMeasurementRange(strDimRange);
-        final Date date = TemporalUtilities.createDate(strTime);
+        final Date date;
+        try {
+            date = TimeParser.toDate(strTime);
+        } catch (ParseException ex) {
+            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, KEY_TIME.toLowerCase());
+        }
         final int width;
         final int height;
         try {

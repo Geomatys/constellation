@@ -287,6 +287,22 @@ public final class TimeParser {
     }
 
     /**
+     * Convert a string containing a date into a {@link Date}, respecting the ISO 8601 standard.
+     *
+     * @param strTime Date as a string.
+     * @return A date parsed from a string, or {@code null} if it doesn't respect the ISO 8601.
+     * @throws java.text.ParseException
+     */
+    public static Date toDate(final String strTime) throws ParseException {
+        if (strTime == null) {
+            return null;
+        }
+        final List<Date> dates = new ArrayList<Date>();
+        TimeParser.parse(strTime, 0L, dates);
+        return (dates != null && !dates.isEmpty()) ? dates.get(0) : null;
+    }
+
+    /**
      * Required for internal working only.
      */
     @Override

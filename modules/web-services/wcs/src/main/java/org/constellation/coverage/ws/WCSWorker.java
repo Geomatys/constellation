@@ -47,6 +47,7 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.register.RegisterException;
 import org.constellation.util.StyleUtils;
+import org.constellation.util.TimeParser;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -78,7 +79,6 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.resources.Errors;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
@@ -805,7 +805,14 @@ public final class WCSWorker extends AbstractWorker {
                            MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
         }
 
-        final Date date = TemporalUtilities.createDate(request.getTime());
+        Date date = null;
+        try {
+            date = TimeParser.toDate(request.getTime());
+        } catch (ParseException ex) {
+            throw new CstlServiceException("Parsing of the date failed. Please verify that the specified" +
+                    " date is compliant with the ISO-8601 standard.", ex, INVALID_PARAMETER_VALUE,
+                    KEY_TIME.toLowerCase());
+        }
 
         final LayerDetails layerRef = getLayerReference(request.getCoverage(), inputVersion);
         if (!layerRef.isQueryable(ServiceType.WCS) || layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
