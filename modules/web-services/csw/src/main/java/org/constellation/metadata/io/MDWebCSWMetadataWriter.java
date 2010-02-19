@@ -68,6 +68,11 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
         this.indexer = index;
     }
 
+    protected MDWebCSWMetadataWriter() throws MetadataIoException {
+        super();
+        indexer = null;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -187,7 +192,8 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      *
      * @return the founded title or UNKNOW_TITLE
      */
-    protected static String findTitle(Object obj) {
+    @Override
+    protected String findTitle(Object obj) {
 
         //here we try to get the title
         AbstractSimpleLiteral titleSL = null;

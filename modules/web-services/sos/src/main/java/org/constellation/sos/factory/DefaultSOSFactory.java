@@ -23,6 +23,7 @@ import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.ObservationWriterType;
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.io.generic.DefaultGenericObservationReader;
 import org.constellation.sos.io.postgrid.DefaultObservationFilter;
 import org.constellation.sos.io.postgrid.DefaultObservationReader;
@@ -123,7 +124,12 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
         switch (type) {
             case FILE_SYSTEM: return new FileSensorReader(configuration);
 
-            case MDWEB: return new MDWebSensorReader(configuration, map);
+            case MDWEB:
+                try {
+                    return new MDWebSensorReader(configuration, map);
+                } catch (MetadataIoException ex) {
+                    throw new CstlServiceException(ex);
+                }
 
             default: throw new IllegalArgumentException("Unknow SML dataSource type: " + type);
         }
@@ -137,7 +143,12 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
         switch (type) {
             case FILE_SYSTEM: return new FileSensorWriter(configuration, sensorIdBase);
 
-            case MDWEB: return new MDWebSensorWriter(configuration, sensorIdBase);
+            case MDWEB:
+                try {
+                    return new MDWebSensorWriter(configuration, sensorIdBase);
+                } catch (MetadataIoException ex) {
+                    throw new CstlServiceException(ex);
+                }
 
             default: throw new IllegalArgumentException("Unknow SML dataSource type: " + type);
         }

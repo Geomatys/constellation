@@ -61,9 +61,10 @@
     in the JARs' list that maven will put in the directory "target/binaries".
   -->
   <dependencies>
-    <dependency>
-      <groupId>org.mdweb.metamodel</groupId>
-      <artifactId>mdweb-metamodel-lib-model</artifactId>
+     <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-metadata</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
      <groupId>org.geotoolkit.pending</groupId>

@@ -117,12 +117,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final Connection mdConnection = db.getConnection();
             final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
             mdWriter  = new Writer20(mdConnection, isPostgres);
-            mdCatalog = mdWriter.getCatalog("CSWCat");
-            if (mdCatalog == null) {
-                mdCatalog = new Catalog("CSWCat", "CSW Data Catalog");
-                mdWriter.writeCatalog(mdCatalog);
-            }
-            this.user     = mdWriter.getUser("admin");
+            mdCatalog = getCatalog();
+            this.user = mdWriter.getUser("admin");
 
         } catch (MD_IOException ex) {
             throw new MetadataIoException("MD_IOException while initializing the MDWeb writer:" +'\n'+
@@ -136,6 +132,20 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         this.alreadyWrite = new HashMap<Object, Value>();
     }
 
+    protected MDWebMetadataWriter() throws MetadataIoException {
+        user = null;
+    }
+    
+    // TODO move this to CSW implementation
+    public Catalog getCatalog() throws MD_IOException {
+        Catalog cat = mdWriter.getCatalog("CSWCat");
+        if (cat == null) {
+            cat = new Catalog("CSWCat", "CSW Data Catalog");
+            mdWriter.writeCatalog(cat);
+        }
+        return cat;
+    }
+
      /**
      * This method try to find a title for this object.
      * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
@@ -145,7 +155,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      *
      * @return the founded title or UNKNOW_TITLE
      */
-    protected static String findTitle(Object obj) {
+    protected String findTitle(Object obj) {
 
         //here we try to get the title
         String title = UNKNOW_TITLE;

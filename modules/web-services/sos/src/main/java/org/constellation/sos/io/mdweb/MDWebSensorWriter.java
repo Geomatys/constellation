@@ -17,9 +17,6 @@
 
 package org.constellation.sos.io.mdweb;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
@@ -27,60 +24,29 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 
 // JAXB dependencies
-import java.util.Collections;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.parsers.ParserConfigurationException;
-import org.xml.sax.SAXException;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.metadata.io.MDWebMetadataWriter;
+import org.constellation.metadata.io.MetadataIoException;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.xml.MarshallerPool;
 import org.mdweb.io.MD_IOException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb dependencies
-import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;
-import org.mdweb.model.storage.Form;
-import org.mdweb.model.users.User;
-import org.mdweb.io.sql.v20.Reader20;
-import org.mdweb.io.sql.v20.Writer20;
-import org.mdweb.io.xml.MalFormedDocumentException;
-import org.mdweb.io.xml.Reader;
 
 /**
  *
  * @author Guilhem Legal (geomatys)
  */
-public class MDWebSensorWriter implements SensorWriter {
-
-    /**
-     * use for debugging purpose
-     */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
+public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWriter {
 
     private static final String SQL_ERROR_MSG = "The service has throw a SQL Exception:";
-    /**
-     * A Writer to the SensorML database.
-     */
-    private final Writer20 sensorMLWriter;
-
-    /**
-     * the data catalog for SensorML database.
-     */
-    private final Catalog sensorMLCatalog;
-
-    /**
-     * The user who owe the form.
-     */
-    private final User mainUser;
 
     /**
      * A connection to the MDWeb database.
@@ -93,99 +59,52 @@ public class MDWebSensorWriter implements SensorWriter {
      * An SQL satetement finding the last sensor ID recorded
      */
     private final PreparedStatement newSensorIdStmt;
-    
-    /**
-     * A JAXB marshaller pool used to provide xml to the XMLReader.
-     */
-    private MarshallerPool marshallerPool;
 
-    public MDWebSensorWriter(final Automatic configuration, final String sensorIdBase) throws CstlServiceException {
-        if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
-        }
-        // we get the database informations
+    private static String currentSensorID;
+    
+    public MDWebSensorWriter(final Automatic configuration, final String sensorIdBase) throws MetadataIoException {
+        super(configuration);
+
         final BDD db = configuration.getBdd();
-        if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
-        }
         try {
             smlConnection   = db.getConnection();
-            final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
-            sensorMLWriter  = new Writer20(smlConnection, isPostgres);
-            sensorMLCatalog = sensorMLWriter.getCatalog("SMLC");
-            mainUser        = sensorMLWriter.getUser("admin");
 
              //we build the prepared Statement
             newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Storage\".\"Forms\" WHERE \"title\" LIKE '%" + sensorIdBase + "%' ");
 
-            //we initialize the marshaller
-            marshallerPool = new MarshallerPool(Collections.singletonMap(MarshallerPool.ROOT_NAMESPACE_KEY, "http://www.opengis.net/sensorML/1.0"),
-                    "org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
-
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("JAXBException while starting the MDweb Sensor writer", NO_APPLICABLE_CODE);
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("SQLException while starting the MDweb Sensor writer: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
-        } catch (MD_IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("MD_IOException while starting the MDweb Sensor writer: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new MetadataIoException("SQLException while starting the MDweb Sensor writer: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
+        } 
+    }
+
+    @Override
+    public Catalog getCatalog() throws MD_IOException {
+        Catalog cat = mdWriter.getCatalog("SMLC");
+        if (cat == null) {
+            cat = new Catalog("SMLC", "SensorML catalog");
+            mdWriter.writeCatalog(cat);
         }
+        return cat;
     }
 
     @Override
      public void writeSensor(String id, AbstractSensorML process) throws CstlServiceException {
-        Marshaller marshaller = null;
+       
         try {
-            marshaller = marshallerPool.acquireMarshaller();
+            currentSensorID = id;
+            super.storeMetadata(process);
 
-            //we create a new Tempory File SensorML
-            final File sensorFile = File.createTempFile("sml", "xml");
-            marshaller.marshal(process, sensorFile);
-
-            //we parse the temporay xmlFile
-            final Reader xmlReader = new Reader(sensorFile, sensorMLWriter, Standard.SENSORML);
-
-            //and we write it in the sensorML Database
-
-            final Form f = xmlReader.readForm(sensorMLCatalog, mainUser, id, Standard.SENSORML);
-            sensorMLWriter.writeForm(f, false, true);
-
-        } catch (ParserConfigurationException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("The service has throw a ParserException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
-        } catch (SAXException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("The service has throw a SAXException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
-        } catch (MalFormedDocumentException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            LOGGER.severe("MalFormedDocumentException:" + ex.getMessage());
-            throw new CstlServiceException("The SensorML Document is Malformed:" + ex.getMessage(),
-                                          INVALID_PARAMETER_VALUE, "sensorDescription");
-        } catch (MD_IOException e) {
+        } catch (MetadataIoException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(),
                                              NO_APPLICABLE_CODE);
-        } catch (FileNotFoundException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("The service cannot build the temporary file",
-                                          NO_APPLICABLE_CODE);
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("the service has throw an IOException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
-        } catch (JAXBException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("the service has throw an JAXBException:" + ex.getMessage(),
-                                          NO_APPLICABLE_CODE);
-        } finally {
-            if (marshaller != null) {
-                marshallerPool.release(marshaller);
-            }
         }
+    }
+
+    @Override
+    protected String findTitle(Object obj) {
+        return currentSensorID;
     }
 
     @Override
@@ -250,13 +169,11 @@ public class MDWebSensorWriter implements SensorWriter {
     
     @Override
     public void destroy() {
+        super.destroy();
         try {
             newSensorIdStmt.close();
-            sensorMLWriter.dispose();
         } catch (SQLException ex) {
             LOGGER.severe("SQLException while closing SOSWorker");
-        } catch (MD_IOException ex) {
-            LOGGER.severe("MD_IOException while closing SOSWorker");
         }
     }
 

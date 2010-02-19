@@ -79,7 +79,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     /**
      * A reader to the MDWeb database.
      */
-    protected Reader mdReader;
+    protected Reader20 mdReader;
     
     /**
      * A map containing the mapping beetween the MDWeb className and java typeName

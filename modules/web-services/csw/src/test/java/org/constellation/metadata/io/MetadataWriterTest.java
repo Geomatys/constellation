@@ -62,6 +62,12 @@ public class MetadataWriterTest {
      */
     @Test
     public void FindTitleTest() throws Exception {
+        MDWebCSWMetadataWriter writer = null;
+        try {
+            writer = new MDWebCSWMetadataWriter();
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
 
         RecordType record = new RecordType();
         record.setIdentifier(new SimpleLiteral("42292_5p_19900609195600"));
@@ -70,7 +76,7 @@ public class MetadataWriterTest {
 
 
         String expResult = "42292_5p_19900609195600";
-        String result = MDWebCSWMetadataWriter.findTitle(record);
+        String result = writer.findTitle(record);
 
         assertEquals(expResult, result);
 
@@ -82,7 +88,7 @@ public class MetadataWriterTest {
 
 
         expResult = "title1";
-        result = MDWebCSWMetadataWriter.findTitle(record);
+        result = writer.findTitle(record);
 
         assertEquals(expResult, result);
 
@@ -94,7 +100,7 @@ public class MetadataWriterTest {
         metadata.setIdentificationInfo(Arrays.asList(identification));
 
         expResult = "titleMeta";
-        result = MDWebCSWMetadataWriter.findTitle(metadata);
+        result = writer.findTitle(metadata);
 
         assertEquals(expResult, result);
     }
