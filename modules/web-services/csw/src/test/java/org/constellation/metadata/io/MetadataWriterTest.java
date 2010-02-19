@@ -70,7 +70,7 @@ public class MetadataWriterTest {
 
 
         String expResult = "42292_5p_19900609195600";
-        String result = MDWebMetadataWriter.findTitle(record);
+        String result = MDWebCSWMetadataWriter.findTitle(record);
 
         assertEquals(expResult, result);
 
@@ -82,7 +82,7 @@ public class MetadataWriterTest {
 
 
         expResult = "title1";
-        result = MDWebMetadataWriter.findTitle(record);
+        result = MDWebCSWMetadataWriter.findTitle(record);
 
         assertEquals(expResult, result);
 
@@ -94,7 +94,7 @@ public class MetadataWriterTest {
         metadata.setIdentificationInfo(Arrays.asList(identification));
 
         expResult = "titleMeta";
-        result = MDWebMetadataWriter.findTitle(metadata);
+        result = MDWebCSWMetadataWriter.findTitle(metadata);
 
         assertEquals(expResult, result);
     }

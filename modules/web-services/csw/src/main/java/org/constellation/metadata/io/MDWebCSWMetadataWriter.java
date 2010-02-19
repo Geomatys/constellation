@@ -17,12 +17,24 @@
 
 package org.constellation.metadata.io;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
+
 import org.constellation.generic.database.Automatic;
+
+import org.geotoolkit.csw.xml.Record;
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
+import org.geotoolkit.dublincore.xml.AbstractSimpleLiteral;
+import org.geotoolkit.ebrim.xml.EbrimInternationalString;
+import org.geotoolkit.ebrim.xml.RegistryObject;
 import org.geotoolkit.lucene.index.AbstractIndexer;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.util.Utilities;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 import org.mdweb.io.MD_IOException;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.PrimitiveType;
@@ -30,7 +42,9 @@ import org.mdweb.model.storage.Catalog;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+import org.opengis.metadata.identification.Identification;
+
 
 /**
  *
@@ -162,5 +176,118 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
             indexer.indexDocument(f);
         }
         return true;
+    }
+
+    /**
+     * This method try to find a title for this object.
+     * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
+     * else we try to find a getName(), getTitle(), or getId() method.
+     *
+     * @param obj the object for which we want a title.
+     *
+     * @return the founded title or UNKNOW_TITLE
+     */
+    protected static String findTitle(Object obj) {
+
+        //here we try to get the title
+        AbstractSimpleLiteral titleSL = null;
+        String title = UNKNOW_TITLE;
+        if (obj instanceof Record) {
+            titleSL = ((Record) obj).getTitle();
+            if (titleSL == null) {
+                titleSL = ((Record) obj).getIdentifier();
+            }
+
+            if (titleSL == null) {
+                title = UNKNOW_TITLE;
+            } else {
+                if (titleSL.getContent().size() > 0)
+                    title = titleSL.getContent().get(0);
+            }
+
+        } else if (obj instanceof DefaultMetadata) {
+            final Collection<Identification> idents = ((DefaultMetadata) obj).getIdentificationInfo();
+            if (idents.size() != 0) {
+                final Identification ident = idents.iterator().next();
+                if (ident != null && ident.getCitation() != null && ident.getCitation().getTitle() != null) {
+                    title = ident.getCitation().getTitle().toString();
+                }
+            }
+        } else if (obj instanceof RegistryObject) {
+            final EbrimInternationalString ident = ((RegistryObject) obj).getName();
+            if (ident != null && ident.getLocalizedString().size() > 0) {
+                title = ident.getLocalizedString().get(0).getValue();
+            } else {
+                title = ((RegistryObject) obj).getId();
+            }
+
+        } else {
+            Method nameGetter = null;
+            String methodName = "";
+            int i = 0;
+            while (i < 3) {
+                try {
+                    switch (i) {
+                        case 0: methodName = "getTitle";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+
+                        case 1: methodName = "getName";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+
+                        case 2: methodName = "getId";
+                                nameGetter = obj.getClass().getMethod(methodName);
+                                break;
+                        default: break;
+                    }
+
+
+                } catch (NoSuchMethodException ex) {
+                    LOGGER.finer("There is no " + methodName + " method in " + obj.getClass().getSimpleName());
+                } catch (SecurityException ex) {
+                    LOGGER.severe(" security exception while getting the title of the object.");
+                }
+                if (nameGetter != null) {
+                    i = 3;
+                } else {
+                    i++;
+                }
+            }
+
+            if (nameGetter != null) {
+                try {
+                    final Object objT = nameGetter.invoke(obj);
+                    if (objT instanceof String) {
+                        title = (String) obj;
+
+                    } else if (objT instanceof AbstractSimpleLiteral) {
+                        titleSL = (AbstractSimpleLiteral) objT;
+                        if (titleSL.getContent().size() > 0)
+                            title = titleSL.getContent().get(0);
+                        else title = UNKNOW_TITLE;
+
+                    } else {
+                        title = UNKNOW_TITLE;
+                    }
+
+                    if (title == null)
+                        title = UNKNOW_TITLE;
+                } catch (IllegalAccessException ex) {
+                    LOGGER.warning("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' +
+                                  "cause: " + ex.getMessage());
+                } catch (IllegalArgumentException ex) {
+                    LOGGER.warning("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
+                                  "cause: " + ex.getMessage());
+                } catch (InvocationTargetException ex) {
+                    LOGGER.warning("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
+                                  "cause: " + ex.getMessage());
+                }
+            }
+
+            if (title.equals(UNKNOW_TITLE))
+                LOGGER.warning("unknow type: " + obj.getClass().getName() + " unable to find a title, using default then.");
+        }
+        return title;
     }
 }

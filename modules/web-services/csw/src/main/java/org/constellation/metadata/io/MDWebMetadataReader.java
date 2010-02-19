@@ -55,13 +55,13 @@ import org.mdweb.io.Reader;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Reader20;
 
-// geotoolkit/GeoAPI dependencies
+// Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.MetadataEntity;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
 import org.geotoolkit.temporal.object.TemporalUtilities;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
+// GeoAPI dependencies
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
 
@@ -145,12 +145,12 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     public MDWebMetadataReader(Automatic configuration) throws MetadataIoException {
         super(true, false);
         if (configuration == null) {
-            throw new MetadataIoException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration object is null");
         }
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
-            throw new MetadataIoException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration file does not contains a BDD object");
         }
         try {
             final Connection mdConnection = db.getConnection();
@@ -158,7 +158,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             this.mdReader           = new Reader20(mdConnection, isPostgres);
         } catch (SQLException ex) {
             throw new MetadataIoException("SQLException while initializing the MDWeb reader:" +'\n'+
-                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+                                           "cause:" + ex.getMessage());
         }
 
         initPackage();
@@ -262,7 +262,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             }
             
         } catch (NumberFormatException e) {
-             throw new MetadataIoException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id");
+             throw new MetadataIoException("Unable to parse: " + identifier, null, "id");
         }
 
         try {
@@ -281,7 +281,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             return result;
 
         } catch (MD_IOException e) {
-             throw new MetadataIoException("SQL exception while reading the metadata: " + identifier, NO_APPLICABLE_CODE, "id");
+             throw new MetadataIoException("SQL exception while reading the metadata: " + identifier, null, "id");
         }
     }
     
@@ -859,7 +859,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 results.add(getObjectFromForm("no cache", f, -1));
             }
         } catch (MD_IOException ex) {
-            throw new MetadataIoException("SQL Exception while getting all the entries: " +ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new MetadataIoException("SQL Exception while getting all the entries: " +ex.getMessage());
         }
         return results;
     }

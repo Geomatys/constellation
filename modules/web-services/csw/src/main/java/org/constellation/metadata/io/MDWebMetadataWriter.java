@@ -42,16 +42,6 @@ import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 
-// Geotoolkit dependencies
-import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
-import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
-import org.geotoolkit.csw.xml.Record;
-import org.geotoolkit.dublincore.xml.AbstractSimpleLiteral;
-import org.geotoolkit.ebrim.xml.EbrimInternationalString;
-import org.geotoolkit.ebrim.xml.RegistryObject;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-
 // MDWeb dependencies
 import org.mdweb.model.profiles.Profile;
 import org.mdweb.model.schemas.Classe;
@@ -69,13 +59,9 @@ import org.mdweb.model.users.User;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Writer20;
 
-// geoAPI dependencies
-import org.opengis.metadata.identification.Identification;
-
-
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public class MDWebMetadataWriter extends AbstractMetadataWriter {
     
@@ -110,7 +96,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     private Map<Object, Value> alreadyWrite;
 
-    private static final String UNKNOW_TITLE = "unknow title";
+    protected static final String UNKNOW_TITLE = "unknow title";
      
     /**
      * Build a new metadata writer.
@@ -119,12 +105,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     public MDWebMetadataWriter(Automatic configuration) throws MetadataIoException {
         super();
         if (configuration == null) {
-            throw new MetadataIoException("The configuration object is null", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration object is null");
         }
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
-            throw new MetadataIoException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The configuration file does not contains a BDD object");
         }
         try {
 
@@ -140,10 +126,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
         } catch (MD_IOException ex) {
             throw new MetadataIoException("MD_IOException while initializing the MDWeb writer:" +'\n'+
-                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+                                           "cause:" + ex.getMessage());
         } catch (SQLException ex) {
             throw new MetadataIoException("SQLException while initializing the MDWeb writer:" +'\n'+
-                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+                                           "cause:" + ex.getMessage());
         }
         
         this.classBinding = new HashMap<Class, Classe>();
@@ -162,104 +148,69 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     protected static String findTitle(Object obj) {
 
         //here we try to get the title
-        AbstractSimpleLiteral titleSL = null;
         String title = UNKNOW_TITLE;
-        if (obj instanceof Record) {
-            titleSL = ((Record) obj).getTitle();
-            if (titleSL == null) {
-                titleSL = ((Record) obj).getIdentifier();
-            }
+        
+        Method nameGetter = null;
+        String methodName = "";
+        int i = 0;
+        while (i < 3) {
+            try {
+                switch (i) {
+                    case 0: methodName = "getTitle";
+                            nameGetter = obj.getClass().getMethod(methodName);
+                            break;
 
-            if (titleSL == null) {
-                title = UNKNOW_TITLE;
-            } else {
-                if (titleSL.getContent().size() > 0)
-                    title = titleSL.getContent().get(0);
-            }
+                    case 1: methodName = "getName";
+                            nameGetter = obj.getClass().getMethod(methodName);
+                            break;
 
-        } else if (obj instanceof DefaultMetadata) {
-            final Collection<Identification> idents = ((DefaultMetadata) obj).getIdentificationInfo();
-            if (idents.size() != 0) {
-                final Identification ident = idents.iterator().next();
-                if (ident != null && ident.getCitation() != null && ident.getCitation().getTitle() != null) {
-                    title = ident.getCitation().getTitle().toString();
+                    case 2: methodName = "getId";
+                            nameGetter = obj.getClass().getMethod(methodName);
+                            break;
+                    default: break;
                 }
+
+
+            } catch (NoSuchMethodException ex) {
+                LOGGER.finer("There is no " + methodName + " method in " + obj.getClass().getSimpleName());
+            } catch (SecurityException ex) {
+                LOGGER.severe(" security exception while getting the title of the object.");
             }
-        } else if (obj instanceof RegistryObject) {
-            final EbrimInternationalString ident = ((RegistryObject) obj).getName();
-            if (ident != null && ident.getLocalizedString().size() > 0) {
-                title = ident.getLocalizedString().get(0).getValue();
-            } else {
-                title = ((RegistryObject) obj).getId();
-            }
-
-        } else {
-            Method nameGetter = null;
-            String methodName = "";
-            int i = 0;
-            while (i < 3) {
-                try {
-                    switch (i) {
-                        case 0: methodName = "getTitle";
-                                nameGetter = obj.getClass().getMethod(methodName);
-                                break;
-
-                        case 1: methodName = "getName";
-                                nameGetter = obj.getClass().getMethod(methodName);
-                                break;
-
-                        case 2: methodName = "getId";
-                                nameGetter = obj.getClass().getMethod(methodName);
-                                break;
-                        default: break;
-                    }
-
-
-                } catch (NoSuchMethodException ex) {
-                    LOGGER.finer("There is no " + methodName + " method in " + obj.getClass().getSimpleName());
-                } catch (SecurityException ex) {
-                    LOGGER.severe(" security exception while getting the title of the object.");
-                }
-                if (nameGetter != null) {
-                    i = 3;
-                } else {
-                    i++;
-                }
-            }
-
             if (nameGetter != null) {
-                try {
-                    final Object objT = nameGetter.invoke(obj);
-                    if (objT instanceof String) {
-                        title = (String) obj;
-
-                    } else if (objT instanceof AbstractSimpleLiteral) {
-                        titleSL = (AbstractSimpleLiteral) objT;
-                        if (titleSL.getContent().size() > 0)
-                            title = titleSL.getContent().get(0);
-                        else title = UNKNOW_TITLE;
-
-                    } else {
-                        title = UNKNOW_TITLE;
-                    }
-
-                    if (title == null)
-                        title = UNKNOW_TITLE;
-                } catch (IllegalAccessException ex) {
-                    LOGGER.warning("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' +
-                                  "cause: " + ex.getMessage());
-                } catch (IllegalArgumentException ex) {
-                    LOGGER.warning("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
-                                  "cause: " + ex.getMessage());
-                } catch (InvocationTargetException ex) {
-                    LOGGER.warning("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
-                                  "cause: " + ex.getMessage());
-                }
+                i = 3;
+            } else {
+                i++;
             }
-
-            if (title.equals(UNKNOW_TITLE))
-                LOGGER.warning("unknow type: " + obj.getClass().getName() + " unable to find a title, using default then.");
         }
+
+        if (nameGetter != null) {
+            try {
+                final Object objT = nameGetter.invoke(obj);
+                if (objT instanceof String) {
+                    title = (String) obj;
+                } else if (objT != null) {
+                    title = objT.toString();
+                } else {
+                    title = UNKNOW_TITLE;
+                }
+
+            } catch (IllegalAccessException ex) {
+                LOGGER.warning("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' +
+                              "cause: " + ex.getMessage());
+            } catch (IllegalArgumentException ex) {
+                LOGGER.warning("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
+                              "cause: " + ex.getMessage());
+            } catch (InvocationTargetException ex) {
+                LOGGER.warning("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
+                              "cause: " + ex.getMessage());
+            }
+        }
+        if (title == null)
+            title = UNKNOW_TITLE;
+
+        if (title.equals(UNKNOW_TITLE))
+            LOGGER.warning("unknow type: " + obj.getClass().getName() + " unable to find a title, using default then.");
+        
         return title;
     }
 
@@ -291,10 +242,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 mainStandard   = Standard.ISO_19115;
             
             // Ebrim Types    
-            } else if (object instanceof IdentifiableType) {
+            } else if (className.equals("IdentifiableType")) {
                 mainStandard = Standard.EBRIM_V3;
            
-            } else if (object instanceof RegistryObjectType) {
+            } else if (className.equals("RegistryObjectType")) {
                 mainStandard = Standard.EBRIM_V2_5;
             
             // CSW Types    
@@ -843,10 +794,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             
         } catch (IllegalArgumentException e) {
              throw new MetadataIoException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
-                                           "cause: " + e.getMessage(),NO_APPLICABLE_CODE);
+                                           "cause: " + e.getMessage());
         } catch (MD_IOException e) {
-             throw new MetadataIoException("The service has throw an SQLException while writing the metadata: " + e.getMessage(),
-                                            NO_APPLICABLE_CODE);
+             throw new MetadataIoException("The service has throw an SQLException while writing the metadata: " + e.getMessage());
         }
         
         // and we store it in the database
@@ -860,8 +810,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 throw e;
                 //return false;*/
             } catch (MD_IOException e) {
-                throw new MetadataIoException("The service has throw an SQLException while writing the metadata :" + e.getMessage(), e,
-                        NO_APPLICABLE_CODE);
+                throw new MetadataIoException("The service has throw an SQLException while writing the metadata :" + e.getMessage(), e, null);
             }
             
             final long time = System.currentTimeMillis() - start;
@@ -928,7 +877,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 throw new NumberFormatException();
             }
         } catch (NumberFormatException e) {
-             throw new MetadataIoException("Unable to parse: " + identifier, NO_APPLICABLE_CODE, "id");
+             throw new MetadataIoException("Unable to parse: " + identifier, null, "id");
         }
         try {
             final Catalog catalog = mdWriter.getCatalog(catalogCode);
@@ -936,8 +885,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
             mdWriter.deleteForm(f.getId());
         } catch (MD_IOException ex) {
-            throw new MetadataIoException("The service has throw an SQLException while deleting the metadata: " + ex.getMessage(),
-                        NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The service has throw an SQLException while deleting the metadata: " + ex.getMessage());
         }
         return true;
     }
@@ -984,7 +932,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             mainStandard = Standard.CSW;
             type = mdWriter.getClasse("Record", mainStandard);
         } else {
-            throw new MetadataIoException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
+            throw new MetadataIoException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record");//, INVALID_PARAMETER_VALUE);
         }
 
         Path p  = new Path(mainStandard, type);
@@ -1001,11 +949,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         final String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
                         ordinal = Integer.parseInt(ordinalValue);
                     } catch (NumberFormatException ex) {
-                        throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
+                        throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer");
                     }
                     propertyName = propertyName.substring(0, propertyName.indexOf('['));
                 } else {
-                    throw new MetadataIoException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
+                    throw new MetadataIoException("The xpath is malformed, unclosed bracket");
                 }
             }
 
@@ -1030,11 +978,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     final String ordinalValue = xpath.substring(xpath.indexOf('[') + 1, xpath.indexOf(']'));
                     ordinal = Integer.parseInt(ordinalValue);
                 } catch (NumberFormatException ex) {
-                    throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
+                    throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer");
                 }
                 xpath = xpath.substring(0, xpath.indexOf('['));
             } else {
-                throw new MetadataIoException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
+                throw new MetadataIoException("The xpath is malformed, unclosed bracket");
             }
         }
         idValue = idValue + ':' + xpath + '.';
@@ -1065,7 +1013,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 }
             }
             if (property == null) {
-                throw new MetadataIoException("There is no property:" + propertyName + " in the class " + type.getName(), INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException("There is no property:" + propertyName + " in the class " + type.getName());//, INVALID_PARAMETER_VALUE);
             }
         }
         return property;
