@@ -26,7 +26,6 @@ import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 import org.constellation.tile.ws.AbstractWMTSWorker;
 import org.constellation.tile.ws.WMTSWorker;
-import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.util.ImageIOUtilities;
@@ -127,7 +126,7 @@ public class WMTSService {
         try {
             final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
             final BufferedImage buffered = worker.getTile(requestTile);
-            final String mimeType = Util.fileExtensionToMimeType(requestTile.getFormat());
+            final String mimeType = ImageIOUtilities.fileExtensionToMimeType(requestTile.getFormat());
             ImageIOUtilities.writeImage(buffered, mimeType, byteOut);
             final BinaryPayload binaryPayLoad = new BinaryPayload();
             binaryPayLoad.setPayloadContent(byteOut.toByteArray());

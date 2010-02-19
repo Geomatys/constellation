@@ -39,6 +39,7 @@ import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.util.FileUtilities;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.FeatureType;
@@ -125,7 +126,7 @@ public class StreamOMFeatureXmlBindingTest {
 
         String result = featureWriter.write(feature);
 
-        String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPoint-1.xml"));
+        String expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPoint-1.xml"));
 
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
@@ -146,7 +147,7 @@ public class StreamOMFeatureXmlBindingTest {
     public void featureCollectionMarshallTest() throws Exception {
         String result = featureWriter.write(fcoll);
 
-        String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection.xml"));
+        String expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection.xml"));
 
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
@@ -230,7 +231,7 @@ public class StreamOMFeatureXmlBindingTest {
      */
     @Test
     public void featuretypeMarshallTest() throws Exception {
-        String expResult = Util.stringFromFile(Util.getFileFromResource("org/constellation/wfs/xsd/sampling.xsd"));
+        String expResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org/constellation/wfs/xsd/sampling.xsd"));
         String result    = featureTypeWriter.write(featureType);
 
         expResult = removeXmlns(expResult);

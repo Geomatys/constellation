@@ -38,10 +38,9 @@ import javax.xml.bind.Unmarshaller;
 // constellation dependencies
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
+import org.constellation.provider.configuration.ConfigDirectory;
 
 //geotoolkit dependencies
-import org.constellation.provider.configuration.ConfigDirectory;
-import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.v202.Capabilities;
@@ -64,6 +63,7 @@ import org.geotoolkit.csw.xml.v202.TransactionResponseType;
 import org.geotoolkit.csw.xml.v202.TransactionType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 
 /**
@@ -247,7 +247,7 @@ public class CSWService {
             if (configDir.exists()) {
                 LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
             } else {
-                return Util.getDirectoryFromResource(configUrl);
+                return FileUtilities.getDirectoryFromResource(configUrl);
             }
             final File f = new File(configDir, fileName);
             LOGGER.info(f.toString());

@@ -64,7 +64,6 @@ import org.constellation.sos.io.ObservationResult;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
-import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
@@ -128,6 +127,7 @@ import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 
 import org.opengis.observation.Measure;
@@ -1957,7 +1957,7 @@ public class SOSworker {
             /* Ifremer's server does not contain any .constellation directory, so the
              * configuration files are put under the WEB-INF/classes/configuration/sos_configuration directory of the WAR file.
              */
-            return Util.getDirectoryFromResource("configuration");
+            return FileUtilities.getDirectoryFromResource("configuration");
         }
     }
 

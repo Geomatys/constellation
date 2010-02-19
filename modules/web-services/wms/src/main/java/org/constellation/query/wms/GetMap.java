@@ -23,10 +23,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import org.constellation.query.QueryRequest;
-import org.constellation.util.StringUtilities;
 import org.constellation.ws.MimeType;
+import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.geometry.ImmutableEnvelope;
 import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 import org.opengis.geometry.Envelope;
@@ -374,10 +375,10 @@ public class GetMap extends WMSQuery {
         final Version version = getVersion();
         //Obligatory Parameters
         kvp            .append(KEY_REQUEST ).append('=').append(GETMAP)
-           .append('&').append(KEY_BBOX    ).append('=').append(StringUtilities.toBboxValue(envelope))
+           .append('&').append(KEY_BBOX    ).append('=').append(RequestsUtilities.toBboxValue(envelope))
            .append('&').append((version.toString().equals("1.1.1")) ?
                                KEY_CRS_V111 :
-                               KEY_CRS_V130).append('=').append(StringUtilities.toCrsCode(envelope))
+                               KEY_CRS_V130).append('=').append(RequestsUtilities.toCrsCode(envelope))
            .append('&').append(KEY_VERSION ).append('=').append(version)
            .append('&').append(KEY_FORMAT  ).append('=').append(format)
            .append('&').append(KEY_LAYERS  ).append('=').append(StringUtilities.toCommaSeparatedValues(layers))

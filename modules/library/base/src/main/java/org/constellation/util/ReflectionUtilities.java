@@ -22,6 +22,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.logging.Logger;
+import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.util.logging.Logging;
+
 
 /**
  *
@@ -29,7 +32,7 @@ import java.util.logging.Logger;
  */
 public final class ReflectionUtilities {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.util");
+    private static final Logger LOGGER = Logging.getLogger(ReflectionUtilities.class);
 
     private ReflectionUtilities() {}
 

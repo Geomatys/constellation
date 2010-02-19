@@ -41,7 +41,6 @@ import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.util.Util;
         
 // MDWeb dependencies
 import org.mdweb.model.schemas.CodeListElement;
@@ -60,6 +59,7 @@ import org.geotoolkit.metadata.iso.MetadataEntity;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
 import org.geotoolkit.temporal.object.TemporalUtilities;
+import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -186,19 +186,19 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     private void initPackage() {
 
-        this.geotoolkitPackage  = Util.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
+        this.geotoolkitPackage  = FileUtilities.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
                                                         "org.geotoolkit.service", "org.geotoolkit.naming", "org.geotoolkit.feature.catalog",
                                                         "org.geotoolkit.metadata.fra", "org.geotoolkit.temporal.object");
-        this.sensorMLPackage    = Util.searchSubPackage("org.geotoolkit.sml.xml.v100");
-        this.swePackage         = Util.searchSubPackage("org.geotoolkit.swe.xml.v100");
-        this.gmlPackage         = Util.searchSubPackage("org.geotoolkit.gml.xml.v311");
+        this.sensorMLPackage    = FileUtilities.searchSubPackage("org.geotoolkit.sml.xml.v100");
+        this.swePackage         = FileUtilities.searchSubPackage("org.geotoolkit.swe.xml.v100");
+        this.gmlPackage         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311");
 
-        this.opengisPackage     = Util.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
+        this.opengisPackage     = FileUtilities.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
                                                         "org.opengis.service", "org.opengis.feature.catalog");
-        this.cswPackage         = Util.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
+        this.cswPackage         = FileUtilities.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
                                                         "org.geotoolkit.ogc.xml");
-        this.ebrimV3Package     = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
-        this.ebrimV25Package    = Util.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
+        this.ebrimV3Package     = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
+        this.ebrimV25Package    = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
     }
 
     /**

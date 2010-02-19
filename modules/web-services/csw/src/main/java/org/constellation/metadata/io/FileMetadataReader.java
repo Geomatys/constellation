@@ -39,7 +39,6 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.CSWClassesContext;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.util.StringUtilities;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // geoAPI dependencies
@@ -71,6 +70,7 @@ import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
+import org.geotoolkit.util.StringUtilities;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;

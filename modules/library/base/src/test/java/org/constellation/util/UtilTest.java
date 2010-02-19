@@ -21,7 +21,9 @@ package org.constellation.util;
 // Junit dependencies
 import java.util.ArrayList;
 import java.util.List;
+import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.geometry.GeneralEnvelope;
+import org.geotoolkit.util.StringUtilities;
 import org.junit.*;
 import org.opengis.geometry.Envelope;
 import static org.junit.Assert.*;
@@ -79,12 +81,12 @@ public class UtilTest {
     public void transformCodeNameTest() throws Exception {
 
         String dirty = "MISSING_PARAMETER_VALUE";
-        String result = Util.transformCodeName(dirty);
+        String result = StringUtilities.transformCodeName(dirty);
         String expresult = "MissingParameterValue";
         assertEquals(expresult, result);
 
         dirty = "INVALID_PARAMETER_VALUE";
-        result = Util.transformCodeName(dirty);
+        result = StringUtilities.transformCodeName(dirty);
         expresult = "InvalidParameterValue";
         assertEquals(expresult, result);
     }
@@ -252,7 +254,7 @@ public class UtilTest {
         double[] max = {110.0, 80.0};
         Envelope envelope = new GeneralEnvelope(min, max);
 
-        String result    = StringUtilities.toBboxValue(envelope);
+        String result    = RequestsUtilities.toBboxValue(envelope);
         String expResult = "20.0,35.0,110.0,80.0";
         assertEquals(expResult, result);
     }
@@ -263,13 +265,13 @@ public class UtilTest {
     @Test
     public void toBooleanTest() throws Exception {
 
-        assertFalse(StringUtilities.toBoolean(null));
-        assertFalse(StringUtilities.toBoolean("whatever"));
-        assertFalse(StringUtilities.toBoolean("FALSE"));
-        assertFalse(StringUtilities.toBoolean("false"));
+        assertFalse(RequestsUtilities.toBoolean(null));
+        assertFalse(RequestsUtilities.toBoolean("whatever"));
+        assertFalse(RequestsUtilities.toBoolean("FALSE"));
+        assertFalse(RequestsUtilities.toBoolean("false"));
 
-        assertTrue(StringUtilities.toBoolean("true"));
-        assertTrue(StringUtilities.toBoolean("TRUE"));
+        assertTrue(RequestsUtilities.toBoolean("true"));
+        assertTrue(RequestsUtilities.toBoolean("TRUE"));
     }
 
     /**
@@ -319,11 +321,11 @@ public class UtilTest {
         list.add("la");
         list.add("super lune");
 
-        assertTrue(StringUtilities.containsMatch(list, "magique"));
-        assertTrue(StringUtilities.containsMatch(list, "super"));
-        assertTrue(StringUtilities.containsMatch(list, "tres grand"));
-        assertFalse(StringUtilities.containsMatch(list, "boulette"));
-        assertFalse(StringUtilities.containsMatch(list, "petit"));
+        assertTrue(StringUtilities.matchesStringfromList(list, "magique"));
+        assertTrue(StringUtilities.matchesStringfromList(list, "super"));
+        assertTrue(StringUtilities.matchesStringfromList(list, "tres grand"));
+        assertFalse(StringUtilities.matchesStringfromList(list, "boulette"));
+        assertFalse(StringUtilities.matchesStringfromList(list, "petit"));
     }
     
     /**

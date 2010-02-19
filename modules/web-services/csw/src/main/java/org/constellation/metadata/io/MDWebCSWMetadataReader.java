@@ -32,7 +32,6 @@ import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.util.StringUtilities;
 
 import static org.constellation.metadata.CSWQueryable.*;
 
@@ -47,6 +46,7 @@ import org.geotoolkit.csw.xml.v202.SummaryRecordType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
+import org.geotoolkit.util.StringUtilities;
 
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.Catalog;

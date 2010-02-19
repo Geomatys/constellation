@@ -25,8 +25,8 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.constellation.provider.configuration.ConfigDirectory;
-import org.constellation.util.Util;
 import org.geotoolkit.map.ElevationModel;
+import org.geotoolkit.util.FileUtilities;
 import org.opengis.feature.type.Name;
 
 /**
@@ -199,7 +199,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
             /*
              * First check that there are config files in the WEB-INF/classes directory
              */
-            File configFile = Util.getFileFromResource(fileName);
+            File configFile = FileUtilities.getFileFromResource(fileName);
             /*
              * No config file in the resources, then we try with the default config directory.
              */

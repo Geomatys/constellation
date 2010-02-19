@@ -18,9 +18,9 @@ package org.constellation.query.wms;
 
 import java.util.List;
 import org.constellation.query.QueryRequest;
-import org.constellation.util.StringUtilities;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.lang.Immutable;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 

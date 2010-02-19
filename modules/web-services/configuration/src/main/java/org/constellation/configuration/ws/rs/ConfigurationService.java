@@ -55,8 +55,6 @@ import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ConfigDirectory;
-import org.constellation.util.StringUtilities;
-import org.constellation.util.Util;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.constellation.ws.CstlServiceException;
@@ -69,6 +67,8 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
+import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.StringUtilities;
 
 /**
  * Web service for administration and configuration operations.
@@ -272,7 +272,7 @@ public class ConfigurationService extends AbstractWebService  {
             
         
         } catch (CstlServiceException ex) {
-            final String code = Util.transformCodeName(ex.getExceptionCode().name());
+            final String code = StringUtilities.transformCodeName(ex.getExceptionCode().name());
             final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(),
                                                                ServiceDef.CONFIG.exceptionVersion.toString());
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
@@ -438,7 +438,7 @@ public class ConfigurationService extends AbstractWebService  {
                                           NO_APPLICABLE_CODE);
         }
         try {
-            Util.storeProperties(prop, propertiesFile);
+            FileUtilities.storeProperties(prop, propertiesFile);
         } catch (IOException ex) {
             throw new CstlServiceException("IOException xhile trying to store the properties files.",
                                           NO_APPLICABLE_CODE);

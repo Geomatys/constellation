@@ -39,8 +39,10 @@ import javax.xml.bind.JAXBElement;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
+
+// Geotoolkit dependencies
+import org.geotoolkit.util.StringUtilities;
 
 // MDWeb dependencies
 import org.mdweb.model.profiles.Profile;

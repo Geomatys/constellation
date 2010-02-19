@@ -41,13 +41,12 @@ import javax.xml.bind.Marshaller;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.coverage.ws.WCSWorker;
-import org.constellation.util.StringUtilities;
-import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.rs.GridWebService;
+import org.geotoolkit.client.util.RequestsUtilities;
 import static org.constellation.query.wcs.WCSQuery.*;
 
 // Geotoolkit dependencies
@@ -63,6 +62,7 @@ import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.resources.Errors;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Utilities;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
@@ -302,7 +302,7 @@ public class WCSService extends GridWebService {
             //serviceDef = getBestVersion(null);
         }
         final String locator = ex.getLocator();
-        final String code = Util.transformCodeName(ex.getExceptionCode().name());
+        final String code = StringUtilities.transformCodeName(ex.getExceptionCode().name());
         if (isOWS(serviceDef)) {
             report = new ExceptionReport(ex.getMessage(), code, locator, serviceDef.exceptionVersion.toString());
         } else {
@@ -471,22 +471,22 @@ public class WCSService extends GridWebService {
         if (bbox != null) {
             pos = new ArrayList<DirectPositionType>();
             final List<String> bboxValues = StringUtilities.toStringList(bbox);
-            final double minimumLon = StringUtilities.toDouble(bboxValues.get(0));
-            final double maximumLon = StringUtilities.toDouble(bboxValues.get(2));
+            final double minimumLon = RequestsUtilities.toDouble(bboxValues.get(0));
+            final double maximumLon = RequestsUtilities.toDouble(bboxValues.get(2));
             try {
                 if (minimumLon > maximumLon) {
                     throw new IllegalArgumentException(
                             Errors.format(Errors.Keys.BAD_RANGE_$2, minimumLon, maximumLon));
                 }
-                final double minimumLat = StringUtilities.toDouble(bboxValues.get(1));
-                final double maximumLat = StringUtilities.toDouble(bboxValues.get(3));
+                final double minimumLat = RequestsUtilities.toDouble(bboxValues.get(1));
+                final double maximumLat = RequestsUtilities.toDouble(bboxValues.get(3));
                 if (minimumLat > maximumLat) {
                     throw new IllegalArgumentException(
                             Errors.format(Errors.Keys.BAD_RANGE_$2, minimumLat, maximumLat));
                 }
                 if (bboxValues.size() > 4) {
-                    final double minimumDepth = StringUtilities.toDouble(bboxValues.get(4));
-                    final double maximumDepth = StringUtilities.toDouble(bboxValues.get(5));
+                    final double minimumDepth = RequestsUtilities.toDouble(bboxValues.get(4));
+                    final double maximumDepth = RequestsUtilities.toDouble(bboxValues.get(5));
                     if (minimumLat > maximumLat) {
                         throw new IllegalArgumentException(
                                 Errors.format(Errors.Keys.BAD_RANGE_$2, minimumDepth, maximumDepth));
@@ -541,7 +541,7 @@ public class WCSService extends GridWebService {
         final org.geotoolkit.wcs.xml.v100.RangeSubsetType rangeSubset;
         final String categories = getParameter(KEY_CATEGORIES, false);
         if (categories != null) {
-            final List<Double[]> ranges = StringUtilities.toCategoriesRange(categories);
+            final List<Double[]> ranges = RequestsUtilities.toCategoriesRange(categories);
             final List<Object> objects = new ArrayList<Object>();
             for (Double[] range : ranges) {
                 if (Utilities.equals(range[0], range[1])) {
@@ -629,7 +629,7 @@ public class WCSService extends GridWebService {
             final Double[] coordinates = new Double[tokens.countTokens()];
             int i = 0;
             while (tokens.hasMoreTokens()) {
-                coordinates[i] = StringUtilities.toDouble(tokens.nextToken());
+                coordinates[i] = RequestsUtilities.toDouble(tokens.nextToken());
                 i++;
             }
             if (i < 4) {
@@ -685,7 +685,7 @@ public class WCSService extends GridWebService {
         StringTokenizer tokens = new StringTokenizer(gridOrigin, ",;");
         final List<Double> origin = new ArrayList<Double>(tokens.countTokens());
         while (tokens.hasMoreTokens()) {
-            origin.add(StringUtilities.toDouble(tokens.nextToken()));
+            origin.add(RequestsUtilities.toDouble(tokens.nextToken()));
         }
 
         final String gridOffsets = getParameter(KEY_GRIDOFFSETS, false);
@@ -693,7 +693,7 @@ public class WCSService extends GridWebService {
         if (gridOffsets != null) {
             tokens = new StringTokenizer(gridOffsets, ",;");
             while (tokens.hasMoreTokens()) {
-                offset.add(StringUtilities.toDouble(tokens.nextToken()));
+                offset.add(RequestsUtilities.toDouble(tokens.nextToken()));
             }
         }
         String gridCS = getParameter(KEY_GRIDCS, false);

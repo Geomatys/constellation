@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -53,7 +52,6 @@ import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
-import org.constellation.util.StringUtilities;
 import org.constellation.writer.CapabilitiesFilterWriter;
 import org.constellation.writer.ExceptionFilterWriter;
 import org.constellation.ws.ServiceType;
@@ -64,13 +62,16 @@ import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
 
 //GeotoolKit dependencies
+import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
+import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.xml.MarshallerPool;
@@ -405,13 +406,13 @@ public class WMSService extends GridWebService {
         final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, null);
         final int x, y;
         try {
-            x = StringUtilities.toInt(strX);
+            x = RequestsUtilities.toInt(strX);
         } catch (NumberFormatException ex) {
             throw new CstlServiceException("Integer value waited. " + ex.getMessage(), ex, INVALID_POINT,
                     version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_I_V111 : KEY_I_V130);
         }
         try {
-            y = StringUtilities.toInt(strY);
+            y = RequestsUtilities.toInt(strY);
         } catch (NumberFormatException ex) {
             throw new CstlServiceException("Integer value waited. " + ex.getMessage(), ex, INVALID_POINT,
                     version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_J_V111 : KEY_J_V130);
@@ -420,7 +421,7 @@ public class WMSService extends GridWebService {
         if (strFeatureCount == null || strFeatureCount.equals("")) {
             featureCount = null;
         } else {
-            featureCount = StringUtilities.toInt(strFeatureCount);
+            featureCount = RequestsUtilities.toInt(strFeatureCount);
         }
         return new GetFeatureInfo(getMap, x, y, queryableLayers, infoFormat, featureCount);
     }
@@ -439,7 +440,7 @@ public class WMSService extends GridWebService {
         final String strHeight = getParameter(KEY_HEIGHT, false);
         final String format;
         try {
-            format = StringUtilities.toFormat(strFormat);
+            format = RequestsUtilities.toFormat(strFormat);
         } catch (IllegalArgumentException i) {
             throw new CstlServiceException(i, INVALID_FORMAT);
         }
@@ -449,8 +450,8 @@ public class WMSService extends GridWebService {
             final int width;
             final int height;
             try {
-                width  = StringUtilities.toInt(strWidth);
-                height = StringUtilities.toInt(strHeight);
+                width  = RequestsUtilities.toInt(strWidth);
+                height = RequestsUtilities.toInt(strHeight);
             } catch (NumberFormatException n) {
                 throw new CstlServiceException(n, INVALID_PARAMETER_VALUE);
             }
@@ -522,13 +523,13 @@ public class WMSService extends GridWebService {
         }
         final Envelope env;
         try {
-            env = StringUtilities.toEnvelope(strBBox, crs);
+            env = RequestsUtilities.toEnvelope(strBBox, crs);
         } catch (IllegalArgumentException i) {
             throw new CstlServiceException(i, INVALID_PARAMETER_VALUE);
         }
         final String format;
         try {
-            format = StringUtilities.toFormat(strFormat);
+            format = RequestsUtilities.toFormat(strFormat);
         } catch (IllegalArgumentException i) {
             throw new CstlServiceException(i, INVALID_FORMAT, KEY_FORMAT.toLowerCase());
         }
@@ -537,28 +538,23 @@ public class WMSService extends GridWebService {
         MutableStyledLayerDescriptor sld = null;
         final Double elevation;
         try {
-            elevation = (strElevation != null) ? StringUtilities.toDouble(strElevation) : null;
+            elevation = (strElevation != null) ? RequestsUtilities.toDouble(strElevation) : null;
         } catch (NumberFormatException n) {
             throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, KEY_ELEVATION.toLowerCase());
         }
         final MeasurementRange dimRange = QueryAdapter.toMeasurementRange(strDimRange);
-        final Date date;
-        try {
-            date = StringUtilities.toDate(strTime);
-        } catch (ParseException ex) {
-            throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, KEY_TIME.toLowerCase());
-        }
+        final Date date = TemporalUtilities.createDate(strTime);
         final int width;
         final int height;
         try {
-            width  = StringUtilities.toInt(strWidth);
-            height = StringUtilities.toInt(strHeight);
+            width  = RequestsUtilities.toInt(strWidth);
+            height = RequestsUtilities.toInt(strHeight);
         } catch (NumberFormatException n) {
             throw new CstlServiceException(n, INVALID_DIMENSION_VALUE);
         }
         final Dimension size = new Dimension(width, height);
-        final Color background = StringUtilities.toColor(strBGColor);
-        final boolean transparent = StringUtilities.toBoolean(strTransparent);
+        final Color background = RequestsUtilities.toColor(strBGColor);
+        final boolean transparent = RequestsUtilities.toBoolean(strTransparent);
         queryContext.setOpaque(!transparent);
 
         if (strRemoteOwsUrl != null) {
@@ -597,7 +593,7 @@ public class WMSService extends GridWebService {
 
         final double azimuth;
         try {
-            azimuth = (strAzimuth == null) ? 0.0 : StringUtilities.toDouble(strAzimuth);
+            azimuth = (strAzimuth == null) ? 0.0 : RequestsUtilities.toDouble(strAzimuth);
         } catch(NumberFormatException ex) {
             throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, KEY_AZIMUTH.toLowerCase());
         }

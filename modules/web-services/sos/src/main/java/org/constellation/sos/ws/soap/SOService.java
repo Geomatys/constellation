@@ -52,8 +52,8 @@ import org.geotoolkit.sos.xml.v100.InsertObservationResponse;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.constellation.sos.ws.SOSworker;
-import org.constellation.util.Util;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 
 
@@ -229,7 +229,7 @@ public class SOService {
             if (configDir.exists()) {
                 LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
             } else {
-                return Util.getDirectoryFromResource(configUrl);
+                return FileUtilities.getDirectoryFromResource(configUrl);
             }
             try {
                 Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();

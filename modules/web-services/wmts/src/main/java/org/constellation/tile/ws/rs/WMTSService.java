@@ -35,8 +35,6 @@ import javax.xml.bind.Marshaller;
 import org.constellation.ServiceDef;
 import org.constellation.tile.ws.AbstractWMTSWorker;
 import org.constellation.tile.ws.WMTSWorker;
-import org.constellation.util.StringUtilities;
-import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
@@ -45,6 +43,8 @@ import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.util.ImageIOUtilities;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 import org.geotoolkit.wmts.xml.v100.GetTile;
@@ -407,7 +407,7 @@ public class WMTSService extends GridWebService {
                     tileRow, tileCol, format, null);
             final String mimeType;
             try {
-                mimeType = Util.formatNameToMimeType(format);
+                mimeType = ImageIOUtilities.formatNameToMimeType(format);
             } catch (IIOException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }

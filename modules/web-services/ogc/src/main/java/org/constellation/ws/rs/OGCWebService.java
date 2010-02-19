@@ -33,7 +33,6 @@ import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
-import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
 // Geotools dependencies
@@ -42,6 +41,7 @@ import org.geotoolkit.ows.xml.AbstractDCP;
 import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
 import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
@@ -191,7 +191,7 @@ public abstract class OGCWebService extends AbstractWebService {
     @Override
     protected Response launchException(final String message, String codeName, final String locator) throws JAXBException {
         if (isOWS(actingVersion)) {
-            codeName = Util.transformCodeName(codeName);
+            codeName = StringUtilities.transformCodeName(codeName);
         }
         final OWSExceptionCode code   = CodeLists.valueOf(OWSExceptionCode.class, codeName);
         final CstlServiceException ex = new CstlServiceException(message, code, locator);

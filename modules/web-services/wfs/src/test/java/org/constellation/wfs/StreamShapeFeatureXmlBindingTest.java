@@ -35,6 +35,7 @@ import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
+import org.geotoolkit.util.FileUtilities;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.FeatureType;
@@ -108,7 +109,7 @@ public class StreamShapeFeatureXmlBindingTest {
 
         String result = featureWriter.write(feature);
 
-        String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.bridge.xml"));
+        String expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridge.xml"));
         
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
@@ -132,7 +133,7 @@ public class StreamShapeFeatureXmlBindingTest {
         result = featureWriter.write(feature);
         
         
-        expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.polygon.xml"));
+        expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.polygon.xml"));
 
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
@@ -155,7 +156,7 @@ public class StreamShapeFeatureXmlBindingTest {
     public void featureCollectionMarshallTest() throws Exception {
         String result = featureWriter.write(fcollBridge);
 
-        String expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"));
+        String expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"));
 
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
@@ -169,7 +170,7 @@ public class StreamShapeFeatureXmlBindingTest {
 
         result = featureWriter.write(fcollPolygons);
 
-        expresult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.polygonCollection.xml"));
+        expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.polygonCollection.xml"));
 
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
@@ -294,14 +295,14 @@ public class StreamShapeFeatureXmlBindingTest {
      */
     @Test
     public void featuretypeMarshallTest() throws Exception {
-        String expResult = Util.stringFromFile(Util.getFileFromResource("org/constellation/wfs/xsd/bridge.xsd"));
+        String expResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org/constellation/wfs/xsd/bridge.xsd"));
         String result    = featureTypeWriter.write(bridgeFeatureType);
 
         expResult = removeXmlns(expResult);
         result    = removeXmlns(result);
         assertEquals(expResult, result);
 
-        expResult = Util.stringFromFile(Util.getFileFromResource("org/constellation/wfs/xsd/polygon.xsd"));
+        expResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org/constellation/wfs/xsd/polygon.xsd"));
         result    = featureTypeWriter.write(polygonFeatureType);
 
         expResult = removeXmlns(expResult);

@@ -42,7 +42,6 @@ import javax.xml.namespace.QName;
 // Constellation dependencies
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataWriter;
-import org.constellation.util.StringUtilities;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
@@ -74,6 +73,7 @@ import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.NotType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;

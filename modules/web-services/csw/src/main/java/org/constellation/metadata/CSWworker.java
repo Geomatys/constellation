@@ -62,7 +62,6 @@ import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.provider.configuration.ConfigDirectory;
-import org.constellation.util.StringUtilities;
 import org.constellation.util.Util;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.CstlServiceException;
@@ -128,6 +127,8 @@ import org.geotoolkit.ows.xml.v100.OperationsMetadata;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v100.ServiceIdentification;
 import org.geotoolkit.ows.xml.v100.ServiceProvider;
+import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
@@ -367,7 +368,7 @@ public class CSWworker {
         /*
          * if the configuration files are put under the WEB-INF/classes/csw_configuration directory of the WAR file.
          */
-        File configDir = Util.getDirectoryFromResource(configUrl);
+        File configDir = FileUtilities.getDirectoryFromResource(configUrl);
         
         if (configDir == null || !configDir.exists()) {
             configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);

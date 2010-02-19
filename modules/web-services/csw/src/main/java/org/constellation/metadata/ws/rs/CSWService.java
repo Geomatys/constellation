@@ -50,7 +50,6 @@ import org.constellation.metadata.Parameters;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.metadata.CSWClassesContext;
-import org.constellation.util.StringUtilities;
 
 import org.geotoolkit.csw.xml.DescribeRecord;
 import org.geotoolkit.csw.xml.GetCapabilities;
@@ -79,6 +78,7 @@ import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.Catching;
 import org.geotoolkit.xml.Namespaces;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;

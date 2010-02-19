@@ -62,6 +62,7 @@ import org.geotoolkit.ogc.xml.v110.SortOrderType;
 import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.wfs.xml.v110.AllSomeType;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
@@ -163,7 +164,7 @@ public class WFSWorkerTest {
         StringWriter sw = new StringWriter();
         marshaller.marshal(result, sw);
         String xmlResult    = removeXmlns(sw.toString());
-        String xmlExpResult = removeXmlns(Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml")));
+        String xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml")));
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -218,7 +219,7 @@ public class WFSWorkerTest {
         sw = new StringWriter();
         marshaller.marshal(result, sw);
         xmlResult    = removeXmlns(sw.toString());
-        xmlExpResult = removeXmlns(Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml")));
+        xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml")));
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -232,7 +233,7 @@ public class WFSWorkerTest {
         sw = new StringWriter();
         marshaller.marshal(result, sw);
         xmlResult    = removeXmlns(sw.toString());
-        xmlExpResult = removeXmlns(Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-om.xml")));
+        xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-om.xml")));
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -246,7 +247,7 @@ public class WFSWorkerTest {
         sw = new StringWriter();
         marshaller.marshal(result, sw);
         xmlResult    = removeXmlns(sw.toString());
-        xmlExpResult = removeXmlns(Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-si.xml")));
+        xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-si.xml")));
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -260,7 +261,7 @@ public class WFSWorkerTest {
         sw = new StringWriter();
         marshaller.marshal(result, sw);
         xmlResult    = removeXmlns(sw.toString());
-        xmlExpResult = removeXmlns(Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml")));
+        xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml")));
 
         assertEquals(xmlExpResult, xmlResult);
     }
@@ -323,7 +324,7 @@ public class WFSWorkerTest {
         Object result = worker.getFeature(request);
 
         String xmlResult    = featureWriter.write((FeatureCollection)result);
-        String xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
+        String xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
@@ -357,7 +358,7 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-5.xml"));
+        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-5.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
@@ -378,7 +379,7 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"));
+        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
@@ -399,7 +400,7 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6.xml"));
+        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
@@ -420,7 +421,7 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7.xml"));
+        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
@@ -500,7 +501,7 @@ public class WFSWorkerTest {
         Object result = worker.getFeature(request);
 
         String xmlResult    = featureWriter.write((FeatureCollection)result);
-        String xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"));
+        String xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"));
 
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
@@ -525,7 +526,7 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.systemCollection-3.xml"));
+        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3.xml"));
 
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
@@ -549,7 +550,7 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.systemCollection-2.xml"));
+        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-2.xml"));
 
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
@@ -581,7 +582,7 @@ public class WFSWorkerTest {
         Object result = worker.getFeature(request);
 
         String xmlResult    = featureWriter.write((FeatureCollection)result);
-        String xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"));
+        String xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
@@ -602,7 +603,7 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.bridgeCollection-2.xml"));
+        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection-2.xml"));
 
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
@@ -621,7 +622,7 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
+        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
@@ -654,7 +655,7 @@ public class WFSWorkerTest {
         result = worker.getFeature(request);
 
         xmlResult    = featureWriter.write((FeatureCollection)result);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
+        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
@@ -684,7 +685,7 @@ public class WFSWorkerTest {
         assertTrue(exLaunched);
         /*
 
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
+        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
@@ -714,7 +715,7 @@ public class WFSWorkerTest {
         assertTrue(exLaunched);
 
         /*
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
+        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
@@ -879,7 +880,7 @@ public class WFSWorkerTest {
         Object resultGF = worker.getFeature(requestGF);
 
         String xmlResult    = featureWriter.write((FeatureCollection)resultGF);
-        String xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-3.xml"));
+        String xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-3.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
@@ -944,7 +945,7 @@ public class WFSWorkerTest {
         Object resultGF = worker.getFeature(requestGF);
 
         String xmlResult    = featureWriter.write((FeatureCollection)resultGF);
-        String xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-2.xml"));
+        String xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-2.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
@@ -979,7 +980,7 @@ public class WFSWorkerTest {
         resultGF = worker.getFeature(requestGF);
 
         xmlResult    = featureWriter.write((FeatureCollection)resultGF);
-        xmlExpResult = Util.stringFromFile(Util.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2.xml"));
+        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2.xml"));
         //we unformat the expected result
         xmlExpResult = xmlExpResult.replace("\n", "");
         xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");

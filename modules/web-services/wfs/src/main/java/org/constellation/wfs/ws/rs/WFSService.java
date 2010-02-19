@@ -53,8 +53,6 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.ValidationEvent;
 import org.constellation.ServiceDef;
-import org.constellation.util.StringUtilities;
-import org.constellation.util.Util;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.ws.CstlServiceException;
@@ -64,6 +62,7 @@ import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
+import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
@@ -76,6 +75,7 @@ import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v100.SectionsType;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Versioned;
 import org.geotoolkit.wfs.xml.v110.AllSomeType;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
@@ -264,7 +264,7 @@ public class WFSService extends OGCWebService {
             final String version = serviceDef.exceptionVersion.toString();
             String exceptionCode;
             if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
-                exceptionCode = Util.transformCodeName(ex.getExceptionCode().name());
+                exceptionCode = StringUtilities.transformCodeName(ex.getExceptionCode().name());
             } else {
                 exceptionCode = ex.getExceptionCode().name();
             }
@@ -688,7 +688,7 @@ public class WFSService extends OGCWebService {
             final StringTokenizer tokens = new StringTokenizer(bbox, ",;");
             int index = 0;
             while (tokens.hasMoreTokens() && index < 4) {
-                final double value = StringUtilities.toDouble(tokens.nextToken());
+                final double value = RequestsUtilities.toDouble(tokens.nextToken());
                 coodinates[index] = value;
                 index++;
             }

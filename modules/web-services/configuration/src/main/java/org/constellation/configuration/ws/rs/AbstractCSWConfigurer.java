@@ -44,7 +44,6 @@ import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
-import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -56,6 +55,7 @@ import org.geotoolkit.factory.FactoryRegistry;
 // MDWeb dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 
 /**
@@ -234,7 +234,7 @@ public abstract class AbstractCSWConfigurer {
         final File cascadingFile = new File(getConfigurationDirectory(), "CSWCascading.properties");
         Properties prop;
         try {
-            prop = Util.getPropertiesFromFile(cascadingFile);
+            prop = FileUtilities.getPropertiesFromFile(cascadingFile);
         } catch (IOException ex) {
             throw new CstlServiceException("IO exception while loading the cascading properties file",
                             NO_APPLICABLE_CODE);
@@ -248,7 +248,7 @@ public abstract class AbstractCSWConfigurer {
             prop.put(servName, request.getCascadedServices().get(servName));
         }
         try {
-            Util.storeProperties(prop, cascadingFile);
+            FileUtilities.storeProperties(prop, cascadingFile);
         } catch (IOException ex) {
             throw new CstlServiceException("unable to store the cascading properties file",
                         NO_APPLICABLE_CODE);

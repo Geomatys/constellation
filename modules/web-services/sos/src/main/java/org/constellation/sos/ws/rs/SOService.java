@@ -49,11 +49,11 @@ import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.constellation.sos.ws.SOSworker;
-import org.constellation.util.StringUtilities;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.util.StringUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
