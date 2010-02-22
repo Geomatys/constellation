@@ -150,6 +150,22 @@
  INSERT INTO "Schemas"."Properties"  VALUES('description',NULL, 'ISO 19108', NULL, 0, 1,'DataRecord','CharacterString', NULL, 'O',1 , 'ISO 19103','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('field',NULL, 'Sensor Web Enablement', NULL, 0, 2147483647,'DataRecord','DataComponentProperty', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
 
+/*-------------------------------------------------*
+ *----------  Classe AnyScalarProperty  -----------*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"  VALUES('AnyScalarProperty',NULL,'Sensor Web Enablement',NULL,0,NULL,NULL, ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('name', NULL, 'Sensor Web Enablement', NULL, 0, 1,'AnyScalarProperty','CharacterString', NULL, 'O',0 , 'ISO 19103','Sensor Web Enablement','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('role', NULL, 'Xlink', NULL, 0, 1,'AnyScalarProperty','CharacterString', NULL, 'O',1 , 'ISO 19103','Sensor Web Enablement','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('href', NULL, 'Xlink', NULL, 0, 1,'AnyScalarProperty','CharacterString', NULL, 'O',2 , 'ISO 19103','Sensor Web Enablement','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('value',NULL, 'Sensor Web Enablement', NULL, 0, 2147483647,'AnyScalarProperty','AnyData', NULL, 'O',3 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+
+/*-------------------------------------------------*
+ *--------------  Classe SimpleDataRecord ---------*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"  VALUES('SimpleDataRecord',NULL,'Sensor Web Enablement','Implementation of ISO-11404 Record datatype.',0,'AbstractDataRecord','Sensor Web Enablement', ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('id',NULL, 'ISO 19108', NULL, 0, 1,'SimpleDataRecord','CharacterString', NULL, 'O',0 , 'ISO 19103','Sensor Web Enablement','C');
+ INSERT INTO "Schemas"."Properties"  VALUES('description',NULL, 'ISO 19108', NULL, 0, 1,'SimpleDataRecord','CharacterString', NULL, 'O',1 , 'ISO 19103','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('field',NULL, 'Sensor Web Enablement', NULL, 0, 2147483647,'SimpleDataRecord','AnyScalarProperty', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
 
 /*-------------------------------------------------*
  *--------------  Classe AllowedValues ------------*
@@ -245,11 +261,13 @@
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Classes"  VALUES('AbstractVector',NULL,'Sensor Web Enablement',NULL,1,'AbstractDataRecord','Sensor Web Enablement', ' ');
 
-
 /*-------------------------------------------------*
- *--------------  Classe Envelope debut-------------*
+ *--------------  Classe BoundingShape ------------*
  *-------------------------------------------------*/
- INSERT INTO "Schemas"."Classes"  VALUES('Envelope',NULL,'Sensor Web Enablement','Envelope described using two vectors specifying lower and upper corner points.',1,'AbstractVector','Sensor Web Enablement', ' ');
+ INSERT INTO "Schemas"."Classes"  VALUES('BoundingShape',NULL,'ISO 19108',NULL,0,NULL,NULL, ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('envelope',NULL, 'ISO 19108', NULL, 0, 1,'BoundingShape','CharacterString', NULL, 'O',0 , 'ISO 19103','ISO 19108','C');
+ INSERT INTO "Schemas"."Properties"  VALUES('null',NULL, 'ISO 19108', NULL, 0, 1,'BoundingShape','CharacterString', NULL, 'O',1 , 'ISO 19103','ISO 19108',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('nilReason',NULL, 'ISO 19108', NULL, 0, 2147483647,'BoundingShape','Envelope', NULL, 'O',2 , 'ISO 19108','ISO 19108',' ');
 
  /*-------------------------------------------------*
  *--------------  Classe AbstractSML --------------*
@@ -258,7 +276,7 @@
  INSERT INTO "Schemas"."Properties"  VALUES('id', NULL, 'ISO 19108', NULL, 0, 1,'AbstractSML','CharacterString', NULL, 'O',1 , 'ISO 19103','SensorML','C');
  INSERT INTO "Schemas"."Properties"  VALUES('description', NULL, 'ISO 19108', NULL, 0, 1,'AbstractSML','CharacterString', NULL, 'O',2 , 'ISO 19103','SensorML',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('name', NULL, 'ISO 19108', NULL, 0, 1,'AbstractSML','CharacterString', NULL, 'O',3 , 'ISO 19103','SensorML',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('boundedBy', NULL, 'ISO 19108', 'Specifies the possible extent of the component location', 0, 4,'AbstractSML','Envelope', NULL, 'O',2 , 'Sensor Web Enablement','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('boundedBy', NULL, 'ISO 19108', 'Specifies the possible extent of the component location', 0, 4,'AbstractSML','BoundingShape', NULL, 'O',2 , 'ISO 19108','SensorML',' ');
  
 /*-------------------------------------------------*
  *--------------  Classe AbstractProcess debut -----*
@@ -527,8 +545,9 @@
 
 
 /*-------------------------------------------------*
- *--------------  Classe Envelope fin -------------*
+ *--------------  Classe Envelope     -------------*
  *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"  VALUES('Envelope',NULL,'Sensor Web Enablement','Envelope described using two vectors specifying lower and upper corner points.',1,'AbstractVector','Sensor Web Enablement', ' ');
  INSERT INTO "Schemas"."Properties"  VALUES('time', NULL, 'Sensor Web Enablement', 'Optionally provides time range dURIng which this bounding envelope applies', 0, 1,'Envelope','TimeRange', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('lowerCorner', NULL, 'Sensor Web Enablement', NULL, 1, 1,'Envelope','Vector', NULL, 'M',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('upperCorner', NULL, 'Sensor Web Enablement', NULL, 1, 1,'Envelope','Vector', NULL, 'M',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');

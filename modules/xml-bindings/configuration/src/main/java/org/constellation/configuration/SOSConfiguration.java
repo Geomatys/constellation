@@ -18,6 +18,8 @@
 
 package org.constellation.configuration;
 
+import java.util.ArrayList;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -46,6 +48,8 @@ public class SOSConfiguration {
 
     @XmlElement(name="OMConfiguration")
     private Automatic omConfiguration;
+
+    private List<Automatic> extensions;
 
     private String observationIdBase;
 
@@ -294,6 +298,23 @@ public class SOSConfiguration {
      */
     public void setVerifySynchronization(boolean verifySynchronization) {
         this.verifySynchronization = verifySynchronization;
+    }
+
+    /**
+     * @return the extensions
+     */
+    public List<Automatic> getExtensions() {
+        if (extensions == null) {
+            extensions = new ArrayList<Automatic>();
+        }
+        return extensions;
+    }
+
+    /**
+     * @param extensions the extensions to set
+     */
+    public void setExtensions(List<Automatic> extensions) {
+        this.extensions = extensions;
     }
 
 }

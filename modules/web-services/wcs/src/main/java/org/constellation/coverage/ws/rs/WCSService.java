@@ -46,7 +46,6 @@ import org.constellation.ws.MimeType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.rs.GridWebService;
-import org.geotoolkit.client.util.RequestsUtilities;
 import static org.constellation.query.wcs.WCSQuery.*;
 
 // Geotoolkit dependencies
@@ -61,6 +60,7 @@ import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.resources.Errors;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Utilities;

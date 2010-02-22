@@ -136,7 +136,7 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public SensorWriter getSensorWriter(DataSourceType type,  Automatic configuration, String sensorIdBase) throws CstlServiceException {
+    public SensorWriter getSensorWriter(DataSourceType type,  Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException {
         if (type == null) {
             return null;
         }
@@ -145,7 +145,7 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
 
             case MDWEB:
                 try {
-                    return new MDWebSensorWriter(configuration, sensorIdBase);
+                    return new MDWebSensorWriter(configuration, sensorIdBase, map);
                 } catch (MetadataIoException ex) {
                     throw new CstlServiceException(ex);
                 }

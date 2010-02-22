@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 
 // JAXB dependencies
+import java.util.Properties;
 import java.util.logging.Level;
 
 // Constellation dependencies
@@ -61,14 +62,19 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     private final PreparedStatement newSensorIdStmt;
 
     private static String currentSensorID;
+
+    /**
+     * The properties file allowing to store the id mapping between physical and database ID.
+     */
+    private final Properties map;
     
-    public MDWebSensorWriter(final Automatic configuration, final String sensorIdBase) throws MetadataIoException {
+    public MDWebSensorWriter(final Automatic configuration, final String sensorIdBase, final Properties map) throws MetadataIoException {
         super(configuration);
 
         final BDD db = configuration.getBdd();
         try {
             smlConnection   = db.getConnection();
-
+            this.map        = map;
              //we build the prepared Statement
             newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Storage\".\"Forms\" WHERE \"title\" LIKE '%" + sensorIdBase + "%' ");
 
@@ -100,6 +106,33 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
             throw new CstlServiceException(SQL_ERROR_MSG + e.getMessage(),
                                              NO_APPLICABLE_CODE);
         }
+    }
+
+    @Override
+    public void deleteSensor(String sensorId) throws CstlServiceException {
+        try {
+            String dbId = map.getProperty(sensorId);
+            if (dbId == null) {
+                dbId = sensorId;
+            }
+            // we find the form id describing the sensor.
+            final int id = mdWriter.getIdFromTitleForm(dbId);
+            LOGGER.finer("describesensor id: " + dbId);
+            LOGGER.finer("describesensor mdweb id: " + id);
+
+            String identifier = id + ":SMLC";
+            super.deleteMetadata(identifier);
+
+        } catch (MD_IOException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new CstlServiceException("the service has throw a MD_IO Exception:" + ex.getMessage(),
+                                         NO_APPLICABLE_CODE);
+        } catch (MetadataIoException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new CstlServiceException("the service has throw a Metadata IO Exception:" + ex.getMessage(),
+                                         NO_APPLICABLE_CODE);
+        }
+        
     }
 
     @Override

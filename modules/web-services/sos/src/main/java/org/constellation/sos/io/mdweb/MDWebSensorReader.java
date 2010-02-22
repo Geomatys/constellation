@@ -35,19 +35,11 @@ import org.mdweb.io.MD_IOException;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
-// MDWeb dependencies
-import org.mdweb.model.storage.Catalog;
-
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 public class MDWebSensorReader extends MDWebMetadataReader implements SensorReader {
-
-    /**
-     * the data catalog for SensorML database.
-     */
-    private final Catalog sensorMLCatalog;
 
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
@@ -71,14 +63,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
         if (db == null) {
             throw new MetadataIoException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
-        try {
-            sensorMLCatalog = mdReader.getCatalog("SMLC");
-            this.map        = map;
-
-        } catch (MD_IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new MetadataIoException("MD_IOException while starting the MDweb Sensor reader: " + "\n" + ex.getMessage(), NO_APPLICABLE_CODE);
-        }
+        this.map        = map;
     }
 
     /**

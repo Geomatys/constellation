@@ -57,7 +57,6 @@ INSERT INTO "Schemas"."Classes"  VALUES ('EX_GeographicBoundingBox', 'GeoBndBox'
 INSERT INTO "Schemas"."Classes"  VALUES ('EX_GeographicDescription', 'GeoDesc', 'ISO 19115', 'EX_GeographicDescription', 0, 'EX_GeographicExtent', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('EX_BoundingPolygon', 'BoundPoly', 'ISO 19115', 'EX_BoundingPolygon', 0, 'EX_GeographicExtent', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('EX_TemporalExtent', 'TempExtent', 'ISO 19115', 'EX_TemporalExtent', 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('TimeInstant', 'TimeInstant', 'ISO 19108', 'TimeInstant', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('EX_VerticalExtent', 'VertExtent', 'ISO 19115', 'EX_VerticalExtent', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('MD_ScopeDescription', 'ScpDesc', 'ISO 19115', 'MD_ScopeDescription', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('LI_Lineage', 'Lineage', 'ISO 19115', 'LI_Lineage', 0, NULL, NULL, ' ');
@@ -2847,7 +2846,7 @@ INSERT INTO "Schemas"."Properties"  VALUES ('accessConstraints', 'accessConsts',
 INSERT INTO "Schemas"."Properties"  VALUES ('useConstraints', 'useConsts', 'ISO 19115', 'Use constraints of the dataset', 0, 2147483647, 'MD_LegalConstraints', NULL, 'MD_RestrictionCode', 'O', 3, 'ISO 19115', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('otherConstraints', 'othConsts', 'ISO 19115', 'Others constraints of the dataset', 0, 2147483647, 'MD_LegalConstraints', 'CharacterString', NULL, 'C', 4, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('citation', 'LegCit', 'ISO 19115 FRA 1.0', 'Citation of documents or information source', 0, 2147483647, 'FRA_LegalConstraints', 'CI_Citation', NULL, 'O', 5, 'ISO 19115', 'ISO 19115 FRA 1.0', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('position', NULL, 'ISO 19108', NULL, 1, 1, 'TimeInstant', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ');
+
 
 /*INSERT INTO "Schemas"."Classes"  VALUES ('TimePosition', 'TimePosition', 'ISO 19108', 'TimePosition', 0, NULL, NULL, ' ')
 INSERT INTO "Schemas"."Properties"  VALUES ('position', NULL, 'ISO 19108', NULL, 1, 1, 'TimePosition', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ')*/

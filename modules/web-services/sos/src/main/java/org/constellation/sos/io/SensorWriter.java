@@ -38,6 +38,15 @@ public interface SensorWriter {
     void writeSensor(String id, AbstractSensorML sensor) throws CstlServiceException;
 
     /**
+     * Delete a SensorML document into the data source.
+     *
+     * @param id The identifier of the sensor
+     *
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    void deleteSensor(String id) throws CstlServiceException;
+
+    /**
      * Start a transaction on the datasource.
      *
      * @throws org.constellation.ws.CstlServiceException

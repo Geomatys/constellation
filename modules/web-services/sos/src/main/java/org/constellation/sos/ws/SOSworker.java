@@ -404,7 +404,7 @@ public class SOSworker {
 
             // we initialize the reader/writer/filter
             smlReader = sosFactory.getSensorReader(smlType, smlConfiguration, sensorIdBase, map);
-            smlWriter = sosFactory.getSensorWriter(smlType, smlConfiguration, sensorIdBase);
+            smlWriter = sosFactory.getSensorWriter(smlType, smlConfiguration, sensorIdBase, map);
             omReader  = sosFactory.getObservationReader(omReaderType, omConfiguration, observationIdBase);
             omWriter  = sosFactory.getObservationWriter(omWriterType, omConfiguration);
             omFilter  = sosFactory.getObservationFilter(omFilterType, observationIdBase, observationTemplateIdBase, map, omConfiguration);
@@ -1941,24 +1941,31 @@ public class SOSworker {
     }
 
     /**
-     * In some implementations there is no sicade directory.
-     * So if we don't find The .constellation/sos_configuration directory
-     * IFREMER hack
-     * we search the deployed war directory /WEB-INF/classes/configuration
+     * In some implementations there is no .constellation directory.
+     *
+     * we search first in the classes resource into /WEB-INF/classes/configuration
+     * else if we don't find it we look for .constellation/sos_configuration directory
+     *
      */
     private File getConfigDirectory() {
-        final String configUrl = "sos_configuration";
-        final File configDir   = new File(ConfigDirectory.getConfigDirectory(), configUrl);
-        if (configDir.exists()) {
-            LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
+
+        /* Ifremer's server does not contain any .constellation directory, so the
+         * configuration files are put under the WEB-INF/classes/configuration/ directory of the WAR file.
+         */
+        final File configDir = FileUtilities.getDirectoryFromResource("configuration");
+
+        if (configDir != null && configDir.exists()) {
+            LOGGER.info("taking configuration from WAR directory resources: " + configDir.getPath());
             return configDir;
         } else {
-
-            /* Ifremer's server does not contain any .constellation directory, so the
-             * configuration files are put under the WEB-INF/classes/configuration/sos_configuration directory of the WAR file.
-             */
-            return FileUtilities.getDirectoryFromResource("configuration");
+            final String configUrl = "sos_configuration";
+            final File constellDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
+            if (constellDir != null && constellDir.exists()) {
+                LOGGER.info("taking configuration from constellation directory: " + constellDir.getPath());
+                return constellDir;
+            }
         }
+        return null;
     }
 
     /**

@@ -51,6 +51,6 @@ public abstract class AbstractSOSFactory extends Factory {
 
     public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException;
 
-    public abstract SensorWriter getSensorWriter(DataSourceType type, Automatic configuration, String sensorIdBase) throws CstlServiceException;
+    public abstract SensorWriter getSensorWriter(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException;
 
 }

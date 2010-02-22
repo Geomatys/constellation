@@ -585,6 +585,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                        && !className.equals("CodeType")) {
             className = className.substring(0, className.length() - 4);
         }
+
+        if (className.endsWith("Entry") ) {
+            className = className.substring(0, className.length() - 5);
+        }
         
         final List<Standard> availableStandards = new ArrayList<Standard>();
         

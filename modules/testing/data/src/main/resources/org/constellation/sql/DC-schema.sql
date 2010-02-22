@@ -59,27 +59,6 @@ INSERT INTO "Schemas"."Properties"  VALUES ('spatial', NULL, 'DublinCore-terms',
  INSERT INTO "Schemas"."Properties"  VALUES('localPart', NULL, 'OGC Filter', NULL, 0, 1,'QName','CharacterString', NULL, 'O',1 , 'ISO 19103','MDWEB', ' ');
 
 /*-------------------------------------------------*
- *--------------  Classe Envelope -----------------*
- *-------------------------------------------------*/
- INSERT INTO "Schemas"."Classes"  VALUES('Envelope',NULL,'ISO 19108',NULL,0,NULL,NULL, ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('id', NULL, 'ISO 19108', NULL, 0, 1,'Envelope','CharacterString', NULL, 'O',0 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('lowerCorner', NULL, 'ISO 19108', NULL, 0, 1,'Envelope','DirectPosition', NULL, 'O',1 , 'ISO 19108','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('upperCorner', NULL, 'ISO 19108', NULL, 0, 1,'Envelope','DirectPosition', NULL, 'O',2 , 'ISO 19108','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('pos', NULL, 'ISO 19108', NULL, 0, 2147483647,'Envelope','DirectPosition', NULL, 'O',3 , 'ISO 19108','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('srsDimension', NULL, 'ISO 19108', NULL, 0, 1,'Envelope','Integer', NULL, 'O',4 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('srsName', NULL, 'ISO 19108', NULL, 0, 1,'Envelope','CharacterString', NULL, 'O',5 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('axisLabels', NULL, 'ISO 19108', NULL, 0, 2147483647,'Envelope','CharacterString', NULL, 'O',6 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('uomLabels', NULL, 'ISO 19108', NULL, 0, 2147483647,'Envelope','CharacterString', NULL, 'O',7 , 'ISO 19103','ISO 19108', ' ');
-
-/*-------------------------------------------------*
- *--------------  Classe EnvelopeWithTimePeriod ---*
- *-------------------------------------------------*/
- INSERT INTO "Schemas"."Classes"  VALUES('EnvelopeWithTimePeriod',NULL,'ISO 19108',NULL,0,'Envelope','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('beginPosition', NULL, 'ISO 19108', NULL, 1, 1,'EnvelopeWithTimePeriod','TimePosition', NULL, 'M',0 , 'ISO 19108','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('endPosition', NULL, 'ISO 19108', NULL, 1, 1,'EnvelopeWithTimePeriod','TimePosition', NULL, 'M',1 , 'ISO 19108','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('frame', NULL, 'ISO 19108', NULL, 0, 1,'EnvelopeWithTimePeriod','CharacterString', NULL, 'O',2 , 'ISO 19103','ISO 19108', ' ');
-
-/*-------------------------------------------------*
  *--------------  Classe PropertyName -------------*
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Classes"  VALUES('PropertyName',NULL,'OGC Filter',NULL,0,NULL,NULL, ' ');

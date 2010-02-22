@@ -161,6 +161,8 @@ public class MDWebMetadataWriterTest {
         assertEquals(expProcess.getOutputs().getOutputList(), resProcess.getOutputs().getOutputList());
         assertEquals(expProcess.getOutputs(), resProcess.getOutputs());
 
+        assertEquals(expProcess.getBoundedBy().getEnvelope().getLowerCorner(), resProcess.getBoundedBy().getEnvelope().getLowerCorner());
+        assertEquals(expProcess.getBoundedBy().getEnvelope(), resProcess.getBoundedBy().getEnvelope());
         assertEquals(expProcess.getBoundedBy(), resProcess.getBoundedBy());
 
         if (expProcess.getCapabilities().size() > 0 && resProcess.getCapabilities().size() > 0) {

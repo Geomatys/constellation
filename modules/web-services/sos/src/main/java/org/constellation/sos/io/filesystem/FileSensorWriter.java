@@ -157,4 +157,19 @@ public class FileSensorWriter implements SensorWriter {
         return "Constellation Filesystem Sensor Writer 0.5";
     }
 
+    @Override
+    public void deleteSensor(String id) throws CstlServiceException {
+        
+        id = id.replace(":", "-");
+        final File currentFile = new File(dataDirectory, id + ".xml");
+        boolean delete = false;
+        if (currentFile.exists()) {
+            delete = currentFile.delete();
+        }
+        if (!delete) {
+            throw new CstlServiceException("the service was unable to delete the file:" + currentFile.getName(), NO_APPLICABLE_CODE);
+        }
+       
+    }
+
 }

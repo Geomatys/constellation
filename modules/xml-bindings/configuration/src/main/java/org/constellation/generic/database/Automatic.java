@@ -57,6 +57,9 @@ public class Automatic {
     
     @XmlAttribute
     private String format;
+
+    @XmlAttribute
+    private String name;
     
     private String dataDirectory;
 
@@ -161,14 +164,39 @@ public class Automatic {
     public void setThesaurus(List<BDD> thesaurus) {
         this.thesaurus = thesaurus;
     }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
     
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder("[Automatic]");
-        s.append("format: ").append(format).append('\n');
-        s.append("BDD:").append(bdd).append('\n');
-        s.append("dataDirectory:").append(bdd).append('\n');
-        s.append("queries ").append(": ").append(queries).append('\n');
+        if (name != null) {
+            s.append("name: ").append(name).append('\n');
+        }
+        if (format != null) {
+            s.append("format: ").append(format).append('\n');
+        }
+        if (bdd != null) {
+            s.append("BDD:").append(bdd).append('\n');
+        }
+        if (dataDirectory != null) {
+            s.append("dataDirectory:").append(dataDirectory).append('\n');
+        }
+        if (queries != null) {
+            s.append("queries ").append(": ").append(queries).append('\n');
+        }
         return s.toString();
     }
     
@@ -183,9 +211,10 @@ public class Automatic {
         if (object instanceof Automatic) {
             final Automatic that = (Automatic) object;
 
-            return Utilities.equals(this.bdd,   that.bdd)         &&
-                   Utilities.equals(this.format  ,   that.format) &&
-                   Utilities.equals(this.queries, that.queries);
+            return Utilities.equals(this.bdd,      that.bdd)         &&
+                   Utilities.equals(this.name  ,   that.name) &&
+                   Utilities.equals(this.format  , that.format) &&
+                   Utilities.equals(this.queries,  that.queries);
         }
         return false;
     }
@@ -196,7 +225,9 @@ public class Automatic {
         hash = 37 * hash + (this.bdd != null ? this.bdd.hashCode() : 0);
         hash = 37 * hash + (this.format != null ? this.format.hashCode() : 0);
         hash = 37 * hash + (this.queries != null ? this.queries.hashCode() : 0);
+        hash = 37 * hash + (this.name != null ? this.name.hashCode() : 0);
         return hash;
     }
+
 
 }

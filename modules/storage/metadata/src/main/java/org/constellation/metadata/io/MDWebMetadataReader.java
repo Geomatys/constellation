@@ -50,7 +50,6 @@ import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.model.storage.LinkedValue;
-import org.mdweb.io.Reader;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Reader20;
 
@@ -757,7 +756,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             
             String name = className;
             int nameType = 0;
-            while (nameType < 8) {
+            while (nameType < 9) {
                 try {
                     LOGGER.finer("searching: " + packageName + '.' + name);
                     result = Class.forName(packageName + '.' + name);
@@ -803,28 +802,35 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                             nameType = 4;
                             break;
                         }
-                        // we put Default before the className
+                         // we put Entry behind the className
                         case 4: {
                             name = name.substring(0, name.indexOf("Type"));
-                            name = "Default" + name;
+                            name += "Entry";
                             nameType = 5;
                             break;
                         }
-                        // we put FRA before the className
+                        // we put Default before the className
                         case 5: {
-                            name = "FRA" + name;
+                            name = name.substring(0, name.indexOf("Entry"));
+                            name = "Default" + name;
                             nameType = 6;
                             break;
                         }
-                        // we put PropertyType behind the className
+                        // we put FRA before the className
                         case 6: {
-                            name = name.substring(10, name.length());
-                            name += "PropertyType";
+                            name = "FRA" + name;
                             nameType = 7;
                             break;
                         }
-                        default:
+                        // we put PropertyType behind the className
+                        case 7: {
+                            name = name.substring(10, name.length());
+                            name += "PropertyType";
                             nameType = 8;
+                            break;
+                        }
+                        default:
+                            nameType = 9;
                             break;
                     }
 

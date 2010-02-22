@@ -38,3 +38,6 @@ INSERT INTO "Schemas"."CodeListElements"  VALUES ('unknown', NULL, 'ISO 19108', 
 INSERT INTO "Schemas"."Classes"  VALUES ('TimePeriod', 'TimePeriod', 'ISO 19108', 'TimePeriod', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('beginPosition', NULL, 'ISO 19108', NULL, 1, 1, 'TimePeriod', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('endPosition', NULL, 'ISO 19108', NULL, 0, 1, 'TimePeriod', NULL, 'TimeIndeterminateValue', 'O', 1, 'ISO 19108', 'ISO 19108', ' ');
+
+INSERT INTO "Schemas"."Classes"  VALUES ('TimeInstant', 'TimeInstant', 'ISO 19108', 'TimeInstant', 0, NULL, NULL, ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('position', NULL, 'ISO 19108', NULL, 1, 1, 'TimeInstant', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ');

@@ -27,6 +27,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 //Junit dependencies
+import org.constellation.configuration.SOSConfiguration;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -43,7 +44,7 @@ public class GenericConfigurationXMLBindingTest {
 
     @Before
     public void setUp() throws JAXBException {
-        pool = new MarshallerPool(Automatic.class);
+        pool = new MarshallerPool(Automatic.class, SOSConfiguration.class);
         unmarshaller = pool.acquireUnmarshaller();
         marshaller   = pool.acquireMarshaller();
     }
@@ -90,7 +91,7 @@ public class GenericConfigurationXMLBindingTest {
         String result = sw.toString();
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                + '\n' +
-        "<automatic format=\"MDWEB\">"                                                 + '\n' +
+        "<automatic format=\"MDWEB\" xmlns:ns2=\"http://www.constellation.org/config\">" + '\n' +
         "    <bdd>"                                                                    + '\n' +
         "        <className>org.driver.test</className>"                               + '\n' +
         "        <connectURL>http://somehost/blablabla</connectURL>"                   + '\n' +
@@ -137,6 +138,57 @@ public class GenericConfigurationXMLBindingTest {
         "        </multiFixed>"                                                        + '\n' +
         "    </queries>"                                                               + '\n' +
         "</automatic>" + '\n';
+
+        assertEquals(expResult, result);
+
+
+        bdd = new BDD("org.driver.test", "http://somehost/blablabla", "bobby", "juanito");
+
+
+        config = new Automatic("MDWEB", bdd, null);
+
+        SOSConfiguration sosConfig = new SOSConfiguration(config, config);
+
+        Automatic config2 = new Automatic("MDWEB", bdd, null);
+        config2.setName("coriolis");
+        sosConfig.getExtensions().add(config2);
+        
+        sw = new StringWriter();
+        marshaller.marshal(sosConfig, sw);
+
+        result = sw.toString();
+        System.out.println("result:" + result);
+        expResult =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"            + '\n' +
+        "<ns2:SOSConfiguration xmlns:ns2=\"http://www.constellation.org/config\">" + '\n' +
+        "    <ns2:SMLConfiguration format=\"MDWEB\">"                              + '\n' +
+        "        <bdd>"                                                            + '\n' +
+        "            <className>org.driver.test</className>"                       + '\n' +
+        "            <connectURL>http://somehost/blablabla</connectURL>"           + '\n' +
+        "            <user>bobby</user>"                                           + '\n' +
+        "            <password>juanito</password>"                                 + '\n' +
+        "        </bdd>"                                                           + '\n' +
+        "    </ns2:SMLConfiguration>"                                              + '\n' +
+        "    <ns2:OMConfiguration format=\"MDWEB\">"                               + '\n' +
+        "        <bdd>"                                                            + '\n' +
+        "            <className>org.driver.test</className>"                       + '\n' +
+        "            <connectURL>http://somehost/blablabla</connectURL>"           + '\n' +
+        "            <user>bobby</user>"                                           + '\n' +
+        "            <password>juanito</password>"                                 + '\n' +
+        "        </bdd>"                                                           + '\n' +
+        "    </ns2:OMConfiguration>"                                               + '\n' +
+        "    <ns2:extensions name=\"coriolis\" format=\"MDWEB\">"                  + '\n' +
+        "        <bdd>"                                                            + '\n' +
+        "            <className>org.driver.test</className>"                       + '\n' +
+        "            <connectURL>http://somehost/blablabla</connectURL>"           + '\n' +
+        "            <user>bobby</user>"                                           + '\n' +
+        "            <password>juanito</password>"                                 + '\n' +
+        "        </bdd>"                                                            + '\n' +
+        "    </ns2:extensions>"                                                    + '\n' +
+        "    <ns2:maxObservationByRequest>0</ns2:maxObservationByRequest>"         + '\n' +
+        "    <ns2:debugMode>false</ns2:debugMode>"                                 + '\n' +
+        "    <ns2:verifySynchronization>false</ns2:verifySynchronization>"         + '\n' +
+        "</ns2:SOSConfiguration>" + '\n';
 
         assertEquals(expResult, result);
     

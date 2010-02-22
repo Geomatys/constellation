@@ -67,7 +67,7 @@ public class SOSFactoryTest {
         ObservationWriter ow = sosFactory.getObservationWriter(null, null);
         assertTrue(ow == null);
 
-        SensorWriter sw = sosFactory.getSensorWriter(null, null, null);
+        SensorWriter sw = sosFactory.getSensorWriter(null, null, null, null);
         assertTrue(sw == null);
 
         SensorReader sr = sosFactory.getSensorReader(null, null, null, null);
