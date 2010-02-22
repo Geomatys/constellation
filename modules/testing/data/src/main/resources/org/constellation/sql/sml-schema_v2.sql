@@ -564,11 +564,11 @@
 
 
  /*-------------------------------------------------*
- *--------------  Classe StateData ----------------*
+ *--------------  Classe VectorOrSquareMatrixProperty ----------------*
  *-------------------------------------------------*/
- INSERT INTO "Schemas"."Classes"  VALUES('StateData',NULL,'Sensor Web Enablement',NULL,1,NULL,NULL, ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('vector', NULL, 'Sensor Web Enablement', NULL, 0, 1,'StateData','Vector', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('squareMatrix', NULL, 'Sensor Web Enablement', NULL, 0, 1,'StateData','SquareMatrix', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Classes"  VALUES('VectorOrSquareMatrixProperty',NULL,'Sensor Web Enablement',NULL,1,NULL,NULL, ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('vector', NULL, 'Sensor Web Enablement', NULL, 0, 1,'VectorOrSquareMatrixProperty','Vector', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('squareMatrix', NULL, 'Sensor Web Enablement', NULL, 0, 1,'VectorOrSquareMatrixProperty','SquareMatrix', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
 
 
 
@@ -584,11 +584,11 @@
  INSERT INTO "Schemas"."Properties"  VALUES('localFrame', NULL, 'Sensor Web Enablement', 'Specifies the spatial frame which location and/or orientation is given by the enclosing vector', 0, 1,'Position','URI', NULL, 'O',4 , 'ISO 19103','Sensor Web Enablement','C');
  INSERT INTO "Schemas"."Properties"  VALUES('time', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Position','Time', NULL, 'O',5 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('location', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Position','VectorProperty', NULL, 'O',6 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('orientation', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Position','StateData', NULL, 'O',7 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('orientation', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Position','VectorOrSquareMatrixProperty', NULL, 'O',7 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('velocity', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Position','Vector', NULL, 'O',8 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('angularVelocity', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Position','StateData', NULL, 'O',9 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('angularVelocity', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Position','VectorOrSquareMatrixProperty', NULL, 'O',9 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('acceleration', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Position','Vector', NULL, 'O',10 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('state', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Position','StateData', NULL, 'O',11 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('state', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Position','VectorOrSquareMatrixProperty', NULL, 'O',11 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('name', NULL, 'SensorML', NULL, 1, 1,'Position','CharacterString', NULL, 'M',12 , 'ISO 19103','Sensor Web Enablement','P');
  
 
