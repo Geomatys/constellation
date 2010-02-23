@@ -177,6 +177,29 @@ public class BDD {
         }
         return conec;
     }
+
+    /**
+     * Return a new connection to the database.
+     *
+     * @return
+     * @throws java.sql.SQLException
+     *
+     * @todo The call to Class.forName(...) is not needed anymore since Java 6 and should be removed.
+     */
+    public Connection getFreshConnection() throws SQLException {
+
+        // by Default  we use the postgres driver.
+        if (className == null) {
+            className = "org.postgresql.Driver";
+        }
+        try {
+            Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            // Non-fatal exception, ignore. If there is really a problem, the
+            // following line is expected to throw the appropriate SQLException.
+        }
+        return DriverManager.getConnection(connectURL, user, password);
+    }
     
     @Override
     public String toString() {
