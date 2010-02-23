@@ -35,7 +35,7 @@ public interface SensorWriter {
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    void writeSensor(String id, AbstractSensorML sensor) throws CstlServiceException;
+    boolean writeSensor(String id, AbstractSensorML sensor) throws CstlServiceException;
 
     /**
      * Delete a SensorML document into the data source.
@@ -44,7 +44,16 @@ public interface SensorWriter {
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    void deleteSensor(String id) throws CstlServiceException;
+    boolean deleteSensor(String id) throws CstlServiceException;
+
+    /**
+     * Replace a SensorML document into the data source.
+     *
+     * @param id The identifier of the sensor
+     *
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    int replaceSensor(String id, AbstractSensorML process) throws CstlServiceException;
 
     /**
      * Start a transaction on the datasource.

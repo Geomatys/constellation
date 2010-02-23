@@ -819,20 +819,22 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (form != null) {
             try {
                 final long startWrite = System.currentTimeMillis();
-                mdWriter.writeForm(form, false, true);
+                int result = mdWriter.writeForm(form, false, true);
                 writeTime = System.currentTimeMillis() - startWrite;
-            /*} catch (IllegalArgumentException e) {
-                //TODO restore catching at this point
-                throw e;
-                //return false;*/
+                if (result == 1) {
+                    return false;
+                }
+
             } catch (MD_IOException e) {
                 throw new MetadataIoException("The service has throw an SQLException while writing the metadata :" + e.getMessage(), e, null);
             }
             
             final long time = System.currentTimeMillis() - start;
-            LOGGER.info("inserted new Form: " + form.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " +  writeTime + ")");
+
+            LOGGER.info("inserted new Form: " + form.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " + writeTime + ")");
             indexDocument(form);
             return true;
+
         }
         return false;
     }
@@ -898,8 +900,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         try {
             final Catalog catalog = mdWriter.getCatalog(catalogCode);
             final Form f          = mdWriter.getForm(catalog, id);
-
-            mdWriter.deleteForm(f.getId());
+            if (f != null) {
+                mdWriter.deleteForm(f.getId());
+            } else {
+                LOGGER.info("The sensor is not registered, nothing to delete");
+                return false;
+            }
         } catch (MD_IOException ex) {
             throw new MetadataIoException("The service has throw an SQLException while deleting the metadata: " + ex.getMessage());
         }

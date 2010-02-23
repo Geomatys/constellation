@@ -95,11 +95,11 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     }
 
     @Override
-     public void writeSensor(String id, AbstractSensorML process) throws CstlServiceException {
+    public boolean writeSensor(String id, AbstractSensorML process) throws CstlServiceException {
        
         try {
             currentSensorID = id;
-            super.storeMetadata(process);
+            return super.storeMetadata(process);
 
         } catch (MetadataIoException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -109,7 +109,20 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     }
 
     @Override
-    public void deleteSensor(String sensorId) throws CstlServiceException {
+    public int replaceSensor(String sensorid, AbstractSensorML process) throws CstlServiceException {
+        boolean deleted = deleteSensor(sensorid);
+        int result;
+        if (deleted) {
+            result = REPLACED;
+        } else {
+            result = INSERTED;
+        }
+        writeSensor(sensorid, process);
+        return result;
+    }
+
+    @Override
+    public boolean deleteSensor(String sensorId) throws CstlServiceException {
         try {
             String dbId = map.getProperty(sensorId);
             if (dbId == null) {
@@ -121,7 +134,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
             LOGGER.finer("describesensor mdweb id: " + id);
 
             String identifier = id + ":SMLC";
-            super.deleteMetadata(identifier);
+            return super.deleteMetadata(identifier);
 
         } catch (MD_IOException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);

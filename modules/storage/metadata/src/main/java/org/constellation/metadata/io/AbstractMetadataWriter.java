@@ -39,7 +39,11 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
      * Record the date format in the metadata.
      */
     protected final List<DateFormat> dateFormat = new ArrayList<DateFormat>();
-    
+
+    public final static int INSERTED = 0;
+
+    public final static int REPLACED = 1;
+
     /**
      * Build a new metadata writer.
      * 

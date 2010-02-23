@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.AbstractMetadataWriter;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
@@ -72,7 +73,7 @@ public class FileSensorWriter implements SensorWriter {
     }
 
     @Override
-    public void writeSensor(String id, AbstractSensorML sensor) throws CstlServiceException {
+    public boolean writeSensor(String id, AbstractSensorML sensor) throws CstlServiceException {
         Marshaller marshaller = null;
         try {
             marshaller = marshallerPool.acquireMarshaller();
@@ -102,8 +103,46 @@ public class FileSensorWriter implements SensorWriter {
                 marshallerPool.release(marshaller);
             }
         }
+        return true;
     }
 
+    @Override
+    public boolean deleteSensor(String id) throws CstlServiceException {
+
+        id = id.replace(":", "-");
+        final File currentFile = new File(dataDirectory, id + ".xml");
+        boolean delete = false;
+        if (currentFile.exists()) {
+            delete = currentFile.delete();
+        }
+        if (!delete) {
+            throw new CstlServiceException("the service was unable to delete the file:" + currentFile.getName(), NO_APPLICABLE_CODE);
+        }
+        return true;
+    }
+
+    @Override
+    public int replaceSensor(String id, AbstractSensorML sensor) throws CstlServiceException {
+        Marshaller marshaller = null;
+        try {
+            marshaller = marshallerPool.acquireMarshaller();
+            id = id.replace(":", "-");
+            final File currentFile = new File(dataDirectory, id + ".xml");
+            marshaller.marshal(sensor, currentFile);
+            return AbstractMetadataWriter.REPLACED;
+        } catch (JAXBException ex) {
+            String msg = ex.getMessage();
+            if (msg == null && ex.getCause() != null) {
+                msg = ex.getCause().getMessage();
+            }
+            throw new CstlServiceException("the service has throw a JAXB Exception:" + msg,
+                                           ex, NO_APPLICABLE_CODE);
+        } finally {
+            if (marshaller != null) {
+                marshallerPool.release(marshaller);
+            }
+        }
+    }
     @Override
     public void startTransaction() throws CstlServiceException {
         uncommittedFiles = new ArrayList<File>();
@@ -156,20 +195,4 @@ public class FileSensorWriter implements SensorWriter {
     public String getInfos() {
         return "Constellation Filesystem Sensor Writer 0.5";
     }
-
-    @Override
-    public void deleteSensor(String id) throws CstlServiceException {
-        
-        id = id.replace(":", "-");
-        final File currentFile = new File(dataDirectory, id + ".xml");
-        boolean delete = false;
-        if (currentFile.exists()) {
-            delete = currentFile.delete();
-        }
-        if (!delete) {
-            throw new CstlServiceException("the service was unable to delete the file:" + currentFile.getName(), NO_APPLICABLE_CODE);
-        }
-       
-    }
-
 }
