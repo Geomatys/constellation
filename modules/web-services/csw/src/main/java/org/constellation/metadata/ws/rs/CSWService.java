@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
+import java.io.File;
 import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
@@ -113,6 +114,25 @@ public class CSWService extends OGCWebService {
         try {
             setXMLContext("", CSWClassesContext.getAllClasses());
             worker = new CSWworker(serviceID, getMarshallerPool());
+
+        } catch (JAXBException ex){
+            LOGGER.severe("The CSW service is not running."       + '\n' +
+                          " cause  : Error creating XML context." + '\n' +
+                          " error  : " + ex.getMessage()          + '\n' +
+                          " details: " + ex.toString());
+        }
+    }
+
+    /**
+     * Build a new Restfull CSW service.
+     * used by subClasses.
+     */
+    protected CSWService(final File configDirectory) {
+        super(ServiceDef.CSW_2_0_2);
+        this.serviceID = "";
+        try {
+            setXMLContext("", CSWClassesContext.getAllClasses());
+            worker = new CSWworker(serviceID, getMarshallerPool(), configDirectory);
 
         } catch (JAXBException ex){
             LOGGER.severe("The CSW service is not running."       + '\n' +

@@ -282,7 +282,7 @@ public class CSWworker {
      * @param unmarshaller  An Unmarshaller to get object from harvested resource.
      * 
      */
-    protected CSWworker(final String serviceID, final MarshallerPool marshallerPool, File configDir) {
+    public CSWworker(final String serviceID, final MarshallerPool marshallerPool, File configDir) {
 
         final String notWorkingMsg = "The CSW service is not working!";
         this.marshallerPool  = marshallerPool;
