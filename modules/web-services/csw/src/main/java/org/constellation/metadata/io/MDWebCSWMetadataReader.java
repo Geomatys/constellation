@@ -400,14 +400,14 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         try {
             if (typeValues.size() != 0) {
                 final TextValue value = (TextValue)typeValues.get(0);
-                final int code = Integer.parseInt(value.getValue());
+                final int code        = Integer.parseInt(value.getValue());
                 final org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList)value.getType();
                 final CodeListElement element = codelist.getElementByCode(code);
                 dataType = element.getName();
             }
             litType = new SimpleLiteral(null, dataType);
         } catch (NumberFormatException ex) {
-            LOGGER.severe("Number format exception while trying to get the DC type");
+            LOGGER.warning("Number format exception while trying to get the DC type");
         }
 
 
@@ -430,13 +430,13 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                     try {
                         code = Integer.parseInt(((TextValue)v).getValue());
                     } catch (NumberFormatException ex) {
-                        LOGGER.severe("unable to parse the codeListelement:" + ((TextValue)v).getValue());
+                        LOGGER.warning("unable to parse the codeListelement:" + ((TextValue)v).getValue());
                     }
                     final CodeListElement element = c.getElementByCode(code);
                     if (element != null) {
                         keywords.add(new SimpleLiteral(null, element.getName()));
                     } else {
-                        LOGGER.severe("no such codeListElement:" + code + " for the codeList:" + c.getName());
+                        LOGGER.warning("no such codeListElement:" + code + " for the codeList:" + c.getName());
                     }
                 } else {
                     keywords.add(new SimpleLiteral(null, ((TextValue)v).getValue()));
@@ -584,7 +584,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                     }
 
                 } catch (IllegalArgumentException ex) {
-                    LOGGER.info("illegal argument exception while invoking the method get" + StringUtilities.firstToUpper(qn.getLocalPart()) + " in the RecordType class");
+                    LOGGER.warning("illegal argument exception while invoking the method get" + StringUtilities.firstToUpper(qn.getLocalPart()) + " in the RecordType class");
                 }
             }
             return result;
@@ -641,7 +641,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                 }
             }
         } catch (NumberFormatException ex) {
-            LOGGER.severe("unable to parse a double in bounding box value:" + '\n' + ex.getMessage() ) ;
+            LOGGER.warning("unable to parse a double in bounding box value:" + '\n' + ex.getMessage() ) ;
         }
 
         if (eastValue != null && westValue != null && northValue != null && southValue != null) {
@@ -656,7 +656,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             LOGGER.finer("boundingBox created");
             return result;
         } else {
-            LOGGER.info("boundingBox null");
+            LOGGER.warning("boundingBox null");
             return null;
         }
     }

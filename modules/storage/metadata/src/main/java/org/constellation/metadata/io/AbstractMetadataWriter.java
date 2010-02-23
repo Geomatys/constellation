@@ -22,6 +22,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -44,6 +45,11 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
 
     public final static int REPLACED = 1;
 
+    /**
+     * The default level for logging non essential informations (ToSee => finer)
+     */
+    protected Level logLevel = Level.INFO;
+    
     /**
      * Build a new metadata writer.
      * 
@@ -98,4 +104,11 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
      */
     @Override
     public abstract void destroy();
+
+    /**
+     * @param LogLevel the LogLevel to set
+     */
+    public void setLogLevel(Level LogLevel) {
+        this.logLevel = LogLevel;
+    }
 }

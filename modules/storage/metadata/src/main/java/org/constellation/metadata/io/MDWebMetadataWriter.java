@@ -831,7 +831,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             
             final long time = System.currentTimeMillis() - start;
 
-            LOGGER.info("inserted new Form: " + form.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " + writeTime + ")");
+            LOGGER.log(logLevel, "inserted new Form: " + form.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " + writeTime + ")");
             indexDocument(form);
             return true;
 
@@ -881,7 +881,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     @Override
     public boolean deleteMetadata(String identifier) throws MetadataIoException {
-        LOGGER.info("metadata to delete:" + identifier);
+        LOGGER.log(logLevel, "metadata to delete:" + identifier);
 
         int id;
         String catalogCode = "";
@@ -903,7 +903,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             if (f != null) {
                 mdWriter.deleteForm(f.getId());
             } else {
-                LOGGER.info("The sensor is not registered, nothing to delete");
+                LOGGER.log(logLevel, "The sensor is not registered, nothing to delete");
                 return false;
             }
         } catch (MD_IOException ex) {

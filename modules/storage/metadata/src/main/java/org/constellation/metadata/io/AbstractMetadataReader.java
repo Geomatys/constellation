@@ -21,6 +21,7 @@ package org.constellation.metadata.io;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
@@ -54,6 +55,11 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * A map containing the metadata already extract from the database.
      */
     private final Map<String, Object> metadatas = new HashMap<String, Object>();
+
+    /**
+     * The default level for logging non essential informations (ToSee => finer)
+     */
+    protected Level logLevel = Level.INFO;
 
     /**
      * Initialize the metadata reader base attribute.
@@ -142,5 +148,12 @@ public abstract class AbstractMetadataReader implements MetadataReader {
     @Override
     public boolean isThreadEnabled() {
         return isThreadEnabled;
+    }
+
+    /**
+     * @param LogLevel the LogLevel to set
+     */
+    public void setLogLevel(Level LogLevel) {
+        this.logLevel = LogLevel;
     }
 }

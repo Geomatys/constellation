@@ -237,7 +237,7 @@ public class FileMetadataReader extends AbstractCSWMetadataReader {
                         if (qn != null) {
                             localPart = qn.getLocalPart();
                         }
-                        LOGGER.info("illegal argument exception while invoking the method for attribute" + localPart + " in the classe RecordType");
+                        LOGGER.warning("illegal argument exception while invoking the method for attribute" + localPart + " in the classe RecordType");
                     }
                 } else {
                     LOGGER.severe("An elementName was null.");

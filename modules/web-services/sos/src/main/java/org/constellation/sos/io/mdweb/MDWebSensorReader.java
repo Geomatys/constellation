@@ -85,8 +85,8 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
             }
             // we find the form id describing the sensor.
             final int id = mdReader.getIdFromTitleForm(dbId);
-            LOGGER.info("describesensor id: " + dbId);
-            LOGGER.info("describesensor mdweb id: " + id);
+            LOGGER.log(logLevel, "describesensor id: " + dbId);
+            LOGGER.log(logLevel, "describesensor mdweb id: " + id);
 
             String identifier = id + ":SMLC";
             Object metadata = getMetadata(identifier, AbstractMetadataReader.SENSORML, null);

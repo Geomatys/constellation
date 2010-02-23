@@ -99,7 +99,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      */
     @Override
     public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException {
-        LOGGER.info("metadataID: " + metadataID);
+        LOGGER.log(logLevel, "metadataID: " + metadataID);
         int id;
         String catalogCode = "";
         Form f = null;
