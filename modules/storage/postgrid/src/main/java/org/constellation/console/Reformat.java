@@ -108,7 +108,7 @@ public final class Reformat extends CommandLine implements FileFilter {
             } else if (model.equalsIgnoreCase("RGB")) {
                 destinationType = BufferedImage.TYPE_INT_RGB;
             } else {
-                err.println(Errors.format(Errors.Keys.UNKNOW_PARAMETER_$1, model));
+                err.println(Errors.format(Errors.Keys.UNKNOWN_PARAMETER_$1, model));
                 System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
             }
         }
@@ -116,7 +116,7 @@ public final class Reformat extends CommandLine implements FileFilter {
             Registry.setNativeCodecAllowed(format, ImageWriterSpi.class, false);
             final Iterator<ImageWriter> it = ImageIO.getImageWritersByFormatName(format);
             if (!it.hasNext()) {
-                err.println(Errors.format(Errors.Keys.UNKNOW_IMAGE_FORMAT_$1, format));
+                err.println(Errors.format(Errors.Keys.UNKNOWN_IMAGE_FORMAT_$1, format));
                 System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
             }
             writer = it.next();

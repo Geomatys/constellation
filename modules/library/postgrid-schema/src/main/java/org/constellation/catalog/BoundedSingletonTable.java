@@ -551,8 +551,8 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
                         }
                         final Envelope envelope;
                         try {
-                            envelope = SpatialFunctions.parse(bbox);
-                        } catch (NumberFormatException e) {
+                            envelope = new GeneralEnvelope(bbox);
+                        } catch (RuntimeException e) {
                             throw new IllegalRecordException(e, this, results, bboxColumn, null);
                         }
                         final int dimension = envelope.getDimension();
@@ -608,7 +608,7 @@ public abstract class BoundedSingletonTable<E extends Element> extends Singleton
                 final GeneralEnvelope envelope = new GeneralEnvelope(
                         new double[] {xMin, yMin, zMin},
                         new double[] {xMax, yMax, zMax});
-                statement.setString(index, SpatialFunctions.formatPolygon(envelope));
+                statement.setString(index, GeneralEnvelope.toPolygonString(envelope));
             }
         }
     }

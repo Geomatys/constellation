@@ -27,7 +27,10 @@ import org.geotoolkit.geometry.GeneralEnvelope;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ *
+ * @deprecated Moved to org.geotoolkit.geometry.GeneralEnvelope
  */
+@Deprecated
 public final class SpatialFunctions {
     /**
      * The maximal dimension allowed by this simple parser.

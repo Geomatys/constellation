@@ -16,7 +16,6 @@
  */
 package org.constellation.catalog;
 
-import java.sql.SQLException;
 import org.opengis.geometry.Envelope;
 
 import org.junit.*;
@@ -30,12 +29,13 @@ import junit.framework.TestCase;
  * @author Cédric Briançon
  * @author Martin Desruisseaux
  */
+@Deprecated
 public class SpatialFunctionsTest extends TestCase {
     /**
      * Tests the parsing and formating of a BOX3D element.
      */
     @Test
-    public void testBoxFormat() throws SQLException {
+    public void testBoxFormat() {
         String wkt;
         Envelope envelope;
 

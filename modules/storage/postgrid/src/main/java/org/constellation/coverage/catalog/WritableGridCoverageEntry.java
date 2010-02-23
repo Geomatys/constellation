@@ -138,7 +138,7 @@ public class WritableGridCoverageEntry {
         } else if (input instanceof CharSequence) {
             inputFile = new File(input.toString());
         } else {
-            throw new IIOException(Errors.format(Errors.Keys.UNKNOW_TYPE_$1,
+            throw new IIOException(Errors.format(Errors.Keys.UNKNOWN_TYPE_$1,
                     Classes.getShortClassName(input)));
         }
         path = inputFile.getParentFile();
