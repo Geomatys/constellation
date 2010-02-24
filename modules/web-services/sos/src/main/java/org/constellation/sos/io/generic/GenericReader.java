@@ -314,12 +314,13 @@ public abstract class GenericReader  {
                         subMultiStmts.add(stmt);
                     }
                 } else {
-                    if (staticParameters.get(var) != null) {
+                    String staticValue = staticParameters.get(var);
+                    if (staticValue != null) {
                         values = new Values();
-                        values.singleValue.put(var, staticParameters.get(var));
-                    }
-                    if (!debugMode)
+                        values.singleValue.put(var, staticValue);
+                    } else {
                         LOGGER.severe("no statement found for variable: " + var);
+                    }
                 }
             }
         }
@@ -406,6 +407,7 @@ public abstract class GenericReader  {
         for (final PreparedStatement stmt : subSingleStmts) {
             cs.submit(new Callable() {
 
+                @Override
                 public Object call() throws CstlServiceException {
                     try {
                         fillStatement(stmt, parameters);
@@ -442,6 +444,7 @@ public abstract class GenericReader  {
         for (final PreparedStatement stmt : subMultiStmts) {
             cs.submit(new Callable() {
 
+                @Override
                 public Object call() throws CstlServiceException {
                     try {
                         fillStatement(stmt, parameters);
@@ -512,7 +515,7 @@ public abstract class GenericReader  {
                 try {
                     type = meta.getParameterType(i);
                 } catch (Exception ex) {
-                    LOGGER.warning("unsupported jdbc operation in fillstatement");
+                    LOGGER.warning("unsupported jdbc operation in fillstatement (normal for oracle driver)");
                     advancedJdbcDriver = false;
                 }
             }
