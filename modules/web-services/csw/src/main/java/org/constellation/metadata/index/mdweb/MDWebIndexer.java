@@ -108,7 +108,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             if (create)
                 createIndex();
         } catch (SQLException ex) {
-            throw new IndexingException("SQL Exception while creating mdweb reader: " +ex.getMessage());
+            throw new IndexingException("SQL Exception while creating mdweb indexer: " + ex.getMessage());
         } 
     }
 
@@ -170,7 +170,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 throw new IndexingException(LOCK_MULTI_MSG, ex);
             } catch (IOException ex) {
                 LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
-                throw new IndexingException("IOException while indexing documents.", ex);
+                throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
             }
             LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                         "catalogs: " + nbCatalogs + " documents indexed: " + nbForms);
@@ -219,7 +219,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             throw new IndexingException(LOCK_MULTI_MSG, ex);
         } catch (IOException ex) {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
-            throw new IndexingException("IOException while indexing documents.", ex);
+            throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
         } catch (MD_IOException ex) {
             LOGGER.severe("SQLException while indexing document: " + ex.getMessage());
             throw new IndexingException("SQLException while indexing documents.", ex);
@@ -268,7 +268,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             throw new IndexingException(LOCK_MULTI_MSG, ex);
         } catch (IOException ex) {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
-            throw new IndexingException("IOException while indexing documents.", ex);
+            throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
         }
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 "catalogs: " + nbCatalogs + " documents indexed: " + nbForms + ".");
@@ -627,7 +627,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         try {
             mdWebReader.close();
         } catch (MD_IOException ex) {
-            LOGGER.severe("SQL Exception while destroying index");
+            LOGGER.severe("SQL Exception while destroying index:" + ex.getMessage());
         }
     }
 }

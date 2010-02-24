@@ -820,8 +820,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             try {
                 final long startWrite = System.currentTimeMillis();
                 int result = mdWriter.writeForm(form, false, true);
-                writeTime = System.currentTimeMillis() - startWrite;
+                writeTime  = System.currentTimeMillis() - startWrite;
                 if (result == 1) {
+                    LOGGER.log(logLevel, "The record have been skipped:" + form.getTitle());
                     return false;
                 }
 

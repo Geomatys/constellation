@@ -476,48 +476,14 @@ public class WFSService extends OGCWebService {
         String service      = getParameter("service", true);
         String version      = getParameter("version", true);
 
-        if (outputFormat == null)
+        if (outputFormat == null) {
             outputFormat = "text/xml; subtype=gml/3.1.1";
+        }
         String namespace = getParameter("namespace", false);
-        Map<String, String> mapping = new HashMap<String, String>();
-        if (namespace != null) {
-            final StringTokenizer tokens = new StringTokenizer(namespace, ",;");
-            while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                if (token.indexOf("xmlns(") != -1 && token.indexOf(')') != -1 && token.indexOf('=') != -1) {
-                    String tmp = token.substring(token.indexOf("xmlns(") + 6, token.indexOf(')'));
-                    String prefix = tmp.substring(0, tmp.indexOf('='));
-                    String namesp = tmp.substring(tmp.indexOf('=') + 1);
-                    mapping.put(prefix, namesp);
+        Map<String, String> mapping = extractMapping(namespace);
 
-                } else {
-                    throw new CstlServiceException("The namespace parameter is malformed : [" + token + "] the good pattern is xmlns(ns1=http://my_ns1.com)",
-                                                  INVALID_PARAMETER_VALUE, "namespace");
-                }
-            }
-        }
-        List<QName> typeNames = new ArrayList<QName>();
         String typeName = getParameter("typeName", false);
-        if (typeName != null) {
-            final StringTokenizer tokens = new StringTokenizer(typeName, ",;");
-            while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                if (token.indexOf(':') != -1) {
-                    String prefix    = token.substring(0, token.indexOf(':'));
-                    String localPart = token.substring(token.indexOf(':') + 1);
-                    String namesp = mapping.get(prefix);
-                    if (namesp != null) {
-                        typeNames.add(new QName(namesp, localPart, prefix));
-                    } else {
-                        throw new CstlServiceException("The typeName parameter is malformed : the prefix [" + prefix + "] is not bounded with a namespace",
-                                                  INVALID_PARAMETER_VALUE, "typeName");
-                    }
-                } else {
-                    throw new CstlServiceException("The typeName parameter is malformed : [" + token + "] the good pattern is ns1:feature",
-                                                  INVALID_PARAMETER_VALUE, "typeName");
-                }
-            }
-        }
+        List<QName> typeNames = extractTypeName(typeName, mapping);
 
         return new DescribeFeatureTypeType(service, version, handle, typeNames, outputFormat);
     }
@@ -583,26 +549,11 @@ public class WFSService extends OGCWebService {
         String handle       = getParameter("handle",  false);
         String outputFormat = getParameter("outputFormat", false);
 
-        if (outputFormat == null)
+        if (outputFormat == null) {
             outputFormat = "text/xml; subtype=gml/3.1.1";
-        String namespace = getParameter("namespace", false);
-        Map<String, String> mapping = new HashMap<String, String>();
-        if (namespace != null) {
-            final StringTokenizer tokens = new StringTokenizer(namespace, ",;");
-            while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                if (token.indexOf("xmlns(") != -1 && token.indexOf(')') != -1 && token.indexOf('=') != -1) {
-                    String tmp    = token.substring(token.indexOf("xmlns(") + 6, token.indexOf(')'));
-                    String prefix = tmp.substring(0, tmp.indexOf('='));
-                    String namesp = tmp.substring(tmp.indexOf('=') + 1);
-                    mapping.put(prefix, namesp);
-
-                } else {
-                    throw new CstlServiceException("The namespace parameter is malformed : [" + token + "] the good pattern is xmlns(ns1=http://my_ns1.com)",
-                                                  INVALID_PARAMETER_VALUE, "namespace");
-                }
-            }
         }
+        String namespace = getParameter("namespace", false);
+        Map<String, String> mapping = extractMapping(namespace);
 
         String result = getParameter("resultType", false);
         ResultTypeType resultType = null;
@@ -617,33 +568,9 @@ public class WFSService extends OGCWebService {
         if (featureId != null) {
             mandatory = false;
         }
-        
-        List<QName> typeNames = new ArrayList<QName>();
-        String typeName = getParameter("typeName", mandatory);
-        if (typeName != null) {
-            final StringTokenizer tokens = new StringTokenizer(typeName, ",;");
-            while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                if (token.indexOf(':') != -1) {
-                    String prefix    = token.substring(0, token.lastIndexOf(':'));
-                    String localPart = token.substring(token.lastIndexOf(':') + 1);
-                    String namesp    = mapping.get(prefix);
-                    if (namesp != null) {
-                        typeNames.add(new QName(namesp, localPart, prefix));
-                    } else {
-                        // we assume that the query was typeName=namespace:localPart
 
-                        typeNames.add(new QName(prefix, localPart));
-                        /*throw new CstlServiceException("The typeName parameter is malformed : the prefix [" + prefix + "] is not bounded with a namespace",
-                                                  INVALID_PARAMETER_VALUE, "typeName");*/
-                    }
-                } else {
-                    typeNames.add(new QName(token));
-                    /*throw new CstlServiceException("The typeName parameter is malformed : [" + token + "] the good pattern is ns1:feature",
-                                                  INVALID_PARAMETER_VALUE, "typeName");*/
-                }
-            }
-        }
+        String typeName = getParameter("typeName", mandatory);
+        List<QName> typeNames = extractTypeName(typeName, mapping);
 
         if (featureId != null) {
             final QueryType query = new QueryType(null, typeNames, featureVersion);
@@ -651,35 +578,8 @@ public class WFSService extends OGCWebService {
 
         }
 
-        String xmlFilter = getParameter("filter", false);
-        FilterType filter = null;
-        if (xmlFilter != null) {
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = getMarshallerPool().acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(new StringReader(xmlFilter));
-                if (obj instanceof JAXBElement) {
-                    obj = ((JAXBElement)obj).getValue();
-                }
-                if (!(obj instanceof FilterType)) {
-                    String type = "null";
-                    if (obj != null) {
-                        type = obj.getClass().getName();
-                    }
-                    throw new CstlServiceException("The xml filter does not have the good type:" + type,
-                                                  INVALID_PARAMETER_VALUE, "filter");
-                } else {
-                    filter = (FilterType) obj;
-                }
-            } catch (JAXBException ex) {
-                throw new CstlServiceException("The service was unable to read the xml filter:" + ex.getMessage(),
-                                                  INVALID_PARAMETER_VALUE, "filter");
-            } finally {
-                if (unmarshaller != null) {
-                    getMarshallerPool().release(unmarshaller);
-                }
-            }
-        }
+        String xmlFilter  = getParameter("filter", false);
+        FilterType filter = extractFilter(xmlFilter);
 
         String bbox = getParameter("bbox", false);
         if (bbox != null) {
@@ -783,74 +683,14 @@ public class WFSService extends OGCWebService {
             }
         }
 
-        String namespace = getParameter("namespace", false);
-        Map<String, String> mapping = new HashMap<String, String>();
-        if (namespace != null) {
-            final StringTokenizer tokens = new StringTokenizer(namespace, ",;");
-            while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                if (token.indexOf("xmlns(") != -1 && token.indexOf(')') != -1 && token.indexOf('=') != -1) {
-                    String tmp = token.substring(token.indexOf("xmlns(") + 6, token.indexOf(')'));
-                    String prefix = tmp.substring(0, tmp.indexOf('='));
-                    String namesp = tmp.substring(tmp.indexOf('=') + 1);
-                    mapping.put(prefix, namesp);
+        String namespace            = getParameter("namespace", false);
+        Map<String, String> mapping = extractMapping(namespace);
 
-                } else {
-                    throw new CstlServiceException("The namespace parameter is malformed : [" + token + "] the good pattern is xmlns(ns1=http://my_ns1.com)",
-                                                  INVALID_PARAMETER_VALUE, "namespace");
-                }
-            }
-        }
-        List<QName> typeNames = new ArrayList<QName>();
-        String typeName = getParameter("typeName", true);
-        if (typeName != null) {
-            final StringTokenizer tokens = new StringTokenizer(typeName, ",;");
-            while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                if (token.indexOf(':') != -1) {
-                    String prefix    = token.substring(0, token.indexOf(':'));
-                    String localPart = token.substring(token.indexOf(':') + 1);
-                    String namesp = mapping.get(prefix);
-                    if (namesp != null) {
-                        typeNames.add(new QName(namesp, localPart, prefix));
-                    } else {
-                        throw new CstlServiceException("The typeName parameter is malformed : the prefix [" + prefix + "] is not bounded with a namespace",
-                                                  INVALID_PARAMETER_VALUE, "typeName");
-                    }
-                } else {
-                    throw new CstlServiceException("The typeName parameter is malformed : [" + token + "] the good pattern is ns1:feature",
-                                                  INVALID_PARAMETER_VALUE, "typeName");
-                }
-            }
-        }
+        String typeName       = getParameter("typeName", true);
+        List<QName> typeNames = extractTypeName(typeName, mapping);
 
-        String xmlFilter = getParameter("filter", false);
-        FilterType filter = null;
-        if (xmlFilter != null) {
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = getMarshallerPool().acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(new StringReader(xmlFilter));
-                if (obj instanceof JAXBElement) {
-                    obj = ((JAXBElement)obj).getValue();
-                }
-                if (!(obj instanceof FilterType)) {
-                    String type = "null";
-                    if (obj != null) {
-                        type = obj.getClass().getName();
-                    }
-                    throw new CstlServiceException("The xml filter does not have the good type:" + type,
-                                                  INVALID_PARAMETER_VALUE, "filter");
-                }
-            } catch (JAXBException ex) {
-                throw new CstlServiceException("The service was unable to read the xml filter:" + ex.getMessage(),
-                                                  INVALID_PARAMETER_VALUE, "filter");
-            } finally {
-                if (unmarshaller != null) {
-                    getMarshallerPool().release(unmarshaller);
-                }
-            }
-        }
+        String xmlFilter  = getParameter("filter", false);
+        FilterType filter = extractFilter(xmlFilter);
         // TODO
         QName typeNamee = typeNames.get(0);
         LockType lock = new LockType(filter, handle, typeNamee);
@@ -868,7 +708,31 @@ public class WFSService extends OGCWebService {
             releaseAction = AllSomeType.fromValue(relAct);
         }
 
-         String namespace = getParameter("namespace", false);
+        String namespace            = getParameter("namespace", false);
+        Map<String, String> mapping = extractMapping(namespace);
+
+        String typeName       = getParameter("typeName", true);
+        List<QName> typeNames = extractTypeName(typeName, mapping);
+
+        String xmlFilter  = getParameter("filter", false);
+        FilterType filter = extractFilter(xmlFilter);
+
+        // TODO
+        QName typeNamee = typeNames.get(0);
+        DeleteElementType delete = new DeleteElementType(filter, handle, typeNamee);
+        return new TransactionType(service, version, handle, releaseAction, delete);
+    }
+
+    /**
+     * Extract The mapping between namespace and prefix in a namespace parameter of a GET request.
+     *
+     * @param namespace a String with the pattern: xmlns(ns1=http://my_ns1.com),xmlns(ns2=http://my_ns2.com),xmlns(ns3=http://my_ns3.com)
+     *
+     * @return a Map of @{<prefix, namespace>}.
+     *
+     * @throws CstlServiceException if the parameter namespace is malformed.
+     */
+    private Map<String, String> extractMapping(String namespace) throws CstlServiceException {
         Map<String, String> mapping = new HashMap<String, String>();
         if (namespace != null) {
             final StringTokenizer tokens = new StringTokenizer(namespace, ",;");
@@ -886,8 +750,20 @@ public class WFSService extends OGCWebService {
                 }
             }
         }
+        return mapping;
+    }
+
+    /**
+     * Extract proper QName from a String list of typeName.
+     * @param typeName A String with the pattern: ns1:type1,ns1:type2,ns2:type3
+     * @param mapping A Map of  @{<prefix, namespace>}
+     *
+     * @return A list of QName.
+     * @throws CstlServiceException if the pattern of the typeName parameter if wrong,
+     *                              or if a refix is not bounded to a namespace in the mapping map.
+     */
+    private List<QName> extractTypeName(String typeName, Map<String, String> mapping) throws CstlServiceException {
         List<QName> typeNames = new ArrayList<QName>();
-        String typeName = getParameter("typeName", true);
         if (typeName != null) {
             final StringTokenizer tokens = new StringTokenizer(typeName, ",;");
             while (tokens.hasMoreTokens()) {
@@ -908,8 +784,18 @@ public class WFSService extends OGCWebService {
                 }
             }
         }
+        return typeNames;
+    }
 
-        String xmlFilter = getParameter("filter", false);
+    /**
+     * Extract an OGC Filter from a String parameter in a GET Request.
+     * @param xmlFilter An piece of XML in a String.
+     *
+     * @return An OGC FIlter.
+     *
+     * @throws CstlServiceException if the XML is malformed or if the root type of the unmarshalled object is not a filter.
+     */
+    private FilterType extractFilter(String xmlFilter) throws CstlServiceException {
         FilterType filter = null;
         if (xmlFilter != null) {
             Unmarshaller unmarshaller = null;
@@ -926,6 +812,8 @@ public class WFSService extends OGCWebService {
                     }
                     throw new CstlServiceException("The xml filter does not have the good type:" + type,
                                                   INVALID_PARAMETER_VALUE, "filter");
+                } else {
+                    filter = (FilterType) obj;
                 }
             } catch (JAXBException ex) {
                 throw new CstlServiceException("The service was unable to read the xml filter:" + ex.getMessage(),
@@ -936,10 +824,7 @@ public class WFSService extends OGCWebService {
                 }
             }
         }
-        // TODO
-        QName typeNamee = typeNames.get(0);
-        DeleteElementType delete = new DeleteElementType(filter, handle, typeNamee);
-        return new TransactionType(service, version, handle, releaseAction, delete);
+        return filter;
     }
 
     public static Map<String, String> getSchemaLocations() {
