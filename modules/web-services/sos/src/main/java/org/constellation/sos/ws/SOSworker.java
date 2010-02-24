@@ -1737,7 +1737,7 @@ public class SOSworker {
 
                 //we add the phenomenon to the offering
                 OfferingPhenomenonEntry offPheno = null;
-                if (!offering.getObservedProperty().contains(template.getObservedProperty())) {
+                if (template.getObservedProperty() != null && !offering.getObservedProperty().contains(template.getObservedProperty())) {
                     offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry) template.getObservedProperty());
                 }
 
@@ -1817,7 +1817,7 @@ public class SOSworker {
 
             //we add the phenomenon to the offering
             OfferingPhenomenonEntry offPheno = null;
-            if (!offering.getObservedProperty().contains(template.getObservedProperty())) {
+            if (template.getObservedProperty() != null && !offering.getObservedProperty().contains(template.getObservedProperty())) {
                 offPheno = new OfferingPhenomenonEntry(offering.getId(), (PhenomenonEntry) template.getObservedProperty());
             }
 

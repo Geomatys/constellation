@@ -30,7 +30,6 @@ import org.geotoolkit.util.collection.WeakValueHashMap;
 import org.constellation.resources.i18n.Resources;
 import org.constellation.resources.i18n.ResourceKeys;
 import org.constellation.util.ReflectionUtilities;
-import org.constellation.util.Util;
 
 
 /**
@@ -494,7 +493,16 @@ public abstract class SingletonTable<E> extends Table {
     private void roolback(final Map<E,Boolean> set) {
         for (final Map.Entry<E,Boolean> entry : set.entrySet()) {
             if (!entry.getValue().booleanValue()) {
-                pool.remove(((Entry)entry.getKey()).getName());
+                if (entry instanceof Entry) {
+                    pool.remove(((Entry)entry.getKey()).getName());
+                } else {
+                    Object obj     = entry.getKey();
+                    final Method m = ReflectionUtilities.getGetterFromName("name", obj.getClass());
+                    String name     = (String) ReflectionUtilities.invokeMethod(obj, m);
+                    if (name != null) {
+                        pool.remove(name);
+                    }
+                }
             }
         }
     }
