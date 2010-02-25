@@ -775,12 +775,14 @@ public class WFSService extends OGCWebService {
                     if (namesp != null) {
                         typeNames.add(new QName(namesp, localPart, prefix));
                     } else {
-                        throw new CstlServiceException("The typeName parameter is malformed : the prefix [" + prefix + "] is not bounded with a namespace",
-                                                  INVALID_PARAMETER_VALUE, "typeName");
+                        typeNames.add(new QName(prefix, localPart));
+                        /*throw new CstlServiceException("The typeName parameter is malformed : the prefix [" + prefix + "] is not bounded with a namespace",
+                                                  INVALID_PARAMETER_VALUE, "typeName");*/
                     }
                 } else {
-                    throw new CstlServiceException("The typeName parameter is malformed : [" + token + "] the good pattern is ns1:feature",
-                                                  INVALID_PARAMETER_VALUE, "typeName");
+                    typeNames.add(new QName(token));
+                    /*throw new CstlServiceException("The typeName parameter is malformed : [" + token + "] the good pattern is ns1:feature",
+                                                  INVALID_PARAMETER_VALUE, "typeName");*/
                 }
             }
         }
