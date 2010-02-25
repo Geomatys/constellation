@@ -262,7 +262,8 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
                 final TimeInstantType instant = (TimeInstantType) time;
                 doc.add(new Field("sampling_time_begin",   Utils.getLuceneTimeValue(instant.getTimePosition()), Field.Store.YES, Field.Index.ANALYZED));
                 doc.add(new Field("sampling_time_end",    "NULL", Field.Store.YES, Field.Index.ANALYZED));
-            } else {
+                
+            } else if (time != null) {
                 LOGGER.severe("unrecognized sampling time type:" + time);
             }
         } catch(CstlServiceException ex) {

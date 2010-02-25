@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -53,6 +53,7 @@ import org.geotoolkit.sml.xml.v100.ComponentType;
 import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.sml.xml.v100.SystemType;
 import org.geotoolkit.sos.xml.v100.EventTime;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.GetResultResponse;
@@ -69,6 +70,9 @@ import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
 import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.observation.sampling.SamplingPoint;
 
 // JUnit dependencies
 import org.junit.Ignore;
@@ -87,6 +91,64 @@ public class SOSWorkerTest {
 
     protected static final String URL = "http://pulsar.geomatys.fr/SOServer/SOService";
 
+    /**
+     * Tests the getcapabilities method
+     *
+     * @throws java.lang.Exception
+     */
+    public void getCapabilitiesErrorTest() throws Exception {
+        
+        /**
+         *  TEST 1 : get capabilities with wrong version (waiting for an exception)
+         */
+        AcceptVersionsType acceptVersions = new AcceptVersionsType("2.0.0");
+        SectionsType sections             = new SectionsType("All");
+        AcceptFormatsType acceptFormats   = new AcceptFormatsType(MimeType.TEXT_XML);
+        GetCapabilities request           = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
+
+        boolean exLaunched = false;
+        try {
+            worker.getCapabilities(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), VERSION_NEGOTIATION_FAILED);
+            assertEquals(ex.getLocator(), "acceptVersion");
+        }
+
+        assertTrue(exLaunched);
+
+         /*
+         *  TEST 2 : get capabilities with wrong formats (waiting for an exception)
+         */
+        request = new GetCapabilities("1.0.0", "ploup/xml");
+
+        exLaunched = false;
+        try {
+            worker.getCapabilities(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "acceptFormats");
+        }
+
+        /*
+         *  TEST 3 : get capabilities no skeleton capabilities
+         */
+
+        worker.setSkeletonCapabilities(null);
+        request = new GetCapabilities();
+
+        exLaunched = false;
+        try {
+            worker.getCapabilities(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
+        }
+
+        assertTrue(exLaunched);
+    }
+    
     /**
      * Tests the getcapabilities method
      *
@@ -208,69 +270,17 @@ public class SOSWorkerTest {
         assertTrue(result.getContents().getObservationOfferingList().getObservationOffering().size() == 1);
         assertTrue(result != null);
 
-        /*
-         *  TEST 7 : get capabilities with wrong version (waiting for an exception)
-         */
-        acceptVersions = new AcceptVersionsType("2.0.0");
-        sections       = new SectionsType("All");
-        acceptFormats  = new AcceptFormatsType(MimeType.TEXT_XML);
-        request = new GetCapabilities(acceptVersions, sections, acceptFormats, "", "SOS");
-
-        boolean exLaunched = false;
-        try {
-            worker.getCapabilities(request);
-        } catch (CstlServiceException ex) {
-            exLaunched = true;
-            assertEquals(ex.getExceptionCode(), VERSION_NEGOTIATION_FAILED);
-            assertEquals(ex.getLocator(), "acceptVersion");
-        }
-
-        assertTrue(exLaunched);
-
-         /*
-         *  TEST 8 : : get capabilities with wrong formats (waiting for an exception)
-         */
-        request = new GetCapabilities("1.0.0", "ploup/xml");
-
-        exLaunched = false;
-        try {
-            worker.getCapabilities(request);
-        } catch (CstlServiceException ex) {
-            exLaunched = true;
-            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), "acceptFormats");
-        }
-
-        /*
-         *  LAST TEST : get capabilities no skeleton capabilities
-         */
-
-        worker.setSkeletonCapabilities(null);
-        request = new GetCapabilities();
-
-        exLaunched = false;
-        try {
-            worker.getCapabilities(request);
-        } catch (CstlServiceException ex) {
-            exLaunched = true;
-            assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-        }
-
-        assertTrue(exLaunched);
-    
     }
 
-    
-    
+
     /**
      * Tests the DescribeSensor method
      *
      * @throws java.lang.Exception
      */
-    public void DescribeSensorTest() throws Exception {
-        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+    public void DescribeSensorErrorTest() throws Exception {
 
-        /**
+         /**
          * Test 1 bad outputFormat
          */
         boolean exLaunched = false;
@@ -312,10 +322,21 @@ public class SOSWorkerTest {
         }
         assertTrue(exLaunched);
 
+    }
+    
+    /**
+     * Tests the DescribeSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    public void DescribeSensorTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+       
         /**
-         * Test 4 system sensor
+         * Test 1 system sensor
          */
-        request  = new DescribeSensor("urn:ogc:object:sensor:GEOM:1", "text/xml;subtype=\"SensorML/1.0.0\"");
+        DescribeSensor request  = new DescribeSensor("urn:ogc:object:sensor:GEOM:1", "text/xml;subtype=\"SensorML/1.0.0\"");
         AbstractSensorML absResult = (AbstractSensorML) worker.describeSensor(request);
 
         AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
@@ -441,7 +462,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, result);
 
         /**
-         * Test 5 component sensor
+         * Test 2 component sensor
          */
         request  = new DescribeSensor("urn:ogc:object:sensor:GEOM:2", "text/xml;subtype=\"SensorML/1.0.0\"");
         absResult = (AbstractSensorML) worker.describeSensor(request);
@@ -1543,7 +1564,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, obsResult);
 
         /**
-         *  Test 18: getObservation with procedure urn:ogc:object:sensor:GEOM:4 AND BBOX Filter (no result expected)
+         *  Test 19: getObservation with procedure urn:ogc:object:sensor:GEOM:4 AND BBOX Filter (no result expected)
          */
         request  = new GetObservation("1.0.0",
                                       "offering-allSensor",
@@ -1701,9 +1722,7 @@ public class SOSWorkerTest {
      *
      * @throws java.lang.Exception
      */
-    public void GetResultTest() throws Exception {
-        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-        
+    public void GetResultErrorTest() throws Exception {
         /**
          * Test 1: bad version number + null template ID
          */
@@ -1747,6 +1766,17 @@ public class SOSWorkerTest {
             assertEquals(ex.getLocator(), "ObservationTemplateId");
         }
         assertTrue(exLaunched);
+    }
+    
+    /**
+     * Tests the GetResult method
+     *
+     * @throws java.lang.Exception
+     */
+    public void GetResultTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        
+        
 
         // we make a getObservation request in order to get a template
 
@@ -1803,10 +1833,10 @@ public class SOSWorkerTest {
         assertEquals(templateExpResult, obsResult);
 
         /**
-         * Test 4:  getResult with no TimeFilter
+         * Test 1:  getResult with no TimeFilter
          */
-        templateId = "urn:ogc:object:observation:template:GEOM:3-0";
-        request = new GetResult(templateId, null, "1.0.0");
+        String templateId = "urn:ogc:object:observation:template:GEOM:3-0";
+        GetResult request = new GetResult(templateId, null, "1.0.0");
         GetResultResponse result = worker.getResult(request);
 
         String value = "2007-05-01T02:59:00,6.560@@2007-05-01T03:59:00,6.560@@2007-05-01T04:59:00,6.560@@2007-05-01T05:59:00,6.560@@2007-05-01T06:59:00,6.560@@" + '\n' +
@@ -1875,7 +1905,7 @@ public class SOSWorkerTest {
         assertEquals(templateExpResult, obsResult);
 
         /**
-         * Test 5:  getResult with no TimeFilter
+         * Test 2:  getResult with no TimeFilter
          */
         templateId = "urn:ogc:object:observation:template:GEOM:3-1";
         request = new GetResult(templateId, null, "1.0.0");
@@ -1890,7 +1920,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, result);
 
          /**
-         * Test 6:  getResult with Tafter
+         * Test 3:  getResult with Tafter
          */
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T03:00:00.0"));
@@ -1911,7 +1941,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, result);
 
         /**
-         * Test 7:  getResult with Tbefore
+         * Test 4:  getResult with Tbefore
          */
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T04:00:00.0"));
@@ -1932,7 +1962,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, result);
 
         /**
-         * Test 8:  getResult with TEquals
+         * Test 5:  getResult with TEquals
          */
         times = new ArrayList<EventTime>();
         instant = new TimeInstantType(new TimePositionType("2007-05-01T03:59:00.0"));
@@ -1953,7 +1983,7 @@ public class SOSWorkerTest {
         assertEquals(expResult, result);
 
         /**
-         * Test 9:  getResult with TEquals
+         * Test 6:  getResult with TEquals
          */
         times = new ArrayList<EventTime>();
         period = new TimePeriodType(new TimePositionType("2007-05-01T03:00:00.0"), new TimePositionType("2007-05-01T04:00:00.0"));
@@ -2031,7 +2061,7 @@ public class SOSWorkerTest {
 
         
         /**
-         * Test 10:  getResult with no TimeFilter
+         * Test 7:  getResult with no TimeFilter
          */
         templateId = "urn:ogc:object:observation:template:GEOM:3-2";
         request = new GetResult(templateId, null, "1.0.0");
@@ -2102,7 +2132,7 @@ public class SOSWorkerTest {
         assertEquals(templateExpResult, obsResult);
 
         /**
-         * Test 11:  getResult with no TimeFilter
+         * Test 8:  getResult with no TimeFilter
          */
         templateId = "urn:ogc:object:observation:template:GEOM:3-3";
         request = new GetResult(templateId, null, "1.0.0");
@@ -2177,6 +2207,53 @@ public class SOSWorkerTest {
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
         assertEquals(expResult.getResult(), result.getResult());
         assertEquals(expResult, result);
+
+        marshallerPool.release(unmarshaller);
+    }
+
+    /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    public void RegisterSensorErrorTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+
+        /**
+         * Test 1 we register a system sensor with no Observation template
+         */
+        AbstractSensorML sensorDescription = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
+        RegisterSensor request = new RegisterSensor("1.0.0", sensorDescription, null);
+        boolean exLaunched = false;
+        try {
+            worker.registerSensor(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(),       Parameters.OBSERVATION_TEMPLATE);
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+        }
+
+        assertTrue(exLaunched);
+
+        /**
+         * Test 2 we register a system sensor with an imcomplete Observation template
+         */
+        JAXBElement obj =  (JAXBElement) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/observationTemplate-6.xml"));
+        ObservationEntry obsTemplate = (ObservationEntry)obj.getValue();
+
+        obsTemplate.setProcedure(null);
+        request = new RegisterSensor("1.0.0", sensorDescription, new ObservationTemplate(obsTemplate));
+        exLaunched = false;
+        try {
+            worker.registerSensor(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getLocator(),       Parameters.OBSERVATION_TEMPLATE);
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+
+        assertTrue(exLaunched);
 
         marshallerPool.release(unmarshaller);
     }
@@ -2324,41 +2401,110 @@ public class SOSWorkerTest {
         assertEquals(expResult, result);
 
 
-        /**
-         * Test 2 we register a system sensor with no Observation template
-         */
+        marshallerPool.release(unmarshaller);
+    }
 
-        request = new RegisterSensor("1.0.0", sensorDescription, null);
+    /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    public void GetFeatureOfInterestErrorTest() throws Exception {
+
+        /**
+         * Test 1 : bad featureID
+         */
+        GetFeatureOfInterest request = new GetFeatureOfInterest("1.0.0", "SOS", "wrongFID");
+
         boolean exLaunched = false;
         try {
-            worker.registerSensor(request);
+            worker.getFeatureOfInterest(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getLocator(),       Parameters.OBSERVATION_TEMPLATE);
-            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
-
         assertTrue(exLaunched);
 
         /**
-         * Test 2 we register a system sensor with an imcomplete Observation template
+         * Test 2 : no filter
          */
-        obsTemplate.setProcedure(null);
-        request = new RegisterSensor("1.0.0", sensorDescription, new ObservationTemplate(obsTemplate));
         exLaunched = false;
+        request = new GetFeatureOfInterest("1.0.0", "SOS", new ArrayList<String>());
+        
         try {
-            worker.registerSensor(request);
+            worker.getFeatureOfInterest(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getLocator(),       Parameters.OBSERVATION_TEMPLATE);
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+        }
+        assertTrue(exLaunched);
+
+        /**
+         * Test 3 : malformed BBOX filter
+         */
+        exLaunched = false;
+        BBOXType bbox = new BBOXType();
+        request = new GetFeatureOfInterest("1.0.0", "SOS", new GetFeatureOfInterest.Location(bbox));
+
+
+        try {
+            worker.getFeatureOfInterest(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
-
         assertTrue(exLaunched);
+    }
+
+    /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    public void GetFeatureOfInterestTest() throws Exception {
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+
+        /**
+         * Test 1 : getFeatureOfInterest with featureID filter
+         */
+        SamplingPoint expResult = ((JAXBElement<SamplingPoint>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/feature1.xml"))).getValue();
+         
+        GetFeatureOfInterest request = new GetFeatureOfInterest("1.0.0", "SOS", "station-001");
+
+        SamplingFeature result = worker.getFeatureOfInterest(request);
+        
+        assertTrue (result instanceof SamplingPoint);
+
+        assertEquals(expResult, result);
+
+        /**
+         * Test 2 : getFeatureOfInterest with featureID filter (SamplingCurve)
+         */
+        SamplingCurveType expResultC = ((JAXBElement<SamplingCurveType>) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/feature3.xml"))).getValue();
+
+        request = new GetFeatureOfInterest("1.0.0", "SOS", "station-003");
+
+        result = worker.getFeatureOfInterest(request);
+
+        assertTrue (result instanceof SamplingCurveType);
+
+        assertEquals(expResultC, result);
+
+        /**
+         * Test 3 : getFeatureOfInterest with BBOX filter restore when multiple works
+         
+        request = new GetFeatureOfInterest("1.0.0", "SOS", new GetFeatureOfInterest.Location(new BBOXType(null, 64000.0, 1730000.0, 66000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582")));
+
+        result = worker.getFeatureOfInterest(request);
+
+        assertTrue (result instanceof SamplingPoint);
+
+        assertEquals(expResult, result);*/
+
+        
 
         marshallerPool.release(unmarshaller);
     }
-    
     /**
      * Tests the destroy method
      *

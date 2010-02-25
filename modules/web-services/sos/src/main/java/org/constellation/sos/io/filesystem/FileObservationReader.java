@@ -252,7 +252,7 @@ public class FileObservationReader implements ObservationReader {
                 }
             }
         }
-        throw new CstlServiceException("The file " + samplingFeatureFile + " does not exist", NO_APPLICABLE_CODE);
+        return null;
     }
 
     @Override

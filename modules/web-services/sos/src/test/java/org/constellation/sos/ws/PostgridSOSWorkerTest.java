@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -172,11 +172,35 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    public void getCapabilitiesErrorTest() throws Exception {
+        super.getCapabilitiesErrorTest();
+
+    }
+
+    
+    /**
+     * Tests the getcapabilities method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
     public void getCapabilitiesTest() throws Exception {
         super.getCapabilitiesTest();
 
     }
 
+
+    /**
+     * Tests the DescribeSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void DescribeSensorErrorTest() throws Exception {
+       super.DescribeSensorErrorTest();
+    }
 
 
     /**
@@ -230,6 +254,17 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
      */
     @Test
     @Override
+    public void GetResultErrorTest() throws Exception {
+        super.GetResultErrorTest();
+    }
+    
+    /**
+     * Tests the GetResult method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
     public void GetResultTest() throws Exception {
         super.GetResultTest();
     }
@@ -244,7 +279,18 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
     public void insertObservationTest() throws Exception {
         super.insertObservationTest();
     }
-    
+
+    /**
+     * Tests the RegisterSensor method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void RegisterSensorErrorTest() throws Exception {
+        super.RegisterSensorTest();
+    }
+
     /**
      * Tests the RegisterSensor method
      *
@@ -256,6 +302,29 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         super.RegisterSensorTest();
     }
 
+    /**
+     * Tests the GetFeatureOfInterest method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetFeatureOfInterestErrorTest() throws Exception {
+        super.GetFeatureOfInterestErrorTest();
+    }
+
+    /**
+     * Tests the GetFeatureOfInterest method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void GetFeatureOfInterestTest() throws Exception {
+        super.GetFeatureOfInterestTest();
+    }
+
+    
     /**
      * Tests the destroy method
      *

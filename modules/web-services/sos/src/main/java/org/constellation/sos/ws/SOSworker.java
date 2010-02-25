@@ -1367,6 +1367,11 @@ public class SOSworker {
         LOGGER.info("GetFeatureOfInterest request processing"  + '\n');
         final long start = System.currentTimeMillis();
 
+        // if there is no filter we throw an exception
+        if (request.getEventTime().size() ==  0 && request.getFeatureOfInterestId().size() == 0 && request.getLocation() == null) {
+            throw new CstlServiceException("You must choose a filter parameter: eventTime, featureId or location", MISSING_PARAMETER_VALUE);
+        }
+
         // for now we don't support time filter on FOI
         if (request.getEventTime().size() > 0) {
             throw new CstlServiceException("The time filter on feature Of Interest is not yet supported", OPERATION_NOT_SUPPORTED);
