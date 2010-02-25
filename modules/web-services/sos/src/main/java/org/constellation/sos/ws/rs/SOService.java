@@ -53,6 +53,7 @@ import org.constellation.ws.MimeType;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.util.StringUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -149,6 +150,23 @@ public class SOService extends OGCWebService {
                 }
                 
                 return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
+
+             }
+
+             if (request.equalsIgnoreCase("GetFeatureInterest") || (objectRequest instanceof GetFeatureOfInterest)) {
+                GetFeatureOfInterest gf = (GetFeatureOfInterest)objectRequest;
+
+                if (gf == null) {
+
+                    throw new CstlServiceException("The operation GetFeatureOfInterest is only requestable in XML",
+                                                     OPERATION_NOT_SUPPORTED, "GetFeatureOfInterest");
+                }
+                if (gf.getVersion() != null)
+                    serviceDef = getVersionFromNumber(gf.getVersion().toString());
+                final StringWriter sw = new StringWriter();
+                marshaller.marshal(worker.getFeatureOfInterest(gf), sw);
+
+                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
 
              }
 

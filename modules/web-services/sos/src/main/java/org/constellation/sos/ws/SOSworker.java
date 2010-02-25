@@ -117,11 +117,14 @@ import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.observation.xml.v100.ProcessEntry;
+import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
+import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.DataArray;
@@ -452,7 +455,7 @@ public class SOSworker {
             infos.append("Transactional profile loaded.").append('\n');
         }
         if (smlReader != null) {
-            infos.append(smlReader.getInfos() + loaded).append('\n');
+            infos.append('\n').append(smlReader.getInfos() + loaded).append('\n');
         } else {
             infos.append("No SensorML reader loaded.\n");
         }
@@ -899,13 +902,10 @@ public class SOSworker {
             } else {
                 // for a BBOX Spatial ops
                 if (foiRequest.getBBOX() != null) {
+                    final EnvelopeEntry e = foiRequest.getBBOX().getEnvelope();
 
-                    if (foiRequest.getBBOX().getEnvelope() != null &&
-                        foiRequest.getBBOX().getEnvelope().getLowerCorner().getValue().size() == 2 &&
-                        foiRequest.getBBOX().getEnvelope().getUpperCorner().getValue().size() == 2) {
-                        
-                        final EnvelopeEntry e = foiRequest.getBBOX().getEnvelope();
-                        boolean add     = false;
+                    if (isWellFormedEnvelope(e)) {
+                        boolean add = false;
                         final List<String> matchingFeatureOfInterest = new ArrayList<String>();
                         if (localOmFilter.isBoundedObservation()) {
                             localOmFilter.setBoundingBox(e);
@@ -1361,7 +1361,103 @@ public class SOSworker {
             }
         return values;
     }
-    
+
+    public SamplingFeature getFeatureOfInterest(GetFeatureOfInterest request) throws CstlServiceException {
+        verifyBaseRequest(request);
+        LOGGER.info("GetFeatureOfInterest request processing"  + '\n');
+        final long start = System.currentTimeMillis();
+
+        // for now we don't support time filter on FOI
+        if (request.getEventTime().size() > 0) {
+            throw new CstlServiceException("The time filter on feature Of Interest is not yet supported", OPERATION_NOT_SUPPORTED);
+        }
+
+        SamplingFeature singleResult;
+        if (request.getFeatureOfInterestId().size() == 1) {
+            singleResult = omReader.getFeatureOfInterest(request.getFeatureOfInterestId().get(0));
+            if (singleResult == null) {
+                throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
+            } else {
+                return singleResult;
+            }
+        } else if (request.getFeatureOfInterestId().size() > 1) {
+            throw new CstlServiceException("You can't specify more than on identifier", OPERATION_NOT_SUPPORTED);
+        }
+
+        if (request.getLocation() != null && request.getLocation().getSpatialOps() != null) {
+            SpatialOpsType spatialFilter = request.getLocation().getSpatialOps().getValue();
+            if (spatialFilter instanceof BBOXType) {
+                List<SamplingFeature> result = spatialFiltering((BBOXType) spatialFilter);
+                if (result.size() > 0) {
+                    return result.get(0);
+                } else {
+                    throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
+                }
+            } else {
+                throw new CstlServiceException("Only the filter BBOX is upported for now", OPERATION_NOT_SUPPORTED);
+            }
+        }
+        LOGGER.info("GetFeatureOfInterest processed in " + (System.currentTimeMillis() - start) + "ms");
+        return null;
+    }
+
+    public List<SamplingFeature> spatialFiltering(BBOXType bbox) throws CstlServiceException {
+
+        final EnvelopeEntry e = bbox.getEnvelope();
+        if (isWellFormedEnvelope(e)) {
+
+            final List<SamplingFeature> matchingFeatureOfInterest = new ArrayList<SamplingFeature>();
+            final List<ObservationOfferingEntry> offerings        = omReader.getObservationOfferings();
+            for (ObservationOfferingEntry off : offerings) {
+                for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
+                    final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation.getHref());
+                    if (station == null) {
+                        LOGGER.warning("the feature of interest is not registered:" + refStation.getHref());
+                        continue;
+                    }
+                    if (station instanceof SamplingPointEntry) {
+                        final SamplingPointEntry sp = (SamplingPointEntry) station;
+                        if (sp.getPosition() != null && sp.getPosition().getPos() != null && sp.getPosition().getPos().getValue().size() >= 2) {
+
+                            double station_x = sp.getPosition().getPos().getValue().get(0);
+                            double station_y = sp.getPosition().getPos().getValue().get(1);
+                            double minx      = e.getLowerCorner().getValue().get(0);
+                            double maxx      = e.getUpperCorner().getValue().get(0);
+                            double miny      = e.getLowerCorner().getValue().get(1);
+                            double maxy      = e.getUpperCorner().getValue().get(1);
+
+                            // we look if the station if contained in the BBOX
+                            if (station_x < maxx && station_x > minx && station_y < maxy && station_y > miny) {
+
+                                matchingFeatureOfInterest.add(sp);
+                            } else {
+                                LOGGER.finer(" the feature of interest " + sp.getId() + " is not in the BBOX");
+                            }
+                        } else {
+                            LOGGER.warning(" the feature of interest " + sp.getId() + " does not have proper position");
+                        }
+                    } else {
+                        LOGGER.warning("unknow implementation:" + station.getClass().getName());
+                    }
+                }
+            }
+            return matchingFeatureOfInterest;
+        } else {
+            throw new CstlServiceException("the envelope is not build correctly", INVALID_PARAMETER_VALUE);
+        }
+    }
+
+    /**
+     * Return True if the envellope got the sufficient parameters.
+     * 
+     * @param env
+     * @return
+     */
+    private boolean isWellFormedEnvelope(EnvelopeEntry env) {
+        return env != null && env.getLowerCorner() != null && env.getUpperCorner() != null &&
+               env.getLowerCorner().getValue().size() == 2 && env.getUpperCorner().getValue().size() == 2;
+    }
+
     /**
      * Web service operation whitch register a Sensor in the SensorML database, 
      * and initialize its observation by adding an observation template in the O&M database.
