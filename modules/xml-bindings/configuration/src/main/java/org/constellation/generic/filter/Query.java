@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -194,7 +194,7 @@ public class Query {
      * Gets the value of the where property for the specified group name.
      */
     public Where getWhere(String group) {
-        for(Where s: getWhere()) {
+        for (Where s: getWhere()) {
             if (group != null && group.equals(s.getGroup())) {
                 return s;
             }
@@ -234,6 +234,22 @@ public class Query {
             orderby = new ArrayList<Orderby>();
         }
         return this.orderby;
+    }
+
+    /**
+     * Gets the value of the where property for the specified group name.
+     */
+    public Orderby getOrderby(String group) {
+        for (Orderby o: getOrderby()) {
+            if (group != null && group.equals(o.getGroup())) {
+                return o;
+            }
+        }
+        return null;
+    }
+
+    public void addOrderby(Orderby orderby) {
+        this.getOrderby().add(orderby);
     }
 
     /**
