@@ -26,7 +26,7 @@ import java.sql.Connection;
 import org.constellation.util.Util;
 import org.constellation.wfs.utils.PostgisUtils;
 
-import org.geotoolkit.data.DefaultFeatureCollection;
+import org.geotoolkit.data.DataUtilities;
 import org.geotoolkit.data.FeatureReader;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
@@ -80,7 +80,7 @@ public class OMFeatureXmlBindingTest {
 
         FeatureReader fr = PostgisUtils.createEmbeddedOMLayer(url, new DefaultName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
         featureType      = fr.getFeatureType();
-        fcoll            = new DefaultFeatureCollection("collection-1", featureType, SimpleFeature.class);
+        fcoll            = DataUtilities.collection("collection-1", featureType);
         while (fr.hasNext()) {
             fcoll.add(fr.next());
         }

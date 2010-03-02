@@ -46,7 +46,6 @@ import org.constellation.ws.rs.OGCWebService;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.DataUtilities;
-import org.geotoolkit.data.DefaultFeatureCollection;
 import org.geotoolkit.wfs.xml.RequestBase;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.query.QueryBuilder;
@@ -509,7 +508,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         } else if (collections.size() == 1) {
             response = collections.get(0);
         } else {
-            response = new DefaultFeatureCollection("collection-1", null, SimpleFeature.class);
+            response = DataUtilities.collection("collection-1", null);
         }
         if (request.getResultType() == ResultTypeType.HITS) {
             FeatureCollectionType collection = new FeatureCollectionType(response.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));

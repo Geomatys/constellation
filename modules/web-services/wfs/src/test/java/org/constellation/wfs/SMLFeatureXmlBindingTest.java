@@ -26,7 +26,7 @@ import java.sql.Connection;
 import org.constellation.util.Util;
 import org.constellation.wfs.utils.PostgisUtils;
 
-import org.geotoolkit.data.DefaultFeatureCollection;
+import org.geotoolkit.data.DataUtilities;
 import org.geotoolkit.data.FeatureReader;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
@@ -88,7 +88,7 @@ public class SMLFeatureXmlBindingTest {
         featureType      = fr.getFeatureType();
         if (featureType == null)
             System.out.println("WARNING: The featureType is null");
-        fcoll            = new DefaultFeatureCollection("id", featureType, SimpleFeature.class);
+        fcoll            = DataUtilities.collection("id", featureType);
         while (fr.hasNext()) {
             fcoll.add(fr.next());
         }
