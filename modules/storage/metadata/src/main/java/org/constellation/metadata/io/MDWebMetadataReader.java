@@ -186,7 +186,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      *
      * @param MDReader a reader to the MDWeb database.
      */
-    protected MDWebMetadataReader(Reader mdReader) {
+    public MDWebMetadataReader(Reader mdReader) {
         super(true, false);
         this.mdReader           = mdReader;
         initPackage();
