@@ -76,7 +76,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     /**
      * The MDWeb user who owe the inserted form.
      */
-    private final User user;
+    private final User defaultUser;
     
     /**
      * A writer to the MDWeb database.
@@ -119,9 +119,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
             final Connection mdConnection = db.getConnection();
             final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
-            mdWriter  = new Writer20(mdConnection, isPostgres);
+            mdWriter    = new Writer20(mdConnection, isPostgres);
             mdRecordSet = getRecordSet();
-            this.user = mdWriter.getUser("admin");
+            defaultUser = mdWriter.getUser("admin");
 
         } catch (MD_IOException ex) {
             throw new MetadataIoException("MD_IOException while initializing the MDWeb writer:" +'\n'+
@@ -144,7 +144,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         this.mdWriter    = mdWriter;
         try {
             this.mdRecordSet = getRecordSet();
-            this.user = mdWriter.getUser("admin");
+            this.defaultUser = mdWriter.getUser("admin");
         } catch (MD_IOException ex) {
             throw new MetadataIoException("MD_IOException while getting the catalog and user:" +'\n'+
                                            "cause:" + ex.getMessage());
@@ -154,7 +154,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
 
     protected MDWebMetadataWriter() throws MetadataIoException {
-        user = null;
+        defaultUser = null;
     }
     
     // TODO move this to CSW implementation
@@ -247,15 +247,25 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
     /**
      * Return an MDWeb formular from an object.
+     *
+     * @param object The object to transform in form.
+     * @return an MDWeb form representing the metadata object.
+     */
+    protected Form getFormFromObject(Object object) throws MD_IOException {
+        String title = findTitle(object);
+        return getFormFromObject(object, defaultUser, mdRecordSet, null, title);
+    }
+
+    /**
+     * Return an MDWeb formular from an object.
      * 
      * @param object The object to transform in form.
      * @return an MDWeb form representing the metadata object.
      */
-    private Form getFormFromObject(Object object) throws MD_IOException {
+    protected Form getFormFromObject(Object object, User user, RecordSet recordSet, Profile profile, String title) throws MD_IOException {
         
         if (object != null) {
             //we try to find a title for the from
-            String title = findTitle(object);
             if (title.equals("unknow title")) {
                 title = mdWriter.getAvailableTitle();
             }
@@ -295,13 +305,14 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 LOGGER.severe(msg);
                 throw new IllegalArgumentException(msg);
             }
-            
-            Profile defaultProfile = null;
-            if  (className.equals("DefaultMetadata")) {
-                defaultProfile = mdWriter.getProfile("ISO_19115");
+
+            if (profile == null) {
+                if  (className.equals("DefaultMetadata")) {
+                    profile = mdWriter.getProfile("ISO_19115");
+                }
             }
             UUID identifier = UUID.randomUUID();
-            final Form form = new Form(-1, identifier, mdRecordSet, title, user, null, defaultProfile, creationDate, creationDate, null, false, false, "normalForm");
+            final Form form = new Form(-1, identifier, recordSet, title, user, null, profile, creationDate, creationDate, null, false, false, "normalForm");
             
             final Classe rootClasse = getClasseFromObject(object);
             if (rootClasse != null) {
