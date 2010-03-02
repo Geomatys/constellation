@@ -49,7 +49,7 @@ import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.util.StringUtilities;
 
 import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.Catalog;
+import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.Value;
 import org.mdweb.io.MD_IOException;
@@ -188,7 +188,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
      * Return a metadata object from the specified identifier.
      * if is not already in cache it read it from the MDWeb database.
      *
-     * @param identifier The form identifier with the pattern : "Form_ID:Catalog_Code"
+     * @param identifier The form identifier with the pattern : "Form_ID:RecordSet_Code"
      * @param mode An output schema mode: EBRIM, ISO_19115 and DUBLINCORE supported.
      * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
      * @param elementName A list of QName describing the requested fields. (implies type == null)
@@ -199,12 +199,12 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
     @Override
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
         int id;
-        String catalogCode = "";
+        String recordSetCode = "";
 
-        //we parse the identifier (Form_ID:Catalog_Code)
+        //we parse the identifier (Form_ID:RecordSet_Code)
         try  {
             if (identifier.indexOf(':') != -1) {
-                catalogCode  = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
+                recordSetCode  = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
                 identifier   = identifier.substring(0, identifier.indexOf(':'));
                 id           = Integer.parseInt(identifier);
             } else {
@@ -217,14 +217,14 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
         try {
             alreadyRead.clear();
-            final Catalog catalog = mdReader.getCatalog(catalogCode);
+            final RecordSet recordSet = mdReader.getRecordSet(recordSetCode);
 
             //we look for cached object
             Object result = getFromCache(identifier);
             if (mode == ISO_19115 || mode == EBRIM || mode == SENSORML) {
 
                 if (result == null) {
-                    final Form f = mdReader.getForm(catalog, id);
+                    final Form f = mdReader.getForm(recordSet, id);
                     result = getObjectFromForm(identifier, f, mode);
                 } else {
                     LOGGER.finer("getting from cache: " + identifier);
@@ -234,7 +234,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
             } else if (mode == DUBLINCORE) {
 
-                final Form form                   = mdReader.getForm(catalog, id);
+                final Form form                   = mdReader.getForm(recordSet, id);
                 if (form != null) {
                     final Value top               = form.getTopValue();
                     final Standard recordStandard = top.getType().getStandard();

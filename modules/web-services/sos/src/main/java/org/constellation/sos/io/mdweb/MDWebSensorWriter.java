@@ -39,7 +39,7 @@ import org.mdweb.io.MD_IOException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb dependencies
-import org.mdweb.model.storage.Catalog;
+import org.mdweb.model.storage.RecordSet;
 
 /**
  *
@@ -85,11 +85,11 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     }
 
     @Override
-    public Catalog getCatalog() throws MD_IOException {
-        Catalog cat = mdWriter.getCatalog("SMLC");
+    public RecordSet getRecordSet() throws MD_IOException {
+        RecordSet cat = mdWriter.getRecordSet("SMLC");
         if (cat == null) {
-            cat = new Catalog("SMLC", "SensorML catalog");
-            mdWriter.writeCatalog(cat);
+            cat = new RecordSet("SMLC", "SensorML RecordSet");
+            mdWriter.writeRecordSet(cat);
         }
         return cat;
     }

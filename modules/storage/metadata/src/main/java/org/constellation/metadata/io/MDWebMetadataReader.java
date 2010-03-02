@@ -45,7 +45,7 @@ import org.constellation.util.ReflectionUtilities;
 // MDWeb dependencies
 import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Path;
-import org.mdweb.model.storage.Catalog;
+import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
@@ -237,7 +237,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * Return a metadata object from the specified identifier.
      * if is not already in cache it read it from the MDWeb database.
      * 
-     * @param identifier The form identifier with the pattern : "Form_ID:Catalog_Code"
+     * @param identifier The form identifier with the pattern : "Form_ID:RecordSet_Code"
      * @param mode An output schema mode: EBRIM, ISO_19115 and DUBLINCORE supported.
      * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
      * @param elementName A list of QName describing the requested fields. (implies type == null)
@@ -248,12 +248,12 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     @Override
     public Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException {
         int id;
-        String catalogCode = "";
+        String recordSetCode = "";
         
-        //we parse the identifier (Form_ID:Catalog_Code)
+        //we parse the identifier (Form_ID:RecordSet_Code)
         try  {
             if (identifier.indexOf(':') != -1) {
-                catalogCode  = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
+                recordSetCode  = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
                 identifier   = identifier.substring(0, identifier.indexOf(':'));
                 id           = Integer.parseInt(identifier);
             } else {
@@ -266,13 +266,13 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         try {
             alreadyRead.clear();
-            final Catalog catalog = mdReader.getCatalog(catalogCode);
+            final RecordSet recordSet = mdReader.getRecordSet(recordSetCode);
 
             //we look for cached object
             Object result = getFromCache(identifier);
 
             if (result == null) {
-                final Form f = mdReader.getForm(catalog, id);
+                final Form f = mdReader.getForm(recordSet, id);
                 result = getObjectFromForm(identifier, f, mode);
             } else {
                 LOGGER.finer("getting from cache: " + identifier);
@@ -859,8 +859,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     public List<? extends Object> getAllEntries() throws MetadataIoException {
         final List<Object> results = new ArrayList<Object>();
         try {
-            final List<Catalog> catalogs = mdReader.getCatalogs();
-            final List<Form> forms       = mdReader.getAllForm(catalogs);
+            final List<RecordSet> recordSets = mdReader.getRecordSets();
+            final List<Form> forms       = mdReader.getAllForm(recordSets);
             for (Form f: forms) {
                 results.add(getObjectFromForm("no cache", f, -1));
             }
@@ -884,21 +884,21 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     public void removeFromCache(String identifier) {
         if (super.isCacheEnabled()) {
             int id;
-            String catalogCode = "";
+            String recordSetCode = "";
 
-            //we parse the identifier (Form_ID:Catalog_Code)
+            //we parse the identifier (Form_ID:RecordSet_Code)
             try {
                 if (identifier.indexOf(':') != -1) {
-                    catalogCode = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
+                    recordSetCode = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
                     identifier  = identifier.substring(0, identifier.indexOf(':'));
                     id = Integer.parseInt(identifier);
                 } else {
                     throw new NumberFormatException();
                 }
 
-                final Catalog catalog = mdReader.getCatalog(catalogCode);
+                final RecordSet recordSet = mdReader.getRecordSet(recordSetCode);
 
-                mdReader.removeFormFromCache(catalog, id);
+                mdReader.removeFormFromCache(recordSet, id);
 
             } catch (MD_IOException ex) {
                 LOGGER.severe("SQLException while removing " + identifier + " from the cache");

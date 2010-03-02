@@ -52,7 +52,7 @@ import org.mdweb.model.schemas.CodeListElement;
 import org.mdweb.model.schemas.Path;
 import org.mdweb.model.schemas.Property;
 import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.Catalog;
+import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.model.storage.TextValue;
@@ -68,9 +68,9 @@ import org.mdweb.io.sql.v20.Writer20;
 public class MDWebMetadataWriter extends AbstractMetadataWriter {
     
     /**
-     * A MDWeb catalogs where write the form.
+     * A MDWeb RecordSets where write the form.
      */
-    private Catalog mdCatalog;
+    private RecordSet mdRecordSet;
     
     /**
      * The MDWeb user who owe the inserted form.
@@ -119,7 +119,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final Connection mdConnection = db.getConnection();
             final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
             mdWriter  = new Writer20(mdConnection, isPostgres);
-            mdCatalog = getCatalog();
+            mdRecordSet = getRecordSet();
             this.user = mdWriter.getUser("admin");
 
         } catch (MD_IOException ex) {
@@ -139,11 +139,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
     
     // TODO move this to CSW implementation
-    public Catalog getCatalog() throws MD_IOException {
-        Catalog cat = mdWriter.getCatalog("CSWCat");
+    public RecordSet getRecordSet() throws MD_IOException {
+        RecordSet cat = mdWriter.getRecordSet("CSWCat");
         if (cat == null) {
-            cat = new Catalog("CSWCat", "CSW Data Catalog");
-            mdWriter.writeCatalog(cat);
+            cat = new RecordSet("CSWCat", "CSW Data RecordSet");
+            mdWriter.writeRecordSet(cat);
         }
         return cat;
     }
@@ -282,7 +282,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 defaultProfile = mdWriter.getProfile("ISO_19115");
             }
             UUID identifier = UUID.randomUUID();
-            final Form form = new Form(-1, identifier, mdCatalog, title, user, null, defaultProfile, creationDate, creationDate, null, false, false, "normalForm");
+            final Form form = new Form(-1, identifier, mdRecordSet, title, user, null, defaultProfile, creationDate, creationDate, null, false, false, "normalForm");
             
             final Classe rootClasse = getClasseFromObject(object);
             if (rootClasse != null) {
@@ -885,11 +885,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         LOGGER.log(logLevel, "metadata to delete:" + identifier);
 
         int id;
-        String catalogCode = "";
-        //we parse the identifier (Form_ID:Catalog_Code)
+        String recordSetCode = "";
+        //we parse the identifier (Form_ID:RecordSet_Code)
         try  {
             if (identifier.indexOf(':') != -1) {
-                catalogCode    = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
+                recordSetCode    = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
                 identifier = identifier.substring(0, identifier.indexOf(':'));
                 id         = Integer.parseInt(identifier);
             } else {
@@ -899,8 +899,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
              throw new MetadataIoException("Unable to parse: " + identifier, null, "id");
         }
         try {
-            final Catalog catalog = mdWriter.getCatalog(catalogCode);
-            final Form f          = mdWriter.getForm(catalog, id);
+            final RecordSet recordSet = mdWriter.getRecordSet(recordSetCode);
+            final Form f          = mdWriter.getForm(recordSet, id);
             if (f != null) {
                 mdWriter.deleteForm(f.getId());
             } else {

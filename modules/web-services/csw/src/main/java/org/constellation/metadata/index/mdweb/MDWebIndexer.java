@@ -53,7 +53,7 @@ import org.mdweb.model.schemas.Locale;
 import org.mdweb.model.schemas.Path;
 import org.mdweb.model.schemas.Property;
 import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.Catalog;
+import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
@@ -147,7 +147,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             LOGGER.info("Creating lucene index for the first time...");
             final long time = System.currentTimeMillis();
             IndexWriter writer;
-            final int nbCatalogs = 0;
+            final int nbRecordSets = 0;
             int nbForms    = 0;
             try {
                 writer  = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
@@ -173,7 +173,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
             }
             LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
-                        "catalogs: " + nbCatalogs + " documents indexed: " + nbForms);
+                        "RecordSets: " + nbRecordSets + " documents indexed: " + nbForms);
         } else {
             LOGGER.info("Index already created");
         }
@@ -190,14 +190,14 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
         final long time = System.currentTimeMillis();
         IndexWriter writer;
-        int nbCatalogs = 0;
+        int nbRecordSets = 0;
         int nbForms = 0;
         try {
             writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
 
             // getting the objects list and index avery item in the IndexWriter.
-            final List<Catalog> cats = mdWebReader.getCatalogs();
-            nbCatalogs = cats.size();
+            final List<RecordSet> cats = mdWebReader.getRecordSets();
+            nbRecordSets = cats.size();
             final List<Form> results = mdWebReader.getAllForm(cats);
             LOGGER.info(results.size() + " forms read in " + (System.currentTimeMillis() - time) + " ms.");
             for (Form form : results) {
@@ -225,7 +225,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             throw new IndexingException("SQLException while indexing documents.", ex);
         }
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
-                "catalogs: " + nbCatalogs + " documents indexed: " + nbForms + ".");
+                "RecordSets: " + nbRecordSets + " documents indexed: " + nbForms + ".");
     }
 
     /**
@@ -239,7 +239,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
         final long time = System.currentTimeMillis();
         IndexWriter writer;
-        final int nbCatalogs = 0;
+        final int nbRecordSets = 0;
         int nbForms = 0;
         try {
             writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
@@ -271,7 +271,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
         }
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
-                "catalogs: " + nbCatalogs + " documents indexed: " + nbForms + ".");
+                "RecordSets: " + nbRecordSets + " documents indexed: " + nbForms + ".");
     }
 
     /**
@@ -342,9 +342,9 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         final Document doc = new Document();
         try {
 
-            doc.add(new Field("id",      form.getId() + "",            Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field("catalog", form.getCatalog().getCode() , Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field("Title",   form.getTitle(),              Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("id",        form.getId() + "",             Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("recordSet", form.getRecordSet().getCode() , Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("Title",     form.getTitle(),                Field.Store.YES, Field.Index.ANALYZED));
 
             Classe identifiable, registryObject;
             if (mdWebReader == null) {

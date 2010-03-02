@@ -64,7 +64,7 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
             final TopDocs hits = searcher.search(query, maxRecords);
             for (ScoreDoc doc : hits.scoreDocs) {
                 final Document document = searcher.doc(doc.doc, new IDFieldSelector());
-                results.add(document.get("id") + ':' + document.get("catalog"));
+                results.add(document.get("id") + ':' + document.get("recordSet"));
             }
             if (results.size() > 1) {
                 LOGGER.warning("multiple record in lucene index for identifier: " + id);
@@ -81,7 +81,7 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
 
     @Override
     public String getMatchingID(Document doc) throws SearchingException {
-        return doc.get("id") + ':' + doc.get("catalog");
+        return doc.get("id") + ':' + doc.get("recordSet");
     }
 
     @Override
@@ -94,7 +94,7 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
         @Override
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {
-                if (fieldName.equals("id") || fieldName.equals("catalog")) {
+                if (fieldName.equals("id") || fieldName.equals("recordSet")) {
                     return FieldSelectorResult.LOAD;
                 } else {
                     return FieldSelectorResult.NO_LOAD;

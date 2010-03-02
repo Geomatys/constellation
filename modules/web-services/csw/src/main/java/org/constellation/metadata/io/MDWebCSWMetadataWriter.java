@@ -38,7 +38,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.PrimitiveType;
-import org.mdweb.model.storage.Catalog;
+import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
@@ -101,14 +101,14 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
     public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException {
         LOGGER.log(logLevel, "metadataID: " + metadataID);
         int id;
-        String catalogCode = "";
+        String recordSetCode = "";
         Form f = null;
-        //we parse the identifier (Form_ID:Catalog_Code)
+        //we parse the identifier (Form_ID:RecordSet_Code)
         try  {
             if (metadataID.indexOf(':') != -1) {
-                catalogCode    = metadataID.substring(metadataID.indexOf(':') + 1, metadataID.length());
-                metadataID = metadataID.substring(0, metadataID.indexOf(':'));
-                id         = Integer.parseInt(metadataID);
+                recordSetCode = metadataID.substring(metadataID.indexOf(':') + 1, metadataID.length());
+                metadataID    = metadataID.substring(0, metadataID.indexOf(':'));
+                id            = Integer.parseInt(metadataID);
             } else {
                 throw new NumberFormatException();
             }
@@ -116,8 +116,8 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
              throw new MetadataIoException("Unable to parse: " + metadataID, NO_APPLICABLE_CODE, "id");
         }
         try {
-            final Catalog catalog = mdWriter.getCatalog(catalogCode);
-            f                     = mdWriter.getForm(catalog, id);
+            final RecordSet recordSet = mdWriter.getRecordSet(recordSetCode);
+            f                     = mdWriter.getForm(recordSet, id);
 
         } catch (MD_IOException ex) {
             throw new MetadataIoException("The service has throw an SQLException while updating the metadata: " + ex.getMessage(),
