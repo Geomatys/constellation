@@ -50,7 +50,7 @@ import org.mdweb.model.schemas.Path;
 import org.mdweb.model.schemas.PrimitiveType;
 import org.mdweb.model.schemas.Property;
 import org.mdweb.model.schemas.Standard;
-import org.mdweb.model.storage.Catalog;
+import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
@@ -357,7 +357,7 @@ public class IndexLuceneTest {
         List<Form> result       = new ArrayList<Form>();
         
         //we create a new Catalog
-        Catalog cat             = new Catalog("catalogTest", "catalogTest");
+        RecordSet cat             = new RecordSet("catalogTest", "catalogTest");
         
         //then we build the classes
         Classe sLiteralClass    = new Classe(Standard.DUBLINCORE, "SimpleLiteral", "sl", "no definition", null, false, ' ');
