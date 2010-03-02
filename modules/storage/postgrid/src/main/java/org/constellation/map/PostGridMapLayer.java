@@ -18,8 +18,8 @@ package org.constellation.map;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.coverage.io.CoverageReader;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.processing.ColorMap;
