@@ -16,8 +16,12 @@
  */
 package org.constellation.map;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.CoverageReader;
+import org.geotoolkit.coverage.io.CoverageStoreException;
+import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.processing.ColorMap;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
@@ -74,20 +78,27 @@ public class PostGridMapLayer extends AbstractMapLayer implements CoverageMapLay
 
     @Override
     public Envelope getBounds() {
-        return reader.getCoverageBounds();
-//        final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
-//        final GeographicBoundingBox bbox;
-//        try {
-//            bbox = reader.getTable().getLayer().getGeographicBoundingBox();
-//        } catch (CatalogException ex) {
-//            LOGGER.warning(ex.getLocalizedMessage());
-//            return new ReferencedEnvelope(crs);
-//        }
-//        return new ReferencedEnvelope(bbox.getWestBoundLongitude(),
-//                bbox.getEastBoundLongitude(),
-//                bbox.getSouthBoundLatitude(),
-//                bbox.getNorthBoundLatitude(),
-//                crs);
+        //        final CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
+        //        final GeographicBoundingBox bbox;
+        //        try {
+        //            bbox = reader.getTable().getLayer().getGeographicBoundingBox();
+        //        } catch (CatalogException ex) {
+        //            LOGGER.warning(ex.getLocalizedMessage());
+        //            return new ReferencedEnvelope(crs);
+        //        }
+        //        return new ReferencedEnvelope(bbox.getWestBoundLongitude(),
+        //                bbox.getEastBoundLongitude(),
+        //                bbox.getSouthBoundLatitude(),
+        //                crs);
+        //                crs);
+
+        try {
+            return reader.getGridGeometry(0).getEnvelope();
+        } catch (CoverageStoreException ex) {
+            Logger.getLogger(PostGridMapLayer.class.getName()).log(Level.SEVERE, null, ex);
+            //todo what should we do ?
+            return null;
+        }
     }
 
     /**
@@ -126,7 +137,7 @@ public class PostGridMapLayer extends AbstractMapLayer implements CoverageMapLay
     }
 
     @Override
-    public CoverageReader getCoverageReader() {
+    public GridCoverageReader getCoverageReader() {
         return reader;
     }
 

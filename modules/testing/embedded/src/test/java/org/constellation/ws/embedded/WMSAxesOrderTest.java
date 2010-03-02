@@ -23,6 +23,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 // Constellation dependencies
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.register.RegisterException;
@@ -45,6 +49,9 @@ import static org.junit.Assume.*;
  * @since 0.3
  */
 public class WMSAxesOrderTest extends AbstractGrizzlyServer {
+
+    private static final long SST_CHECKSUM = 1472385698L;
+    
     /**
      * URLs which will be tested on the server.
      */
@@ -193,7 +200,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
         assertEquals(image.getHeight(), 512);
-        assertEquals(Commons.checksum(image), 3640849032L);
+        assertEquals(Commons.checksum(image), SST_CHECKSUM);
     }
 
     /**
@@ -227,7 +234,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         // Here we have to ensure that the axis order should be lat,long in the GetMap request.
         // So with that axes order, the image should be the same than the one done in GetMap
         // version 1.1.1 with axes order long,lat.
-        assertTrue  (Commons.checksum(image) != 3640849032L);
+        assertTrue  (Commons.checksum(image) != SST_CHECKSUM);
     }
 
     /**
@@ -254,7 +261,7 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
         assertEquals(image.getHeight(), 512);
-        assertEquals(Commons.checksum(image), 3640849032L);
+        assertEquals(Commons.checksum(image), SST_CHECKSUM);
     }
 
     /**
@@ -288,6 +295,6 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         // Here we have to ensure that the axis order should be lat,long in the GetMap request.
         // So with that axes order, the image should be the same than the one done in GetMap
         // version 1.1.1 with axes order long,lat.
-        assertEquals(Commons.checksum(image), 3640849032L);
+        assertEquals(Commons.checksum(image), SST_CHECKSUM);
     }
 }

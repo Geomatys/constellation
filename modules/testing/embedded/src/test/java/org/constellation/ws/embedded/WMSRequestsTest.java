@@ -59,6 +59,9 @@ import static org.junit.Assume.*;
  * @since 0.3
  */
 public class WMSRequestsTest extends AbstractGrizzlyServer {
+
+    private static final long SST_CHECKSUM = 1472385698L;
+
     private static MarshallerPool pool;
 
     /**
@@ -160,7 +163,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         // Test on the returned image.
         assertEquals(image.getWidth(), 1024);
         assertEquals(image.getHeight(), 512);
-        assertEquals(Commons.checksum(image), 3640849032L);
+        assertEquals(Commons.checksum(image), SST_CHECKSUM);
     }
 
     /**

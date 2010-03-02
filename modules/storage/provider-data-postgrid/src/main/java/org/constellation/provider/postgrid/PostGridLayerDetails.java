@@ -42,9 +42,9 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display.shape.DoubleDimension2D;
-import org.geotoolkit.coverage.io.CoverageReader;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.map.ElevationModel;
@@ -301,7 +301,7 @@ class PostGridLayerDetails implements CoverageLayerDetails {
         return reader.getTable().getLayer().getThematic();
     }
 
-    protected CoverageReader getReader(){
+    protected GridCoverageReader getReader(){
         return reader;
     }
 

@@ -59,6 +59,8 @@ import static org.junit.Assume.*;
 public class WCSRequestsTest extends AbstractGrizzlyServer {
     private static MarshallerPool pool;
 
+    private static final long SST_CHECKSUM = 855939187L;
+
     /**
      * URLs which will be tested on the server.
      */
@@ -156,7 +158,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         // The checksum value should be the same as the checksum on the same image produced by
         // a getMap request. It is strange but they are slightly different, even if for the user
         // both images are identical.
-        assertEquals(Commons.checksum(image), 3183786073L);
+        assertEquals(Commons.checksum(image), SST_CHECKSUM);
     }
 
     /**
