@@ -60,6 +60,7 @@ import org.mdweb.model.storage.Value;
 import org.mdweb.model.users.User;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Writer20;
+import org.mdweb.io.Writer;
 
 /**
  *
@@ -80,7 +81,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     /**
      * A writer to the MDWeb database.
      */
-    protected Writer20 mdWriter;
+    protected Writer mdWriter;
     
     /**
      * The current main standard of the Object to create
@@ -130,6 +131,24 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                            "cause:" + ex.getMessage());
         }
         
+        this.classBinding = new HashMap<Class, Classe>();
+        this.alreadyWrite = new HashMap<Object, Value>();
+    }
+
+    /**
+     * Build a new metadata writer.
+     *
+     */
+    public MDWebMetadataWriter(Writer mdWriter) throws MetadataIoException {
+        super();
+        this.mdWriter    = mdWriter;
+        try {
+            this.mdRecordSet = getRecordSet();
+            this.user = mdWriter.getUser("admin");
+        } catch (MD_IOException ex) {
+            throw new MetadataIoException("MD_IOException while getting the catalog and user:" +'\n'+
+                                           "cause:" + ex.getMessage());
+        }
         this.classBinding = new HashMap<Class, Classe>();
         this.alreadyWrite = new HashMap<Object, Value>();
     }

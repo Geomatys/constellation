@@ -52,6 +52,7 @@ import org.mdweb.model.storage.Value;
 import org.mdweb.model.storage.LinkedValue;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Reader20;
+import org.mdweb.io.Reader;
 
 // Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.MetadataEntity;
@@ -78,7 +79,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     /**
      * A reader to the MDWeb database.
      */
-    protected Reader20 mdReader;
+    protected Reader mdReader;
     
     /**
      * A map containing the mapping beetween the MDWeb className and java typeName
@@ -174,6 +175,20 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     protected MDWebMetadataReader(Connection mdConnection) {
         super(true, false);
         this.mdReader           = new Reader20(mdConnection);
+        initPackage();
+        this.classBinding       = new HashMap<String, Class>();
+        this.alreadyRead        = new HashMap<Value, Object>();
+        this.classeNotFound     = new ArrayList<String>();
+    }
+
+    /**
+     * A constructor used in profile Test .
+     *
+     * @param MDReader a reader to the MDWeb database.
+     */
+    protected MDWebMetadataReader(Reader mdReader) {
+        super(true, false);
+        this.mdReader           = mdReader;
         initPackage();
         this.classBinding       = new HashMap<String, Class>();
         this.alreadyRead        = new HashMap<Value, Object>();

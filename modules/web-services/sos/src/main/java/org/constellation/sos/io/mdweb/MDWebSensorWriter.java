@@ -36,6 +36,7 @@ import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.mdweb.io.MD_IOException;
+import org.mdweb.io.sql.v20.Writer20;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb dependencies
@@ -129,7 +130,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
                 dbId = sensorId;
             }
             // we find the form id describing the sensor.
-            final int id = mdWriter.getIdFromTitleForm(dbId);
+            final int id = ((Writer20)mdWriter).getIdFromTitleForm(dbId);
             LOGGER.finer("describesensor id: " + dbId);
             LOGGER.finer("describesensor mdweb id: " + id);
 

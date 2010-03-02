@@ -33,6 +33,7 @@ import org.constellation.ws.CstlServiceException;
 import org.mdweb.io.MD_IOException;
 
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.mdweb.io.sql.v20.Reader20;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -84,7 +85,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
                 dbId = sensorId;
             }
             // we find the form id describing the sensor.
-            final int id = mdReader.getIdFromTitleForm(dbId);
+            final int id = ((Reader20)mdReader).getIdFromTitleForm(dbId);
             LOGGER.log(logLevel, "describesensor id: " + dbId);
             LOGGER.log(logLevel, "describesensor mdweb id: " + id);
 
