@@ -26,7 +26,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,6 +64,8 @@ import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
+import org.mdweb.io.sql.v21.Reader21;
+import org.mdweb.model.schemas.Classe;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
 
@@ -154,7 +158,23 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         }
         try {
             final Connection mdConnection = db.getConnection();
-            final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
+            final boolean isPostgres      = db.getClassName().equals("org.postgresql.Driver");
+            String version                = null;
+            Statement versionStmt         = mdConnection.createStatement();
+            ResultSet result                = versionStmt.executeQuery("Select * FROM \"version\"");
+            if (result.next()) {
+                version = result.getString(1);
+            }
+            result.close();
+            versionStmt.close();
+
+            if (version.startsWith("2.0")) {
+                mdReader = new Reader20(mdConnection, isPostgres);
+            } else if (version.startsWith("2.1")) {
+                mdReader = new Reader21(mdConnection, isPostgres);
+            } else {
+                throw new MetadataIoException("unexpected database version:" + version);
+            }
             this.mdReader           = new Reader20(mdConnection, isPostgres);
         } catch (SQLException ex) {
             throw new MetadataIoException("SQLException while initializing the MDWeb reader:" +'\n'+
@@ -200,9 +220,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     private void initPackage() {
 
-        this.geotoolkitPackage  = FileUtilities.searchSubPackage("org.geotoolkit.metadata", "org.geotoolkit.referencing",
-                                                        "org.geotoolkit.service", "org.geotoolkit.naming", "org.geotoolkit.feature.catalog",
-                                                        "org.geotoolkit.metadata.fra", "org.geotoolkit.temporal.object");
+        this.geotoolkitPackage  = FileUtilities.searchSubPackage("org.geotoolkit.metadata.iso", "org.geotoolkit.referencing",
+                                                               "org.geotoolkit.service", "org.geotoolkit.naming", "org.geotoolkit.feature.catalog",
+                                                               "org.geotoolkit.metadata.fra", "org.geotoolkit.temporal.object");
         this.sensorMLPackage    = FileUtilities.searchSubPackage("org.geotoolkit.sml.xml.v100");
         this.swePackage         = FileUtilities.searchSubPackage("org.geotoolkit.swe.xml.v100");
         this.gmlPackage         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311");
@@ -343,24 +363,20 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @return a geotoolkit metadat object.
      */
     private Object getObjectFromValue(Form form, Value value, int mode) {
-        String className;
-        String standardName;
+        Class classe = null;
+        // we get the value's class
         if (value.getType() != null) {
-            className    = value.getType().getName();
-            standardName = value.getType().getStandard().getName();
+            classe = getClassFromName(value.getType(), mode);
         } else {
             LOGGER.severe("Error null type for value:" + value.getIdValue());
             return null;
         }
-        Class classe = null;
-        Object result;
         
-        // we get the value's class
-        classe = getClassFromName(className, standardName, mode);
         if (classe == null) {
             return null;
         }
-
+        
+        Object result;
         // if the value is a leaf => primitive type
         if (value instanceof TextValue) {
             String textValue = ((TextValue) value).getValue();
@@ -399,6 +415,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             // if the value is a date we call the static method parse
             // instead of a constructor (temporary patch: createDate method)
             } else if (classe.equals(Date.class)) {
+                if (textValue == null || textValue.isEmpty()) {
+                    return null;
+                }
                 return TemporalUtilities.createDate(textValue);
 
             } else if (classe.equals(Locale.class)) {
@@ -700,7 +719,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * 
      * @return a class object corresponding to the specified name.
      */
-    private Class getClassFromName(String className, String standardName, int mode) {
+    private Class getClassFromName(Classe type, int mode) {
+        String className    = type.getName();
+        String standardName = type.getStandard().getName();
+
         Class result = classBinding.get(standardName + ':' + className);
         if (result == null) {
             LOGGER.finer("search for class " + className);
@@ -771,7 +793,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             
             String name = className;
             int nameType = 0;
-            while (nameType < 9) {
+            while (nameType < 10) {
                 try {
                     LOGGER.finer("searching: " + packageName + '.' + name);
                     result = Class.forName(packageName + '.' + name);
@@ -844,8 +866,15 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                             nameType = 8;
                             break;
                         }
-                        default:
+                        // we put Abstract before the className
+                        case 8: {
+                            name = name.substring(0, name.indexOf("PropertyType"));
+                            name = "Abstract" + name;
                             nameType = 9;
+                            break;
+                        }
+                        default:
+                            nameType = 10;
                             break;
                     }
 

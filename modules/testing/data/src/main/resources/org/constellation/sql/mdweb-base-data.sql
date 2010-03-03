@@ -1,14 +1,16 @@
- INSERT INTO "Schemas"."Standard"  VALUES ('Sensor Web Enablement','swe');
- INSERT INTO "Schemas"."Standard"  VALUES ('SensorML','sml');
- INSERT INTO "Schemas"."Standard"  VALUES ('XML Schema','xsi');
- INSERT INTO "Schemas"."Standard"  VALUES ('ISO 19115','gmd');
- INSERT INTO "Schemas"."Standard"  VALUES ('ISO 19103','gco');
- INSERT INTO "Schemas"."Standard"  VALUES ('ISO 19108','gml');
- INSERT INTO "Schemas"."Standard"  VALUES ('ISO 636-2', NULL);
- INSERT INTO "Schemas"."Standard"  VALUES ('ISO 19115 FRA 1.0', 'fra');
- INSERT INTO "Schemas"."Standard"  VALUES ('ISO 3166', NULL);
- INSERT INTO "Schemas"."Standard"  VALUES ('MDWEB', NULL);
- INSERT INTO "Schemas"."Standard"  VALUES ('Xlink', 'xlink');
+INSERT INTO "Schemas"."Standard"  VALUES ('Sensor Web Enablement','swe');
+INSERT INTO "Schemas"."Standard"  VALUES ('SensorML','sml');
+INSERT INTO "Schemas"."Standard"  VALUES ('XML Schema','xsi');
+INSERT INTO "Schemas"."Standard"  VALUES ('ISO 19115','gmd');
+INSERT INTO "Schemas"."Standard"  VALUES ('ISO 19103','gco');
+INSERT INTO "Schemas"."Standard"  VALUES ('ISO 19108','gml');
+INSERT INTO "Schemas"."Standard"  VALUES ('ISO 636-2', NULL);
+INSERT INTO "Schemas"."Standard"  VALUES ('ISO 19115 FRA 1.0', 'fra');
+INSERT INTO "Schemas"."Standard"  VALUES ('ISO 3166', NULL);
+INSERT INTO "Schemas"."Standard"  VALUES ('MDWEB', NULL);
+INSERT INTO "Schemas"."Standard"  VALUES ('Xlink', 'xlink');
+
+insert into "version" values('2.0.4');
 
 INSERT INTO "Schemas"."Obligations" ("code", "name") VALUES ('O', 'Optionnal');
 INSERT INTO "Schemas"."Obligations" ("code", "name") VALUES ('M', 'Mandatory');

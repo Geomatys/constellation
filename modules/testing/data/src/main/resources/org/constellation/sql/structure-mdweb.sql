@@ -334,6 +334,9 @@ CREATE TABLE "Markers" (
     "id_metadata" integer NOT NULL
 );
 
+create table "version" (
+"number"  character varying(10));
+
 ALTER TABLE  "Markers" ADD CONSTRAINT "Markers_pkey" PRIMARY KEY ("idgeom", "idform", "id_metadata");
 
 ALTER TABLE  "Profiles"."FieldElements"  ADD CONSTRAINT "FieldElements_pkey" PRIMARY KEY ("profileName", "path");

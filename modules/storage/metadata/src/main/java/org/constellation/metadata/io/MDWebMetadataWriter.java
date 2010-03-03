@@ -23,7 +23,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -61,6 +63,7 @@ import org.mdweb.model.users.User;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Writer20;
 import org.mdweb.io.Writer;
+import org.mdweb.io.sql.v21.Writer21;
 
 /**
  *
@@ -118,8 +121,24 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         try {
 
             final Connection mdConnection = db.getConnection();
-            final boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
-            mdWriter    = new Writer20(mdConnection, isPostgres);
+            final boolean isPostgres      = db.getClassName().equals("org.postgresql.Driver");
+            String version                = null;
+            Statement versionStmt         = mdConnection.createStatement();
+            ResultSet result              = versionStmt.executeQuery("Select * FROM \"version\"");
+            if (result.next()) {
+                version = result.getString(1);
+            }
+            result.close();
+            versionStmt.close();
+            
+            if (version.startsWith("2.0")) {
+                mdWriter = new Writer20(mdConnection, isPostgres);
+            } else if (version.startsWith("2.1")) {
+                mdWriter = new Writer21(mdConnection, isPostgres);
+            } else {
+                throw new MetadataIoException("unexpected database version:" + version);
+            }
+           
             mdRecordSet = getRecordSet();
             defaultUser = mdWriter.getUser("admin");
 
@@ -601,6 +620,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         //we remove the Default prefix
         if (className.startsWith("Default")) {
             className = className.substring(7, className.length());
+        }
+
+        //we remove the Abstract prefix
+        if (className.startsWith("Abstract") && packageName.startsWith("org.geotoolkit.metadata.iso")) {
+            className = className.substring(8, className.length());
         }
         
         //we remove the Type suffix
