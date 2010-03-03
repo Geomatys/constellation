@@ -34,8 +34,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 
-// Geotools dependencies
-import org.geotoolkit.util.Utilities;
+// Geotoolkit dependencies
+import org.geotoolkit.util.Strings;
 
 // Constellation dependencies
 import org.constellation.catalog.Database;
@@ -231,7 +231,7 @@ public class MergedMeasurementTable extends Table {
                 out.write(')');
                 length += code.length() + 2;
             }
-            out.write(Utilities.spaces(width[i] - length + 1));
+            out.write(Strings.spaces(width[i] - length + 1));
         }
         int count = 0;
         out.write(lineSeparator);
@@ -259,7 +259,7 @@ public class MergedMeasurementTable extends Table {
                         value = "";
                     }
                 }
-                out.write(Utilities.spaces(width[i]-value.length()));
+                out.write(Strings.spaces(width[i]-value.length()));
                 out.write(value);
                 out.write(' ');
             }

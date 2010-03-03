@@ -39,7 +39,7 @@ import static java.lang.Double.NaN;
 import static java.lang.Double.isNaN;
 import static java.lang.System.arraycopy;
 import static org.geotoolkit.util.XArrays.isSorted;
-import static org.geotoolkit.util.Utilities.spaces;
+import static org.geotoolkit.util.Strings.spaces;
 
 
 /**

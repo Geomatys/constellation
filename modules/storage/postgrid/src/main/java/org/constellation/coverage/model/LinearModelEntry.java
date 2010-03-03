@@ -34,6 +34,7 @@ import java.text.NumberFormat;
 import org.geotoolkit.io.TableWriter;
 import org.geotoolkit.util.Utilities;
 import org.constellation.coverage.catalog.Layer;
+import org.geotoolkit.util.Strings;
 
 
 /**
@@ -344,7 +345,7 @@ final class LinearModelEntry extends ModelEntry implements LinearModel {
             for (final Descriptor descriptor : descriptors) {
                 final String name = descriptor.getName();
                 table.write('\u00D7'); // Multiplication sign
-                table.write(Utilities.spaces(leadingSymbols[i] - leadingSymbols(name) + 1));
+                table.write(Strings.spaces(leadingSymbols[i] - leadingSymbols(name) + 1));
                 table.write(name);
                 table.nextColumn();
                 i++;
