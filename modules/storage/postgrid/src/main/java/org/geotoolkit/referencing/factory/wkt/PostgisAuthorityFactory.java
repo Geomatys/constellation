@@ -393,7 +393,7 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
             if (!results.wasNull()) {
                 if (value != null && !candidate.equals(value)) {
                     results.close();
-                    throw new FactoryException(Errors.format(Errors.Keys.DUPLICATED_VALUES_$1, code));
+                    throw new FactoryException(Errors.format(Errors.Keys.DUPLICATED_VALUES_FOR_KEY_$1, code));
                 }
                 value = type.cast(candidate);
             }
