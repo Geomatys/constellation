@@ -161,7 +161,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             final boolean isPostgres      = db.getClassName().equals("org.postgresql.Driver");
             String version                = null;
             Statement versionStmt         = mdConnection.createStatement();
-            ResultSet result                = versionStmt.executeQuery("Select * FROM \"version\"");
+            ResultSet result              = versionStmt.executeQuery("Select * FROM \"version\"");
             if (result.next()) {
                 version = result.getString(1);
             }
@@ -175,7 +175,6 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             } else {
                 throw new MetadataIoException("unexpected database version:" + version);
             }
-            this.mdReader           = new Reader20(mdConnection, isPostgres);
         } catch (SQLException ex) {
             throw new MetadataIoException("SQLException while initializing the MDWeb reader:" +'\n'+
                                            "cause:" + ex.getMessage());

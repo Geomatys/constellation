@@ -21,7 +21,9 @@ package org.constellation.metadata.index.mdweb;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +62,7 @@ import org.mdweb.model.storage.Value;
 import org.mdweb.io.Reader;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Reader20;
+import org.mdweb.io.sql.v21.Reader21;
 
 /**
  * A Lucene index handler for an MDWeb Database.
@@ -101,8 +104,23 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         }
         try {
             final Connection mdConnection = db.getConnection();
-            boolean isPostgres = db.getClassName().equals("org.postgresql.Driver");
-            mdWebReader   = new Reader20(mdConnection, isPostgres);
+            boolean isPostgres    = db.getClassName().equals("org.postgresql.Driver");
+            String version        = null;
+            Statement versionStmt = mdConnection.createStatement();
+            ResultSet result      = versionStmt.executeQuery("Select * FROM \"version\"");
+            if (result.next()) {
+                version = result.getString(1);
+            }
+            result.close();
+            versionStmt.close();
+
+            if (version.startsWith("2.0")) {
+                mdWebReader = new Reader20(mdConnection, isPostgres);
+            } else if (version.startsWith("2.1")) {
+                mdWebReader = new Reader21(mdConnection, isPostgres);
+            } else {
+                throw new IndexingException("unexpected database version:" + version);
+            }
             pathMap       = null;
             classeMap     = null;
             if (create)
