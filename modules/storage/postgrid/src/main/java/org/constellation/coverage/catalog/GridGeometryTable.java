@@ -46,7 +46,7 @@ import org.geotoolkit.util.collection.WeakHashSet;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.operation.transform.AffineTransform2D;
 import org.geotoolkit.referencing.factory.IdentifiedObjectFinder;
-import org.geotoolkit.referencing.factory.wkt.PostgisAuthorityFactory;
+import org.geotoolkit.referencing.factory.wkt.LegacyPostgisAuthorityFactory;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.IllegalRecordException;
@@ -70,7 +70,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      * The authority factory connected to the PostGIS {@code "spatial_ref_sys"} table.
      * Will be created when first needed.
      */
-    private transient PostgisAuthorityFactory crsFactory;
+    private transient LegacyPostgisAuthorityFactory crsFactory;
 
     /**
      * A map of CRS created up to date.
@@ -105,10 +105,10 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      *
      * @throws SQLException if an error occured while querying the database.
      */
-    private PostgisAuthorityFactory getAuthorityFactory() throws SQLException {
+    private LegacyPostgisAuthorityFactory getAuthorityFactory() throws SQLException {
         assert Thread.holdsLock(this);
         if (crsFactory == null) {
-            crsFactory = new PostgisAuthorityFactory(null, getDatabase().getConnection());
+            crsFactory = new LegacyPostgisAuthorityFactory(null, getDatabase().getConnection());
         }
         return crsFactory;
     }
@@ -163,7 +163,7 @@ final class GridGeometryTable extends SingletonTable<GridGeometryEntry> {
      */
     public synchronized int getSRID(final String wkt) throws SQLException, FactoryException {
         final CoordinateReferenceSystem crs = CRS.parseWKT(wkt);
-        final PostgisAuthorityFactory factory = getAuthorityFactory();
+        final LegacyPostgisAuthorityFactory factory = getAuthorityFactory();
         final IdentifiedObjectFinder finder = factory.getIdentifiedObjectFinder(CoordinateReferenceSystem.class);
         final String srid = finder.findIdentifier(crs);
         if (srid == null) {

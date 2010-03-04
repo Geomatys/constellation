@@ -126,7 +126,7 @@ public abstract class DirectSqlAuthorityFactory extends DirectAuthorityFactory {
      *
      * @param  type The type of the object being created, or {@code null} if unknown.
      * @param  code The code of the object being created, or {@code null} if unknown.
-     * @param  SQLException The SQL exception that occured while querying the database.
+     * @param  exception SQLException The SQL exception that occured while querying the database.
      * @return A factory exception wrapping the SQL exception.
      */
     protected FactoryException databaseFailure(final Class<?> type, final String code,

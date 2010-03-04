@@ -56,7 +56,7 @@ import org.geotoolkit.resources.Errors;
  * @version $Id$
  * @author Martin Desruisseaux
  */
-public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implements CRSAuthorityFactory {
+public class LegacyPostgisAuthorityFactory extends DirectSqlAuthorityFactory implements CRSAuthorityFactory {
 
     // NOTE: the following table and column names are defined as static private constants
     //       because the code assumes that they do not require quotes (i.e. all lowercase
@@ -122,7 +122,7 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
      * @param hints The hints, or {@code null} if none.
      * @param connection The connection to the database.
      */
-    public PostgisAuthorityFactory(final Hints hints, final Connection connection) {
+    public LegacyPostgisAuthorityFactory(final Hints hints, final Connection connection) {
         super(hints, connection);
         this.schema = null;  // TODO: fetch from the hints.
     }
@@ -160,7 +160,7 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
                 authority = getDefaultAuthority();
             }
         } catch (FactoryException exception) {
-            Logging.unexpectedException(LOGGER, PostgisAuthorityFactory.class, "getAuthority", exception);
+            Logging.unexpectedException(LOGGER, LegacyPostgisAuthorityFactory.class, "getAuthority", exception);
             authority = getDefaultAuthority();
         }
         return authority;
@@ -422,7 +422,7 @@ public class PostgisAuthorityFactory extends DirectSqlAuthorityFactory implement
                 selectPK = null;
             }
         } catch (SQLException exception) {
-            Logging.unexpectedException(PostgisAuthorityFactory.class, "dispose", exception);
+            Logging.unexpectedException(LegacyPostgisAuthorityFactory.class, "dispose", exception);
         }
         authority   = null;
         authorities = null;
