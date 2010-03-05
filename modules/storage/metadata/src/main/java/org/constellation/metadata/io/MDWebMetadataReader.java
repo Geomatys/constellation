@@ -407,7 +407,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
                     return result;
                 } catch (NumberFormatException e) {
-                    LOGGER.severe("Format NumberException : unable to parse the code: " + textValue + " in the codelist: " + codelist.getName());
+                    if (textValue != null && !textValue.equals("")) {
+                        LOGGER.severe("Format NumberException : unable to parse the code: " + textValue + " in the codelist: " + codelist.getName());
+                    }
                     return null;
                 }
 

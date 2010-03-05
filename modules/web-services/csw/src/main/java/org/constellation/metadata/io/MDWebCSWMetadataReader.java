@@ -424,13 +424,17 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final List<Value> topicCategoriesValues  = form.getValueFromPath(mdReader.getPath(pathMap.get("subject2")));
         for (Value v: topicCategoriesValues) {
             if (v instanceof TextValue) {
+                String value = ((TextValue)v).getValue();
+                if (value == null || value.equals("")) {
+                    continue;
+                }
                 if (v.getType() instanceof org.mdweb.model.schemas.CodeList) {
                     final org.mdweb.model.schemas.CodeList c = (org.mdweb.model.schemas.CodeList) v.getType();
                     int code = 0;
                     try {
-                        code = Integer.parseInt(((TextValue)v).getValue());
+                        code = Integer.parseInt(value);
                     } catch (NumberFormatException ex) {
-                        LOGGER.warning("unable to parse the codeListelement:" + ((TextValue)v).getValue());
+                        LOGGER.warning("unable to parse the codeListelement:" + value);
                     }
                     final CodeListElement element = c.getElementByCode(code);
                     if (element != null) {
@@ -439,7 +443,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                         LOGGER.warning("no such codeListElement:" + code + " for the codeList:" + c.getName());
                     }
                 } else {
-                    keywords.add(new SimpleLiteral(null, ((TextValue)v).getValue()));
+                    keywords.add(new SimpleLiteral(null, value));
                 }
             }
         }

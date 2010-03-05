@@ -377,7 +377,7 @@ public final class ReflectionUtilities {
     public static Method getGetterFromName(String propertyName, final Class<?> rootClass) {
 
 
-        //special case and corrections
+        //special case and corrections TODO remove
         if (propertyName.equals("beginPosition") && !rootClass.getName().equals("org.geotoolkit.gml.xml.v311.TimePeriodType")) {
             if (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultInstant"))
                 return null;
@@ -390,6 +390,10 @@ public final class ReflectionUtilities {
                 propertyName = "ending";
         } else if (propertyName.equals("dataSetURI")) {
             propertyName = "dataSetUri";
+        } else if (propertyName.equals("nameOfMeasure")) {
+            propertyName = "namesOfMeasure";
+        } else if (propertyName.equals("dateTime") && rootClass.getName().startsWith("org.geotoolkit.metadata.iso.quality")) {
+             propertyName = "dates";
         } else if (propertyName.equals("extentTypeCode")) {
             propertyName = "inclusion";
         // TODO remove when this issue will be fix in MDWeb
@@ -405,15 +409,18 @@ public final class ReflectionUtilities {
             return null;
         } else if (propertyName.equals("position") && (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultPeriod"))) {
             return null;
+        }  else if ((propertyName.equals("calendarEraName") || propertyName.equals("frame") || propertyName.equals("indeterminatePosition")) && (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultPosition"))) {
+            return null;
         } else if (propertyName.equals("value") && (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultPosition"))) {
             propertyName = "date";
         }
 
         String methodName = "get" + StringUtilities.firstToUpper(propertyName);
         String methodName2 = "is" + StringUtilities.firstToUpper(propertyName);
+        String methodName3  = propertyName;
         int occurenceType = 0;
 
-        while (occurenceType < 5) {
+        while (occurenceType < 6) {
 
             try {
                 Method getter = null;
@@ -440,6 +447,10 @@ public final class ReflectionUtilities {
                     }
                     case 4: {
                         getter = rootClass.getMethod(methodName2);
+                        break;
+                    }
+                    case 5: {
+                        getter = rootClass.getMethod(methodName3);
                         break;
                     }
                     default: break;
