@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.sql.Savepoint;
 
 // JAXB dependencies
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -147,6 +148,40 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
                                          NO_APPLICABLE_CODE);
         }
         
+    }
+
+    /**
+     * This method should be called. It is used in a subProject in order to clear the database.
+     *
+     * @return
+     * @throws CstlServiceException
+     */
+    public void deleteAllSensor() throws CstlServiceException {
+        try {
+            
+            RecordSet smlCat      = mdWriter.getRecordSet("SMLC");
+            List<String> allTitle = mdWriter.getFormsTitle(smlCat);
+
+            for (String title : allTitle) {
+                // we find the form id describing the sensor.
+                final int id = ((Writer20)mdWriter).getIdFromTitleForm(title);
+                LOGGER.finer("describesensor id: " + title);
+                LOGGER.finer("describesensor mdweb id: " + id);
+
+                String identifier = id + ":SMLC";
+                super.deleteMetadata(identifier);
+            }
+
+        } catch (MD_IOException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new CstlServiceException("the service has throw a MD_IO Exception:" + ex.getMessage(),
+                                         NO_APPLICABLE_CODE);
+        } catch (MetadataIoException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new CstlServiceException("the service has throw a Metadata IO Exception:" + ex.getMessage(),
+                                         NO_APPLICABLE_CODE);
+        }
+
     }
 
     @Override
