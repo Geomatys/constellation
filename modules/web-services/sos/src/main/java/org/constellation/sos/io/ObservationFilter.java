@@ -24,6 +24,7 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.opengis.observation.Observation;
 
 /**
  *
@@ -39,7 +40,7 @@ public interface ObservationFilter {
     /**
      * Initialize the query.
      */
-    void initFilterGetResult(String procedure, QName resultModel);
+    void initFilterGetResult(Observation procedure, QName resultModel);
 
     /**
      * Add some procedure filter to the request.

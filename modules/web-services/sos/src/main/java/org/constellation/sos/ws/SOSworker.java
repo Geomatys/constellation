@@ -1132,7 +1132,7 @@ public class SOSworker {
         }
         
         //we begin to create the sql request
-        localOmFilter.initFilterGetResult(((ProcessEntry)template.getProcedure()).getHref(), resultModel);
+        localOmFilter.initFilterGetResult(template, resultModel);
         
         //we treat the time constraint
         final List<EventTime> times = requestResult.getEventTime();

@@ -26,8 +26,10 @@ import org.geotoolkit.gml.xml.v311.AbstractFeatureEntry;
 import org.geotoolkit.gml.xml.v311.BoundingShapeEntry;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sml.xml.AbstractClassification;
 import org.geotoolkit.sml.xml.AbstractClassifier;
 import org.geotoolkit.sml.xml.AbstractDerivableComponent;
@@ -248,8 +250,10 @@ public final class Utils {
         double maxy = -Double.MAX_VALUE;
 
         for (Observation observation: collection.getMember()) {
-            if (observation.getFeatureOfInterest() instanceof AbstractFeatureEntry) {
-                final AbstractFeatureEntry feature = (AbstractFeatureEntry) observation.getFeatureOfInterest();
+            FeaturePropertyType featureProp = ((ObservationEntry)observation).getPropertyFeatureOfInterest();
+
+            if (featureProp != null && featureProp.getAbstractFeature() != null) {
+                final AbstractFeatureEntry feature = featureProp.getAbstractFeature();
                 if (feature.getBoundedBy() != null) {
                     final BoundingShapeEntry bound = feature.getBoundedBy();
                     if (bound.getEnvelope() != null) {

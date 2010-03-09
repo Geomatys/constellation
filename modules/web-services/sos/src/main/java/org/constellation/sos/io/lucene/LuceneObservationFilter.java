@@ -37,9 +37,11 @@ import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SpatialQuery;
+import org.geotoolkit.observation.xml.v100.ProcessEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 //import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
+import org.opengis.observation.Observation;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.sos.ws.Utils.*;
 
@@ -89,11 +91,12 @@ public class LuceneObservationFilter implements ObservationFilter {
     }
 
     @Override
-    public void initFilterGetResult(String procedure, QName resultModel) {
+    public void initFilterGetResult(Observation template, QName resultModel) {
+        ProcessEntry process = (ProcessEntry) template.getProcedure();
         if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
-            luceneRequest = new StringBuilder("type:measurement AND procedure:\"" + procedure + "\" ");
+            luceneRequest = new StringBuilder("type:measurement AND procedure:\"" + process.getHref() + "\" ");
         } else {
-            luceneRequest = new StringBuilder("type:observation AND procedure:\"" + procedure + "\" ");
+            luceneRequest = new StringBuilder("type:observation AND procedure:\"" + process.getHref() + "\" ");
         }
     }
 

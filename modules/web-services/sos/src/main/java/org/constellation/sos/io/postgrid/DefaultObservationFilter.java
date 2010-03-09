@@ -39,8 +39,10 @@ import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.observation.xml.v100.ProcessEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
+import org.opengis.observation.Observation;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.sos.ws.Utils.*;
@@ -136,14 +138,16 @@ public class DefaultObservationFilter implements ObservationFilter {
      * Initialize the query.
      */
     @Override
-    public void initFilterGetResult(String procedure, QName resultModel) {
+    public void initFilterGetResult(Observation template, QName resultModel) {
+        ProcessEntry process = (ProcessEntry) template.getProcedure();
+        
         if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
             sqlRequest = new StringBuilder("SELECT \"result\", \"sampling_time_begin\", \"sampling_time_end\" FROM \"observation\".\"measurements\" WHERE ");
         } else {
             sqlRequest = new StringBuilder("SELECT \"result\", \"sampling_time_begin\", \"sampling_time_end\" FROM \"observation\".\"observations\" WHERE ");
         }
         //we add to the request the property of the template
-        sqlRequest.append("\"procedure\"='").append(procedure).append("'");
+        sqlRequest.append("\"procedure\"='").append(process.getHref()).append("'");
     }
 
     /**

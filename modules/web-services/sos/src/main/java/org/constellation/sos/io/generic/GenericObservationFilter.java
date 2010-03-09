@@ -50,6 +50,8 @@ import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.observation.xml.v100.ProcessEntry;
+import org.opengis.observation.Observation;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.sos.ws.Utils.*;
@@ -156,12 +158,14 @@ public class GenericObservationFilter implements ObservationFilter {
      * Initialize the query.
      */
     @Override
-    public void initFilterGetResult(String procedure, QName resultModel) {
+    public void initFilterGetResult(Observation template, QName resultModel) {
         currentQuery        = new Query();
         final Select select = configurationQuery.getSelect("filterResult");
         final From from     = configurationQuery.getFrom("observations");
         final Where where   = configurationQuery.getWhere(Parameters.PROCEDURE);
-        where.replaceVariable(Parameters.PROCEDURE, procedure, true);
+
+        ProcessEntry process = (ProcessEntry) template.getProcedure();
+        where.replaceVariable(Parameters.PROCEDURE, process.getHref(), true);
         currentQuery.addSelect(select);
         currentQuery.addFrom(from);
         currentQuery.addWhere(where);
