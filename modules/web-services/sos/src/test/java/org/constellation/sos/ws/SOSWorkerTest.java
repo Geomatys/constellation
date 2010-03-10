@@ -29,6 +29,7 @@ import javax.xml.namespace.QName;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
+import org.geotoolkit.gml.xml.v311.AbstractFeatureEntry;
 
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
@@ -2471,7 +2472,7 @@ public class SOSWorkerTest {
          
         GetFeatureOfInterest request = new GetFeatureOfInterest("1.0.0", "SOS", "station-001");
 
-        SamplingFeature result = worker.getFeatureOfInterest(request);
+        AbstractFeatureEntry result = worker.getFeatureOfInterest(request);
         
         assertTrue (result instanceof SamplingPoint);
 
