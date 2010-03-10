@@ -67,11 +67,15 @@ import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
+import static org.constellation.sos.ws.Utils.*;
+import static org.constellation.sos.ws.Normalizer.*;
 
 // GeoAPI dependencies
 import org.opengis.observation.Observation;
 import org.opengis.observation.CompositePhenomenon;
 import org.opengis.observation.Phenomenon;
+import org.opengis.observation.Measure;
+import org.opengis.observation.sampling.SamplingFeature;
 
 // Geotoolkit dependencies
 import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
@@ -111,7 +115,10 @@ import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
+import org.geotoolkit.gml.xml.v311.AbstractFeatureEntry;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.gml.xml.v311.FeatureCollectionType;
+import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
@@ -121,8 +128,12 @@ import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
+import org.geotoolkit.sampling.xml.v100.ObjectFactory;
+import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
+import org.geotoolkit.sampling.xml.v100.SamplingSolidType;
+import org.geotoolkit.sampling.xml.v100.SamplingSurfaceType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.swe.xml.AbstractEncoding;
@@ -132,13 +143,8 @@ import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
-
-import org.opengis.observation.Measure;
-import org.opengis.observation.sampling.SamplingFeature;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
-import static org.constellation.sos.ws.Utils.*;
-import static org.constellation.sos.ws.Normalizer.*;
 
 
 /**
@@ -1362,7 +1368,7 @@ public class SOSworker {
         return values;
     }
 
-    public SamplingFeature getFeatureOfInterest(GetFeatureOfInterest request) throws CstlServiceException {
+    public AbstractFeatureEntry getFeatureOfInterest(GetFeatureOfInterest request) throws CstlServiceException {
         verifyBaseRequest(request);
         LOGGER.info("GetFeatureOfInterest request processing"  + '\n');
         final long start = System.currentTimeMillis();
@@ -1377,24 +1383,47 @@ public class SOSworker {
             throw new CstlServiceException("The time filter on feature Of Interest is not yet supported", OPERATION_NOT_SUPPORTED);
         }
 
-        SamplingFeature singleResult;
+        // we return a single result
         if (request.getFeatureOfInterestId().size() == 1) {
-            singleResult = omReader.getFeatureOfInterest(request.getFeatureOfInterestId().get(0));
+            SamplingFeature singleResult = omReader.getFeatureOfInterest(request.getFeatureOfInterestId().get(0));
             if (singleResult == null) {
                 throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
             } else {
-                return singleResult;
+                return (SamplingFeatureEntry)singleResult;
             }
+
+        // we return a featureCollection
         } else if (request.getFeatureOfInterestId().size() > 1) {
-            throw new CstlServiceException("You can't specify more than on identifier", OPERATION_NOT_SUPPORTED);
+            List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
+            for (String featureID : request.getFeatureOfInterestId()) {
+                SamplingFeature feature = omReader.getFeatureOfInterest(featureID);
+                if (feature == null) {
+                    throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
+                } else {
+                    features.add(buildFeatureProperty(feature));
+                }
+            }
+            return new FeatureCollectionType("feature-collection-1", null, null, features);
         }
 
         if (request.getLocation() != null && request.getLocation().getSpatialOps() != null) {
             SpatialOpsType spatialFilter = request.getLocation().getSpatialOps().getValue();
             if (spatialFilter instanceof BBOXType) {
                 List<SamplingFeature> result = spatialFiltering((BBOXType) spatialFilter);
-                if (result.size() > 0) {
-                    return result.get(0);
+                
+                // we return a single result
+                if (result.size() == 1) {
+                    return (AbstractFeatureEntry) result.get(0);
+
+                // we return a feature collection
+                } else if (result.size() > 1) {
+                    List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
+                    for (SamplingFeature feature : result) {
+                        features.add(buildFeatureProperty(feature));
+                    }
+                    return new FeatureCollectionType("feature-collection-1", null, null, features);
+
+                // if there is no response we send an error
                 } else {
                     throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
                 }
@@ -1402,8 +1431,31 @@ public class SOSworker {
                 throw new CstlServiceException("Only the filter BBOX is upported for now", OPERATION_NOT_SUPPORTED);
             }
         }
+        // TODO never readh
         LOGGER.info("GetFeatureOfInterest processed in " + (System.currentTimeMillis() - start) + "ms");
         return null;
+    }
+
+    /**
+     * Build the correct featurePropertyType from a sampling feature
+     * 
+     * @param feature
+     * @return
+     */
+    private FeaturePropertyType buildFeatureProperty(SamplingFeature feature) {
+        ObjectFactory samplingFactory = new ObjectFactory();
+        if (feature instanceof SamplingPointEntry) {
+            return new FeaturePropertyType(samplingFactory.createSamplingPoint((SamplingPointEntry)feature));
+        } else if (feature instanceof SamplingCurveType) {
+            return new FeaturePropertyType(samplingFactory.createSamplingCurve((SamplingCurveType)feature));
+        } else if (feature instanceof SamplingSolidType) {
+            return new FeaturePropertyType(samplingFactory.createSamplingSolid((SamplingSolidType)feature));
+        } else if (feature instanceof SamplingSurfaceType) {
+            return new FeaturePropertyType(samplingFactory.createSamplingSurface((SamplingSurfaceType)feature));
+        } else {
+            LOGGER.warning("unexpected feature type:" + feature);
+            return null;
+        }
     }
 
     public List<SamplingFeature> spatialFiltering(BBOXType bbox) throws CstlServiceException {
