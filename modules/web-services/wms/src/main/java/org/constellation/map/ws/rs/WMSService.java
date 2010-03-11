@@ -257,10 +257,10 @@ public class WMSService extends GridWebService {
         // Log the exception, even if the request specify that the exception should be in image.
         // In that precise case, printing the exception in the logs would allow administrator to
         // follow the user's error.
-        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-            !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
-            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED))
+        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE)   &&
+            !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED) &&
+            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)   && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE)    &&
+            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED))
         {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         } else {

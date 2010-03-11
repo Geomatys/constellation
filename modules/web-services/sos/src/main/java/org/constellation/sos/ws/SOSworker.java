@@ -2063,20 +2063,22 @@ public class SOSworker {
         /* Ifremer's server does not contain any .constellation directory, so the
          * configuration files are put under the WEB-INF/classes/configuration/ directory of the WAR file.
          */
-        final File configDir = FileUtilities.getDirectoryFromResource("configuration");
+        File configDir = FileUtilities.getDirectoryFromResource("configuration");
 
-        if (configDir != null && configDir.exists()) {
-            LOGGER.info("taking configuration from WAR directory resources: " + configDir.getPath());
-            return configDir;
-        } else {
-            final String configUrl = "sos_configuration";
-            final File constellDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
-            if (constellDir != null && constellDir.exists()) {
-                LOGGER.info("taking configuration from constellation directory: " + constellDir.getPath());
-                return constellDir;
-            }
+        // if not find we search also in WEB-INF//classes/sos_configuration
+        if (configDir == null || !configDir.exists()) {
+            configDir = FileUtilities.getDirectoryFromResource("sos_configuration");
         }
-        return null;
+
+        // else we search the .constellation directory
+        if (configDir == null || !configDir.exists()) {
+            configDir = new File(ConfigDirectory.getConfigDirectory(), "sos_configuration");
+        }
+
+        if (configDir != null) {
+            LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
+        }
+        return configDir;
     }
 
     /**

@@ -284,10 +284,10 @@ public class WCSService extends GridWebService {
         // LOG THE EXCEPTION
         // We do not want to log the full stack trace if this is an error
         // which seems to have been caused by the user.
-        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    &&
-            !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)    &&
-            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED))
+        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE) &&
+            !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED) &&
+            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE) &&
+            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)   && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED))
         {
             LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
         } else {

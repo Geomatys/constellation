@@ -136,10 +136,15 @@ public class SOService extends OGCWebService {
 
                 AbstractSensorML sensor = worker.describeSensor(ds);
                 // for sensorML file we need to change the schema localtion
-                if (sensor != null && sensor.getVersion().equals("1.0.1")) {
-                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.opengis.net/sensorML/1.0.1 http://schemas.opengis.net/sensorML/1.0.1/sensorML.xsd");
-                } else {
-                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.opengis.net/sensorML/1.0 http://schemas.opengis.net/sensorML/1.0.0/sensorML.xsd");
+                if (sensor != null) {
+                    if (sensor.getVersion() != null && sensor.getVersion().equals("1.0.1")) {
+                        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.opengis.net/sensorML/1.0.1 http://schemas.opengis.net/sensorML/1.0.1/sensorML.xsd");
+                    } else {
+                        if (sensor.getVersion() == null) {
+                            LOGGER.warning("there is no version for sensorML file");
+                        }
+                        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, "http://www.opengis.net/sensorML/1.0 http://schemas.opengis.net/sensorML/1.0.0/sensorML.xsd");
+                    }
                 }
 
                 marshaller.marshal(sensor, sw);
