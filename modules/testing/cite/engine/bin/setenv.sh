@@ -1,1 +1,1 @@
-export JAVA_OPTS=-Xmx256m
+export JAVA_OPTS="-Xmx4096m -Xss1024m" 
