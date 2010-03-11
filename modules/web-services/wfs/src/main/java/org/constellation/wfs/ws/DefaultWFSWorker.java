@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -46,9 +48,13 @@ import org.constellation.ws.rs.OGCWebService;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.DataUtilities;
+import org.geotoolkit.feature.SchemaException;
 import org.geotoolkit.wfs.xml.RequestBase;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.query.QueryBuilder;
+import org.geotoolkit.factory.Hints;
+import org.geotoolkit.factory.HintsPending;
+import org.geotoolkit.feature.FeatureTypeUtilities;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.Utils;
 import org.geotoolkit.gml.xml.v311.AbstractGMLEntry;
@@ -333,6 +339,14 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             }
         }
 
+
+        for (int i = 0, size = types.size(); i < size; i++) {
+            try {
+                types.set(i, FeatureTypeUtilities.excludePrimaryKeyFields((SimpleFeatureType) types.get(i)));
+            } catch (SchemaException ex) {
+                LOGGER.log(Level.SEVERE, "error while excluding primary keys", ex);
+            }
+        }
         LOGGER.log(logLevel, "DescribeFeatureType treated in " + (System.currentTimeMillis() - start) + "ms");
         return writer.getSchemaFromFeatureType(types);
     }
@@ -468,6 +482,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 }
 
                 queryBuilder.setTypeName(ft.getName());
+                queryBuilder.setHints(new Hints(HintsPending.FEATURE_HIDE_ID_PROPERTY, Boolean.TRUE));
 
                 // we verify that all the properties contained in the filter are known by the feature type.
                 verifyFilterProperty(ft, filter);
