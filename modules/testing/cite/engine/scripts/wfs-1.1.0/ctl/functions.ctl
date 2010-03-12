@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ctl:package
- xmlns="http://www.w3.org/2001/XMLSchema"
  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
  xmlns:ctl="http://www.occamlab.com/ctl"
  xmlns:parsers="http://www.occamlab.com/te/parsers"
@@ -11,8 +10,10 @@
  xmlns:gml="http://www.opengis.net/gml" 
  xmlns:ogc="http://www.opengis.net/ogc"
  xmlns:sf="http://cite.opengeospatial.org/gmlsf" 
- xmlns:xi="http://www.w3.org/2001/XInclude">
+ xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
+<!-- xmlns="http://www.w3.org/2001/XMLSchema"-->
 	<!-- Sample usage:
     (1)
     <ctl:call-test name="ctl:assert-xpath">
