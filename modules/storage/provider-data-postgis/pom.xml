@@ -20,7 +20,7 @@
   <groupId>org.constellation.storage</groupId>
   <artifactId>cstl-store-data-postgis</artifactId>
   <packaging>jar</packaging>
-  <name>Provider for data : postgis</name>
+  <name>Provider for data : PostGIS</name>
   <description>
     These packages provide access to postgis datas.
   </description>

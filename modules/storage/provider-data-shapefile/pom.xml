@@ -20,7 +20,7 @@
   <groupId>org.constellation.storage</groupId>
   <artifactId>cstl-store-data-shapefile</artifactId>
   <packaging>jar</packaging>
-  <name>Provider for data : shapefile</name>
+  <name>Provider for data : Shapefile</name>
   <description>
     These packages provide access to shapefiles datas.
   </description>

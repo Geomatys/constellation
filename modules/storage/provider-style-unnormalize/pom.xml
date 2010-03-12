@@ -20,7 +20,7 @@
   <groupId>org.constellation.storage</groupId>
   <artifactId>cstl-store-style-unnormalize</artifactId>
   <packaging>jar</packaging>
-  <name>Provider for style : unnormalize</name>
+  <name>Provider for style : Unnormalize</name>
   <description>
     These packages provide access to unnormalize styles.
   </description>

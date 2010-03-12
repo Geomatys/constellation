@@ -20,7 +20,7 @@
   <groupId>org.constellation.storage</groupId>
   <artifactId>cstl-store-style-sld</artifactId>
   <packaging>jar</packaging>
-  <name>Provider for style : sld</name>
+  <name>Provider for style : Styled Layer Descriptor</name>
   <description>
     These packages provide access to sld styles.
   </description>

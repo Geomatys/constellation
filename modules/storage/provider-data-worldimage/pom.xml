@@ -18,11 +18,11 @@
     Module description.
   -->
   <groupId>org.constellation.storage</groupId>
-  <artifactId>cstl-store-data-postgrid</artifactId>
+  <artifactId>cstl-store-data-worldimage</artifactId>
   <packaging>jar</packaging>
-  <name>Provider for data : PostGRID</name>
+  <name>Provider for data : World-Image</name>
   <description>
-    These packages provide access to postgrid datas.
+    These packages provide access to world image files.
   </description>
 
 
@@ -61,9 +61,8 @@
     </dependency>
 
     <dependency>
-        <groupId>postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <scope>compile</scope>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-coverageio-pending</artifactId>
     </dependency>
 
   </dependencies>
