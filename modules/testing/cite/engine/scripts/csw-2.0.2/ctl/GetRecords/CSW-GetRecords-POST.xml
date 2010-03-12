@@ -433,7 +433,7 @@
                     <xsl:variable name="r1.date" select="$response//csw:SearchResults/*[1]/dc:date"/>
                     <xsl:variable name="r2.date" select="$response//csw:SearchResults/*[2]/dc:date"/>
                     <xsl:variable name="r3.date" select="$response//csw:SearchResults/*[3]/dc:date"/>
-                    <xsl:if test="not(xsd:date($r1.date) gt xsd:date($r2.date)) or not(xsd:date($r2.date) gt xsd:date($r3.date))">
+                    <xsl:if test="not(xsd:date($r1.date) &gt; xsd:date($r2.date)) or not(xsd:date($r2.date) &gt; xsd:date($r3.date))">
                         <ctl:message>[FAILURE] Search results are not sorted correctly by dc:date in descending order.</ctl:message>
                         <ctl:message><xsl:value-of select="$r1.date"/>, <xsl:value-of select="$r2.date"/>, <xsl:value-of select="$r3.date"/></ctl:message>
                         <ctl:fail/>
@@ -473,7 +473,7 @@
                     <xsl:variable name="r1.date" select="$response1//csw:SearchResults/*[1]/dc:date"/>
                     <xsl:variable name="r2.date" select="$response1//csw:SearchResults/*[2]/dc:date"/>
                     <xsl:variable name="r3.date" select="$response1//csw:SearchResults/*[3]/dc:date"/>
-                    <xsl:if test="not(xsd:date($r1.date) gt xsd:date($r2.date)) or not(xsd:date($r2.date) gt xsd:date($r3.date))">
+                    <xsl:if test="not(xsd:date($r1.date) &gt; xsd:date($r2.date)) or not(xsd:date($r2.date) &gt; xsd:date($r3.date))">
                         <ctl:message>[FAILURE] Search results are not sorted correctly by dc:date in descending order.</ctl:message>
                         <ctl:message><xsl:value-of select="$r1.date"/>, <xsl:value-of select="$r2.date"/>, <xsl:value-of select="$r3.date"/> </ctl:message>
                         <ctl:fail/>
@@ -1190,13 +1190,13 @@
                 <xsl:for-each select="$response//csw:SearchResults/*">
                   <xsl:choose>
                     <xsl:when test="contains(dc:date, 'T')">
-                      <xsl:if test="xsd:dateTime(dc:date) gt xsd:dateTime('2005-10-24T00:00:00Z')">
+                      <xsl:if test="xsd:dateTime(dc:date) &gt; xsd:dateTime('2005-10-24T00:00:00Z')">
                         <ctl:message>[FAILURE] Record dated after 2005-10-24T00:00:00Z (<xsl:value-of select="dc:date"/>)</ctl:message>
                         <ctl:fail/>
                       </xsl:if>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:if test="xsd:date(dc:date) gt xsd:date('2005-10-24Z')">
+                      <xsl:if test="xsd:date(dc:date) &gt; xsd:date('2005-10-24Z')">
                         <ctl:message>[FAILURE] Record dated after 2005-10-24Z (<xsl:value-of select="dc:date"/>)</ctl:message>
                         <ctl:fail/>
                       </xsl:if>
@@ -1259,13 +1259,13 @@
                 <xsl:for-each select="$response//csw:SearchResults/*">
                   <xsl:choose>
                     <xsl:when test="contains(dc:date, 'T')">
-                      <xsl:if test="xsd:dateTime(dc:date) lt xsd:dateTime('2006-03-26T00:00:00Z')">
+                      <xsl:if test="xsd:dateTime(dc:date) &lt; xsd:dateTime('2006-03-26T00:00:00Z')">
                         <ctl:message>[FAILURE] Included record dated before 2006-03-26T00:00:00Z (<xsl:value-of select="dc:date"/>)</ctl:message>
                         <ctl:fail/>
                       </xsl:if>
                     </xsl:when>
                     <xsl:otherwise>
-                      <xsl:if test="xsd:date(dc:date) lt xsd:date('2006-03-26Z')">
+                      <xsl:if test="xsd:date(dc:date) &lt; xsd:date('2006-03-26Z')">
                         <ctl:message>[FAILURE] Included record dated before 2006-03-26Z (<xsl:value-of select="dc:date"/>)</ctl:message>
                         <ctl:fail/>
                       </xsl:if>
@@ -1681,7 +1681,7 @@
               </xsl:when>
               <xsl:otherwise>
                 <xsl:variable name="recordCount" select="count($response//csw:SearchResults/csw:SummaryRecord)"/>
-                <xsl:if test="($recordCount lt 1) or ($recordCount gt 10)">
+                <xsl:if test="($recordCount &lt; 1) or ($recordCount &gt; 10)">
                   <ctl:message>[FAILURE] 1-10 csw:SummaryRecord elements expected in response (<xsl:value-of select="$recordCount"/> included)</ctl:message>
                   <ctl:fail/>
                 </xsl:if>
@@ -2119,7 +2119,7 @@
               </xsl:when>
               <xsl:otherwise>
                 <xsl:variable name="nRecords" select="count($response//csw:SearchResults/*)"/>
-                <xsl:if test="$nRecords gt 0">
+                <xsl:if test="$nRecords &gt; 0">
                   <ctl:message>[FAILURE] csw:SearchResults should be empty (<xsl:value-of select="$nRecords"/> included)</ctl:message>
                   <ctl:fail/>
                 </xsl:if>

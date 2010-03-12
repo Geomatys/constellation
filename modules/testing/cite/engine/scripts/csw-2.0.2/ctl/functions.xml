@@ -67,17 +67,17 @@
       </ctl:return>
       <ctl:description>Determines if two envelopes are disjoint. If not, they intersect.</ctl:description>
       <ctl:code>
-         <xsl:variable name="minX1" select="xsd:decimal(substring-before($env//gml:lowerCorner, ' '))" />
-         <xsl:variable name="maxX1" select="xsd:decimal(substring-before($env//gml:upperCorner, ' '))" />
-         <xsl:variable name="minY1" select="xsd:decimal(substring-after($env//gml:lowerCorner, ' '))" />
-         <xsl:variable name="maxY1" select="xsd:decimal(substring-after($env//gml:upperCorner, ' '))" />
-         <xsl:variable name="minX2" select="xsd:decimal(substring-before($bbox//ows:LowerCorner, ' '))" />
-         <xsl:variable name="maxX2" select="xsd:decimal(substring-before($bbox//ows:UpperCorner, ' '))" />
-         <xsl:variable name="minY2" select="xsd:decimal(substring-after($bbox//ows:LowerCorner, ' '))" />
-         <xsl:variable name="maxY2" select="xsd:decimal(substring-after($bbox//ows:UpperCorner, ' '))" />
+         <xsl:variable name="minX1" select="number(substring-before($env//gml:lowerCorner, ' '))" />
+         <xsl:variable name="maxX1" select="number(substring-before($env//gml:upperCorner, ' '))" />
+         <xsl:variable name="minY1" select="number(substring-after($env//gml:lowerCorner, ' '))" />
+         <xsl:variable name="maxY1" select="number(substring-after($env//gml:upperCorner, ' '))" />
+         <xsl:variable name="minX2" select="number(substring-before($bbox//ows:LowerCorner, ' '))" />
+         <xsl:variable name="maxX2" select="number(substring-before($bbox//ows:UpperCorner, ' '))" />
+         <xsl:variable name="minY2" select="number(substring-after($bbox//ows:LowerCorner, ' '))" />
+         <xsl:variable name="maxY2" select="number(substring-after($bbox//ows:UpperCorner, ' '))" />
          <xsl:choose>
             <xsl:when test="$env//@srsName != $bbox//@crs">-1</xsl:when>
-            <xsl:when test="($minX2 gt $maxX1) or ($minY2 gt $maxY1) or ($maxX2 lt $minX1) or ($maxY2 lt $minY1)">1</xsl:when>
+            <xsl:when test="($minX2 &gt; $maxX1) or ($minY2 &gt; $maxY1) or ($maxX2 &lt; $minX1) or ($maxY2 &lt; $minY1)">1</xsl:when>
             <xsl:otherwise>0</xsl:otherwise>
          </xsl:choose>
       </ctl:code>
