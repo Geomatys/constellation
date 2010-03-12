@@ -996,7 +996,7 @@ public class SOSworker {
                 final LiteralType literal  = result.getPropertyIsEqualTo().getLiteral();
                 if (propertyName == null || propertyName.equals("") || literal == null) {
                      throw new CstlServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
-                                                   MISSING_PARAMETER_VALUE, "propertyIsEqualTo");
+                                                   INVALID_PARAMETER_VALUE, "propertyIsEqualTo"); // cite test
                 }
 
 
