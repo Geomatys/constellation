@@ -330,11 +330,6 @@
 
       <!-- Geotoolkit version -->
       <dependency>
-        <groupId>org.geotoolkit.project</groupId>
-        <artifactId>geotk-test</artifactId>
-        <version>${geotoolkit.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.geotoolkit</groupId>
         <artifactId>geotk-metadata</artifactId>
         <version>${geotoolkit.version}</version>

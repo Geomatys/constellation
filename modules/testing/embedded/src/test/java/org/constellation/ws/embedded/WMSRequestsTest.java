@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009-2010, Geomatys
+ *    (C) 2009, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -32,14 +32,13 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.register.RegisterException;
-import org.constellation.test.ImageTesting;
+import org.constellation.test.Commons;
 import org.constellation.ws.ServiceExceptionReport;
 
 // Geotoolkit dependencies
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
-import org.geotoolkit.test.Commons;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v111.Layer;
 import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
@@ -61,7 +60,7 @@ import static org.junit.Assume.*;
  */
 public class WMSRequestsTest extends AbstractGrizzlyServer {
 
-    private long SST_CHECKSUM;
+    private static final long SST_CHECKSUM = 1472385698L;
 
     private static MarshallerPool pool;
 
@@ -162,10 +161,9 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
-        assertTrue  (!(ImageTesting.isImageEmpty(image)));
-        assertEquals(1024, image.getWidth());
-        assertEquals(512,  image.getHeight());
-        assertEquals(SST_CHECKSUM, Commons.checksum(image));
+        assertEquals(image.getWidth(), 1024);
+        assertEquals(image.getHeight(), 512);
+        assertEquals(Commons.checksum(image), SST_CHECKSUM);
     }
 
     /**
@@ -202,7 +200,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         final Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST);
 
         assertNotNull(layer);
-        assertEquals("EPSG:4326", layer.getSRS().get(0));
+        assertEquals(layer.getSRS().get(0), "EPSG:4326");
         final LatLonBoundingBox bboxGeo = (LatLonBoundingBox) layer.getLatLonBoundingBox();
         assertTrue(bboxGeo.getWestBoundLongitude() == -180d);
         assertTrue(bboxGeo.getSouthBoundLatitude() ==  -90d);
@@ -272,9 +270,9 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         final BufferedImage image = getImageFromURL(getLegendUrl, "image/png");
 
         // Test on the returned image.
-        assertTrue  (!(ImageTesting.isImageEmpty(image)));
-        assertEquals(200, image.getWidth());
-        assertEquals(40,  image.getHeight());
+        assertEquals(image.getWidth(), 200);
+        assertEquals(image.getHeight(), 40);
+        assertEquals(Commons.isImageEmpty(image), false);
     }
 
     /**
@@ -311,7 +309,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         assertFalse(layerDescs.isEmpty());
         final List<TypeNameType> typeNames = layerDescs.get(0).getTypeName();
         assertFalse(typeNames.isEmpty());
-        assertEquals(LAYER_TEST, typeNames.get(0).getCoverageName());
+        assertEquals(typeNames.get(0).getCoverageName(), LAYER_TEST);
     }
 
     /**
