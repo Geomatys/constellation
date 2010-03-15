@@ -566,6 +566,10 @@ public class WFSService extends OGCWebService {
         String featureId = getParameter("featureid", false);
         boolean mandatory = true;
         if (featureId != null) {
+            //cite test fix
+            if (featureId.endsWith(",")) {
+                featureId = featureId.substring(0, featureId.length() - 1);
+            }
             mandatory = false;
         }
 
