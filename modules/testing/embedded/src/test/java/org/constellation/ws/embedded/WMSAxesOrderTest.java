@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -23,14 +23,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 // Constellation dependencies
-import javax.swing.ImageIcon;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.register.RegisterException;
-import org.constellation.test.Commons;
+import org.constellation.test.ImageTesting;
+
+// Geotoolkit.org dependencies
+import org.geotoolkit.test.Commons;
 
 // JUnit dependencies
 import org.junit.*;
@@ -139,8 +138,10 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         final BufferedImage image130 = getImageFromURL(getMap130Url, "image/png");
 
         // Test on the returned image.
-        assertEquals(image111.getWidth(), 1024);
-        assertEquals(image111.getHeight(), 512);
+        assertTrue  (!(ImageTesting.isImageEmpty(image111)));
+        assertTrue  (!(ImageTesting.isImageEmpty(image130)));
+        assertEquals(1024, image111.getWidth());
+        assertEquals(512,  image111.getHeight());
         assertEquals(Commons.checksum(image111), Commons.checksum(image130));
         // TODO: retrieve the right colors.
         //assertEquals(Commons.checksum(image130), 2274939253L);
@@ -172,8 +173,9 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
-        assertEquals(image.getWidth(), 1024);
-        assertEquals(image.getHeight(), 512);
+        assertTrue  (!(ImageTesting.isImageEmpty(image)));
+        assertEquals(1024, image.getWidth());
+        assertEquals(512,  image.getHeight());
     }
 
     /**
@@ -198,9 +200,10 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
-        assertEquals(image.getWidth(), 1024);
-        assertEquals(image.getHeight(), 512);
-        assertEquals(Commons.checksum(image), SST_CHECKSUM);
+        assertTrue  (!(ImageTesting.isImageEmpty(image)));
+        assertEquals(1024, image.getWidth());
+        assertEquals(512,  image.getHeight());
+        assertEquals(SST_CHECKSUM, Commons.checksum(image));
     }
 
     /**
@@ -228,9 +231,9 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
-        assertEquals(image.getWidth(), 512);
-        assertEquals(image.getHeight(), 1024);
-        assertTrue  (!(Commons.isImageEmpty(image)));
+        assertTrue  (!(ImageTesting.isImageEmpty(image)));
+        assertEquals(512,  image.getWidth());
+        assertEquals(1024, image.getHeight());
         // Here we have to ensure that the axis order should be lat,long in the GetMap request.
         // So with that axes order, the image should be the same than the one done in GetMap
         // version 1.1.1 with axes order long,lat.
@@ -259,9 +262,10 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
-        assertEquals(image.getWidth(), 1024);
-        assertEquals(image.getHeight(), 512);
-        assertEquals(Commons.checksum(image), SST_CHECKSUM);
+        assertTrue  (!(ImageTesting.isImageEmpty(image)));
+        assertEquals(1024, image.getWidth());
+        assertEquals(512,  image.getHeight());
+        assertEquals(SST_CHECKSUM, Commons.checksum(image));
     }
 
     /**
@@ -289,12 +293,12 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
         final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
-        assertEquals(image.getWidth(), 1024);
-        assertEquals(image.getHeight(), 512);
-        assertTrue  (!(Commons.isImageEmpty(image)));
+        assertTrue  (!(ImageTesting.isImageEmpty(image)));
+        assertEquals(1024, image.getWidth());
+        assertEquals(512,  image.getHeight());
         // Here we have to ensure that the axis order should be lat,long in the GetMap request.
         // So with that axes order, the image should be the same than the one done in GetMap
         // version 1.1.1 with axes order long,lat.
-        assertEquals(Commons.checksum(image), SST_CHECKSUM);
+        assertEquals(SST_CHECKSUM, Commons.checksum(image));
     }
 }

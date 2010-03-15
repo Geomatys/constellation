@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -19,65 +19,25 @@ package org.constellation.test;
 // J2SE dependencies
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
-import java.awt.image.DataBufferByte;
 import java.awt.image.Raster;
 import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
-import java.util.zip.CRC32;
+import java.util.HashSet;
+import java.util.Set;
 import javax.media.jai.operator.AffineDescriptor;
-
-// JUnit dependencies
-import static org.junit.Assert.*;
 
 
 /**
- * Regroups static methods from <strong>Geotidy</strong>, developped by Martin Desruisseaux.
- * Those methods will be used in the Constellation tests.
- *
- * TODO: delete methods copied from Geotidy when moving to this one for Constellation.
- *
- * @version $Id$
+ * Regroups static methods for image verification in JUnit tests.
  *
  * @author Cédric Briançon (Geomatys)
  * @author Martin Desruisseaux (Geomatys)
  *
  * @since 0.3
  */
-public final class Commons {
+public final class ImageTesting {
 
-    private Commons() {}
-
-    /**
-     * Computes the checksum on pixels of the given image. Current implementation assumes that
-     * the data type are {@link DataBuffer#TYPE_BYTE}. Note that this computation is sensitive
-     * to image tiling, if there is any.
-     *
-     * TODO: this method comes from Geotidy (module build/tools/gt-test), and has to be removed
-     *       when moving to the Geotidy source code for Constellation.
-     *
-     * @param  image The image for which to compute the checksum.
-     * @return The checksum of the given image.
-     */
-    public static long checksum(final RenderedImage image) {
-        assertEquals("Current implementation requires byte data type.",
-                DataBuffer.TYPE_BYTE, image.getSampleModel().getDataType());
-        final CRC32 sum = new CRC32();
-        int ty = image.getMinTileY();
-        for (int ny=image.getNumYTiles(); --ny>=0; ty++) {
-            int tx = image.getMinTileX();
-            for (int nx=image.getNumXTiles(); --nx>=0; tx++) {
-                final Raster raster = image.getTile(tx, ty);
-                final DataBufferByte buffer = (DataBufferByte) raster.getDataBuffer();
-                final int[] offsets = buffer.getOffsets();
-                final int size = buffer.getSize();
-                for (int i=0; i<offsets.length; i++) {
-                    sum.update(buffer.getData(i), offsets[i], size);
-                }
-            }
-        }
-        return sum.getValue();
-    }
+    private ImageTesting() {}
 
     /**
      * Verifies that a {@link BufferedImage} is empty or not.
@@ -97,6 +57,32 @@ public final class Commons {
             }
         }
         return true;
+    }
+
+    /**
+     * Returns the number of different colors present in a {@link BufferedImage}.
+     * The current implementation only do additions on the different values composing
+     * an RGB image, consequently
+     *
+     * @param image The input image.
+     * @return The number of different colors composing an image.
+     */
+    public static int getNumColors(final BufferedImage image) {
+        final Set<Integer> colors = new HashSet<Integer>();
+        final int nbBands = image.getSampleModel().getNumBands();
+        final int[] pixelValue = new int[nbBands];
+        final Raster raster = image.getData();
+        for (int x=0, nw=image.getWidth(); x<nw; x++) {
+            for (int y=0, nh=image.getHeight(); y<nh; y++) {
+                raster.getPixel(x, y, pixelValue);
+                int result = 0;
+                for (int b=0; b<nbBands; b++) {
+                    result += pixelValue[b];
+                }
+                colors.add(result);
+            }
+        }
+        return colors.size();
     }
 
     /**

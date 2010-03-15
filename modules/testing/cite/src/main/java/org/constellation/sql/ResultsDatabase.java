@@ -465,9 +465,7 @@ public final class ResultsDatabase {
      */
     private boolean isTestPresentInList(final Result test, final List<Result> tests) {
         for (Result currentTest : tests) {
-            if (currentTest.getDirectory().equals(test.getDirectory()) &&
-                currentTest.getId().equals(test.getId()))
-            {
+            if (currentTest.getId().equals(test.getId())) {
                 return true;
             }
         }
