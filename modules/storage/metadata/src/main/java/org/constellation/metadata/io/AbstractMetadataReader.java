@@ -44,12 +44,12 @@ public abstract class AbstractMetadataReader implements MetadataReader {
     /**
      * A flag indicating if the cache mecanism is enabled or not.
      */
-    private final boolean isCacheEnabled;
+    private boolean isCacheEnabled;
 
     /**
      * A flag indicating if the multi thread mecanism is enabled or not.
      */
-    private final boolean isThreadEnabled;
+    private boolean isThreadEnabled;
     
     /**
      * A map containing the metadata already extract from the database.
@@ -155,5 +155,19 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      */
     public void setLogLevel(Level LogLevel) {
         this.logLevel = LogLevel;
+    }
+
+    /**
+     * @param isCacheEnabled the isCacheEnabled to set
+     */
+    public void setIsCacheEnabled(boolean isCacheEnabled) {
+        this.isCacheEnabled = isCacheEnabled;
+    }
+
+    /**
+     * @param isThreadEnabled the isThreadEnabled to set
+     */
+    public void setIsThreadEnabled(boolean isThreadEnabled) {
+        this.isThreadEnabled = isThreadEnabled;
     }
 }

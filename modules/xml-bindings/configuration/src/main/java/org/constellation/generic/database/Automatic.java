@@ -60,7 +60,11 @@ public class Automatic {
 
     @XmlAttribute
     private String name;
+
+    private String enableThread;
     
+    private String enableCache;
+
     private String dataDirectory;
 
     private Queries queries;
@@ -227,6 +231,34 @@ public class Automatic {
         hash = 37 * hash + (this.queries != null ? this.queries.hashCode() : 0);
         hash = 37 * hash + (this.name != null ? this.name.hashCode() : 0);
         return hash;
+    }
+
+    /**
+     * @return the enableThread
+     */
+    public String getEnableThread() {
+        return enableThread;
+    }
+
+    /**
+     * @param enableThread the enableThread to set
+     */
+    public void setEnableThread(String enableThread) {
+        this.enableThread = enableThread;
+    }
+
+    /**
+     * @return the enablecache
+     */
+    public String getEnableCache() {
+        return enableCache;
+    }
+
+    /**
+     * @param enablecache the enablecache to set
+     */
+    public void setEnablecache(String enableCache) {
+        this.enableCache = enableCache;
     }
 
 

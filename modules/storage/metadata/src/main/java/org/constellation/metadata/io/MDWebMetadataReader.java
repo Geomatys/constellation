@@ -180,6 +180,22 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                                            "cause:" + ex.getMessage());
         }
 
+        if (configuration.getEnableThread() != null && !configuration.getEnableThread().isEmpty()) {
+            boolean t = Boolean.parseBoolean(configuration.getEnableThread());
+            if (t) {
+                LOGGER.info("parralele treatment enabled");
+            }
+            setIsThreadEnabled(t);
+        }
+
+        if (configuration.getEnableCache() != null && !configuration.getEnableCache().isEmpty()) {
+            boolean c = Boolean.parseBoolean(configuration.getEnableCache());
+            if (!c) {
+                LOGGER.info("cache system have been disabled");
+            }
+            setIsCacheEnabled(c);
+        }
+
         initPackage();
         this.classBinding       = initClassBinding(configuration.getConfigurationDirectory());
         this.alreadyRead        = new HashMap<Value, Object>();
