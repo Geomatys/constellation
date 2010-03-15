@@ -2023,10 +2023,13 @@ public class SOSworker {
         try {
             if (dbId != null && physicalID != null) {
                 map.setProperty(physicalID, dbId);
-                final File mappingFile     = new File(getConfigDirectory(), "mapping.properties");
-                final FileOutputStream out = new FileOutputStream(mappingFile);
-                map.store(out, "");
-                out.close();
+                File configDirectory = getConfigDirectory();
+                if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
+                    final File mappingFile     = new File(getConfigDirectory(), "mapping.properties");
+                    final FileOutputStream out = new FileOutputStream(mappingFile);
+                    map.store(out, "");
+                    out.close();
+                }
             }
 
         } catch (FileNotFoundException ex) {
