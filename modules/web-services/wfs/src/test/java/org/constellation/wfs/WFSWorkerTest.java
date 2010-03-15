@@ -1171,6 +1171,9 @@ public class WFSWorkerTest {
         if (styleJar == null || !styleJar.exists()) {
             throw new IOException("Unable to find the style folder: "+ styleJar);
         }
+        if (styleJar.isDirectory()) {
+            return styleJar;
+        }
         final InputStream in = new FileInputStream(styleJar);
         final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
         final File outputDir = new File(tmpDir, "Constellation");

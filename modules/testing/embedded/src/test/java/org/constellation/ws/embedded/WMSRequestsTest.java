@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.register.RegisterException;
-import org.constellation.test.Commons;
+import org.constellation.test.ImageTesting;
 import org.constellation.ws.ServiceExceptionReport;
 
 // Geotoolkit dependencies
@@ -59,8 +59,6 @@ import static org.junit.Assume.*;
  * @since 0.3
  */
 public class WMSRequestsTest extends AbstractGrizzlyServer {
-
-    private static final long SST_CHECKSUM = 1472385698L;
 
     private static MarshallerPool pool;
 
@@ -161,9 +159,10 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         final BufferedImage image = getImageFromURL(getMapUrl, "image/png");
 
         // Test on the returned image.
-        assertEquals(image.getWidth(), 1024);
-        assertEquals(image.getHeight(), 512);
-        assertEquals(Commons.checksum(image), SST_CHECKSUM);
+        assertTrue  (!(ImageTesting.isImageEmpty(image)));
+        assertEquals(1024, image.getWidth());
+        assertEquals(512,  image.getHeight());
+        assertTrue  (ImageTesting.getNumColors(image) > 8);
     }
 
     /**
@@ -200,7 +199,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         final Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST);
 
         assertNotNull(layer);
-        assertEquals(layer.getSRS().get(0), "EPSG:4326");
+        assertEquals("EPSG:4326", layer.getSRS().get(0));
         final LatLonBoundingBox bboxGeo = (LatLonBoundingBox) layer.getLatLonBoundingBox();
         assertTrue(bboxGeo.getWestBoundLongitude() == -180d);
         assertTrue(bboxGeo.getSouthBoundLatitude() ==  -90d);
@@ -270,9 +269,9 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         final BufferedImage image = getImageFromURL(getLegendUrl, "image/png");
 
         // Test on the returned image.
-        assertEquals(image.getWidth(), 200);
-        assertEquals(image.getHeight(), 40);
-        assertEquals(Commons.isImageEmpty(image), false);
+        assertTrue  (!(ImageTesting.isImageEmpty(image)));
+        assertEquals(200, image.getWidth());
+        assertEquals(40,  image.getHeight());
     }
 
     /**
@@ -309,7 +308,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         assertFalse(layerDescs.isEmpty());
         final List<TypeNameType> typeNames = layerDescs.get(0).getTypeName();
         assertFalse(typeNames.isEmpty());
-        assertEquals(typeNames.get(0).getCoverageName(), LAYER_TEST);
+        assertEquals(LAYER_TEST, typeNames.get(0).getCoverageName());
     }
 
     /**

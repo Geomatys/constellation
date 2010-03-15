@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.register.RegisterException;
-import org.constellation.test.Commons;
+import org.constellation.test.ImageTesting;
 import org.constellation.ws.ServiceExceptionReport;
 
 // Geotoolkit dependencies
@@ -58,8 +58,6 @@ import static org.junit.Assume.*;
  */
 public class WCSRequestsTest extends AbstractGrizzlyServer {
     private static MarshallerPool pool;
-
-    private static final long SST_CHECKSUM = 855939187L;
 
     /**
      * URLs which will be tested on the server.
@@ -127,7 +125,6 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         final Object obj = unmarshaller.unmarshal(in);
         in.close();
         pool.release(unmarshaller);
-        System.out.println(obj.getClass());
         assertTrue(obj instanceof ServiceExceptionReport);
     }
 
@@ -153,12 +150,10 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         final BufferedImage image = getImageFromURL(getCoverageUrl, "image/png");
 
         // Test on the returned image.
-        assertEquals(image.getWidth(), 1024);
-        assertEquals(image.getHeight(), 512);
-        // The checksum value should be the same as the checksum on the same image produced by
-        // a getMap request. It is strange but they are slightly different, even if for the user
-        // both images are identical.
-        assertEquals(Commons.checksum(image), SST_CHECKSUM);
+        assertFalse (ImageTesting.isImageEmpty(image));
+        assertEquals(1024, image.getWidth());
+        assertEquals(512,  image.getHeight());
+        assertTrue  (ImageTesting.getNumColors(image) > 8);
     }
 
     /**
@@ -280,8 +275,8 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         final CoverageDescription responseDesc = (CoverageDescription)obj;
         assertNotNull(responseDesc);
         final List<CoverageOfferingType> coverageOffs = responseDesc.getCoverageOffering();
-        assertFalse(coverageOffs.isEmpty());
-        assertEquals(coverageOffs.get(0).getRest().get(1).getValue(), LAYER_TEST);
+        assertFalse (coverageOffs.isEmpty());
+        assertEquals(LAYER_TEST, coverageOffs.get(0).getRest().get(1).getValue());
         // TODO: add more tests on returned XML doc
     }
 
