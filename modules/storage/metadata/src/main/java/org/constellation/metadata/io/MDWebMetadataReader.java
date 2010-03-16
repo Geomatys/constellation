@@ -21,6 +21,7 @@ package org.constellation.metadata.io;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -35,7 +36,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.logging.Level;
 import javax.measure.unit.Unit;
 import javax.xml.namespace.QName;
 
@@ -141,6 +144,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     private List<String> classeNotFound;
 
+    private boolean storeMapping;
+
     /**
      * Build a new metadata Reader.
      * 
@@ -183,7 +188,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         if (configuration.getEnableThread() != null && !configuration.getEnableThread().isEmpty()) {
             boolean t = Boolean.parseBoolean(configuration.getEnableThread());
             if (t) {
-                LOGGER.info("parralele treatment enabled");
+                LOGGER.info("parrallele treatment enabled");
             }
             setIsThreadEnabled(t);
         }
@@ -194,6 +199,14 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 LOGGER.info("cache system have been disabled");
             }
             setIsCacheEnabled(c);
+        }
+
+        if (configuration.getStoreMapping() != null && !configuration.getStoreMapping().isEmpty()) {
+            boolean m = Boolean.parseBoolean(configuration.getStoreMapping());
+            if (m) {
+                LOGGER.info("mapping storage enabled");
+            }
+            storeMapping = m;
         }
 
         initPackage();
@@ -266,7 +279,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             prop.load(in);
             in.close();
 
-            for(Object className : prop.keySet()) {
+            LOGGER.info("loading classe mapping");
+            for (Object className : prop.keySet()) {
                 try {
                     final Class c = Class.forName(prop.getProperty((String)className));
                     result.put((String)className, c);
@@ -909,11 +923,39 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     public void destroy() {
         try {
             mdReader.close();
+            if (storeMapping) {
+                storeClassBinding();
+            }
             classBinding.clear();
             alreadyRead.clear();
         } catch (MD_IOException ex) {
             LOGGER.severe("SQL Exception while destroying MDWeb MetadataReader");
         }
+    }
+
+    private void storeClassBinding() {
+        FileOutputStream out = null;
+        try {
+            // todo find where to write this file
+            final File bindingFile = new File("classMapping.properties");
+            out = new FileOutputStream(bindingFile);
+            final Properties prop = new Properties();
+            for (Entry<String, Class> entry : classBinding.entrySet()) {
+                prop.put(entry.getKey(), entry.getValue().getName());
+            }
+            LOGGER.info("stored " + classBinding.size() + " classes in classMapping.properties");
+            prop.store(out, "save at reader destroy");
+
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                out.close();
+            } catch (IOException ex) {
+                LOGGER.log(Level.SEVERE, null, ex);
+            }
+        }
+
     }
 
     @Override

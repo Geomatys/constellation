@@ -65,6 +65,8 @@ public class Automatic {
     
     private String enableCache;
 
+    private String storeMapping;
+
     private String dataDirectory;
 
     private Queries queries;
@@ -259,6 +261,20 @@ public class Automatic {
      */
     public void setEnablecache(String enableCache) {
         this.enableCache = enableCache;
+    }
+
+    /**
+     * @return the storeMapping
+     */
+    public String getStoreMapping() {
+        return storeMapping;
+    }
+
+    /**
+     * @param storeMapping the storeMapping to set
+     */
+    public void setStoreMapping(String storeMapping) {
+        this.storeMapping = storeMapping;
     }
 
 
