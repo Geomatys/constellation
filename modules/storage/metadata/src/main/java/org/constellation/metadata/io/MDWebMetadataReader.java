@@ -144,7 +144,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      */
     private List<String> classeNotFound;
 
-    private boolean storeMapping;
+    private boolean storeMapping = false;
 
     /**
      * Build a new metadata Reader.
@@ -316,12 +316,14 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         
         //we parse the identifier (Form_ID:RecordSet_Code)
         try  {
-            if (identifier.indexOf(':') != -1) {
-                recordSetCode  = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
-                identifier   = identifier.substring(0, identifier.indexOf(':'));
-                id           = Integer.parseInt(identifier);
+            int semiColonIndex = identifier.indexOf(':');
+            if (semiColonIndex != -1) {
+
+                recordSetCode = identifier.substring(semiColonIndex + 1);
+                identifier    = identifier.substring(0, semiColonIndex);
+                id            = Integer.parseInt(identifier);
             } else {
-                throw new NumberFormatException();
+                throw new NumberFormatException("The identifer must follow the pattern Form_ID:RecordSet_Code");
             }
             
         } catch (NumberFormatException e) {
@@ -337,7 +339,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
             if (result == null) {
                 final Form f = mdReader.getForm(recordSet, id);
-                result = getObjectFromForm(identifier, f, mode);
+                result       = getObjectFromForm(identifier, f, mode);
             } else {
                 LOGGER.finer("getting from cache: " + identifier);
             }
@@ -364,7 +366,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             final Object result  = getObjectFromValue(form, topValue, mode);
             
             //we put the full object in the already read metadatas.
-            if (result != null) {
+            if (result != null && isCacheEnabled()) {
                addInCache(identifier, result);
             }
             return result;
@@ -754,19 +756,19 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         String className    = type.getName();
         String standardName = type.getStandard().getName();
 
-        Class result = classBinding.get(standardName + ':' + className);
+        final String classNameSave = standardName + ':' + className;
+
+        Class result = classBinding.get(classNameSave);
         if (result == null) {
-            LOGGER.finer("search for class " + className);
+            LOGGER.info("search for class " + classNameSave);
         } else {
             return result;
         }
         
-        final String classNameSave = standardName + ':' + className;
-        
         //for the primitive type we return java primitive type
         result = getPrimitiveTypeFromName(className, standardName);
         if (result != null) {
-            classBinding.put(standardName + ':' + className, result);
+            classBinding.put(classNameSave, result);
             return result;
         }
 
@@ -822,7 +824,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             else if (className.equals("ReferenceSystemMetadata"))
                 packageName = "org.geotoolkit.internal.jaxb.metadata";
             
-            String name = className;
+            String name  = className;
             int nameType = 0;
             while (nameType < 10) {
                 try {
@@ -830,7 +832,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     result = Class.forName(packageName + '.' + name);
                     
                     //if we found the class we store and return it
-                    classBinding.put(standardName + ':' + className, result);
+                    classBinding.put(classNameSave, result);
                     LOGGER.finer("class found:" + packageName + '.' + name);
                     return result;
 

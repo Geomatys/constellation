@@ -121,8 +121,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * @param metadata The object to put in cache.
      */
     protected void addInCache(String identifier,  Object metadata) {
-        if (isCacheEnabled)
-            metadatas.put(identifier, metadata);
+        metadatas.put(identifier, metadata);
     }
     
     /**

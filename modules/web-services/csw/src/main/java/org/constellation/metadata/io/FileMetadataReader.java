@@ -169,7 +169,9 @@ public class FileMetadataReader extends AbstractCSWMetadataReader {
                 if (metadata instanceof JAXBElement) {
                     metadata = ((JAXBElement) metadata).getValue();
                 }
-                addInCache(identifier, metadata);
+                if (isCacheEnabled()) {
+                    addInCache(identifier, metadata);
+                }
                 return metadata;
             } catch (JAXBException ex) {
                 throw new MetadataIoException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
@@ -520,7 +522,9 @@ public class FileMetadataReader extends AbstractCSWMetadataReader {
                     if (metadata instanceof JAXBElement) {
                         metadata = ((JAXBElement) metadata).getValue();
                     }
-                    addInCache(identifier, metadata);
+                    if (isCacheEnabled()) {
+                        addInCache(identifier, metadata);
+                    }
                     results.add(metadata);
                 } catch (JAXBException ex) {
                     throw new MetadataIoException("The metadataFile : " + f.getPath() + " can not be unmarshalled" + "\n" +
