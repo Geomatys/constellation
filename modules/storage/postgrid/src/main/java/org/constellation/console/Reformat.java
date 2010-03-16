@@ -18,7 +18,6 @@
 package org.constellation.console;
 
 import java.io.*;
-import java.util.*;
 import javax.imageio.*;
 import javax.imageio.spi.*;
 import javax.imageio.stream.*;
@@ -29,6 +28,7 @@ import java.awt.geom.AffineTransform;
 
 import org.geotoolkit.console.Option;
 import org.geotoolkit.console.CommandLine;
+import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.resources.Errors;
 
@@ -114,12 +114,12 @@ public final class Reformat extends CommandLine implements FileFilter {
         }
         if (format != null) {
             Registry.setNativeCodecAllowed(format, ImageWriterSpi.class, false);
-            final Iterator<ImageWriter> it = ImageIO.getImageWritersByFormatName(format);
-            if (!it.hasNext()) {
+            try {
+                writer = XImageIO.getWriterByFormatName(format, null, null);
+            } catch (IOException ex) {
                 err.println(Errors.format(Errors.Keys.UNKNOWN_IMAGE_FORMAT_$1, format));
                 System.exit(ILLEGAL_ARGUMENT_EXIT_CODE);
             }
-            writer = it.next();
             final String[] suffixes = writer.getOriginatingProvider().getFileSuffixes();
             suffix = (suffixes != null && suffixes.length != 0) ? suffixes[0] : format;
         }
@@ -148,6 +148,12 @@ public final class Reformat extends CommandLine implements FileFilter {
             }
         }
         if (writer != null) {
+            try {
+                XImageIO.close(writer);
+            } catch (IOException ex) {
+                err.println(ex);
+                System.exit(IO_EXCEPTION_EXIT_CODE);
+            }
             writer.dispose();
             writer = null;
         }

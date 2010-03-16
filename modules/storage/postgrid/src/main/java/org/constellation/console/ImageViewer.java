@@ -20,7 +20,6 @@ package org.constellation.console;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.io.File;
 import java.io.Writer;
 import java.io.IOException;
@@ -34,12 +33,8 @@ import javax.swing.JFrame;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
-import javax.imageio.IIOException;
 import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.spi.ImageReaderSpi;
-import javax.imageio.spi.ImageWriterSpi;
-import javax.imageio.stream.ImageInputStream;
-import javax.imageio.stream.ImageOutputStream;
+import org.geotoolkit.image.io.XImageIO;
 
 import org.geotoolkit.image.io.metadata.GeographicMetadata;
 
@@ -117,33 +112,18 @@ public final class ImageViewer {
         if (dot < 0) {
             return ImageIO.read(file);
         }
-        final String extension = filename.substring(dot+1);
-        final Iterator<ImageReader> it = ImageIO.getImageReadersBySuffix(extension);
-        if (it != null) while (it.hasNext()) {
-            final ImageReader reader = it.next();
-            final ImageReaderSpi spi = reader.getOriginatingProvider();
-            final ImageInputStream input;
-            if (spi!=null && acceptFile(spi.getInputTypes())) {
-                reader.setInput(file);
-                input = null;
-            } else {
-                input = ImageIO.createImageInputStream(file);
-                reader.setInput(input);
+        final String extension = filename.substring(dot + 1);
+        final ImageReader reader = XImageIO.getReaderBySuffix(extension, file, true, true);
+        final RenderedImage image = reader.readAsRenderedImage(imageIndex, null);
+        XImageIO.close(reader);
+        if (out != null) {
+            final IIOMetadata metadata = reader.getImageMetadata(imageIndex);
+            if (metadata instanceof GeographicMetadata) {
+                out.write(metadata.toString());
             }
-            final RenderedImage image = reader.readAsRenderedImage(imageIndex, null);
-            if (out != null) {
-                final IIOMetadata metadata = reader.getImageMetadata(imageIndex);
-                if (metadata instanceof GeographicMetadata) {
-                    out.write(metadata.toString());
-                }
-            }
-            reader.dispose();
-            if (input != null) {
-                input.close();
-            }
-            return image;
         }
-        throw new IIOException("Can't find a decoder.");
+        reader.dispose();
+        return image;
     }
 
     /**
@@ -166,26 +146,11 @@ public final class ImageViewer {
             filename += ".png";
             file      = new File(file.getParentFile(), filename);
         }
-        final Iterator<ImageWriter> it = ImageIO.getImageWritersBySuffix(extension);
-        if (it!=null && it.hasNext()) {
-            final ImageWriter writer = it.next();
-            final ImageWriterSpi spi = writer.getOriginatingProvider();
-            final ImageOutputStream output;
-            if (spi!=null && acceptFile(spi.getOutputTypes())) {
-                writer.setOutput(file);
-                output = null;
-            } else {
-                output = ImageIO.createImageOutputStream(file);
-                writer.setOutput(output);
-            }
-            writer.write(image);
-            writer.dispose();
-            if (output != null) {
-                output.close();
-            }
-            return;
-        }
-        throw new IIOException("Can't find an encoder.");
+        final ImageWriter writer = XImageIO.getWriterBySuffix(extension, file, null);
+        writer.write(image);
+        XImageIO.close(writer);
+        writer.dispose();
+        return;
     }
 
     /**

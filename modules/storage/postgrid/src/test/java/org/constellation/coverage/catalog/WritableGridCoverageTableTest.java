@@ -22,9 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.Set;
-import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import org.junit.Test;
 
@@ -32,6 +30,7 @@ import org.constellation.catalog.Element;
 import org.constellation.catalog.TableTest;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.CatalogException;
+import org.geotoolkit.image.io.XImageIO;
 
 
 /**
@@ -70,10 +69,8 @@ public class WritableGridCoverageTableTest extends TableTest {
         final Layer layer = layers.getEntry(LayerTableTest.NETCDF_NAME);
         final Set<Series> series = layer.getSeries();
         assertEquals("Expected only one series in the layer.", 1, series.size());
-        final Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("NetCDF");
-        assertTrue("A NetCDF reader must be available.", readers.hasNext());
-        final ImageReader reader = readers.next();
-        reader.setInput(file);
+        final ImageReader reader = XImageIO.getReaderByFormatName("NetCDF", file, true, true);
+        assertNotNull("A NetCDF reader must be available.", reader);
 
         WritableGridCoverageTable table = database.getTable(WritableGridCoverageTable.class);
         try {
@@ -91,6 +88,7 @@ public class WritableGridCoverageTableTest extends TableTest {
         table = new WritableGridCoverageTable(table);
         table.setLayer(layer);
         table.addEntry(reader);
+        XImageIO.close(reader);
         reader.dispose();
     }
 }

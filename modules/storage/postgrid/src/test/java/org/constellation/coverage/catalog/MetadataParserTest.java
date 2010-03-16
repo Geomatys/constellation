@@ -18,8 +18,6 @@ package org.constellation.coverage.catalog;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
-import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import org.constellation.catalog.CatalogException;
 import org.junit.Test;
@@ -28,6 +26,7 @@ import org.geotoolkit.util.DateRange;
 
 import org.constellation.catalog.Element;
 import org.constellation.catalog.DatabaseTest;
+import org.geotoolkit.image.io.XImageIO;
 
 
 /**
@@ -57,10 +56,8 @@ public class MetadataParserTest extends DatabaseTest {
             Element.LOGGER.warning("Test file \"" + file + "\" not found.");
             return;
         }
-        final Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("NetCDF");
-        assertTrue("A NetCDF reader must be available.", readers.hasNext());
-        final ImageReader reader = readers.next();
-        reader.setInput(file);
+        final ImageReader reader = XImageIO.getReaderByFormatName("NetCDF", file, true, true);
+        assertTrue("A NetCDF reader must be available.", reader != null);
 
         final MetadataParser metadata = new MetadataParser(database, reader, 0);
         final DateRange[] dates = metadata.getDateRanges();
@@ -74,6 +71,7 @@ public class MetadataParserTest extends DatabaseTest {
         assertEquals(dateRange.getMinValue(), dateRange.getMaxValue());
         assertEquals(1181088000000L, dateRange.getMinValue().getTime()); // June 6, 2007.
 
+        XImageIO.close(reader);
         reader.dispose();
     }
 }

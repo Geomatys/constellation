@@ -26,13 +26,10 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 
 // Constellation dependencies
 import org.constellation.data.PostgridTestCase;
@@ -51,6 +48,8 @@ import org.constellation.provider.postgrid.PostGridProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.util.Util;
+import org.geotoolkit.image.io.XImageIO;
+import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.junit.*;
@@ -103,6 +102,7 @@ public abstract class AbstractGrizzlyServer extends PostgridTestCase {
          */
         grizzly = new GrizzlyThread();
 
+        WorldFileImageReader.Spi.registerDefaults(null);
         // Defines a PostGrid data provider
         final ProviderSource source = new ProviderSource();
         source.parameters.put(PostGridProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
@@ -245,16 +245,10 @@ public abstract class AbstractGrizzlyServer extends PostgridTestCase {
     protected static BufferedImage getImageFromURL(final URL url, final String mime) throws IOException {
         // Try to get the image from the url.
         final InputStream in = url.openStream();
-        final ImageInputStream iis = ImageIO.createImageInputStream(in);
-        final Iterator<ImageReader> irs = ImageIO.getImageReadersByMIMEType(mime);
-        if (!irs.hasNext()) {
-            return null;
-        }
-        final ImageReader ir = irs.next();
-        ir.setInput(iis, true, true);
-        final BufferedImage image = ir.read(0);
-        ir.dispose();
-        iis.close();
+        final ImageReader reader = XImageIO.getReaderByMIMEType(mime, in, true, true);
+        final BufferedImage image = reader.read(0);
+        XImageIO.close(reader);
+        reader.dispose();
         // For debugging, uncomment the JFrame creation and the Thread.sleep further,
         // in order to see the image in a popup.
 //        javax.swing.JFrame frame = new javax.swing.JFrame();
