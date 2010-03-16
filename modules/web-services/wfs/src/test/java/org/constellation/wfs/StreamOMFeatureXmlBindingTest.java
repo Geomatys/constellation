@@ -207,7 +207,8 @@ public class StreamOMFeatureXmlBindingTest {
 
             featureEquals(expFeature, resFeature);
         }
-
+        expIterator.close();
+        resIterator.close();
 
     }
 

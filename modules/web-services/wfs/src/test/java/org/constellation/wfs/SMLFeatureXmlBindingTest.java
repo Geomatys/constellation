@@ -92,7 +92,7 @@ public class SMLFeatureXmlBindingTest {
         while (fr.hasNext()) {
             fcoll.add(fr.next());
         }
-
+        fr.close();
     }
 
     @AfterClass
@@ -214,7 +214,8 @@ public class SMLFeatureXmlBindingTest {
 
             featureEquals(expFeature, resFeature);
         }
-
+        expIterator.close();
+        resIterator.close();
 
     }
 

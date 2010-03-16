@@ -84,7 +84,7 @@ public class OMFeatureXmlBindingTest {
         while (fr.hasNext()) {
             fcoll.add(fr.next());
         }
-
+        fr.close();
     }
 
     @AfterClass
@@ -208,7 +208,8 @@ public class OMFeatureXmlBindingTest {
 
             featureEquals(expFeature, resFeature);
         }
-
+        expIterator.close();
+        resIterator.close();
 
     }
 

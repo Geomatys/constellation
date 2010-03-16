@@ -244,6 +244,8 @@ public class StreamShapeFeatureXmlBindingTest {
 
             featureEquals(expFeature, resFeature);
         }
+        expIterator.close();
+        resIterator.close();
 
         featureReader.setFeatureType(fcollPolygons.getFeatureType());
         
@@ -265,7 +267,8 @@ public class StreamShapeFeatureXmlBindingTest {
 
             featureEquals(expFeature, resFeature);
         }
-
+        expIterator.close();
+        resIterator.close();
 
 
     }
