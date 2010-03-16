@@ -18,6 +18,7 @@
 package org.constellation.util;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
@@ -596,4 +597,19 @@ public final class ReflectionUtilities {
         }
         return null;
     }
+
+    public static Field getFieldFromName(String attribName, Class classe) {
+        Field field      = null;
+        Class tempClasse = classe;
+        while (field == null && tempClasse != null) {
+            try {
+                field = tempClasse.getDeclaredField(attribName);
+            } catch (NoSuchFieldException ex) {
+                field = null;
+            }
+            tempClasse = tempClasse.getSuperclass();
+        }
+        return field;
+    }
+
 }

@@ -1203,7 +1203,7 @@ public class CSWworkerTest {
     public void transactionUpdateTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
-        LOGGER.info("--- TRANSACTION UPDATE TEST ---");
+        LOGGER.info("\n\n--- TRANSACTION UPDATE TEST ---\n\n");
         /*
          *  TEST 1 : we update the metadata 42292_5p_19900609195600 by replacing it by another metadata
          */
@@ -1974,6 +1974,7 @@ public class CSWworkerTest {
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass());
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName());
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0));
+                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getName(), resVEx.getVerticalCRS().getCoordinateSystem().getName());
                         assertEquals(expVEx.getVerticalCRS().getCoordinateSystem(), resVEx.getVerticalCRS().getCoordinateSystem());
                         assertEquals(expVEx.getVerticalCRS().getDatum(), resVEx.getVerticalCRS().getDatum());
                         assertEquals(expVEx.getVerticalCRS(), resVEx.getVerticalCRS());

@@ -539,172 +539,170 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             alreadyRead.put(value, result);
         }
 
-        //if the result is a subClasses of MetaDataEntity
-        Map<String, Object> metaMap = null;
-        boolean isMeta  = false;
-        boolean wasMeta = false;
-        if (result instanceof MetadataEntity) {
-            final MetadataEntity meta = (MetadataEntity) result;
-            metaMap = meta.asMap();
-            isMeta  = true;
-            wasMeta = true;
-        }
+        if (result != null) {
+            //if the result is a subClasses of MetaDataEntity
+            Map<String, Object> metaMap = null;
+            boolean isMeta  = false;
+            if (result instanceof MetadataEntity) {
+                final MetadataEntity meta = (MetadataEntity) result;
+                metaMap = meta.asMap();
+                isMeta  = true;
+            }
 
-        // then we search the setter for all the child value
-        for (Value childValue : form.getValues()) {
-            
-            final Path path = childValue.getPath();
+            // then we search the setter for all the child value
+            for (Value childValue : form.getValues()) {
 
-            if (childValue.getParent()!= null && childValue.getParent().equals(value)) {
-                LOGGER.finer("new childValue:" + path.getName());
+                final Path path = childValue.getPath();
 
-                // we get the object from the child Value
-                final Object param = getObjectFromValue(form, childValue, mode);
-                if (param == null) {
-                    continue;
-                }
-                //we try to put the parameter in the parent object
-                // by searching for the good attribute name
-                boolean tryAgain = true;
-                String attribName = path.getName();
+                if (childValue.getParent()!= null && childValue.getParent().equals(value)) {
+                    LOGGER.finer("new childValue:" + path.getName());
 
-                if (mode != SENSORML) {
-                    //special case due to a bug in mdweb
-                    if (attribName.startsWith("geographicElement")) {
-                        attribName = "geographicElements";
-                    } else if (attribName.equals("transformationParameterAvailability")) {
-                        attribName = "transformationParameterAvailable";
-                    } else if (attribName.equals("beginPosition")) {
-                        attribName = "begining";
-                    } else if (attribName.equals("endPosition")) {
-                        attribName = "ending";
-                    } else if (attribName.equals("value") && classe.getSimpleName().equals("DefaultPosition")) {
-                        attribName = "position";
+                    // we get the object from the child Value
+                    final Object param = getObjectFromValue(form, childValue, mode);
+                    if (param == null) {
+                        continue;
+                    } 
+                    //we try to put the parameter in the parent object
+                    // by searching for the good attribute name
+                    String attribName = path.getName();
+
+                    if (mode != SENSORML) {
+                        //special case due to a bug in mdweb
+                        if (attribName.startsWith("geographicElement")) {
+                            attribName = "geographicElements";
+                        } else if (attribName.equals("transformationParameterAvailability")) {
+                            attribName = "transformationParameterAvailable";
+                        } else if (attribName.equals("beginPosition")) {
+                            attribName = "begining";
+                        } else if (attribName.equals("endPosition")) {
+                            attribName = "ending";
+                        } else if (attribName.equals("value") && classe.getSimpleName().equals("DefaultPosition")) {
+                            attribName = "position";
+                        } else if (attribName.equalsIgnoreCase("verticalCSProperty")) {
+                            attribName = "coordinateSystem";
+                        } else if (attribName.equalsIgnoreCase("verticalDatumProperty")) {
+                            attribName = "datum";
+                        } else if (attribName.equalsIgnoreCase("axisDirection")) {
+                            attribName = "direction";
+                        } else if (attribName.equalsIgnoreCase("axisAbbrev")) {
+                            attribName = "abbreviation";
+                        } else if (attribName.equalsIgnoreCase("uom")) {
+                            attribName = "unit";
+                        } else if (attribName.equalsIgnoreCase("codeSpace")) {
+                            attribName = "codespace";
+                        }
                     }
-                }
 
-                int casee = 0;
-                while (tryAgain) {
-                    try {
+                    boolean putSuceed = false;
+                    if (isMeta) {
+                          putSuceed = putMeta(metaMap, attribName, param, result, path);
+                    }
 
-                        //LOGGER.finer("PUT " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
-                        if (isMeta) {
-                              metaMap.put(attribName, param);
+                    if (!putSuceed) {
+                        final Method setter = ReflectionUtilities.getSetterFromName(attribName, param.getClass(), classe);
+                        
+                        if (setter != null) {
+                            ReflectionUtilities.invokeMethod(setter, result, param);
                         } else {
-                            final Method setter = ReflectionUtilities.getSetterFromName(attribName, param.getClass(), classe);
-                            if (setter != null && result != null) {
-                                ReflectionUtilities.invokeMethod(setter, result, param);
+
+                            if (mode != SENSORML  && attribName.equalsIgnoreCase("identifier")) {
+                                attribName = "name";
+                            }
+                            Field field = ReflectionUtilities.getFieldFromName(attribName, classe);
+
+                            if (field != null) {
+                                setFieldToValue(field, attribName, result, param);
                             } else {
-                                
-                                if (mode != SENSORML) {
-                                     // special case for geootoolkit referencing
-                                    if (attribName.equalsIgnoreCase("identifier")) {
-                                        attribName = "name";
-                                    } else if (attribName.equalsIgnoreCase("verticalCSProperty")) {
-                                        attribName = "coordinateSystem";
-                                    } else if (attribName.equalsIgnoreCase("verticalDatumProperty")) {
-                                        attribName = "datum";
-                                    } else if (attribName.equalsIgnoreCase("axisDirection")) {
-                                        attribName = "direction";
-                                    } else if (attribName.equalsIgnoreCase("axisAbbrev")) {
-                                        attribName = "abbreviation";
-                                    } else if (attribName.equalsIgnoreCase("uom")) {
-                                        attribName = "unit";
-                                    } else if (attribName.equalsIgnoreCase("codeSpace")) {
-                                        attribName = "codespace";
-                                    }
-                                }
-
-                                Field field      = null;
-                                Class tempClasse = classe;
-                                while (field == null && tempClasse != null) {
-                                    try {
-                                        field = tempClasse.getDeclaredField(attribName);
-                                    } catch (NoSuchFieldException ex) {
-                                        field = null;
-                                    }
-                                    tempClasse = tempClasse.getSuperclass();
-                                }
-                                if (field != null && result != null) {
-                                    field.setAccessible(true);
-                                    try {
-                                        if (attribName.equals("axis")) {
-                                            final CoordinateSystemAxis[] params = new CoordinateSystemAxis[1];
-                                            params[0] = (CoordinateSystemAxis) param;
-                                            field.set(result, params);
-                                        } else if (field.getType().isArray()) {
-                                          // todo find how to build a typed array
-                                            final Object[] params = new Object[1];
-                                            params[0] = param;
-                                            field.set(result, params);
-                                        
-                                        } else if (field.getType().equals(Unit.class)) {
-
-                                            final Unit<?> unit = Unit.valueOf((String)param);
-                                            field.set(result, unit);
-                                        } else {
-                                            field.set(result, param);
-                                        }
-                                    } catch (IllegalAccessException ex) {
-                                        LOGGER.severe("error while setting the parameter:" + param + "\n to the field:" + field + ":" + ex.getMessage());
-                                    } catch (IllegalArgumentException ex) {
-                                        String objectStr = "null";
-                                        if (param != null) {
-                                            try {
-                                                objectStr = param.toString();
-                                            } catch (UnformattableObjectException ex2) {
-                                                objectStr = "(unformattableObject) " + param.getClass().getSimpleName();
-                                            }
-                                        }
-                                        LOGGER.severe("IllegalArgumentException:" + ex.getMessage() + '\n' +
-                                                      "while setting the parameter: " + objectStr   + '\n' +
-                                                      "to the field: " + field + ".");
-                                    }
-                                } else {
-                                    LOGGER.warning("no field " + attribName + " in class:" + classe.getName());
-                                }
+                                LOGGER.warning("no field " + attribName + " in class:" + classe.getName());
                             }
                         }
-                        tryAgain = false;
-                    } catch (IllegalArgumentException e) {
-                        LOGGER.finer(e.getMessage());
-                        switch (casee) {
-
-                            case 0:
-                                if (attribName.charAt(attribName.length() - 1) == 'y') {
-                                    attribName = path.getName().substring(0, attribName.length() - 1);
-                                    attribName = attribName + "ies";
-                                } else {
-                                    attribName = path.getName() + 's';
-                                }
-                                casee = 1;
-                                break;
-
-                            case 1:
-                                attribName = path.getName() + "es";
-                                casee = 2;
-                                break;
-                            case 2:
-                                attribName = path.getName();
-                                casee      = 3;
-                                isMeta = false;
-                                break;
-                            default:
-                                
-                                LOGGER.severe("unable to put " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
-                                tryAgain = false;
-                        }
-                    } catch (ClassCastException ex) {
-                        LOGGER.severe("Exception while putting in geotoolkit metadata: " + '\n' +
-                                      "cause: " + ex.getMessage());
-                        tryAgain = false;
                     }
                 }
-                if (wasMeta)
-                    isMeta = true;
             }
         }
         return result;
+    }
+
+
+    private boolean putMeta(Map<String, Object> metaMap, String attribName, Object param, Object result, Path path) {
+        boolean tryAgain = true;
+        int casee = 0;
+        while (tryAgain) {
+            try {
+                metaMap.put(attribName, param);
+                tryAgain = false;
+                return true;
+            } catch (IllegalArgumentException e) {
+                LOGGER.finer(e.getMessage());
+                switch (casee) {
+
+                    case 0:
+                        if (attribName.charAt(attribName.length() - 1) == 'y') {
+                            attribName = path.getName().substring(0, attribName.length() - 1);
+                            attribName = attribName + "ies";
+                        } else {
+                            attribName = path.getName() + 's';
+                        }
+                        casee = 1;
+                        break;
+
+                    case 1:
+                        attribName = path.getName() + "es";
+                        casee = 2;
+                        break;
+                    case 2:
+                        attribName = path.getName();
+                        casee = 3;
+                        break;
+                    default:
+
+                        LOGGER.severe("unable to put " + attribName + " type " + param.getClass().getName() + " in class: " + result.getClass().getName());
+                        tryAgain = false;
+                }
+            } catch (ClassCastException ex) {
+                LOGGER.severe("Exception while putting in geotoolkit metadata: " + '\n'
+                        + "cause: " + ex.getMessage());
+                tryAgain = false;
+            }
+        }
+        return false;
+    }
+
+    private void setFieldToValue(Field field, String attribName, Object result, Object param) {
+        field.setAccessible(true);
+        try {
+            if (attribName.equals("axis")) {
+                final CoordinateSystemAxis[] params = new CoordinateSystemAxis[1];
+                params[0] = (CoordinateSystemAxis) param;
+                field.set(result, params);
+            } else if (field.getType().isArray()) {
+                // todo find how to build a typed array
+                final Object[] params = new Object[1];
+                params[0] = param;
+                field.set(result, params);
+
+            } else if (field.getType().equals(Unit.class)) {
+
+                final Unit<?> unit = Unit.valueOf((String) param);
+                field.set(result, unit);
+            } else {
+                field.set(result, param);
+            }
+        } catch (IllegalAccessException ex) {
+            LOGGER.severe("error while setting the parameter:" + param + "\n to the field:" + field + ":" + ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            String objectStr = "null";
+            if (param != null) {
+                try {
+                    objectStr = param.toString();
+                } catch (UnformattableObjectException ex2) {
+                    objectStr = "(unformattableObject) " + param.getClass().getSimpleName();
+                }
+            }
+            LOGGER.severe("IllegalArgumentException:" + ex.getMessage() + '\n'
+                        + "while setting the parameter: " + objectStr + '\n'
+                        + "to the field: " + field + ".");
+        }
     }
 
     /**
@@ -760,7 +758,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
         Class result = classBinding.get(classNameSave);
         if (result == null) {
-            LOGGER.info("search for class " + classNameSave);
+            LOGGER.finer("search for class " + classNameSave);
         } else {
             return result;
         }

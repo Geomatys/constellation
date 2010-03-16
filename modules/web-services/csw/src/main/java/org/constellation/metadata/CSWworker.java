@@ -427,7 +427,9 @@ public class CSWworker {
                 pool.addAnchor(entry.getKey(),entry.getValue());
                 nbWord ++;
             }
-            LOGGER.info(nbWord + " words put in pool.");
+            if (nbWord > 0) {
+                LOGGER.info(nbWord + " words put in pool.");
+            }
         }
     }
     

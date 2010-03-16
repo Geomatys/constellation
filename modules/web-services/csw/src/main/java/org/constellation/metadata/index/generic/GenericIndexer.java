@@ -511,7 +511,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
             if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
                 for (int j = 0; j < minx.length; j++)  {
-                    LOGGER.info("added new bbox:" + minx[j] + " " + maxx[j] + " " + miny[j] + " " + maxy[j] + " for identifier:" + identifier);
+                    LOGGER.finer("added new bbox:" + minx[j] + " " + maxx[j] + " " + miny[j] + " " + maxy[j] + " for identifier:" + identifier);
                     addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
                 }
             } else {
