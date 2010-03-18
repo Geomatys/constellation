@@ -94,6 +94,7 @@ import org.opengis.metadata.citation.Role;
 // JUnit dependencies
 import org.junit.Ignore;
 import org.opengis.metadata.extent.Extent;
+import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.VerticalExtent;
 import static org.junit.Assert.*;
 
@@ -1087,6 +1088,9 @@ public class CSWworkerTest {
      */
     public void transactionDeleteTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+
+        LOGGER.info("\n\n--- TRANSACTION DELETE TEST --- \n\n");
+        
         /*
          *  TEST 1 : we delete the metadata 42292_5p_19900609195600
          */
@@ -1138,7 +1142,7 @@ public class CSWworkerTest {
      */
     public void transactionInsertTest() throws Exception {
 
-        LOGGER.info("--- TRANSACTION INSERT TEST ---");
+        LOGGER.info("\n\n--- TRANSACTION INSERT TEST --- \n\n");
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         /*
@@ -1941,6 +1945,7 @@ public class CSWworkerTest {
                     assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getKeywords(), idResult.getDescriptiveKeywords().iterator().next().getKeywords());
                     if (idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().hasNext()) {
                         assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getClass(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getClass());
+                        assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getCode(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next().getCode());
                         assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next());
                     }
                     assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers());
@@ -1958,6 +1963,16 @@ public class CSWworkerTest {
                 while (expIt.hasNext() && resIt.hasNext()) {
                     Extent expEx = expIt.next();
                     Extent resEx = resIt.next();
+                    
+                    Iterator<? extends GeographicExtent> expGeExIt = expEx.getGeographicElements().iterator();
+                    Iterator<? extends GeographicExtent> resGeExIt = resEx.getGeographicElements().iterator();
+                    while (expGeExIt.hasNext() && resGeExIt.hasNext()) {
+                        GeographicExtent expGeEx = expGeExIt.next();
+                        GeographicExtent resGeEx = resGeExIt.next();
+
+                        //assertEquals(expGeEx.getInclusion(), resGeEx.getInclusion());
+                        assertEquals(expGeEx, resGeEx);
+                    }
                     assertEquals(expEx.getGeographicElements(), resEx.getGeographicElements());
                     assertEquals(expEx.getVerticalElements().size(),   resEx.getVerticalElements().size());
                     Iterator<? extends VerticalExtent> expVIt = expEx.getVerticalElements().iterator();

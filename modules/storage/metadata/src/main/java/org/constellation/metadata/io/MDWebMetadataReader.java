@@ -408,7 +408,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         }
         
         Object result;
-        // if the value is a leaf => primitive type
+        /*
+         * 
+         * if the value is a leaf => primitive type
+         *
+         */
         if (value instanceof TextValue) {
             String textValue = ((TextValue) value).getValue();
             // in some special case (Date, double) we have to format the text value.
@@ -466,10 +470,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 //we execute the constructor
                 result = ReflectionUtilities.newInstance(classe, textValue);
 
-                //fix a bug in MDWeb with the value attribute TODO remove
+                /*fix a bug in MDWeb with the value attribute TODO remove
                 if (!form.asMoreChild(value)) {
                     return result;
-                }
+                }*/
             }
 
         //if the value is a link
@@ -489,13 +493,15 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
              * Again another special case LocalName does not have a empty constructor (immutable)
              * and no setters so we must call the normal constructor.
              */
-            if (classe.getSimpleName().equals("LocalName")) {
+            String className = classe.getSimpleName();
+            if (className.equals("LocalName")) {
                 TextValue child = null;
 
                 //We search the child of the localName
-                for (Value childValue : form.getValues()) {
-                    if (childValue.getParent() != null && childValue.getParent().equals(value) && childValue instanceof TextValue) {
+                for (Value childValue : value.getChildren()) {
+                    if (childValue instanceof TextValue) {
                         child = (TextValue) childValue;
+                        break;
                     }
                 }
                 if (child != null) {
@@ -510,7 +516,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
              * Again another special case QNAME does not have a empty constructor.
              * and no setters so we must call the normal constructor.
              */
-            } else if (classe.getSimpleName().equals("QName")) {
+            } else if (className.equals("QName")) {
                 String localPart    = null;
                 String namespaceURI = null;
 
@@ -550,71 +556,68 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             }
 
             // then we search the setter for all the child value
-            for (Value childValue : form.getValues()) {
+            for (Value childValue : value.getChildren()) {
 
                 final Path path = childValue.getPath();
+                
 
-                if (childValue.getParent()!= null && childValue.getParent().equals(value)) {
-                    LOGGER.finer("new childValue:" + path.getName());
+                // we get the object from the child Value
+                final Object param = getObjectFromValue(form, childValue, mode);
+                if (param == null) {
+                    continue;
+                }
+                //we try to put the parameter in the parent object
+                // by searching for the good attribute name
+                String attribName = path.getName();
 
-                    // we get the object from the child Value
-                    final Object param = getObjectFromValue(form, childValue, mode);
-                    if (param == null) {
-                        continue;
-                    } 
-                    //we try to put the parameter in the parent object
-                    // by searching for the good attribute name
-                    String attribName = path.getName();
+                if (mode != SENSORML) {
+                    //special case due to a bug in mdweb
+                    if (attribName.startsWith("geographicElement")) {
+                        attribName = "geographicElements";
+                    } else if (attribName.equals("transformationParameterAvailability")) {
+                        attribName = "transformationParameterAvailable";
+                    } else if (attribName.equals("beginPosition")) {
+                        attribName = "begining";
+                    } else if (attribName.equals("endPosition")) {
+                        attribName = "ending";
+                    } else if (attribName.equals("value") && classe.getSimpleName().equals("DefaultPosition")) {
+                        attribName = "position";
+                    } else if (attribName.equalsIgnoreCase("verticalCSProperty")) {
+                        attribName = "coordinateSystem";
+                    } else if (attribName.equalsIgnoreCase("verticalDatumProperty")) {
+                        attribName = "datum";
+                    } else if (attribName.equalsIgnoreCase("axisDirection")) {
+                        attribName = "direction";
+                    } else if (attribName.equalsIgnoreCase("axisAbbrev")) {
+                        attribName = "abbreviation";
+                    } else if (attribName.equalsIgnoreCase("uom")) {
+                        attribName = "unit";
+                    } else if (attribName.equalsIgnoreCase("codeSpace")) {
+                        attribName = "codespace";
+                    }
+                }
 
-                    if (mode != SENSORML) {
-                        //special case due to a bug in mdweb
-                        if (attribName.startsWith("geographicElement")) {
-                            attribName = "geographicElements";
-                        } else if (attribName.equals("transformationParameterAvailability")) {
-                            attribName = "transformationParameterAvailable";
-                        } else if (attribName.equals("beginPosition")) {
-                            attribName = "begining";
-                        } else if (attribName.equals("endPosition")) {
-                            attribName = "ending";
-                        } else if (attribName.equals("value") && classe.getSimpleName().equals("DefaultPosition")) {
-                            attribName = "position";
-                        } else if (attribName.equalsIgnoreCase("verticalCSProperty")) {
-                            attribName = "coordinateSystem";
-                        } else if (attribName.equalsIgnoreCase("verticalDatumProperty")) {
-                            attribName = "datum";
-                        } else if (attribName.equalsIgnoreCase("axisDirection")) {
-                            attribName = "direction";
-                        } else if (attribName.equalsIgnoreCase("axisAbbrev")) {
-                            attribName = "abbreviation";
-                        } else if (attribName.equalsIgnoreCase("uom")) {
-                            attribName = "unit";
-                        } else if (attribName.equalsIgnoreCase("codeSpace")) {
-                            attribName = "codespace";
+                boolean putSuceed = false;
+                if (isMeta) {
+                      putSuceed = putMeta(metaMap, attribName, param, result, path);
+                }
+
+                if (!putSuceed) {
+                    final Method setter = ReflectionUtilities.getSetterFromName(attribName, param.getClass(), classe);
+
+                    if (setter != null) {
+                        ReflectionUtilities.invokeMethod(setter, result, param);
+                    } else {
+
+                        if (mode != SENSORML  && attribName.equalsIgnoreCase("identifier")) {
+                            attribName = "name";
                         }
-                    }
+                        Field field = ReflectionUtilities.getFieldFromName(attribName, classe);
 
-                    boolean putSuceed = false;
-                    if (isMeta) {
-                          putSuceed = putMeta(metaMap, attribName, param, result, path);
-                    }
-
-                    if (!putSuceed) {
-                        final Method setter = ReflectionUtilities.getSetterFromName(attribName, param.getClass(), classe);
-                        
-                        if (setter != null) {
-                            ReflectionUtilities.invokeMethod(setter, result, param);
+                        if (field != null) {
+                            setFieldToValue(field, attribName, result, param);
                         } else {
-
-                            if (mode != SENSORML  && attribName.equalsIgnoreCase("identifier")) {
-                                attribName = "name";
-                            }
-                            Field field = ReflectionUtilities.getFieldFromName(attribName, classe);
-
-                            if (field != null) {
-                                setFieldToValue(field, attribName, result, param);
-                            } else {
-                                LOGGER.warning("no field " + attribName + " in class:" + classe.getName());
-                            }
+                            LOGGER.warning("no field " + attribName + " in class:" + classe.getName());
                         }
                     }
                 }

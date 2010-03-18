@@ -33,6 +33,7 @@ import org.constellation.ws.CstlServiceException;
 import org.mdweb.io.MD_IOException;
 
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.mdweb.io.sql.AbstractReader;
 import org.mdweb.io.sql.v20.Reader20;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -64,6 +65,14 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
         if (db == null) {
             throw new MetadataIoException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
+        // pre warm up
+        try {
+            ((AbstractReader)mdReader).getAllClasses();
+        } catch (MD_IOException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw new MetadataIoException("the service has throw a MD_IO Exception:" + ex.getMessage(),
+                                         NO_APPLICABLE_CODE);
+        }
         this.map        = map;
     }
 
@@ -87,7 +96,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
             // we find the form id describing the sensor.
             final int id = ((Reader20)mdReader).getIdFromTitleForm(dbId);
             LOGGER.log(logLevel, "describesensor id: " + dbId);
-            LOGGER.log(logLevel, "describesensor mdweb id: " + id);
+            //LOGGER.log(logLevel, "describesensor mdweb id: " + id);
 
             String identifier = id + ":SMLC";
             Object metadata = getMetadata(identifier, AbstractMetadataReader.SENSORML, null);
