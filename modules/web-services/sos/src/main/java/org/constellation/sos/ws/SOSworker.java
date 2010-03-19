@@ -863,24 +863,29 @@ public class SOSworker {
             final List<String> singlePhenomenons    = new ArrayList<String>();
             final List<String> compositePhenomenons = new ArrayList<String>();
             for (String phenomenonName : observedProperties) {
-                LOGGER.info("phenomenon:" + phenomenonName + " phenomenonIdBase:" + phenomenonIdBase);
-                if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
-                    phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
-                }
-                LOGGER.info("phenomenon:" + phenomenonName);
-                final Phenomenon phen = omReader.getPhenomenon(phenomenonName);
-                if (phen == null) {
-                    throw new CstlServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",
-                            INVALID_PARAMETER_VALUE, "observedProperty");
-                }
-                if (phen instanceof CompositePhenomenon) {
-                    compositePhenomenons.add(phenomenonName);
+                
+                if (!phenomenonName.equals(phenomenonIdBase + "ALL")) {
+                    
+                    // we remove the phenomenon id base
+                    if (phenomenonName.indexOf(phenomenonIdBase) != -1) {
+                        phenomenonName = phenomenonName.replace(phenomenonIdBase, "");
+                    }
+                    final Phenomenon phen = omReader.getPhenomenon(phenomenonName);
+                    if (phen == null) {
+                        throw new CstlServiceException(" this phenomenon " + phenomenonName + " is not registred in the database!",
+                                INVALID_PARAMETER_VALUE, "observedProperty");
+                    }
+                    if (phen instanceof CompositePhenomenon) {
+                        compositePhenomenons.add(phenomenonName);
 
-                } else {
-                    singlePhenomenons.add(phenomenonName);
+                    } else {
+                        singlePhenomenons.add(phenomenonName);
+                    }
                 }
             }
-            localOmFilter.setObservedProperties(singlePhenomenons, compositePhenomenons);
+            if (singlePhenomenons.size() > 0 || compositePhenomenons.size() > 0) {
+                localOmFilter.setObservedProperties(singlePhenomenons, compositePhenomenons);
+            }
         }
 
 

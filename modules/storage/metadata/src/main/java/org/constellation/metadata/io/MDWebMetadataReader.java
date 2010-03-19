@@ -335,7 +335,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             final RecordSet recordSet = mdReader.getRecordSet(recordSetCode);
 
             //we look for cached object
-            Object result = getFromCache(identifier);
+            Object result = null;
+            if (isCacheEnabled()) {
+                result = getFromCache(identifier);
+            }
 
             if (result == null) {
                 final Form f = mdReader.getForm(recordSet, id);
