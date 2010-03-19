@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 
 // JAXB dependencies
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
@@ -70,6 +71,8 @@ public class FileObservationWriter implements ObservationWriter {
 
     private static final String FILE_EXTENSION = ".xml";
 
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.io.filesystem");
+
     public FileObservationWriter(Automatic configuration) throws CstlServiceException {
         super();
         final File dataDirectory = configuration.getDataDirectory();
@@ -103,13 +106,20 @@ public class FileObservationWriter implements ObservationWriter {
         try {
             marshaller = marshallerPool.acquireMarshaller();
             final File observationFile = new File(observationDirectory, observation.getName() + FILE_EXTENSION);
-            final boolean created      = observationFile.createNewFile();
-            if (!created) {
-                throw new CstlServiceException("unable to create an observation file.", NO_APPLICABLE_CODE);
+            if (observationFile.exists()) {
+                final boolean created      = observationFile.createNewFile();
+                if (!created) {
+                    throw new CstlServiceException("unable to create an observation file.", NO_APPLICABLE_CODE);
+                }
+            } else {
+                LOGGER.warning("we overwrite the file:" + observationFile.getPath());
             }
+            
             marshaller.marshal(observation, observationFile);
             writePhenomenon((PhenomenonEntry) observation.getObservedProperty());
-            writeFeatureOfInterest((SamplingFeatureEntry) observation.getFeatureOfInterest());
+            if (observation.getFeatureOfInterest() !=  null) {
+                writeFeatureOfInterest((SamplingFeatureEntry) observation.getFeatureOfInterest());
+            }
             indexer.indexDocument((ObservationEntry) observation);
             return observation.getName();
         } catch (JAXBException ex) {
@@ -153,6 +163,9 @@ public class FileObservationWriter implements ObservationWriter {
         Marshaller marshaller = null;
         try {
             marshaller = marshallerPool.acquireMarshaller();
+            if (!phenomenonDirectory.exists()) {
+                phenomenonDirectory.mkdir();
+            }
             final File phenomenonFile = new File(phenomenonDirectory, phenomenon.getId() + FILE_EXTENSION);
             if (!phenomenonFile.exists()) {
                 final boolean created = phenomenonFile.createNewFile();
@@ -176,6 +189,9 @@ public class FileObservationWriter implements ObservationWriter {
         Marshaller marshaller = null;
         try {
             marshaller = marshallerPool.acquireMarshaller();
+            if (!foiDirectory.exists()) {
+                foiDirectory.mkdir();
+            }
             final File foiFile = new File(foiDirectory, foi.getId() + FILE_EXTENSION);
             if (!foiFile.exists()) {
                 final boolean created = foiFile.createNewFile();
@@ -200,6 +216,9 @@ public class FileObservationWriter implements ObservationWriter {
         Marshaller marshaller = null;
         try {
             marshaller = marshallerPool.acquireMarshaller();
+            if (!offeringDirectory.exists()) {
+                offeringDirectory.mkdir();
+            }
             final File offeringFile = new File(offeringDirectory, offering.getName() + FILE_EXTENSION);
             final boolean created = offeringFile.createNewFile();
             if (!created) {

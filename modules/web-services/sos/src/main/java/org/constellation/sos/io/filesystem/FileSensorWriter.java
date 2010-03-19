@@ -79,9 +79,13 @@ public class FileSensorWriter implements SensorWriter {
             marshaller = marshallerPool.acquireMarshaller();
             id = id.replace(":", "-");
             final File currentFile = new File(dataDirectory, id + ".xml");
-            final boolean create  = currentFile.createNewFile();
-            if (!create) {
-                throw new CstlServiceException("the service was unable to create a new file:" + currentFile.getName(), NO_APPLICABLE_CODE);
+            if (!currentFile.exists()) {
+                final boolean create  = currentFile.createNewFile();
+                if (!create) {
+                    throw new CstlServiceException("the service was unable to create a new file:" + currentFile.getName(), NO_APPLICABLE_CODE);
+                }
+            } else {
+                LOGGER.warning("we overwrite the file: " + currentFile.getPath());
             }
             marshaller.marshal(sensor, currentFile);
         } catch (JAXBException ex) {

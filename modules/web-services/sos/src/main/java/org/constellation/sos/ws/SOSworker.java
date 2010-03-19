@@ -1970,7 +1970,7 @@ public class SOSworker {
         //we create a list of accepted responseMode (fixed)
         final List<ResponseModeType> responses = Arrays.asList(RESULT_TEMPLATE, INLINE);
         final List<QName> resultModel = Arrays.asList(Parameters.OBSERVATION_QNAME, Parameters.MEASUREMENT_QNAME);
-        final List<String> offeringOutputFormat = Arrays.asList(MimeType.TEXT_XML);
+        final List<String> offeringOutputFormat = Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
         final List<String> srsName = Arrays.asList("EPSG:4326");
 
         String description = "";
