@@ -103,14 +103,14 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public ObservationWriter getObservationWriter(ObservationWriterType type, Automatic configuration) throws CstlServiceException {
+    public ObservationWriter getObservationWriter(ObservationWriterType type, String observationTemplateIdBase, Automatic configuration) throws CstlServiceException {
         if (type == null) {
             return null;
         }
         switch (type) {
             case DEFAULT   : return new DefaultObservationWriter(configuration);
             
-            case FILESYSTEM: return new FileObservationWriter(configuration);
+            case FILESYSTEM: return new FileObservationWriter(configuration, observationTemplateIdBase);
             
             default : throw new IllegalArgumentException("Unknow O&M dataSource type: " + type);
         }

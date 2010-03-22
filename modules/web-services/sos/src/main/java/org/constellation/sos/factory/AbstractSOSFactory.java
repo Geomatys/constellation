@@ -47,7 +47,7 @@ public abstract class AbstractSOSFactory extends Factory {
     
     public abstract ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase) throws CstlServiceException;
 
-    public abstract ObservationWriter getObservationWriter(ObservationWriterType type, Automatic configuration) throws CstlServiceException;
+    public abstract ObservationWriter getObservationWriter(ObservationWriterType type, String observationTemplateIdBase, Automatic configuration) throws CstlServiceException;
 
     public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException;
 

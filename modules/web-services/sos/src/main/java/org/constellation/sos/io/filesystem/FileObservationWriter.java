@@ -59,6 +59,8 @@ public class FileObservationWriter implements ObservationWriter {
 
     private File observationDirectory;
 
+    private File observationTemplateDirectory;
+
     //private File sensorDirectory;
 
     private File foiDirectory;
@@ -69,12 +71,15 @@ public class FileObservationWriter implements ObservationWriter {
 
     private LuceneObservationIndexer indexer;
 
+    private String observationTemplateIdBase;
+
     private static final String FILE_EXTENSION = ".xml";
 
     private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.io.filesystem");
 
-    public FileObservationWriter(Automatic configuration) throws CstlServiceException {
+    public FileObservationWriter(Automatic configuration, String observationTemplateIdBase) throws CstlServiceException {
         super();
+        this.observationTemplateIdBase = observationTemplateIdBase;
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory.exists()) {
             offeringDirectory    = new File(dataDirectory, "offerings");
@@ -83,6 +88,8 @@ public class FileObservationWriter implements ObservationWriter {
             //sensorDirectory      = new File(dataDirectory, "sensors");
             foiDirectory         = new File(dataDirectory, "features");
             //resultDirectory      = new File(dataDirectory, "results");
+            observationTemplateDirectory = new File(dataDirectory, "observationTemplates");
+
         }
         try {
             indexer        = new LuceneObservationIndexer(configuration, "");
@@ -105,7 +112,12 @@ public class FileObservationWriter implements ObservationWriter {
         Marshaller marshaller = null;
         try {
             marshaller = marshallerPool.acquireMarshaller();
-            final File observationFile = new File(observationDirectory, observation.getName() + FILE_EXTENSION);
+            final File observationFile;
+            if (observation.getName().startsWith(observationTemplateIdBase)) {
+                observationFile = new File(observationTemplateDirectory, observation.getName() + FILE_EXTENSION);
+            } else {
+                observationFile = new File(observationDirectory, observation.getName() + FILE_EXTENSION);
+            }
             if (observationFile.exists()) {
                 final boolean created      = observationFile.createNewFile();
                 if (!created) {

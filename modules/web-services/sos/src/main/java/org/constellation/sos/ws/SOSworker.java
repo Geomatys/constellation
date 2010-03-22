@@ -415,7 +415,7 @@ public class SOSworker {
             smlReader = sosFactory.getSensorReader(smlType, smlConfiguration, sensorIdBase, map);
             smlWriter = sosFactory.getSensorWriter(smlType, smlConfiguration, sensorIdBase, map);
             omReader  = sosFactory.getObservationReader(omReaderType, omConfiguration, observationIdBase);
-            omWriter  = sosFactory.getObservationWriter(omWriterType, omConfiguration);
+            omWriter  = sosFactory.getObservationWriter(omWriterType, observationTemplateIdBase, omConfiguration);
             omFilter  = sosFactory.getObservationFilter(omFilterType, observationIdBase, observationTemplateIdBase, map, omConfiguration);
 
             //we initialize the variables depending on the Reader capabilities
