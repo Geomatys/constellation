@@ -44,6 +44,7 @@ import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 
 // MDWeb dependencies
+import org.geotoolkit.resources.NIOUtilities;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.Obligation;
 import org.mdweb.model.schemas.Path;
@@ -79,10 +80,10 @@ public class IndexLuceneTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         configDirectory = new File("config-test");
-        if (!configDirectory.exists())
-            configDirectory.mkdir();
-        else
-            deleteIndex(configDirectory);
+        if (configDirectory.exists()) {
+            NIOUtilities.deleteDirectory(configDirectory);
+        }
+        configDirectory.mkdir();
 
         List<Form> forms     = new ArrayList<Form>();
         List<Path> paths     = new ArrayList<Path>();
@@ -90,21 +91,14 @@ public class IndexLuceneTest {
         forms                = fillTestData(paths, classes);
 
         MDWebIndexer indexer = new MDWebIndexer(forms, classes, paths, configDirectory);
-        indexSearcher        = new MDWebIndexSearcher(configDirectory, "");
+        indexSearcher          = new MDWebIndexSearcher(configDirectory, "");
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
         configDirectory = new File("config-test");
         if (configDirectory.exists()) {
-            File indexDirectory = new File(configDirectory, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-            configDirectory.delete();
+            NIOUtilities.deleteDirectory(configDirectory);
         }
     }
 
@@ -114,19 +108,6 @@ public class IndexLuceneTest {
 
     @After
     public void tearDown() throws Exception {
-    }
-
-    public static void deleteIndex(File configDir) {
-        if (configDir.exists()) {
-            File indexDirectory = new File(configDir, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-        }
-
     }
 
     /**

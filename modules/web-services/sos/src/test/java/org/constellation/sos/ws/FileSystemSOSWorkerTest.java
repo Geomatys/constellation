@@ -31,6 +31,7 @@ import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.util.Util;
+import org.geotoolkit.resources.NIOUtilities;
 import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.xml.MarshallerPool;
 
@@ -46,13 +47,14 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        deleteTemporaryFile();
-
         MarshallerPool pool   = new MarshallerPool(org.constellation.configuration.ObjectFactory.class);
         Marshaller marshaller =  pool.acquireMarshaller();
 
 
         File configDir = new File("SOSWorkerTest");
+        if (configDir.exists()) {
+            NIOUtilities.deleteDirectory(configDir);
+        }
         if (!configDir.exists()) {
             configDir.mkdir();
 
@@ -151,67 +153,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        deleteTemporaryFile();
-    }
-
-    public static void deleteTemporaryFile() {
-        File configDirectory = new File("SOSWorkerTest");
-        if (configDirectory.exists()) {
-            File dataDirectory = new File(configDirectory, "sensors");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            File indexDirectory = new File(configDirectory, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-            dataDirectory = new File(configDirectory, "offerings");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            dataDirectory = new File(configDirectory, "observations");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            dataDirectory = new File(configDirectory, "observationTemplates");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            dataDirectory = new File(configDirectory, "features");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            dataDirectory = new File(configDirectory, "phenomenons");
-            if (dataDirectory.exists()) {
-                for (File f : dataDirectory.listFiles()) {
-                    f.delete();
-                }
-                dataDirectory.delete();
-            }
-            File conf = new File(configDirectory, "config.xml");
-            conf.delete();
-            File map = new File(configDirectory, "mapping.properties");
-            map.delete();
-            configDirectory.delete();
-        }
+        NIOUtilities.deleteDirectory(new File("SOSWorkerTest"));
     }
 
     @Before

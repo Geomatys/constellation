@@ -37,8 +37,6 @@ import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.filter.ConfigurationFileFilter;
-import org.constellation.configuration.filter.IndexDirectoryFilter;
-import org.constellation.configuration.filter.NextIndexDirectoryFilter;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.AbstractMetadataReader;
@@ -55,6 +53,7 @@ import org.geotoolkit.factory.FactoryRegistry;
 // MDWeb dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
+import org.geotoolkit.lucene.index.AbstractIndexer.IndexDirectoryFilter;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 
@@ -288,6 +287,8 @@ public abstract class AbstractCSWConfigurer {
     /**
      * Delete The index folder and call the restart() method.
      *
+     * TODO maybe we can directly recreate the index here (fusion of synchrone/asynchrone)
+     *
      * @param configurationDirectory The CSW configuration directory.
      * @param id The service identifier.
      *
@@ -321,28 +322,12 @@ public abstract class AbstractCSWConfigurer {
      */
     private void asynchroneIndexRefresh(File configurationDirectory, String id) throws CstlServiceException {
         /*
-         * we delete each pre-builded index directory.
-         * if there is a specific id in parameter we only delete the specified profile
-         */
-        for (File indexDir : configurationDirectory.listFiles(new NextIndexDirectoryFilter(id))) {
-            for (File f : indexDir.listFiles()) {
-                final boolean sucess = f.delete();
-                if (!sucess) {
-                    throw new CstlServiceException("The service can't delete the next index file:" + f.getPath(), NO_APPLICABLE_CODE);
-                }
-            }
-            if (!indexDir.delete()) {
-                throw new CstlServiceException("The service can't delete the next index folder.", NO_APPLICABLE_CODE);
-            }
-        }
-
-        /*
          * then we create all the nextIndex directory and create the indexes
          * if there is a specific id in parameter we only index the specified profile
          */
         for (File configFile : configurationDirectory.listFiles(new ConfigurationFileFilter(id))) {
             final String currentId        = getConfigID(configFile);
-            final File nexIndexDir        = new File(configurationDirectory, currentId + "nextIndex");
+            final File nexIndexDir        = new File(configurationDirectory, currentId + "index-" + System.currentTimeMillis());
             AbstractIndexer indexer = null;
             try {
                 indexer = initIndexer(currentId, null);
@@ -387,9 +372,9 @@ public abstract class AbstractCSWConfigurer {
          * if there is a specific id in parameter we only index the specified profile
          */
         for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(id))) {
-            final String currentId        = getConfigID(configFile);
-            AbstractIndexer indexer = null;
-            CSWMetadataReader reader   = null;
+            final String currentId   = getConfigID(configFile);
+            AbstractIndexer indexer  = null;
+            CSWMetadataReader reader = null;
             try {
                 reader  = initReader(currentId);
                 final List<Object> objectToIndex = new ArrayList<Object>();

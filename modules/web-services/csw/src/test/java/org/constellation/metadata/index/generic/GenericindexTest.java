@@ -49,6 +49,7 @@ import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 
 // GeoAPI dependencies
+import org.geotoolkit.resources.NIOUtilities;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 //Junit dependencies
@@ -75,8 +76,8 @@ public class GenericindexTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        deleteIndex();
         File configDirectory      = new File("GenericIndexTest");
+        NIOUtilities.deleteDirectory(new File("GenericIndexTest"));
         List<Object> object       = fillTestData();
         indexer                   = new GenericIndexer(object, null, configDirectory, "");
         indexSearcher             = new GenericIndexSearcher(configDirectory, "");
@@ -85,22 +86,9 @@ public class GenericindexTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        deleteIndex();
+        NIOUtilities.deleteDirectory(new File("GenericIndexTest"));
     }
 
-    public static void deleteIndex() {
-        File configDirectory = new File("GenericIndexTest");
-        if (configDirectory.exists()) {
-            File indexDirectory = new File(configDirectory, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-            configDirectory.delete();
-        }
-    }
 
     @Before
     public void setUp() throws Exception {

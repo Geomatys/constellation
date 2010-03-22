@@ -155,11 +155,6 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             pathMap.put(p.getId(), p);
         }
 
-        // we get the configuration file
-        final File f = new File(configDirectory, "index");
-
-        setFileDirectory(f);
-
         //if the index File exists we don't need to index the documents again.
         if(!getFileDirectory().exists()) {
             LOGGER.info("Creating lucene index for the first time...");

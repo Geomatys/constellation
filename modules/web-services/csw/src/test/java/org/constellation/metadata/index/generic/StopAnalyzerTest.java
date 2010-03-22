@@ -42,6 +42,7 @@ import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.resources.NIOUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -68,7 +69,7 @@ public class StopAnalyzerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        deleteIndex();
+        NIOUtilities.deleteDirectory(configDirectory);
         List<DefaultMetadata> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StopAnalyzer(Version.LUCENE_CURRENT));
         indexSearcher          = new GenericIndexSearcher(configDirectory, "", new StopAnalyzer(Version.LUCENE_CURRENT));
@@ -76,20 +77,7 @@ public class StopAnalyzerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        deleteIndex();
-    }
-
-    public static void deleteIndex() {
-        if (configDirectory.exists()) {
-            File indexDirectory = new File(configDirectory, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-            configDirectory.delete();
-        }
+       NIOUtilities.deleteDirectory(configDirectory);
     }
 
     @Before

@@ -29,6 +29,7 @@ import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.resources.NIOUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 
@@ -47,7 +48,12 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
         dbDirectory    = new File("CSWWorkerTestDatabase");
+
         File configDir = new File("CSWWorkerTest");
+        if (configDir.exists()) {
+            NIOUtilities.deleteDirectory(new File("CSWWorkerTest"));
+        }
+
         if (!configDir.exists()) {
             configDir.mkdir();
             final String url = "jdbc:derby:" + dbDirectory.getPath().replace('\\','/');
@@ -82,28 +88,11 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        deleteDirectory(dbDirectory);
-        deleteDirectory(new File("CSWWorkerTest"));
+        NIOUtilities.deleteDirectory(dbDirectory);
+        NIOUtilities.deleteDirectory(new File("CSWWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();
-        }
-    }
-
-    public static void deleteDirectory(File dir) {
-         if (dir.exists()) {
-            if (dir.isDirectory()) {
-                for (File f : dir.listFiles()) {
-                    if (f.isDirectory()) {
-                        deleteDirectory(f);
-                    } else {
-                        f.delete();
-                    }
-                }
-                dir.delete();
-            } else {
-                dir.delete();
-            }
         }
     }
 

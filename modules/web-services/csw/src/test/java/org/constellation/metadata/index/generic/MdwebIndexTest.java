@@ -50,6 +50,7 @@ import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
 // GeoAPI dependencies
+import org.geotoolkit.resources.NIOUtilities;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 //Junit dependencies
@@ -78,8 +79,8 @@ public class MdwebIndexTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        deleteIndex();
         File configDirectory      = new File("MDwebIndexTest");
+        NIOUtilities.deleteDirectory(configDirectory);
 
         final String url = "jdbc:derby:memory:MDITest;create=true";
         ds = new DefaultDataSource(url);
@@ -111,21 +112,7 @@ public class MdwebIndexTest {
         if (ds != null) {
             ds.shutdown();
         }
-        deleteIndex();
-    }
-
-    public static void deleteIndex() {
-        File configDirectory = new File("MDwebIndexTest");
-        if (configDirectory.exists()) {
-            File indexDirectory = new File(configDirectory, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-            configDirectory.delete();
-        }
+        NIOUtilities.deleteDirectory(new File("MDwebIndexTest"));
     }
 
     @Before

@@ -40,6 +40,7 @@ import org.geotoolkit.metadata.iso.DefaultMetadata;
 
 //Junit dependencies
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.resources.NIOUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import org.opengis.filter.FilterFactory2;
@@ -64,7 +65,7 @@ public class KeywordAnalyzerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        deleteIndex();
+        NIOUtilities.deleteDirectory(configDirectory);
         List<DefaultMetadata> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new KeywordAnalyzer());
         indexSearcher          = new GenericIndexSearcher(configDirectory, "", new KeywordAnalyzer());
@@ -72,21 +73,10 @@ public class KeywordAnalyzerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        deleteIndex();
+        NIOUtilities.deleteDirectory(configDirectory);
     }
 
-    public static void deleteIndex() {
-        if (configDirectory.exists()) {
-            File indexDirectory = new File(configDirectory, "index");
-            if (indexDirectory.exists()) {
-                for (File f : indexDirectory.listFiles()) {
-                    f.delete();
-                }
-                indexDirectory.delete();
-            }
-            configDirectory.delete();
-        }
-    }
+    
 
     @Before
     public void setUp() throws Exception {
