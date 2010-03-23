@@ -68,6 +68,14 @@ public interface Provider<K,V> {
     V getByIdentifier(String key);
 
     /**
+     * Get the data related to the given key, accessible by the given service.
+     * the key is stored as a String here for convinient needs. The service should
+     * be able to transform the String key to it's own key class.
+     * @return V object if it is in the dataprovider, or null if not.
+     */
+    V getByIdentifier(String key, String service);
+
+    /**
      * Get the data related to the given key.
      * @return V object if it is in the dataprovider, or null if not.
      */
