@@ -71,6 +71,8 @@ public class Automatic {
 
     private String dataDirectory;
 
+    private String defaultRecordSet;
+
     private Queries queries;
 
     public Automatic() {
@@ -283,6 +285,20 @@ public class Automatic {
      */
     public void setStoreMapping(String storeMapping) {
         this.storeMapping = storeMapping;
+    }
+
+    /**
+     * @return the defaultRecordSet
+     */
+    public String getDefaultRecordSet() {
+        return defaultRecordSet;
+    }
+
+    /**
+     * @param defaultRecordSet the defaultRecordSet to set
+     */
+    public void setDefaultRecordSet(String defaultRecordSet) {
+        this.defaultRecordSet = defaultRecordSet;
     }
 
 

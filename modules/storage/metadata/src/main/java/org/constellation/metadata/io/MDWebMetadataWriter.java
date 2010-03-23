@@ -104,7 +104,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     private Map<Object, Value> alreadyWrite;
 
     protected static final String UNKNOW_TITLE = "unknow title";
-     
+    
     /**
      * Build a new metadata writer.
      * 
@@ -140,7 +140,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 throw new MetadataIoException("unexpected database version:" + version);
             }
            
-            mdRecordSet = getRecordSet();
+            mdRecordSet = getRecordSet(configuration.getDefaultRecordSet());
             defaultUser = mdWriter.getUser("admin");
 
         } catch (MD_IOException ex) {
@@ -159,11 +159,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * Build a new metadata writer.
      *
      */
-    public MDWebMetadataWriter(Writer mdWriter) throws MetadataIoException {
+    public MDWebMetadataWriter(Writer mdWriter, String defaultrecordSet) throws MetadataIoException {
         super();
         this.mdWriter    = mdWriter;
         try {
-            this.mdRecordSet = getRecordSet();
+            this.mdRecordSet = getRecordSet(defaultrecordSet);
             this.defaultUser = mdWriter.getUser("admin");
         } catch (MD_IOException ex) {
             throw new MetadataIoException("MD_IOException while getting the catalog and user:" +'\n'+
@@ -178,11 +178,18 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
     
     // TODO move this to CSW implementation
-    public RecordSet getRecordSet() throws MD_IOException {
-        RecordSet cat = mdWriter.getRecordSet("CSWCat");
+    public RecordSet getRecordSet(String defaultRecordSet) throws MD_IOException {
+        RecordSet cat = null;
+        if (defaultRecordSet != null) {
+            cat = mdWriter.getRecordSet(defaultRecordSet);
+        }
         if (cat == null) {
-            cat = new RecordSet("CSWCat", "CSW Data RecordSet", null, null, EXPOSURE.EXTERNAL, 0, new Date(System.currentTimeMillis()));
-            mdWriter.writeRecordSet(cat);
+            cat = mdWriter.getRecordSet("CSWCat");
+            if (cat == null) {
+                cat = new RecordSet("CSWCat", "CSW Data RecordSet", null, null, EXPOSURE.EXTERNAL, 0, new Date(System.currentTimeMillis()));
+                mdWriter.writeRecordSet(cat);
+                LOGGER.info("writing CSWCat");
+            }
         }
         return cat;
     }
