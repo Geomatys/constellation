@@ -319,7 +319,7 @@ public class CSWworker {
                 final int datasourceType = configuration.getType();
                 //we initialize all the data retriever (reader/writer) and index worker
                 mdReader              = cswfactory.getMetadataReader(configuration);
-                profile               = cswfactory.getProfile(datasourceType);
+                profile               = configuration.getProfile();
                 final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID);
                 indexSearcher         = cswfactory.getIndexSearcher(datasourceType, configDir, serviceID);
                 mdWriter              = cswfactory.getMetadataWriter(configuration, indexer);
@@ -329,7 +329,11 @@ public class CSWworker {
                 initializeAcceptedResourceType();
                 initializeAnchorsMap();
                 loadCascadedService(configDir);
-                LOGGER.info("CSW service (" + configuration.getFormat() + ") running");
+                String suffix = "";
+                if (profile == TRANSACTIONAL) {
+                    suffix = "-T";
+                }
+                LOGGER.info("CSW" + suffix + " service (" + configuration.getFormat() + ") running");
             }
         } catch (FactoryNotFoundException ex) {
             LOGGER.severe(notWorkingMsg + '\n' +

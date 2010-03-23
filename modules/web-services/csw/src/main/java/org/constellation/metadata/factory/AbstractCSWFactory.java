@@ -46,8 +46,6 @@ public abstract class AbstractCSWFactory extends Factory {
 
     public abstract CSWMetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer index) throws MetadataIoException;
     
-    public abstract int getProfile(int dbType);
-    
     public abstract AbstractIndexer getIndexer(Automatic configuration, CSWMetadataReader reader, String serviceID) throws IndexingException;
     
     public abstract AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws IndexingException;

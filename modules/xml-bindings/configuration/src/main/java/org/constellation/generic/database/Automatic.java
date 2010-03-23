@@ -42,9 +42,9 @@ public class Automatic {
     @XmlTransient
     public static final int CDI         = 2;
     @XmlTransient
-    public static final int EDMED       = 3;
+    public static final int EDMED      = 3;
     @XmlTransient
-    public static final int MDWEB       = 4;
+    public static final int MDWEB      = 4;
     @XmlTransient
     public static final int FILESYSTEM  = 5;
             
@@ -60,6 +60,8 @@ public class Automatic {
 
     @XmlAttribute
     private String name;
+
+    private String profile;
 
     private String enableThread;
     
@@ -154,6 +156,12 @@ public class Automatic {
             return DEFAULT;
     }
 
+    public int getProfile() {
+        if ("discovery".equalsIgnoreCase(profile))
+            return 0;
+        return 1;
+    }
+    
     /**
      * @return the Thesaurus
      */

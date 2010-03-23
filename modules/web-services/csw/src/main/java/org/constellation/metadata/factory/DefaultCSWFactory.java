@@ -96,24 +96,6 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
     }
     
     /**
-     * Return a profile (discovery or transactionnal) for the specified databaseType
-     * @param dbType The type of the database.
-     * 
-     * @return DISCOVERY or TRANSACTIONAL 
-     */
-    @Override
-    public int getProfile(int dbType) {
-        switch (dbType) {
-            case MDWEB :
-                return CSWworker.TRANSACTIONAL;
-            case FILESYSTEM:
-                return CSWworker.TRANSACTIONAL;
-            default:
-                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + dbType);
-        }
-    }
-    
-    /**
      * Return a Lucene index for the specified database type.
      * 
      * @param dbType The type of the database.
