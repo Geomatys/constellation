@@ -64,6 +64,7 @@ import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Writer20;
 import org.mdweb.io.Writer;
 import org.mdweb.io.sql.v21.Writer21;
+import org.mdweb.model.storage.RecordSet.EXPOSURE;
 
 /**
  *
@@ -180,7 +181,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     public RecordSet getRecordSet() throws MD_IOException {
         RecordSet cat = mdWriter.getRecordSet("CSWCat");
         if (cat == null) {
-            cat = new RecordSet("CSWCat", "CSW Data RecordSet");
+            cat = new RecordSet("CSWCat", "CSW Data RecordSet", null, null, EXPOSURE.EXTERNAL, 0, new Date(System.currentTimeMillis()));
             mdWriter.writeRecordSet(cat);
         }
         return cat;

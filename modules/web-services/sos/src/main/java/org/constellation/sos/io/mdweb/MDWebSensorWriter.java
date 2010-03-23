@@ -18,6 +18,7 @@
 package org.constellation.sos.io.mdweb;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -42,6 +43,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb dependencies
 import org.mdweb.model.storage.RecordSet;
+import org.mdweb.model.storage.RecordSet.EXPOSURE;
 
 /**
  *
@@ -90,7 +92,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     public RecordSet getRecordSet() throws MD_IOException {
         RecordSet cat = mdWriter.getRecordSet("SMLC");
         if (cat == null) {
-            cat = new RecordSet("SMLC", "SensorML RecordSet");
+            cat = new RecordSet("SMLC", "SensorML RecordSet", null, null, EXPOSURE.EXTERNAL, 0, new Date(System.currentTimeMillis()));
             mdWriter.writeRecordSet(cat);
         }
         return cat;
