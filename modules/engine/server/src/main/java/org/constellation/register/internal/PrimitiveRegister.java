@@ -69,7 +69,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
     public List<LayerDetails> getAllLayerReferences(ServiceDef serviceDef) throws RegisterException {
 
         if (isServiceAllowed("read all files", serviceDef)) {
-            return getAllLayerRefs();
+            return getAllLayerRefs(serviceDef);
         }
 
         /* SHOULD NOT REACH HERE */
@@ -81,7 +81,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
             List<String> layerNames) throws RegisterException {
 
         if (isServiceAllowed("read all files", serviceDef)) {
-            return getLayerRefs(layerNames);
+            return getLayerRefs(serviceDef, layerNames);
         }
 
         /* SHOULD NOT REACH HERE */
@@ -93,7 +93,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
     public LayerDetails getLayerReference(ServiceDef serviceDef, String layerName) throws RegisterException {
 
         if (isServiceAllowed("read all files", serviceDef)) {
-            return getLayerRef(layerName);
+            return getLayerRef(serviceDef, layerName);
         }
 
         /* SHOULD NOT REACH HERE */
@@ -101,10 +101,10 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
     }
 
-    private List<LayerDetails> getAllLayerRefs() throws RegisterException {
+    private List<LayerDetails> getAllLayerRefs(ServiceDef serviceDef) throws RegisterException {
 
         final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
-        final Set<Name> layerNames = LayerProviderProxy.getInstance().getKeys();
+        final Set<Name> layerNames = LayerProviderProxy.getInstance().getKeys(serviceDef.specification.name());
         for (Name layerName : layerNames) {
             final LayerDetails layerRef = LayerProviderProxy.getInstance().get(layerName);
 
@@ -131,11 +131,12 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
     }
 
-    private List<LayerDetails> getLayerRefs(List<String> layerNames) throws RegisterException {
+    private List<LayerDetails> getLayerRefs(ServiceDef serviceDef, List<String> layerNames) throws RegisterException {
 
         final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
         for (String layerName : layerNames) {
-            LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName);
+            LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName,
+                    serviceDef.specification.name());
 
             if (null == layerRef) {
 
@@ -157,9 +158,10 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
         return layerRefs;
     }
 
-    private LayerDetails getLayerRef(String layerName) throws RegisterException {
+    private LayerDetails getLayerRef(ServiceDef serviceDef, String layerName) throws RegisterException {
 
-        LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName);
+        LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName,
+                serviceDef.specification.name());
 
         if (null == layerRef) {
 
