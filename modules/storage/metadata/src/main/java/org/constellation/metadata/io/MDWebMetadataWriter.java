@@ -404,7 +404,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (parentValue == null) {
             ordinal = 1;
         } else {
-            ordinal  = form.getNewOrdinal(parentValue.getIdValue() + ':' + path.getName());
+            ordinal  = parentValue.getNewOrdinalForChild(path.getName());
         }
         
         //we look if the object have been already write
