@@ -580,7 +580,7 @@ public class CSWService extends OGCWebService {
         final String constLanguage     = getParameter("CONSTRAINTLANGUAGE", false);
         QueryConstraintType constraint = null;
         if (constLanguage != null) {
-            final String languageVersion  = getParameter("CONSTRAINT_LANGUAGE_VERSION", false);
+            final String languageVersion  = getParameter("CONSTRAINT_LANGUAGE_VERSION", true);
             
             if (constLanguage.equalsIgnoreCase("CQL_TEXT")) {
 
