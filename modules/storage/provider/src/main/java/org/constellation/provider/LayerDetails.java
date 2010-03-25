@@ -23,10 +23,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import org.constellation.ServiceDef;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Layer;
-import org.constellation.ws.ServiceType;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.factory.FactoryFinder;
@@ -144,7 +144,7 @@ public interface LayerDetails {
      *
      * @see Layer#isQueryable 
      */
-    boolean isQueryable(ServiceType service);
+    boolean isQueryable(ServiceDef.Query query);
 
     /**
      * Returns the type of provider for a {@linkplain Layer layer}.

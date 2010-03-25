@@ -30,9 +30,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.constellation.ServiceDef;
 
 import org.constellation.catalog.CatalogException;
-import org.constellation.ws.ServiceType;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.data.DataStore;
@@ -178,7 +178,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
      * {@inheritDoc}
      */
     @Override
-    public boolean isQueryable(ServiceType service) {
+    public boolean isQueryable(ServiceDef.Query query) {
         return true;
     }
 

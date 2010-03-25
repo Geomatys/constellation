@@ -28,13 +28,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.constellation.ServiceDef;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.CoverageReference;
 import org.constellation.coverage.catalog.GridCoverageTable;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.ws.ServiceType;
 import org.constellation.map.PostGridMapLayer;
 import org.constellation.map.PostGridReader;
 import org.constellation.provider.CoverageLayerDetails;
@@ -220,8 +220,8 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public boolean isQueryable(ServiceType service) {
-        return reader.getTable().getLayer().isQueryable(service);
+    public boolean isQueryable(ServiceDef.Query query) {
+        return true;
     }
 
     /**

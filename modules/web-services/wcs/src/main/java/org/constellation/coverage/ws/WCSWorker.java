@@ -230,7 +230,7 @@ public final class WCSWorker extends AbstractWorker {
             }
             final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
             final String coverageName = coverageRef.getName();
-            if (!coverageRef.isQueryable(ServiceType.WCS)) {
+            if (!coverageRef.isQueryable(ServiceDef.Query.WCS_ALL)) {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
                         coverageName + "\".", LAYER_NOT_QUERYABLE, KEY_COVERAGE.toLowerCase());
             }
@@ -376,7 +376,7 @@ public final class WCSWorker extends AbstractWorker {
             }
             final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
             final String coverageName = coverageRef.getName();
-            if (!coverageRef.isQueryable(ServiceType.WCS)) {
+            if (!coverageRef.isQueryable(ServiceDef.Query.WCS_ALL)) {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
                         coverageName + "\".", INVALID_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
             }
@@ -605,7 +605,7 @@ public final class WCSWorker extends AbstractWorker {
                 if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
                     continue;
                 }
-                if (!layer.isQueryable(ServiceType.WCS)) {
+                if (!layer.isQueryable(ServiceDef.Query.WCS_ALL)) {
                     continue;
                 }
                 final CoverageOfferingBriefType co = new CoverageOfferingBriefType();
@@ -738,7 +738,7 @@ public final class WCSWorker extends AbstractWorker {
                 if (layer.getType().equals(LayerDetails.TYPE.FEATURE)) {
                     continue;
                 }
-                if (!layer.isQueryable(ServiceType.WCS)) {
+                if (!layer.isQueryable(ServiceDef.Query.WCS_ALL)) {
                     continue;
                 }
                 final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
@@ -815,7 +815,7 @@ public final class WCSWorker extends AbstractWorker {
         }
 
         final LayerDetails layerRef = getLayerReference(request.getCoverage(), inputVersion);
-        if (!layerRef.isQueryable(ServiceType.WCS) || layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
+        if (!layerRef.isQueryable(ServiceDef.Query.WCS_ALL) || layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +
                     layerRef.getName() + "\".", INVALID_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
         }

@@ -230,7 +230,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         //Build the list of layers
         final List<AbstractLayer> layers = new ArrayList<AbstractLayer>();
         for (LayerDetails layer : layerRefs){
-            if (!layer.isQueryable(ServiceType.WMS)) {
+            if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
                 continue;
             }
             /*
@@ -325,7 +325,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                                                     "FORMAT=";
             final String legendUrlGif = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;
             final String legendUrlPng = beginLegendUrl + MimeType.IMAGE_PNG + "&LAYER=" + layerName;
-            final int queryable = (layer.isQueryable(ServiceType.GETINFO)) ? 1 : 0;
+            final int queryable = (layer.isQueryable(ServiceDef.Query.WMS_GETINFO)) ? 1 : 0;
             final AbstractLayer outputLayer;
             if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
                 /*
@@ -533,7 +533,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         final List<LayerDetails> layerRefs = getLayerReferences(layerNames, getFI.getVersion().toString());
 
         for (LayerDetails layer : layerRefs) {
-            if (!layer.isQueryable(ServiceType.GETINFO)) {
+            if (!layer.isQueryable(ServiceDef.Query.WMS_GETINFO)) {
                 throw new CstlServiceException("You are not allowed to request the layer \""+
                         layer.getName() +"\".", LAYER_NOT_QUERYABLE, KEY_LAYERS.toLowerCase());
             }
@@ -646,7 +646,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
     @Override
     public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
         final LayerDetails layer = getLayerReference(getLegend.getLayer(), getLegend.getVersion().toString());
-        if (!layer.isQueryable(ServiceType.WMS)) {
+        if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
             throw new CstlServiceException("You are not allowed to request the layer \""+
                     layer.getName() +"\".", LAYER_NOT_QUERYABLE, KEY_LAYER.toLowerCase());
         }
@@ -704,7 +704,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             }
         }
         for (LayerDetails layer : layerRefs) {
-            if (!layer.isQueryable(ServiceType.WMS)) {
+            if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
                 throw new CstlServiceException("You are not allowed to request the layer \""+
                         layer.getName() +"\".", LAYER_NOT_QUERYABLE, KEY_LAYERS.toLowerCase());
             }

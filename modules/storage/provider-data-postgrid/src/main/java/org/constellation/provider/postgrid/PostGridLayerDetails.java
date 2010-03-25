@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import org.constellation.ServiceDef;
 
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
@@ -220,7 +221,21 @@ class PostGridLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public boolean isQueryable(ServiceType service) {
+    public boolean isQueryable(ServiceDef.Query query) {
+        ServiceType service;
+        switch(query.specification){
+            case CSW : service = ServiceType.CSW; break;
+            case SOS : service = ServiceType.SOS; break;
+            case WCS : service = ServiceType.WCS; break;
+            case WFS : service = ServiceType.WFS; break;
+            case WMS : service = ServiceType.WMS; break;
+            default: service = ServiceType.OTHER;
+        }
+
+        if(query == ServiceDef.Query.WMS_GETINFO){
+            service = ServiceType.GETINFO;
+        }
+
         return reader.getTable().getLayer().isQueryable(service);
     }
 

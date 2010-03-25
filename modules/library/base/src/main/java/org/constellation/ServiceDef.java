@@ -200,4 +200,36 @@ public enum ServiceDef {
             organization = org;
         }
     }
+
+    public enum Query {
+        WMS_ALL(Specification.WMS),
+        WMS_GETMAP(Specification.WMS),
+        WMS_GETINFO(Specification.WMS),
+
+        WMTS_ALL(Specification.WMTS),
+
+        WCS_ALL(Specification.WCS),
+
+        WFS_ALL(Specification.WFS),
+
+        CSW_ALL(Specification.CSW),
+
+        MDW_ALL(Specification.MDW),
+
+        NONE_ALL(Specification.NONE),
+
+        PDP_ALL(Specification.PDP),
+
+        PEP_ALL(Specification.PEP),
+
+        SOS_ALL(Specification.SOS);
+
+
+        public final Specification specification;
+
+        private Query(Specification specification){
+            this.specification = specification;
+        }
+    }
+
 }

@@ -31,11 +31,11 @@ import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.constellation.ServiceDef;
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.Database;
 import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.ws.ServiceType;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
@@ -188,7 +188,7 @@ class WorldImageLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public boolean isQueryable(ServiceType service) {
+    public boolean isQueryable(ServiceDef.Query service) {
         return true;
     }
 
