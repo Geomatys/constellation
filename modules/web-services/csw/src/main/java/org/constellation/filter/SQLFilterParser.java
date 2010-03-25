@@ -31,9 +31,9 @@ import org.apache.lucene.search.Filter;
 
 // constellation dependencies
 import org.constellation.ws.CstlServiceException;
-import org.constellation.metadata.Parameters;
 import org.geotoolkit.csw.xml.QueryConstraint;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.constellation.metadata.CSWConstants.*;
 
 // Geotoolkit dependencies
 
@@ -306,7 +306,7 @@ public class SQLFilterParser extends FilterParser {
                 response.append('v').append(nbField).append("value LIKE '");
             } else {
                 throw new CstlServiceException("An operator propertyIsLike must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
             
             //we get the value of the field
@@ -329,7 +329,7 @@ public class SQLFilterParser extends FilterParser {
                 
             } else {
                 throw new CstlServiceException("An operator propertyIsLike must specified the literal value.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
         } else if (comparisonOps instanceof PropertyIsNullType) {
              final PropertyIsNullType pin = (PropertyIsNullType) comparisonOps;
@@ -341,7 +341,7 @@ public class SQLFilterParser extends FilterParser {
                 response.append(" AND v").append(nbField).append(".form=identifier ");
             } else {
                 throw new CstlServiceException("An operator propertyIsNull must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
         } else if (comparisonOps instanceof PropertyIsBetweenType) {
             
@@ -357,7 +357,7 @@ public class SQLFilterParser extends FilterParser {
             
             if (propertyName == null || literal == null) {
                 throw new CstlServiceException("A binary comparison operator must be constitued of a literal and a property name.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } else {
                 if (operator.equals("PropertyIsEqualTo")) {                
                     response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
@@ -377,7 +377,7 @@ public class SQLFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
@@ -385,7 +385,7 @@ public class SQLFilterParser extends FilterParser {
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                         throw new CstlServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, Parameters.QUERY_CONSTRAINT);
+                                                          OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
                     }
                 
                 } else if (operator.equals("PropertyIsGreaterThan")) {
@@ -395,7 +395,7 @@ public class SQLFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
@@ -403,7 +403,7 @@ public class SQLFilterParser extends FilterParser {
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                         throw new CstlServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, Parameters.QUERY_CONSTRAINT);
+                                                          OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
                     }
                 
                 } else if (operator.equals("PropertyIsLessThan") ) {
@@ -414,7 +414,7 @@ public class SQLFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
@@ -422,7 +422,7 @@ public class SQLFilterParser extends FilterParser {
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                         throw new CstlServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, Parameters.QUERY_CONSTRAINT);
+                                                          OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
                     }
                     
                 } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
@@ -432,7 +432,7 @@ public class SQLFilterParser extends FilterParser {
                             if (dateValue.indexOf("CEST") != -1)
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
-                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
@@ -440,11 +440,11 @@ public class SQLFilterParser extends FilterParser {
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                          throw new CstlServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, Parameters.QUERY_CONSTRAINT);
+                                                          OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
                     }
                 } else {
                     throw new CstlServiceException("Unkwnow comparison operator: " + operator,
-                                                     INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                     INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                 }
             }
         }

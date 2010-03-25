@@ -34,7 +34,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.apache.lucene.search.Filter;
 
 // geotoolkit dependencies
-import org.constellation.metadata.Parameters;
 import org.geotoolkit.csw.xml.QueryConstraint;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
@@ -51,7 +50,7 @@ import org.geotoolkit.ogc.xml.v110.PropertyIsNullType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 
-// GeoAPI dependencies
+import static org.constellation.metadata.CSWConstants.*;
 
 
 /**
@@ -261,7 +260,7 @@ public class LuceneFilterParser extends FilterParser {
                 response.append(removePrefix(propertyName)).append(':');
             } else {
                 throw new CstlServiceException("An operator propertyIsLike must specified the propertyName.",
-                                             INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                             INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
             
             //we get the value of the field
@@ -283,7 +282,7 @@ public class LuceneFilterParser extends FilterParser {
                 
             } else {
                 throw new CstlServiceException("An operator propertyIsLike must specified the literal value.",
-                                              INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                              INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
         } else if (comparisonOps instanceof PropertyIsNullType) {
              final PropertyIsNullType pin = (PropertyIsNullType) comparisonOps;
@@ -293,7 +292,7 @@ public class LuceneFilterParser extends FilterParser {
                 response.append(removePrefix(pin.getPropertyName().getContent())).append(':').append("null");
             } else {
                 throw new CstlServiceException("An operator propertyIsNull must specified the propertyName.",
-                                             INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                             INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
         } else if (comparisonOps instanceof PropertyIsBetweenType) {
             
@@ -309,7 +308,7 @@ public class LuceneFilterParser extends FilterParser {
             
             if (propertyName == null || literal == null) {
                 throw new CstlServiceException("A binary comparison operator must be constitued of a literal and a property name.",
-                                             INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                             INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } else {
                 if (operator.equals("PropertyIsEqualTo")) {                
                     response.append(removePrefix(propertyName)).append(":\"").append(literal.getStringValue()).append('"');
@@ -327,14 +326,14 @@ public class LuceneFilterParser extends FilterParser {
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue,
-                                                          INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                          INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replaceAll("-", "");
                         dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":[").append(dateValue).append(' ').append(" 30000101]");
                     } else {
                         throw new CstlServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
-                                                      OPERATION_NOT_SUPPORTED, Parameters.QUERY_CONSTRAINT);
+                                                      OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
                     }
                 
                 } else if (operator.equals("PropertyIsGreaterThan")) {
@@ -345,14 +344,14 @@ public class LuceneFilterParser extends FilterParser {
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue,
-                                                         INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                         INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replaceAll("-", "");
                         dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":{").append(dateValue).append(' ').append(" 30000101}");
                     } else {
                         throw new CstlServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
-                                                      OPERATION_NOT_SUPPORTED, Parameters.QUERY_CONSTRAINT);
+                                                      OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
                     }
                 
                 } else if (operator.equals("PropertyIsLessThan") ) {
@@ -364,14 +363,14 @@ public class LuceneFilterParser extends FilterParser {
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue,
-                                                          INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                          INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replaceAll("-", "");
                         dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":{00000101").append(' ').append(dateValue).append("}");
                     } else {
                         throw new CstlServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
-                                                      OPERATION_NOT_SUPPORTED, Parameters.QUERY_CONSTRAINT);
+                                                      OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
                     }
                     
                 } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
@@ -382,18 +381,18 @@ public class LuceneFilterParser extends FilterParser {
                                 dateValue = createDate(dateValue);
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue,
-                                                          INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                          INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
                         dateValue = dateValue.replaceAll("-", "");
                         dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":[00000101").append(' ').append(dateValue).append("]");
                     } else {
                          throw new CstlServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,
-                                                      OPERATION_NOT_SUPPORTED, Parameters.QUERY_CONSTRAINT);
+                                                      OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
                     }
                 } else {
                     throw new CstlServiceException("Unkwnow comparison operator: " + operator,
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                 }
             }
         }

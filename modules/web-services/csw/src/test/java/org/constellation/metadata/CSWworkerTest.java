@@ -80,11 +80,13 @@ import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.dublincore.xml.v2.elements.ObjectFactory.*;
 import static org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.*;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import static org.geotoolkit.csw.xml.TypeNames.*;
+import static org.constellation.metadata.CSWConstants.*;
 
 // GeoAPI dependencies
 import org.opengis.metadata.Datatype;
@@ -729,7 +731,7 @@ public class CSWworkerTest {
             worker.getRecords(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getLocator(), Parameters.TYPENAMES);
+            assertEquals(ex.getLocator(), TYPENAMES);
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
         assertTrue(exLaunched);
@@ -748,7 +750,7 @@ public class CSWworkerTest {
             worker.getRecords(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getLocator(), Parameters.TYPENAMES);
+            assertEquals(ex.getLocator(), TYPENAMES);
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
         assertTrue(exLaunched);
@@ -767,7 +769,7 @@ public class CSWworkerTest {
             worker.getRecords(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getLocator(), Parameters.OUTPUT_SCHEMA);
+            assertEquals(ex.getLocator(), OUTPUT_SCHEMA);
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
         assertTrue(exLaunched);
@@ -967,7 +969,7 @@ public class CSWworkerTest {
             result = worker.getDomain(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getLocator(), Parameters.PARAMETERNAME);
+            assertEquals(ex.getLocator(), PARAMETERNAME);
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
         assertTrue(exLaunched);
@@ -998,7 +1000,7 @@ public class CSWworkerTest {
             result = worker.getDomain(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getLocator(), Parameters.PARAMETERNAME);
+            assertEquals(ex.getLocator(), PARAMETERNAME);
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
         assertTrue(exLaunched);
@@ -1013,7 +1015,7 @@ public class CSWworkerTest {
             result = worker.getDomain(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getLocator(), Parameters.PARAMETERNAME);
+            assertEquals(ex.getLocator(), PARAMETERNAME);
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
         assertTrue(exLaunched);
@@ -1028,7 +1030,7 @@ public class CSWworkerTest {
             result = worker.getDomain(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getLocator(), Parameters.PARAMETERNAME);
+            assertEquals(ex.getLocator(), PARAMETERNAME);
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
         assertTrue(exLaunched);

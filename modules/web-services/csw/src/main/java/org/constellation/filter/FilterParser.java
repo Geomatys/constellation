@@ -35,7 +35,6 @@ import javax.xml.namespace.QName;
 import org.apache.lucene.search.Filter;
 
 // constellation dependencies
-import org.constellation.metadata.Parameters;
 import org.constellation.ws.CstlServiceException;
 
 // Geotoolkit dependencies
@@ -80,6 +79,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotoolkit.gml.GeometrytoJTS;
 
+import static org.constellation.metadata.CSWConstants.*;
+
 /**
  *
  * @author Guilhem Legal
@@ -89,7 +90,7 @@ public abstract class FilterParser {
     protected static final FilterFactory2 FF = (FilterFactory2)
             FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
 
-     /**
+    /**
      * use for debugging purpose
      */
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
@@ -146,7 +147,7 @@ public abstract class FilterParser {
         final String crsName = gmlLine.getSrsName();
         if (crsName == null) {
             throw new CstlServiceException("A CRS (coordinate Reference system) must be specified for the line.",
-                                          INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                          INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         }
        
         final CoordinatesType coord = gmlLine.getCoordinates();
@@ -187,7 +188,7 @@ public abstract class FilterParser {
         final String crsName = gmlEnvelope.getSrsName();
         if (crsName == null) {
             throw new CstlServiceException("An operator BBOX must specified a CRS (coordinate Reference system) for the envelope.",
-                                          INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                          INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         }
        
         final List<Double> lmin = gmlEnvelope.getLowerCorner().getValue();
@@ -225,13 +226,13 @@ public abstract class FilterParser {
 
         if (crsName == null) {
             throw new CstlServiceException("A GML point must specify Coordinate Reference System.",
-                    INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                    INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         }
 
         //we get the coordinate of the point (if they are present)
         if (gmlPoint.getCoordinates() == null && gmlPoint.getPos() == null) {
             throw new CstlServiceException("A GML point must specify coordinates or direct position.",
-                    INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                    INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         }
 
         final double[] coordinates = new double[2];
@@ -244,7 +245,7 @@ public abstract class FilterParser {
                 final double value = parseDouble(tokens.nextToken());
                 if (index >= coordinates.length) {
                     throw new CstlServiceException("This service support only 2D point.",
-                            INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                            INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                 }
                 coordinates[index++] = value;
             }
@@ -253,7 +254,7 @@ public abstract class FilterParser {
             coordinates[0] = gmlPoint.getPos().getValue().get(1);
         } else {
             throw new CstlServiceException("The GML point is malformed.",
-                    INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                    INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         }
         final GeneralDirectPosition point   = new GeneralDirectPosition(coordinates);
         final CoordinateReferenceSystem crs = CRS.decode(crsName, true);
@@ -447,12 +448,12 @@ public abstract class FilterParser {
         // both constraint type are filled we throw an exception
         } else if (constraint.getCqlText() != null && constraint.getFilter() != null) {
             throw new CstlServiceException("The query constraint must be in Filter or CQL but not both.",
-                    INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                    INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         
         // none constraint type are filled we throw an exception
         } else if (constraint.getCqlText() == null && constraint.getFilter() == null) {
             throw new CstlServiceException("The query constraint must contain a Filter or a CQL query.",
-                    INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                    INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         
         // for a CQL request we transform it in Filter
         } else if (constraint.getCqlText() != null) {
@@ -461,11 +462,11 @@ public abstract class FilterParser {
 
             } catch (JAXBException ex) {
                 LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-                throw new CstlServiceException("JAXBException while parsing CQL query: " + ex.getMessage(), NO_APPLICABLE_CODE, Parameters.QUERY_CONSTRAINT);
+                throw new CstlServiceException("JAXBException while parsing CQL query: " + ex.getMessage(), NO_APPLICABLE_CODE, QUERY_CONSTRAINT);
             } catch (CQLException ex) {
                 throw new CstlServiceException("The CQL query is malformed: " + ex.getMessage() + '\n'
                                                  + "syntax Error: " + ex.getSyntaxError(),
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
             
         // for a filter we return directly it
@@ -523,18 +524,18 @@ public abstract class FilterParser {
             //we verify that all the parameters are specified
             if (propertyName == null) {
                 throw new CstlServiceException("An operator BBOX must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } else if (!propertyName.contains("BoundingBox")) {
                 throw new CstlServiceException("An operator the propertyName BBOX must be geometry valued. The property :" + propertyName + " is not.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
             if (bbox.getEnvelope() == null && bbox.getEnvelopeWithTimePeriod() == null) {
                 throw new CstlServiceException("An operator BBOX must specified an envelope.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
             if (crsName == null) {
                 throw new CstlServiceException("An operator BBOX must specified a CRS (coordinate Reference system) fot the envelope.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
 
             //we transform the EnvelopeEntry in GeneralEnvelope
@@ -551,15 +552,15 @@ public abstract class FilterParser {
             //we verify that all the parameters are specified
             if (dist.getPropertyName() == null) {
                  throw new CstlServiceException("An distanceBuffer operator must specified the propertyName.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
             if (units == null) {
                  throw new CstlServiceException("An distanceBuffer operator must specified the ditance units.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
             if (jbGeom == null || jbGeom.getValue() == null) {
                  throw new CstlServiceException("An distanceBuffer operator must specified a geometric object.",
-                                                  INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
 
             final Object gml = jbGeom.getValue();
@@ -591,18 +592,18 @@ public abstract class FilterParser {
                     spatialfilter = wrap(FF.beyond(GEOMETRY_PROPERTY,FF.literal(geometry),distance, units));
                 } else {
                     throw new CstlServiceException("Unknow DistanceBuffer operator.",
-                            INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                            INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                 }
 
             } catch (NoSuchAuthorityCodeException e) {
                     throw new CstlServiceException(UNKNOW_CRS_ERROR_MSG + crsName,
-                                                     INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                     INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } catch (FactoryException e) {
                     throw new CstlServiceException(FACTORY_BBOX_ERROR_MSG + e.getMessage(),
-                                                     INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                     INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } catch (IllegalArgumentException e) {
                     throw new CstlServiceException(INCORRECT_BBOX_DIM_ERROR_MSG+ e.getMessage(),
-                                                      INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                      INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
 
         } else if (spatialOps instanceof BinarySpatialOpType) {
@@ -647,7 +648,7 @@ public abstract class FilterParser {
 
             if (propertyName == null && gmlGeometry == null) {
                 throw new CstlServiceException("An Binarary spatial operator must specified a propertyName and a geometry.",
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
             SpatialFilterType filterType = null;
             try {
@@ -657,7 +658,7 @@ public abstract class FilterParser {
             }
             if (filterType == null) {
                 throw new CstlServiceException("Unknow FilterType: " + operator,
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
 
             String crsName = "undefined CRS";
@@ -699,13 +700,13 @@ public abstract class FilterParser {
 
             } catch (NoSuchAuthorityCodeException e) {
                 throw new CstlServiceException(UNKNOW_CRS_ERROR_MSG + crsName,
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } catch (FactoryException e) {
                 throw new CstlServiceException(FACTORY_BBOX_ERROR_MSG + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } catch (IllegalArgumentException e) {
                 throw new CstlServiceException(INCORRECT_BBOX_DIM_ERROR_MSG + e.getMessage(),
-                                                 INVALID_PARAMETER_VALUE, Parameters.QUERY_CONSTRAINT);
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
 
         }

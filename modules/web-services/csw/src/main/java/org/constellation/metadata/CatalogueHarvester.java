@@ -76,7 +76,9 @@ import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.constellation.metadata.CSWConstants.*;
 
 /**
  *
@@ -186,7 +188,7 @@ public class CatalogueHarvester {
         final QueryConstraintType constraint = new QueryConstraintType(filter1, "1.1.0");
         typeNames.add(RECORD_QNAME);
         final QueryType query = new QueryType(typeNames, new ElementSetNameType(ElementSetType.FULL), null, constraint);
-        fullGetRecordsRequestv202 = new GetRecordsType(Parameters.CSW, Parameters.CSW_202_VERSION, ResultType.RESULTS, null, MimeType.APPLICATION_XML, Namespaces.CSW_202, 1, 20, query, null);
+        fullGetRecordsRequestv202 = new GetRecordsType(CSW, CSW_202_VERSION, ResultType.RESULTS, null, MimeType.APPLICATION_XML, Namespaces.CSW_202, 1, 20, query, null);
                  
         
         //we build the base request to harvest another CSW service (2.0.0)
@@ -196,7 +198,7 @@ public class CatalogueHarvester {
         org.geotoolkit.csw.xml.v200.QueryType query2 = new org.geotoolkit.csw.xml.v200.QueryType(typeNames2,
                                                                                          new org.geotoolkit.csw.xml.v200.ElementSetNameType(ElementSetType.FULL),
                                                                                          constraint2); 
-        fullGetRecordsRequestv200 = new org.geotoolkit.csw.xml.v200.GetRecordsType(Parameters.CSW, "2.0.0", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw", 1, 20, query2, null);
+        fullGetRecordsRequestv200 = new org.geotoolkit.csw.xml.v200.GetRecordsType(CSW, "2.0.0", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw", 1, 20, query2, null);
         
         
         //we build the special request to harvest unstandardized CSW service (2.0.0)
@@ -206,17 +208,17 @@ public class CatalogueHarvester {
         query2             = new org.geotoolkit.csw.xml.v200.QueryType(typeNames2,
                                                                    new org.geotoolkit.csw.xml.v200.ElementSetNameType(ElementSetType.FULL),
                                                                    constraint2); 
-        fullGetRecordsRequestv200Special1 = new org.geotoolkit.csw.xml.v200.GetRecordsType(Parameters.CSW, "2.0.0", ResultType.RESULTS, null, MimeType.APPLICATION_XML, null, 1, 20, query2, null);
+        fullGetRecordsRequestv200Special1 = new org.geotoolkit.csw.xml.v200.GetRecordsType(CSW, "2.0.0", ResultType.RESULTS, null, MimeType.APPLICATION_XML, null, 1, 20, query2, null);
         
         
         //we build the base request to get the capabilities of anoter CSW service (2.0.2)
-        final AcceptVersionsType versions = new AcceptVersionsType(Parameters.CSW_202_VERSION, "2.0.0");
+        final AcceptVersionsType versions = new AcceptVersionsType(CSW_202_VERSION, "2.0.0");
         final SectionsType sections       = new SectionsType("All");
         final AcceptFormatsType formats   = new AcceptFormatsType(MimeType.TEXT_XML, MimeType.APPLICATION_XML);
-        getCapabilitiesRequestv202        = new GetCapabilitiesType(versions, sections, formats, null, Parameters.CSW);
+        getCapabilitiesRequestv202        = new GetCapabilitiesType(versions, sections, formats, null, CSW);
         
         //we build the base request to get the capabilities of anoter CSW service (2.0.0)
-        getCapabilitiesRequestv200  = new org.geotoolkit.csw.xml.v200.GetCapabilitiesType(versions, sections, formats, null, Parameters.CSW);
+        getCapabilitiesRequestv200  = new org.geotoolkit.csw.xml.v200.GetCapabilitiesType(versions, sections, formats, null, CSW);
     }
     
     
@@ -447,7 +449,7 @@ public class CatalogueHarvester {
      *  Analyse a capabilities Document and update the specified GetRecords request at the same time.
      */
     private GetRecordsRequest analyseCapabilitiesDocument(CapabilitiesBaseType capa, GetRecordsRequest request) {
-        String distantVersion = Parameters.CSW_202_VERSION;
+        String distantVersion = CSW_202_VERSION;
         final StringBuilder report = new StringBuilder();
 
         //we get the service version (could be 2.0.0 or 2.0.1 or 2.0.2)
@@ -791,7 +793,7 @@ public class CatalogueHarvester {
      * @return
      */
     private String getNamespaceURIFromprefix(String prefix, String distantVersion) {
-        if (distantVersion.equals(Parameters.CSW_202_VERSION)) {
+        if (distantVersion.equals(CSW_202_VERSION)) {
             if (prefix.equals("csw"))
                 return Namespaces.CSW_202;
             

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -14,38 +14,37 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.metadata;
 
+import org.geotoolkit.lang.Immutable;
+
+
 /**
+ * CSW constants.
  *
- * @author Guilhem Legal (Geomatys)
+ * @version $Id$
+ * @author glegal (Geomatys)
  */
-public class Parameters {
+@Immutable
+public abstract class CSWConstants {
 
-    private Parameters() {}
-    
+    /**
+     * Request parameters.
+     */
     public static final String CSW_202_VERSION = "2.0.2";
-
     public static final String CSW = "CSW";
-    
+
     public static final String SERVICE = "service";
-
     public static final String OUTPUT_SCHEMA = "outputSchema";
-
     public static final String TYPENAMES = "TypeNames";
-
     public static final String FILTER_CAPABILITIES = "Filter_Capabilities";
-
     public static final String PARAMETERNAME = "parameterName";
-
     public static final String TRANSACTION_TYPE = "TransactionType";
-
     public static final String QUERY_CONSTRAINT = "QueryConstraint";
-
     public static final String SOURCE = "Source";
-
     public static final String ALL = "All";
-
     public static final String NAMESPACE = "namespace";
+
+    private CSWConstants() {}
+
 }
