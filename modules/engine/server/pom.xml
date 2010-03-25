@@ -68,10 +68,6 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-go2</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-xml-sld</artifactId>
-    </dependency>
   </dependencies>
 
 </project>
