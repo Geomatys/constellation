@@ -63,7 +63,6 @@ import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.csw.xml.QueryConstraint;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
-import org.geotoolkit.filter.FilterFactoryImpl;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -78,6 +77,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 // JTS dependencies
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotoolkit.gml.GeometrytoJTS;
+import org.geotoolkit.sld.xml.XMLUtilities;
 
 import static org.constellation.metadata.CSWConstants.*;
 
@@ -109,29 +109,9 @@ public abstract class FilterParser {
      * @param cqlQuery A well-formed CQL query .
      */
     public static FilterType cqlToFilter(String cqlQuery) throws CQLException, JAXBException {
-        FilterType result;
-        final Object newFilter = CQL.toFilter(cqlQuery, new FilterFactoryImpl());
-        /*
-         * here we put a temporary patch consisting in using the geotoolkit filterFactory implementation
-         * instead of our own implementation.
-         * Then we unmarshaller the xml to get a constellation Filter object.
-         *
-         * File f = File.createTempFile("CQL", "query");
-         * FileWriter fw = new FileWriter(f);
-         * new FilterTransformer().transform(newFilter, fw);
-         * fw.close();
-         * JAXBElement jb = (JAXBElement) filterUnMarshaller.unmarshal(f);
-         */
-
-        if (!(newFilter instanceof FilterType)) {
-            result = new FilterType(newFilter);
-        } else {
-            result = (FilterType) newFilter;
-        }
-        
-        /*Debuging purpose
-        filterMarshaller.marshal(result, System.out);*/
-        return result;
+        final org.opengis.filter.Filter newFilter = CQL.toFilter(cqlQuery, FF);
+        final XMLUtilities util = new XMLUtilities();
+        return util.getTransformerXMLv110().visit(newFilter);
     }
     
     /**

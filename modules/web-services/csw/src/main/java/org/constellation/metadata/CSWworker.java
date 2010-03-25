@@ -1350,7 +1350,7 @@ public class CSWworker {
                             type = RECORD_QNAME;
                         }
                         if (param != null) {
-                            final DomainValues value = CswXmlFactory.getDomainValues(actingVersion.toString(), token, null, param.getValue(), type);
+                            final DomainValues value = CswXmlFactory.getDomainValues(actingVersion.version.toString(), token, null, param.getValue(), type);
                             responseList.add(value);
                         } else {
                             throw new CstlServiceException("The parameter " + parameter + " in the operation " + operationName + " does not exist",
@@ -1387,7 +1387,7 @@ public class CSWworker {
         }
         LOGGER.log(logLevel, "GetDomain request processed in " + (System.currentTimeMillis() - startTime) + " ms");
 
-        return CswXmlFactory.getDomainResponse(actingVersion.toString(), responseList);
+        return CswXmlFactory.getDomainResponse(actingVersion.version.toString(), responseList);
     }
     
     /**
