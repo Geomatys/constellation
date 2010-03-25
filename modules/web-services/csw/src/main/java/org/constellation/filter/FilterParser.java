@@ -76,8 +76,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Geometry;
+import org.geotoolkit.filter.FilterFactoryImpl;
 import org.geotoolkit.gml.GeometrytoJTS;
-import org.geotoolkit.sld.xml.XMLUtilities;
+import org.geotoolkit.gml.xml.v311.PolygonType;
 
 import static org.constellation.metadata.CSWConstants.*;
 
@@ -109,9 +110,18 @@ public abstract class FilterParser {
      * @param cqlQuery A well-formed CQL query .
      */
     public static FilterType cqlToFilter(String cqlQuery) throws CQLException, JAXBException {
-        final org.opengis.filter.Filter newFilter = CQL.toFilter(cqlQuery, FF);
+        FilterType result;
+        final Object newFilter = CQL.toFilter(cqlQuery, new FilterFactoryImpl());
+
+        if (!(newFilter instanceof FilterType)) {
+            result = new FilterType(newFilter);
+        } else {
+            result = (FilterType) newFilter;
+        }
+        return result;
+        /*final org.opengis.filter.Filter newFilter = CQL.toFilter(cqlQuery, FF);
         final XMLUtilities util = new XMLUtilities();
-        return util.getTransformerXMLv110().visit(newFilter);
+        return util.getTransformerXMLv110().visit(newFilter);*/
     }
     
     /**
@@ -618,6 +628,9 @@ public abstract class FilterParser {
                 } else if (ab instanceof LineStringType) {
                     gmlGeometry     = (LineStringType) ab;
 
+                } else if (ab instanceof PolygonType) {
+                    gmlGeometry     = (PolygonType) ab;
+
                 } else if (ab == null) {
                    throw new IllegalArgumentException("null value in BinarySpatialOp type");
 
@@ -651,16 +664,12 @@ public abstract class FilterParser {
                     crsName                   = gmlEnvelope.getSrsName();
                     filterGeometry            = GeometrytoJTS.toJTS(gmlEnvelope);
 
-                } else if (gmlGeometry instanceof PointType) {
-                    final PointType gmlPoint  = (PointType) gmlGeometry;
-                    crsName                   = gmlPoint.getSrsName();
-                    filterGeometry            = GeometrytoJTS.toJTS(gmlPoint);
+                } else if (gmlGeometry instanceof AbstractGeometryType) {
 
-                } else if (gmlGeometry instanceof LineStringType) {
-                    final LineStringType gmlLine =  (LineStringType) gmlGeometry;
-                    crsName                = gmlLine.getSrsName();
-                    filterGeometry         = GeometrytoJTS.toJTS(gmlLine);
-                }
+                    crsName                   = ((AbstractGeometryType)gmlGeometry).getSrsName();
+                    filterGeometry            = GeometrytoJTS.toJTS((AbstractGeometryType)gmlGeometry);
+
+                } 
 
                 final int srid = SRIDGenerator.toSRID(crsName, Version.V1);
                 filterGeometry.setSRID(srid);
