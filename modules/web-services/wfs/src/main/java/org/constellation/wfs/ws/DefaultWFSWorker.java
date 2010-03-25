@@ -39,8 +39,6 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
 import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
@@ -129,7 +127,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     /**
      * The current version of the service.
      */
-    private ServiceVersion actingVersion = new ServiceVersion(ServiceType.WFS, "1.1.0");
+    private ServiceDef actingVersion = ServiceDef.WFS_1_1_0;
 
     private Map<String, String> schemaLocations;
 
@@ -965,7 +963,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             if (request.getVersion() != null) {
                 if (request.getVersion().toString().equals("1.1.0") || request.getVersion().toString().equals("1.1") || 
                         request.getVersion().toString().equals("")  || request.getVersion().toString().equals("1.0.0") ) { // hack for openScale accept 1.0.0
-                    this.actingVersion = new ServiceVersion(ServiceType.WFS, "1.1.0");
+                    this.actingVersion = ServiceDef.WFS_1_1_0;
 
                 } else {
                     CodeList code;
@@ -980,7 +978,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 if (versionMandatory) {
                     throw new CstlServiceException("version must be specified!", MISSING_PARAMETER_VALUE, "version");
                 } else {
-                    this.actingVersion = new ServiceVersion(ServiceType.WFS, "1.1.0");
+                    this.actingVersion = ServiceDef.WFS_1_1_0;
                 }
             }
          } else {

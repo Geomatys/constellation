@@ -51,6 +51,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
 //Constellation dependencies
+import org.constellation.ServiceDef;
 import org.constellation.filter.FilterParser;
 import org.constellation.filter.LuceneFilterParser;
 import org.constellation.filter.SQLFilterParser;
@@ -66,8 +67,6 @@ import org.constellation.util.Util;
 import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.ServiceType;
-import org.constellation.ws.ServiceVersion;
 
 import static org.constellation.metadata.io.AbstractMetadataReader.*;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -256,7 +255,7 @@ public class CSWworker {
     /**
      * The current version of the service.
      */
-    private ServiceVersion actingVersion = new ServiceVersion(ServiceType.CSW, Parameters.CSW_202_VERSION);
+    private ServiceDef actingVersion = ServiceDef.CSW_2_0_2;
 
     /**
      * The log level off al the informations log.
@@ -1712,9 +1711,9 @@ public class CSWworker {
                  * TODO remove this
                  */
                 if (request.getVersion().equals(Parameters.CSW_202_VERSION)) {
-                    this.actingVersion = new ServiceVersion(ServiceType.CSW, Parameters.CSW_202_VERSION);
+                    this.actingVersion = ServiceDef.CSW_2_0_2;
                 } else if (request.getVersion().equals("2.0.0") && (request instanceof GetDomain)) {
-                    this.actingVersion = new ServiceVersion(ServiceType.CSW, "2.0.0");
+                    this.actingVersion = ServiceDef.CSW_2_0_0;
 
                 } else {
                     throw new CstlServiceException("version must be \"2.0.2\"!", VERSION_NEGOTIATION_FAILED, "version");
