@@ -30,10 +30,15 @@ import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.wrs.xml.v100.ExtrinsicObjectType;
 
 /**
+ * @deprecated This class is now part of the Geotoolkit-pending project, as
+ * {@link org.geotoolkit.csw.xml.CSWClassesContext}. Nevertheless the EBRIM classes
+ * declaration is now in its binding module, in the class
+ * {@link org.geotoolkit.ebrim.xml.EBRIMClassesContext}.
  *
  * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
+@Deprecated
 public final class CSWClassesContext {
 
     private CSWClassesContext() {}
@@ -57,7 +62,10 @@ public final class CSWClassesContext {
      * Return the list of all the marshallable classes
      *
      * @return
+     * @deprecated use {@link org.geotoolkit.csw.xml.CSWClassesContext#getAllClassesList}
+     *              or {@link org.geotoolkit.ebrim.xml.EBRIMClassesContext#getAllClassesList}
      */
+    @Deprecated
     public static List<Class> getAllClassesList() {
         final List<Class> classeList = new ArrayList<Class>();
 
@@ -125,7 +133,10 @@ public final class CSWClassesContext {
      * Return the list of all the marshallable classes
      *
      * @return
+     * @deprecated use {@link org.geotoolkit.csw.xml.CSWClassesContext#getAllClasses}
+     *              or {@link org.geotoolkit.ebrim.xml.EBRIMClassesContext#getAllClasses}
      */
+    @Deprecated
     public static Class[] getAllClasses() {
         List<Class> classes =getAllClassesList();
         return classes.toArray(new Class[classes.size()]);
