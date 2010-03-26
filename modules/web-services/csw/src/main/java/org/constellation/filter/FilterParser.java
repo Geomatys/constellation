@@ -18,8 +18,6 @@
 package org.constellation.filter;
 
 import java.awt.geom.Line2D;
-import java.text.ParseException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -79,8 +77,6 @@ import com.vividsolutions.jts.geom.Geometry;
 import org.geotoolkit.filter.FilterFactoryImpl;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.v311.PolygonType;
-import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.Strings;
 
 import static org.constellation.metadata.CSWConstants.*;
 
@@ -269,131 +265,6 @@ public abstract class FilterParser {
         }
     }
     
-//    /**
-//     * Return a Date by parsing different kind of date format.
-//     *
-//     * @param date a date representation (example 2002, 02-2007, 2004-03-04, ...)
-//     *
-//     * @return a formated date (example 2002 -> 01-01-2002,  2004-03-04 -> 04-03-2004, ...)
-//     */
-//    @Deprecated
-//    protected String createDate(String date) throws ParseException {
-//
-//        if(date == null){
-//            return "1970-01-01";
-//        }
-//
-//        final Map<String, String> monthPOOL = new HashMap<String, String>();
-//        //french lowerCase
-//        monthPOOL.put("janvier",   "01");
-//        monthPOOL.put("février",   "02");
-//        monthPOOL.put("mars",      "03");
-//        monthPOOL.put("avril",     "04");
-//        monthPOOL.put("mai",       "05");
-//        monthPOOL.put("juin",      "06");
-//        monthPOOL.put("juillet",   "07");
-//        monthPOOL.put("août",      "08");
-//        monthPOOL.put("septembre", "09");
-//        monthPOOL.put("octobre",   "10");
-//        monthPOOL.put("novembre",  "11");
-//        monthPOOL.put("décembre",  "12");
-//        //french first upperCase
-//        monthPOOL.put("Janvier",   "01");
-//        monthPOOL.put("Février",   "02");
-//        monthPOOL.put("Mars",      "03");
-//        monthPOOL.put("Avril",     "04");
-//        monthPOOL.put("Mai",       "05");
-//        monthPOOL.put("Juin",      "06");
-//        monthPOOL.put("Juillet",   "07");
-//        monthPOOL.put("Août",      "08");
-//        monthPOOL.put("Septembre", "09");
-//        monthPOOL.put("Octobre",   "10");
-//        monthPOOL.put("Novembre",  "11");
-//        monthPOOL.put("Décembre",  "12");
-//
-//         //english first upperCase + cut
-//        monthPOOL.put("Jan",       "01");
-//        monthPOOL.put("Feb",       "02");
-//        monthPOOL.put("Mar",       "03");
-//        monthPOOL.put("Apr",       "04");
-//        monthPOOL.put("May",       "05");
-//        monthPOOL.put("Jun",       "06");
-//        monthPOOL.put("Jul",       "07");
-//        monthPOOL.put("Aug",       "08");
-//        monthPOOL.put("Sep",       "09");
-//        monthPOOL.put("Oct",       "10");
-//        monthPOOL.put("Nov",       "11");
-//        monthPOOL.put("Dec",       "12");
-//
-//
-//        final String year;
-//        final String month;
-//        final String day;
-//
-//        if(date.contains("/")){
-//            day   = date.substring(0, date.indexOf('/'));
-//            date  = date.substring(date.indexOf('/') + 1);
-//            month = date.substring(0, date.indexOf('/'));
-//            year  = date.substring(date.indexOf('/') + 1);
-//
-//            tmp   = year + '-' + month + '-' + day;
-//        } else if ( Strings.count(date, ' ') == 2 ) {
-//            if (! date.contains("?")){
-//
-//                day    = date.substring(0, date.indexOf(' '));
-//                date   = date.substring(date.indexOf(' ') + 1);
-//                month  = monthPOOL.get(date.substring(0, date.indexOf(' ')));
-//                year   = date.substring(date.indexOf(' ')+1);
-//
-//                tmp    = day + "-" + month + "-" + year;
-//            } else tmp = "2000-01-01";
-//
-//        } else if ( Strings.count(date, ' ') == 1 ) {
-//
-//            month = monthPOOL.get(date.substring(0, date.indexOf(' ')));
-//            year  = date.substring(date.indexOf(' ') + 1);
-//           tmp   = year + "-" + month + "-01";
-//
-//        } else if ( Strings.count(date, '-') == 1 ) {
-//
-//            month = date.substring(0, date.indexOf('-'));
-//            year  = date.substring(date.indexOf('-') + 1);
-//
-//            tmp   = year + "-" + month + "-01";
-//
-//        } else if ( Strings.count(date, '-') == 2 ) {
-//
-//            //if date is in format yyyy-mm-dd
-//            if (date.substring(0, date.indexOf('-')).length()==4){
-//                year  = date.substring(0, date.indexOf('-'));
-//                date  = date.substring(date.indexOf('-') + 1);
-//                month = date.substring(0, date.indexOf('-'));
-//                day   = date.substring(date.indexOf('-') + 1);
-//
-//                tmp   = year + "-" + month + "-" + day;
-//            }
-//            else{
-//                day   = date.substring(0, date.indexOf('-'));
-//                date  = date.substring(date.indexOf('-') + 1);
-//                month = date.substring(0, date.indexOf('-'));
-//                year  = date.substring(date.indexOf('-') + 1);
-//
-//                tmp   = year + "-" + month + "-" + day;
-//            }
-//
-//        } else if ( StringUtilities.getOccurence(date, "CEST") == 1) {
-//            year  = date.substring(date.indexOf("CEST") + 4);
-//            month = monthPOOL.get(date.substring(4, 7));
-//            day   = date.substring(8, 10);
-//            tmp   = year + "-" + month + "-" + day;
-//        } else {
-//            year = date;
-//            tmp  =  year + "-01-01";
-//        }
-//
-//        return new StringBuilder(year).append('-').append(month).append('-').append(day).toString();
-//    }
-        
     public abstract Object getQuery(final QueryConstraint constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException;
     
     protected abstract Object treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws CstlServiceException;
