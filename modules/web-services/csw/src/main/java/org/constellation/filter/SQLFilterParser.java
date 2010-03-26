@@ -57,6 +57,7 @@ import org.geotoolkit.ogc.xml.v110.PropertyIsNullType;
 
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
+import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.mdweb.model.schemas.Standard;
 
 ;
@@ -374,12 +375,10 @@ public class SQLFilterParser extends FilterParser {
                     if (isDateField(propertyName)) {
                         String dateValue = literal.getStringValue();
                         try {
-                            if (dateValue.indexOf("CEST") != -1)
-                                dateValue = createDate(dateValue);
+                            dateValue = TemporalUtilities.parseDate(dateValue).toString();
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
-                        dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
                         response.append('v').append(nbField).append(".value >= '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
@@ -392,12 +391,10 @@ public class SQLFilterParser extends FilterParser {
                     if (isDateField(propertyName)) {
                         String dateValue = literal.getStringValue();
                         try {
-                            if (dateValue.indexOf("CEST") != -1)
-                                dateValue = createDate(dateValue);
+                            dateValue = TemporalUtilities.parseDate(dateValue).toString();
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
-                        dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
                         response.append('v').append(nbField).append(".value > '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
@@ -411,12 +408,10 @@ public class SQLFilterParser extends FilterParser {
                         //if we are passed by CQL we must format the date
                         String dateValue = literal.getStringValue();
                         try {
-                            if (dateValue.indexOf("CEST") != -1)
-                                dateValue = createDate(dateValue);
+                            dateValue = TemporalUtilities.parseDate(dateValue).toString();
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
-                        dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
                         response.append('v').append(nbField).append(".value < '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
@@ -429,12 +424,10 @@ public class SQLFilterParser extends FilterParser {
                     if (isDateField(propertyName)) {
                         String dateValue = literal.getStringValue();
                         try {
-                            if (dateValue.indexOf("CEST") != -1)
-                                dateValue = createDate(dateValue);
+                            dateValue = TemporalUtilities.parseDate(dateValue).toString();
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
-                        dateValue = dateValue.replace("Z", "");
                         response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
                         response.append('v').append(nbField).append(".value <= '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");

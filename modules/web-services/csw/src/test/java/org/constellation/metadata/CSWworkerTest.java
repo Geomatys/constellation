@@ -1442,10 +1442,10 @@ public class CSWworkerTest {
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
-        assertTrue(response != null);
-        assertTrue(response.getSearchResults() != null);
-        assertTrue(response.getSearchResults().getAny() != null);
-        assertTrue(response.getSearchResults().getAny().size() == 2);
+        assertNotNull(response);
+        assertNotNull(response.getSearchResults());
+        assertNotNull(response.getSearchResults().getAny());
+        assertEquals(2, response.getSearchResults().getAny().size());
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -1482,10 +1482,10 @@ public class CSWworkerTest {
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
-        assertTrue(response != null);
-        assertTrue(response.getSearchResults() != null);
-        assertTrue(response.getSearchResults().getAny() != null);
-        assertTrue(response.getSearchResults().getAny().size() == 1);
+        assertNotNull(response);
+        assertNotNull(response.getSearchResults());
+        assertNotNull(response.getSearchResults().getAny());
+        assertEquals(1, response.getSearchResults().getAny().size());
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -1512,9 +1512,9 @@ public class CSWworkerTest {
         gr         = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.isotc211.org/2005/gmd", 1, 10, query, null);
 
         response = (GetRecordsResponseType) worker.getRecords(gr);
-        assertTrue(response != null);
-        assertTrue(response.getSearchResults() != null);
-        assertTrue(response.getSearchResults().getAny() != null);
+        assertNotNull(response);
+        assertNotNull(response.getSearchResults());
+        assertNotNull(response.getSearchResults().getAny());
         assertEquals(2, response.getSearchResults().getAny().size());
 
         results = new ArrayList<String>();
@@ -1550,10 +1550,10 @@ public class CSWworkerTest {
 
         // we perform again the getRecord request the modified metadata must appears again in the list
         response = (GetRecordsResponseType) worker.getRecords(gr);
-        assertTrue(response != null);
-        assertTrue(response.getSearchResults() != null);
-        assertTrue(response.getSearchResults().getAny() != null);
-        assertTrue(response.getSearchResults().getAny().size() == 2);
+        assertNotNull(response);
+        assertNotNull(response.getSearchResults());
+        assertNotNull(response.getSearchResults().getAny());
+        assertEquals(2, response.getSearchResults().getAny().size());
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {

@@ -19,6 +19,8 @@ package org.constellation.filter;
 // J2SE dependencies
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +51,7 @@ import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsNullType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
+import org.geotoolkit.temporal.object.TemporalUtilities;
 
 import static org.constellation.metadata.CSWConstants.*;
 
@@ -321,15 +324,13 @@ public class LuceneFilterParser extends FilterParser {
                 } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
                     if (isDateField(propertyName)) {
                         String dateValue = literal.getStringValue();
+
                         try {
-                            if (dateValue.indexOf("CEST") != -1)
-                                dateValue = createDate(dateValue);
+                            dateValue = toLuceneDate(TemporalUtilities.parseDate(dateValue));
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue,
                                                           INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
-                        dateValue = dateValue.replaceAll("-", "");
-                        dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":[").append(dateValue).append(' ').append(" 30000101]");
                     } else {
                         throw new CstlServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
@@ -340,14 +341,11 @@ public class LuceneFilterParser extends FilterParser {
                     if (isDateField(propertyName)) {
                         String dateValue = literal.getStringValue();
                         try {
-                            if (dateValue.indexOf("CEST") != -1)
-                                dateValue = createDate(dateValue);
+                            dateValue = toLuceneDate(TemporalUtilities.parseDate(dateValue));
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue,
                                                          INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
-                        dateValue = dateValue.replaceAll("-", "");
-                        dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":{").append(dateValue).append(' ').append(" 30000101}");
                     } else {
                         throw new CstlServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
@@ -359,14 +357,11 @@ public class LuceneFilterParser extends FilterParser {
                         //if we are passed by CQL we must format the date
                         String dateValue = literal.getStringValue();
                         try {
-                            if (dateValue.indexOf("CEST") != -1)
-                                dateValue = createDate(dateValue);
+                            dateValue = toLuceneDate(TemporalUtilities.parseDate(dateValue));
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue,
                                                           INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
-                        dateValue = dateValue.replaceAll("-", "");
-                        dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":{00000101").append(' ').append(dateValue).append("}");
                     } else {
                         throw new CstlServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
@@ -377,14 +372,11 @@ public class LuceneFilterParser extends FilterParser {
                     if (isDateField(propertyName)) {
                         String dateValue = literal.getStringValue();
                         try {
-                            if (dateValue.indexOf("CEST") != -1)
-                                dateValue = createDate(dateValue);
+                            dateValue = toLuceneDate(TemporalUtilities.parseDate(dateValue));
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue,
                                                           INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
-                        dateValue = dateValue.replaceAll("-", "");
-                        dateValue = dateValue.replace("Z", "");
                         response.append(removePrefix(propertyName)).append(":[00000101").append(' ').append(dateValue).append("]");
                     } else {
                          throw new CstlServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,
@@ -421,4 +413,26 @@ public class LuceneFilterParser extends FilterParser {
         }
         return s;
     }
+
+    private static String toLuceneDate(Date date){
+        final Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.valueOf(c.get(Calendar.YEAR)));
+
+        int month = c.get(Calendar.MONTH)+1;
+        if(month < 10){
+            sb.append('0');
+        }
+        sb.append(month);
+
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        if(day < 10){
+            sb.append('0');
+        }
+        sb.append(day);
+        
+        return sb.toString();
+    }
+
 }

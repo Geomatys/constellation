@@ -83,10 +83,10 @@ public class CQLParserTest {
         
         FilterType filter = FilterParser.cqlToFilter("Title LIKE 'VM%'");
         
-        assertTrue(filter.getComparisonOps() != null);
-        assertTrue(filter.getLogicOps()      == null);
-        assertTrue(filter.getId().size()     == 0   );
-        assertTrue(filter.getSpatialOps()    == null);
+        assertNotNull(filter.getComparisonOps());
+        assertNull(filter.getLogicOps());
+        assertEquals(0, filter.getId().size() );
+        assertNull(filter.getSpatialOps());
         
         SpatialQuery spaQuery = filterParser.getLuceneQuery(filter);
         
@@ -101,10 +101,10 @@ public class CQLParserTest {
         filter = FilterParser.cqlToFilter("Title ='VM'");
         
         
-        assertTrue(filter.getComparisonOps() != null);
-        assertTrue(filter.getLogicOps()      == null);
-        assertTrue(filter.getId().size()     == 0   );
-        assertTrue(filter.getSpatialOps()    == null);
+        assertNotNull(filter.getComparisonOps());
+        assertNull(filter.getLogicOps());
+        assertEquals(0, filter.getId().size() );
+        assertNull(filter.getSpatialOps());
         
         spaQuery = filterParser.getLuceneQuery(filter);
         
@@ -118,10 +118,10 @@ public class CQLParserTest {
         
         filter =FilterParser.cqlToFilter("Title <>'VM'");
         
-        assertTrue(filter.getComparisonOps() == null);
-        assertTrue(filter.getLogicOps()      != null);
-        assertTrue(filter.getId().size()     == 0   );
-        assertTrue(filter.getSpatialOps()    == null);
+        assertNull(filter.getComparisonOps());
+        assertNotNull(filter.getLogicOps());
+        assertEquals(0, filter.getId().size() );
+        assertNull(filter.getSpatialOps());
         
         spaQuery = filterParser.getLuceneQuery(filter);
         
@@ -135,10 +135,10 @@ public class CQLParserTest {
          */ 
         filter = FilterParser.cqlToFilter("Title IS NULL");
         
-        assertTrue(filter.getComparisonOps() != null);
-        assertTrue(filter.getLogicOps()      == null);
-        assertTrue(filter.getId().size()     == 0   );
-        assertTrue(filter.getSpatialOps()    == null);
+        assertNotNull(filter.getComparisonOps());
+        assertNull(filter.getLogicOps());
+        assertEquals(0, filter.getId().size() );
+        assertNull(filter.getSpatialOps());
         
         spaQuery = filterParser.getLuceneQuery(filter);
         
@@ -151,32 +151,32 @@ public class CQLParserTest {
          */
         filter = FilterParser.cqlToFilter("CreationDate AFTER 2007-06-02T00:00:00Z");
         
-        assertTrue(filter.getComparisonOps() != null);
-        assertTrue(filter.getLogicOps()      == null);
-        assertTrue(filter.getId().size()     == 0   );
-        assertTrue(filter.getSpatialOps()    == null);
+        assertNotNull(filter.getComparisonOps());
+        assertNull(filter.getLogicOps());
+        assertEquals(0, filter.getId().size() );
+        assertNull(filter.getSpatialOps());
         
         spaQuery = filterParser.getLuceneQuery(filter);
         
-        assertTrue(spaQuery.getSpatialFilter() == null);
-        assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:{20070602  30000101}");
+        assertNull(spaQuery.getSpatialFilter());
+        assertEquals(0, spaQuery.getSubQueries().size());
+        assertEquals("CreationDate:{20070602  30000101}", spaQuery.getQuery());
         
          /**
          * Test 6: PropertyIsLessThan
          */
         filter = FilterParser.cqlToFilter("CreationDate BEFORE 2007-06-02T00:00:00Z");
         
-        assertTrue(filter.getComparisonOps() != null);
-        assertTrue(filter.getLogicOps()      == null);
-        assertTrue(filter.getId().size()     == 0   );
-        assertTrue(filter.getSpatialOps()    == null);
+        assertNotNull(filter.getComparisonOps());
+        assertNull(filter.getLogicOps());
+        assertEquals(0, filter.getId().size() );
+        assertNull(filter.getSpatialOps());
         
         spaQuery = filterParser.getLuceneQuery(filter);
         
-        assertTrue(spaQuery.getSpatialFilter() == null);
-        assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "CreationDate:{00000101 20070602}");
+        assertNull(spaQuery.getSpatialFilter());
+        assertEquals(0, spaQuery.getSubQueries().size());
+        assertEquals("CreationDate:{00000101 20070602}", spaQuery.getQuery());
     }
     
     /**
