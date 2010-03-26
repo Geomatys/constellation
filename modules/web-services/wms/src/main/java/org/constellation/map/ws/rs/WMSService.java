@@ -56,7 +56,6 @@ import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.util.TimeParser;
 import org.constellation.writer.CapabilitiesFilterWriter;
 import org.constellation.writer.ExceptionFilterWriter;
-import org.constellation.ws.ServiceType;
 import org.constellation.ws.ServiceExceptionReport;
 import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.CstlServiceException;
@@ -356,7 +355,7 @@ public class WMSService extends GridWebService {
      */
     private GetCapabilities adaptGetCapabilities(final String version) throws CstlServiceException {
         final String service = getParameter(KEY_SERVICE, true);
-        if (!ServiceType.WMS.toString().equalsIgnoreCase(service)) {
+        if (!ServiceDef.Specification.WMS.toString().equalsIgnoreCase(service)) {
             throw new CstlServiceException("Invalid service specified. Should be WMS.",
                     INVALID_PARAMETER_VALUE, KEY_SERVICE.toLowerCase());
         }

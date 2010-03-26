@@ -25,11 +25,11 @@ import org.constellation.provider.AbstractFeatureLayerDetails;
 import org.constellation.provider.StyleProviderProxy;
 
 import org.geotoolkit.data.DataStore;
-import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.query.QueryBuilder;
 import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 
 import org.opengis.feature.type.FeatureType;

@@ -34,11 +34,11 @@ import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.data.DataStore;
-import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.util.collection.Cache;
+import org.geotoolkit.storage.DataStoreException;
 import org.opengis.feature.type.Name;
 
 

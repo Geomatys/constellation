@@ -21,7 +21,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,18 +31,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.constellation.ServiceDef;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
-import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReadParam;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.ext.legend.DefaultLegendService;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
@@ -111,14 +107,12 @@ class WorldImageLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
-            final Double elevation, final Date time) throws CatalogException, IOException{
+            final Double elevation, final Date time) throws DataStoreException, IOException{
 
         final GridCoverageReadParam param = new GridCoverageReadParam();
         param.setEnvelope(envelope);
         try {
             return (GridCoverage2D) reader.read(0, param);
-        } catch (CoverageStoreException ex) {
-            throw new IOException(ex.getMessage(),ex);
         } catch (CancellationException ex) {
             throw new IOException(ex.getMessage(),ex);
         }
@@ -196,17 +190,15 @@ class WorldImageLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
+    public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
         Envelope env;
         try {
             env = reader.getGridGeometry(0).getEnvelope();
             return new DefaultGeographicBoundingBox(env);
-        } catch (CoverageStoreException ex) {
-            throw new CatalogException(ex);
         } catch (CancellationException ex) {
-            throw new CatalogException(ex);
+            throw new DataStoreException(ex);
         } catch (TransformException ex) {
-            throw new CatalogException(ex);
+            throw new DataStoreException(ex);
         }
 
     }
@@ -215,7 +207,7 @@ class WorldImageLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public SortedSet<Date> getAvailableTimes() throws CatalogException {
+    public SortedSet<Date> getAvailableTimes() throws DataStoreException {
         return new TreeSet<Date>();
     }
 
@@ -223,7 +215,7 @@ class WorldImageLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public SortedSet<Number> getAvailableElevations() throws CatalogException {
+    public SortedSet<Number> getAvailableElevations() throws DataStoreException {
         return new TreeSet<Number>();
     }
 
@@ -270,7 +262,7 @@ class WorldImageLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public Set<Series> getSeries() {
-        return new HashSet<Series>();
+        return Collections.emptySet();
     }
 
     /**

@@ -372,6 +372,16 @@
       </dependency>
       <dependency>
         <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-coverage-sql</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-storage</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit</groupId>
         <artifactId>geotk-widgets-swing</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>

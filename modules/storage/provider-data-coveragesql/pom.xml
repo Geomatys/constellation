@@ -56,6 +56,10 @@
     </dependency>
 
     <dependency>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-coverage-sql</artifactId>
+    </dependency>
+    <dependency>
         <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-go2-style-extension</artifactId>
     </dependency>

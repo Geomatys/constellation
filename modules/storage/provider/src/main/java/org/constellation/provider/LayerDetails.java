@@ -25,15 +25,13 @@ import java.util.Map;
 import java.util.SortedSet;
 import org.constellation.ServiceDef;
 
-import org.constellation.catalog.CatalogException;
-import org.constellation.coverage.catalog.Layer;
-
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.style.MutableStyleFactory;
@@ -74,12 +72,12 @@ public interface LayerDetails {
     /**
      * @see Layer#getAvailableTimes
      */
-    SortedSet<Date> getAvailableTimes() throws CatalogException;
+    SortedSet<Date> getAvailableTimes() throws DataStoreException;
 
     /**
      * @see Layer#getAvailableElevations
      */
-    SortedSet<Number> getAvailableElevations() throws CatalogException;
+    SortedSet<Number> getAvailableElevations() throws DataStoreException;
 
     /**
      * Returns the coverage requested.
@@ -93,7 +91,7 @@ public interface LayerDetails {
      * @throws java.io.IOException
      */
     GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
-            final Double elevation, final Date time) throws CatalogException, IOException;
+            final Double elevation, final Date time) throws DataStoreException, IOException;
 
     /**
      * Returns a list of favorites styles associated to this layer.
@@ -103,7 +101,7 @@ public interface LayerDetails {
     /**
      * @see Layer#getGeographicBoundingBox
      */
-    GeographicBoundingBox getGeographicBoundingBox() throws CatalogException;
+    GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException;
 
     /**
      * @see Layer#getLegend(Dimension)

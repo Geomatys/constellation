@@ -295,7 +295,6 @@ class PostGridLayerDetails implements CoverageLayerDetails {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Set<Series> getSeries() {
         return reader.getTable().getLayer().getSeries();
     }

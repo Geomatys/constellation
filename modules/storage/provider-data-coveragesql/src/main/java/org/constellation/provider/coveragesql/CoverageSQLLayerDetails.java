@@ -29,20 +29,14 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import org.constellation.ServiceDef;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.coverage.catalog.CoverageReference;
-import org.constellation.coverage.catalog.GridCoverageTable;
-import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
-import org.constellation.map.PostGridMapLayer;
-import org.constellation.map.PostGridReader;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.GridCoverageReader;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display.shape.DoubleDimension2D;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
@@ -72,14 +66,14 @@ import org.opengis.style.Symbolizer;
  * @author Cédric Briançon
  */
 class CoverageSQLLayerDetails implements CoverageLayerDetails {
-    private final PostGridReader reader;
-
-    /**
-     * Favorites styles associated with this layer.
-     */
-    private final List<String> favorites;
-
-    private final String elevationModel;
+//    private final PostGridReader reader;
+//
+//    /**
+//     * Favorites styles associated with this layer.
+//     */
+//    private final List<String> favorites;
+//
+//    private final String elevationModel;
 
     /**
      * Stores information about a {@linkplain Layer layer} in a {@code PostGRID}
@@ -88,15 +82,15 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      * @param database The database connection.
      * @param layer The layer to consider in the database.
      */
-    CoverageSQLLayerDetails(final PostGridReader reader, final List<String> favorites, final String elevationModel) {
-        this.reader = reader;
-
-        if (favorites == null) {
-            this.favorites = Collections.emptyList();
-        } else {
-            this.favorites = favorites;
-        }
-        this.elevationModel = elevationModel;
+    CoverageSQLLayerDetails(final GridCoverageReader reader, final List<String> favorites, final String elevationModel) {
+//        this.reader = reader;
+//
+//        if (favorites == null) {
+//            this.favorites = Collections.emptyList();
+//        } else {
+//            this.favorites = favorites;
+//        }
+//        this.elevationModel = elevationModel;
     }
 
     /**
@@ -104,53 +98,54 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
-            final Double elevation, final Date time) throws CatalogException, IOException{
-
-        final int width = dimension.width;
-        final int height = dimension.height;
-        final Envelope genv;
-        try {
-            genv = CRS.transform(envelope, DefaultGeographicCRS.WGS84);
-        } catch (TransformException ex) {
-            throw new CatalogException(ex);
-        }
-        final GeneralEnvelope renv = new GeneralEnvelope(genv);
-
-        //Create BBOX-----------------------------------------------------------
-        final GeographicBoundingBox bbox;
-        try {
-            bbox = new DefaultGeographicBoundingBox(renv);
-        } catch (TransformException ex) {
-            throw new CatalogException(ex);
-        }
-
-        //Create resolution-----------------------------------------------------
-        final double w = renv.toRectangle2D().getWidth()  / width;
-        final double h = renv.toRectangle2D().getHeight() / height;
-        final Dimension2D resolution = new DoubleDimension2D(w, h);
-
-        GridCoverageTable table = reader.getTable();
-        table = new GridCoverageTable(table);
-
-        table.setGeographicBoundingBox(bbox);
-        table.setPreferredResolution(resolution);
-        table.setTimeRange(time, time);
-        if (elevation != null) {
-            table.setVerticalRange(elevation, elevation);
-        } else {
-            table.setVerticalRange(null);
-        }
-        final CoverageReference coverageRef;
-        try {
-            coverageRef = table.getEntry();
-        } catch (SQLException ex) {
-            throw new CatalogException(ex);
-        }
-        if (coverageRef == null) {
-            throw new CatalogException("The request done is not in the domain of validity of the coverage. " +
-                    "Either the envelope or the date (or both) is/are not defined for this coverage.");
-        }
-        return coverageRef.getCoverage(null);
+            final Double elevation, final Date time) throws DataStoreException, IOException{
+        return null;
+//
+//        final int width = dimension.width;
+//        final int height = dimension.height;
+//        final Envelope genv;
+//        try {
+//            genv = CRS.transform(envelope, DefaultGeographicCRS.WGS84);
+//        } catch (TransformException ex) {
+//            throw new CatalogException(ex);
+//        }
+//        final GeneralEnvelope renv = new GeneralEnvelope(genv);
+//
+//        //Create BBOX-----------------------------------------------------------
+//        final GeographicBoundingBox bbox;
+//        try {
+//            bbox = new DefaultGeographicBoundingBox(renv);
+//        } catch (TransformException ex) {
+//            throw new CatalogException(ex);
+//        }
+//
+//        //Create resolution-----------------------------------------------------
+//        final double w = renv.toRectangle2D().getWidth()  / width;
+//        final double h = renv.toRectangle2D().getHeight() / height;
+//        final Dimension2D resolution = new DoubleDimension2D(w, h);
+//
+//        GridCoverageTable table = reader.getTable();
+//        table = new GridCoverageTable(table);
+//
+//        table.setGeographicBoundingBox(bbox);
+//        table.setPreferredResolution(resolution);
+//        table.setTimeRange(time, time);
+//        if (elevation != null) {
+//            table.setVerticalRange(elevation, elevation);
+//        } else {
+//            table.setVerticalRange(null);
+//        }
+//        final CoverageReference coverageRef;
+//        try {
+//            coverageRef = table.getEntry();
+//        } catch (SQLException ex) {
+//            throw new CatalogException(ex);
+//        }
+//        if (coverageRef == null) {
+//            throw new CatalogException("The request done is not in the domain of validity of the coverage. " +
+//                    "Either the envelope or the date (or both) is/are not defined for this coverage.");
+//        }
+//        return coverageRef.getCoverage(null);
     }
 
 
@@ -159,45 +154,46 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) {
-        final PostGridMapLayer mapLayer = new PostGridMapLayer(reader);
-
-        mapLayer.setName(getName());
-
-        if(style == null && favorites.size() > 0){
-            //no style provided, try to get the favorite one
-            //there are some favorites styles
-            final String namedStyle = favorites.get(0);
-            style = StyleProviderProxy.getInstance().get(namedStyle);
-        }
-
-        if(style == null){
-            //no favorites defined, create a default one
-            style = RANDOM_FACTORY.createRasterStyle();
-        }
-        
-        mapLayer.setStyle(style);
-
-        //search if we need an elevationmodel for style
-        search_loop:
-        for (FeatureTypeStyle fts : mapLayer.getStyle().featureTypeStyles()){
-            for (Rule rule : fts.rules()){
-                for (Symbolizer symbol : rule.symbolizers()){
-                    if (symbol instanceof RasterSymbolizer){
-                        final RasterSymbolizer rs = (RasterSymbolizer) symbol;
-                        final ShadedRelief sr     = rs.getShadedRelief();
-                        if (sr.getReliefFactor().evaluate(null, Float.class) != 0){
-                            final ElevationModel model = LayerProviderProxy.getInstance().getElevationModel(elevationModel);
-                            if (model != null){
-                                mapLayer.setElevationModel(model);
-                            }
-                            break search_loop;
-                        }
-                    }
-                }
-            }
-        }
-
-        return mapLayer;
+        return null;
+//        final PostGridMapLayer mapLayer = new PostGridMapLayer(reader);
+//
+//        mapLayer.setName(getName());
+//
+//        if(style == null && favorites.size() > 0){
+//            //no style provided, try to get the favorite one
+//            //there are some favorites styles
+//            final String namedStyle = favorites.get(0);
+//            style = StyleProviderProxy.getInstance().get(namedStyle);
+//        }
+//
+//        if(style == null){
+//            //no favorites defined, create a default one
+//            style = RANDOM_FACTORY.createRasterStyle();
+//        }
+//
+//        mapLayer.setStyle(style);
+//
+//        //search if we need an elevationmodel for style
+//        search_loop:
+//        for (FeatureTypeStyle fts : mapLayer.getStyle().featureTypeStyles()){
+//            for (Rule rule : fts.rules()){
+//                for (Symbolizer symbol : rule.symbolizers()){
+//                    if (symbol instanceof RasterSymbolizer){
+//                        final RasterSymbolizer rs = (RasterSymbolizer) symbol;
+//                        final ShadedRelief sr     = rs.getShadedRelief();
+//                        if (sr.getReliefFactor().evaluate(null, Float.class) != 0){
+//                            final ElevationModel model = LayerProviderProxy.getInstance().getElevationModel(elevationModel);
+//                            if (model != null){
+//                                mapLayer.setElevationModel(model);
+//                            }
+//                            break search_loop;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        return mapLayer;
     }
 
     /**
@@ -205,7 +201,8 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public String getName() {
-        return reader.getTable().getLayer().getName();
+        return null;
+//        return reader.getTable().getLayer().getName();
     }
 
     /**
@@ -213,7 +210,8 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public List<String> getFavoriteStyles(){
-        return favorites;
+        return null;
+//        return favorites;
     }
 
     /**
@@ -228,24 +226,27 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
-        return reader.getTable().getLayer().getGeographicBoundingBox();
+    public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
+        return null;
+        //return reader.getTable().getLayer().getGeographicBoundingBox();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public SortedSet<Date> getAvailableTimes() throws CatalogException {
-        return reader.getTable().getLayer().getAvailableTimes();
+    public SortedSet<Date> getAvailableTimes() throws DataStoreException {
+        return null;
+        //return reader.getTable().getLayer().getAvailableTimes();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public SortedSet<Number> getAvailableElevations() throws CatalogException {
-        return reader.getTable().getLayer().getAvailableElevations();
+    public SortedSet<Number> getAvailableElevations() throws DataStoreException {
+        return null;
+        //return reader.getTable().getLayer().getAvailableElevations();
     }
 
     /**
@@ -253,7 +254,8 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template) {
-        return reader.getTable().getLayer().getLegend((dimension != null) ? dimension : LEGEND_SIZE);
+        return null;
+        //return reader.getTable().getLayer().getLegend((dimension != null) ? dimension : LEGEND_SIZE);
     }
 
     /**
@@ -274,7 +276,8 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public MeasurementRange<?>[] getSampleValueRanges() {
-        return reader.getTable().getLayer().getSampleValueRanges();
+        return null;
+        //return reader.getTable().getLayer().getSampleValueRanges();
     }
 
     /**
@@ -282,7 +285,7 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public Set<Series> getSeries() {
-        return reader.getTable().getLayer().getSeries();
+        return Collections.emptySet();
     }
 
     /**
@@ -290,7 +293,8 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public String getRemarks() {
-        return reader.getTable().getLayer().getRemarks();
+        return null;
+        //return reader.getTable().getLayer().getRemarks();
     }
 
     /**
@@ -298,11 +302,8 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public String getThematic() {
-        return reader.getTable().getLayer().getThematic();
-    }
-
-    protected GridCoverageReader getReader(){
-        return reader;
+        return null;
+        //return reader.getTable().getLayer().getThematic();
     }
 
     /**

@@ -39,7 +39,6 @@ import javax.xml.bind.JAXBException;
 // Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
-import org.constellation.catalog.CatalogException;
 import org.constellation.coverage.catalog.Series;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
@@ -51,7 +50,6 @@ import org.constellation.util.TimeParser;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.ServiceType;
 import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
@@ -78,6 +76,7 @@ import org.geotoolkit.ows.xml.v110.WGS84BoundingBoxType;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.resources.Errors;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
@@ -243,7 +242,7 @@ public final class WCSWorker extends AbstractWorker {
             final GeographicBoundingBox inputGeoBox;
             try {
                 inputGeoBox = coverageRef.getGeographicBoundingBox();
-            } catch (CatalogException ex) {
+            } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
             final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
@@ -252,7 +251,7 @@ public final class WCSWorker extends AbstractWorker {
                 final SortedSet<Number> elevations;
                 try {
                     elevations = coverageRef.getAvailableElevations();
-                } catch (CatalogException ex) {
+                } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                 }
                 final List<Double> pos1 = new ArrayList<Double>();
@@ -284,7 +283,7 @@ public final class WCSWorker extends AbstractWorker {
             final SortedSet<Date> dates;
             try {
                 dates = coverageRef.getAvailableTimes();
-            } catch (CatalogException ex) {
+            } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
             final org.geotoolkit.wcs.xml.v100.TimeSequenceType temporalDomain;
@@ -389,7 +388,7 @@ public final class WCSWorker extends AbstractWorker {
             final GeographicBoundingBox inputGeoBox;
             try {
                 inputGeoBox = coverageRef.getGeographicBoundingBox();
-            } catch (CatalogException ex) {
+            } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, KEY_BOUNDINGBOX.toLowerCase());
             }
             final List<JAXBElement<? extends BoundingBoxType>> bboxs =
@@ -430,7 +429,7 @@ public final class WCSWorker extends AbstractWorker {
             final SortedSet<Date> dates;
             try {
                 dates = coverageRef.getAvailableTimes();
-            } catch (CatalogException ex) {
+            } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
             final DateFormat df = new SimpleDateFormat(DATE_FORMAT);
@@ -653,7 +652,7 @@ public final class WCSWorker extends AbstractWorker {
                 offBrief.add(co);
             }
             contentMetadata = new ContentMetadata(offBrief);
-        } catch (CatalogException exception) {
+        } catch (DataStoreException exception) {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
 
@@ -775,7 +774,7 @@ public final class WCSWorker extends AbstractWorker {
             }
 
             contents = new Contents(summary, null, null, null);
-        } catch (CatalogException exception) {
+        } catch (DataStoreException exception) {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
         }
 
@@ -867,7 +866,7 @@ public final class WCSWorker extends AbstractWorker {
                     throw new CstlServiceException("The requested bbox is outside the domain of validity " +
                             "for this coverage", NO_APPLICABLE_CODE, KEY_BBOX.toLowerCase());
                 }
-            } catch (CatalogException ex) {
+            } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE, KEY_BBOX.toLowerCase());
             }
         } else {
@@ -877,7 +876,7 @@ public final class WCSWorker extends AbstractWorker {
                 envelope = new JTSEnvelope2D(geoBbox.getWestBoundLongitude(), geoBbox.getEastBoundLongitude(),
                                              geoBbox.getSouthBoundLatitude(), geoBbox.getNorthBoundLatitude(),
                                              DefaultGeographicCRS.WGS84);
-            } catch (CatalogException ex) {
+            } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE, KEY_BBOX.toLowerCase());
             }
         }
@@ -932,7 +931,7 @@ public final class WCSWorker extends AbstractWorker {
                 image = gridCov.getRenderedImage();
             } catch (IOException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            } catch (CatalogException ex) {
+            } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
 

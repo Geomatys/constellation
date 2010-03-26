@@ -22,6 +22,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import org.constellation.resources.i18n.ResourceKeys;
 import org.constellation.resources.i18n.Resources;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.converter.Classes;
 
 
@@ -32,7 +33,7 @@ import org.geotoolkit.util.converter.Classes;
  * @author Remi Eve
  * @author Martin Desruisseaux
  */
-public class CatalogException extends Exception {
+public class CatalogException extends DataStoreException {
     /**
      * For cross-version compatibility.
      */

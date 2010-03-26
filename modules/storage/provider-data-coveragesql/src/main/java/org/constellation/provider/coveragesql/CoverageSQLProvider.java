@@ -18,36 +18,24 @@ package org.constellation.provider.coveragesql;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
 
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.ConfigurationKey;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.NoSuchTableException;
-import org.constellation.coverage.catalog.GridCoverageTable;
-import org.constellation.coverage.catalog.Layer;
-import org.constellation.coverage.catalog.LayerTable;
-import org.constellation.map.PostGridReader;
+import org.geotoolkit.coverage.sql.CoverageDatabase;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
-import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
-import org.geotoolkit.feature.DefaultName;
 
 import org.geotoolkit.map.ElevationModel;
-import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.sql.WrappedDataSource;
 import org.geotoolkit.util.logging.Logging;
+
 import org.opengis.feature.type.Name;
+
 import org.postgresql.ds.PGConnectionPoolDataSource;
 
 
@@ -58,23 +46,20 @@ import org.postgresql.ds.PGConnectionPoolDataSource;
  */
 public class CoverageSQLProvider extends AbstractLayerProvider{
 
-    public static final String KEY_DATABASE = "Database";
-    public static final String KEY_USER = "User";
-    public static final String KEY_PASSWORD = "Password";
-    public static final String KEY_READONLY = "ReadOnly";
-    public static final String KEY_DRIVER = "Driver";
-    public static final String KEY_ROOT_DIRECTORY = "RootDirectory";
+   private static final Logger LOGGER = Logging.getLogger(CoverageSQLProvider.class);
 
-
-    private static final Logger LOGGER = Logging.getLogger(CoverageSQLProvider.class);
-
-    private final Map<Name,Layer> index = new HashMap<Name,Layer>();
-    private final Map<Name,List<String>> favorites = new  HashMap<Name, List<String>>();
-    private final Map<Name,CoverageSQLLayerDetails> cache = new HashMap<Name, CoverageSQLLayerDetails>();
+    public static final String KEY_SERVER = "server";
+    public static final String KEY_PORT = "port";
+    public static final String KEY_DATABASE = "database";
+    public static final String KEY_SCHEMA = "schema";
+    public static final String KEY_USER = "user";
+    public static final String KEY_PASSWORD = "password";
+    public static final String KEY_READONLY = "readOnly";
+    public static final String KEY_DRIVER = "driver";
+    public static final String KEY_ROOT_DIRECTORY = "rootDirectory";
 
     private final ProviderSource source;
-    private final Database database;
-    private final GridCoverageTable coverageTable;
+    private final CoverageDatabase database;
 
     protected CoverageSQLProvider(ProviderSource source) throws IOException, SQLException {
         this.source = source;
@@ -89,7 +74,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         String dbName = "";
 
         //parse string if old format : exemple jdbc:postgresql://server/database
-        String oldDataBase = properties.getProperty(ConfigurationKey.DATABASE.getKey());
+        String oldDataBase = properties.getProperty(KEY_DATABASE);
         if(oldDataBase.contains("/")){
             int index = oldDataBase.lastIndexOf("/");
             dbName = oldDataBase.substring(index+1, oldDataBase.length());
@@ -106,10 +91,9 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
                 port = 5432;
             }
 
-
         }else{
-            server = (properties.getProperty(ConfigurationKey.SERVER.getKey()));
-            String portTxt = (properties.getProperty(ConfigurationKey.PORT.getKey()));
+            server = properties.getProperty(KEY_SERVER);
+            String portTxt = properties.getProperty(KEY_PORT);
             if(server == null || server.trim().isEmpty()){
                 server = "localhost";
             }
@@ -117,31 +101,24 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
                 port = Integer.parseInt(portTxt);
             }catch(Exception nf){
                 //catch numberformat and nullpointer
-                LOGGER.log(Level.WARNING,"Port value for postgrid is not valid : "+ portTxt);
+                LOGGER.log(Level.WARNING,"Port value for coverage-sql is not valid : "+ portTxt);
                 port = 5432;
             }
-            dbName = properties.getProperty(ConfigurationKey.DATABASE.getKey());
+            dbName = properties.getProperty(KEY_DATABASE);
         }
 
-        
+
         final PGConnectionPoolDataSource pool = new PGConnectionPoolDataSource();
         pool.setServerName(server);
         pool.setPortNumber(port);
         pool.setDatabaseName(dbName);
-        pool.setUser(properties.getProperty(ConfigurationKey.USER.getKey()));
-        pool.setPassword(properties.getProperty(ConfigurationKey.PASSWORD.getKey()));
+        pool.setUser(properties.getProperty(KEY_USER));
+        pool.setPassword(properties.getProperty(KEY_PASSWORD));
         pool.setLoginTimeout(5);
 
         final DataSource dataSource = new WrappedDataSource(pool);
-        database = new Database(dataSource,properties);
 
-        GridCoverageTable gridTable = null;
-        try {
-            gridTable = database.getTable(GridCoverageTable.class);
-        } catch (NoSuchTableException ex) {
-            LOGGER.log(Level.SEVERE, "No GridCoverageTable", ex);
-        }
-        coverageTable = gridTable;
+        database = new CoverageDatabase(dataSource, properties);
         
         visit();
     }
@@ -155,15 +132,12 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     @Override
     public Set<Name> getKeys() {
-        return index.keySet();
+        return Collections.emptySet();
     }
 
     @Override
     public Set<Name> getKeys(String service) {
-        if (source.services.contains(service) || source.services.isEmpty()) {
-            return index.keySet();
-        }
-        return new HashSet();
+        return Collections.emptySet();
     }
 
     /**
@@ -171,7 +145,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     @Override
     public boolean contains(Name key) {
-        return index.containsKey(key);
+        return false;
     }
 
     /**
@@ -179,38 +153,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     @Override
     public LayerDetails get(final Name key) {
-
-        CoverageSQLLayerDetails detail = cache.get(key);
-
-        if(detail == null){
-            //coverage reader is not in the cache, try to load it
-            final Layer layer = index.get(key);
-
-            if(layer == null) return null;
-
-            //create a mutable copy
-            final GridCoverageTable gridTable = new GridCoverageTable(coverageTable);
-            gridTable.setLayer(layer);
-            final PostGridReader reader = new PostGridReader(gridTable);
-
-            /*-reader is null, this layer is not registered in this provider.
-            if(reader == null) return null;*/
-
-            final ProviderLayer layerDef = source.getLayer(key.getLocalPart());
-            final List<String> styles = new ArrayList<String>();
-            final String elevationModel;
-            if(layerDef != null){
-                styles.addAll(layerDef.styles);
-                elevationModel = layerDef.elevationModel;
-            }else{
-                elevationModel = null;
-            }
-
-            detail = new CoverageSQLLayerDetails(reader, styles, elevationModel);
-            cache.put(key, detail);
-        }
-
-        return detail;
+        return null;
     }
 
     @Override
@@ -227,9 +170,9 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     @Override
     public void reload() {
         synchronized(this){
-            favorites.clear();
-            index.clear();
-            cache.clear();
+//            favorites.clear();
+//            index.clear();
+//            cache.clear();
             visit();
         }
     }
@@ -240,53 +183,53 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     @Override
     public void dispose() {
         synchronized(this){
-            favorites.clear();
-            index.clear();
-            cache.clear();
+//            favorites.clear();
+//            index.clear();
+//            cache.clear();
         }
     }
 
     private void visit() {
-        LayerTable layers = null;
-
-        try {
-            layers = database.getTable(LayerTable.class);
-        } catch (NoSuchTableException ex) {
-            LOGGER.log(Level.SEVERE, "Unknown specified type in the database", ex);
-        }
-
-        if(layers != null) {
-            Set<Layer> set = null;
-            try {
-                set = layers.getEntries();
-            } catch (CatalogException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                LOGGER.log(Level.SEVERE, null, ex);
-            }
-
-            if(set != null && !set.isEmpty()) {
-                for(Layer layer : set) {
-                    index.put(new DefaultName(layer.getName()),layer);
-                }
-            }
-
-        } else {
-            LOGGER.log(Level.SEVERE, "Layer table is null");
-        }
+//        LayerTable layers = null;
+//
+//        try {
+//            layers = database.getTable(LayerTable.class);
+//        } catch (NoSuchTableException ex) {
+//            LOGGER.log(Level.SEVERE, "Unknown specified type in the database", ex);
+//        }
+//
+//        if(layers != null) {
+//            Set<Layer> set = null;
+//            try {
+//                set = layers.getEntries();
+//            } catch (CatalogException ex) {
+//                LOGGER.log(Level.SEVERE, null, ex);
+//            } catch (SQLException ex) {
+//                LOGGER.log(Level.SEVERE, null, ex);
+//            }
+//
+//            if(set != null && !set.isEmpty()) {
+//                for(Layer layer : set) {
+//                    index.put(new DefaultName(layer.getName()),layer);
+//                }
+//            }
+//
+//        } else {
+//            LOGGER.log(Level.SEVERE, "Layer table is null");
+//        }
 
     }
 
     @Override
     public ElevationModel getElevationModel(String name) {
 
-        final ProviderLayer layer = source.getLayer(name);
-        if(layer != null && layer.isElevationModel){
-            final CoverageSQLLayerDetails pgld = (CoverageSQLLayerDetails) getByIdentifier(name);
-            if(pgld != null){
-                return MapBuilder.createElevationModel(pgld.getReader());
-            }
-        }
+//        final ProviderLayer layer = source.getLayer(name);
+//        if(layer != null && layer.isElevationModel){
+//            final CoverageSQLLayerDetails pgld = (CoverageSQLLayerDetails) getByIdentifier(name);
+//            if(pgld != null){
+//                return MapBuilder.createElevationModel(pgld.getReader());
+//            }
+//        }
         
         return null;
     }

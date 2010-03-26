@@ -25,27 +25,26 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.NamingException;
 import javax.xml.parsers.ParserConfigurationException;
-import org.constellation.provider.AbstractLayerProvider;
 
+import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
-import org.constellation.resources.ArraySet;
 
 import org.geotoolkit.data.DataStore;
-import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
 import org.geotoolkit.map.ElevationModel;
+import org.geotoolkit.storage.DataStoreException;
 
 import org.opengis.feature.type.Name;
 
@@ -80,7 +79,7 @@ public class PostGisProvider extends AbstractLayerProvider{
 //    public static final String KEY_WKBENABLED      = PostgisNGDataStoreFactory.WKBENABLED.key;
 
     private final Map<String,Serializable> params = new HashMap<String,Serializable>();
-    private final List<Name> index = new ArrayList<Name>();
+    private final Set<Name> index = new LinkedHashSet<Name>();
     private final DataStore store;
     private final ProviderSource source;
 
@@ -148,7 +147,7 @@ public class PostGisProvider extends AbstractLayerProvider{
      */
     @Override
     public Set<Name> getKeys() {
-        return new ArraySet<Name>(index);
+        return Collections.unmodifiableSet(index);
     }
 
     /**
@@ -157,9 +156,9 @@ public class PostGisProvider extends AbstractLayerProvider{
     @Override
     public Set<Name> getKeys(String service) {
         if (source.services.contains(service) || source.services.isEmpty()) {
-            return new ArraySet<Name>(index);
+            return Collections.unmodifiableSet(index);
         } else {
-            return new HashSet<Name>();
+            return Collections.emptySet();
         }
     }
 

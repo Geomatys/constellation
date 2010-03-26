@@ -17,7 +17,8 @@
 
 package org.constellation.provider;
 
-import java.util.List;
+import java.util.Collection;
+
 import org.geotoolkit.map.ElevationModel;
 import org.opengis.feature.type.Name;
 
@@ -81,7 +82,7 @@ public abstract class AbstractLayerProvider implements LayerProvider{
         return null;
     }
 
-    public static Name containsOnlyLocalPart(List<Name> index, Name layerName) {
+    public static Name containsOnlyLocalPart(Collection<Name> index, Name layerName) {
         if (layerName != null) {
             if (layerName.getNamespaceURI() == null) {
                 for (Name name : index) {

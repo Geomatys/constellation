@@ -32,11 +32,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.ServiceDef;
 
-import org.constellation.catalog.CatalogException;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.data.DataStore;
-import org.geotoolkit.data.DataStoreException;
 import org.geotoolkit.data.query.Query;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.DefaultGlyphService;
@@ -52,6 +50,7 @@ import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 
@@ -186,7 +185,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
      * {@inheritDoc}
      */
     @Override
-    public GeographicBoundingBox getGeographicBoundingBox() throws CatalogException {
+    public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
         //TODO handle this correctly
         try{
             final Envelope env = store.getEnvelope(QueryBuilder.all(groupName));
@@ -212,7 +211,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
      * {@inheritDoc}
      */
     @Override
-    public SortedSet<Date> getAvailableTimes() throws CatalogException {
+    public SortedSet<Date> getAvailableTimes() throws DataStoreException {
         final SortedSet<Date> dates = new TreeSet<Date>();
         FeatureIterator<SimpleFeature> features = null;
         if(dateStartField != null){
@@ -262,7 +261,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
      * {@inheritDoc}
      */
     @Override
-    public SortedSet<Number> getAvailableElevations() throws CatalogException {
+    public SortedSet<Number> getAvailableElevations() throws DataStoreException {
         final SortedSet<Number> elevations = new TreeSet<Number>();
         FeatureIterator<SimpleFeature> features = null;
         if (elevationStartField != null) {
@@ -353,7 +352,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
      */
     @Override
     public GridCoverage2D getCoverage(final Envelope envelope, final Dimension dimension,
-            final Double elevation, final Date time) throws CatalogException, IOException
+            final Double elevation, final Date time) throws DataStoreException, IOException
     {
         return null;
     }

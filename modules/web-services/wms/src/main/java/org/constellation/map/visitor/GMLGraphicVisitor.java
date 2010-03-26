@@ -29,7 +29,6 @@ import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.constellation.catalog.CatalogException;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.query.wms.GetFeatureInfo;
@@ -41,6 +40,7 @@ import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.metadata.iso.citation.Citations;
 import org.geotoolkit.referencing.CRS;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.MeasurementRange;
 
 import org.opengis.geometry.Envelope;
@@ -155,7 +155,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
             SortedSet<Date> dates = null;
             try {
                 dates = layerPostgrid.getAvailableTimes();
-            } catch (CatalogException ex) {
+            } catch (DataStoreException ex) {
                 dates = null;
             }
             if (dates != null && !(dates.isEmpty())) {
@@ -172,7 +172,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
             SortedSet<Number> elevs = null;
             try {
                 elevs = layerPostgrid.getAvailableElevations();
-            } catch (CatalogException ex) {
+            } catch (DataStoreException ex) {
                 elevs = null;
             }
             if (elevs != null && !(elevs.isEmpty())) {
@@ -183,7 +183,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         final GridCoverage2D grid;
         try {
             grid = layerPostgrid.getCoverage(objEnv, new Dimension(gfi.getSize()), elevation, time);
-        } catch (CatalogException cat) {
+        } catch (DataStoreException cat) {
             Logger.getAnonymousLogger().log(Level.SEVERE, cat.getMessage(), cat);
             return;
         } catch (IOException io) {

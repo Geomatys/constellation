@@ -17,7 +17,6 @@
 package org.constellation.provider;
 
 import java.util.Set;
-import org.constellation.coverage.catalog.Layer;
 import org.constellation.coverage.catalog.Series;
 
 

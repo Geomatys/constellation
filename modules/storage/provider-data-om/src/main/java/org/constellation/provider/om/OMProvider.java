@@ -27,8 +27,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.naming.NamingException;
@@ -40,11 +39,9 @@ import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
-import org.constellation.resources.ArraySet;
 
 import org.geotoolkit.data.DataStore;
-import org.geotoolkit.data.DataStoreException;
-import org.geotoolkit.data.DataStoreFactory;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.data.om.OMDataStoreFactory;
 
@@ -77,7 +74,7 @@ public class OMProvider extends AbstractLayerProvider {
     public  static final String KEY_NAMESPACE  = OMDataStoreFactory.NAMESPACE.getName().toString();
 
     private final Map<String,Serializable> params = new HashMap<String,Serializable>();
-    private final List<Name> index = new ArrayList<Name>();
+    private final Set<Name> index = new LinkedHashSet<Name>();
     private DataStore store;
     private final ProviderSource source;
 
@@ -163,7 +160,7 @@ public class OMProvider extends AbstractLayerProvider {
      */
     @Override
     public Set<Name> getKeys() {
-        return new ArraySet<Name>(index);
+        return Collections.unmodifiableSet(index);
     }
 
     /**
@@ -172,9 +169,9 @@ public class OMProvider extends AbstractLayerProvider {
     @Override
     public Set<Name> getKeys(String service) {
         if (source.services.contains(service) || source.services.isEmpty()) {
-            return new ArraySet<Name>(index);
+            return Collections.unmodifiableSet(index);
         }
-        return new HashSet();
+        return Collections.emptySet();
     }
     
     /**

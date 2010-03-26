@@ -41,7 +41,6 @@ import javax.xml.bind.JAXBException;
 //Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
-import org.constellation.catalog.CatalogException;
 import org.constellation.map.visitor.CSVGraphicVisitor;
 import org.constellation.map.visitor.GMLGraphicVisitor;
 import org.constellation.map.visitor.HTMLGraphicVisitor;
@@ -59,7 +58,6 @@ import org.constellation.query.wms.WMSQuery;
 import org.constellation.register.RegisterException;
 import org.constellation.util.PeriodUtilities;
 import org.constellation.ws.AbstractWorker;
-import org.constellation.ws.ServiceType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
@@ -80,6 +78,7 @@ import org.geotoolkit.sld.MutableNamedStyle;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.sld.xml.v110.LayerDescriptionType;
 import org.geotoolkit.sld.xml.v110.TypeNameType;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.StringUtilities;
@@ -240,7 +239,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             final GeographicBoundingBox inputGeoBox;
             try {
                 inputGeoBox = layer.getGeographicBoundingBox();
-            } catch (CatalogException exception) {
+            } catch (DataStoreException exception) {
                 throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
             }
 
@@ -253,7 +252,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             SortedSet<Date> dates = null;
             try {
                 dates = layer.getAvailableTimes();
-            } catch (CatalogException ex) {
+            } catch (DataStoreException ex) {
                 LOGGER.log(Level.INFO, "Error retrieving dates values for the layer :"+ layer.getName(), ex);
                 dates = null;
             }
@@ -274,7 +273,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             SortedSet<Number> elevations = null;
             try {
                 elevations = layer.getAvailableElevations();
-            } catch (CatalogException ex) {
+            } catch (DataStoreException ex) {
                 LOGGER.log(Level.INFO, "Error retrieving elevation values for the layer :"+ layer.getName(), ex);
                 elevations = null;
             }
