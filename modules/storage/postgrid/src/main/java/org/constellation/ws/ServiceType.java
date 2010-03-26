@@ -22,7 +22,9 @@ package org.constellation.ws;
  *
  * @version $Id$
  * @author Martin Desruisseaux
+ * @deprecated use ServiceDef.Specification
  */
+@Deprecated
 public enum ServiceType {
     /**
      * Web Map ServiceType.
