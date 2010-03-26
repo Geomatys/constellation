@@ -176,7 +176,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             if (getServletContext() != null) {
                 deployedDir = getServletContext().getRealPath("WEB-INF");
             }
-            inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(deployedDir, actingVersion.toString(), "WFS");
+            inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(deployedDir, actingVersion.version.toString(), "WFS");
         } catch (IOException e) {
             throw new CstlServiceException(e, NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
@@ -778,7 +778,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                                                                           totalUpdated,
                                                                           totalDeleted);
 
-        final TransactionResponseType response = new TransactionResponseType(summary, null, insertResults, actingVersion.toString());
+        final TransactionResponseType response = new TransactionResponseType(summary, null, insertResults, actingVersion.version.toString());
         LOGGER.log(logLevel, "Transaction request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         
         return response;
