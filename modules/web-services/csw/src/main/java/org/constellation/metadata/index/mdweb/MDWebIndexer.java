@@ -24,6 +24,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +64,7 @@ import org.mdweb.io.Reader;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Reader20;
 import org.mdweb.io.sql.v21.Reader21;
+import org.mdweb.model.storage.RecordSet.EXPOSURE;
 
 /**
  * A Lucene index handler for an MDWeb Database.
@@ -209,16 +211,24 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
 
             // getting the objects list and index avery item in the IndexWriter.
-            final List<RecordSet> cats = mdWebReader.getRecordSets();
+            final List<RecordSet> cats       = mdWebReader.getRecordSets();
+            final List<RecordSet> catToIndex = new ArrayList<RecordSet>();
+            for (RecordSet r : cats) {
+                if (r.getExposure() != EXPOSURE.INTERNAL) {
+                    catToIndex.add(r);
+                } else {
+                    LOGGER.info("RecordSet:" + r.getCode() + " is internal we exclude it.");
+                }
+            }
             nbRecordSets = cats.size();
-            final List<Form> results = mdWebReader.getAllForm(cats);
+            final List<Form> results = mdWebReader.getAllForm(catToIndex);
             LOGGER.info(results.size() + " forms read in " + (System.currentTimeMillis() - time) + " ms.");
             for (Form form : results) {
                 if ((form.getType() == null || !form.getType().equals("templateForm")) && form.isPublished()) {
                     indexDocument(writer, form);
                     nbForms++;
                 } else {
-                     LOGGER.info("The form " + form.getId() + " is a context (or is not published) so we don't index it");
+                     LOGGER.info("The form " + form.getTitle() + '(' + form.getId() + ") is a context (or is not published) so we don't index it");
                 }
             }
             writer.optimize();
@@ -261,11 +271,11 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             for (Object form : forms) {
                 if (form instanceof Form) {
                     final Form ff = (Form) form;
-                    //if (ff.isFullyValidated()) {
+                    if (ff.isPublished()) {
                         indexDocument(writer, ff);
-                    //} else {
-                    //   logger.info("The form " + ff.getId() + "is not validated we don't index it");
-                    //}
+                    } else {
+                       LOGGER.info("The form " + ff.getId() + "is not published we don't index it");
+                    }
                 } else {
                     throw new IllegalArgumentException("The objects must be forms");
                 }
