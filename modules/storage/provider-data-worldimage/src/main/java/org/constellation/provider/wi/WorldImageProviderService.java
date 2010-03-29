@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.postgrid;
+package org.constellation.provider.wi;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +34,7 @@ import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
 
-import static org.constellation.provider.postgrid.WorldImageProvider.*;
+import static org.constellation.provider.wi.WorldImageProvider.*;
 
 /**
  * Service providing world image files coverag reader.

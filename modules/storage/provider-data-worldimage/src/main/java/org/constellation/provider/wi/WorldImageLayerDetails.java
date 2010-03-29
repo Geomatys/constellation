@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.provider.postgrid;
+package org.constellation.provider.wi;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
