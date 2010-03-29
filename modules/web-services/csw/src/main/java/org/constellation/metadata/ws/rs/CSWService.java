@@ -44,6 +44,7 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
+import org.constellation.configuration.HarvestTasks;
 import org.constellation.jaxb.MarshallWarnings;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
@@ -79,6 +80,7 @@ import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.util.XArrays;
 import org.geotoolkit.xml.Catching;
 import org.geotoolkit.xml.Namespaces;
 
@@ -113,7 +115,11 @@ public class CSWService extends OGCWebService {
         super(ServiceDef.CSW_2_0_2);
         this.serviceID = serviceID;
         try {
-            setXMLContext("", CSWClassesContext.getAllClasses());
+            Class[] classes = CSWClassesContext.getAllClasses();
+            classes = XArrays.resize(classes, classes.length + 1);
+            classes[classes.length - 1] = HarvestTasks.class;
+
+            setXMLContext("", classes);
             worker = new CSWworker(serviceID, getMarshallerPool());
 
         } catch (JAXBException ex){
@@ -132,7 +138,11 @@ public class CSWService extends OGCWebService {
         super(ServiceDef.CSW_2_0_2);
         this.serviceID = "";
         try {
-            setXMLContext("", CSWClassesContext.getAllClasses());
+            Class[] classes = CSWClassesContext.getAllClasses();
+            classes = XArrays.resize(classes, classes.length + 1);
+            classes[classes.length - 1] = HarvestTasks.class;
+            
+            setXMLContext("", classes);
             worker = new CSWworker(serviceID, getMarshallerPool(), configDirectory);
 
         } catch (JAXBException ex){

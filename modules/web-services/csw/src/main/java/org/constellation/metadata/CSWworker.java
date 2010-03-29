@@ -322,9 +322,11 @@ public class CSWworker {
                 profile               = configuration.getProfile();
                 final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID);
                 indexSearcher         = cswfactory.getIndexSearcher(datasourceType, configDir, serviceID);
-                mdWriter              = cswfactory.getMetadataWriter(configuration, indexer);
-                catalogueHarvester    = new CatalogueHarvester(marshallerPool, mdWriter);
-                harvestTaskSchreduler = new HarvestTaskSchreduler(marshallerPool, configDir, catalogueHarvester);
+                if (profile == TRANSACTIONAL) {
+                    mdWriter              = cswfactory.getMetadataWriter(configuration, indexer);
+                    catalogueHarvester    = new CatalogueHarvester(marshallerPool, mdWriter);
+                    harvestTaskSchreduler = new HarvestTaskSchreduler(marshallerPool, configDir, catalogueHarvester);
+                }
                 initializeSupportedTypeNames();
                 initializeAcceptedResourceType();
                 initializeAnchorsMap();

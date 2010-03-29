@@ -163,6 +163,10 @@ public class Automatic {
             return 0;
         return 1;
     }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
+    }
     
     /**
      * @return the Thesaurus
