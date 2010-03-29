@@ -16,9 +16,6 @@
  */
 package org.constellation.provider;
 
-import java.util.Set;
-import org.constellation.coverage.catalog.Series;
-
 
 /**
  * Coverage extension of a {@link LayerDetails}, which add some methods specific
@@ -33,7 +30,7 @@ public interface CoverageLayerDetails extends LayerDetails {
     /**
      * @see Layer#getSeries
      */
-    Set<Series> getSeries();
+    String getImageFormat();
 
     /**
      * @see Layer#getRemarks

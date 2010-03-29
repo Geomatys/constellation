@@ -27,10 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import javax.xml.bind.JAXBElement;
@@ -39,7 +37,6 @@ import javax.xml.bind.JAXBException;
 // Constellation dependencies
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
-import org.constellation.coverage.catalog.Series;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
@@ -234,11 +231,6 @@ public final class WCSWorker extends AbstractWorker {
                         coverageName + "\".", LAYER_NOT_QUERYABLE, KEY_COVERAGE.toLowerCase());
             }
 
-            final Set<Series> series = coverageRef.getSeries();
-            if (series == null || series.isEmpty()) {
-                throw new CstlServiceException("The coverage " + coverageName + " is not defined.",
-                        LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
-            }
             final GeographicBoundingBox inputGeoBox;
             try {
                 inputGeoBox = coverageRef.getGeographicBoundingBox();
@@ -315,11 +307,9 @@ public final class WCSWorker extends AbstractWorker {
             supportedFormats.add(new CodeListType("tiff"));
             supportedFormats.add(new CodeListType("matrix"));
             supportedFormats.add(new CodeListType("ascii-grid"));
-            String nativeFormat = "unknown";
-            final Iterator<Series> it = coverageRef.getSeries().iterator();
-            if (it.hasNext()) {
-                final Series s = it.next();
-                nativeFormat = s.getFormat().getImageFormat();
+            String nativeFormat = coverageRef.getImageFormat();
+            if(nativeFormat == null || nativeFormat.isEmpty()){
+                nativeFormat = "unknown";
             }
             final SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, supportedFormats);
 
@@ -381,10 +371,6 @@ public final class WCSWorker extends AbstractWorker {
             }
             final org.geotoolkit.ows.xml.v110.ObjectFactory owsFactory =
                     new org.geotoolkit.ows.xml.v110.ObjectFactory();
-            if (coverageRef.getSeries().size() == 0) {
-                throw new CstlServiceException("the coverage " + coverageName +
-                        " is not defined", LAYER_NOT_DEFINED, KEY_IDENTIFIER.toLowerCase());
-            }
             final GeographicBoundingBox inputGeoBox;
             try {
                 inputGeoBox = coverageRef.getGeographicBoundingBox();

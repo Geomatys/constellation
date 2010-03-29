@@ -29,7 +29,6 @@ import java.util.Set;
 import java.util.SortedSet;
 
 import org.constellation.ServiceDef;
-import org.constellation.coverage.catalog.Series;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
@@ -284,8 +283,8 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public Set<Series> getSeries() {
-        return Collections.emptySet();
+    public String getImageFormat() {
+        return null; //layer.getCoverageReference().getImageFormat();
     }
 
     /**

@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.CancellationException;
@@ -31,7 +30,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.constellation.ServiceDef;
-import org.constellation.coverage.catalog.Series;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
@@ -261,8 +259,8 @@ class WorldImageLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public Set<Series> getSeries() {
-        return Collections.emptySet();
+    public String getImageFormat() {
+        return null;
     }
 
     /**
