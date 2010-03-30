@@ -30,6 +30,7 @@ import org.geotoolkit.swe.xml.DataBlockDefinition;
 import org.geotoolkit.swe.xml.v101.DataBlockDefinitionEntry;
 import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
 import org.geotoolkit.swe.xml.v101.TextBlockEntry;
+import org.geotoolkit.swe.xml.v101.AbstractEncodingPropertyType;
 
 /**
  * Connexion vers la table des {@linkplain DataBlockDefinition dataBlockDefintion}.
@@ -125,7 +126,8 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
             if (textBlockEncodings == null) {
                 textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
             }
-            statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry)databloc.getEncoding()));
+            AbstractEncodingPropertyType encProp = databloc.getEncoding();
+            statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry) encProp.getEncoding()));
             updateSingleton(statement);
         
             if (dataRecords == null) {

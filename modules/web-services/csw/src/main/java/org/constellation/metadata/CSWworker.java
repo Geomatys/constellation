@@ -342,9 +342,9 @@ public class CSWworker {
                     "cause: Unable to find a CSW Factory");
             isStarted = false;
         } catch (JAXBException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            //LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             LOGGER.severe(notWorkingMsg + '\n' +
-                    "cause: JAXBException while getting configuration");
+                    "cause: JAXBException while getting configuration:" + ex.getLocalizedMessage());
             isStarted = false;
         } catch (MetadataIoException e) {
             LOGGER.severe(notWorkingMsg + '\n' +

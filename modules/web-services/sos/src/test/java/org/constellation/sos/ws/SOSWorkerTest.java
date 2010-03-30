@@ -945,8 +945,8 @@ public class SOSWorkerTest {
 
         Iterator<AnyScalarPropertyType> i1 = expSdr.getField().iterator();
         Iterator<AnyScalarPropertyType> i2 = obsSdr.getField().iterator();
-        TimeType expT = (TimeType) i1.next().getComponent();
-        TimeType obsT = (TimeType) i2.next().getComponent();
+        TimeType expT = (TimeType) i1.next().getValue();
+        TimeType obsT = (TimeType) i2.next().getValue();
 
         assertEquals(expT.getUom(), obsT.getUom());
         assertEquals(expT, obsT);
@@ -960,6 +960,14 @@ public class SOSWorkerTest {
         assertEquals(expR.getDataArray().getElementCount(),    obsR.getDataArray().getElementCount());
         assertEquals(expR.getDataArray().getName(),            obsR.getDataArray().getName());
         assertEquals(expR.getDataArray().getPropertyElementType(), obsR.getDataArray().getPropertyElementType());
+        assertEquals(expR.getDataArray().getPropertyEncoding(), obsR.getDataArray().getPropertyEncoding());
+        assertEquals(expR.getDataArray().getId(),               obsR.getDataArray().getId());
+        assertEquals(expR.getDataArray().getElementCount(),     obsR.getDataArray().getElementCount());
+        assertEquals(expR.getDataArray().getDefinition(),       obsR.getDataArray().getDefinition());
+        assertEquals(expR.getDataArray().getDescription(),      obsR.getDataArray().getDescription());
+        assertEquals(expR.getDataArray().getParameterName(),    obsR.getDataArray().getParameterName());
+        assertEquals(expR.getDataArray().getDescriptionReference(),                      obsR.getDataArray().getDescriptionReference());
+        assertEquals(expR.getDataArray().isFixed(),                      obsR.getDataArray().isFixed());
         assertEquals(expR.getDataArray(),                      obsR.getDataArray());
 
         assertEquals(expResult.getResult(), obsResult.getResult());

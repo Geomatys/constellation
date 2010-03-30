@@ -426,7 +426,7 @@ public class SOSworker {
             logInfos();
 
         } catch (JAXBException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            LOGGER.log(Level.FINER, ex.getMessage(), ex);
             String msg;
             if (ex.getMessage() != null) {
                 msg = ex.getMessage();
