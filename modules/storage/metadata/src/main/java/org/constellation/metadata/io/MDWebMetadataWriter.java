@@ -411,7 +411,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         final Value linkedValue = alreadyWrite.get(object);
         
         // if its a primitive type we create a TextValue
-        if (isPrimitive(classe)) {
+        if (isPrimitive(classe) || classe.getName().equals("LocalName")) {
             if (classe instanceof CodeList) {
                 final CodeList cl = (CodeList) classe;
                 String codelistElement;

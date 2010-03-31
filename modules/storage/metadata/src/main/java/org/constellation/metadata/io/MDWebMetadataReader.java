@@ -63,6 +63,8 @@ import org.mdweb.io.Reader;
 import org.geotoolkit.metadata.iso.MetadataEntity;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
+import org.geotoolkit.naming.DefaultLocalName;
+import org.geotoolkit.naming.DefaultNameFactory;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.FileUtilities;
 
@@ -468,15 +470,16 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 }
                  return new Locale(textValue);
 
+            // Patch for LocalName Class
+            } else if (classe.equals(DefaultLocalName.class)) {
+                DefaultNameFactory facto = new DefaultNameFactory();
+                return facto.createLocalName(null, textValue);
+
             // else we use a String constructor
             } else {
                 //we execute the constructor
                 result = ReflectionUtilities.newInstance(classe, textValue);
 
-                /*fix a bug in MDWeb with the value attribute TODO remove
-                if (!form.asMoreChild(value)) {
-                    return result;
-                }*/
             }
 
         //if the value is a link
