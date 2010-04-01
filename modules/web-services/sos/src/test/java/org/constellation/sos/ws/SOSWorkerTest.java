@@ -70,6 +70,7 @@ import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
 import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.xml.MarshallerPool;
+import static org.constellation.sos.ws.SOSConstants.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import org.opengis.observation.sampling.SamplingFeature;
@@ -319,7 +320,7 @@ public class SOSWorkerTest {
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), Parameters.PROCEDURE);
+            assertEquals(ex.getLocator(), PROCEDURE);
         }
         assertTrue(exLaunched);
 
@@ -578,7 +579,7 @@ public class SOSWorkerTest {
                                                      null,
                                                      null,
                                                      "text/xml;subtype=\"om/2.0.0\"",
-                                                     Parameters.OBSERVATION_QNAME,
+                                                     OBSERVATION_QNAME,
                                                      ResponseModeType.INLINE,
                                                      null);
         boolean exLaunched = false;
@@ -587,7 +588,7 @@ public class SOSWorkerTest {
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), Parameters.RESPONSE_FORMAT);
+            assertEquals(ex.getLocator(), RESPONSE_FORMAT);
         }
         assertTrue(exLaunched);
 
@@ -602,7 +603,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       null,
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         exLaunched = false;
@@ -611,7 +612,7 @@ public class SOSWorkerTest {
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), Parameters.RESPONSE_FORMAT);
+            assertEquals(ex.getLocator(), RESPONSE_FORMAT);
         }
         assertTrue(exLaunched);
 
@@ -634,7 +635,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.OUT_OF_BAND,
                                       null);
         exLaunched = false;
@@ -643,7 +644,7 @@ public class SOSWorkerTest {
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-            assertEquals(ex.getLocator(), Parameters.RESPONSE_MODE);
+            assertEquals(ex.getLocator(), RESPONSE_MODE);
         }
         assertTrue(exLaunched);
 
@@ -666,7 +667,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.ATTACHED,
                                       null);
         exLaunched = false;
@@ -675,7 +676,7 @@ public class SOSWorkerTest {
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), OPERATION_NOT_SUPPORTED);
-            assertEquals(ex.getLocator(), Parameters.RESPONSE_MODE);
+            assertEquals(ex.getLocator(), RESPONSE_MODE);
         }
         assertTrue(exLaunched);
 
@@ -698,7 +699,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         exLaunched = false;
@@ -707,7 +708,7 @@ public class SOSWorkerTest {
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), Parameters.OFFERING);
+            assertEquals(ex.getLocator(), OFFERING);
         }
         assertTrue(exLaunched);
 
@@ -730,7 +731,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         exLaunched = false;
@@ -739,7 +740,7 @@ public class SOSWorkerTest {
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), Parameters.OFFERING);
+            assertEquals(ex.getLocator(), OFFERING);
         }
         assertTrue(exLaunched);
 
@@ -762,7 +763,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       "EPSG:3333");
         exLaunched = false;
@@ -826,7 +827,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         exLaunched = false;
@@ -835,7 +836,7 @@ public class SOSWorkerTest {
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), Parameters.PROCEDURE);
+            assertEquals(ex.getLocator(), PROCEDURE);
         }
         assertTrue(exLaunched);
 
@@ -851,7 +852,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
 
@@ -877,7 +878,7 @@ public class SOSWorkerTest {
                                       new GetObservation.FeatureOfInterest(Arrays.asList("NIMP")),
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
 
@@ -985,7 +986,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       null,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1019,7 +1020,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1053,7 +1054,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1081,7 +1082,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1105,7 +1106,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1134,7 +1135,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1163,7 +1164,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1188,7 +1189,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1240,7 +1241,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1291,7 +1292,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1343,7 +1344,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1389,7 +1390,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1423,7 +1424,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1458,7 +1459,7 @@ public class SOSWorkerTest {
                                       new GetObservation.FeatureOfInterest(Arrays.asList("station-002")),
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1493,7 +1494,7 @@ public class SOSWorkerTest {
                                       new GetObservation.FeatureOfInterest(Arrays.asList("station-002")),
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1515,7 +1516,7 @@ public class SOSWorkerTest {
                                       new GetObservation.FeatureOfInterest(Arrays.asList("station-002")),
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.MEASUREMENT_QNAME,
+                                      MEASUREMENT_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1549,7 +1550,7 @@ public class SOSWorkerTest {
                                       new GetObservation.FeatureOfInterest(new BBOXType(null, 64000.0, 1730000.0, 66000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582")),
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1583,7 +1584,7 @@ public class SOSWorkerTest {
                                       new GetObservation.FeatureOfInterest(new BBOXType(null, 66000.0, 1730000.0, 67000.0, 1740000.0, "urn:ogc:def:crs:EPSG:27582")),
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1616,7 +1617,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
         ObservationCollectionEntry result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1679,7 +1680,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1707,7 +1708,7 @@ public class SOSWorkerTest {
                                       new GetObservation.FeatureOfInterest(Arrays.asList("station-003")),
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.INLINE,
                                       null);
         result = (ObservationCollectionEntry) worker.getObservation(request);
@@ -1801,7 +1802,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
         ObservationCollectionEntry obsCollResult = (ObservationCollectionEntry) worker.getObservation(GOrequest);
@@ -1837,6 +1838,9 @@ public class SOSWorkerTest {
         assertEquals(templateExpResult.getFeatureOfInterest(), obsResult.getFeatureOfInterest());
         assertEquals(templateExpResult.getObservedProperty(), obsResult.getObservedProperty());
         assertEquals(templateExpResult.getProcedure(), obsResult.getProcedure());
+        assertEquals(((DataArrayPropertyType)templateExpResult.getResult()).getDataArray().getName(), ((DataArrayPropertyType)obsResult.getResult()).getDataArray().getName());
+        assertEquals(((DataArrayPropertyType)templateExpResult.getResult()).getDataArray().getEncoding(), ((DataArrayPropertyType)obsResult.getResult()).getDataArray().getEncoding());
+        assertEquals(((DataArrayPropertyType)templateExpResult.getResult()).getDataArray(), ((DataArrayPropertyType)obsResult.getResult()).getDataArray());
         assertEquals(templateExpResult.getResult(), obsResult.getResult());
         assertEquals(templateExpResult.getSamplingTime(), obsResult.getSamplingTime());
         assertEquals(templateExpResult, obsResult);
@@ -1875,7 +1879,7 @@ public class SOSWorkerTest {
                                         null,
                                         null,
                                         "text/xml; subtype=\"om/1.0.0\"",
-                                        Parameters.OBSERVATION_QNAME,
+                                        OBSERVATION_QNAME,
                                         ResponseModeType.RESULT_TEMPLATE,
                                         null);
         obsCollResult = (ObservationCollectionEntry) worker.getObservation(GOrequest);
@@ -2030,7 +2034,7 @@ public class SOSWorkerTest {
                                         null,
                                         null,
                                         "text/xml; subtype=\"om/1.0.0\"",
-                                        Parameters.OBSERVATION_QNAME,
+                                        OBSERVATION_QNAME,
                                         ResponseModeType.RESULT_TEMPLATE,
                                         null);
         obsCollResult = (ObservationCollectionEntry) worker.getObservation(GOrequest);
@@ -2103,7 +2107,7 @@ public class SOSWorkerTest {
                                         null,
                                         null,
                                         "text/xml; subtype=\"om/1.0.0\"",
-                                        Parameters.OBSERVATION_QNAME,
+                                        OBSERVATION_QNAME,
                                         ResponseModeType.RESULT_TEMPLATE,
                                         null);
         obsCollResult = (ObservationCollectionEntry) worker.getObservation(GOrequest);
@@ -2195,7 +2199,7 @@ public class SOSWorkerTest {
                                       null,
                                       null,
                                       "text/xml; subtype=\"om/1.0.0\"",
-                                      Parameters.OBSERVATION_QNAME,
+                                      OBSERVATION_QNAME,
                                       ResponseModeType.RESULT_TEMPLATE,
                                       null);
         ObservationCollectionEntry obsColl = (ObservationCollectionEntry) worker.getObservation(GOrequest);
@@ -2239,7 +2243,7 @@ public class SOSWorkerTest {
             worker.registerSensor(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getLocator(),       Parameters.OBSERVATION_TEMPLATE);
+            assertEquals(ex.getLocator(),       OBSERVATION_TEMPLATE);
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
         }
 
@@ -2258,7 +2262,7 @@ public class SOSWorkerTest {
             worker.registerSensor(request);
         } catch (CstlServiceException ex) {
             exLaunched = true;
-            assertEquals(ex.getLocator(),       Parameters.OBSERVATION_TEMPLATE);
+            assertEquals(ex.getLocator(),       OBSERVATION_TEMPLATE);
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
 

@@ -33,7 +33,6 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
-import org.constellation.sos.ws.Parameters;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
@@ -46,6 +45,7 @@ import org.opengis.observation.Observation;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.sos.ws.Utils.*;
+import static org.constellation.sos.ws.SOSConstants.*;
 
 /**
  *
@@ -121,7 +121,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public void initFilterObservation(ResponseModeType requestMode, QName resultModel) {
-        if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
+        if (resultModel.equals(MEASUREMENT_QNAME)) {
             sqlRequest = new StringBuilder("SELECT \"name\" FROM \"observation\".\"measurements\" WHERE \"name\" LIKE '%");
         } else {
             sqlRequest = new StringBuilder("SELECT \"name\" FROM \"observation\".\"observations\" WHERE \"name\" LIKE '%");
@@ -141,7 +141,7 @@ public class DefaultObservationFilter implements ObservationFilter {
     public void initFilterGetResult(Observation template, QName resultModel) {
         ProcessEntry process = (ProcessEntry) template.getProcedure();
         
-        if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
+        if (resultModel.equals(MEASUREMENT_QNAME)) {
             sqlRequest = new StringBuilder("SELECT \"result\", \"sampling_time_begin\", \"sampling_time_end\" FROM \"observation\".\"measurements\" WHERE ");
         } else {
             sqlRequest = new StringBuilder("SELECT \"result\", \"sampling_time_begin\", \"sampling_time_end\" FROM \"observation\".\"observations\" WHERE ");
@@ -250,7 +250,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
-                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
+                    INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
 
@@ -273,7 +273,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_Before operation require timeInstant!",
-                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
+                    INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
 
@@ -300,7 +300,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_After operation require timeInstant!",
-                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
+                    INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
 
@@ -336,7 +336,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_During operation require TimePeriod!",
-                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
+                    INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
 

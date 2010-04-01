@@ -28,11 +28,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-// Constellation dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+
+// Constellation dependencies
 import org.constellation.catalog.CatalogException;
 import org.constellation.catalog.ConfigurationKey;
 import org.constellation.catalog.Database;
@@ -50,11 +50,12 @@ import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointTable;
 import org.constellation.sos.ObservationOfferingTable;
 import org.constellation.sos.io.ObservationReader;
-import org.constellation.sos.ws.Parameters;
 import org.constellation.swe.v101.AnyResultTable;
 import org.constellation.swe.v101.CompositePhenomenonTable;
 import org.constellation.swe.v101.PhenomenonTable;
 import org.constellation.ws.CstlServiceException;
+import static org.constellation.sos.ws.SOSConstants.*;
+
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
@@ -64,6 +65,7 @@ import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 
 /**
  * Default Observation reader for Postgrid O&M database.
@@ -375,7 +377,7 @@ public class DefaultObservationReader implements ObservationReader {
     @Override
     public ObservationEntry getObservation(String identifier, QName resultModel) throws CstlServiceException {
         try {
-            if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
+            if (resultModel.equals(MEASUREMENT_QNAME)) {
                 return (MeasurementEntry) measTable.getEntry(identifier);
             } else {
                 return (ObservationEntry) obsTable.getEntry(identifier);
@@ -400,7 +402,7 @@ public class DefaultObservationReader implements ObservationReader {
     @Override
     public Object getResult(String identifier, QName resultModel) throws CstlServiceException {
         try {
-            if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
+            if (resultModel.equals(MEASUREMENT_QNAME)) {
                 final MeasureTable meaTable = omDatabase.getTable(MeasureTable.class);
                 return meaTable.getEntry(identifier);
             } else {

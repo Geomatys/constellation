@@ -23,13 +23,17 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
+
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
-import org.constellation.sos.ws.Parameters;
 import org.constellation.ws.CstlServiceException;
+import static org.constellation.sos.ws.SOSConstants.*;
+import static org.constellation.sos.ws.Utils.*;
+
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
@@ -40,11 +44,9 @@ import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.observation.xml.v100.ProcessEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
-//import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
-import org.opengis.observation.Observation;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.sos.ws.Utils.*;
 
+import org.opengis.observation.Observation;
 /**
  * TODO
  * 
@@ -77,7 +79,7 @@ public class LuceneObservationFilter implements ObservationFilter {
     
     @Override
     public void initFilterObservation(ResponseModeType requestMode, QName resultModel) {
-        if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
+        if (resultModel.equals(MEASUREMENT_QNAME)) {
             luceneRequest = new StringBuilder("type:measurement ");
         } else {
             luceneRequest = new StringBuilder("type:observation ");
@@ -93,7 +95,7 @@ public class LuceneObservationFilter implements ObservationFilter {
     @Override
     public void initFilterGetResult(Observation template, QName resultModel) {
         ProcessEntry process = (ProcessEntry) template.getProcedure();
-        if (resultModel.equals(Parameters.MEASUREMENT_QNAME)) {
+        if (resultModel.equals(MEASUREMENT_QNAME)) {
             luceneRequest = new StringBuilder("type:measurement AND procedure:\"" + process.getHref() + "\" ");
         } else {
             luceneRequest = new StringBuilder("type:observation AND procedure:\"" + process.getHref() + "\" ");
@@ -175,7 +177,7 @@ public class LuceneObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
-                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
+                    INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
 
@@ -192,7 +194,7 @@ public class LuceneObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_Before operation require timeInstant!",
-                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
+                    INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
 
@@ -213,7 +215,7 @@ public class LuceneObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_After operation require timeInstant!",
-                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
+                    INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
 
@@ -243,7 +245,7 @@ public class LuceneObservationFilter implements ObservationFilter {
 
         } else {
             throw new CstlServiceException("TM_During operation require TimePeriod!",
-                    INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
+                    INVALID_PARAMETER_VALUE, EVENT_TIME);
         }
     }
 

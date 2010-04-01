@@ -27,7 +27,10 @@ import javax.xml.namespace.QName;
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.sos.io.ObservationReader;
-import org.constellation.sos.ws.Parameters;
+import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.MimeType;
+import static org.constellation.sos.ws.SOSConstants.*;
+
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.swe.xml.v101.AbstractDataComponentEntry;
@@ -43,8 +46,6 @@ import org.geotoolkit.swe.xml.v101.QuantityType;
 import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
 import org.geotoolkit.swe.xml.v101.TextBlockEntry;
 import org.geotoolkit.swe.xml.v101.TimeType;
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.MimeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
@@ -55,6 +56,7 @@ import org.geotoolkit.observation.xml.v100.ProcessEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
 
 /**
  *
@@ -177,7 +179,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
 
         //static part
         final List<String> responseFormat = Arrays.asList(MimeType.APP_XML);
-        final List<QName> resultModel     = Arrays.asList(Parameters.OBSERVATION_QNAME);
+        final List<QName> resultModel     = Arrays.asList(OBSERVATION_QNAME);
         final List<ResponseModeType> responseMode = Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
         return new ObservationOfferingEntry(offeringName,
                                             offeringName,

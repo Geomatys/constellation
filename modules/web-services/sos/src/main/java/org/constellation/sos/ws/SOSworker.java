@@ -67,6 +67,7 @@ import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
+import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.Utils.*;
 import static org.constellation.sos.ws.Normalizer.*;
 
@@ -135,6 +136,8 @@ import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingSolidType;
 import org.geotoolkit.sampling.xml.v100.SamplingSurfaceType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.SmlFactory;
+import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.AnyResult;
@@ -142,6 +145,7 @@ import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
@@ -230,6 +234,15 @@ public class SOSworker {
                                                 MimeType.APP_XML,
                                                 MimeType.TEXT_PLAIN);
     }
+
+    /**
+     * A list of supported SensorML version
+     */
+    private static final List<String> ACCEPTED_SENSORML_FORMATS;
+    static {
+        ACCEPTED_SENSORML_FORMATS = Arrays.asList(SENSORML_100_FORMAT,
+                                                  SENSORML_101_FORMAT);
+    }
     
     /**
      * The profile of the SOS service (transational/discovery). 
@@ -301,6 +314,11 @@ public class SOSworker {
      */
     private boolean verifySynchronization;
 
+    /**
+     * The log level off al the informations log.
+     */
+    private Level logLevel = Level.INFO;
+    
     /**
      * Initialize the database connection.
      */
@@ -529,22 +547,22 @@ public class SOSworker {
      */
     public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws CstlServiceException {
         isWorking();
-        LOGGER.info("getCapabilities request processing" + '\n');
+        LOGGER.log(logLevel, "getCapabilities request processing" + '\n');
         final long start = System.currentTimeMillis();
         
         //we verify the base request attribute
         if (requestCapabilities.getService() != null) {
-            if (!requestCapabilities.getService().equals(Parameters.SOS)) {
+            if (!requestCapabilities.getService().equals(SOS)) {
                 throw new CstlServiceException("service must be \"SOS\"!",
-                                                 INVALID_PARAMETER_VALUE, Parameters.SERVICE);
+                                                 INVALID_PARAMETER_VALUE, SERVICE);
             }
         } else {
             throw new CstlServiceException("Service must be specified!",
-                                             MISSING_PARAMETER_VALUE, Parameters.SERVICE);
+                                             MISSING_PARAMETER_VALUE, SERVICE);
         }
         final AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
         if (versions != null) {
-            if (!versions.getVersion().contains(Parameters.VERSION)){
+            if (!versions.getVersion().contains(VERSION)){
                  throw new CstlServiceException("version available : 1.0.0",
                                              VERSION_NEGOTIATION_FAILED, "acceptVersion");
             }
@@ -585,19 +603,19 @@ public class SOSworker {
         }
 
         //we enter the information for service identification.
-        if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains(Parameters.ALL)) {
+        if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains(ALL)) {
 
             si = skeletonCapabilities.getServiceIdentification();
         }
 
         //we enter the information for service provider.
-        if (sections.getSection().contains("ServiceProvider") || sections.getSection().contains(Parameters.ALL)) {
+        if (sections.getSection().contains("ServiceProvider") || sections.getSection().contains(ALL)) {
 
             sp = skeletonCapabilities.getServiceProvider();
         }
 
         //we enter the operation Metadata
-        if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains(Parameters.ALL)) {
+        if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains(ALL)) {
 
            om = skeletonCapabilities.getOperationsMetadata();
 
@@ -609,28 +627,28 @@ public class SOSworker {
 
 
            //we update the URL
-           OGCWebService.updateOWSURL(om.getOperation(), serviceURL, Parameters.SOS);
+           OGCWebService.updateOWSURL(om.getOperation(), serviceURL, SOS);
 
 
            //we update the parameter in operation metadata.
            final Operation go = om.getOperation("GetObservation");
 
            // the list of offering names
-           go.updateParameter(Parameters.OFFERING, omReader.getOfferingNames());
+           go.updateParameter(OFFERING, omReader.getOfferingNames());
 
            // the event time range
            final List<String> eventTime = omReader.getEventTime();
            if (eventTime != null && eventTime.size() == 1) {
                final RangeType range = new RangeType(eventTime.get(0), "now");
-               go.updateParameter(Parameters.EVENT_TIME, range);
+               go.updateParameter(EVENT_TIME, range);
            } else if (eventTime != null && eventTime.size() == 2) {
                final RangeType range = new RangeType(eventTime.get(0), eventTime.get(1));
-               go.updateParameter(Parameters.EVENT_TIME, range);
+               go.updateParameter(EVENT_TIME, range);
            }
 
            //the process list
            final Collection<String> procNames  = omReader.getProcedureNames();
-           go.updateParameter(Parameters.PROCEDURE, procNames);
+           go.updateParameter(PROCEDURE, procNames);
 
            //the phenomenon list
            go.updateParameter("observedProperty", omReader.getPhenomenonNames());
@@ -643,33 +661,33 @@ public class SOSworker {
            for (ResponseModeType rm: acceptedResponseMode) {
                arm.add(rm.value());
            }
-           go.updateParameter(Parameters.RESPONSE_MODE, arm);
+           go.updateParameter(RESPONSE_MODE, arm);
 
            // the different responseFormat available
            go.updateParameter("responseFormat", acceptedResponseFormat);
 
            final Operation ds = om.getOperation("DescribeSensor");
-           ds.updateParameter(Parameters.PROCEDURE, procNames);
+           ds.updateParameter(PROCEDURE, procNames);
 
         }
 
         //we enter the information filter capablities.
-        if (sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains(Parameters.ALL)) {
+        if (sections.getSection().contains("Filter_Capabilities") || sections.getSection().contains(ALL)) {
 
             fc = skeletonCapabilities.getFilterCapabilities();
         }
 
-        if (sections.getSection().contains("Contents") || sections.getSection().contains(Parameters.ALL)) {
+        if (sections.getSection().contains("Contents") || sections.getSection().contains(ALL)) {
             // we add the list of observation ofeerings 
             final ObservationOfferingList ool = new ObservationOfferingList(omReader.getObservationOfferings());
             cont = new Contents(ool);
         }
-        c = new Capabilities(si, sp, om, Parameters.VERSION, null, fc, cont);
+        c = new Capabilities(si, sp, om, VERSION, null, fc, cont);
 
         // we normalize the document
         c = normalizeDocument(c);
 
-        LOGGER.info("getCapabilities processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        LOGGER.log(logLevel, "getCapabilities processed in " + (System.currentTimeMillis() - start) + "ms.\n");
         return c;
     }
     
@@ -679,31 +697,44 @@ public class SOSworker {
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
      */
     public AbstractSensorML describeSensor(DescribeSensor requestDescSensor) throws CstlServiceException  {
-        LOGGER.info("DescribeSensor request processing"  + '\n');
+        LOGGER.log(logLevel, "DescribeSensor request processing"  + '\n');
         final long start = System.currentTimeMillis();
 
         // we get the form
         verifyBaseRequest(requestDescSensor);
 
-        //we verify that the output format is good.     
-        if (requestDescSensor.getOutputFormat() != null) {
-            if (!requestDescSensor.getOutputFormat().equalsIgnoreCase("text/xml;subtype=\"SensorML/1.0.0\"")) {
-                throw new CstlServiceException("only text/xml;subtype=\"SensorML/1.0.0\" is accepted for outputFormat",
-                        INVALID_PARAMETER_VALUE, "outputFormat");
+        //we verify that the output format is good.
+        String out = requestDescSensor.getOutputFormat();
+        if (out != null) {
+            if (!StringUtilities.containsIgnoreCase(ACCEPTED_SENSORML_FORMATS, requestDescSensor.getOutputFormat())) {
+                String msg = "Accepted values for outputFormat:";
+                for (String s : ACCEPTED_SENSORML_FORMATS) {
+                    msg = msg + '\n' + s;
+                }
+                throw new CstlServiceException(msg, INVALID_PARAMETER_VALUE, "outputFormat");
             }
         } else {
-            throw new CstlServiceException("output format text/xml;subtype=\"SensorML/1.0.0\" must be specify",
-                                             MISSING_PARAMETER_VALUE, "outputFormat");
+            String msg = "output format must be specify, accepted value are:";
+            for (String s : ACCEPTED_SENSORML_FORMATS) {
+                msg = msg + '\n' + s;
+            }
+            throw new CstlServiceException(msg, MISSING_PARAMETER_VALUE, "outputFormat");
         }
-        //we transform the form into an XML string
-        if (requestDescSensor.getProcedure() == null) {
-            throw new CstlServiceException("You must specify the sensor ID!",
-                                         MISSING_PARAMETER_VALUE, Parameters.PROCEDURE);
-        }
-        final String sensorId = requestDescSensor.getProcedure();
 
-        final AbstractSensorML result = smlReader.getSensor(sensorId);
-        LOGGER.info("describeSensor processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        // we verify that we have a sensor ID.
+        final String sensorId = requestDescSensor.getProcedure();
+        if (sensorId == null) {
+            throw new CstlServiceException("You must specify the sensor ID!",
+                                         MISSING_PARAMETER_VALUE, PROCEDURE);
+        }
+       
+
+        AbstractSensorML result = smlReader.getSensor(sensorId);
+        if (result instanceof SensorML && out.equalsIgnoreCase(SENSORML_101_FORMAT)) {
+            result = SmlFactory.convertTo101((SensorML)result);
+        }
+        
+        LOGGER.log(logLevel, "describeSensor processed in " + (System.currentTimeMillis() - start) + "ms.\n");
         return result;
     }
     
@@ -714,7 +745,7 @@ public class SOSworker {
      * @param requestObservation a document specifying the parameter of the request.
      */
     public Object getObservation(GetObservation requestObservation) throws CstlServiceException {
-        LOGGER.info("getObservation request processing"  + '\n');
+        LOGGER.log(logLevel, "getObservation request processing"  + '\n');
         final long start = System.currentTimeMillis();
         
         //we verify the base request attribute
@@ -747,7 +778,7 @@ public class SOSworker {
 
         QName resultModel = requestObservation.getResultModel();
         if (resultModel == null) {
-            resultModel = Parameters.OBSERVATION_QNAME;
+            resultModel = OBSERVATION_QNAME;
         }
 
         //we get the mode of result
@@ -766,7 +797,7 @@ public class SOSworker {
                 }
                 throw new CstlServiceException("The response Mode: " + requestObservation.getResponseMode() + " is not supported by the service." +
                                                "Supported Values are:\n" + arm,
-                                                 INVALID_PARAMETER_VALUE, Parameters.RESPONSE_MODE);
+                                                 INVALID_PARAMETER_VALUE, RESPONSE_MODE);
             }
         }
         try {
@@ -786,19 +817,19 @@ public class SOSworker {
             }
             throw new CstlServiceException("This response Mode is not supported by the service" + 
                                            "Supported Values are:\n" + arm,
-                                             OPERATION_NOT_SUPPORTED, Parameters.RESPONSE_MODE);
+                                             OPERATION_NOT_SUPPORTED, RESPONSE_MODE);
         }
 
         ObservationOfferingEntry off;
         //we verify that there is an offering
         if (requestObservation.getOffering() == null) {
             throw new CstlServiceException("Offering must be specify!",
-                                             MISSING_PARAMETER_VALUE, Parameters.OFFERING);
+                                             MISSING_PARAMETER_VALUE, OFFERING);
         } else {
             off = omReader.getObservationOffering(requestObservation.getOffering());
             if (off == null) {
                 throw new CstlServiceException("This offering is not registered in the service",
-                                              INVALID_PARAMETER_VALUE, Parameters.OFFERING);
+                                              INVALID_PARAMETER_VALUE, OFFERING);
             }
         }
 
@@ -836,21 +867,21 @@ public class SOSworker {
                 if (dbId == null) {
                     dbId = s;
                 }
-                LOGGER.info("process ID: " + dbId);
+                LOGGER.log(logLevel, "process ID: " + dbId);
                 final ReferenceEntry proc = omReader.getReference(dbId);
                 if (proc == null) {
                     throw new CstlServiceException(" this process is not registred in the table",
-                            INVALID_PARAMETER_VALUE, Parameters.PROCEDURE);
+                            INVALID_PARAMETER_VALUE, PROCEDURE);
                 }
                 if (!off.getProcedure().contains(proc)) {
                     throw new CstlServiceException(" this process is not registred in the offering",
-                            INVALID_PARAMETER_VALUE, Parameters.PROCEDURE);
+                            INVALID_PARAMETER_VALUE, PROCEDURE);
                 }
             } else {
                 //if there is only one proccess null we return error (we'll see)
                 if (procedures.size() == 1) {
                     throw new CstlServiceException("the process is null",
-                            INVALID_PARAMETER_VALUE, Parameters.PROCEDURE);
+                            INVALID_PARAMETER_VALUE, PROCEDURE);
                 }
             }
         }
@@ -965,7 +996,7 @@ public class SOSworker {
                         throw new CstlServiceException("the envelope is not build correctly", INVALID_PARAMETER_VALUE);
                     }
                 } else {
-                    throw new CstlServiceException(Parameters.NOT_SUPPORTED, OPERATION_NOT_SUPPORTED);
+                    throw new CstlServiceException(NOT_SUPPORTED, OPERATION_NOT_SUPPORTED);
                 }
             }
 
@@ -1006,7 +1037,7 @@ public class SOSworker {
 
 
             } else if (result.getPropertyIsLike() != null) {
-                throw new CstlServiceException(Parameters.NOT_SUPPORTED, OPERATION_NOT_SUPPORTED, "propertyIsLike");
+                throw new CstlServiceException(NOT_SUPPORTED, OPERATION_NOT_SUPPORTED, "propertyIsLike");
 
             } else if (result.getPropertyIsBetween() != null) {
 
@@ -1025,7 +1056,7 @@ public class SOSworker {
                 }
 
             } else {
-                throw new CstlServiceException(Parameters.NOT_SUPPORTED,OPERATION_NOT_SUPPORTED);
+                throw new CstlServiceException(NOT_SUPPORTED,OPERATION_NOT_SUPPORTED);
             }
         }
 
@@ -1075,7 +1106,7 @@ public class SOSworker {
                     final Timer t = new Timer();
                     //we get the date and time for now
                     final Date d = new Date(System.currentTimeMillis() + templateValidTime);
-                    LOGGER.info("this template will be destroyed at:" + d.toString());
+                    LOGGER.log(logLevel, "this template will be destroyed at:" + d.toString());
                     t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
                     schreduledTask.add(t);
 
@@ -1100,11 +1131,11 @@ public class SOSworker {
             if (localOmFilter instanceof ObservationFilterReader) {
                 sReponse = ((ObservationFilterReader)localOmFilter).getOutOfBandResults();
             } else {
-                throw new CstlServiceException("Out of band response mode has been implemented only for ObservationFilterReader for now", NO_APPLICABLE_CODE, Parameters.RESPONSE_MODE);
+                throw new CstlServiceException("Out of band response mode has been implemented only for ObservationFilterReader for now", NO_APPLICABLE_CODE, RESPONSE_MODE);
             }
             response = sReponse;
         }
-        LOGGER.info("getObservation processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        LOGGER.log(logLevel, "getObservation processed in " + (System.currentTimeMillis() - start) + "ms.\n");
         return response;
     }
 
@@ -1113,7 +1144,7 @@ public class SOSworker {
      * Web service operation
      */
     public GetResultResponse getResult(GetResult requestResult) throws CstlServiceException {
-        LOGGER.info("getResult request processing"  + '\n');
+        LOGGER.log(logLevel, "getResult request processing"  + '\n');
         final long start = System.currentTimeMillis();
         
         //we verify the base request attribute
@@ -1137,9 +1168,9 @@ public class SOSworker {
         
         final QName resultModel;
         if (template instanceof MeasurementEntry) {
-            resultModel = Parameters.MEASUREMENT_QNAME;
+            resultModel = MEASUREMENT_QNAME;
         } else {
-            resultModel = Parameters.OBSERVATION_QNAME;
+            resultModel = OBSERVATION_QNAME;
         }
         
         //we begin to create the sql request
@@ -1217,7 +1248,7 @@ public class SOSworker {
         }
         final GetResultResponse.Result r = new GetResultResponse.Result(values, serviceURL + '/' + requestResult.getObservationTemplateId());
         final GetResultResponse response = new GetResultResponse(r);
-        LOGGER.info("GetResult processed in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "GetResult processed in " + (System.currentTimeMillis() - start) + "ms");
         return response;
     }
     
@@ -1375,7 +1406,7 @@ public class SOSworker {
 
     public AbstractFeatureEntry getFeatureOfInterest(GetFeatureOfInterest request) throws CstlServiceException {
         verifyBaseRequest(request);
-        LOGGER.info("GetFeatureOfInterest request processing"  + '\n');
+        LOGGER.log(logLevel, "GetFeatureOfInterest request processing"  + '\n');
         final long start = System.currentTimeMillis();
 
         // if there is no filter we throw an exception
@@ -1437,7 +1468,7 @@ public class SOSworker {
             }
         }
         // TODO never readh
-        LOGGER.info("GetFeatureOfInterest processed in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "GetFeatureOfInterest processed in " + (System.currentTimeMillis() - start) + "ms");
         return null;
     }
 
@@ -1510,7 +1541,7 @@ public class SOSworker {
     }
 
     /**
-     * Return True if the envellope got the sufficient parameters.
+     * Return True if the envellope got the sufficient 
      * 
      * @param env
      * @return
@@ -1532,7 +1563,7 @@ public class SOSworker {
             throw new CstlServiceException("The operation registerSensor is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
         }
-        LOGGER.info("registerSensor request processing"  + '\n');
+        LOGGER.log(logLevel, "registerSensor request processing"  + '\n');
         final long start = System.currentTimeMillis();
         
         //we verify the base request attribute
@@ -1565,11 +1596,11 @@ public class SOSworker {
             if(obs == null) {
                 throw new CstlServiceException("observation template must be specify",
                                               MISSING_PARAMETER_VALUE,
-                                              Parameters.OBSERVATION_TEMPLATE);
+                                              OBSERVATION_TEMPLATE);
             } else if (!obs.isComplete()) {
                 throw new CstlServiceException("observation template must specify at least the following fields: procedure ,observedProperty ,featureOfInterest, Result",
                                               INVALID_PARAMETER_VALUE,
-                                              Parameters.OBSERVATION_TEMPLATE);
+                                              OBSERVATION_TEMPLATE);
             }
             
             //we create a new Identifier from the SensorML database
@@ -1579,7 +1610,7 @@ public class SOSworker {
                 if (pentry.getHref() != null && pentry.getHref().startsWith(sensorIdBase)) {
                     id  = pentry.getHref();
                     num = id.substring(sensorIdBase.length());
-                    LOGGER.info("using specified sensor ID:" + id + " num =" + num);
+                    LOGGER.log(logLevel, "using specified sensor ID:" + id + " num =" + num);
                 }
             } 
 
@@ -1621,7 +1652,7 @@ public class SOSworker {
             }
         }
         
-        LOGGER.info("registerSensor processed in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "registerSensor processed in " + (System.currentTimeMillis() - start) + "ms");
         return new RegisterSensorResponse(id);
     }
     
@@ -1636,7 +1667,7 @@ public class SOSworker {
             throw new CstlServiceException("The operation insertObservation is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
         }
-        LOGGER.info("InsertObservation request processing"  + '\n');
+        LOGGER.log(logLevel, "InsertObservation request processing"  + '\n');
         final long start = System.currentTimeMillis();
 
         //we verify the base request attribute
@@ -1663,7 +1694,7 @@ public class SOSworker {
             LOGGER.finer("template received:" + '\n' + obs.toString());
         } else {
             throw new CstlServiceException("The observation template must be specified",
-                                             MISSING_PARAMETER_VALUE, Parameters.OBSERVATION_TEMPLATE);
+                                             MISSING_PARAMETER_VALUE, OBSERVATION_TEMPLATE);
         }
 
         // Debug part
@@ -1683,16 +1714,16 @@ public class SOSworker {
         //we record the observation in the O&M database
        if (obs instanceof MeasurementEntry) {
            id = omWriter.writeMeasurement((MeasurementEntry)obs);
-           LOGGER.info("new Measurement inserted: id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
+           LOGGER.log(logLevel, "new Measurement inserted: id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
         } else {
 
             //in first we verify that the observation is conform to the template
-            final ObservationEntry template = (ObservationEntry) omReader.getObservation(observationTemplateIdBase + num, Parameters.OBSERVATION_QNAME);
+            final ObservationEntry template = (ObservationEntry) omReader.getObservation(observationTemplateIdBase + num, OBSERVATION_QNAME);
             //if the observation to insert match the template we can insert it in the OM db
             if (obs.matchTemplate(template)) {
                 if (obs.getSamplingTime() != null && obs.getResult() != null) {
                     id = omWriter.writeObservation(obs);
-                    LOGGER.info("new observation inserted: id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
+                    LOGGER.log(logLevel, "new observation inserted: id = " + id + " for the sensor " + ((ProcessEntry)obs.getProcedure()).getName());
                 } else {
                     throw new CstlServiceException("The observation sampling time and the result must be specify",
                                                   MISSING_PARAMETER_VALUE, "samplingTime");
@@ -1703,7 +1734,7 @@ public class SOSworker {
             }
         }
 
-        LOGGER.info("insertObservation processed in " + (System.currentTimeMillis() - start) + "ms");
+        LOGGER.log(logLevel, "insertObservation processed in " + (System.currentTimeMillis() - start) + "ms");
         omFilter.refresh();
         return new InsertObservationResponse(id);
     }
@@ -1740,7 +1771,7 @@ public class SOSworker {
                         
                     } else {
                         throw new CstlServiceException("TM_Equals operation require timeInstant or TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
+                                                      INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
                 
                 // The operation Time before    
@@ -1757,7 +1788,7 @@ public class SOSworker {
                         templateTime = new TimePeriodType(TimeIndeterminateValueType.BEFORE, ti.getTimePosition());
                     } else {
                         throw new CstlServiceException("TM_Before operation require timeInstant!",
-                                                      INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
+                                                      INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
                     
                 // The operation Time after    
@@ -1775,7 +1806,7 @@ public class SOSworker {
                         
                     } else {
                        throw new CstlServiceException("TM_After operation require timeInstant!",
-                                                     INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
+                                                     INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
                     
                 // The time during operation    
@@ -1793,7 +1824,7 @@ public class SOSworker {
                         
                     } else {
                         throw new CstlServiceException("TM_During operation require TimePeriod!",
-                                                      INVALID_PARAMETER_VALUE, Parameters.EVENT_TIME);
+                                                      INVALID_PARAMETER_VALUE, EVENT_TIME);
                     }
                 } else if (time.getTBegins() != null || time.getTBegunBy() != null || time.getTContains() != null ||time.getTEndedBy() != null || time.getTEnds() != null || time.getTMeets() != null
                            || time.getTOveralps() != null || time.getTOverlappedBy() != null) {
@@ -1817,14 +1848,14 @@ public class SOSworker {
         isWorking();
         if (request != null) {
             if (request.getService() != null) {
-                if (!request.getService().equals(Parameters.SOS))  {
-                    throw new CstlServiceException("service must be \"SOS\"!", INVALID_PARAMETER_VALUE, Parameters.SERVICE);
+                if (!request.getService().equals(SOS))  {
+                    throw new CstlServiceException("service must be \"SOS\"!", INVALID_PARAMETER_VALUE, SERVICE);
                 }
             } else {
-                throw new CstlServiceException("service must be specified!", MISSING_PARAMETER_VALUE, Parameters.SERVICE);
+                throw new CstlServiceException("service must be specified!", MISSING_PARAMETER_VALUE, SERVICE);
             }
             if (request.getVersion()!= null) {
-                if (!request.getVersion().equals(Parameters.VERSION)) {
+                if (!request.getVersion().equals(VERSION)) {
                     throw new CstlServiceException("version must be \"1.0.0\"!", VERSION_NEGOTIATION_FAILED);
                 }
             } else {
@@ -1945,7 +1976,7 @@ public class SOSworker {
      * @throws CstlServiceException If the service does not succeed to store the offering in the datasource.
      */
     private void createOffering(String offeringName, Observation template) throws CstlServiceException {
-       LOGGER.info("offering " + offeringName + " not present, first build");
+       LOGGER.log(logLevel, "offering " + offeringName + " not present, first build");
 
         // TODO bounded by??? station?
 
@@ -1969,7 +2000,7 @@ public class SOSworker {
 
         //we create a list of accepted responseMode (fixed)
         final List<ResponseModeType> responses = Arrays.asList(RESULT_TEMPLATE, INLINE);
-        final List<QName> resultModel = Arrays.asList(Parameters.OBSERVATION_QNAME, Parameters.MEASUREMENT_QNAME);
+        final List<QName> resultModel = Arrays.asList(OBSERVATION_QNAME, MEASUREMENT_QNAME);
         final List<String> offeringOutputFormat = Arrays.asList("text/xml; subtype=\"om/1.0.0\"");
         final List<String> srsName = Arrays.asList("EPSG:4326");
 
@@ -2129,6 +2160,10 @@ public class SOSworker {
         }
         isStarted = false;
     }
+
+    public void setLogLevel(Level logLevel) {
+        this.logLevel = logLevel;
+    }
     
     /**
      * A task destroying a observation template when the template validity period pass.
@@ -2155,7 +2190,7 @@ public class SOSworker {
         @Override
         public void run() {
             templates.remove(templateId);
-            LOGGER.info("template:" + templateId + " destroyed");
+            LOGGER.log(logLevel, "template:" + templateId + " destroyed");
         }
     }
 }

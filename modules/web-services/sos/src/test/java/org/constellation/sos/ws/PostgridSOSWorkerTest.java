@@ -20,6 +20,7 @@ package org.constellation.sos.ws;
 // JUnit dependencies
 import java.io.File;
 import java.sql.Connection;
+import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.DataSourceType;
@@ -144,6 +145,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
         worker.setSkeletonCapabilities(stcapa);
         worker.setServiceURL(URL);
+        worker.setLogLevel(Level.FINER);
         marshallerPool.release(unmarshaller);
     }
 

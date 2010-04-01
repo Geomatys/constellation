@@ -32,7 +32,7 @@
                 </swe:Count>
             </swe:elementCount>
             <swe:elementType name="dataArray-0">
-                <swe:SimpleDataRecord gml:id="datarecord">
+                <swe:SimpleDataRecord gml:id="datarecord" fixed="false">
                     <swe:field name="Time">
                         <swe:Time definition="urn:ogc:data:time:iso8601"/>
                     </swe:field>

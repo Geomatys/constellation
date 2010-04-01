@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.DataSourceType;
@@ -167,6 +168,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
         worker.setSkeletonCapabilities(stcapa);
         worker.setServiceURL(URL);
+        worker.setLogLevel(Level.FINER);
         marshallerPool.release(unmarshaller);
     }
 
