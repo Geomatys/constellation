@@ -1,1 +1,1 @@
-org.constellation.provider.postgrid.CoverageSQLProviderService
+org.constellation.provider.coveragesql.CoverageSQLProviderService

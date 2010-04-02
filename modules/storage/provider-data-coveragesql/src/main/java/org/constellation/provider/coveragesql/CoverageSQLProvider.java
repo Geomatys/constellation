@@ -19,18 +19,25 @@ package org.constellation.provider.coveragesql;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sql.DataSource;
+import org.geotoolkit.coverage.io.CoverageStoreException;
 
 import org.geotoolkit.coverage.sql.CoverageDatabase;
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
+import org.geotoolkit.coverage.sql.LayerCoverageReader;
+import org.geotoolkit.feature.DefaultName;
 
 import org.geotoolkit.map.ElevationModel;
+import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.sql.WrappedDataSource;
 import org.geotoolkit.util.logging.Logging;
 
@@ -57,13 +64,21 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     public static final String KEY_READONLY = "readOnly";
     public static final String KEY_DRIVER = "driver";
     public static final String KEY_ROOT_DIRECTORY = "rootDirectory";
+    public static final String KEY_NAMESPACE = "namespace";
 
     private final ProviderSource source;
-    private final CoverageDatabase database;
+    private CoverageDatabase database;
+
+    private final Set<Name> index = new HashSet<Name>();
 
     protected CoverageSQLProvider(ProviderSource source) throws IOException, SQLException {
         this.source = source;
 
+        loadDataBase();
+        visit();
+    }
+
+    private void loadDataBase() throws SQLException{
         final Properties properties = new Properties();
         for(String key : source.parameters.keySet()){
             properties.put(key, source.parameters.get(key));
@@ -119,9 +134,8 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         final DataSource dataSource = new WrappedDataSource(pool);
 
         database = new CoverageDatabase(dataSource, properties);
-        
-        visit();
     }
+
 
     protected ProviderSource getSource(){
         return source;
@@ -132,12 +146,15 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     @Override
     public Set<Name> getKeys() {
-        return Collections.emptySet();
+        return Collections.unmodifiableSet(index);
     }
 
     @Override
     public Set<Name> getKeys(String service) {
-        return Collections.emptySet();
+        if (source.services.contains(service) || source.services.isEmpty()) {
+            return getKeys();
+        }
+        return new HashSet();
     }
 
     /**
@@ -145,7 +162,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     @Override
     public boolean contains(Name key) {
-        return false;
+        return index.contains(key);
     }
 
     /**
@@ -153,6 +170,25 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     @Override
     public LayerDetails get(final Name key) {
+        LayerCoverageReader reader = null;
+        try {
+            reader = database.createGridCoverageReader(key.getLocalPart());
+        } catch (CoverageStoreException ex) {
+            Logger.getLogger(CoverageSQLProvider.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+        if (reader != null) {
+            final String name = key.getLocalPart();
+            final ProviderLayer layer = source.getLayer(name);
+            if (layer == null) {
+                return new CoverageSQLLayerDetails(reader,null,null,name);
+
+            } else {
+                return new CoverageSQLLayerDetails(reader,layer.styles,null,name);
+            }
+        }
+
         return null;
     }
 
@@ -169,10 +205,14 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     @Override
     public void reload() {
+        dispose();
         synchronized(this){
-//            favorites.clear();
-//            index.clear();
-//            cache.clear();
+            index.clear();
+            try {
+                loadDataBase();
+            } catch (SQLException ex) {
+                Logger.getLogger(CoverageSQLProvider.class.getName()).log(Level.SEVERE, null, ex);
+            }
             visit();
         }
     }
@@ -183,41 +223,43 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     @Override
     public void dispose() {
         synchronized(this){
-//            favorites.clear();
-//            index.clear();
-//            cache.clear();
+            index.clear();
+            database.dispose();
         }
     }
 
     private void visit() {
-//        LayerTable layers = null;
-//
-//        try {
-//            layers = database.getTable(LayerTable.class);
-//        } catch (NoSuchTableException ex) {
-//            LOGGER.log(Level.SEVERE, "Unknown specified type in the database", ex);
-//        }
-//
-//        if(layers != null) {
-//            Set<Layer> set = null;
-//            try {
-//                set = layers.getEntries();
-//            } catch (CatalogException ex) {
-//                LOGGER.log(Level.SEVERE, null, ex);
-//            } catch (SQLException ex) {
-//                LOGGER.log(Level.SEVERE, null, ex);
-//            }
-//
-//            if(set != null && !set.isEmpty()) {
-//                for(Layer layer : set) {
-//                    index.put(new DefaultName(layer.getName()),layer);
-//                }
-//            }
-//
-//        } else {
-//            LOGGER.log(Level.SEVERE, "Layer table is null");
-//        }
+        System.out.println("---- VISIT ----");
+        try {
+            final Set<String> layers = CoverageDatabase.now(database.getLayers());
 
+            for(String name : layers){
+                System.out.println(name);
+                test(name);
+            }
+        } catch (CoverageStoreException ex) {
+            Logger.getLogger(CoverageSQLProvider.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (CancellationException ex) {
+            Logger.getLogger(CoverageSQLProvider.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+
+    /**
+     * Add the layer name
+     *
+     * @param candidate Candidate to be a shape file.
+     */
+    private void test(final String candidate){
+        final String name = candidate;
+        if (source.loadAll || source.containsLayer(name)){
+            String nmsp = source.parameters.get(KEY_NAMESPACE);
+            if (nmsp == null) {
+                nmsp = DEFAULT_NAMESPACE;
+            }
+            index.add(new DefaultName(nmsp,name));
+        }
     }
 
     @Override
