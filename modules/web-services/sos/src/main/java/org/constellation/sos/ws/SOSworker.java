@@ -252,7 +252,7 @@ public class SOSworker {
     /**
      * A date formater used to parse datablock.
      */
-    private final static List<DateFormat> DATE_FORMATS = new ArrayList<DateFormat>();
+    private static final List<DateFormat> DATE_FORMATS = new ArrayList<DateFormat>();
     static {
         DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"));
         DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
@@ -469,7 +469,7 @@ public class SOSworker {
     /**
      * Log some informations about the implementations classes for reader / writer / filter object.
      */
-    public void logInfos() {
+    public final void logInfos() {
         final String loaded =  " loaded.\n";
         final StringBuilder infos = new StringBuilder();
 
@@ -704,7 +704,7 @@ public class SOSworker {
         verifyBaseRequest(requestDescSensor);
 
         //we verify that the output format is good.
-        String out = requestDescSensor.getOutputFormat();
+        final String out = requestDescSensor.getOutputFormat();
         if (out != null) {
             if (!StringUtilities.containsIgnoreCase(ACCEPTED_SENSORML_FORMATS, requestDescSensor.getOutputFormat())) {
                 String msg = "Accepted values for outputFormat:";
@@ -752,7 +752,7 @@ public class SOSworker {
         verifyBaseRequest(requestObservation);
 
         // we clone the filter for this request
-        ObservationFilter localOmFilter = sosFactory.cloneObservationFilter(omFilter);
+        final ObservationFilter localOmFilter = sosFactory.cloneObservationFilter(omFilter);
 
 
         //we verify that the output format is good.     
@@ -961,16 +961,16 @@ public class SOSworker {
                                     final SamplingPointEntry sp = (SamplingPointEntry) station;
                                     if (sp.getPosition() != null && sp.getPosition().getPos() != null && sp.getPosition().getPos().getValue().size() >= 2) {
 
-                                        double station_x = sp.getPosition().getPos().getValue().get(0);
-                                        double station_y = sp.getPosition().getPos().getValue().get(1);
-                                        double minx      = e.getLowerCorner().getValue().get(0);
-                                        double maxx      = e.getUpperCorner().getValue().get(0);
-                                        double miny      = e.getLowerCorner().getValue().get(1);
-                                        double maxy      = e.getUpperCorner().getValue().get(1);
+                                        final double stationX  = sp.getPosition().getPos().getValue().get(0);
+                                        final double stationY  = sp.getPosition().getPos().getValue().get(1);
+                                        final double minx      = e.getLowerCorner().getValue().get(0);
+                                        final double maxx      = e.getUpperCorner().getValue().get(0);
+                                        final double miny      = e.getLowerCorner().getValue().get(1);
+                                        final double maxy      = e.getUpperCorner().getValue().get(1);
                                         
                                         // we look if the station if contained in the BBOX
-                                        if (station_x < maxx && station_x > minx &&
-                                            station_y < maxy && station_y > miny) {
+                                        if (stationX < maxx && stationX > minx &&
+                                            stationY < maxy && stationY > miny) {
 
                                             matchingFeatureOfInterest.add(sp.getId());
                                             add = true;
@@ -1151,7 +1151,7 @@ public class SOSworker {
         verifyBaseRequest(requestResult);
 
         // we clone the filter for this request
-        ObservationFilter localOmFilter = sosFactory.cloneObservationFilter(omFilter);
+        final ObservationFilter localOmFilter = sosFactory.cloneObservationFilter(omFilter);
         
         ObservationEntry template = null;
         if (requestResult.getObservationTemplateId() != null) {
@@ -1421,7 +1421,7 @@ public class SOSworker {
 
         // we return a single result
         if (request.getFeatureOfInterestId().size() == 1) {
-            SamplingFeature singleResult = omReader.getFeatureOfInterest(request.getFeatureOfInterestId().get(0));
+            final SamplingFeature singleResult = omReader.getFeatureOfInterest(request.getFeatureOfInterestId().get(0));
             if (singleResult == null) {
                 throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
             } else {
@@ -1430,9 +1430,9 @@ public class SOSworker {
 
         // we return a featureCollection
         } else if (request.getFeatureOfInterestId().size() > 1) {
-            List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
+            final List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
             for (String featureID : request.getFeatureOfInterestId()) {
-                SamplingFeature feature = omReader.getFeatureOfInterest(featureID);
+                final SamplingFeature feature = omReader.getFeatureOfInterest(featureID);
                 if (feature == null) {
                     throw new CstlServiceException("There is no such Feature Of Interest", INVALID_PARAMETER_VALUE);
                 } else {
@@ -1443,9 +1443,9 @@ public class SOSworker {
         }
 
         if (request.getLocation() != null && request.getLocation().getSpatialOps() != null) {
-            SpatialOpsType spatialFilter = request.getLocation().getSpatialOps().getValue();
+            final SpatialOpsType spatialFilter = request.getLocation().getSpatialOps().getValue();
             if (spatialFilter instanceof BBOXType) {
-                List<SamplingFeature> result = spatialFiltering((BBOXType) spatialFilter);
+                final List<SamplingFeature> result = spatialFiltering((BBOXType) spatialFilter);
                 
                 // we return a single result
                 if (result.size() == 1) {
@@ -1453,7 +1453,7 @@ public class SOSworker {
 
                 // we return a feature collection
                 } else if (result.size() > 1) {
-                    List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
+                    final List<FeaturePropertyType> features = new ArrayList<FeaturePropertyType>();
                     for (SamplingFeature feature : result) {
                         features.add(buildFeatureProperty(feature));
                     }
@@ -1512,15 +1512,15 @@ public class SOSworker {
                         final SamplingPointEntry sp = (SamplingPointEntry) station;
                         if (sp.getPosition() != null && sp.getPosition().getPos() != null && sp.getPosition().getPos().getValue().size() >= 2) {
 
-                            double station_x = sp.getPosition().getPos().getValue().get(0);
-                            double station_y = sp.getPosition().getPos().getValue().get(1);
-                            double minx      = e.getLowerCorner().getValue().get(0);
-                            double maxx      = e.getUpperCorner().getValue().get(0);
-                            double miny      = e.getLowerCorner().getValue().get(1);
-                            double maxy      = e.getUpperCorner().getValue().get(1);
+                            final double stationX  = sp.getPosition().getPos().getValue().get(0);
+                            final double stationY  = sp.getPosition().getPos().getValue().get(1);
+                            final double minx      = e.getLowerCorner().getValue().get(0);
+                            final double maxx      = e.getUpperCorner().getValue().get(0);
+                            final double miny      = e.getLowerCorner().getValue().get(1);
+                            final double maxy      = e.getUpperCorner().getValue().get(1);
 
                             // we look if the station if contained in the BBOX
-                            if (station_x < maxx && station_x > minx && station_y < maxy && station_y > miny) {
+                            if (stationX < maxx && stationX > minx && stationY < maxy && stationY > miny) {
 
                                 matchingFeatureOfInterest.add(sp);
                             } else {
@@ -1905,8 +1905,8 @@ public class SOSworker {
 
         // for each network we create (or update) an offering
         for (String networkName : networkNames) {
-            final String offeringName         = "offering-" + networkName;
-            ObservationOfferingEntry offering = omReader.getObservationOffering(offeringName);
+            final String offeringName               = "offering-" + networkName;
+            final ObservationOfferingEntry offering = omReader.getObservationOffering(offeringName);
             
             if (offering != null) {
                 updateOffering(offering, template);
@@ -1918,7 +1918,7 @@ public class SOSworker {
         /*
          * then  we add the sensor to the global offering containing all the sensor
          */
-        ObservationOfferingEntry offering = omReader.getObservationOffering("offering-allSensor");
+        final ObservationOfferingEntry offering = omReader.getObservationOffering("offering-allSensor");
         if (offering != null) {
             updateOffering(offering, template);
         } else {
@@ -2059,7 +2059,7 @@ public class SOSworker {
         try {
             if (dbId != null && physicalID != null) {
                 map.setProperty(physicalID, dbId);
-                File configDirectory = getConfigDirectory();
+                final File configDirectory = getConfigDirectory();
                 if (configDirectory != null && configDirectory.exists() && configDirectory.isDirectory()) {
                     final File mappingFile     = new File(getConfigDirectory(), "mapping.properties");
                     final FileOutputStream out = new FileOutputStream(mappingFile);

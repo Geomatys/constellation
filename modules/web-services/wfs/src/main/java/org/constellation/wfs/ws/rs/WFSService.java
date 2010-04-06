@@ -185,7 +185,7 @@ public class WFSService extends OGCWebService {
             } else if (STR_GETFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof GetFeatureType)) {
                 final GetFeatureType model = adaptGetFeatureType(objectRequest);
                 version = getVersionFromNumber(model.getVersion());
-                Object response = worker.getFeature(model);
+                final Object response = worker.getFeature(model);
                 if (response instanceof FeatureCollection) {
                     schemaLocations = worker.getSchemaLocations();
                     return Response.ok(response, getOutputFormat()).build();
@@ -268,8 +268,8 @@ public class WFSService extends OGCWebService {
             } else {
                 exceptionCode = ex.getExceptionCode().name();
             }
-            ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(), version);
-            StringWriter sw = new StringWriter();
+            final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(), version);
+            final StringWriter sw = new StringWriter();
             Marshaller marshaller = null;
             try {
                 marshaller = getMarshallerPool().acquireMarshaller();
@@ -299,7 +299,7 @@ public class WFSService extends OGCWebService {
         if (marshallerPool != null) {
             Object request = null;
             Unmarshaller unmarshaller = null;
-            JAXBEventHandler handler = new JAXBEventHandler();
+            final JAXBEventHandler handler = new JAXBEventHandler();
             try {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
                 unmarshaller.setEventHandler(handler);
@@ -317,9 +317,9 @@ public class WFSService extends OGCWebService {
                         sw.append(new String(buffer, 0, size));
                     }
                     in.reset();
-                    String xml = sw.toString();
+                    final String xml = sw.toString();
                     try {
-                        XmlFeatureReader featureReader = new JAXPStreamFeatureReader(worker.getFeatureTypes());
+                        final XmlFeatureReader featureReader = new JAXPStreamFeatureReader(worker.getFeatureTypes());
                         if (xml.contains("<wfs:Transaction")) {
                             featuresToInsert =  featureReader.read(xml);
                         }
@@ -342,10 +342,10 @@ public class WFSService extends OGCWebService {
 
                 // we replace the feature to insert unmarshalled by JAXB with the feature read by JAXP.
                 if (request instanceof TransactionType && featuresToInsert != null) {
-                    TransactionType transaction = (TransactionType) request;
+                    final TransactionType transaction = (TransactionType) request;
                     for (Object obj : transaction.getInsertOrUpdateOrDelete()) {
                         if (obj instanceof InsertElementType) {
-                            InsertElementType insert = (InsertElementType) obj;
+                            final InsertElementType insert = (InsertElementType) obj;
                             insert.getFeature().clear();
 
                             if (featuresToInsert instanceof List) {
@@ -471,19 +471,19 @@ public class WFSService extends OGCWebService {
     }
 
     private DescribeFeatureTypeType createNewDescribeFeatureTypeRequest() throws CstlServiceException {
-        String outputFormat = getParameter("outputFormat", false);
-        String handle       = getParameter("handle", false);
-        String service      = getParameter("service", true);
-        String version      = getParameter("version", true);
+        String outputFormat   = getParameter("outputFormat", false);
+        final String handle   = getParameter("handle", false);
+        final String service  = getParameter("service", true);
+        final String version  = getParameter("version", true);
 
         if (outputFormat == null) {
             outputFormat = "text/xml; subtype=gml/3.1.1";
         }
-        String namespace = getParameter("namespace", false);
-        Map<String, String> mapping = extractMapping(namespace);
+        final String namespace = getParameter("namespace", false);
+        final Map<String, String> mapping = extractMapping(namespace);
 
-        String typeName = getParameter("typeName", false);
-        List<QName> typeNames = extractTypeName(typeName, mapping);
+        final String typeName = getParameter("typeName", false);
+        final List<QName> typeNames = extractTypeName(typeName, mapping);
 
         return new DescribeFeatureTypeType(service, version, handle, typeNames, outputFormat);
     }
@@ -500,12 +500,12 @@ public class WFSService extends OGCWebService {
              versions = new AcceptVersionsType("1.1.0");
         }
 
-        AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
+        final AcceptFormatsType formats = new AcceptFormatsType(getParameter("AcceptFormats", false));
 
         //We transform the String of sections in a list.
         //In the same time we verify that the requested sections are valid.
-        SectionsType sections;
-        String section = getParameter("Sections", false);
+        final SectionsType sections;
+        final String section = getParameter("Sections", false);
         if (section != null && !section.equalsIgnoreCase("All")) {
             List<String> requestedSections = new ArrayList<String>();
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
@@ -534,7 +534,7 @@ public class WFSService extends OGCWebService {
 
     private GetFeatureType createNewGetFeatureRequest() throws CstlServiceException {
         Integer maxFeature = null;
-        String max = getParameter("maxfeatures", false);
+        final String max = getParameter("maxfeatures", false);
         if (max != null) {
             try {
                 maxFeature = Integer.parseInt(max);
@@ -544,24 +544,24 @@ public class WFSService extends OGCWebService {
             }
 
         }
-        String service      = getParameter("service", true);
-        String version      = getParameter("version", true);
-        String handle       = getParameter("handle",  false);
-        String outputFormat = getParameter("outputFormat", false);
+        final String service = getParameter("service", true);
+        final String version = getParameter("version", true);
+        final String handle  = getParameter("handle",  false);
+        String outputFormat  = getParameter("outputFormat", false);
 
         if (outputFormat == null) {
             outputFormat = "text/xml; subtype=gml/3.1.1";
         }
-        String namespace = getParameter("namespace", false);
-        Map<String, String> mapping = extractMapping(namespace);
+        final String namespace = getParameter("namespace", false);
+        final Map<String, String> mapping = extractMapping(namespace);
 
-        String result = getParameter("resultType", false);
+        final String result = getParameter("resultType", false);
         ResultTypeType resultType = null;
         if (result != null) {
             resultType = ResultTypeType.fromValue(result.toLowerCase());
         }
         
-        String featureVersion = getParameter("featureVersion", false);
+        final String featureVersion = getParameter("featureVersion", false);
 
         String featureId = getParameter("featureid", false);
         boolean mandatory = true;
@@ -573,8 +573,8 @@ public class WFSService extends OGCWebService {
             mandatory = false;
         }
 
-        String typeName = getParameter("typeName", mandatory);
-        List<QName> typeNames = extractTypeName(typeName, mapping);
+        final String typeName = getParameter("typeName", mandatory);
+        final List<QName> typeNames = extractTypeName(typeName, mapping);
 
         if (featureId != null) {
             final QueryType query = new QueryType(null, typeNames, featureVersion);
@@ -582,10 +582,10 @@ public class WFSService extends OGCWebService {
 
         }
 
-        String xmlFilter  = getParameter("filter", false);
+        final String xmlFilter  = getParameter("filter", false);
         FilterType filter = extractFilter(xmlFilter);
 
-        String bbox = getParameter("bbox", false);
+        final String bbox = getParameter("bbox", false);
         if (bbox != null) {
             final double[] coodinates = new double[4];
 
@@ -602,7 +602,7 @@ public class WFSService extends OGCWebService {
             }
             
             if (coodinates != null) {
-                BBOXType bboxFilter = new BBOXType("", coodinates[0], coodinates[1], coodinates[2], coodinates[3], crs);
+                final BBOXType bboxFilter = new BBOXType("", coodinates[0], coodinates[1], coodinates[2], coodinates[3], crs);
                 if (filter == null) {
                     filter = new FilterType(bboxFilter);
                 } else {
@@ -611,9 +611,9 @@ public class WFSService extends OGCWebService {
             }
         }
         
-        QueryType query = new QueryType(filter, typeNames, featureVersion);
+        final QueryType query = new QueryType(filter, typeNames, featureVersion);
 
-        String srsName = getParameter("srsName", false);
+        final String srsName = getParameter("srsName", false);
         query.setSrsName(srsName);
 
         // TODO handle multiple properties and handle prefixed properties
@@ -623,7 +623,7 @@ public class WFSService extends OGCWebService {
                 sortByParam = sortByParam.substring(sortByParam.indexOf(':') + 1);
             }
             //we get the order
-            SortOrder order;
+            final SortOrder order;
             if (sortByParam.indexOf(' ') != -1) {
                 char cOrder = sortByParam.charAt(sortByParam.length() -1);
                 sortByParam = sortByParam.substring(0, sortByParam.indexOf(' '));
@@ -635,15 +635,15 @@ public class WFSService extends OGCWebService {
             } else {
                 order = SortOrder.ASCENDING;
             }
-            List<SortPropertyType> sortProperties = new ArrayList<SortPropertyType>();
+            final List<SortPropertyType> sortProperties = new ArrayList<SortPropertyType>();
             sortProperties.add(new SortPropertyType(sortByParam, order));
-            SortByType sortBy = new SortByType(sortProperties);
+            final SortByType sortBy = new SortByType(sortProperties);
             query.setSortBy(sortBy);
         }
 
-        String propertyNameParam = getParameter("propertyName", false);
+        final String propertyNameParam = getParameter("propertyName", false);
         if (propertyNameParam != null) {
-            List<String> propertyNames = new ArrayList<String>();
+            final List<String> propertyNames = new ArrayList<String>();
             final StringTokenizer tokens = new StringTokenizer(propertyNameParam, ",;");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
@@ -656,27 +656,27 @@ public class WFSService extends OGCWebService {
     }
 
     private GetGmlObjectType createNewGetGmlObjectRequest() throws CstlServiceException {
-        String service      = getParameter("service", true);
-        String version      = getParameter("version", true);
-        String handle       = getParameter("handle",  false);
-        String outputFormat = getParameter("outputFormat", false);
-        String id           = getParameter("gmlobjectid", true);
+        final String service      = getParameter("service", true);
+        final String version      = getParameter("version", true);
+        final String handle       = getParameter("handle",  false);
+        final String outputFormat = getParameter("outputFormat", false);
+        final String id           = getParameter("gmlobjectid", true);
 
-        GmlObjectIdType gmlObjectId = new GmlObjectIdType(id);
+        final GmlObjectIdType gmlObjectId = new GmlObjectIdType(id);
         return new GetGmlObjectType(service, version, handle, gmlObjectId, outputFormat);
     }
 
     private LockFeatureType createNewLockFeatureRequest() throws CstlServiceException {
-        String service      = getParameter("service", true);
-        String version      = getParameter("version", true);
-        String handle       = getParameter("handle",  false);
+        final String service  = getParameter("service", true);
+        final String version  = getParameter("version", true);
+        final String handle   = getParameter("handle",  false);
 
-        String lockAct      = getParameter("lockAction",  false);
+        final String lockAct  = getParameter("lockAction",  false);
         AllSomeType lockAction = null;
         if (lockAct != null) {
             lockAction = AllSomeType.fromValue(lockAct);
         }
-        String exp         = getParameter("expiry",  false);
+        final String exp   = getParameter("expiry",  false);
         Integer expiry     = null;
         if (exp != null) {
             try {
@@ -687,43 +687,43 @@ public class WFSService extends OGCWebService {
             }
         }
 
-        String namespace            = getParameter("namespace", false);
-        Map<String, String> mapping = extractMapping(namespace);
+        final String namespace            = getParameter("namespace", false);
+        final Map<String, String> mapping = extractMapping(namespace);
 
-        String typeName       = getParameter("typeName", true);
-        List<QName> typeNames = extractTypeName(typeName, mapping);
+        final String typeName       = getParameter("typeName", true);
+        final List<QName> typeNames = extractTypeName(typeName, mapping);
 
-        String xmlFilter  = getParameter("filter", false);
-        FilterType filter = extractFilter(xmlFilter);
+        final String xmlFilter  = getParameter("filter", false);
+        final FilterType filter = extractFilter(xmlFilter);
         // TODO
-        QName typeNamee = typeNames.get(0);
-        LockType lock = new LockType(filter, handle, typeNamee);
+        final QName typeNamee = typeNames.get(0);
+        final LockType lock = new LockType(filter, handle, typeNamee);
 
         return new LockFeatureType(service, version, handle, Arrays.asList(lock), expiry, lockAction);
     }
 
     private TransactionType createNewTransactionRequest() throws CstlServiceException {
-        String service      = getParameter("service", true);
-        String version      = getParameter("version", true);
-        String handle       = getParameter("handle",  false);
-        String relAct       = getParameter("releaseAction",  false);
+        final String service      = getParameter("service", true);
+        final String version      = getParameter("version", true);
+        final String handle       = getParameter("handle",  false);
+        final String relAct       = getParameter("releaseAction",  false);
         AllSomeType releaseAction = null;
         if (relAct != null) {
             releaseAction = AllSomeType.fromValue(relAct);
         }
 
-        String namespace            = getParameter("namespace", false);
-        Map<String, String> mapping = extractMapping(namespace);
+        final String namespace            = getParameter("namespace", false);
+        final Map<String, String> mapping = extractMapping(namespace);
 
-        String typeName       = getParameter("typeName", true);
-        List<QName> typeNames = extractTypeName(typeName, mapping);
+        final String typeName       = getParameter("typeName", true);
+        final List<QName> typeNames = extractTypeName(typeName, mapping);
 
-        String xmlFilter  = getParameter("filter", false);
-        FilterType filter = extractFilter(xmlFilter);
+        final String xmlFilter  = getParameter("filter", false);
+        final FilterType filter = extractFilter(xmlFilter);
 
         // TODO
-        QName typeNamee = typeNames.get(0);
-        DeleteElementType delete = new DeleteElementType(filter, handle, typeNamee);
+        final QName typeNamee = typeNames.get(0);
+        final DeleteElementType delete = new DeleteElementType(filter, handle, typeNamee);
         return new TransactionType(service, version, handle, releaseAction, delete);
     }
 
@@ -737,15 +737,15 @@ public class WFSService extends OGCWebService {
      * @throws CstlServiceException if the parameter namespace is malformed.
      */
     private Map<String, String> extractMapping(String namespace) throws CstlServiceException {
-        Map<String, String> mapping = new HashMap<String, String>();
+        final Map<String, String> mapping = new HashMap<String, String>();
         if (namespace != null) {
             final StringTokenizer tokens = new StringTokenizer(namespace, ",;");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
                 if (token.indexOf("xmlns(") != -1 && token.indexOf(')') != -1 && token.indexOf('=') != -1) {
-                    String tmp = token.substring(token.indexOf("xmlns(") + 6, token.indexOf(')'));
-                    String prefix = tmp.substring(0, tmp.indexOf('='));
-                    String namesp = tmp.substring(tmp.indexOf('=') + 1);
+                    final String tmp    = token.substring(token.indexOf("xmlns(") + 6, token.indexOf(')'));
+                    final String prefix = tmp.substring(0, tmp.indexOf('='));
+                    final String namesp = tmp.substring(tmp.indexOf('=') + 1);
                     mapping.put(prefix, namesp);
 
                 } else {
@@ -767,15 +767,15 @@ public class WFSService extends OGCWebService {
      *                              or if a refix is not bounded to a namespace in the mapping map.
      */
     private List<QName> extractTypeName(String typeName, Map<String, String> mapping) throws CstlServiceException {
-        List<QName> typeNames = new ArrayList<QName>();
+        final List<QName> typeNames = new ArrayList<QName>();
         if (typeName != null) {
             final StringTokenizer tokens = new StringTokenizer(typeName, ",;");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
                 if (token.indexOf(':') != -1) {
-                    String prefix    = token.substring(0, token.indexOf(':'));
-                    String localPart = token.substring(token.indexOf(':') + 1);
-                    String namesp = mapping.get(prefix);
+                    final String prefix    = token.substring(0, token.indexOf(':'));
+                    final String localPart = token.substring(token.indexOf(':') + 1);
+                    final String namesp    = mapping.get(prefix);
                     if (namesp != null) {
                         typeNames.add(new QName(namesp, localPart, prefix));
                     } else {
@@ -838,7 +838,7 @@ public class WFSService extends OGCWebService {
     }
 
     public MediaType getOutputFormat() {
-        String format = worker.getOutputFormat();
+        final String format = worker.getOutputFormat();
         if (format.equals("text/xml; subtype=gml/3.1.1")) {
             return new MediaType("text", "xml; subtype=gml/3.1.1");
         } else {

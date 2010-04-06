@@ -159,7 +159,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     @Override
     public WFSCapabilitiesType getCapabilities(final GetCapabilitiesType request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetCapabilities request proccesing");
-        long start = System.currentTimeMillis();
+        final long start = System.currentTimeMillis();
 
         // we verify the base attribute
         verifyBaseRequest(request, false, true);
@@ -280,7 +280,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     @Override
     public Schema describeFeatureType(final DescribeFeatureTypeType request) throws CstlServiceException {
         LOGGER.log(logLevel, "DecribeFeatureType request proccesing");
-        long start = System.currentTimeMillis();
+        final long start = System.currentTimeMillis();
 
         // we verify the base attribute
         verifyBaseRequest(request, false, false);
@@ -307,7 +307,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             //search all types
             for (final Name name : wfsNames) {
                 final LayerDetails layer = namedProxy.get(name);
-                if (layer == null || !(layer instanceof FeatureLayerDetails)) continue;
+                if (!(layer instanceof FeatureLayerDetails)) continue;
 
                 final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
                 final SimpleFeatureType sft;
@@ -328,7 +328,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
                 final LayerDetails layer = namedProxy.get(n);
                 
-                if(layer == null || !(layer instanceof FeatureLayerDetails)) {
+                if(!(layer instanceof FeatureLayerDetails)) {
                     throw new CstlServiceException("The specified TypeNames does not exist:" + name);
                 }
 
@@ -361,7 +361,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     @Override
     public Object getFeature(final GetFeatureType request) throws CstlServiceException {
         LOGGER.log(logLevel, "GetFeature request proccesing");
-        long start = System.currentTimeMillis();
+        final long start = System.currentTimeMillis();
 
         // we verify the base attribute
         verifyBaseRequest(request, false, false);
@@ -418,8 +418,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 }
                 
                 if (obj instanceof String) {
-                    String pName = (String) obj;
-                    int pos = pName.lastIndexOf(':');
+                    String pName  = (String) obj;
+                    final int pos = pName.lastIndexOf(':');
                     if (pos != -1) {
                         pName = pName.substring(pos + 1);
                     }
@@ -445,7 +445,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
             for (QName typeName : typeNames) {
 
-                LayerDetails layerD = namedProxy.get(Utils.getNameFromQname(typeName), ServiceDef.Specification.WFS.name());
+                final LayerDetails layerD = namedProxy.get(Utils.getNameFromQname(typeName), ServiceDef.Specification.WFS.name());
                 if (layerD == null) {
                     throw new CstlServiceException("The specified TypeNames does not exist:" + typeName);
                 }
@@ -530,7 +530,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             response = DataUtilities.collection("collection-1", null);
         }
         if (request.getResultType() == ResultTypeType.HITS) {
-            FeatureCollectionType collection = new FeatureCollectionType(response.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
+            final FeatureCollectionType collection = new FeatureCollectionType(response.size(), org.geotoolkit.internal.jaxb.XmlUtilities.toXML(new Date()));
             collection.setId("collection-1");
             return collection;
 
@@ -609,7 +609,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                             final String fid = features.get(0).getID(); // get the id of the inserted feature
                             inserted.add(new InsertedFeatureType(new FeatureIdType(fid), handle));
                             totalInserted++;
-                            System.out.println("simpleInsert fid inserted: " + fid + " total:" + totalInserted);
+                            LOGGER.finer("simpleInsert fid inserted: " + fid + " total:" + totalInserted);
                         } catch (DataStoreException ex) {
                             Logging.unexpectedException(LOGGER, ex);
                             throw new CstlServiceException("Error while inserting the Feature:" + ex.getMessage(), NO_APPLICABLE_CODE);
@@ -631,7 +631,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                                 final String id = fid.getID(); // get the id of the inserted feature
                                 inserted.add(new InsertedFeatureType(new FeatureIdType(id), handle));
                                 totalInserted++;
-                                System.out.println("collectionInsert fid inserted: " + fid + " total:" + totalInserted);
+                                LOGGER.finer("collectionInsert fid inserted: " + fid + " total:" + totalInserted);
                             }
                         } catch (DataStoreException ex) {
                             Logging.unexpectedException(LOGGER, ex);
@@ -722,7 +722,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         }
                         Object value;
                         if (updateProperty.getValue() instanceof ElementNSImpl) {
-                            String strValue = getXMLFromElementNSImpl((ElementNSImpl)updateProperty.getValue());
+                            final String strValue = getXMLFromElementNSImpl((ElementNSImpl)updateProperty.getValue());
                             value = null;
                             LOGGER.info(">> updating : "+ updatePropertyValue +"   => " + strValue);
                         } else {
@@ -788,7 +788,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         final StringBuilder s = new StringBuilder();
         s.append('<').append(elt.getLocalName()).append('>');
         final Node node = elt.getFirstChild();
-        s.append(getXMLFromNode(node)).toString();
+        s.append(getXMLFromNode(node));
 
         s.append("</").append(elt.getLocalName()).append('>');
         return s.toString();
@@ -844,7 +844,6 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 filter = defaultFilter;
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
         }
         return filter;
@@ -921,7 +920,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                            env.getMaximum(0),
                            env.getMaximum(1));
                 } else {
-                    Envelope enveloppe = CRS.transform(env, EPSG4326);
+                    final Envelope enveloppe = CRS.transform(env, EPSG4326);
                     return new WGS84BoundingBoxType(
                             "urn:ogc:def:crs:OGC:2:84",
                            enveloppe.getMinimum(0),
@@ -999,7 +998,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         //search all types
         for (final Name name : namedProxy.getKeys(ServiceDef.Specification.WFS.name())) {
             final LayerDetails layer = namedProxy.get(name);
-            if (layer == null || !(layer instanceof FeatureLayerDetails)) continue;
+            if (!(layer instanceof FeatureLayerDetails)) continue;
 
             final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
             try {
