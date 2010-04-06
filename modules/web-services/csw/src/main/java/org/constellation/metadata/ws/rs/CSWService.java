@@ -848,8 +848,8 @@ public class CSWService extends OGCWebService {
             id = '(' + serviceID + ')';
 
         LOGGER.info("Shutting down the REST CSW service facade " + id + '.');
-        if (worker != null)
+        if (worker != null) {
             worker.destroy();
+        }
     }
-
 }

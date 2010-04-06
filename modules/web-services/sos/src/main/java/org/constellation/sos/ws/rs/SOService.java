@@ -371,7 +371,7 @@ public class SOService extends OGCWebService {
     @PreDestroy
     @Override
     public void destroy() {
-        LOGGER.info("Destroying SOS service");
+        LOGGER.info("Shutting down the REST SOS service facade");
         if (worker != null) {
             worker.destroy();
         }
