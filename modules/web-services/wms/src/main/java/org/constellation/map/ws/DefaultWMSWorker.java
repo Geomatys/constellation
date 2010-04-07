@@ -243,6 +243,12 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                 throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
             }
 
+            if (inputGeoBox == null) {
+                // The layer does not contain geometric information, we do not want this layer
+                // in the capabilities response.
+                continue;
+            }
+
             // List of elevations, times and dim_range values.
             final List<AbstractDimension> dimensions = new ArrayList<AbstractDimension>();
 
@@ -331,12 +337,11 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                  * TODO
                  * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
                  */
-                final org.geotoolkit.wms.xml.v111.BoundingBox outputBBox = (inputGeoBox != null) ?
+                final org.geotoolkit.wms.xml.v111.BoundingBox outputBBox =
                     new org.geotoolkit.wms.xml.v111.BoundingBox("EPSG:4326",
                             inputGeoBox.getWestBoundLongitude(),
                             inputGeoBox.getSouthBoundLatitude(), inputGeoBox.getEastBoundLongitude(),
-                            inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0, queryVersion) :
-                    null;
+                            inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0, queryVersion);
 
                 // we build The Style part
                 org.geotoolkit.wms.xml.v111.OnlineResource or =
@@ -391,14 +396,13 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                  * TODO
                  * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
                  */
-                final org.geotoolkit.wms.xml.v130.BoundingBox outputBBox = (inputGeoBox != null) ?
+                final org.geotoolkit.wms.xml.v130.BoundingBox outputBBox =
                     new org.geotoolkit.wms.xml.v130.BoundingBox("EPSG:4326",
                             inputGeoBox.getWestBoundLongitude(),
                             inputGeoBox.getSouthBoundLatitude(),
                             inputGeoBox.getEastBoundLongitude(),
                             inputGeoBox.getNorthBoundLatitude(), 0.0, 0.0,
-                            queryVersion) :
-                    null;
+                            queryVersion);
 
                 // we build a Style Object
                 org.geotoolkit.wms.xml.v130.OnlineResource or =

@@ -33,6 +33,7 @@ import org.constellation.ServiceDef;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
+import org.geotoolkit.coverage.grid.GeneralGridGeometry;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.coverage.io.CoverageStoreException;
@@ -55,6 +56,7 @@ import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -72,6 +74,10 @@ import org.opengis.style.Symbolizer;
  * @author Johann Sorel (Geomatys)
  */
 class CoverageSQLLayerDetails implements CoverageLayerDetails {
+    /**
+     * Default logger.
+     */
+    private static final Logger LOGGER = Logging.getLogger(CoverageSQLLayerDetails.class);
 
     private final LayerCoverageReader reader;
 
@@ -86,8 +92,10 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      * Stores information about a {@linkplain Layer layer} in a {@code PostGRID}
      * {@linkplain Database database}.
      *
-     * @param database The database connection.
-     * @param layer The layer to consider in the database.
+     * @param reader         The reader for this layer.
+     * @param favorites      Favorites styles for this layer.
+     * @param elevationModel The elevation model to apply.
+     * @param name           The name of the layer.
      */
     CoverageSQLLayerDetails(final LayerCoverageReader reader, final List<String> favorites, 
             final String elevationModel, final String name) {
@@ -188,13 +196,22 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the geographic bounding box for the coverage, or {@code null} if the
+     * coverage does not contain any geographic information.
+     *
+     * @throws DataStoreException
      */
     @Override
     public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
-        Envelope env;
+        final Envelope env;
+        final GeneralGridGeometry generalGridGeom = reader.getGridGeometry(0);
+        if (generalGridGeom == null) {
+            LOGGER.info("The layer \""+ name +"\" does not contain" +
+                    " a grid geometry information.");
+            return null;
+        }
         try {
-            env = reader.getGridGeometry(0).getEnvelope();
+            env = generalGridGeom.getEnvelope();
             return new DefaultGeographicBoundingBox(env);
         } catch (CancellationException ex) {
             throw new DataStoreException(ex);
