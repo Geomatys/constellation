@@ -21,6 +21,8 @@ package org.constellation.sos.io.filesystem;
 import java.io.File;
 
 // JAXB dependencies
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
@@ -103,5 +105,19 @@ public class FileSensorReader implements SensorReader {
     @Override
     public String getInfos() {
         return "Constellation Filesystem Sensor Reader 0.5";
+    }
+
+    @Override
+    public List<String> getSensorNames() throws CstlServiceException {
+        List<String> result = new ArrayList<String>();
+        for (File sensorFile : dataDirectory.listFiles()) {
+            String sensorID = sensorFile.getName();
+            int suffixPos = sensorID.indexOf(".xml");
+            if (suffixPos != -1){
+                sensorID = sensorID.substring(0, suffixPos);
+                result.add(sensorID);
+            }
+        }
+        return result;
     }
 }

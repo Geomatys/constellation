@@ -17,6 +17,7 @@
 
 package org.constellation.sos.io.mdweb;
 
+import java.util.List;
 import java.util.Properties;
 
 // JAXB dependencies
@@ -35,6 +36,7 @@ import org.mdweb.io.MD_IOException;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.mdweb.io.sql.AbstractReader;
 import org.mdweb.io.sql.v20.Reader20;
+import org.mdweb.model.storage.RecordSet;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -130,5 +132,15 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
     @Override
     public String getInfos() {
         return "Constellation MDweb Sensor Reader 0.5";
+    }
+
+    @Override
+    public List<String> getSensorNames() throws CstlServiceException {
+        try {
+            RecordSet smlCat = mdReader.getRecordSet("SMLC");
+            return mdReader.getFormsTitle(smlCat);
+        } catch (MD_IOException ex) {
+            throw new CstlServiceException(ex);
+        }
     }
 }

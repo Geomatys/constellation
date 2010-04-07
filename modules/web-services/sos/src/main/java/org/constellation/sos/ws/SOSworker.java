@@ -647,7 +647,7 @@ public class SOSworker {
            }
 
            //the process list
-           final Collection<String> procNames  = omReader.getProcedureNames();
+           final Collection<String> procNames = omReader.getProcedureNames();
            go.updateParameter(PROCEDURE, procNames);
 
            //the phenomenon list
@@ -666,8 +666,15 @@ public class SOSworker {
            // the different responseFormat available
            go.updateParameter("responseFormat", acceptedResponseFormat);
 
+           /**
+            * Because sometimes there is some sensor that are queryable in DescribeSensor but not in GetObservation
+            */
            final Operation ds = om.getOperation("DescribeSensor");
-           ds.updateParameter(PROCEDURE, procNames);
+           if (smlReader != null) {
+               ds.updateParameter(PROCEDURE, smlReader.getSensorNames());
+           } else {
+               ds.updateParameter(PROCEDURE, procNames);
+           }
 
         }
 
