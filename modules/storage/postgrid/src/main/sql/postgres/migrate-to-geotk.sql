@@ -50,3 +50,9 @@ INSERT INTO coverages."GridCoverages" ("series", "filename", "index", "startTime
 SELECT "SeriesID"."identifier", "filename", "index", "startTime", "endTime", "GridGeometriesID"."identifier" FROM ONLY postgrid."GridCoverages"
 JOIN postgrid."SeriesID" ON "GridCoverages"."series" = "SeriesID"."name"
 JOIN postgrid."GridGeometriesID" ON "GridCoverages"."extent" = "GridGeometriesID"."name";
+
+--- Tiles ------------------------------------------------------------------------------------------
+INSERT INTO coverages."Tiles" ("series", "filename", "index", "startTime", "endTime", "extent", "dx", "dy")
+SELECT "SeriesID"."identifier", "filename", "index", "startTime", "endTime", "GridGeometriesID"."identifier", "dx", "dy" FROM postgrid."Tiles"
+JOIN postgrid."SeriesID" ON "Tiles"."series" = "SeriesID"."name"
+JOIN postgrid."GridGeometriesID" ON "Tiles"."extent" = "GridGeometriesID"."name";
