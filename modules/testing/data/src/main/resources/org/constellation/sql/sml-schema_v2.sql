@@ -613,23 +613,6 @@
  INSERT INTO "Schemas"."Properties"  VALUES('id', NULL, 'SensorML', NULL, 0, 1,'PositionList','CharacterString', NULL, 'O',2 , 'ISO 19103','SensorML',' ');
 
 
- /*-------------------------------------------------*
- *--------------  Classe Event --------------------*
- *-------------------------------------------------*/
- INSERT INTO "Schemas"."Classes"  VALUES('Event',NULL,'SensorML','Event record (change to the object) including a date/time, description, identification and additional references and metadata',0,NULL,NULL, ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('date', NULL, 'SensorML', 'Date/Time of event', 1, 1,'Event','DateTime', NULL, 'M',0 , 'ISO 19108','SensorML',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('description', NULL, 'ISO 19108', NULL, 1, 1,'Event','CharacterString', NULL, 'M',1 , 'ISO 19103','SensorML',' ');
-
-
-
-/*-------------------------------------------------*
- *--------------  Classe EventList ----------------*
- *-------------------------------------------------*/
- INSERT INTO "Schemas"."Classes"  VALUES('EventList',NULL,'SensorML','List of events related to the enclosing object',0,NULL,NULL, ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('name', NULL, 'Sensor Web Enablement', 'Value is optional, to enable structure to act in a schema for values provided using other encodings', 1, 1,'EventList','CharacterString', NULL, 'M',0 , 'ISO 19103','SensorML',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('id', NULL, 'Sensor Web Enablement', 'Value is optional, to enable structure to act in a schema for values provided using other encodings', 1, 1,'EventList','CharacterString', NULL, 'M',1 , 'ISO 19103','SensorML',' ');
-
-
 /*-------------------------------------------------*
  *--------------  Classe ObservableProperty -------*
  *-------------------------------------------------*/
@@ -734,6 +717,47 @@
  INSERT INTO "Schemas"."Properties"  VALUES('timeInstant', NULL, 'SensorML', NULL, 0, 1,'ValidTime','TimeInstant', NULL, 'O',1 , 'ISO 19108','SensorML',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('timePeriod', NULL, 'SensorML', NULL, 0, 1,'ValidTime','TimePeriod', NULL, 'O',2 , 'ISO 19108','SensorML','P');
 
+ /*-------------------------------------------------*
+ *--------------  Classe Event --------------------*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"  VALUES('Event',NULL,'SensorML','Event record (change to the object) including a date/time, description, identification and additional references and metadata',0,NULL,NULL, ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('date', NULL, 'SensorML', 'Date/Time of event', 1, 1,'Event','DateTime', NULL, 'M',0 , 'ISO 19108','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('description', NULL, 'ISO 19108', NULL, 1, 1,'Event','CharacterString', NULL, 'M',1 , 'ISO 19103','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('keywords', NULL, 'SensorML', NULL, 0, 2147483647,'Event','KeywordList', NULL, 'O',0 , 'SensorML','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('identification', NULL, 'SensorML', NULL, 0, 2147483647,'Event','Identification', NULL, 'O',1 , 'SensorML','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('classification', NULL, 'SensorML', NULL, 0, 2147483647,'Event','Classification', NULL, 'O',2 , 'SensorML','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('contact', NULL, 'SensorML', NULL, 0, 2147483647,'Event','Contact', NULL, 'O',8 , 'SensorML','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('documentation', NULL, 'SensorML', NULL, 0, 2147483647,'Event','Documentation', NULL, 'O',9 , 'SensorML','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('property', NULL, 'SensorML', NULL, 0, 2147483647,'Event','DataComponentProperty', NULL, 'O',7 , 'Sensor Web Enablement','SensorML',' ');
+
+
+/*-------------------------------------------------*
+ *--------------  Classe EventListMember ----------*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"  VALUES('EventListMember',NULL,'SensorML','List of events related to the enclosing object',0,NULL,NULL, ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('role', NULL, 'Xlink', NULL, 0, 1,'EventListMember','CharacterString', NULL, 'O',1 , 'ISO 19103','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('href', NULL, 'Xlink', NULL, 0, 1,'EventListMember','CharacterString', NULL, 'O',2 , 'ISO 19103','SensorML','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('event', NULL, 'SensorML', NULL, 0, 1,'EventListMember','Event', NULL, 'O',1 , 'SensorML','SensorML',' ');
+
+
+/*-------------------------------------------------*
+ *--------------  Classe EventList ----------------*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"  VALUES('EventList',NULL,'SensorML','List of events related to the enclosing object',0,NULL,NULL, ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('id', NULL, 'SensorML', 'Value is optional, to enable structure to act in a schema for values provided using other encodings', 1, 1,'EventList','CharacterString', NULL, 'M',1 , 'ISO 19103','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('member', NULL, 'SensorML', NULL, 1, 1,'EventList','EventListMember', NULL, 'M',2 , 'SensorML','SensorML',' ');
+
+
+
+/*-------------------------------------------------*
+ *--------------  Classe History ------------------*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"     VALUES('History',NULL,'SensorML',NULL,0,NULL,NULL, ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('role', NULL, 'Xlink', NULL, 0, 1,'History','CharacterString', NULL, 'O',1 , 'ISO 19103','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('href', NULL, 'Xlink', NULL, 0, 1,'History','CharacterString', NULL, 'O',2 , 'ISO 19103','SensorML','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('eventList', NULL, 'SensorML', NULL, 1, 2147483647,'History','EventList', NULL, 'M',0 , 'SensorML','SensorML',' ');
+
+
 /*-------------------------------------------------*
  *--------------  Classe AbstractProcess fin ------*
  *-------------------------------------------------*/
@@ -746,7 +770,7 @@
  INSERT INTO "Schemas"."Properties"  VALUES('capabilities', NULL, 'SensorML', NULL, 0, 2147483647,'AbstractProcess','CapabilitiesSML', NULL, 'O',7 , 'SensorML','SensorML',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('contact', NULL, 'SensorML', NULL, 0, 2147483647,'AbstractProcess','Contact', NULL, 'O',8 , 'SensorML','SensorML',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('documentation', NULL, 'SensorML', NULL, 0, 2147483647,'AbstractProcess','Documentation', NULL, 'O',9 , 'SensorML','SensorML',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('history', NULL, 'SensorML', NULL, 0, 2147483647,'AbstractProcess','EventList', NULL, 'O',10 , 'SensorML','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('history', NULL, 'SensorML', NULL, 0, 2147483647,'AbstractProcess','History', NULL, 'O',10 , 'SensorML','SensorML',' ');
 
 
 
@@ -981,6 +1005,11 @@ INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "own
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:documentation:document:format', 'format', 'SensorML', 'Document', 'SensorML:SensorML:member:process:documentation:document', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:documentation:document:onlineResource', 'onlineResource', 'SensorML', 'Document', 'SensorML:SensorML:member:process:documentation:document', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:documentation:document:onlineResource:href', 'href', 'Xlink', 'OnlineResource', 'SensorML:SensorML:member:process:documentation:document:onlineResource', 'SensorML');
+INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:history', 'history', 'SensorML', 'AbstractProcess', 'SensorML:SensorML:member:process', 'SensorML');
+INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:history:eventList', 'eventList', 'SensorML', 'History', 'SensorML:SensorML:member:process:history', 'SensorML');
+INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:history:eventList:member', 'member', 'SensorML', 'EventList', 'SensorML:SensorML:member:process:history:eventList', 'SensorML');
+INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:history:eventList:member:event', 'event', 'SensorML', 'EventListMember', 'SensorML:SensorML:member:process:history:eventList:member', 'SensorML');
+INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:history:eventList:member:event:date', 'date', 'SensorML', 'Event', 'SensorML:SensorML:member:process:history:eventList:member:event', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:spatialReferenceFrame', 'spatialReferenceFrame', 'SensorML', 'AbstractDerivableComponent', 'SensorML:SensorML:member:process', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:spatialReferenceFrame:engineeringCRS', 'engineeringCRS', 'ISO 19108', 'SpatialReferenceFrame', 'SensorML:SensorML:member:process:spatialReferenceFrame', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:spatialReferenceFrame:engineeringCRS:id', 'id', 'ISO 19108', 'EngineeringCRS', 'SensorML:SensorML:member:process:spatialReferenceFrame:engineeringCRS', 'ISO 19108');
