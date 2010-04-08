@@ -460,7 +460,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 if (textValue == null || textValue.isEmpty()) {
                     return null;
                 }
-                return TemporalUtilities.createDate(textValue);
+                return TemporalUtilities.parseDateSafe(textValue,true);
 
             } else if (classe.equals(Locale.class)) {
                 for (Locale candidate : Locale.getAvailableLocales()) {
