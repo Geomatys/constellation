@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -15,22 +15,27 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.ws.rs;
 
+import javax.imageio.ImageIO;
 import org.constellation.ServiceDef;
 import org.geotoolkit.image.jai.Registry;
+import org.geotoolkit.internal.io.Installation;
+
 
 /**
  * A Super class for WMS and WCS Webservice.
  * The point is to remove the hard-coded dependency to JAI.
  *
  * @author Guilhem Legal (Geomatys)
+ * @author Cédric Briançon (Geomatys)
  * @since 0.5
  */
 public abstract class GridWebService extends OGCWebService {
 
     static {
+        Installation.allowSystemPreferences = false;
+        ImageIO.scanForPlugins();
         Registry.setDefaultCodecPreferences();
     }
 
