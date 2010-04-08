@@ -22,6 +22,7 @@ import java.io.File;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
@@ -104,6 +105,8 @@ public class MdwebIndexTest {
         configuration.setConfigurationDirectory(configDirectory);
         indexer                 = new MDWebIndexer(configuration, "");
         indexSearcher           = new MDWebIndexSearcher(configDirectory, "");
+        indexer.setLogLevel(Level.FINER);
+        indexSearcher.setLogLevel(Level.FINER);
 
     }
 

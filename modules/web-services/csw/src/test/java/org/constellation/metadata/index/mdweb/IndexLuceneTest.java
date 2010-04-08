@@ -23,6 +23,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 //Junit dependencies
@@ -71,12 +72,13 @@ public class IndexLuceneTest {
     protected static final FilterFactory2 FF = (FilterFactory2)
             FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
     
-    private Logger logger = Logger.getLogger("org.constellation.metadata");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
    
     private static MDWebIndexSearcher indexSearcher;
 
     private static File configDirectory;
-    
+
+    private static final Level LOG_LEVEL = Level.FINER;
     @BeforeClass
     public static void setUpClass() throws Exception {
         configDirectory = new File("config-test");
@@ -92,6 +94,8 @@ public class IndexLuceneTest {
 
         MDWebIndexer indexer = new MDWebIndexer(forms, classes, paths, configDirectory);
         indexSearcher          = new MDWebIndexSearcher(configDirectory, "");
+        indexer.setLogLevel(LOG_LEVEL);
+        indexSearcher.setLogLevel(LOG_LEVEL);
     }
 
     @AfterClass
@@ -129,7 +133,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        logger.info("SimpleSearch 1:" + '\n' + resultReport);
+        LOGGER.log(LOG_LEVEL,"SimpleSearch 1:" + '\n' + resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("1:catalogTest");
@@ -146,7 +150,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        logger.info("SimpleSearch 2:" + '\n' + resultReport);
+        LOGGER.log(LOG_LEVEL,"SimpleSearch 2:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("1:catalogTest");
@@ -166,7 +170,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        logger.info("SimpleSearch 3:" + '\n' + resultReport);
+        LOGGER.log(LOG_LEVEL,"SimpleSearch 3:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("2:catalogTest");
@@ -199,7 +203,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        logger.info("SortedSearch 1:" + '\n' + resultReport);
+        LOGGER.log(LOG_LEVEL,"SortedSearch 1:" + '\n' + resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("3:catalogTest");
@@ -222,7 +226,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        logger.info("SortedSearch 2:" + '\n' + resultReport);
+        LOGGER.log(LOG_LEVEL,"SortedSearch 2:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("4:catalogTest");
@@ -245,7 +249,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        logger.info("SortedSearch 3:" + '\n' + resultReport);
+        LOGGER.log(LOG_LEVEL,"SortedSearch 3:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("2:catalogTest");
@@ -268,7 +272,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        logger.info("SortedSearch 4:" + '\n' + resultReport);
+        LOGGER.log(LOG_LEVEL,"SortedSearch 4:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("4:catalogTest");
@@ -300,7 +304,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        logger.info("spatialSearch 1:" + '\n' + resultReport);
+        LOGGER.log(LOG_LEVEL,"spatialSearch 1:" + '\n' + resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("2:catalogTest");
@@ -325,7 +329,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        logger.info("spatialSearch 2:" + '\n' + resultReport);
+        LOGGER.log(LOG_LEVEL,"spatialSearch 2:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("1:catalogTest");

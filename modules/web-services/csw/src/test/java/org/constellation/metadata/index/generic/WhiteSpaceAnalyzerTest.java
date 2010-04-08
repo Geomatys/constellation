@@ -21,6 +21,7 @@ package org.constellation.metadata.index.generic;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -76,6 +77,8 @@ public class WhiteSpaceAnalyzerTest {
         List<DefaultMetadata> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new WhitespaceAnalyzer());
         indexSearcher          = new GenericIndexSearcher(configDirectory, "", new WhitespaceAnalyzer());
+        indexer.setLogLevel(Level.FINER);
+        indexSearcher.setLogLevel(Level.FINER);
     }
 
     @AfterClass

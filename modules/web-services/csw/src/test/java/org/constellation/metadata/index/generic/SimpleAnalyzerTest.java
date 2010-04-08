@@ -21,6 +21,7 @@ package org.constellation.metadata.index.generic;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
@@ -68,6 +69,8 @@ public class SimpleAnalyzerTest {
         List<DefaultMetadata> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new SimpleAnalyzer());
         indexSearcher          = new GenericIndexSearcher(configDirectory, "", new SimpleAnalyzer());
+        indexer.setLogLevel(Level.FINER);
+        indexSearcher.setLogLevel(Level.FINER);
     }
 
     @AfterClass
