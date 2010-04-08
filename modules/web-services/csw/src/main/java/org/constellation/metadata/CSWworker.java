@@ -1822,5 +1822,8 @@ public class CSWworker {
 
     public void setLogLevel(Level logLevel) {
         this.logLevel = logLevel;
+        if (indexSearcher != null) {
+            indexSearcher.setLogLevel(logLevel);
+        }
     }
 }

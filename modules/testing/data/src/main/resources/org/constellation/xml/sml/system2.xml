@@ -72,6 +72,7 @@
                             <city>MONTPELLIER</city>
                             <electronicMailAddress>e.bloom@suna.fr</electronicMailAddress>
                         </address>
+                        <onlineResource xlink:href="http://www.suna-corp.com"/>
                     </contactInfo>
                 </ResponsibleParty>
             </contact>
@@ -165,7 +166,7 @@
             </outputs>
             <components>
                 <ComponentList>
-                    <component xlink:role="urn:x-ogc:def:sensor:detector" xlink:href="capteur_"/>
+                    <component xlink:role="urn:x-ogc:def:sensor:detector" xlink:href="capteur_" name="something"/>
                 </ComponentList>
             </components>
             <positions>
