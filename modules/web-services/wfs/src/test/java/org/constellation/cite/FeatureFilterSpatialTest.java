@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.feature.simple.SimpleFeatureBuilder;
-import org.geotoolkit.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotoolkit.feature.FeatureTypeBuilder;
 import org.geotoolkit.filter.DefaultFilterFactory2;
 import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.isoonjts.spatialschema.geometry.aggregate.JTSMultiPoint;
@@ -78,7 +78,7 @@ public class FeatureFilterSpatialTest {
         final Name id = new DefaultName("http://cite.opengeospatial.org/gmlsf", "id");
 
 
-        final SimpleFeatureTypeBuilder sftb = new SimpleFeatureTypeBuilder();
+        final FeatureTypeBuilder sftb = new FeatureTypeBuilder();
         sftb.setName(new DefaultName("http://cite.opengeospatial.org/gmlsf", "AggregateGeoFeature"));
         sftb.add(description, String.class);
         sftb.add(name, String.class);
@@ -91,7 +91,7 @@ public class FeatureFilterSpatialTest {
         sftb.add(featureCode, String.class);
         sftb.add(id, String.class);
 
-        final SimpleFeatureType aggregateGeoFeatureType = sftb.buildFeatureType();
+        final SimpleFeatureType aggregateGeoFeatureType = sftb.buildSimpleFeatureType();
 
         /*********************************************************************************************
          *                            AggregateGeoFeature 1                                          *
@@ -133,7 +133,7 @@ public class FeatureFilterSpatialTest {
         sftb.add(featureRef, String.class);
         sftb.add(id, String.class);
 
-        final SimpleFeatureType entiteGeneriqueType = sftb.buildFeatureType();
+        final SimpleFeatureType entiteGeneriqueType = sftb.buildSimpleFeatureType();
 
         sfb = new SimpleFeatureBuilder(entiteGeneriqueType);
 
