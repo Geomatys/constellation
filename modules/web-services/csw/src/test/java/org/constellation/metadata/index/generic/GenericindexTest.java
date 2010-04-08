@@ -21,6 +21,7 @@ package org.constellation.metadata.index.generic;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBElement;
@@ -79,8 +80,10 @@ public class GenericindexTest {
         File configDirectory      = new File("GenericIndexTest");
         NIOUtilities.deleteDirectory(new File("GenericIndexTest"));
         List<Object> object       = fillTestData();
-        indexer                   = new GenericIndexer(object, null, configDirectory, "");
-        indexSearcher             = new GenericIndexSearcher(configDirectory, "");
+        indexer                    = new GenericIndexer(object, null, configDirectory, "");
+        indexSearcher               = new GenericIndexSearcher(configDirectory, "");
+        indexer.setLogLevel(Level.FINER);
+        indexSearcher.setLogLevel(Level.FINER);
         
     }
 

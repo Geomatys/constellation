@@ -342,7 +342,6 @@ public class CSWworker {
                     "cause: Unable to find a CSW Factory");
             isStarted = false;
         } catch (JAXBException ex) {
-            //LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             LOGGER.severe(notWorkingMsg + '\n' +
                     "cause: JAXBException while getting configuration:" + ex.getLocalizedMessage());
             isStarted = false;
@@ -355,7 +354,6 @@ public class CSWworker {
                     "cause:" + e.getMessage());
             isStarted = false;
         } catch (IllegalArgumentException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
             LOGGER.severe(notWorkingMsg + '\n' +
                     "cause: IllegalArgumentException: " + e.getMessage());
             isStarted = false;

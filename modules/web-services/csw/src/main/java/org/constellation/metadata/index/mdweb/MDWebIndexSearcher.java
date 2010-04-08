@@ -60,7 +60,7 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
             final TermQuery query = new TermQuery(new Term("identifier_sort", id));
             final List<String> results = new ArrayList<String>();
             final int maxRecords = searcher.maxDoc();
-            LOGGER.info("TermQuery: " + query.toString());
+            LOGGER.log(logLevel, "TermQuery: " + query.toString());
             final TopDocs hits = searcher.search(query, maxRecords);
             for (ScoreDoc doc : hits.scoreDocs) {
                 final Document document = searcher.doc(doc.doc, new IDFieldSelector());

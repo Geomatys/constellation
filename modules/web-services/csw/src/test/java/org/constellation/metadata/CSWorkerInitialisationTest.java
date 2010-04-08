@@ -19,6 +19,7 @@ package org.constellation.metadata;
 
 // JAXB dependencies
 import java.io.File;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
@@ -124,6 +125,7 @@ public class CSWorkerInitialisationTest {
          */
         CSWworker worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
+        worker.setLogLevel(Level.FINER);
 
         boolean exceptionLaunched = false;
         GetCapabilitiesType request = new GetCapabilitiesType("CSW");
@@ -147,6 +149,7 @@ public class CSWorkerInitialisationTest {
         
         worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
+        worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
         try {
@@ -178,6 +181,7 @@ public class CSWorkerInitialisationTest {
 
         worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
+        worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
         try {
@@ -204,6 +208,7 @@ public class CSWorkerInitialisationTest {
 
         worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
+        worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
         try {
@@ -230,6 +235,7 @@ public class CSWorkerInitialisationTest {
 
         worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
+        worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
         try {
@@ -256,6 +262,7 @@ public class CSWorkerInitialisationTest {
 
         worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
+        worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
         try {
@@ -282,6 +289,7 @@ public class CSWorkerInitialisationTest {
 
         worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
+        worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
         try {
@@ -307,6 +315,7 @@ public class CSWorkerInitialisationTest {
 
         worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
+        worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
         try {
@@ -332,6 +341,7 @@ public class CSWorkerInitialisationTest {
 
         worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
+        worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
         try {
@@ -357,6 +367,7 @@ public class CSWorkerInitialisationTest {
 
         worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
+        worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
         try {
@@ -382,6 +393,7 @@ public class CSWorkerInitialisationTest {
 
         worker = new CSWworker("", pool, configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
+        worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
         try {
