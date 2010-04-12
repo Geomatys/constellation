@@ -1,6 +1,5 @@
 
 INSERT INTO "Schemas"."Classes"  VALUES ('Measure', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('RecordType', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('UomLength', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('Anchor', NULL, 'MDWEB', NULL, 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('TM_PeriodDuration', NULL, 'MDWEB', NULL, 0, NULL, NULL, ' ');
@@ -133,6 +132,45 @@ INSERT INTO "Schemas"."CodeListElements"  VALUES ('UP', NULL, 'ISO 19108', NULL,
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('DOWN', NULL, 'ISO 19108', NULL, 0, 1, 'AxisDirection', 'AxisDirection', 'AxisDirection', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 2);
 
 
+INSERT INTO "Schemas"."CodeLists"  VALUES ('MeasureType', 'MeasType', 'ISO 19103', NULL, 0, 'CodeList', NULL, ' ');
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('angle', NULL, 'ISO 19103', NULL, 0, 1, 'MeasureType', 'MeasureType', 'MeasureType', 'C', 0, 'ISO 19103', 'ISO 19103', ' ', 1);
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('area', NULL, 'ISO 19103', NULL, 0, 1, 'MeasureType', 'MeasureType', 'MeasureType', 'C', 0, 'ISO 19103', 'ISO 19103', ' ', 2);
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('length', NULL, 'ISO 19103', NULL, 0, 1, 'MeasureType', 'MeasureType', 'MeasureType', 'C', 0, 'ISO 19103', 'ISO 19103', ' ', 3);
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('scale', NULL, 'ISO 19103', NULL, 0, 1, 'MeasureType', 'MeasureType', 'MeasureType', 'C', 0, 'ISO 19103', 'ISO 19103', ' ', 4);
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('time', NULL, 'ISO 19103', NULL, 0, 1, 'MeasureType', 'MeasureType', 'MeasureType', 'C', 0, 'ISO 19103', 'ISO 19103', ' ', 5);
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('velocity', NULL, 'ISO 19103', NULL, 0, 1, 'MeasureType', 'MeasureType', 'MeasureType', 'C', 0, 'ISO 19103', 'ISO 19103', ' ', 6);
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('volume', NULL, 'ISO 19103', NULL, 0, 1, 'MeasureType', 'MeasureType', 'MeasureType', 'C', 0, 'ISO 19103', 'ISO 19103', ' ', 7);
+INSERT INTO "Schemas"."CodeListElements"  VALUES ('weight', NULL, 'ISO 19103', NULL, 0, 1, 'MeasureType', 'MeasureType', 'MeasureType', 'C', 0, 'ISO 19103', 'ISO 19103', ' ', 8);
+
+
+INSERT INTO "Schemas"."Classes" VALUES ('UnitOfMeasure', null, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('formula', null, 'ISO 19103', null, 0, 1, 'UnitOfMeasure', 'CharacterString', NULL, 'O', 1, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('measureType', null, 'ISO 19103', null, 1, 1, 'UnitOfMeasure', NULL, 'MeasureType', 'O', 2, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('nameStandardUnit', null, 'ISO 19103', null, 0, 1, 'UnitOfMeasure', 'CharacterString', NULL, 'O', 3, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('offsetToStandardUnit', null, 'ISO 19103', null, 0, 1, 'UnitOfMeasure', 'Real', NULL, 'O', 4, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('scaleToStandardUnit', null, 'ISO 19103', null, 0, 1, 'UnitOfMeasure', 'Real', NULL, 'O', 5, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('uomName', null, 'ISO 19103', null, 1, 1, 'UnitOfMeasure', 'CharacterString', NULL, 'O', 6, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('uomSymbol', null, 'ISO 19103', null, 1, 1, 'UnitOfMeasure', 'CharacterString', NULL, 'O', 7, 'ISO 19103', 'ISO 19103', ' ');
+
+INSERT INTO "Schemas"."Classes" VALUES ('Type', null, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('typeName', null, 'ISO 19103', null, 1, 1, 'Type', 'TypeName', NULL, 'M', 1, 'ISO 19103', 'ISO 19103', ' ');
+
+INSERT INTO "Schemas"."Classes" VALUES ('RecordType', null, 'ISO 19103', NULL, 0, 'Type', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('attributes', null, 'ISO 19103', null, 0, 2147483647, 'RecordType', 'Type', NULL, 'O', 1, 'ISO 19103', 'ISO 19103', ' ');
+
+INSERT INTO "Schemas"."Classes" VALUES ('Record', null, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('recordType', null, 'ISO 19103', null, 0, 1, 'Record', 'RecordType', NULL, 'M', 1, 'ISO 19103', 'ISO 19103', ' ');
+
+INSERT INTO "Schemas"."Classes" VALUES ('DQ_Result', 'Result', 'ISO 19115', 'generalisation of more specific result classes', 1, NULL, NULL, ' ');
+INSERT INTO "Schemas"."Classes" VALUES ('DQ_ConformanceResult', 'ConResult', 'ISO 19115', 'information about the outcome of evaluating the obtained value (or set of values) against a specified acceptable conformance quality level', 0, 'DQ_Result', 'ISO 19115', ' ');
+
+
+INSERT INTO "Schemas"."Classes" VALUES ('DQ_QuantitativeResult', 'QuanResult', 'ISO 19115', 'the values or information about the value(s) (or set of values) obtained from applying a data quality measure', 0, 'DQ_Result', 'ISO 19115', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('valueType', null, 'ISO 19115', null, 0, 1, 'DQ_QuantitativeResult', 'RecordType', NULL, 'O', 1, 'ISO 19103', 'ISO 19115', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('valueUnit', null, 'ISO 19115', null, 1, 1, 'DQ_QuantitativeResult', 'UnitOfMeasure', NULL, 'M', 2, 'ISO 19103', 'ISO 19115', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('errorStatistic', null, 'ISO 19115', null, 1, 1, 'DQ_QuantitativeResult', 'CharacterString', NULL, 'M', 3, 'ISO 19103', 'ISO 19115', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('value', null, 'ISO 19115', null, 1, 2147483647, 'DQ_QuantitativeResult', 'Record', NULL, 'M', 4, 'ISO 19103', 'ISO 19115', ' ');
+
 
 /*-------------------------------------------------*
  *--------------  Classe CoordinateSystemAxis -----*
@@ -171,12 +209,6 @@ INSERT INTO "Schemas"."Properties"  VALUES('verticalDatumProperty', NULL, 'ISO 1
  INSERT INTO "Schemas"."Properties"  VALUES('identifier', NULL, 'ISO 19108', NULL, 0, 1,'LineString','CharacterString', NULL, 'O',0 , 'ISO 19103','ISO 19108',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('name', NULL, 'ISO 19108', NULL, 0, 1,'LineString','CharacterString', NULL, 'O',1 , 'ISO 19103','ISO 19108',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('coordinates', NULL, 'ISO 19108', NULL, 0, 1,'LineString','CharacterString', NULL, 'O',2 , 'ISO 19103','ISO 19108',' ');
-
-
-
-
-INSERT INTO "Schemas"."Classes" VALUES ('DQ_Result', 'Result', 'ISO 19115', 'generalisation of more specific result classes', 1, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes" VALUES ('DQ_ConformanceResult', 'ConResult', 'ISO 19115', 'information about the outcome of evaluating the obtained value (or set of values) against a specified acceptable conformance quality level', 0, 'DQ_Result', 'ISO 19115', ' ');
 
 INSERT INTO "Schemas"."CodeLists"  VALUES ('MD_RestrictionCode', 'RestrictCd', 'ISO 19115', NULL, 0, 'CodeList', NULL, ' ');
 INSERT INTO "Schemas"."CodeLists"  VALUES ('DS_AssociationTypeCode', 'AscTypeCd', 'ISO 19115', NULL, 0, 'CodeList', NULL, ' ');
@@ -650,10 +682,18 @@ INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:distributionInfo:transferOptions:onLine:protocol', 'protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:distributionInfo:transferOptions:onLine', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:distributionInfo:transferOptions:onLine:description', 'description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:distributionInfo:transferOptions:onLine', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:distributionInfo:transferOptions:onLine:function', 'function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:distributionInfo:transferOptions:onLine', 'ISO 19115');
-INSERT INTO "Schemas"."Paths" VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result', 'result', 'ISO 19115', 'DQ_Element', 'ISO 19115:MD_Metadata:dataQualityInfo:report', 'ISO 19115');
-INSERT INTO "Schemas"."Paths" VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification', 'specification', 'ISO 19115', 'DQ_Result', 'ISO 19115:MD_Metadata:dataQualityInfo:report:result', 'ISO 19115');
-INSERT INTO "Schemas"."Paths" VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result:explanation', 'explanation', 'ISO 19115', 'DQ_Result', 'ISO 19115:MD_Metadata:dataQualityInfo:report:result', 'ISO 19115');
-INSERT INTO "Schemas"."Paths" VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result:pass', 'pass', 'ISO 19115', 'DQ_Result', 'ISO 19115:MD_Metadata:dataQualityInfo:report:result', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:measureDescription', 'measureDescription', 'ISO 19115', 'DQ_Element', 'ISO 19115:MD_Metadata:dataQualityInfo:report', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:evaluationMethodType', 'evaluationMethodType', 'ISO 19115', 'DQ_Element', 'ISO 19115:MD_Metadata:dataQualityInfo:report', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:evaluationMethodDescription', 'evaluationMethodDescription', 'ISO 19115', 'DQ_Element', 'ISO 19115:MD_Metadata:dataQualityInfo:report', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:dateTime', 'dateTime', 'ISO 19115', 'DQ_Element', 'ISO 19115:MD_Metadata:dataQualityInfo:report', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:nameOfMeasure', 'nameOfMeasure', 'ISO 19115', 'DQ_Element', 'ISO 19115:MD_Metadata:dataQualityInfo:report', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:measureIdentification', 'measureIdentification', 'ISO 19115', 'DQ_Element', 'ISO 19115:MD_Metadata:dataQualityInfo:report', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:measureIdentification:code', 'code', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:report:measureIdentification', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:measureIdentification:codeSpace', 'codeSpace', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:report:measureIdentification', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result', 'result', 'ISO 19115', 'DQ_Element', 'ISO 19115:MD_Metadata:dataQualityInfo:report', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification', 'specification', 'ISO 19115', 'DQ_Result', 'ISO 19115:MD_Metadata:dataQualityInfo:report:result', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result:explanation', 'explanation', 'ISO 19115', 'DQ_Result', 'ISO 19115:MD_Metadata:dataQualityInfo:report:result', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result:pass', 'pass', 'ISO 19115', 'DQ_Result', 'ISO 19115:MD_Metadata:dataQualityInfo:report:result', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:title', 'title', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:date', 'date', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:date:date', 'date', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:date', 'ISO 19115');

@@ -76,6 +76,7 @@ public class MDWebMetadataReaderTest {
         Util.executeSQLScript("org/constellation/sql/ebrim-schema.sql", con);
         Util.executeSQLScript("org/constellation/sql/mdweb-user-data.sql", con);
         Util.executeSQLScript("org/constellation/metadata/sql/csw-data.sql", con);
+        Util.executeSQLScript("org/constellation/metadata/sql/csw-data-5.sql", con);
         
         Util.executeSQLScript("org/constellation/sql/sml-schema_v2.sql", con);
         Util.executeSQLScript("org/constellation/sql/sml-data_v2.sql", con);
@@ -122,6 +123,14 @@ public class MDWebMetadataReaderTest {
 
         assertTrue(result instanceof DefaultMetadata);
         CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+
+        result = reader.getMetadata("15:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta9.xml"));
+
+        assertTrue(result instanceof DefaultMetadata);
+        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+
         pool.release(unmarshaller);
     }
 

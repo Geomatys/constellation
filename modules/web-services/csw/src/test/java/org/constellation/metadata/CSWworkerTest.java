@@ -98,6 +98,8 @@ import org.junit.Ignore;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.VerticalExtent;
+import org.opengis.metadata.quality.DataQuality;
+import org.opengis.metadata.quality.Element;
 import static org.junit.Assert.*;
 
 /**
@@ -1926,6 +1928,24 @@ public class CSWworkerTest {
         assertEquals(expResult.getCharacterSet(), result.getCharacterSet());
         assertEquals(expResult.getContacts(), result.getContacts());
         assertEquals(expResult.getContentInfo(), result.getContentInfo());
+        assertEquals(expResult.getDataQualityInfo().size(), result.getDataQualityInfo().size());
+
+        Iterator<DataQuality> expDqIt = expResult.getDataQualityInfo().iterator();
+        Iterator<DataQuality> resDqIt = result.getDataQualityInfo().iterator();
+        while (expDqIt.hasNext()) {
+            DataQuality expDq = expDqIt.next();
+            DataQuality resDq = resDqIt.next();
+            assertEquals(expDq.getLineage(), resDq.getLineage());
+            assertEquals(expDq.getReports().size(), resDq.getReports().size());
+            Iterator<? extends Element> expDqRep = expDq.getReports().iterator();
+            Iterator<? extends Element> resDqRep = resDq.getReports().iterator();
+            while (expDqRep.hasNext()) {
+                assertEquals(expDqRep.next(), resDqRep.next());
+            }
+            assertEquals(expDq.getReports(), resDq.getReports());
+            assertEquals(expDq.getScope(), resDq.getScope());
+            assertEquals(expDq, resDq);
+        }
         assertEquals(expResult.getDataQualityInfo(), result.getDataQualityInfo());
         assertEquals(expResult.getDataSetUri(), result.getDataSetUri());
         assertEquals(expResult.getDateStamp(), result.getDateStamp());
