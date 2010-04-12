@@ -24,10 +24,13 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.Utilities;
+import org.postgresql.ds.PGSimpleDataSource;
 
 /**
  *
@@ -176,6 +179,43 @@ public class BDD {
             CONNECTION_MAP.put(this, conec);
         }
         return conec;
+    }
+
+    /**
+     * Return a new connection to the database.
+     *
+     * @return
+     * @throws java.sql.SQLException
+     *
+     * @todo The call to Class.forName(...) is not needed anymore since Java 6 and should be removed.
+     */
+    public DataSource getDataSource() throws SQLException {
+        final DataSource source;
+        // by Default  we use the postgres driver.
+        if (className == null) {
+            className = "org.postgresql.Driver";
+        }
+        if (className.equals("org.postgresql.Driver")) {
+            PGSimpleDataSource pgSource = new PGSimpleDataSource();
+            //jdbc:postgresql://localhost:5432/mdweb-SML
+            String url    = connectURL.substring(17);
+            String host   = url.substring(0, url.indexOf(':'));
+            url           = url.substring(url.indexOf(':') + 1);
+            String sPort  = url.substring(0, url.indexOf('/'));
+            int port      = Integer.parseInt(sPort);
+            String dbName = url.substring(url.indexOf('/') + 1);
+
+            pgSource.setServerName(host);
+            pgSource.setPortNumber(port);
+            pgSource.setDatabaseName(dbName);
+            pgSource.setUser(user);
+            pgSource.setPassword(password);
+            source = pgSource;
+        } else {
+            source = new DefaultDataSource(connectURL);
+
+        }
+        return source;
     }
 
     /**
