@@ -102,10 +102,13 @@ public class Where {
     }
 
     public void replaceVariable(String varName, String varValue, boolean withQuote) {
-        if (withQuote)
-            value = value.replaceAll('&' + varName, "'" + varValue + "'");
-        else
-            value = value.replaceAll('&' + varName, varValue);
+        if (varValue != null) {
+            if (withQuote) {
+                value = value.replaceAll('&' + varName, "'" + varValue + "'");
+            } else {
+                value = value.replaceAll('&' + varName, varValue);
+            }
+        }
     }
 
 
