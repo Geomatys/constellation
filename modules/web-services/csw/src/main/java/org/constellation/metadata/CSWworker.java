@@ -1823,5 +1823,12 @@ public class CSWworker {
         if (indexSearcher != null) {
             indexSearcher.setLogLevel(logLevel);
         }
+        if (mdWriter != null) {
+            mdWriter.setLogLevel(logLevel);
+        }
+
+        if (mdReader != null) {
+            mdReader.setLogLevel(logLevel);
+        }
     }
 }

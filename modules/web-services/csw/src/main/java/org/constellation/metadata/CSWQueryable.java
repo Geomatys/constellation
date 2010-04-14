@@ -150,8 +150,8 @@ public final class CSWQueryable {
         ISO_QUERYABLE.put("OrganisationName", paths);
         
         //TODO If an instance of the class MD_SecurityConstraint exists for a resource, the “HasSecurityConstraints” is “true”, otherwise “false”
-        paths = new ArrayList<String>();
-        ISO_QUERYABLE.put("HasSecurityConstraints", paths);
+        //paths = new ArrayList<String>();
+        //ISO_QUERYABLE.put("HasSecurityConstraints", paths);
         
         //TODO MD_FeatureCatalogueDescription
         paths = new ArrayList<String>();
@@ -197,7 +197,7 @@ public final class CSWQueryable {
         //TODO not existing path in MDWeb or geotoolkit (Distance is treated as a primitive type)
         paths = new ArrayList<String>();
         //paths.add("ISO 19115:MD_Metadata:identificationInfo:spatialResolution:distance:uom");
-        ISO_QUERYABLE.put("DistanceUOM", paths);
+        //ISO_QUERYABLE.put("DistanceUOM", paths);
         
         /*
          * Temporal Extent

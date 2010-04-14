@@ -23,6 +23,7 @@ import java.util.List;
 
 /// geotoolkit dependencies
 import java.util.Map;
+import java.util.logging.Level;
 import javax.xml.namespace.QName;
 import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
@@ -80,4 +81,6 @@ public interface CSWMetadataReader extends MetadataReader {
      * @throws MetadataIoException
      */
     public abstract List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException;
+
+    public void setLogLevel(Level logLevel);
 }

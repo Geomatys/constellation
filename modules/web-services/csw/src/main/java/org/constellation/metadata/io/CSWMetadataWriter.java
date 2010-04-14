@@ -19,6 +19,7 @@ package org.constellation.metadata.io;
 import java.util.List;
 
 //geotoolkit dependencies
+import java.util.logging.Level;
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 
 /**
@@ -35,4 +36,5 @@ public interface CSWMetadataWriter extends MetadataWriter {
      */
     public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException;
 
+    public void setLogLevel(Level logLevel);
 }

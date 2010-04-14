@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.constellation.generic.database.Automatic;
 
@@ -296,4 +297,14 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
         }
         return title;
     }
+
+    @Override
+    public void setLogLevel(Level LogLevel) {
+        super.setLogLevel(LogLevel);
+        if (this.indexer != null) {
+            this.indexer.setLogLevel(logLevel);
+        }
+    }
+
+
 }
