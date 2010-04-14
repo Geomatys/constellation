@@ -46,8 +46,8 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:svn:https://svn.codehaus.org/constellation/trunk</connection>
-    <url>http://svn.codehaus.org/constellation/trunk</url>
+    <connection>scm:hg:http://hg.geomatys.com/constellation</connection>
+    <url>http://hg.geomatys.com/constellation</url>
   </scm>
 
   <ciManagement>
