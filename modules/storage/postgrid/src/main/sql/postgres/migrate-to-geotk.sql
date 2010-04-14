@@ -7,6 +7,10 @@
 INSERT INTO coverages."Formats" ("name", "plugin", "packMode", "comments")
 SELECT "name", "mime", "encoding"::coverages."PackMode", "comment" FROM postgrid."Formats" WHERE "name" <> 'PNG' AND "name" <> 'TIFF';
 
+UPDATE coverages."Formats" SET "plugin"='PNG'    WHERE "plugin" LIKE 'image/png%';
+UPDATE coverages."Formats" SET "plugin"='RAW'    WHERE "plugin" LIKE 'image/raw%';
+UPDATE coverages."Formats" SET "plugin"='NetCDF' WHERE "plugin" LIKE 'image/x-netcdf%';
+
 --- SampleDimensions -------------------------------------------------------------------------------
 INSERT INTO coverages."SampleDimensions" ("format", "band", "name", "units")
 SELECT "format", "band", "identifier", "units" FROM postgrid."SampleDimensions";
