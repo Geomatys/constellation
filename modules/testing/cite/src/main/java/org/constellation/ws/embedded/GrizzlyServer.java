@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ import java.util.Collections;
 
 // Constellation dependencies
 import java.util.logging.Logger;
-import org.constellation.data.PostgridTestCase;
+import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.StyleProviderProxy;
@@ -33,10 +33,10 @@ import org.constellation.provider.StyleProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
+import org.constellation.provider.coveragesql.CoverageSQLProvider;
+import org.constellation.provider.coveragesql.CoverageSQLProviderService;
 import org.constellation.provider.postgis.PostGisProvider;
 import org.constellation.provider.postgis.PostGisProviderService;
-import org.constellation.provider.postgrid.PostGridProvider;
-import org.constellation.provider.postgrid.PostGridProviderService;
 import org.constellation.provider.shapefile.ShapeFileProvider;
 import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.provider.sld.SLDProvider;
@@ -89,24 +89,25 @@ public final class GrizzlyServer {
         grizzly = new GrizzlyThread();
 
         // Initialises the postgrid testing raster.
-        PostgridTestCase.init();
+        CoverageSQLTestCase.init();
 
         // Defines a PostGrid data provider
         final ProviderSource sourcePostGrid = new ProviderSource();
-        sourcePostGrid.parameters.put(PostGridProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
-        sourcePostGrid.parameters.put(PostGridProvider.KEY_DRIVER,   "org.postgresql.Driver");
-        sourcePostGrid.parameters.put(PostGridProvider.KEY_PASSWORD, "test");
-        sourcePostGrid.parameters.put(PostGridProvider.KEY_READONLY, "true");
+        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
+        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_DRIVER,   "org.postgresql.Driver");
+        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_PASSWORD, "test");
+        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_READONLY, "true");
         final String rootDir = System.getProperty("java.io.tmpdir") + "/Constellation/images";
-        sourcePostGrid.parameters.put(PostGridProvider.KEY_ROOT_DIRECTORY, rootDir);
-        sourcePostGrid.parameters.put(PostGridProvider.KEY_USER,     "test");
-
+        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_ROOT_DIRECTORY, rootDir);
+        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
+        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
+        sourcePostGrid.loadAll = true;
         final ProviderConfig configPostGrid = new ProviderConfig();
         configPostGrid.sources.add(sourcePostGrid);
 
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             // Here we should have the postgrid data provider defined previously
-            if (service instanceof PostGridProviderService) {
+            if (service instanceof CoverageSQLProviderService) {
                 service.setConfiguration(configPostGrid);
                 if (service.getProviders().isEmpty()) {
                     return;

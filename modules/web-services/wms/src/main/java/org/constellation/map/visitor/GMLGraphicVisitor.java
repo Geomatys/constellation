@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -99,7 +99,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
             return;
         }
 
-        final String layerName = coverage.getCoverageLayer().getName();
+        final String layerName = coverage.getCoverageLayer().getCoverageName().getLocalPart();
         List<String> strs = values.get(layerName);
         if (strs == null) {
             strs = new ArrayList<String>();

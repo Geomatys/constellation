@@ -24,7 +24,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.concurrent.CancellationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -226,7 +225,7 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public SortedSet<Date> getAvailableTimes() throws DataStoreException {
-        return new TreeSet<Date>();
+        return reader.getInput().getAvailableTimes();
     }
 
     /**
@@ -234,7 +233,7 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public SortedSet<Number> getAvailableElevations() throws DataStoreException {
-        return new TreeSet<Number>();
+        return reader.getInput().getAvailableElevations();
     }
 
     /**
@@ -250,7 +249,7 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
             return DefaultLegendService.portray(template, context, dimension);
 
         } catch (PortrayalException ex) {
-            Logger.getLogger(CoverageSQLLayerDetails.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.INFO, ex.getMessage(), ex);
         }
 
         return DefaultGlyphService.create(style, dimension,null);
@@ -272,7 +271,13 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public MeasurementRange<?>[] getSampleValueRanges() {
-        return new MeasurementRange[0];
+        try {
+            final List<MeasurementRange<?>> sampleValueRanges = reader.getInput().getSampleValueRanges();
+            return sampleValueRanges.toArray(new MeasurementRange<?>[0]);
+        } catch (CoverageStoreException ex) {
+            LOGGER.log(Level.INFO, ex.getMessage(), ex);
+            return new MeasurementRange[0];
+        }
     }
 
     /**
@@ -283,7 +288,7 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
         try {
             return reader.getInput().getImageFormats().first();
         } catch (CoverageStoreException ex) {
-            Logger.getLogger(CoverageSQLLayerDetails.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.INFO, ex.getMessage(), ex);
             return "unknown";
         }
     }

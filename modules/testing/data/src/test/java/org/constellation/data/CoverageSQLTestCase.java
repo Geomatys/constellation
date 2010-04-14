@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2009-2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -35,7 +35,7 @@ import org.junit.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public abstract class PostgridTestCase {
+public abstract class CoverageSQLTestCase {
     /**
      * The temporary directory on a computer, according to the environment.
      */
@@ -56,7 +56,7 @@ public abstract class PostgridTestCase {
         // Write the image in resources into the temporary directory previously created.
         if (fileNeedsToBeWritten) {
             final String imageName = "SSTMDE200305.png";
-            final InputStream in = PostgridTestCase.class.getResourceAsStream(imageName);
+            final InputStream in = CoverageSQLTestCase.class.getResourceAsStream(imageName);
             final OutputStream os = new FileOutputStream(new File(sstDir, imageName));
             final byte buffer[] = new byte[4096];
             int len;

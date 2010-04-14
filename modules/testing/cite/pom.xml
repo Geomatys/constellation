@@ -116,7 +116,7 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-postgrid</artifactId>
+      <artifactId>cstl-store-data-coveragesql</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -154,15 +154,15 @@
     </dependency>
     <!-- For testing static methods -->
     <dependency>
-      <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-postgrid</artifactId>
+      <groupId>org.constellation.testing</groupId>
+      <artifactId>cstl-test-data</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.constellation.testing</groupId>
       <artifactId>cstl-test-data</artifactId>
       <version>${project.version}</version>
+      <type>test-jar</type>
     </dependency>
   </dependencies>
 

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -37,7 +37,6 @@ import org.geotoolkit.coverage.sql.LayerCoverageReader;
 import org.geotoolkit.feature.DefaultName;
 
 import org.geotoolkit.map.ElevationModel;
-import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.sql.WrappedDataSource;
 import org.geotoolkit.util.logging.Logging;
 
@@ -48,13 +47,17 @@ import org.postgresql.ds.PGConnectionPoolDataSource;
 
 /**
  *
- * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
 public class CoverageSQLProvider extends AbstractLayerProvider{
+    /**
+     * Default logger for this provider.
+     */
+    private static final Logger LOGGER = Logging.getLogger(CoverageSQLProvider.class);
 
-   private static final Logger LOGGER = Logging.getLogger(CoverageSQLProvider.class);
-
+    /**
+     * Keys to use in configuration file.
+     */
     public static final String KEY_SERVER = "server";
     public static final String KEY_PORT = "port";
     public static final String KEY_DATABASE = "database";
@@ -78,6 +81,12 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         visit();
     }
 
+    /**
+     * Creates a {@linkplain CoverageDatabase database connection} with the provided
+     * parameters.
+     *
+     * @throws SQLException if the login attempt reaches the timeout (5s here).
+     */
     private void loadDataBase() throws SQLException{
         final Properties properties = new Properties();
         for(String key : source.parameters.keySet()){
@@ -149,6 +158,9 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         return Collections.unmodifiableSet(index);
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Set<Name> getKeys(String service) {
         if (source.services.contains(service) || source.services.isEmpty()) {
@@ -170,11 +182,17 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     @Override
     public LayerDetails get(final Name key) {
+        // If the key is not present for this provider, it is not necessary to go further.
+        // Without this test, an exception will be logged whose message is a warning about
+        // the non presence of the requested key into the "Layers" table.
+        if (!contains(key)) {
+            return null;
+        }
         LayerCoverageReader reader = null;
         try {
             reader = database.createGridCoverageReader(key.getLocalPart());
         } catch (CoverageStoreException ex) {
-            Logger.getLogger(CoverageSQLProvider.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         }
 
 
@@ -192,6 +210,9 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         return null;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public LayerDetails get(Name key, String service) {
        if (source.services.contains(service) || source.services.isEmpty()) {
@@ -211,7 +232,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
             try {
                 loadDataBase();
             } catch (SQLException ex) {
-                Logger.getLogger(CoverageSQLProvider.class.getName()).log(Level.SEVERE, null, ex);
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             }
             visit();
         }
@@ -228,28 +249,29 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         }
     }
 
+    /**
+     * Visit all layers detected from the database table {@code Layers}.
+     */
     private void visit() {
-        System.out.println("---- VISIT ----");
         try {
             final Set<String> layers = CoverageDatabase.now(database.getLayers());
 
             for(String name : layers){
-                System.out.println(name);
                 test(name);
             }
         } catch (CoverageStoreException ex) {
-            Logger.getLogger(CoverageSQLProvider.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         } catch (CancellationException ex) {
-            Logger.getLogger(CoverageSQLProvider.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
         }
 
     }
 
 
     /**
-     * Add the layer name
+     * Test whether the provided candidate layer can be handled by the provider or not.
      *
-     * @param candidate Candidate to be a shape file.
+     * @param candidate Candidate to be a layer.
      */
     private void test(final String candidate){
         final String name = candidate;

@@ -264,8 +264,7 @@ public final class WCSWorker extends AbstractWorker {
                 throw new CstlServiceException("The geographic bbox for the layer is null !",
                         NO_APPLICABLE_CODE);
             }
-            final Keywords keywords = new Keywords("WCS", coverageName,
-                    StringUtilities.cleanSpecialCharacter(coverageRef.getThematic()));
+            final Keywords keywords = new Keywords("WCS", coverageName);
 
             //Spatial metadata
             final org.geotoolkit.wcs.xml.v100.SpatialDomainType spatialDomain =
