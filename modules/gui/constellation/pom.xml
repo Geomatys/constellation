@@ -186,11 +186,6 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-postgrid</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-coveragesql</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -251,6 +246,11 @@
     <dependency>
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-epsg</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.geotoolkit</groupId>
+      <artifactId>geotk-coverageio-netcdf</artifactId>
     </dependency>
 
     <dependency>
