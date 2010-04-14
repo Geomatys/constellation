@@ -28,10 +28,11 @@
 
 
  INSERT INTO "Schemas"."Classes"  VALUES('ResponsibleParty',NULL,'SensorML','based on ISO 19115',0,NULL,NULL, ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('individualName', NULL, 'SensorML', NULL, 0, 1,'ResponsibleParty','CharacterString', NULL, 'O',0 , 'ISO 19103','SensorML',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('organizationName', NULL, 'SensorML', NULL, 0, 1,'ResponsibleParty','CharacterString', NULL, 'O',1 , 'ISO 19103','SensorML',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('positionName', NULL, 'SensorML', NULL, 0, 1,'ResponsibleParty','CharacterString', NULL, 'O',2 , 'ISO 19103','SensorML',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('contactInfo', NULL, 'SensorML', NULL, 0, 1,'ResponsibleParty','ContactInfo', NULL, 'O',3 , 'SensorML','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('id', NULL, 'ISO 19103', NULL, 0, 1,'ResponsibleParty','CharacterString', NULL, 'O',0 , 'ISO 19103','SensorML','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('individualName', NULL, 'SensorML', NULL, 0, 1,'ResponsibleParty','CharacterString', NULL, 'O',1 , 'ISO 19103','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('organizationName', NULL, 'SensorML', NULL, 0, 1,'ResponsibleParty','CharacterString', NULL, 'O',2 , 'ISO 19103','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('positionName', NULL, 'SensorML', NULL, 0, 1,'ResponsibleParty','CharacterString', NULL, 'O',3 , 'ISO 19103','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('contactInfo', NULL, 'SensorML', NULL, 0, 1,'ResponsibleParty','ContactInfo', NULL, 'O',4 , 'SensorML','SensorML',' ');
  
 /*
  * --INSERT INTO "Schemas"."Properties"  VALUES('person', NULL, 'SensorML', NULL, 0, 1,'Contact','Person', NULL, 'O',1 , 'SensorML','SensorML',' ')
@@ -42,6 +43,8 @@
  INSERT INTO "Schemas"."Properties"  VALUES('responsibleParty', NULL, 'SensorML', NULL, 0, 1,'Contact','ResponsibleParty', NULL, 'O',0 , 'SensorML','SensorML',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('role', NULL, 'Xlink', NULL, 0, 1,'Contact','CharacterString', NULL, 'O',1 , 'ISO 19103','SensorML','P');
  INSERT INTO "Schemas"."Properties"  VALUES('href', NULL, 'Xlink', NULL, 0, 1,'Contact','CharacterString', NULL, 'O',2 , 'ISO 19103','SensorML','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('arcrole', NULL, 'Xlink', NULL, 0, 1,'Contact','CharacterString', NULL, 'O',3 , 'ISO 19103','SensorML','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('type', NULL, 'Xlink', NULL, 0, 1,'Contact','CharacterString', NULL, 'O',4 , 'ISO 19103','SensorML','P');
 
 /*---------------------------------------------*
  *--------------  Classe LinkRef --------------*
@@ -239,6 +242,7 @@
  INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', 'The quality property provides an indication of the reliability of estimates of the asociated value', 0, 2147483647,'Quantity','Quality', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('value', NULL, 'Sensor Web Enablement', 'Value is optional, to enable structure to act in a schema for values provided using other encodings', 0, 1,'Quantity','Double', NULL, 'O',3 , 'ISO 19103','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('axisID', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Quantity','CharacterString', NULL, 'O',4 , 'ISO 19103','Sensor Web Enablement','C');
+ INSERT INTO "Schemas"."Properties"  VALUES('referenceFrame', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Quantity','URI', NULL, 'O',5 , 'ISO 19103','Sensor Web Enablement','C');
 
 /*-------------------------------------------------*
  *--------------  Classe Count --------------------*
@@ -901,12 +905,13 @@
  INSERT INTO "Schemas"."Properties"  VALUES('connections', NULL, 'SensorML', NULL, 0, 1,'System','Connections', NULL, 'O',2 , 'SensorML','SensorML',' ');
 
 /*-------------------------------------------------*
- *--------------  Classe SensorML -----------------*
+ *--------------  Classe Member   -----------------*
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Classes"     VALUES('Member',NULL,'SensorML','SensorML document root',0,NULL,NULL, ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('role', NULL, 'Xlink', NULL, 1, 2147483647,'Member','CharacterString', NULL, 'O',0 , 'ISO 19103','SensorML',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('href', NULL, 'Xlink', NULL, 1, 1,'Member','CharacterString', NULL, 'O',1 , 'ISO 19103','SensorML',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('process', NULL, 'SensorML', NULL, 0, 1,'Member','AbstractSML', NULL, 'M',0 , 'SensorML','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('role', NULL, 'Xlink', NULL, 0, 1,'Member','CharacterString', NULL, 'O',0 , 'ISO 19103','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('arcrole', NULL, 'Xlink', NULL, 0, 1,'Member','CharacterString', NULL, 'O',1 , 'ISO 19103','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('href', NULL, 'Xlink', NULL, 0, 1,'Member','CharacterString', NULL, 'O',2 , 'ISO 19103','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('process', NULL, 'SensorML', NULL, 0, 1,'Member','AbstractSML', NULL, 'M',3 , 'SensorML','SensorML',' ');
 
 /*-------------------------------------------------*
  *--------------  Classe SensorML -----------------*
@@ -922,6 +927,7 @@ INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "own
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member', 'member', 'SensorML', 'SensorML', 'SensorML:SensorML', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process', 'process', 'SensorML', 'Member', 'SensorML:SensorML:member', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:role', 'role', 'Xlink', 'Member', 'SensorML:SensorML:member', 'SensorML');
+INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:arcrole', 'arcrole', 'Xlink', 'Member', 'SensorML:SensorML:member', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:id', 'id', 'ISO 19108', 'AbstractSML', 'SensorML:SensorML:member:process', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:description', 'description', 'ISO 19108', 'AbstractSML', 'SensorML:SensorML:member:process', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:name', 'name', 'ISO 19108', 'AbstractSML', 'SensorML:SensorML:member:process', 'SensorML');
@@ -989,6 +995,9 @@ INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "own
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:contact', 'contact', 'SensorML', 'AbstractProcess', 'SensorML:SensorML:member:process', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:contact:responsibleParty', 'responsibleParty', 'SensorML', 'Contact', 'SensorML:SensorML:member:process:contact', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:contact:role', 'role', 'Xlink', 'ResponsibleParty', 'SensorML:SensorML:member:process:contact', 'SensorML');
+INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:contact:arcrole', 'arcrole', 'Xlink', 'ResponsibleParty', 'SensorML:SensorML:member:process:contact', 'SensorML');
+INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:contact:type', 'type', 'Xlink', 'ResponsibleParty', 'SensorML:SensorML:member:process:contact', 'SensorML');
+INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:contact:responsibleParty:id', 'id', 'SensorML', 'ResponsibleParty', 'SensorML:SensorML:member:process:contact:responsibleParty', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:contact:responsibleParty:individualName', 'individualName', 'SensorML', 'ResponsibleParty', 'SensorML:SensorML:member:process:contact:responsibleParty', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:contact:responsibleParty:organizationName', 'organizationName', 'SensorML', 'ResponsibleParty', 'SensorML:SensorML:member:process:contact:responsibleParty', 'SensorML');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:contact:responsibleParty:contactInfo', 'contactInfo', 'SensorML', 'ResponsibleParty', 'SensorML:SensorML:member:process:contact:responsibleParty', 'SensorML');
@@ -1067,6 +1076,7 @@ INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "own
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:outputs:outputList:output:value:field:name', 'name', 'SensorML', 'DataComponentProperty', 'SensorML:SensorML:member:process:outputs:outputList:output:value:field', 'Sensor Web Enablement');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:outputs:outputList:output:value:field:value', 'value', 'SensorML', 'DataComponentProperty', 'SensorML:SensorML:member:process:outputs:outputList:output:value:field', 'Sensor Web Enablement');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:outputs:outputList:output:value:field:value:definition', 'definition', 'Sensor Web Enablement', 'AbstractDataComponent', 'SensorML:SensorML:member:process:outputs:outputList:output:value:field:value', 'Sensor Web Enablement');
+INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:outputs:outputList:output:value:field:value:referenceFrame', 'referenceFrame', 'Sensor Web Enablement', 'Quantity', 'SensorML:SensorML:member:process:outputs:outputList:output:value:field:value', 'Sensor Web Enablement');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:outputs:outputList:output:value:field:value:uom', 'uom', 'Sensor Web Enablement', 'Time', 'SensorML:SensorML:member:process:outputs:outputList:output:value:field:value', 'Sensor Web Enablement');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:outputs:outputList:output:value:field:value:uom:href', 'href', 'Xlink', 'UomProperty', 'SensorML:SensorML:member:process:outputs:outputList:output:value:field:value:uom', 'Sensor Web Enablement');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:outputs:outputList:output:value:field:value:uom:code', 'code', 'Sensor Web Enablement', 'UomProperty', 'SensorML:SensorML:member:process:outputs:outputList:output:value:field:value:uom', 'Sensor Web Enablement');
@@ -1091,6 +1101,7 @@ INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "own
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate:name', 'name', 'SensorML', 'Coordinate', 'SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate', 'Sensor Web Enablement');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate:quantity', 'quantity', 'SensorML', 'Coordinate', 'SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate', 'Sensor Web Enablement');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate:quantity:axisID', 'axisID', 'Sensor Web Enablement', 'Quantity', 'SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate:quantity', 'Sensor Web Enablement');
+INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate:quantity:referenceFrame', 'referenceFrame', 'Sensor Web Enablement', 'Quantity', 'SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate:quantity', 'Sensor Web Enablement');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate:quantity:definition', 'definition', 'Sensor Web Enablement', 'AbstractDataComponent', 'SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate:quantity', 'Sensor Web Enablement');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate:quantity:uom', 'uom', 'Sensor Web Enablement', 'Quantity', 'SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate:quantity', 'Sensor Web Enablement');
 INSERT INTO "Schemas"."Paths" ("id", "name", "standard", "owner", "parent", "owner_Standard") VALUES ('SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate:quantity:uom:code', 'code', 'Sensor Web Enablement', 'UomProperty', 'SensorML:SensorML:member:process:positions:positionList:position:position:location:vector:coordinate:quantity:uom', 'Sensor Web Enablement');

@@ -1,5 +1,5 @@
 <SensorML xmlns="http://www.opengis.net/sensorML/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:swe="http://www.opengis.net/swe/1.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" xsi:schemaLocation="http://www.opengis.net/sensorML/1.0 D:\Guilhem\DIVERS~1\SOSFUL~1\sml\1.0.0\sensorML.xsd">
-    <member xlink:role="urn:x-ogx:def:sensor:OGC:detector">
+    <member xlink:role="urn:x-ogx:def:sensor:OGC:detector" xlink:arcrole="arcrole1">
         <System gml:id="sensor-system2">
             <gml:description>information about the piezometer</gml:description>
             <gml:name>Piezometer Test</gml:name>
@@ -62,8 +62,8 @@
                     </swe:field>
                 </swe:DataRecord>
             </characteristics>
-            <contact xlink:role="urn:x-ogc:def:role:producer">
-                <ResponsibleParty>
+            <contact xlink:role="urn:x-ogc:def:role:producer" xlink:arcrole="contact-arcrole" xlink:type="complex">
+                <ResponsibleParty gml:id="resp-1">
                     <individualName>BLOOM Edward</individualName>
                     <organizationName>SUNA-corp</organizationName>
                     <contactInfo>
@@ -73,6 +73,7 @@
                             <electronicMailAddress>e.bloom@suna.fr</electronicMailAddress>
                         </address>
                         <onlineResource xlink:href="http://www.suna-corp.com"/>
+                        <onlineResource xlink:href="http://www.suna2-corp.com"/>
                     </contactInfo>
                 </ResponsibleParty>
             </contact>
@@ -152,7 +153,7 @@
                                 </swe:Time>
                             </swe:field>
                             <swe:field name="depth">
-                                <swe:Quantity definition="urn:x-ogc:def:phenomenon:OGC:depth">
+                                <swe:Quantity definition="urn:x-ogc:def:phenomenon:OGC:depth" referenceFrame="framez">
                                     <swe:uom code="m"/>
                                 </swe:Quantity>
                             </swe:field>
@@ -176,19 +177,19 @@
                             <swe:location>
                                 <swe:Vector definition="urn:ogc:def:phenomenon:location">
                                     <swe:coordinate name="x">
-                                        <swe:Quantity definition="urn:ogc:def:phenomenon:distance" axisID="X">
+                                        <swe:Quantity definition="urn:ogc:def:phenomenon:distance" axisID="X" referenceFrame="framez">
                                             <swe:uom code="m"/>
                                             <swe:value>0.0</swe:value>
                                         </swe:Quantity>
                                     </swe:coordinate>
                                     <swe:coordinate name="y">
-                                        <swe:Quantity definition="urn:ogc:def:phenomenon:distance" axisID="Y">
+                                        <swe:Quantity definition="urn:ogc:def:phenomenon:distance" axisID="Y" referenceFrame="framez">
                                             <swe:uom code="m"/>
                                             <swe:value>0.0</swe:value>
                                         </swe:Quantity>
                                     </swe:coordinate>
                                     <swe:coordinate name="z">
-                                        <swe:Quantity definition="urn:ogc:def:phenomenon:distance" axisID="Z">
+                                        <swe:Quantity definition="urn:ogc:def:phenomenon:distance" axisID="Z" referenceFrame="framez">
                                             <swe:uom code="m"/>
                                             <swe:value>0</swe:value>
                                         </swe:Quantity>
