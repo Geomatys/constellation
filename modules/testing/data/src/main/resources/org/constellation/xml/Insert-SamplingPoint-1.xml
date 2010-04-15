@@ -13,7 +13,7 @@
             <gml:name>666-999</gml:name>
             <sampling:sampledFeature>urn:blablabla:4</sampling:sampledFeature>
             <sampling:position>
-                <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                <gml:Point srsName="urn:ogc:def:crs:epsg:7.5.0.1:27582">
                     <gml:pos>59563.0 2521478.0</gml:pos>
                 </gml:Point>
             </sampling:position>
@@ -23,7 +23,7 @@
             <gml:name>r2d2-xoupi</gml:name>
             <sampling:sampledFeature>urn:blablabla:5</sampling:sampledFeature>
             <sampling:position>
-                <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                <gml:Point srsName="urn:ogc:def:crs:epsg:7.5.0.1:27582">
                     <gml:pos>95800.0 1591753.0</gml:pos>
                 </gml:Point>
             </sampling:position>

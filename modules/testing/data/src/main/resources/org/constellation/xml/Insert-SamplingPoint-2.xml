@@ -10,7 +10,7 @@
     <wfs:Insert idgen="UseExisting">
         <wfs:FeatureCollection gml:id="id">
             <gml:boundedBy>
-                <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                <gml:Envelope srsName="urn:ogc:def:crs:epsg:7.5.0.1:27582">
                     <gml:lowerCorner>21400.0 2001368.0</gml:lowerCorner>
                     <gml:upperCorner>23400.0 2001368.0</gml:upperCorner>
                 </gml:Envelope>
@@ -21,7 +21,7 @@
                     <gml:name>10972X0137-SLAPS</gml:name>
                     <sampling:sampledFeature>urn:-sandre:object:bdrhf:48X</sampling:sampledFeature>
                     <sampling:position>
-                        <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                        <gml:Point srsName="urn:ogc:def:crs:epsg:7.5.0.1:27582">
                             <gml:pos>21400.0 2001368.0</gml:pos>
                         </gml:Point>
                     </sampling:position>
@@ -33,7 +33,7 @@
                     <gml:name>10972X0137-SLIDE</gml:name>
                     <sampling:sampledFeature>urn:-sandre:object:bdrhf:560X</sampling:sampledFeature>
                     <sampling:position>
-                        <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+                        <gml:Point srsName="urn:ogc:def:crs:epsg:7.5.0.1:27582">
                             <gml:pos>23400.0 2001368.0</gml:pos>
                         </gml:Point>
                     </sampling:position>

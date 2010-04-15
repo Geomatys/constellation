@@ -6,7 +6,7 @@
     <sml:keywords>geosciences</sml:keywords>
     <sml:keywords>point d'eau</sml:keywords>
     <sml:location>
-        <gml:Point srsName="urn:ogc:def:crs:epsg:7.4:27582">
+        <gml:Point srsName="urn:ogc:def:crs:epsg:7.5.0.1:27582">
             <gml:pos>65400.0 1731368.0</gml:pos>
         </gml:Point>
     </sml:location>

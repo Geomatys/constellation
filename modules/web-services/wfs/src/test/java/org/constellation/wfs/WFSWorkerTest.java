@@ -509,7 +509,7 @@ public class WFSWorkerTest {
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
         // to see
-        xmlExpResult = xmlExpResult.replaceAll("srsName=\"\"", "srsName=\"urn:ogc:def:crs:epsg:7.4:27582\"");
+        xmlExpResult = xmlExpResult.replaceAll("srsName=\"\"", "srsName=\"urn:ogc:def:crs:epsg:7.5.0.1:27582\"");
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -558,7 +558,7 @@ public class WFSWorkerTest {
         xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
         // to see
-        xmlExpResult = xmlExpResult.replaceAll("srsName=\"\"", "srsName=\"urn:ogc:def:crs:epsg:7.4:27582\"");
+        xmlExpResult = xmlExpResult.replaceAll("srsName=\"\"", "srsName=\"urn:ogc:def:crs:epsg:7.5.0.1:27582\"");
 
         assertEquals(xmlExpResult, xmlResult);
 
