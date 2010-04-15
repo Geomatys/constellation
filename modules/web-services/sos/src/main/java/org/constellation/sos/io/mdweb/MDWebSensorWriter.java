@@ -92,7 +92,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     public RecordSet getRecordSet(String recordSet) throws MD_IOException {
         RecordSet cat = mdWriter.getRecordSet("SMLC");
         if (cat == null) {
-            cat = new RecordSet("SMLC", "SensorML RecordSet", null, null, EXPOSURE.EXTERNAL, 0, new Date(System.currentTimeMillis()));
+            cat = new RecordSet("SMLC", "SensorML RecordSet", null, null, EXPOSURE.EXTERNAL, 0, new Date(System.currentTimeMillis()), false);
             mdWriter.writeRecordSet(cat);
         }
         return cat;

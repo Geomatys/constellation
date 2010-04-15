@@ -186,7 +186,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (cat == null) {
             cat = mdWriter.getRecordSet("CSWCat");
             if (cat == null) {
-                cat = new RecordSet("CSWCat", "CSW Data RecordSet", null, null, EXPOSURE.EXTERNAL, 0, new Date(System.currentTimeMillis()));
+                cat = new RecordSet("CSWCat", "CSW Data RecordSet", null, null, EXPOSURE.EXTERNAL, 0, new Date(System.currentTimeMillis()), false);
                 mdWriter.writeRecordSet(cat);
                 LOGGER.info("writing CSWCat");
             }
