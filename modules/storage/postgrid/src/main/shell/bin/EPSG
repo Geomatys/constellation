@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# ---------------------------------------------------------------------------
-# Prints Coordinate Reference System (CRS) objects in "Well Known Text" (WKT)
-# format. The CRS objects are designed by their EPSG code.
-# ---------------------------------------------------------------------------
-
-`dirname $0`/CRS -colors -authority=EPSG "$@"
