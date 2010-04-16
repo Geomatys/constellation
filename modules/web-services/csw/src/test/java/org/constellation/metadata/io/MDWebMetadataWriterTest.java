@@ -380,8 +380,6 @@ public class MDWebMetadataWriterTest {
 
         assertEquals(expResult, result);
 
-        Logger.getLogger("MDWTest").info("\n--- start system2---\n");
-
         absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system2.xml"));
 
         writer.storeMetadata(absExpResult);
