@@ -167,7 +167,11 @@
             </outputs>
             <components>
                 <ComponentList>
-                    <component xlink:role="urn:x-ogc:def:sensor:detector" xlink:href="capteur_" name="something"/>
+                    <component xlink:role="urn:x-ogc:def:sensor:detector" xlink:href="capteur_" name="something">
+                        <Component>
+                            <method xlink:href="capteur_"/>
+                        </Component>
+                    </component>
                 </ComponentList>
             </components>
             <positions>

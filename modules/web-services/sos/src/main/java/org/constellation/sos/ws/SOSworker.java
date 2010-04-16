@@ -342,13 +342,13 @@ public class SOSworker {
                 if (object instanceof SOSConfiguration) {
                     configuration = (SOSConfiguration) object;
                 } else {
-                    LOGGER.severe(notWorkingMsg                                  + '\n' +
+                    LOGGER.warning(notWorkingMsg                                 + '\n' +
                             "cause: The generic configuration file is malformed" + '\n');
                     isStarted = false;
                     return;
                 }
             } else {
-                LOGGER.severe(notWorkingMsg                            + '\n' +
+                LOGGER.warning(notWorkingMsg                           + '\n' +
                         "cause: The configuration file can't be found" + '\n');
                 isStarted = false;
                 return;
@@ -378,7 +378,7 @@ public class SOSworker {
 
             final Automatic smlConfiguration = configuration.getSMLConfiguration();
             if (smlConfiguration == null) {
-                LOGGER.severe(notWorkingMsg + '\n' +
+                LOGGER.warning(notWorkingMsg + '\n' +
                         "cause: The configuration file does not contains a SML configuration");
                 isStarted = false;
                 return;
@@ -387,7 +387,7 @@ public class SOSworker {
 
             final Automatic omConfiguration = configuration.getOMConfiguration();
             if (omConfiguration == null) {
-                LOGGER.severe(notWorkingMsg + '\n' +
+                LOGGER.warning(notWorkingMsg + '\n' +
                         "cause: The configuration file does not contains a O&M configuration");
                 isStarted = false;
                 return;
@@ -455,13 +455,13 @@ public class SOSworker {
                     msg = "no message";
                 }
             }
-            LOGGER.severe(notWorkingMsg + '\n' + "cause: JAXBException:" + msg);
+            LOGGER.warning(notWorkingMsg + '\n' + "cause: JAXBException:" + msg);
             isStarted = false;
         } catch (FactoryNotFoundException ex) {
-            LOGGER.severe(notWorkingMsg + '\n' + "cause: Unable to find a SOS Factory");
+            LOGGER.warning(notWorkingMsg + '\n' + "cause: Unable to find a SOS Factory");
             isStarted = false;
         } catch (CstlServiceException ex) {
-            LOGGER.severe(notWorkingMsg + '\n' + "cause:" + ex.getMessage());
+            LOGGER.warning(notWorkingMsg + '\n' + "cause:" + ex.getMessage());
             isStarted = false;
         }
     }

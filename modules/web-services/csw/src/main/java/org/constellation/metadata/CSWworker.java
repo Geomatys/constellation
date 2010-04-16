@@ -289,8 +289,7 @@ public class CSWworker {
         if (configDir == null) {
             configDir    = getConfigDirectory();
             if (configDir == null) {
-                LOGGER.severe( notWorkingMsg + '\n' +
-                              "cause: The configuration directory has not been found");
+                LOGGER.warning(notWorkingMsg + "\nCause: The configuration directory has not been found");
                 isStarted = false;
                 return;
             }
@@ -303,8 +302,7 @@ public class CSWworker {
             final Unmarshaller configUnmarshaller = jb.createUnmarshaller();
             final File configFile                 = new File(configDir, serviceID + "config.xml");
             if (!configFile.exists()) {
-                 LOGGER.severe(notWorkingMsg + '\n' +
-                        "cause: The configuration file has not been found");
+                 LOGGER.warning(notWorkingMsg + "\nCause: The configuration file has not been found");
                  isStarted = false;
             } else {
                 final Automatic configuration = (Automatic) configUnmarshaller.unmarshal(configFile);
@@ -338,24 +336,19 @@ public class CSWworker {
                 LOGGER.info("CSW" + suffix + " service (" + configuration.getFormat() + ") running");
             }
         } catch (FactoryNotFoundException ex) {
-            LOGGER.severe(notWorkingMsg + '\n' +
-                    "cause: Unable to find a CSW Factory");
+            LOGGER.warning(notWorkingMsg + "\nCause: Unable to find a CSW Factory");
             isStarted = false;
         } catch (JAXBException ex) {
-            LOGGER.severe(notWorkingMsg + '\n' +
-                    "cause: JAXBException while getting configuration:" + ex.getLocalizedMessage());
+            LOGGER.warning(notWorkingMsg + "\nCause: JAXBException while getting configuration:" + ex.getLocalizedMessage());
             isStarted = false;
         } catch (MetadataIoException e) {
-            LOGGER.severe(notWorkingMsg + '\n' +
-                    "cause:" + e.getMessage());
+            LOGGER.warning(notWorkingMsg + "\nCause:" + e.getMessage());
             isStarted = false;
         } catch (IndexingException e) {
-            LOGGER.severe(notWorkingMsg + '\n' +
-                    "cause:" + e.getMessage());
+            LOGGER.warning(notWorkingMsg + "\nCause:" + e.getMessage());
             isStarted = false;
         } catch (IllegalArgumentException e) {
-            LOGGER.severe(notWorkingMsg + '\n' +
-                    "cause: IllegalArgumentException: " + e.getMessage());
+            LOGGER.warning(notWorkingMsg + "\nCause: IllegalArgumentException: " + e.getMessage());
             isStarted = false;
         }
     }

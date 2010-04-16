@@ -126,10 +126,10 @@ public class WFSService extends OGCWebService {
             candidate       = new DefaultWFSWorker(getMarshallerPool());
 
         } catch (JAXBException ex){
-            LOGGER.severe("The WFS service is not running."       + '\n' +
-                          " cause  : Error creating XML context." + '\n' +
-                          " error  : " + ex.getMessage()          + '\n' +
-                          " details: " + ex.toString());
+            LOGGER.warning("The WFS service is not running."       + '\n' +
+                           " cause  : Error creating XML context." + '\n' +
+                           " error  : " + ex.getMessage()          + '\n' +
+                           " details: " + ex.toString());
         } 
         this.worker        = candidate;
 

@@ -379,6 +379,10 @@ public class MDWebMetadataReaderTest {
         assertEquals(expProcess.getLegalConstraint(), resProcess.getLegalConstraint());
         assertEquals(expProcess.getLocation(), resProcess.getLocation());
         assertEquals(expProcess.getName(), resProcess.getName());
+        
+        
+        assertEquals(expProcess.getComponents().getComponentList().getComponent(), resProcess.getComponents().getComponentList().getComponent());
+        assertEquals(expProcess.getComponents().getComponentList(), resProcess.getComponents().getComponentList());
         assertEquals(expProcess.getComponents(), resProcess.getComponents());
 
         assertEquals(expProcess.getParameters(), resProcess.getParameters());

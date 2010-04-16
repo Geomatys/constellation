@@ -21,6 +21,7 @@ package org.constellation.metadata.io;
 import java.sql.Connection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -379,9 +380,13 @@ public class MDWebMetadataWriterTest {
 
         assertEquals(expResult, result);
 
+        Logger.getLogger("MDWTest").info("\n--- start system2---\n");
+
         absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system2.xml"));
 
         writer.storeMetadata(absExpResult);
+
+        absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system2.xml"));
 
         absResult = (AbstractSensorML) reader.getMetadata("16:SMLC", AbstractMetadataReader.SENSORML, null);
 
