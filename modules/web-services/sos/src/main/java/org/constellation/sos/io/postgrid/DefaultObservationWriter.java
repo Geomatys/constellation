@@ -248,7 +248,7 @@ public class DefaultObservationWriter implements ObservationWriter {
 
     @Override
     public String getInfos() {
-        return "Constellation Postgrid O&M Writer 0.5";
+        return "Constellation Postgrid O&M Writer 0.6";
     }
 
     @Override

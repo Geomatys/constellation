@@ -146,7 +146,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      */
     @Override
     public void createIndex() throws IndexingException {
-        LOGGER.info("(light memory) Creating lucene index for Generic database please wait...");
+        LOGGER.log(logLevel, "(light memory) Creating lucene index for Generic database please wait...");
         final long time = System.currentTimeMillis();
         IndexWriter writer;
         int nbEntries = 0;
@@ -203,7 +203,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      */
     @Override
     public void createIndex(List<? extends Object> toIndex) throws IndexingException {
-        LOGGER.info("Creating lucene index for Generic database please wait...");
+        LOGGER.log(logLevel, "Creating lucene index for Generic database please wait...");
         final long time = System.currentTimeMillis();
         IndexWriter writer;
         int nbEntries = 0;
@@ -242,7 +242,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         }
-        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 " documents indexed: " + nbEntries);
     }
 
@@ -418,13 +418,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                         addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
                     }
                 } else {
-                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
+                    LOGGER.warning("unable to spatially index form: " + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
                             "cause: missing coordinates.: " + coord);
                 }
 
             } catch (NumberFormatException e) {
                 if (!coord.equals(NULL_VALUE)) {
-                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
+                    LOGGER.warning("unable to spatially index form: " + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
                             "cause: unable to parse double: " + coord);
                 }
             }
@@ -516,10 +516,10 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 }
             } else {
                 if (metadata instanceof DefaultMetadata) {
-                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
+                    LOGGER.warning("unable to spatially index form: " + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
                         "cause: missing coordinates.: " + coord);
                 } else if (metadata instanceof RecordType) {
-                    LOGGER.severe("unable to spatially index form: " + ((RecordType)metadata).getIdentifier() + '\n' +
+                    LOGGER.warning("unable to spatially index form: " + ((RecordType)metadata).getIdentifier() + '\n' +
                         "cause: missing coordinates.: " + coord);
                 } else {
                     LOGGER.finer("Unexpected metadata type");
@@ -529,10 +529,10 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         } catch (NumberFormatException e) {
             if (!coord.equals(NULL_VALUE)) {
                 if (metadata instanceof DefaultMetadata) {
-                    LOGGER.severe("unable to spatially index form: " + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
+                    LOGGER.warning("unable to spatially index form: " + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
                         "cause: unable to parse double: " + coord);
                 } else if (metadata instanceof RecordType) {
-                    LOGGER.severe("unable to spatially index form: " + ((RecordType)metadata).getIdentifier() + '\n' +
+                    LOGGER.warning("unable to spatially index form: " + ((RecordType)metadata).getIdentifier() + '\n' +
                         "cause: unable to parse double: " + coord);
                 } else {
                     LOGGER.finer("Unexpected metadata type");

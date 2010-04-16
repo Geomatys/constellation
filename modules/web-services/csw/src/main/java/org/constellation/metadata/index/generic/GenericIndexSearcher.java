@@ -65,7 +65,7 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
             final List<String> results = new ArrayList<String>();
             int maxRecords = searcher.maxDoc();
             if (maxRecords == 0) {
-                LOGGER.severe("There is no document in the index");
+                LOGGER.warning("There is no document in the index");
                 maxRecords = 1;
             }
             LOGGER.log(logLevel, "TermQuery: " + query.toString());

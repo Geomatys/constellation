@@ -263,7 +263,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
 
     @Override
     public String getInfos() {
-        return "Constellation MDweb Sensor Writer 0.5";
+        return "Constellation MDweb Sensor Writer 0.6";
     }
 
 }

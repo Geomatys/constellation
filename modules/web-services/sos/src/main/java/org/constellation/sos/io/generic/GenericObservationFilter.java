@@ -388,7 +388,7 @@ public class GenericObservationFilter implements ObservationFilter {
 
     @Override
     public String getInfos() {
-        return "Constellation Generic O&M Filter 0.5";
+        return "Constellation Generic O&M Filter 0.6";
     }
 
     @Override

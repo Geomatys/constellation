@@ -159,7 +159,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
         //if the index File exists we don't need to index the documents again.
         if(!getFileDirectory().exists()) {
-            LOGGER.info("Creating lucene index for the first time...");
+            LOGGER.log(logLevel, "Creating lucene index for the first time...");
             final long time = System.currentTimeMillis();
             IndexWriter writer;
             final int nbRecordSets = 0;
@@ -187,10 +187,10 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
                 throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
             }
-            LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+            LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                         "RecordSets: " + nbRecordSets + " documents indexed: " + nbForms);
         } else {
-            LOGGER.info("Index already created");
+            LOGGER.log(logLevel, "Index already created");
         }
     }
 
@@ -201,7 +201,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      */
     @Override
     public void createIndex() throws IndexingException {
-        LOGGER.info("Creating lucene index for MDWeb database please wait...");
+        LOGGER.log(logLevel, "Creating lucene index for MDWeb database please wait...");
 
         final long time = System.currentTimeMillis();
         IndexWriter writer;
@@ -217,18 +217,18 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 if (r.getExposure() != EXPOSURE.INTERNAL) {
                     catToIndex.add(r);
                 } else {
-                    LOGGER.info("RecordSet:" + r.getCode() + " is internal we exclude it.");
+                    LOGGER.log(logLevel, "RecordSet:" + r.getCode() + " is internal we exclude it.");
                 }
             }
             nbRecordSets = cats.size();
             final List<Form> results = mdWebReader.getAllForm(catToIndex);
-            LOGGER.info(results.size() + " forms read in " + (System.currentTimeMillis() - time) + " ms.");
+            LOGGER.log(logLevel, results.size() + " forms read in " + (System.currentTimeMillis() - time) + " ms.");
             for (Form form : results) {
                 if ((form.getType() == null || !form.getType().equals("templateForm")) && form.isPublished()) {
                     indexDocument(writer, form);
                     nbForms++;
                 } else {
-                     LOGGER.info("The form " + form.getTitle() + '(' + form.getId() + ") is a context (or is not published) so we don't index it");
+                     LOGGER.log(logLevel, "The form " + form.getTitle() + '(' + form.getId() + ") is a context (or is not published) so we don't index it");
                 }
             }
             writer.optimize();
@@ -247,7 +247,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             LOGGER.severe("SQLException while indexing document: " + ex.getMessage());
             throw new IndexingException("SQLException while indexing documents.", ex);
         }
-        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 "RecordSets: " + nbRecordSets + " documents indexed: " + nbForms + ".");
     }
 
@@ -258,7 +258,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      */
     @Override
     public void createIndex(List<? extends Object> forms) throws IndexingException {
-        LOGGER.info("Creating lucene index for MDWeb database please wait...");
+        LOGGER.log(logLevel, "Creating lucene index for MDWeb database please wait...");
 
         final long time = System.currentTimeMillis();
         IndexWriter writer;
@@ -274,7 +274,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                     if (ff.isPublished()) {
                         indexDocument(writer, ff);
                     } else {
-                       LOGGER.info("The form " + ff.getId() + "is not published we don't index it");
+                       LOGGER.log(logLevel, "The form " + ff.getId() + "is not published we don't index it");
                     }
                 } else {
                     throw new IllegalArgumentException("The objects must be forms");
@@ -293,7 +293,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
         }
-        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 "RecordSets: " + nbRecordSets + " documents indexed: " + nbForms + ".");
     }
 
@@ -379,10 +379,10 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             }
 
             if (form.getTopValue() == null) {
-                LOGGER.severe("unable to index form:" + form.getId() + " top value is null");
+                LOGGER.warning("unable to index form:" + form.getId() + " top value is null");
 
             } else if (form.getTopValue().getType() == null) {
-                LOGGER.severe("unable to index form:" + form.getId() + " top value type is null");
+                LOGGER.warning("unable to index form:" + form.getId() + " top value type is null");
 
             // For an ISO 19115 form
             } else if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
@@ -413,8 +413,8 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
                 } catch (NumberFormatException e) {
                     if (!coord.equals("null"))
-                        LOGGER.severe("unable to spatially index form: " + form.getTitle() + '\n' +
-                                      "cause:  unable to parse double: " + coord);
+                        LOGGER.warning("unable to spatially index form: " + form.getTitle() + '\n' +
+                                       "cause:  unable to parse double: " + coord);
                 }
 
                 for (String term :INSPIRE_QUERYABLE.keySet()) {
@@ -446,7 +446,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 LOGGER.finer("indexing CSW Record");
 
             } else {
-                LOGGER.severe("unknow Form classe unable to index: " + form.getTopValue().getType().getName());
+                LOGGER.warning("unknow Form classe unable to index: " + form.getTopValue().getType().getName());
             }
 
 
@@ -501,7 +501,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
             } catch (NumberFormatException e) {
                 if (!coord.equals("null"))
-                    LOGGER.severe("unable to spatially index form: " + form.getTitle() + '\n' +
+                    LOGGER.warning("unable to spatially index form: " + form.getTitle() + '\n' +
                                   "cause:  unable to parse double: " + coord);
             }
 
@@ -601,14 +601,14 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                                 try {
                                     code = Integer.parseInt(tv.getValue());
                                 } catch (NumberFormatException ex) {
-                                    LOGGER.severe("NumberFormat Exception while parsing a codelist code: " + tv.getValue());
+                                    LOGGER.warning("NumberFormat Exception while parsing a codelist code: " + tv.getValue());
                                 }
                                 final CodeListElement element = cl.getElementByCode(code);
 
                                 if (element != null) {
                                     response.append(element.getName()).append(',');
                                 } else {
-                                    LOGGER.severe("Unable to find a codelistElement for the code: " + code + " in the codelist: " + cl.getName());
+                                    LOGGER.warning("Unable to find a codelistElement for the code: " + code + " in the codelist: " + cl.getName());
                                 }
                             }
                         } else if (tv.getType().getName().equals("Date")) {
@@ -650,7 +650,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         try {
             mdWebReader.close();
         } catch (MD_IOException ex) {
-            LOGGER.severe("SQL Exception while destroying index:" + ex.getMessage());
+            LOGGER.warning("MD IO Exception during destroying index while closing MDW reader:" + ex.getMessage());
         }
     }
 }
