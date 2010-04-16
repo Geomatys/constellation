@@ -24,13 +24,17 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
+
+import org.geotoolkit.csw.xml.CSWClassesContext;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.resources.NIOUtilities;
 import org.geotoolkit.xml.MarshallerPool;
+
 import org.junit.*;
 
 /**

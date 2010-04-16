@@ -37,7 +37,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
 // geotools dependencies
-import org.constellation.metadata.CSWClassesContext;
+import org.geotoolkit.csw.xml.CSWClassesContext;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;

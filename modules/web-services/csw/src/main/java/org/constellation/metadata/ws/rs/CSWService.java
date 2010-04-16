@@ -50,7 +50,6 @@ import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
-import org.constellation.metadata.CSWClassesContext;
 
 import org.geotoolkit.csw.xml.DescribeRecord;
 import org.geotoolkit.csw.xml.GetCapabilities;
@@ -71,6 +70,7 @@ import org.geotoolkit.csw.xml.v202.GetRecordsType;
 import org.geotoolkit.csw.xml.v202.HarvestType;
 import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.csw.xml.v202.QueryType;
+import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ogc.xml.v110.SortOrderType;
@@ -115,7 +115,7 @@ public class CSWService extends OGCWebService {
         super(ServiceDef.CSW_2_0_2);
         this.serviceID = serviceID;
         try {
-            Class[] classes = CSWClassesContext.getAllClasses();
+            Class[] classes = EBRIMClassesContext.getAllClasses();
             classes = XArrays.resize(classes, classes.length + 1);
             classes[classes.length - 1] = HarvestTasks.class;
 
@@ -138,7 +138,7 @@ public class CSWService extends OGCWebService {
         super(ServiceDef.CSW_2_0_2);
         this.serviceID = "";
         try {
-            Class[] classes = CSWClassesContext.getAllClasses();
+            Class[] classes = EBRIMClassesContext.getAllClasses();
             classes = XArrays.resize(classes, classes.length + 1);
             classes[classes.length - 1] = HarvestTasks.class;
             

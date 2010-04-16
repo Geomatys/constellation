@@ -26,8 +26,8 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.AnchorPool;
-import org.constellation.metadata.CSWClassesContext;
 import org.constellation.util.Util;
+import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.v100.ComponentType;
@@ -59,7 +59,7 @@ public class MDWebMetadataWriterTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        List<Class> classes = CSWClassesContext.getAllClassesList();
+        List<Class> classes = EBRIMClassesContext.getAllClassesList();
         classes.add(org.geotoolkit.sml.xml.v100.ObjectFactory.class);
 
         pool = new AnchorPool(classes);

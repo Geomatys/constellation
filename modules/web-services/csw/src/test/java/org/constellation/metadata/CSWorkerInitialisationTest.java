@@ -20,17 +20,20 @@ package org.constellation.metadata;
 // JAXB dependencies
 import java.io.File;
 import java.util.logging.Level;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
+
+import org.geotoolkit.csw.xml.CSWClassesContext;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.geotoolkit.xml.MarshallerPool;

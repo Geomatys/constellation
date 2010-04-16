@@ -48,6 +48,7 @@ import static org.junit.Assert.*;
 import org.constellation.util.Util;
 
 // geotoolkit dependencies
+import org.geotoolkit.csw.xml.CSWClassesContext;
 import org.geotoolkit.internal.jaxb.metadata.ReferenceSystemMetadata;
 import org.geotoolkit.internal.referencing.VerticalDatumTypes;
 import org.geotoolkit.metadata.iso.DefaultExtendedElementInformation;

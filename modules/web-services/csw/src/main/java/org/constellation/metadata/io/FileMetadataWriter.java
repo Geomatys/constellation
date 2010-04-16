@@ -48,10 +48,10 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.CSWClassesContext;
 import org.constellation.util.ReflectionUtilities;
 
 // GeoApi dependencies
+import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
 import org.opengis.util.InternationalString;
 
 
@@ -92,7 +92,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         }
         
         try {
-            marshallerPool = new MarshallerPool(CSWClassesContext.getAllClasses());
+            marshallerPool = new MarshallerPool(EBRIMClassesContext.getAllClasses());
         } catch (JAXBException ex) {
             throw new MetadataIoException("JAXB exception while creating unmarshaller", NO_APPLICABLE_CODE);
         }
