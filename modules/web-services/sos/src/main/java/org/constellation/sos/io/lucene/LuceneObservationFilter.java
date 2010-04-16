@@ -295,4 +295,11 @@ public class LuceneObservationFilter implements ObservationFilter {
             throw new CstlServiceException("Indexing Exception while refreshing the lucene index", ex, NO_APPLICABLE_CODE);
         }
     }
+
+    @Override
+    public void setLoglevel(Level logLevel) {
+        if (searcher != null) {
+            searcher.setLogLevel(logLevel);
+        }
+    }
 }

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Properties;
 
 // JAXB dependencies
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -404,5 +405,10 @@ public class GenericObservationFilter implements ObservationFilter {
     @Override
     public void refresh() {
         // do nothing
+    }
+
+    @Override
+    public void setLoglevel(Level logLevel) {
+         //do nothing
     }
 }

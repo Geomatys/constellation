@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Properties;
 
 // Constellation dependencies
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
@@ -366,7 +367,7 @@ public class DefaultObservationFilter implements ObservationFilter {
 
     @Override
     public List<String> filterObservation() throws CstlServiceException {
-        LOGGER.info("request:" + sqlRequest.toString());
+        LOGGER.finer("request:" + sqlRequest.toString());
         try {
             final List<String> results       = new ArrayList<String>();
             final Statement currentStatement = connection.createStatement();
@@ -405,5 +406,8 @@ public class DefaultObservationFilter implements ObservationFilter {
         //do nothing
     }
 
-
+    @Override
+    public void setLoglevel(Level logLevel) {
+         //do nothing
+    }
 }

@@ -55,6 +55,8 @@ import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.AbstractMetadataReader;
+import org.constellation.metadata.io.AbstractMetadataWriter;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.ObservationFilter;
@@ -986,6 +988,33 @@ public class SOSworker {
                                         }
                                     } else {
                                         LOGGER.warning(" the feature of interest " + sp.getId() + " does not have proper position");
+                                    }
+                                } else if (station instanceof SamplingCurveType) {
+                                    final SamplingCurveType sc = (SamplingCurveType) station;
+                                    if (sc.getBoundedBy() != null && sc.getBoundedBy().getEnvelope() != null &&
+                                        sc.getBoundedBy().getEnvelope().getLowerCorner() != null && sc.getBoundedBy().getEnvelope().getUpperCorner() != null &&
+                                        sc.getBoundedBy().getEnvelope().getLowerCorner().getValue().size() > 1 && sc.getBoundedBy().getEnvelope().getUpperCorner().getValue().size() > 1) {
+
+                                        final double stationMinX  = sc.getBoundedBy().getEnvelope().getLowerCorner().getValue().get(0);
+                                        final double stationMaxX  = sc.getBoundedBy().getEnvelope().getUpperCorner().getValue().get(0);
+                                        final double stationMinY  = sc.getBoundedBy().getEnvelope().getLowerCorner().getValue().get(1);
+                                        final double stationMaxY  = sc.getBoundedBy().getEnvelope().getUpperCorner().getValue().get(1);
+                                        final double minx         = e.getLowerCorner().getValue().get(0);
+                                        final double maxx         = e.getUpperCorner().getValue().get(0);
+                                        final double miny         = e.getLowerCorner().getValue().get(1);
+                                        final double maxy         = e.getUpperCorner().getValue().get(1);
+
+                                        // we look if the station if contained in the BBOX
+                                        if (stationMaxX < maxx && stationMinX > minx &&
+                                            stationMaxY < maxy && stationMinY > miny) {
+
+                                            matchingFeatureOfInterest.add(sc.getId());
+                                            add = true;
+                                        } else {
+                                            LOGGER.finer(" the feature of interest " + sc.getId() + " is not in the BBOX");
+                                        }
+                                    } else {
+                                        LOGGER.warning(" the feature of interest (samplingCurve)" + sc.getId() + " does not have proper bounds");
                                     }
                                 } else {
                                     LOGGER.warning("unknow implementation:" + station.getClass().getName());
@@ -2170,6 +2199,15 @@ public class SOSworker {
 
     public void setLogLevel(Level logLevel) {
         this.logLevel = logLevel;
+        if (omFilter != null) {
+            omFilter.setLoglevel(logLevel);
+        }
+        if (smlReader instanceof AbstractMetadataReader) {
+            ((AbstractMetadataReader)smlReader).setLogLevel(logLevel);
+        }
+        if (smlWriter instanceof AbstractMetadataWriter) {
+            ((AbstractMetadataWriter)smlWriter).setLogLevel(logLevel);
+        }
     }
     
     /**

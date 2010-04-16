@@ -18,6 +18,7 @@
 package org.constellation.sos.io;
 
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.xml.namespace.QName;
 import org.constellation.ws.CstlServiceException;
@@ -137,4 +138,6 @@ public interface ObservationFilter {
      * Return true if each observation has a position
      */
     boolean isBoundedObservation();
+
+    void setLoglevel(Level logLevel);
 }

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
+import org.geotoolkit.observation.xml.v100.MeasureEntry;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
@@ -190,11 +191,13 @@ public final class Normalizer {
                 } else {
                     encAlreadySee.add(encoding);
                 }
+            } else if (observation.getResult() instanceof MeasureEntry) {
+                // do nothing
             } else {
                 if (observation.getResult() != null)
-                    LOGGER.severe("NormalizeDocument: Class not recognized for result:" + observation.getResult().getClass().getSimpleName());
+                    LOGGER.warning("NormalizeDocument: Class not recognized for result:" + observation.getResult().getClass().getSimpleName());
                 else
-                    LOGGER.severe("NormalizeDocument: The result is null");
+                    LOGGER.warning("NormalizeDocument: The result is null");
             }
         }
         return collection;

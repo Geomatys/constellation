@@ -130,7 +130,7 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
             if (filter != null) {
                 f = filter.toString();
             }
-            LOGGER.info("Searching for result: " + query.toString(field) + '\n' + SerialChainFilter.valueOf(operator) + '\n' + f + '\n' + sorted + '\n' + "max records: " + maxRecords);
+            LOGGER.log(logLevel, "Searching for result: " + query.toString(field) + '\n' + SerialChainFilter.valueOf(operator) + '\n' + f + '\n' + sorted + '\n' + "max records: " + maxRecords);
 
             // simple query with an AND
             if (operator == SerialChainFilter.AND || (operator == SerialChainFilter.OR && filter == null)) {
@@ -209,7 +209,7 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                 }
             }
 
-            LOGGER.info(results.size() + " total matching documents (" + (System.currentTimeMillis() - start) + "ms)");
+            LOGGER.log(logLevel, results.size() + " total matching documents (" + (System.currentTimeMillis() - start) + "ms)");
             return results;
         } catch (ParseException ex) {
             throw new SearchingException("Parse Exception while performing lucene request", ex);
@@ -229,12 +229,12 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
         try {
             begin = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_begin")));
         } catch (IllegalArgumentException ex) {
-            LOGGER.info("unable  to parse the timestamp");
+            LOGGER.log(logLevel, "unable  to parse the timestamp");
         }
         try {
             end = Timestamp.valueOf(unLuceneTimeValue(d.get("sampling_time_end")));
         } catch (IllegalArgumentException ex) {
-            LOGGER.info("unable  to parse the timestamp");
+            LOGGER.log(logLevel, "unable  to parse the timestamp");
         }
         return new ObservationResult(d.get("id"), begin, end);
     }
