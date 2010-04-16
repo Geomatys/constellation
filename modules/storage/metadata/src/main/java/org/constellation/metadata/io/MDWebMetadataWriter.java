@@ -34,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 
 // JAXB dependencies
+import java.util.MissingResourceException;
 import java.util.UUID;
 import javax.xml.bind.JAXBElement;
 
@@ -416,7 +417,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 final CodeList cl = (CodeList) classe;
                 String codelistElement;
                 if (classe.getName().equals("LanguageCode")) {
-                    codelistElement =  ((Locale) object).getISO3Language();
+                    try {
+                        codelistElement =  ((Locale) object).getISO3Language();
+                    } catch (MissingResourceException ex) {
+                       codelistElement = ((Locale) object).getLanguage();
+                    }
                 } else {
                     if (object instanceof org.opengis.util.CodeList) {
                         codelistElement =  ((org.opengis.util.CodeList) object).identifier();
@@ -443,7 +448,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     for (Property p: classe.getProperties()) {
                         values.append(p.getName()).append('\n');
                     }
-                    LOGGER.severe("unable to find a codeListElement named " + codelistElement + " in the codelist " + classe.getName() + '\n' +
+                    LOGGER.warning("unable to find a codeListElement named " + codelistElement + " in the codelist " + classe.getName() + '\n' +
                                   "allowed values are: " + '\n' +  values);
                 }
             }
