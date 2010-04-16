@@ -60,7 +60,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         Util.executeSQLScript("org/constellation/sql/mdweb-base-data.sql", con2);
         Util.executeSQLScript("org/constellation/sql/ISO19115-base-data.sql", con2);
         Util.executeSQLScript("org/constellation/sql/mdweb-user-data.sql", con2);
-        Util.executeSQLScript("org/constellation/sql/sml-schema_v2.sql", con2);
+        Util.executeSQLScript("org/constellation/sql/sml-schema_v2.sql", con2, true);
         Util.executeSQLScript("org/constellation/sql/sml-data_v2.sql", con2);
 
         final String url = "jdbc:derby:memory:Test1;create=true";

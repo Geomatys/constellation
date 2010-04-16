@@ -92,9 +92,8 @@ public class IndexLuceneTest {
         List<Classe> classes = new ArrayList<Classe>();
         forms                = fillTestData(paths, classes);
 
-        MDWebIndexer indexer = new MDWebIndexer(forms, classes, paths, configDirectory);
+        MDWebIndexer indexer = new MDWebIndexer(forms, classes, paths, configDirectory, LOG_LEVEL);
         indexSearcher          = new MDWebIndexSearcher(configDirectory, "");
-        indexer.setLogLevel(LOG_LEVEL);
         indexSearcher.setLogLevel(LOG_LEVEL);
     }
 

@@ -131,6 +131,20 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      *
      * @param configDirectory A directory where the index can write indexation file.
      */
+    public GenericIndexer(List<? extends Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID, Analyzer analyzer, Level logLevel) throws IndexingException {
+        super(serviceID, configDirectory, analyzer);
+        this.logLevel            = logLevel;
+        this.reader              = null;
+        this.additionalQueryable = additionalQueryable;
+        if (create)
+            createIndex(toIndex);
+    }
+
+    /**
+     * Creates a new Lucene Index into the specified directory with the specified list of object to index.
+     *
+     * @param configDirectory A directory where the index can write indexation file.
+     */
     public GenericIndexer(List<? extends Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID) throws IndexingException {
         super(serviceID, configDirectory);
         this.reader = null;

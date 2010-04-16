@@ -72,9 +72,8 @@ public class StopAnalyzerTest {
     public static void setUpClass() throws Exception {
         NIOUtilities.deleteDirectory(configDirectory);
         List<DefaultMetadata> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StopAnalyzer(Version.LUCENE_CURRENT));
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StopAnalyzer(Version.LUCENE_CURRENT), Level.FINER);
         indexSearcher          = new GenericIndexSearcher(configDirectory, "", new StopAnalyzer(Version.LUCENE_CURRENT));
-        indexer.setLogLevel(Level.FINER);
         indexSearcher.setLogLevel(Level.FINER);
     }
 

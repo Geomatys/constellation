@@ -68,9 +68,8 @@ public class KeywordAnalyzerTest {
     public static void setUpClass() throws Exception {
         NIOUtilities.deleteDirectory(configDirectory);
         List<DefaultMetadata> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new KeywordAnalyzer());
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new KeywordAnalyzer(), Level.FINER);
         indexSearcher          = new GenericIndexSearcher(configDirectory, "", new KeywordAnalyzer());
-        indexer.setLogLevel(Level.FINER);
         indexSearcher.setLogLevel(Level.FINER);
     }
 

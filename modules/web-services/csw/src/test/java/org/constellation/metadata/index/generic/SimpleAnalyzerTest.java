@@ -67,9 +67,8 @@ public class SimpleAnalyzerTest {
     public static void setUpClass() throws Exception {
         NIOUtilities.deleteDirectory(configDirectory);
         List<DefaultMetadata> object = fillTestData();
-        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new SimpleAnalyzer());
+        GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new SimpleAnalyzer(), Level.FINER);
         indexSearcher          = new GenericIndexSearcher(configDirectory, "", new SimpleAnalyzer());
-        indexer.setLogLevel(Level.FINER);
         indexSearcher.setLogLevel(Level.FINER);
     }
 

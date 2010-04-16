@@ -141,8 +141,9 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      * @param paths The list of path used in the forms (necesary because of there is no reader)
      * @param configDirectory A directory where the index can write indexation file.
      */
-    protected MDWebIndexer(List<Form> forms, List<Classe> classes, List<Path> paths, File configDirectory) throws IndexingException {
+    protected MDWebIndexer(List<Form> forms, List<Classe> classes, List<Path> paths, File configDirectory, Level logLevel) throws IndexingException {
         super("", configDirectory);
+        this.logLevel = logLevel;
         mdWebReader   = null;
 
         //we fill the map of classe

@@ -156,6 +156,18 @@ public final class Util {
      * @param connection.
      */
     public static void executeSQLScript(String path, Connection connection) {
+        executeSQLScript(path, connection, false);
+    }
+
+    /**
+     * Execute a SQL script located into the resources.
+     *
+     * @param path the path to the name of the file example : org.constellation.sos.sql in Resources folder.
+     * @param connection a connection to the SQL datasource.
+     * @param a flag indicating if we have to use a derby syntax (replace true and false by 1 and 0)
+     */
+    public static void executeSQLScript(String path, Connection connection, boolean derbySource) {
+
         try {
             final BufferedReader in = new BufferedReader(new InputStreamReader(getResourceAsStream(path), "UTF-8"));
             final StringWriter sw   = new StringWriter();
@@ -171,7 +183,11 @@ public final class Util {
             int end               = SqlQuery.indexOf(';');
             int nbQuery           = 0;
             while (end != -1) {
-                final String singleQuery = SqlQuery.substring(0, end);
+                String singleQuery = SqlQuery.substring(0, end);
+                if (derbySource) {
+                    singleQuery = singleQuery.replaceAll("true", "1");
+                    singleQuery = singleQuery.replaceAll("false", "0");
+                }
                 try {
                     stmt.execute(singleQuery);
                     nbQuery++;

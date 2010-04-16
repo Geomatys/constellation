@@ -78,7 +78,7 @@ public class MDWebMetadataReaderTest {
         Util.executeSQLScript("org/constellation/metadata/sql/csw-data.sql", con);
         Util.executeSQLScript("org/constellation/metadata/sql/csw-data-5.sql", con);
         
-        Util.executeSQLScript("org/constellation/sql/sml-schema_v2.sql", con);
+        Util.executeSQLScript("org/constellation/sql/sml-schema_v2.sql", con, true);
         Util.executeSQLScript("org/constellation/sql/sml-data_v2.sql", con);
         Util.executeSQLScript("org/constellation/sql/sml-data-2_v2.sql", con);
 
