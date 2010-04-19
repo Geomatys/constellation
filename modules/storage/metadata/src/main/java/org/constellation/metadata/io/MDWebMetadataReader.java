@@ -351,7 +351,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             return result;
 
         } catch (MD_IOException e) {
-             throw new MetadataIoException("SQL exception while reading the metadata: " + identifier, null, "id");
+             throw new MetadataIoException("MD_IO Exception while reading the metadata: " + identifier, e, null, "id");
         }
     }
     
