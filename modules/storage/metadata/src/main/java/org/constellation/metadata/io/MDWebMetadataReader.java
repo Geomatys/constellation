@@ -69,6 +69,7 @@ import org.geotoolkit.temporal.object.TemporalUtilities;
 import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
+import org.mdweb.io.sql.AbstractReader;
 import org.mdweb.io.sql.v21.Reader21;
 import org.mdweb.model.schemas.Classe;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
@@ -201,6 +202,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 LOGGER.info("cache system have been disabled");
             }
             setIsCacheEnabled(c);
+            ((AbstractReader)mdReader).setCacheStorage(c);
         }
 
         if (configuration.getStoreMapping() != null && !configuration.getStoreMapping().isEmpty()) {

@@ -403,7 +403,11 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                 final int code        = Integer.parseInt(value.getValue());
                 final org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList)value.getType();
                 final CodeListElement element = codelist.getElementByCode(code);
-                dataType = element.getName();
+                if (element != null) {
+                    dataType = element.getName();
+                } else {
+                    LOGGER.warning("No codeListElement found for code:" + code + " in codelist:" + codelist.getName());
+                }
             }
             litType = new SimpleLiteral(null, dataType);
         } catch (NumberFormatException ex) {
