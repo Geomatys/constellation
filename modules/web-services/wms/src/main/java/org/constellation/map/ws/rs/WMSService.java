@@ -489,7 +489,7 @@ public class WMSService extends GridWebService {
             }
         }
 
-        String strCRS                = getParameter((version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
+        final String strCRS          = getParameter((version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
                                             KEY_CRS_V111 : KEY_CRS_V130, true);
         final String strBBox         = getParameter(KEY_BBOX,            true);
         final String strLayers       = getParameter(KEY_LAYERS,          true);
@@ -508,17 +508,22 @@ public class WMSService extends GridWebService {
                 && (version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()))) ? false : fromGetMap);
 
         final CoordinateReferenceSystem crs;
+        boolean forceLongitudeFirst = false;
         try {
-            if(version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) && strCRS.equalsIgnoreCase("epsg:4326")){
-                //if we are in 1.1.1 that mean EPSG:4326 define a false EPSG:4326
-                //we must replace it by CRS:84 which is the correct match
-                strCRS = "CRS:84";
+            if (version.equals(ServiceDef.WMS_1_0_0.version.toString())     ||
+                version.equals(ServiceDef.WMS_1_0_0_SLD.version.toString()) ||
+                version.equals(ServiceDef.WMS_1_1_1.version.toString())     ||
+                version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()))
+            {
+                /*
+                 * If we are in version older than WMS 1.3.0, then the bounding box is
+                 * expressed with the longitude in first, even if the CRS has the latitude as
+                 * first axis. Consequently we have to force the longitude in first for the
+                 * CRS decoding.
+                 */
+                forceLongitudeFirst = true;
             }
-            if (strCRS != null) {
-                crs = CRS.decode(strCRS);
-            } else {
-                crs = null;
-            }
+            crs = CRS.decode(strCRS, forceLongitudeFirst);
         } catch (FactoryException ex) {
             throw new CstlServiceException(ex, INVALID_CRS);
         }
