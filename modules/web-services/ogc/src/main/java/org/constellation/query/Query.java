@@ -32,26 +32,26 @@ public interface Query {
     /**
      * Parameters for all requests.
      */
-    static final String KEY_SERVICE = "SERVICE";
-    static final String KEY_VERSION = "VERSION";
-    static final String KEY_REQUEST = "REQUEST";
+     String KEY_SERVICE = "SERVICE";
+     String KEY_VERSION = "VERSION";
+     String KEY_REQUEST = "REQUEST";
 
     /**
      * Exception handling parameters.
      */
-    static final String KEY_EXCEPTIONS = "EXCEPTIONS";
-    static final String EXCEPTIONS_INIMAGE = "INIMAGE";
+     String KEY_EXCEPTIONS = "EXCEPTIONS";
+     String EXCEPTIONS_INIMAGE = "INIMAGE";
 
     /**
      * Undefined CRS constant.
      */
-    static final String UNDEFINED_CRS = "UNDEFINEDCRS";
+     String UNDEFINED_CRS = "UNDEFINEDCRS";
 
     /**
      * Formats values.
      */
-    static final String GML = "gml";
-    static final String XML = "xml";
+     String GML = "gml";
+     String XML = "xml";
 
     /**
      * Returns the request type specified for this query.

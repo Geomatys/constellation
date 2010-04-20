@@ -195,8 +195,8 @@ public abstract class AbstractCSWConfigurer {
     private void refreshServiceConfiguration() throws ConfigurationException {
         serviceConfiguration = new HashMap<String, Automatic>();
 
-        File cswConfigDir = getConfigurationDirectory();
-        if (cswConfigDir == null || (cswConfigDir != null && !cswConfigDir.isDirectory())) {
+        final File cswConfigDir = getConfigurationDirectory();
+        if (cswConfigDir == null || !cswConfigDir.isDirectory()) {
             throw new ConfigurationException("No configuration directory have been found");
         }
         try {
@@ -205,9 +205,9 @@ public abstract class AbstractCSWConfigurer {
 
             for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(null))) {
                 //we get the csw ID (if single mode return "")
-                String id = getConfigID(configFile);
+                final String id = getConfigID(configFile);
                 // we get the CSW configuration file
-                Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
+                final Automatic config = (Automatic) configUnmarshaller.unmarshal(configFile);
                 config.setConfigurationDirectory(cswConfigDir);
                 serviceConfiguration.put(id, config);
             }
@@ -405,7 +405,7 @@ public abstract class AbstractCSWConfigurer {
                 }
             }
         }
-        String msg = "The specified record have been added to the CSW index";
+        final String msg = "The specified record have been added to the CSW index";
         return new AcknowlegementType("success", msg);
     }
 

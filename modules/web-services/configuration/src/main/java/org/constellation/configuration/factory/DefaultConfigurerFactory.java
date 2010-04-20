@@ -28,10 +28,6 @@ import org.constellation.ws.rs.ContainerNotifierImpl;
  */
 public class DefaultConfigurerFactory extends AbstractConfigurerFactory {
 
-    public DefaultConfigurerFactory() {
-        super();
-    }
-    
     @Override
     public AbstractCSWConfigurer getCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException {
         return new DefaultCSWConfigurer(cn);

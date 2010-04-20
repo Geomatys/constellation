@@ -21,7 +21,7 @@ package org.constellation.configuration.ws.rs;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class Parameters {
+public final class Parameters {
 
     public static final String REQUEST = "Request";
 

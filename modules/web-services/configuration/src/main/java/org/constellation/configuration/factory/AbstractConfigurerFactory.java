@@ -29,10 +29,6 @@ import org.geotoolkit.factory.Factory;
  */
 public abstract class AbstractConfigurerFactory extends Factory {
 
-    public AbstractConfigurerFactory() {
-        super();
-    }
-
     public abstract AbstractCSWConfigurer getCSWConfigurer(ContainerNotifierImpl cn) throws ConfigurationException;
 
 }

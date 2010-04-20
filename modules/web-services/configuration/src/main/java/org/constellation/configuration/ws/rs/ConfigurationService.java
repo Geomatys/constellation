@@ -85,7 +85,7 @@ import org.geotoolkit.util.StringUtilities;
  */
 @Path("configuration")
 @Singleton
-public class ConfigurationService extends AbstractWebService  {
+public final class ConfigurationService extends AbstractWebService  {
 
     /**
      * A container notifier allowing to dynamically reload all the active service.
@@ -99,9 +99,9 @@ public class ConfigurationService extends AbstractWebService  {
     
     private boolean cswFunctionEnabled;
 
-    public static boolean isIndexing;
+    private static boolean indexing;
 
-    public static final List<String> serviceIndexing = new ArrayList<String>();
+    private static final List<String> SERVICE_INDEXING = new ArrayList<String>();
     
     public static final Map<String, File> SERVCE_DIRECTORY = new HashMap<String, File>();
     static {
@@ -114,7 +114,7 @@ public class ConfigurationService extends AbstractWebService  {
      */
     public ConfigurationService() {
         super();
-        isIndexing = false;
+        indexing = false;
         try {
             setXMLContext("org.geotoolkit.ows.xml.v110:org.constellation.configuration:org.geotoolkit.skos.xml", "");
             final AbstractConfigurerFactory configurerfactory = factory.getServiceProvider(AbstractConfigurerFactory.class, null, null, null);
@@ -183,13 +183,14 @@ public class ConfigurationService extends AbstractWebService  {
                 if (cswFunctionEnabled) {
                     final boolean asynchrone = Boolean.parseBoolean((String) getParameter("ASYNCHRONE", false));
                     final String id          = getParameter("ID", false);
-                    boolean forced           = Boolean.parseBoolean((String) getParameter("FORCED", false));
+                    final boolean forced     = Boolean.parseBoolean((String) getParameter("FORCED", false));
 
                     if (isIndexing(id) && !forced) {
-                        AcknowlegementType refused = new AcknowlegementType("Failure", "An indexation is already started for this service:" + id);
+                        final AcknowlegementType refused = new AcknowlegementType("Failure",
+                                "An indexation is already started for this service:" + id);
                         marshaller.marshal(refused, sw);
                         return Response.ok(sw.toString(), "text/xml").build();
-                    } else if (isIndexing && forced) {
+                    } else if (indexing && forced) {
                         AbstractIndexer.stopIndexation(Arrays.asList(id));
                     }
                     
@@ -230,10 +231,10 @@ public class ConfigurationService extends AbstractWebService  {
 
             if ("stopIndex".equalsIgnoreCase(request)) {
                 if (cswFunctionEnabled) {
-                    String service     = getParameter("SERVICE", false);
-                    String id          = getParameter("ID", false);
+                    //final String service     = getParameter("SERVICE", false);
+                    final String id          = getParameter("ID", false);
 
-                    AcknowlegementType ack= stopIndexation(id);
+                    final AcknowlegementType ack= stopIndexation(id);
                     marshaller.marshal(ack, sw);
                     return Response.ok(sw.toString(), "text/xml").build();
                 } else {
@@ -295,20 +296,20 @@ public class ConfigurationService extends AbstractWebService  {
     }
 
     private boolean isIndexing(String id) {
-        return isIndexing & serviceIndexing.contains(id);
+        return indexing & SERVICE_INDEXING.contains(id);
     }
 
     private void startIndexation(String id) {
-        isIndexing  = true;
+        indexing  = true;
         if (id != null) {
-            serviceIndexing.add(id);
+            SERVICE_INDEXING.add(id);
         }
     }
 
     private void endIndexation(String id) {
-        isIndexing = false;
+        indexing = false;
         if (id != null) {
-            serviceIndexing.remove(id);
+            SERVICE_INDEXING.remove(id);
         }
     }
 
@@ -358,7 +359,7 @@ public class ConfigurationService extends AbstractWebService  {
         }
 
         if (cn != null) {
-            if (!isIndexing) {
+            if (!indexing) {
                 cn.reload();
                 return new AcknowlegementType(Parameters.SUCCESS, "services succefully restarted");
             } else if (!forced) {

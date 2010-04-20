@@ -36,7 +36,11 @@ public class ConfigurationFileFilter implements FilenameFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean accept(File dir, String name) {
-        return (name.endsWith(prefix + "config.xml"));
+        return name.endsWith(prefix + "config.xml");
     }
 }
