@@ -95,6 +95,16 @@
  INSERT INTO "Schemas"."Properties"  VALUES('id', NULL, 'Sensor Web Enablement', 'List of allowed token values for this component', 1, 1,'AllowedTokens','CharacterString', NULL, 'M',1 , 'ISO 19103','Sensor Web Enablement',' ');
 
 
+/*-------------------------------------------------*
+ *--------------  Classe AllowedTokensProperty-----*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"  VALUES('AllowedTokensProperty',NULL,'Sensor Web Enablement','Enumeration of allowed values',false,NULL,NULL, ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('role', NULL, 'Xlink', NULL, 0, 1,'AllowedTokensProperty','CharacterString', NULL, 'O',1 , 'ISO 19103','Sensor Web Enablement','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('href', NULL, 'Xlink', NULL, 0, 1,'AllowedTokensProperty','CharacterString', NULL, 'O',2 , 'ISO 19103','Sensor Web Enablement','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('arcrole', NULL, 'Xlink', NULL, 0, 1,'AllowedTokensProperty','CharacterString', NULL, 'O',3 , 'ISO 19103','Sensor Web Enablement','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('type', NULL, 'Xlink', NULL, 0, 1,'AllowedTokensProperty','CharacterString', NULL, 'O',4 , 'ISO 19103','Sensor Web Enablement','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('allowedTokens', NULL, 'Sensor Web Enablement', NULL, 0, 1,'AllowedTokensProperty','AllowedTokens', NULL, 'O',5 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+
  /*---------------------------------------------*
   *--------------  Classe Link  ----------------*
   *---------------------------------------------*/
@@ -179,6 +189,17 @@
  INSERT INTO "Schemas"."Properties"  VALUES('id', NULL, 'Sensor Web Enablement', 'List of allowed token values for this component', 1, 1,'AllowedValues','CharacterString', NULL, 'M',2 , 'ISO 19103','Sensor Web Enablement',' ');
 
 /*-------------------------------------------------*
+ *--------------  Classe AllowedValuesProperty-----*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"  VALUES('AllowedValuesProperty',NULL,'Sensor Web Enablement','Enumeration of allowed values',false,NULL,NULL, ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('role', NULL, 'Xlink', NULL, 0, 1,'AllowedValuesProperty','CharacterString', NULL, 'O',1 , 'ISO 19103','Sensor Web Enablement','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('href', NULL, 'Xlink', NULL, 0, 1,'AllowedValuesProperty','CharacterString', NULL, 'O',2 , 'ISO 19103','Sensor Web Enablement','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('arcrole', NULL, 'Xlink', NULL, 0, 1,'AllowedValuesProperty','CharacterString', NULL, 'O',3 , 'ISO 19103','Sensor Web Enablement','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('type', NULL, 'Xlink', NULL, 0, 1,'AllowedValuesProperty','CharacterString', NULL, 'O',4 , 'ISO 19103','Sensor Web Enablement','P');
+ INSERT INTO "Schemas"."Properties"  VALUES('allowedValues', NULL, 'Sensor Web Enablement', NULL, 0, 1,'AllowedValuesProperty','AllowedValues', NULL, 'O',5 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+
+
+/*-------------------------------------------------*
  *--------------  Classe CodeSpace ----*
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Classes"  VALUES('CodeSpaceProperty',NULL,'Sensor Web Enablement','Property type that indicates the codespace',false,NULL,NULL, ' ');
@@ -205,14 +226,14 @@
  /*-------------------------------------------------*
  *--------------  Classe Quality debut -------------*
  *-------------------------------------------------*/
- INSERT INTO "Schemas"."Classes"  VALUES('Quality',NULL,'Sensor Web Enablement','Allows for a simple quality assessment of the values carried by this component.',false,NULL,NULL, ' ');
+ INSERT INTO "Schemas"."Classes"  VALUES('QualityProperty',NULL,'Sensor Web Enablement','Allows for a simple quality assessment of the values carried by this component.',false,NULL,NULL, ' ');
 
 
 /*-------------------------------------------------*
  *--------------  Classe Boolean ------------------*
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Classes"  VALUES('Boolean',NULL,'Sensor Web Enablement','Scalar component used to express truth: 1 or 0, 0 or 1',false,'AbstractDataComponent', 'Sensor Web Enablement', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Boolean','Quality', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Boolean','QualityProperty', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('definition', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Boolean','URI', NULL, 'O',1 , 'ISO 19103','Sensor Web Enablement','C');
 
 
@@ -220,8 +241,8 @@
  *--------------  Classe QuantityRange ------------*
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Classes"  VALUES('QuantityRange',NULL,'Sensor Web Enablement',NULL,false,'AbstractDataComponent','Sensor Web Enablement', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('constraint', NULL, 'Sensor Web Enablement', NULL, 0, 1,'QuantityRange','AllowedValues', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', NULL, 0, 1,'QuantityRange','Quality', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('constraint', NULL, 'Sensor Web Enablement', NULL, 0, 1,'QuantityRange','AllowedValuesProperty', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', NULL, 0, 1,'QuantityRange','QualityProperty', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('uom', NULL, 'Sensor Web Enablement', NULL, 0, 1,'QuantityRange','UomProperty', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('value', NULL, 'Sensor Web Enablement', NULL, 0, 1,'QuantityRange','Double', NULL, 'O',3 , 'ISO 19103','Sensor Web Enablement','V');
 
@@ -229,8 +250,8 @@
  *--------------  Classe Category fin -------------*
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Properties"  VALUES('codeSpace', NULL, 'Sensor Web Enablement', 'Provides link to dictionary or rule set to which the value belongs', 0, 1,'Category','CodeSpaceProperty', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('constraint', NULL, 'Sensor Web Enablement', 'The constraint property defines the permitted values, as an enumerated list', 0, 1,'Category','AllowedTokens', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', 'The quality property provides an indication of the reliability of estimates of the asociated value', 0, 1,'Category','Quality', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('constraint', NULL, 'Sensor Web Enablement', 'The constraint property defines the permitted values, as an enumerated list', 0, 1,'Category','AllowedTokensProperty', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', 'The quality property provides an indication of the reliability of estimates of the asociated value', 0, 1,'Category','QualityProperty', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('value', NULL, 'Sensor Web Enablement', 'Value is optional, to enable structure to act in a schema for values provided using other encodings', 0, 1,'Category','CharacterString', NULL, 'O',3 , 'ISO 19103','Sensor Web Enablement',' ');
 
 
@@ -238,8 +259,8 @@
  *--------------  Classe Quantity fin -------------*
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Properties"  VALUES('uom', NULL, 'Sensor Web Enablement', 'Unit of measure', 0, 1,'Quantity','UomProperty', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('constraint', NULL, 'Sensor Web Enablement', 'The constraint property defines the permitted values, as a range or enumerated list', 0, 1,'Quantity','AllowedValues', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', 'The quality property provides an indication of the reliability of estimates of the asociated value', 0, 2147483647,'Quantity','Quality', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('constraint', NULL, 'Sensor Web Enablement', 'The constraint property defines the permitted values, as a range or enumerated list', 0, 1,'Quantity','AllowedValuesProperty', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', 'The quality property provides an indication of the reliability of estimates of the asociated value', 0, 2147483647,'Quantity','QualityProperty', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('value', NULL, 'Sensor Web Enablement', 'Value is optional, to enable structure to act in a schema for values provided using other encodings', 0, 1,'Quantity','Double', NULL, 'O',3 , 'ISO 19103','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('axisID', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Quantity','CharacterString', NULL, 'O',4 , 'ISO 19103','Sensor Web Enablement','C');
  INSERT INTO "Schemas"."Properties"  VALUES('referenceFrame', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Quantity','URI', NULL, 'O',5 , 'ISO 19103','Sensor Web Enablement','C');
@@ -248,8 +269,8 @@
  *--------------  Classe Count --------------------*
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Classes"  VALUES('Count',NULL,'Sensor Web Enablement','Integer number used for a counting value',true,'AbstractDataComponent','Sensor Web Enablement', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('constraint', NULL, 'Sensor Web Enablement', 'The constraint property defines the permitted values, as a range or enumerated list', 0, 1,'Count','AllowedValues', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', 'The quality property provides an indication of the reliability of estimates of the asociated value', 0, 1,'Count','Quality', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('constraint', NULL, 'Sensor Web Enablement', 'The constraint property defines the permitted values, as a range or enumerated list', 0, 1,'Count','AllowedValuesProperty', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', 'The quality property provides an indication of the reliability of estimates of the asociated value', 0, 1,'Count','QualityProperty', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('value', NULL, 'Sensor Web Enablement', 'Value is optional, to enable structure to act in a schema for values provided using other encodings', 0, 1,'Count','Integer', NULL, 'O',2 , 'ISO 19103','Sensor Web Enablement',' ');
 
 
@@ -311,7 +332,7 @@
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Properties"  VALUES('uom', NULL, 'Sensor Web Enablement', NULL, 0, 1,'Time','UomProperty', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('constraint', NULL, 'Sensor Web Enablement', 'The constraint property defines the permitted values, as a range or enumerated list', 0, 1,'Time','AllowedTimes', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', 'The quality property provides an indication of the reliability of estimates of the asociated value', 0, 1,'Time','Quality', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', 'The quality property provides an indication of the reliability of estimates of the asociated value', 0, 1,'Time','QualityProperty', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('value', NULL, 'Sensor Web Enablement', 'Value is optional, to enable structure to act in a schema for values provided using other encodings', 0, 1,'Time','TimePosition', NULL, 'O',3 , 'SensorML','Sensor Web Enablement',' ');
 
 
@@ -321,9 +342,20 @@
  INSERT INTO "Schemas"."Classes"  VALUES('TimeRange',NULL,'Sensor Web Enablement','Time value pair for specifying a time range (can be a decimal or ISO 8601)',false,'AbstractDataComponent','Sensor Web Enablement', ' ');
  INSERT INTO "Schemas"."Properties"  VALUES('uom', NULL, 'Sensor Web Enablement', 'Unit of measure', 0, 1,'TimeRange','UomIdentifier', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('constraint', NULL, 'Sensor Web Enablement', 'The constraint property defines the permitted values, as a range or enumerated list', 0, 1,'TimeRange','AllowedTimes', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', 'The quality property provides an indication of the reliability of estimates of the asociated value', 0, 1,'TimeRange','Quality', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('quality', NULL, 'Sensor Web Enablement', 'The quality property provides an indication of the reliability of estimates of the asociated value', 0, 1,'TimeRange','QualityProperty', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('value', NULL, 'Sensor Web Enablement', 'Value is optional, to enable structure to act in a schema for values provided using other encodings', 0, 1,'TimeRange','TimePair', NULL, 'O',3 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
 
+
+/*-------------------------------------------------*
+ *--------------  Classe QualityProperty fin  -----*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Properties"  VALUES('quantity', NULL, 'Sensor Web Enablement', NULL, 0, 1,'QualityProperty','Quantity', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('quantityRange', NULL, 'Sensor Web Enablement', NULL, 0, 1,'QualityProperty','QuantityRange', NULL, 'O',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('category', NULL, 'Sensor Web Enablement', NULL, 0, 1,'QualityProperty','Category', NULL, 'O',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('text', NULL, 'Sensor Web Enablement', NULL, 0, 1,'QualityProperty','Text', NULL, 'O',3 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('role', NULL, 'Xlink', NULL, 0, 1,'QualityProperty','CharacterString', NULL, 'O',4 , 'ISO 19103','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('arcrole', NULL, 'Xlink', NULL, 0, 1,'QualityProperty','CharacterString', NULL, 'O',5 , 'ISO 19103','Sensor Web Enablement',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('href', NULL, 'Xlink', NULL, 0, 1,'QualityProperty','CharacterString', NULL, 'O',6 , 'ISO 19103','Sensor Web Enablement','P');
 
 /*-------------------------------------------------*
  *--------------  Classe AnyNumerical -------------*
@@ -555,8 +587,6 @@
  INSERT INTO "Schemas"."Properties"  VALUES('time', NULL, 'Sensor Web Enablement', 'Optionally provides time range dURIng which this bounding envelope applies', 0, 1,'Envelope','TimeRange', NULL, 'O',0 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('lowerCorner', NULL, 'Sensor Web Enablement', NULL, 1, 1,'Envelope','Vector', NULL, 'M',1 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('upperCorner', NULL, 'Sensor Web Enablement', NULL, 1, 1,'Envelope','Vector', NULL, 'M',2 , 'Sensor Web Enablement','Sensor Web Enablement',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('nil', NULL, 'XML Schema', NULL, 0, 1,'Envelope','Boolean', NULL, 'O',3 , 'ISO 19103','Sensor Web Enablement',' ');
-
 
 /*-------------------------------------------------*
  *--------------  Classe SquareMatrix -------------*
@@ -849,6 +879,21 @@
  INSERT INTO "Schemas"."Properties"  VALUES('outputs',    NULL, 'SensorML', NULL, 0, 1,'AbstractComponent','Outputs',    NULL, 'O',3 , 'SensorML','SensorML',' ');
  INSERT INTO "Schemas"."Properties"  VALUES('parameters', NULL, 'SensorML', NULL, 0, 1,'AbstractComponent','Parameters', NULL, 'O',4 , 'SensorML','SensorML',' ');
 
+
+/*------------------------------------------------*
+ *--------------  Classe AbstractPureProcess --------*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"     VALUES('AbstractRestrictedProcess',NULL,'SensorML',NULL,true,'AbstractProcess','SensorML', ' ');
+
+/*------------------------------------------------*
+ *--------------  Classe AbstractPureProcess --------*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"     VALUES('AbstractPureProcess',NULL,'SensorML','Complex Type for all soft-typed processes',true,'AbstractRestrictedProcess','SensorML', ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('inputs',     NULL, 'SensorML', NULL, 0, 1,'AbstractPureProcess','Inputs',     NULL, 'O',2 , 'SensorML','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('outputs',    NULL, 'SensorML', NULL, 0, 1,'AbstractPureProcess','Outputs',    NULL, 'O',3 , 'SensorML','SensorML',' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('parameters', NULL, 'SensorML', NULL, 0, 1,'AbstractPureProcess','Parameters', NULL, 'O',4 , 'SensorML','SensorML',' ');
+
+
 /*----------------------------------------------------*
  *--------------  Classe Security TODO         -------*
  *----------------------------------------------------*/
@@ -886,12 +931,19 @@
  INSERT INTO "Schemas"."Properties"  VALUES('type', NULL, 'Xlink', NULL, 0, 1,'MethodProperty','CharacterString', NULL, 'O',4 , 'ISO 19103','SensorML','P');
  INSERT INTO "Schemas"."Properties"  VALUES('processMethod', NULL, 'SensorML', NULL, 1, 2147483647,'MethodProperty','ProcessMethod', NULL, 'O',5 , 'SensorML','SensorML',' ');
 
- /*-------------------------------------------------*
+/*-------------------------------------------------*
  *--------------  Classe Component ----------------*
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Classes"     VALUES('Component',NULL,'SensorML','Collection of subprocesses that can be chained using connections',false,'AbstractComponent','SensorML', ' ');
  INSERT INTO "Schemas"."Properties"  VALUES('method', NULL, 'SensorML', NULL, 0, 1,'Component','MethodProperty', NULL, 'O',1 , 'SensorML','SensorML',' ');
- 
+
+ /*-------------------------------------------------*
+ *--------------  Classe Component ----------------*
+ *-------------------------------------------------*/
+ INSERT INTO "Schemas"."Classes"     VALUES('ProcessModel',NULL,'SensorML','Complex Type for atomic processes',false,'AbstractPureProcess','SensorML', ' ');
+ INSERT INTO "Schemas"."Properties"  VALUES('method', NULL, 'SensorML', NULL, 0, 1,'ProcessModel','MethodProperty', NULL, 'O',1 , 'SensorML','SensorML',' ');
+
+
 /*-------------------------------------------------*
  *--------------  Classe ComponentProperty ----*
  *-------------------------------------------------*/

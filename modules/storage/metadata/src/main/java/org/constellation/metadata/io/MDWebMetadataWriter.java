@@ -375,7 +375,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (object == null) {
             return result;
         }             
-        
+        if (object instanceof JAXBElement) {
+            final JAXBElement jb = (JAXBElement) object;
+            object = jb.getValue();
+        }
+
         //if the object is a collection we call the method on each child
         Classe classe;
         if (object instanceof Collection) {
@@ -388,10 +392,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             
         //if the object is a JAXBElement we desencapsulate it    
         } else {
-            if (object instanceof JAXBElement) {
-                final JAXBElement jb = (JAXBElement) object;
-                object = jb.getValue();
-            } 
+            
             classe = getClasseFromObject(object);
         }
         
@@ -692,7 +693,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         // Ebrim v2.5 tandard
         } else if (Standard.SENSORML.equals(mainStandard)) {
             availableStandards.add(Standard.SENSORML);
-            availableStandards.add(mdWriter.getStandard("Sensor Web Enablement"));
+            availableStandards.add(Standard.SENSOR_WEB_ENABLEMENT);
             availableStandards.add(Standard.ISO_19108);
             
 
@@ -709,9 +710,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
              */
             if (packageName.equals("org.geotoolkit.service")) {
                 standard = Standard.ISO_19119;
-            } else if (packageName.equals("org.geotoolkit.sml.xml.v100")) {
+            } else if (packageName.startsWith("org.geotoolkit.sml.xml")) {
                 standard = Standard.SENSORML;
-            } else if (packageName.equals("org.geotoolkit.swe.xml.v100")) {
+            } else if (packageName.startsWith("org.geotoolkit.swe.xml")) {
                 standard = mdWriter.getStandard("Sensor Web Enablement");
             } else if (packageName.equals("org.geotoolkit.gml.xml.v311")) {
                 standard = Standard.ISO_19108;

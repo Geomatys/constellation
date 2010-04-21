@@ -17,7 +17,6 @@
 package org.constellation.coverage.ws;
 
 import java.awt.image.RenderedImage;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -166,12 +165,12 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
         final List<String> axis = new ArrayList<String>();
         axis.add("width");
         axis.add("height");
-        final List<BigInteger> low  = new ArrayList<BigInteger>();
-        low.add(BigInteger.ZERO);
-        low.add(BigInteger.ZERO);
-        final List<BigInteger> high = new ArrayList<BigInteger>();
-        high.add(new BigInteger("1024"));
-        high.add(new BigInteger("512"));
+        final List<Integer> low  = new ArrayList<Integer>();
+        low.add(0);
+        low.add(0);
+        final List<Integer> high = new ArrayList<Integer>();
+        high.add(1024);
+        high.add(512);
         final GridLimitsType limits = new GridLimitsType(low, high);
         final GridType grid = new GridType(limits, axis);
         final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();

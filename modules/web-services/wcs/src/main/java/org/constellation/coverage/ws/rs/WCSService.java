@@ -511,19 +511,19 @@ public class WCSService extends GridWebService {
         final List<String> axis = new ArrayList<String>();
         axis.add("width");
         axis.add("height");
-        List<BigInteger> low = null;
-        List<BigInteger> high = null;
+        List<Integer> low = null;
+        List<Integer> high = null;
         if (width != null && height != null) {
-            low = new ArrayList<BigInteger>();
-            high = new ArrayList<BigInteger>();
-            low.add(BigInteger.ZERO);
-            low.add(BigInteger.ZERO);
-            high.add(new BigInteger(width));
-            high.add(new BigInteger(height));
+            low = new ArrayList<Integer>();
+            high = new ArrayList<Integer>();
+            low.add(0);
+            low.add(0);
+            high.add(new Integer(width));
+            high.add(new Integer(height));
             if (depth != null) {
                 axis.add("depth");
-                low.add(BigInteger.ZERO);
-                high.add(new BigInteger(depth));
+                low.add(0);
+                high.add(new Integer(depth));
             }
         }
         final GridLimitsType limits = new GridLimitsType(low, high);
