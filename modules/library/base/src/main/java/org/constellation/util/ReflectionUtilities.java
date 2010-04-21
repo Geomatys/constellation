@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.Logging;
@@ -214,7 +215,7 @@ public final class ReflectionUtilities {
             LOGGER.warning(baseMessage + "the argument does not match with the method.");
 
         } catch (InvocationTargetException ex) {
-            LOGGER.warning(baseMessage + "an Exception was thrown by the invoked method.");
+            LOGGER.log(Level.WARNING, baseMessage + "an Exception was thrown by the invoked method.", ex);
         }
         return result;
     }
@@ -266,7 +267,7 @@ public final class ReflectionUtilities {
             if (errorMsg == null && ex.getTargetException() != null) {
                 errorMsg = ex.getTargetException().getMessage();
             }
-            LOGGER.warning(baseMessage + "an Exception was thrown in the invoked method:" + errorMsg);
+            LOGGER.log(Level.WARNING, baseMessage + "an Exception was thrown in the invoked method:" + errorMsg, ex);
         }
         return result;
     }
