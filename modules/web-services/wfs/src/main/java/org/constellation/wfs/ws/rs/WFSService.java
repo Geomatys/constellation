@@ -95,6 +95,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.sort.SortOrder;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.query.wfs.WFSQuery.*;
+import static org.constellation.wfs.ws.WFSConstants.*;
 
 /**
  *
@@ -387,7 +388,7 @@ public class WFSService extends OGCWebService {
             if (request instanceof Versioned) {
                 final Versioned ar = (Versioned) request;
                 if (ar.getVersion() != null)
-                    getUriContext().getQueryParameters().add("VERSION", ar.getVersion().toString());
+                    getUriContext().getQueryParameters().add(VERSION, ar.getVersion().toString());
             } if (request != null) {
                 String type = "";
                 if (request instanceof JAXBElement) {
@@ -472,14 +473,14 @@ public class WFSService extends OGCWebService {
 
     private DescribeFeatureTypeType createNewDescribeFeatureTypeRequest() throws CstlServiceException {
         String outputFormat   = getParameter("outputFormat", false);
-        final String handle   = getParameter("handle", false);
-        final String service  = getParameter("service", true);
-        final String version  = getParameter("version", true);
+        final String handle   = getParameter(HANDLE, false);
+        final String service  = getParameter(SERVICE, true);
+        final String version  = getParameter(VERSION, true);
 
         if (outputFormat == null) {
             outputFormat = "text/xml; subtype=gml/3.1.1";
         }
-        final String namespace = getParameter("namespace", false);
+        final String namespace = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = extractMapping(namespace);
 
         final String typeName = getParameter("typeName", false);
@@ -528,7 +529,7 @@ public class WFSService extends OGCWebService {
                                        sections,
                                        formats,
                                        null,
-                                       getParameter("SERVICE", true));
+                                       getParameter(SERVICE, true));
 
     }
 
@@ -544,15 +545,15 @@ public class WFSService extends OGCWebService {
             }
 
         }
-        final String service = getParameter("service", true);
-        final String version = getParameter("version", true);
-        final String handle  = getParameter("handle",  false);
+        final String service = getParameter(SERVICE, true);
+        final String version = getParameter(VERSION, true);
+        final String handle  = getParameter(HANDLE,  false);
         String outputFormat  = getParameter("outputFormat", false);
 
         if (outputFormat == null) {
             outputFormat = "text/xml; subtype=gml/3.1.1";
         }
-        final String namespace = getParameter("namespace", false);
+        final String namespace = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = extractMapping(namespace);
 
         final String result = getParameter("resultType", false);
@@ -582,7 +583,7 @@ public class WFSService extends OGCWebService {
 
         }
 
-        final String xmlFilter  = getParameter("filter", false);
+        final String xmlFilter  = getParameter(FILTER, false);
         FilterType filter = extractFilter(xmlFilter);
 
         final String bbox = getParameter("bbox", false);
@@ -656,9 +657,9 @@ public class WFSService extends OGCWebService {
     }
 
     private GetGmlObjectType createNewGetGmlObjectRequest() throws CstlServiceException {
-        final String service      = getParameter("service", true);
-        final String version      = getParameter("version", true);
-        final String handle       = getParameter("handle",  false);
+        final String service      = getParameter(SERVICE, true);
+        final String version      = getParameter(VERSION, true);
+        final String handle       = getParameter(HANDLE,  false);
         final String outputFormat = getParameter("outputFormat", false);
         final String id           = getParameter("gmlobjectid", true);
 
@@ -667,9 +668,9 @@ public class WFSService extends OGCWebService {
     }
 
     private LockFeatureType createNewLockFeatureRequest() throws CstlServiceException {
-        final String service  = getParameter("service", true);
-        final String version  = getParameter("version", true);
-        final String handle   = getParameter("handle",  false);
+        final String service  = getParameter(SERVICE, true);
+        final String version  = getParameter(VERSION, true);
+        final String handle   = getParameter(HANDLE,  false);
 
         final String lockAct  = getParameter("lockAction",  false);
         AllSomeType lockAction = null;
@@ -687,13 +688,13 @@ public class WFSService extends OGCWebService {
             }
         }
 
-        final String namespace            = getParameter("namespace", false);
+        final String namespace            = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = extractMapping(namespace);
 
         final String typeName       = getParameter("typeName", true);
         final List<QName> typeNames = extractTypeName(typeName, mapping);
 
-        final String xmlFilter  = getParameter("filter", false);
+        final String xmlFilter  = getParameter(FILTER, false);
         final FilterType filter = extractFilter(xmlFilter);
         // TODO
         final QName typeNamee = typeNames.get(0);
@@ -703,22 +704,22 @@ public class WFSService extends OGCWebService {
     }
 
     private TransactionType createNewTransactionRequest() throws CstlServiceException {
-        final String service      = getParameter("service", true);
-        final String version      = getParameter("version", true);
-        final String handle       = getParameter("handle",  false);
+        final String service      = getParameter(SERVICE, true);
+        final String version      = getParameter(VERSION, true);
+        final String handle       = getParameter(HANDLE,  false);
         final String relAct       = getParameter("releaseAction",  false);
         AllSomeType releaseAction = null;
         if (relAct != null) {
             releaseAction = AllSomeType.fromValue(relAct);
         }
 
-        final String namespace            = getParameter("namespace", false);
+        final String namespace            = getParameter(NAMESPACE, false);
         final Map<String, String> mapping = extractMapping(namespace);
 
         final String typeName       = getParameter("typeName", true);
         final List<QName> typeNames = extractTypeName(typeName, mapping);
 
-        final String xmlFilter  = getParameter("filter", false);
+        final String xmlFilter  = getParameter(FILTER, false);
         final FilterType filter = extractFilter(xmlFilter);
 
         // TODO
@@ -750,7 +751,7 @@ public class WFSService extends OGCWebService {
 
                 } else {
                     throw new CstlServiceException("The namespace parameter is malformed : [" + token + "] the good pattern is xmlns(ns1=http://my_ns1.com)",
-                                                  INVALID_PARAMETER_VALUE, "namespace");
+                                                  INVALID_PARAMETER_VALUE, NAMESPACE);
                 }
             }
         }
@@ -817,13 +818,13 @@ public class WFSService extends OGCWebService {
                         type = obj.getClass().getName();
                     }
                     throw new CstlServiceException("The xml filter does not have the good type:" + type,
-                                                  INVALID_PARAMETER_VALUE, "filter");
+                                                  INVALID_PARAMETER_VALUE, FILTER);
                 } else {
                     filter = (FilterType) obj;
                 }
             } catch (JAXBException ex) {
                 throw new CstlServiceException("The service was unable to read the xml filter:" + ex.getMessage(),
-                                                  INVALID_PARAMETER_VALUE, "filter");
+                                                  INVALID_PARAMETER_VALUE, FILTER);
             } finally {
                 if (unmarshaller != null) {
                     getMarshallerPool().release(unmarshaller);
