@@ -17,21 +17,21 @@
 
 package org.constellation.wfs.ws;
 
+import org.geotoolkit.lang.Immutable;
+
 /**
- *
-* @author Guilhem Legal (Geomatys)
+ *  WFS Constants
+ * 
+ * @author Guilhem Legal (Geomatys)
  */
+@Immutable
 public class WFSConstants {
 
     private WFSConstants() {}
 
     public static final String HANDLE = "handle";
-
     public static final String SERVICE = "service";
-
     public static final String VERSION = "version";
-
     public static final String NAMESPACE = "namespace";
-
     public static final String FILTER = "filter";
 }

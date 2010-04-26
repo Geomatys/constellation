@@ -23,7 +23,7 @@ import org.geotoolkit.lang.Immutable;
  * CSW constants.
  *
  * @version $Id$
- * @author glegal (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  */
 @Immutable
 public abstract class CSWConstants {
@@ -33,7 +33,7 @@ public abstract class CSWConstants {
      */
     public static final String CSW_202_VERSION = "2.0.2";
     public static final String CSW = "CSW";
-
+    public static final String VERSION = "VERSION";
     public static final String SERVICE = "service";
     public static final String OUTPUT_SCHEMA = "outputSchema";
     public static final String TYPENAMES = "TypeNames";
@@ -44,6 +44,10 @@ public abstract class CSWConstants {
     public static final String SOURCE = "Source";
     public static final String ALL = "All";
     public static final String NAMESPACE = "namespace";
+
+    // TODO those 2 namespace must move to geotk Namespace class
+    public static final String EBRIM_25 = "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5";
+    public static final String EBRIM_30 = "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";
 
     private CSWConstants() {}
 

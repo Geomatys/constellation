@@ -432,7 +432,7 @@ public class CSWService extends OGCWebService {
                                        sections,
                                        formats,
                                        null,
-                                       getParameter("SERVICE", true));
+                                       getParameter(SERVICE, true));
         
     }
     
@@ -442,8 +442,8 @@ public class CSWService extends OGCWebService {
      */
     private GetRecordsType createNewGetRecordsRequest() throws CstlServiceException {
         
-        final String version    = getParameter("VERSION", true);
-        final String service    = getParameter("SERVICE", true);
+        final String version    = getParameter(VERSION, true);
+        final String service    = getParameter(SERVICE, true);
         
         //we get the value of result type, if not set we put default value "HITS"
         final String resultTypeName = getParameter("RESULTTYPE", false);
@@ -499,29 +499,7 @@ public class CSWService extends OGCWebService {
         
         // we get the namespaces.
         final String namespace               = getParameter("NAMESPACE", false);
-        final Map<String, String> namespaces = new HashMap<String, String>();
-        StringTokenizer tokens;
-                
-        if (namespace != null) {
-            tokens = new StringTokenizer(namespace, ",;");
-            while (tokens.hasMoreTokens()) {
-                String token = tokens.nextToken().trim();
-                if (token.startsWith("xmlns(") && token.endsWith(")")) {
-                    token = token.substring(6, token.length() -1);
-                    if (token.indexOf('=') != -1) {
-                        final String prefix = token.substring(0, token.indexOf('='));
-                        final String url    = token.substring(token.indexOf('=') + 1);
-                        namespaces.put(prefix, url);
-                    } else {
-                         throw new CstlServiceException("The namespace " + token + " is malformed",
-                                                       INVALID_PARAMETER_VALUE, NAMESPACE);
-                    }
-                } else {
-                    throw new CstlServiceException("The namespace attribute is malformed: good pattern is \"xmlns(ns1=http://namespace1),xmlns(ns2=http://namespace2)\"",
-                                                       INVALID_PARAMETER_VALUE, NAMESPACE);
-                }
-            }
-        }
+        final Map<String, String> namespaces = extractNamespace(namespace);
         
         //if there is not namespace specified, using the default namespace
         if (namespaces.size() == 0) {
@@ -531,7 +509,7 @@ public class CSWService extends OGCWebService {
         
         final String names          = getParameter("TYPENAMES", true);
         final List<QName> typeNames = new ArrayList<QName>();
-        tokens = new StringTokenizer(names, ",;");
+        StringTokenizer tokens = new StringTokenizer(names, ",;");
         while (tokens.hasMoreTokens()) {
             final String token = tokens.nextToken().trim();
 
@@ -658,14 +636,47 @@ public class CSWService extends OGCWebService {
                                   distribSearch);
             
     }
+
+    /**
+     * 
+     * @param namespace
+     * @return
+     * @throws CstlServiceException
+     */
+    private Map<String,String> extractNamespace(String namespace) throws CstlServiceException {
+        final Map<String, String> namespaces = new HashMap<String, String>();
+        StringTokenizer tokens;
+
+        if (namespace != null) {
+            tokens = new StringTokenizer(namespace, ",;");
+            while (tokens.hasMoreTokens()) {
+                String token = tokens.nextToken().trim();
+                if (token.startsWith("xmlns(") && token.endsWith(")")) {
+                    token = token.substring(6, token.length() -1);
+                    if (token.indexOf('=') != -1) {
+                        final String prefix = token.substring(0, token.indexOf('='));
+                        final String url    = token.substring(token.indexOf('=') + 1);
+                        namespaces.put(prefix, url);
+                    } else {
+                         throw new CstlServiceException("The namespace " + token + " is malformed",
+                                                       INVALID_PARAMETER_VALUE, NAMESPACE);
+                    }
+                } else {
+                    throw new CstlServiceException("The namespace attribute is malformed: good pattern is \"xmlns(ns1=http://namespace1),xmlns(ns2=http://namespace2)\"",
+                                                       INVALID_PARAMETER_VALUE, NAMESPACE);
+                }
+            }
+        }
+        return namespaces;
+    }
     
     /**
      * Build a new GetRecordById request object with the url parameters 
      */
     private GetRecordByIdType createNewGetRecordByIdRequest() throws CstlServiceException {
     
-        final String version    = getParameter("VERSION", true);
-        final String service    = getParameter("SERVICE", true);
+        final String version    = getParameter(VERSION, true);
+        final String service    = getParameter(SERVICE, true);
         
         String eSetName         = getParameter("ELEMENTSETNAME", false);
         ElementSetType elementSet = ElementSetType.SUMMARY;
@@ -713,8 +724,8 @@ public class CSWService extends OGCWebService {
      */
     private DescribeRecordType createNewDescribeRecordRequest() throws CstlServiceException {
     
-        final String version    = getParameter("VERSION", true);
-        final String service    = getParameter("SERVICE", true);
+        final String version    = getParameter(VERSION, true);
+        final String service    = getParameter(SERVICE, true);
         
         String outputFormat = getParameter("OUTPUTFORMAT", false);
         if (outputFormat == null) {
@@ -728,27 +739,8 @@ public class CSWService extends OGCWebService {
         
          // we get the namespaces.
         final String namespace               = getParameter("NAMESPACE", false);
-        final Map<String, String> namespaces = new HashMap<String, String>();
-        if (namespace != null) {
-            final StringTokenizer tokens = new StringTokenizer(namespace, ",;");
-            while (tokens.hasMoreTokens()) {
-                String token = tokens.nextToken().trim();
-                if (token.startsWith("xmlns(") && token.endsWith(")")) {
-                    token = token.substring(6, token.length() -1);
-                    if (token.indexOf('=') != -1) {
-                        final String prefix = token.substring(0, token.indexOf('='));
-                        final String url    = token.substring(token.indexOf('=') + 1);
-                        namespaces.put(prefix, url);
-                    } else {
-                         throw new CstlServiceException("The namespace " + token + " is malformed",
-                                                       INVALID_PARAMETER_VALUE, NAMESPACE);
-                    }
-                } else {
-                    throw new CstlServiceException("The namespace attribute is malformed: good pattern is \"xmlns(ns1=http://namespace1),xmlns(ns2=http://namespace2)\"",
-                                                       INVALID_PARAMETER_VALUE, NAMESPACE);
-                }
-            }
-        }
+        final Map<String, String> namespaces = extractNamespace(namespace);
+        
         //if there is not namespace specified, using the default namespace
         // TODO add gmd...
         if (namespaces.size() == 0) {
@@ -787,8 +779,8 @@ public class CSWService extends OGCWebService {
      */
     private GetDomainType createNewGetDomainRequest() throws CstlServiceException {
     
-        final String version    = getParameter("VERSION", true);
-        final String service    = getParameter("SERVICE", true);
+        final String version    = getParameter(VERSION, true);
+        final String service    = getParameter(SERVICE, true);
         
         //not supported by the ISO profile
         final String parameterName = getParameter("PARAMETERNAME", false);
@@ -807,8 +799,8 @@ public class CSWService extends OGCWebService {
      */
     private HarvestType createNewHarvestRequest() throws CstlServiceException {
     
-        final String version      = getParameter("VERSION", true);
-        final String service      = getParameter("SERVICE", true);
+        final String version      = getParameter(VERSION, true);
+        final String service      = getParameter(SERVICE, true);
         final String source       = getParameter("SOURCE", true);
         final String resourceType = getParameter("RESOURCETYPE", true);
         String resourceFormat     = getParameter("RESOURCEFORMAT", false);

@@ -407,8 +407,8 @@ public class CSWworker {
             acceptedResourceType.add(Namespaces.CSW_202);
         }
         if (supportedDataTypes.contains(EBRIM)) {
-            acceptedResourceType.add("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0");
-            acceptedResourceType.add("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5");
+            acceptedResourceType.add(EBRIM_30);
+            acceptedResourceType.add(EBRIM_25);
         }
     }
 
@@ -771,7 +771,7 @@ public class CSWworker {
         }
 
         List<String> results;
-        if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0") || outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5")) {
+        if (outputSchema.equals(EBRIM_30) || outputSchema.equals(EBRIM_25)) {
            
             // build the sql query from the specified filter
            final SQLQuery sqlQuery = (SQLQuery) sqlFilterParser.getQuery(query.getConstraint(), variables, prefixs);
@@ -855,7 +855,7 @@ public class CSWworker {
         int mode;
         if (outputSchema.equals(Namespaces.GMD) || outputSchema.equals(Namespaces.GFC)) {
             mode = ISO_19115;
-        } else if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0") || outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5")) {
+        } else if (outputSchema.equals(EBRIM_30) || outputSchema.equals(EBRIM_25)) {
             mode = EBRIM;
         } else if (outputSchema.equals(Namespaces.CSW_202)) {
             mode = DUBLINCORE;
@@ -1114,7 +1114,7 @@ public class CSWworker {
            response = new GetRecordByIdResponseType(null, records);      
         
         //we build a Ebrim 3.0 object
-        } else if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0")) {
+        } else if (outputSchema.equals(EBRIM_30)) {
            final List<Object> records = new ArrayList<Object>();
            for (String id:request.getId()) {
                
@@ -1150,7 +1150,7 @@ public class CSWworker {
            response = new GetRecordByIdResponseType(null, records);      
       
          //we build a Ebrim 2.5 object
-        } else if (outputSchema.equals("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5")) {
+        } else if (outputSchema.equals(EBRIM_25)) {
            final List<Object> records = new ArrayList<Object>();
            for (String id:request.getId()) {
                
@@ -1276,13 +1276,13 @@ public class CSWworker {
             
             if (containsOneOfEbrim30(typeNames)) {
                 final Object object = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd"));
-                final SchemaComponentType component = new SchemaComponentType("urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0", schemaLanguage, object);
+                final SchemaComponentType component = new SchemaComponentType(EBRIM_30, schemaLanguage, object);
                 components.add(component);
             }
             
             if (containsOneOfEbrim25(typeNames)) {
                 final Object object = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd"));
-                final SchemaComponentType component = new SchemaComponentType("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", schemaLanguage, object);
+                final SchemaComponentType component = new SchemaComponentType(EBRIM_25, schemaLanguage, object);
                 components.add(component);
             }
                 
