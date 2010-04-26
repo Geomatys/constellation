@@ -297,6 +297,9 @@ public final class Utils {
             maxy = 90.0;
         }
 
-        return new EnvelopeEntry(null, new DirectPositionType(minx, miny), new DirectPositionType(maxx, maxy), "EPSG:4326");
+        EnvelopeEntry env =  new EnvelopeEntry(null, new DirectPositionType(minx, miny), new DirectPositionType(maxx, maxy), "urn:ogc:def:crs:EPSG::4326");
+        env.setSrsDimension(2);
+        env.setAxisLabels("Y X");
+        return env;
     }
 }

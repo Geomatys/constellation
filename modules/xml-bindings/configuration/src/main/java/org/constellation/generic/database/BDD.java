@@ -198,7 +198,7 @@ public class BDD {
         if (className.equals("org.postgresql.Driver")) {
             PGSimpleDataSource pgSource = new PGSimpleDataSource();
             //jdbc:postgresql://localhost:5432/mdweb-SML
-            String url    = connectURL.substring(17);
+            String url    = connectURL.substring(18);
             String host   = url.substring(0, url.indexOf(':'));
             url           = url.substring(url.indexOf(':') + 1);
             String sPort  = url.substring(0, url.indexOf('/'));
