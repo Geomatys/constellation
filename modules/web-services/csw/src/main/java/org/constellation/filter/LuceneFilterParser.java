@@ -417,16 +417,16 @@ public class LuceneFilterParser extends FilterParser {
     private static String toLuceneDate(Date date){
         final Calendar c = Calendar.getInstance();
         c.setTime(date);
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append(String.valueOf(c.get(Calendar.YEAR)));
 
-        int month = c.get(Calendar.MONTH)+1;
+        final int month = c.get(Calendar.MONTH)+1;
         if(month < 10){
             sb.append('0');
         }
         sb.append(month);
 
-        int day = c.get(Calendar.DAY_OF_MONTH);
+        final int day = c.get(Calendar.DAY_OF_MONTH);
         if(day < 10){
             sb.append('0');
         }

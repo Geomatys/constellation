@@ -343,8 +343,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             }
         }
 
-
-        for (int i = 0, size = types.size(); i < size; i++) {
+        final int size = types.size();
+        for (int i = 0; i < size; i++) {
             try {
                 types.set(i, FeatureTypeUtilities.excludePrimaryKeyFields((SimpleFeatureType) types.get(i)));
             } catch (SchemaException ex) {

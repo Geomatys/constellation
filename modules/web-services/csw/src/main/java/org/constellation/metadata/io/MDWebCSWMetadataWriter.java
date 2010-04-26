@@ -86,7 +86,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
 
     @Override
     public boolean deleteMetadata(String identifier) throws MetadataIoException {
-         boolean success = super.deleteMetadata(identifier);
+         final boolean success = super.deleteMetadata(identifier);
          if (identifier.indexOf(':') != -1) {
             identifier = identifier.substring(0, identifier.indexOf(':'));
          }

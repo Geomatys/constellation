@@ -169,6 +169,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             final DataSource dataSource   = db.getDataSource();
             final boolean isPostgres      = db.getClassName().equals("org.postgresql.Driver");
             String version                = null;
+            if (dataSource == null) {
+                throw new MetadataIoException("Unable to instanciate a dataSource.");
+            }
             final Connection mdConnection = dataSource.getConnection();
             final Statement versionStmt   = mdConnection.createStatement();
             final ResultSet result        = versionStmt.executeQuery("Select * FROM \"version\"");

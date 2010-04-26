@@ -196,21 +196,25 @@ public class BDD {
             className = "org.postgresql.Driver";
         }
         if (className.equals("org.postgresql.Driver")) {
-            PGSimpleDataSource pgSource = new PGSimpleDataSource();
-            //jdbc:postgresql://localhost:5432/mdweb-SML
-            String url    = connectURL.substring(18);
-            String host   = url.substring(0, url.indexOf(':'));
-            url           = url.substring(url.indexOf(':') + 1);
-            String sPort  = url.substring(0, url.indexOf('/'));
-            int port      = Integer.parseInt(sPort);
-            String dbName = url.substring(url.indexOf('/') + 1);
+            if (connectURL != null && connectURL.startsWith("jdbc:postgresql://")) {
+                final PGSimpleDataSource pgSource = new PGSimpleDataSource();
+                // exemple : jdbc:postgresql://localhost:5432/mdweb-SML
+                String url          = connectURL.substring(18);
+                final String host   = url.substring(0, url.indexOf(':'));
+                url                 = url.substring(url.indexOf(':') + 1);
+                final String sPort  = url.substring(0, url.indexOf('/'));
+                final int port      = Integer.parseInt(sPort);
+                final String dbName = url.substring(url.indexOf('/') + 1);
 
-            pgSource.setServerName(host);
-            pgSource.setPortNumber(port);
-            pgSource.setDatabaseName(dbName);
-            pgSource.setUser(user);
-            pgSource.setPassword(password);
-            source = pgSource;
+                pgSource.setServerName(host);
+                pgSource.setPortNumber(port);
+                pgSource.setDatabaseName(dbName);
+                pgSource.setUser(user);
+                pgSource.setPassword(password);
+                source = pgSource;
+            } else {
+                return null;
+            }
         } else {
             source = new DefaultDataSource(connectURL);
 

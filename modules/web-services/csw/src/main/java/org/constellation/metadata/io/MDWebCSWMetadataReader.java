@@ -428,7 +428,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         final List<Value> topicCategoriesValues  = form.getValueFromPath(pathMap.get("subject2"));
         for (Value v: topicCategoriesValues) {
             if (v instanceof TextValue) {
-                String value = ((TextValue)v).getValue();
+                final String value = ((TextValue)v).getValue();
                 if (value == null || value.equals("")) {
                     continue;
                 }

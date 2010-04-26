@@ -17,6 +17,7 @@
 
 package org.constellation.sos.io.mdweb;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -100,8 +101,8 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
             LOGGER.log(logLevel, "describesensor id: " + dbId);
             //LOGGER.log(logLevel, "describesensor mdweb id: " + id);
 
-            String identifier = id + ":SMLC";
-            Object metadata = getMetadata(identifier, AbstractMetadataReader.SENSORML, null);
+            final String identifier = id + ":SMLC";
+            final Object metadata   = getMetadata(identifier, AbstractMetadataReader.SENSORML, null);
             
             
             if (metadata instanceof AbstractSensorML) {
@@ -137,8 +138,11 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
     @Override
     public List<String> getSensorNames() throws CstlServiceException {
         try {
-            RecordSet smlCat = mdReader.getRecordSet("SMLC");
-            return mdReader.getFormsTitle(smlCat);
+            final RecordSet smlCat = mdReader.getRecordSet("SMLC");
+            if (smlCat != null) {
+                return mdReader.getFormsTitle(smlCat);
+            }
+            return new ArrayList<String>();
         } catch (MD_IOException ex) {
             throw new CstlServiceException(ex);
         }

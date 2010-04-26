@@ -99,7 +99,7 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
         final Query simpleQuery = new TermQuery(new Term("metafile", "doc"));
         try {
             final long start = System.currentTimeMillis();
-            List<ObservationResult> results = new ArrayList<ObservationResult>();
+            final List<ObservationResult> results = new ArrayList<ObservationResult>();
 
             int maxRecords = searcher.maxDoc();
             if (maxRecords == 0) {

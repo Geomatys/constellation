@@ -508,7 +508,7 @@ public class WFSService extends OGCWebService {
         final SectionsType sections;
         final String section = getParameter("Sections", false);
         if (section != null && !section.equalsIgnoreCase("All")) {
-            List<String> requestedSections = new ArrayList<String>();
+            final List<String> requestedSections = new ArrayList<String>();
             final StringTokenizer tokens = new StringTokenizer(section, ",;");
             while (tokens.hasMoreTokens()) {
                 final String token = tokens.nextToken().trim();
@@ -626,7 +626,7 @@ public class WFSService extends OGCWebService {
             //we get the order
             final SortOrder order;
             if (sortByParam.indexOf(' ') != -1) {
-                char cOrder = sortByParam.charAt(sortByParam.length() -1);
+                final char cOrder = sortByParam.charAt(sortByParam.length() -1);
                 sortByParam = sortByParam.substring(0, sortByParam.indexOf(' '));
                 if (cOrder == 'D') {
                     order = SortOrder.DESCENDING;

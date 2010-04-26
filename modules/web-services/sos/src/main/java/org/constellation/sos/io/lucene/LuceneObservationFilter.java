@@ -94,7 +94,7 @@ public class LuceneObservationFilter implements ObservationFilter {
 
     @Override
     public void initFilterGetResult(Observation template, QName resultModel) {
-        ProcessEntry process = (ProcessEntry) template.getProcedure();
+        final ProcessEntry process = (ProcessEntry) template.getProcedure();
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             luceneRequest = new StringBuilder("type:measurement AND procedure:\"" + process.getHref() + "\" ");
         } else {
@@ -253,8 +253,8 @@ public class LuceneObservationFilter implements ObservationFilter {
     public List<ObservationResult> filterResult() throws CstlServiceException {
         List<ObservationResult> results = new ArrayList<ObservationResult>();
         try {
-            SpatialQuery query = new SpatialQuery(luceneRequest.toString());
-            SortField sf       = new SortField("sampling_time_begin", SortField.STRING, false);
+            final SpatialQuery query = new SpatialQuery(luceneRequest.toString());
+            final SortField sf       = new SortField("sampling_time_begin", SortField.STRING, false);
             query.setSort(new Sort(sf));
             results = searcher.doResultSearch(query);
         } catch(SearchingException ex) {

@@ -243,7 +243,7 @@ public class CSWService {
         Object response = capabilities.get(fileName);
         if (response == null) {
             final String configUrl = "csw_configuration";
-            File configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
+            final File configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
             if (configDir.exists()) {
                 LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
             } else {

@@ -165,9 +165,9 @@ public class CSWService extends OGCWebService {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
-        Catching.Marshaller marshaller = null;
-        ServiceDef serviceDef          = null;
-        MarshallWarnings warnings       = new MarshallWarnings();
+        Catching.Marshaller marshaller    = null;
+        ServiceDef serviceDef           = null;
+        final MarshallWarnings warnings = new MarshallWarnings();
         try {
             marshaller = getMarshallerPool().acquireMarshaller();
             marshaller.setObjectConverters(warnings);
@@ -580,7 +580,7 @@ public class CSWService extends OGCWebService {
                 constraint = new QueryConstraintType(constraintObject, languageVersion);
                 
             } else if (constLanguage.equalsIgnoreCase("FILTER")) {
-                Object constraintObject = getComplexParameter("CONSTRAINT", false);
+                final Object constraintObject = getComplexParameter("CONSTRAINT", false);
                 if (constraintObject == null) {
                     //final PropertyIsLikeType filter = new PropertyIsLikeType(new PropertyNameType("AnyText"), "%%", "%", "?", "\\");
                     //constraintObject = new FilterType(filter);

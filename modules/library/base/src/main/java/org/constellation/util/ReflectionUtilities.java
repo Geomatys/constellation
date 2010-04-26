@@ -417,9 +417,9 @@ public final class ReflectionUtilities {
             propertyName = "date";
         }
 
-        String methodName = "get" + StringUtilities.firstToUpper(propertyName);
-        String methodName2 = "is" + StringUtilities.firstToUpper(propertyName);
-        String methodName3  = propertyName;
+        String methodName        = "get" + StringUtilities.firstToUpper(propertyName);
+        final String methodName2 = "is" + StringUtilities.firstToUpper(propertyName);
+        final String methodName3 = propertyName;
         int occurenceType = 0;
 
         while (occurenceType < 6) {

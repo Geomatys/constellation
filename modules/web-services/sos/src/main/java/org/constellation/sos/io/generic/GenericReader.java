@@ -314,7 +314,7 @@ public abstract class GenericReader  {
                         subMultiStmts.add(stmt);
                     }
                 } else {
-                    String staticValue = staticParameters.get(var);
+                    final String staticValue = staticParameters.get(var);
                     if (staticValue != null) {
                         values = new Values();
                         values.singleValue.put(var, staticValue);
@@ -489,8 +489,8 @@ public abstract class GenericReader  {
         if (parameters == null) {
             parameters = new ArrayList<String>();
         }
-        ParameterMetaData meta = stmt.getParameterMetaData();
-        int nbParam            = meta.getParameterCount();
+        final ParameterMetaData meta = stmt.getParameterMetaData();
+        final int nbParam            = meta.getParameterCount();
 
         if (nbParam != parameters.size() && parameters.size() != 1) {
             throw new IllegalArgumentException("There is not the good number of parameters specified for this statement: stmt:" + nbParam + " parameters:" + parameters.size());

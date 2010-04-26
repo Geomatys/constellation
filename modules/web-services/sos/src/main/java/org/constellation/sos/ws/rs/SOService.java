@@ -134,7 +134,7 @@ public class SOService extends OGCWebService {
                 serviceDef = getVersionFromNumber(ds.getVersion());
                 final StringWriter sw = new StringWriter();
 
-                AbstractSensorML sensor = worker.describeSensor(ds);
+                final AbstractSensorML sensor = worker.describeSensor(ds);
                 // for sensorML file we need to change the schema localtion
                 if (sensor != null) {
                     if (sensor.getVersion() != null && sensor.getVersion().equals("1.0.1")) {
@@ -159,7 +159,7 @@ public class SOService extends OGCWebService {
              }
 
              if (request.equalsIgnoreCase("GetFeatureInterest") || (objectRequest instanceof GetFeatureOfInterest)) {
-                GetFeatureOfInterest gf = (GetFeatureOfInterest)objectRequest;
+                final GetFeatureOfInterest gf = (GetFeatureOfInterest)objectRequest;
 
                 if (gf == null) {
 
@@ -277,7 +277,7 @@ public class SOService extends OGCWebService {
             if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
                 exceptionCode = exceptionCode.replace("_", "");
                 exceptionCode = exceptionCode.toLowerCase();
-                org.geotoolkit.ows.xml.OWSExceptionCode code = CodeLists.valueOf(org.geotoolkit.ows.xml.OWSExceptionCode.class, exceptionCode);
+                final org.geotoolkit.ows.xml.OWSExceptionCode code = CodeLists.valueOf(org.geotoolkit.ows.xml.OWSExceptionCode.class, exceptionCode);
                 exceptionCode = code.name();
             }
             final StringWriter sw = new StringWriter();

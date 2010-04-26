@@ -166,7 +166,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         int nbEntries = 0;
         try {
             writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
-            String serviceID = getServiceID();
+            final String serviceID = getServiceID();
             
             // TODO getting the objects list and index avery item in the IndexWriter.
             final List<String> ids = reader.getAllIdentifiers();
@@ -223,7 +223,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         int nbEntries = 0;
         try {
             writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
-            String serviceID = getServiceID();
+            final String serviceID = getServiceID();
             
             nbEntries = toIndex.size();
             for (Object entry : toIndex) {

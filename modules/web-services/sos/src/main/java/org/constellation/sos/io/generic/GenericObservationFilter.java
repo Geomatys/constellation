@@ -165,7 +165,7 @@ public class GenericObservationFilter implements ObservationFilter {
         final From from     = configurationQuery.getFrom("observations");
         final Where where   = configurationQuery.getWhere(PROCEDURE);
 
-        ProcessEntry process = (ProcessEntry) template.getProcedure();
+        final ProcessEntry process = (ProcessEntry) template.getProcedure();
         where.replaceVariable(PROCEDURE, process.getHref(), true);
         currentQuery.addSelect(select);
         currentQuery.addFrom(from);

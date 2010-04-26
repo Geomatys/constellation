@@ -225,17 +225,17 @@ public class SOService {
         Object response           = capabilities.get(fileName);
         if (response == null) {
             final String configUrl    = "sos_configuration";
-            File configDir            = new File(ConfigDirectory.getConfigDirectory(), configUrl);
+            final File configDir      = new File(ConfigDirectory.getConfigDirectory(), configUrl);
             if (configDir.exists()) {
                 LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
             } else {
                 return FileUtilities.getDirectoryFromResource(configUrl);
             }
             try {
-                Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-                final File f              = new File(configDir, fileName);
+                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+                final File f                    = new File(configDir, fileName);
                 LOGGER.info(f.toString());
-                response                  = unmarshaller.unmarshal(f);
+                response                        = unmarshaller.unmarshal(f);
                 marshallerPool.release(unmarshaller);
             } catch(JAXBException ex) {
                 LOGGER.log(Level.SEVERE, "unable to unmarshall the capabilities file", ex);

@@ -68,7 +68,7 @@ public class FileSensorReader implements SensorReader {
     public AbstractSensorML getSensor(final String sensorId) throws CstlServiceException {
         File sensorFile = new File(dataDirectory, sensorId + ".xml");
         if (!sensorFile.exists()) {
-            String sensorIdTmp = sensorId.replace(":", "-");
+            final String sensorIdTmp = sensorId.replace(":", "-");
             sensorFile = new File(dataDirectory, sensorIdTmp + ".xml");
         }
         if (sensorFile.exists()){
@@ -109,10 +109,10 @@ public class FileSensorReader implements SensorReader {
 
     @Override
     public List<String> getSensorNames() throws CstlServiceException {
-        List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<String>();
         for (File sensorFile : dataDirectory.listFiles()) {
             String sensorID = sensorFile.getName();
-            int suffixPos = sensorID.indexOf(".xml");
+            final int suffixPos = sensorID.indexOf(".xml");
             if (suffixPos != -1){
                 sensorID = sensorID.substring(0, suffixPos);
                 result.add(sensorID);

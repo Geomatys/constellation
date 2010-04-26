@@ -1515,7 +1515,7 @@ public class SOSworker {
      * @return
      */
     private FeaturePropertyType buildFeatureProperty(SamplingFeature feature) {
-        ObjectFactory samplingFactory = new ObjectFactory();
+        final ObjectFactory samplingFactory = new ObjectFactory();
         if (feature instanceof SamplingPointEntry) {
             return new FeaturePropertyType(samplingFactory.createSamplingPoint((SamplingPointEntry)feature));
         } else if (feature instanceof SamplingCurveType) {

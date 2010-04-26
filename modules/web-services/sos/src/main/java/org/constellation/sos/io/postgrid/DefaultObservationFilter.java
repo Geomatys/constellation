@@ -140,7 +140,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public void initFilterGetResult(Observation template, QName resultModel) {
-        ProcessEntry process = (ProcessEntry) template.getProcedure();
+        final ProcessEntry process = (ProcessEntry) template.getProcedure();
         
         if (resultModel.equals(MEASUREMENT_QNAME)) {
             sqlRequest = new StringBuilder("SELECT \"result\", \"sampling_time_begin\", \"sampling_time_end\" FROM \"observation\".\"measurements\" WHERE ");

@@ -482,7 +482,7 @@ public class FileMetadataReader extends AbstractCSWMetadataReader {
                     if (metadata instanceof JAXBElement) {
                         metadata = ((JAXBElement) metadata).getValue();
                     }
-                    String value = GenericIndexer.getValues(metadata, paths);
+                    final String value = GenericIndexer.getValues(metadata, paths);
                     if (value != null && !value.equals("null")) {
                         result.add(value);
                     }

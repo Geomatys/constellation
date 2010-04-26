@@ -106,12 +106,12 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             throw new IndexingException("The configuration file does not contains a BDD object");
         }
         try {
-            final DataSource dataSource = db.getDataSource();
-            boolean isPostgres          = db.getClassName().equals("org.postgresql.Driver");
-            String version              = null;
-            Connection mdConnection     = dataSource.getConnection();
-            Statement versionStmt       = mdConnection.createStatement();
-            ResultSet result            = versionStmt.executeQuery("Select * FROM \"version\"");
+            final DataSource dataSource   = db.getDataSource();
+            final boolean isPostgres      = db.getClassName().equals("org.postgresql.Driver");
+            String version                = null;
+            final Connection mdConnection = dataSource.getConnection();
+            final Statement versionStmt   = mdConnection.createStatement();
+            final ResultSet result        = versionStmt.executeQuery("Select * FROM \"version\"");
             if (result.next()) {
                 version = result.getString(1);
             }
@@ -459,7 +459,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             final StringBuilder anyText = new StringBuilder();
             for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
 
-                String values = getValues(term,  form, DUBLIN_CORE_QUERYABLE, -1);
+                final String values = getValues(term,  form, DUBLIN_CORE_QUERYABLE, -1);
                 if (!values.equals("null")) {
                     LOGGER.finer("put " + term + " values: " + values);
                     anyText.append(values).append(" ");

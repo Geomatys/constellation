@@ -250,7 +250,7 @@ public final class Utils {
         double maxy = -Double.MAX_VALUE;
 
         for (Observation observation: collection.getMember()) {
-            FeaturePropertyType featureProp = ((ObservationEntry)observation).getPropertyFeatureOfInterest();
+            final FeaturePropertyType featureProp = ((ObservationEntry)observation).getPropertyFeatureOfInterest();
 
             if (featureProp != null && featureProp.getAbstractFeature() != null) {
                 final AbstractFeatureEntry feature = featureProp.getAbstractFeature();

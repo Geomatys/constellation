@@ -802,18 +802,16 @@ public class CSWworker {
                     throw new CstlServiceException("A SortBy filter must specify a propertyName.",
                                                   NO_APPLICABLE_CODE);
                 final String propertyName = StringUtilities.removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
-            
-                Sort sortFilter;
-                if (first.getSortOrder().equals(SortOrder.ASCENDING)) {
-                    SortField sf = new SortField(propertyName, SortField.STRING, false);
 
-                    sortFilter = new Sort(sf);
+                final SortField sf;
+                if (first.getSortOrder().equals(SortOrder.ASCENDING)) {
+                    sf = new SortField(propertyName, SortField.STRING, false);
                     LOGGER.log(logLevel, "sort ASC");
                 } else {
-                    SortField sf = new SortField(propertyName, SortField.STRING, true);
-                    sortFilter = new Sort(sf);
+                    sf = new SortField(propertyName, SortField.STRING, true);
                     LOGGER.log(logLevel, "sort DSC");
                 }
+                final Sort sortFilter = new Sort(sf);
                 luceneQuery.setSort(sortFilter);
             }
         

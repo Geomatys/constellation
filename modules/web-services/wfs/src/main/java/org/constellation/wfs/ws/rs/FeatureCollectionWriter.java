@@ -55,7 +55,7 @@ public class FeatureCollectionWriter<T extends FeatureCollection> implements Mes
     @Override
     public void writeTo(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
         try {
-            XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter(WFSService.getSchemaLocations());
+            final XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter(WFSService.getSchemaLocations());
             featureWriter.write(t, out);
         } catch (JAXBException ex) {
             LOGGER.severe("JAXB exception while writing the feature collection");
