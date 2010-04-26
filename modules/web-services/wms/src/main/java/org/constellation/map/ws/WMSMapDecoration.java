@@ -211,7 +211,8 @@ public final class WMSMapDecoration {
 
         final DecorationExtension ext = new DecorationExtension();
 
-        for(int i=0, n=nodes.getLength(); i<n; i++){
+        final int n = nodes.getLength();
+        for(int i=0; i<n; i++){
             final Element decoNode = (Element)nodes.item(i);
             parseDecoration(ext, decoNode);
         }
@@ -269,7 +270,8 @@ public final class WMSMapDecoration {
             Font secondLineFont = new Font("serial", Font.BOLD, 14);
 
             NodeList nodes = decoNode.getElementsByTagName(TAG_MAIN);
-            for(int i=0, n=nodes.getLength(); i<n; i++){
+            int n = nodes.getLength();
+            for(int i=0; i<n; i++){
                 final Element sub = (Element)nodes.item(i);
                 final Map<String,String> subParams = parseParameters(sub);
                 mainLineStroke = parseStroke(subParams.get(PARAM_STROKE_WIDTH), subParams.get(PARAM_STROKE_DASHES));
@@ -278,7 +280,8 @@ public final class WMSMapDecoration {
             }
 
             nodes = decoNode.getElementsByTagName(TAG_SECOND);
-            for(int i=0, n=nodes.getLength(); i<n; i++){
+            n = nodes.getLength();
+            for(int i=0; i<n; i++){
                 final Element sub = (Element)nodes.item(i);
                 final Map<String,String> subParams = parseParameters(sub);
                 secondLineStroke = parseStroke(subParams.get(PARAM_STROKE_WIDTH), subParams.get(PARAM_STROKE_DASHES));
@@ -366,10 +369,6 @@ public final class WMSMapDecoration {
             parsed.put(TYPE_SCALE_GRAPHIC, template);
             parsed.put(PARAM_POSITION, parsePosition(params.get(PARAM_POSITION), SwingConstants.SOUTH_WEST));
 
-        }else if(type.equalsIgnoreCase(TYPE_SCALE_NUMERIC)){
-
-            //not handle yet
-
         }else if(type.equalsIgnoreCase(TYPE_TEXT)){
             String txt = params.get(PARAM_TEXT);
             if(txt == null) txt = "";
@@ -389,7 +388,8 @@ public final class WMSMapDecoration {
         final Map<String,String> params = new HashMap<String, String>();
 
         final NodeList nodes = decoNode.getElementsByTagName(TAG_PARAMETER);
-        for(int i=0, n=nodes.getLength(); i<n; i++){
+        final int n = nodes.getLength();
+        for(int i=0; i<n; i++){
             final Element paramNode = (Element)nodes.item(i);
             params.put(
                     paramNode.getAttribute(ATT_NAME).trim().toLowerCase(),
@@ -600,10 +600,6 @@ public final class WMSMapDecoration {
                     scaleDeco.setPosition((Integer)params.get(PARAM_POSITION));
                     scaleDeco.setOffset((Integer)params.get(PARAM_OFFSET_X), (Integer)params.get(PARAM_OFFSET_Y));
                     canvas.getContainer().add(scaleDeco);
-
-                }else if(type.equalsIgnoreCase(TYPE_SCALE_NUMERIC)){
-
-                    //not handle yet
 
                 }else if(type.equalsIgnoreCase(TYPE_TEXT)){
                     final TextTemplate textTemplate = (TextTemplate) params.get(TYPE_TEXT);

@@ -44,7 +44,7 @@ import org.opengis.style.Symbolizer;
  *
  * @author Johann Sorel (Geomatys)
  */
-public class StyleUtils {
+public final class StyleUtils {
 
     private static final MutableStyleFactory SF = new DefaultStyleFactory();
     private static final FilterFactory2 FF = new DefaultFilterFactory2();
@@ -198,7 +198,6 @@ public class StyleUtils {
                         return 0;
                     }
                 }
-
             }
         });
 

@@ -264,7 +264,7 @@ public final class WCSWorker extends AbstractWorker {
                 throw new CstlServiceException("The geographic bbox for the layer is null !",
                         NO_APPLICABLE_CODE);
             }
-            final Keywords keywords = new Keywords("WCS", coverageName);
+            final Keywords keywords = new Keywords(ServiceDef.Specification.WCS.toString(), coverageName);
 
             //Spatial metadata
             final org.geotoolkit.wcs.xml.v100.SpatialDomainType spatialDomain =
@@ -402,7 +402,7 @@ public final class WCSWorker extends AbstractWorker {
             final List<LanguageStringType> abstractt = new ArrayList<LanguageStringType>();
             abstractt.add(new LanguageStringType(StringUtilities.cleanSpecialCharacter(coverageRef.getRemarks())));
             final List<KeywordsType> keywords = new ArrayList<KeywordsType>();
-            keywords.add(new KeywordsType(new LanguageStringType("WCS"),
+            keywords.add(new KeywordsType(new LanguageStringType(ServiceDef.Specification.WCS.toString()),
                     new LanguageStringType(coverageName)));
 
             // spatial metadata
@@ -544,7 +544,8 @@ public final class WCSWorker extends AbstractWorker {
         // We unmarshall the static capabilities document.
         final WCSCapabilitiesType staticCapabilities;
         try {
-            staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(getServletContext().getRealPath("WEB-INF"), ServiceDef.WCS_1_0_0.version.toString(), "WCS");
+            staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(getServletContext().getRealPath("WEB-INF"),
+                    ServiceDef.WCS_1_0_0.version.toString(), ServiceDef.Specification.WCS.toString());
         } catch (IOException e) {
             throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
                     NO_APPLICABLE_CODE);
@@ -685,7 +686,8 @@ public final class WCSWorker extends AbstractWorker {
         // We unmarshall the static capabilities document.
         final Capabilities staticCapabilities;
         try {
-            staticCapabilities = (Capabilities) getStaticCapabilitiesObject(getServletContext().getRealPath("WEB-INF"), ServiceDef.WCS_1_1_1.version.toString(), "WCS");
+            staticCapabilities = (Capabilities) getStaticCapabilitiesObject(getServletContext().getRealPath("WEB-INF"),
+                    ServiceDef.WCS_1_1_1.version.toString(), ServiceDef.Specification.WCS.toString());
         } catch (IOException e) {
             throw new CstlServiceException(e, NO_APPLICABLE_CODE);
         }
@@ -693,22 +695,24 @@ public final class WCSWorker extends AbstractWorker {
         ServiceIdentification si = null;
         ServiceProvider sp = null;
         OperationsMetadata om = null;
+        final String all = "All";
         //we add the static sections if the are included in the requested sections
-        if (requestedSections.contains("ServiceProvider") || requestedSections.contains("All")) {
+        if (requestedSections.contains("ServiceProvider") || requestedSections.contains(all)) {
             sp = staticCapabilities.getServiceProvider();
         }
-        if (requestedSections.contains("ServiceIdentification") || requestedSections.contains("All")) {
+        if (requestedSections.contains("ServiceIdentification") || requestedSections.contains(all)) {
             si = staticCapabilities.getServiceIdentification();
         }
-        if (requestedSections.contains("OperationsMetadata") || requestedSections.contains("All")) {
+        if (requestedSections.contains("OperationsMetadata") || requestedSections.contains(all)) {
             om = staticCapabilities.getOperationsMetadata();
             //we update the url in the static part.
-            OGCWebService.updateOWSURL(om.getOperation(), getUriContext().getBaseUri().toString(), "WCS");
+            OGCWebService.updateOWSURL(om.getOperation(), getUriContext().getBaseUri().toString(),
+                    ServiceDef.Specification.WCS.toString());
         }
         final Capabilities responsev111 = new Capabilities(si, sp, om, ServiceDef.WCS_1_1_1.version.toString(), null, null);
 
         // if the user does not request the contents section we can return the result.
-        if (!requestedSections.contains("Contents") && !requestedSections.contains("All")) {
+        if (!requestedSections.contains("Contents") && !requestedSections.contains(all)) {
             return responsev111;
         }
 

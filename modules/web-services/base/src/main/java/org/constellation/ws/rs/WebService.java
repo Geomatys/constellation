@@ -182,12 +182,6 @@ public abstract class WebService {
      */
     private String mainXsdPath = null;
 
-    /**
-     * Initialize the basic attribute of a web service.
-     */
-    public WebService() {
-    }
-
     protected final UriInfo getUriContext(){
         return uriContext;
     }
@@ -286,8 +280,8 @@ public abstract class WebService {
                 unmarshaller = marshallerPool.acquireUnmarshaller();
                 if (requestValidationActivated) {
                     try {
-                        SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                        Schema schema    = sf.newSchema(new URL(mainXsdPath));
+                        final SchemaFactory sf = SchemaFactory.newInstance(javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                        final Schema schema    = sf.newSchema(new URL(mainXsdPath));
                         unmarshaller.setSchema(schema);
                     } catch (SAXException ex) {
                         LOGGER.severe("SAX exception while adding the Validator to the JAXB unmarshaller");
@@ -305,7 +299,7 @@ public abstract class WebService {
                         errorMsg = e.getLinkedException().getMessage();
                     }
                 }
-                String codeName;
+                final String codeName;
                 if (errorMsg != null && errorMsg.startsWith("unexpected element")) {
                     codeName = OPERATION_NOT_SUPPORTED.name();
                 } else {
@@ -324,7 +318,7 @@ public abstract class WebService {
                 if (ar.getVersion() != null)
                     getUriContext().getQueryParameters().add("VERSION", ar.getVersion().toString());
             } if (request != null) {
-                String type = "";
+                final String type;
                 if (request instanceof JAXBElement) {
                     type = ((JAXBElement)request).getDeclaredType().getName();
                 } else {

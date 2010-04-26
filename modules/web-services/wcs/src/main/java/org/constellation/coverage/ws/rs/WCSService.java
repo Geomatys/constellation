@@ -23,7 +23,6 @@ import com.sun.jersey.spi.resource.Singleton;
 // J2SE dependencies
 import java.awt.image.RenderedImage;
 import java.io.StringWriter;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -518,12 +517,12 @@ public class WCSService extends GridWebService {
             high = new ArrayList<Integer>();
             low.add(0);
             low.add(0);
-            high.add(new Integer(width));
-            high.add(new Integer(height));
+            high.add(Integer.valueOf(width));
+            high.add(Integer.valueOf(height));
             if (depth != null) {
                 axis.add("depth");
                 low.add(0);
-                high.add(new Integer(depth));
+                high.add(Integer.valueOf(depth));
             }
         }
         final GridLimitsType limits = new GridLimitsType(low, high);
