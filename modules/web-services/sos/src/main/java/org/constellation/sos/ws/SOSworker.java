@@ -203,11 +203,6 @@ public class SOSworker {
     private long templateValidTime;
     
     /**
-     * The maximum of observation return in a getObservation request.
-     */
-    private int maxObservationByRequest;
-    
-    /**
      * A capabilities object containing the static part of the document.
      */
     private Capabilities skeletonCapabilities;
@@ -411,9 +406,6 @@ public class SOSworker {
 
             observationTemplateIdBase = configuration.getObservationTemplateIdBase() != null ?
             configuration.getObservationTemplateIdBase() : "urn:ogc:object:observationTemplate:unknow:";
-
-            maxObservationByRequest   = configuration.getMaxObservationByRequest() != 0 ?
-            configuration.getMaxObservationByRequest() : 500;
 
             int h, m;
             try {
@@ -1149,12 +1141,6 @@ public class SOSworker {
                     ocResponse.add(temporaryTemplate);
                 } else {
                     ocResponse.add((ObservationEntry) o);
-
-                    //we stop the request if its too big
-                    if (ocResponse.getMember().size() > maxObservationByRequest) {
-                        throw new CstlServiceException("Your request is to voluminous please add filter and try again",
-                                NO_APPLICABLE_CODE);
-                    }
                 }
             }
             ocResponse = regroupObservation(ocResponse);
