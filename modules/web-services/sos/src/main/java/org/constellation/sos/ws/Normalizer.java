@@ -92,19 +92,19 @@ public final class Normalizer {
      * @return a collection
      */
     public static ObservationCollectionEntry regroupObservation(ObservationCollectionEntry collection){
-        List<Observation> members = collection.getMember();
-        Map<String, ObservationEntry> merged = new HashMap<String, ObservationEntry>();
+        final List<Observation> members = collection.getMember();
+        final Map<String, ObservationEntry> merged = new HashMap<String, ObservationEntry>();
         for (Observation obs : members) {
-            ProcessEntry process = (ProcessEntry) obs.getProcedure();
+            final ProcessEntry process = (ProcessEntry) obs.getProcedure();
             if (merged.containsKey(process.getHref())) {
-                ObservationEntry uniqueObs         = merged.get(process.getHref());
+                final ObservationEntry uniqueObs         = merged.get(process.getHref());
                 if (uniqueObs.getResult() instanceof DataArrayPropertyType) {
-                    DataArrayPropertyType mergedArrayP = (DataArrayPropertyType) uniqueObs.getResult();
-                    DataArrayEntry mergedArray         = mergedArrayP.getDataArray();
+                    final DataArrayPropertyType mergedArrayP = (DataArrayPropertyType) uniqueObs.getResult();
+                    final DataArrayEntry mergedArray         = mergedArrayP.getDataArray();
 
                     if (obs.getResult() instanceof DataArrayPropertyType) {
-                        DataArrayPropertyType arrayP = (DataArrayPropertyType) obs.getResult();
-                        DataArrayEntry array         = arrayP.getDataArray();
+                        final DataArrayPropertyType arrayP = (DataArrayPropertyType) obs.getResult();
+                        final DataArrayEntry array         = arrayP.getDataArray();
 
                         //we merge this observation with the map one
                         mergedArray.setElementCount(mergedArray.getElementCount().getCount().getValue() + array.getElementCount().getCount().getValue());
@@ -112,7 +112,7 @@ public final class Normalizer {
                     } 
                 }
             } else {
-                ObservationEntry clone;
+                final ObservationEntry clone;
                 if (obs instanceof MeasurementEntry) {
                     clone = (MeasurementEntry) obs;
                 } else {
@@ -122,7 +122,7 @@ public final class Normalizer {
             }
         }
 
-        ObservationCollectionEntry result = new ObservationCollectionEntry();
+        final ObservationCollectionEntry result = new ObservationCollectionEntry();
         for (ObservationEntry entry: merged.values()) {
             result.add(entry);
         }

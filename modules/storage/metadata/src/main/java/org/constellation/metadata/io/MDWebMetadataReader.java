@@ -166,12 +166,12 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             throw new MetadataIoException("The configuration file does not contains a BDD object");
         }
         try {
-            final DataSource dataSource = db.getDataSource();
-            boolean isPostgres          = db.getClassName().equals("org.postgresql.Driver");
-            String version              = null;
-            Connection mdConnection     = dataSource.getConnection();
-            Statement versionStmt       = mdConnection.createStatement();
-            ResultSet result            = versionStmt.executeQuery("Select * FROM \"version\"");
+            final DataSource dataSource   = db.getDataSource();
+            final boolean isPostgres      = db.getClassName().equals("org.postgresql.Driver");
+            String version                = null;
+            final Connection mdConnection = dataSource.getConnection();
+            final Statement versionStmt   = mdConnection.createStatement();
+            final ResultSet result        = versionStmt.executeQuery("Select * FROM \"version\"");
             if (result.next()) {
                 version = result.getString(1);
             }
@@ -192,7 +192,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         }
 
         if (configuration.getEnableThread() != null && !configuration.getEnableThread().isEmpty()) {
-            boolean t = Boolean.parseBoolean(configuration.getEnableThread());
+            final boolean t = Boolean.parseBoolean(configuration.getEnableThread());
             if (t) {
                 LOGGER.info("parrallele treatment enabled");
             }
@@ -200,7 +200,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         }
 
         if (configuration.getEnableCache() != null && !configuration.getEnableCache().isEmpty()) {
-            boolean c = Boolean.parseBoolean(configuration.getEnableCache());
+            final boolean c = Boolean.parseBoolean(configuration.getEnableCache());
             if (!c) {
                 LOGGER.info("cache system have been disabled");
             }
@@ -209,7 +209,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         }
 
         if (configuration.getStoreMapping() != null && !configuration.getStoreMapping().isEmpty()) {
-            boolean m = Boolean.parseBoolean(configuration.getStoreMapping());
+            final boolean m = Boolean.parseBoolean(configuration.getStoreMapping());
             if (m) {
                 LOGGER.info("mapping storage enabled");
             }
@@ -323,7 +323,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         
         //we parse the identifier (Form_ID:RecordSet_Code)
         try  {
-            int semiColonIndex = identifier.indexOf(':');
+            final int semiColonIndex = identifier.indexOf(':');
             if (semiColonIndex != -1) {
 
                 recordSetCode = identifier.substring(semiColonIndex + 1);
@@ -477,7 +477,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
 
             // Patch for LocalName Class
             } else if (classe.equals(DefaultLocalName.class)) {
-                DefaultNameFactory facto = new DefaultNameFactory();
+                final DefaultNameFactory facto = new DefaultNameFactory();
                 return facto.createLocalName(null, textValue);
 
             // else we use a String constructor
@@ -504,7 +504,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
              * Again another special case LocalName does not have a empty constructor (immutable)
              * and no setters so we must call the normal constructor.
              */
-            String className = classe.getSimpleName();
+            final String className = classe.getSimpleName();
             if (className.equals("LocalName")) {
                 TextValue child = null;
 
@@ -623,7 +623,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         if (mode != SENSORML  && attribName.equalsIgnoreCase("identifier")) {
                             attribName = "name";
                         }
-                        Field field = ReflectionUtilities.getFieldFromName(attribName, classe);
+                        final Field field = ReflectionUtilities.getFieldFromName(attribName, classe);
 
                         if (field != null) {
                             setFieldToValue(field, attribName, result, param);
@@ -765,8 +765,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @return a class object corresponding to the specified name.
      */
     private Class getClassFromName(Classe type, int mode) {
-        String className    = type.getName();
-        String standardName = type.getStandard().getName();
+        String className          = type.getName();
+        final String standardName = type.getStandard().getName();
 
         final String classNameSave = standardName + ':' + className;
 
