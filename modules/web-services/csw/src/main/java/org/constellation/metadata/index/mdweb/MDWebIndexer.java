@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import javax.sql.DataSource;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -105,21 +106,23 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             throw new IndexingException("The configuration file does not contains a BDD object");
         }
         try {
-            final Connection mdConnection = db.getConnection();
-            boolean isPostgres    = db.getClassName().equals("org.postgresql.Driver");
-            String version        = null;
-            Statement versionStmt = mdConnection.createStatement();
-            ResultSet result      = versionStmt.executeQuery("Select * FROM \"version\"");
+            final DataSource dataSource = db.getDataSource();
+            boolean isPostgres          = db.getClassName().equals("org.postgresql.Driver");
+            String version              = null;
+            Connection mdConnection     = dataSource.getConnection();
+            Statement versionStmt       = mdConnection.createStatement();
+            ResultSet result            = versionStmt.executeQuery("Select * FROM \"version\"");
             if (result.next()) {
                 version = result.getString(1);
             }
             result.close();
             versionStmt.close();
+            mdConnection.close();
 
             if (version.startsWith("2.0")) {
-                mdWebReader = new Reader20(mdConnection, isPostgres);
+                mdWebReader = new Reader20(dataSource, isPostgres);
             } else if (version.startsWith("2.1")) {
-                mdWebReader = new Reader21(mdConnection, isPostgres);
+                mdWebReader = new Reader21(dataSource, isPostgres);
             } else {
                 throw new IndexingException("unexpected database version:" + version);
             }

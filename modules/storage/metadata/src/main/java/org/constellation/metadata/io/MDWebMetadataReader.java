@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
 import javax.measure.unit.Unit;
+import javax.sql.DataSource;
 import javax.xml.namespace.QName;
 
 // Constellation Dependencies
@@ -165,21 +166,23 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             throw new MetadataIoException("The configuration file does not contains a BDD object");
         }
         try {
-            final Connection mdConnection = db.getConnection();
-            final boolean isPostgres      = db.getClassName().equals("org.postgresql.Driver");
-            String version                = null;
-            Statement versionStmt         = mdConnection.createStatement();
-            ResultSet result              = versionStmt.executeQuery("Select * FROM \"version\"");
+            final DataSource dataSource = db.getDataSource();
+            boolean isPostgres          = db.getClassName().equals("org.postgresql.Driver");
+            String version              = null;
+            Connection mdConnection     = dataSource.getConnection();
+            Statement versionStmt       = mdConnection.createStatement();
+            ResultSet result            = versionStmt.executeQuery("Select * FROM \"version\"");
             if (result.next()) {
                 version = result.getString(1);
             }
             result.close();
             versionStmt.close();
+            mdConnection.close();
 
             if (version.startsWith("2.0")) {
-                mdReader = new Reader20(mdConnection, isPostgres);
+                mdReader = new Reader20(dataSource, isPostgres);
             } else if (version.startsWith("2.1")) {
-                mdReader = new Reader21(mdConnection, isPostgres);
+                mdReader = new Reader21(dataSource, isPostgres);
             } else {
                 throw new MetadataIoException("unexpected database version:" + version);
             }
@@ -224,7 +227,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      *
      * @param MDReader a reader to the MDWeb database.
      */
-    protected MDWebMetadataReader(Connection mdConnection) {
+    protected MDWebMetadataReader(DataSource mdConnection) {
         super(true, false);
         this.mdReader           = new Reader20(mdConnection);
         initPackage();

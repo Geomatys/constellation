@@ -36,6 +36,7 @@ import java.util.Map;
 // JAXB dependencies
 import java.util.MissingResourceException;
 import java.util.UUID;
+import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 
 // constellation dependencies
@@ -122,21 +123,23 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
         try {
 
-            final Connection mdConnection = db.getConnection();
-            final boolean isPostgres      = db.getClassName().equals("org.postgresql.Driver");
-            String version                = null;
-            Statement versionStmt         = mdConnection.createStatement();
-            ResultSet result              = versionStmt.executeQuery("Select * FROM \"version\"");
+            final DataSource dataSource = db.getDataSource();
+            boolean isPostgres          = db.getClassName().equals("org.postgresql.Driver");
+            String version              = null;
+            Connection mdConnection     = dataSource.getConnection();
+            Statement versionStmt       = mdConnection.createStatement();
+            ResultSet result            = versionStmt.executeQuery("Select * FROM \"version\"");
             if (result.next()) {
                 version = result.getString(1);
             }
             result.close();
             versionStmt.close();
+            mdConnection.close();
             
             if (version.startsWith("2.0")) {
-                mdWriter = new Writer20(mdConnection, isPostgres);
+                mdWriter = new Writer20(dataSource, isPostgres);
             } else if (version.startsWith("2.1")) {
-                mdWriter = new Writer21(mdConnection, isPostgres);
+                mdWriter = new Writer21(dataSource, isPostgres);
             } else {
                 throw new MetadataIoException("unexpected database version:" + version);
             }
