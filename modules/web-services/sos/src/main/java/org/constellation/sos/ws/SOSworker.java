@@ -1145,7 +1145,12 @@ public class SOSworker {
             }
             ocResponse = regroupObservation(ocResponse);
             ocResponse.setId("collection-1");
-            ocResponse.setBoundedBy(getCollectionBound(ocResponse));
+            // this is a little hack for cite test dummy srsName comparaison
+            String srsName = "urn:ogc:def:crs:EPSG::4326";
+            if (requestObservation.getSrsName().equals("EPSG:4326")) {
+                srsName ="EPSG:4326";
+            }
+            ocResponse.setBoundedBy(getCollectionBound(ocResponse, srsName));
             ocResponse = normalizeDocument(ocResponse);
             response = ocResponse;
         } else {

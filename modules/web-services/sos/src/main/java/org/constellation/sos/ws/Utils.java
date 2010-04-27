@@ -243,7 +243,7 @@ public final class Utils {
      * @param collection
      * @return
      */
-    public static EnvelopeEntry getCollectionBound(final ObservationCollectionEntry collection) {
+    public static EnvelopeEntry getCollectionBound(final ObservationCollectionEntry collection, String srsName) {
         double minx = Double.MAX_VALUE;
         double miny = Double.MAX_VALUE;
         double maxx = -Double.MAX_VALUE;
@@ -297,7 +297,7 @@ public final class Utils {
             maxy = 90.0;
         }
 
-        EnvelopeEntry env =  new EnvelopeEntry(null, new DirectPositionType(minx, miny), new DirectPositionType(maxx, maxy), "urn:ogc:def:crs:EPSG::4326");
+        EnvelopeEntry env =  new EnvelopeEntry(null, new DirectPositionType(minx, miny), new DirectPositionType(maxx, maxy), srsName);
         env.setSrsDimension(2);
         env.setAxisLabels("Y X");
         return env;
