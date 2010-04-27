@@ -1147,7 +1147,7 @@ public class SOSworker {
             ocResponse.setId("collection-1");
             // this is a little hack for cite test dummy srsName comparaison
             String srsName = "urn:ogc:def:crs:EPSG::4326";
-            if (requestObservation.getSrsName().equals("EPSG:4326")) {
+            if ("EPSG:4326".equals(requestObservation.getSrsName())) {
                 srsName ="EPSG:4326";
             }
             ocResponse.setBoundedBy(getCollectionBound(ocResponse, srsName));
