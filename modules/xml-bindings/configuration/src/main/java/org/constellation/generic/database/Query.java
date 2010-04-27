@@ -86,6 +86,20 @@ public class Query {
     }
 
     /**
+     * Return all the name of the variable in a List.
+     * @return
+     */
+    public List<String> getVarNames() {
+        List<String> varNames = new ArrayList<String>();
+        if (select != null) {
+            for (Column col : select.getCol()) {
+                varNames.add(col.getVar());
+            }
+        }
+        return varNames;
+    }
+    
+    /**
      * Sets the value of the name property.
      */
     public void setName(String value) {

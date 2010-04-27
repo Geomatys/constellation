@@ -54,9 +54,11 @@ public class Where {
     }
 
     public Where(Where original) {
-        this.group    = original.group;
-        this.operator = original.operator;
-        this.value    = original.value;
+        if (original != null) {
+            this.group    = original.group;
+            this.operator = original.operator;
+            this.value    = original.value;
+        }
     }
 
     /**

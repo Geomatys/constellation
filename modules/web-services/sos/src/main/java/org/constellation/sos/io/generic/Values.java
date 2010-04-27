@@ -30,18 +30,18 @@ import java.util.Map;
 public class Values {
     /**
      * A Map of (varName) - (value) refreshed at every request.
-     */
-    protected Map<String, String> singleValue;
+    
+    protected Map<String, String> singleValue; */
     /**
      * * A Map of (varName) - (list of values) refreshed at every request.
      */
-    protected Map<String, List<String>> multipleValue;
+    private final Map<String, List<String>> multipleValue;
 
     /**
      * Build a new values container.
      */
     public Values() {
-        singleValue = new HashMap<String, String>();
+        //singleValue = new HashMap<String, String>();
         multipleValue = new HashMap<String, List<String>>();
     }
 
@@ -52,9 +52,13 @@ public class Values {
      * @param singleValue   A map of (variable name) - (value)
      * @param multipleValue A map of (variable name) - (list of values)
      */
-    public Values(Map<String, String> singleValue, Map<String, List<String>> multipleValue) {
-        this.singleValue   = singleValue;
-        this.multipleValue = multipleValue;
+    public Values(Map<String, List<String>> multipleValue) {
+        //this.singleValue   = singleValue;
+        if (multipleValue != null) {
+            this.multipleValue = multipleValue;
+        } else {
+            this.multipleValue = new HashMap<String, List<String>>();
+        }
     }
 
     /**
@@ -64,8 +68,9 @@ public class Values {
      * @return
      */
     public String getVariable(String variable) {
-        if (singleValue != null) {
-            return singleValue.get(variable);
+        List<String> result = multipleValue.get(variable);
+        if (result != null && result.size() > 0) {
+            return result.get(0);
         }
         return null;
     }
@@ -79,41 +84,12 @@ public class Values {
     public List<String> getVariables(String variable) {
         if (multipleValue != null) {
             List<String> values = multipleValue.get(variable);
-            if (values == null)
+            if (values == null) {
                 values = new ArrayList<String>();
+            }
             return values;
         }
         return null;
-    }
-
-    /**
-     * Add a single value for the specified varibale name to the container.
-     *
-     * @param varName The name of the variable.
-     * @param value The value of the variable.
-     */
-    public void addSingleValue(String varName, String value) {
-        singleValue.put(varName, value);
-    }
-
-    /**
-     * Add a new multiple field for the specified variable.
-     *
-     * @param varName The name of the variable.
-     */
-    public void createNewMultipleValue(String varName) {
-        multipleValue.put(varName, new ArrayList<String>());
-    }
-
-    /**
-     * Add a new multiple field for the specified variable.
-     *
-     * @param varName The name of the variable.
-     */
-    public void createNewMultipleValues(List<String> varNames) {
-        for (String varName : varNames) {
-            multipleValue.put(varName, new ArrayList<String>());
-        }
     }
 
     /**
@@ -123,8 +99,9 @@ public class Values {
      * @param value   The value to add.
      */
     public void addToMultipleValue(String varName, String value) {
-        if (multipleValue.get(varName) != null) {
-            multipleValue.get(varName).add(value);
+        if (multipleValue.get(varName) == null) {
+           multipleValue.put(varName, new ArrayList<String>());
         }
+        multipleValue.get(varName).add(value);
     }
 }

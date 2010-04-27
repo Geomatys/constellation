@@ -34,7 +34,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.generic.database.Column;
 import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
@@ -55,14 +54,9 @@ public abstract class GenericReader  {
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
 
     /**
-     * A list of precompiled SQL request returning single value.
+     * A list of precompiled SQL request returning single and multiple values.
      */
-    private Map<LockedPreparedStatement, List<String>> singleStatements;
-
-    /**
-     * A list of precompiled SQL request returning multiple value.
-     */
-    private Map<LockedPreparedStatement, List<String>> multipleStatements;
+    private final Map<LockedPreparedStatement, List<String>> statements = new HashMap<LockedPreparedStatement, List<String>>();
 
     /**
      * A flag indicating if the jdbc driver support several specific operation
@@ -137,8 +131,6 @@ public abstract class GenericReader  {
         advancedJdbcDriver = true;
         debugMode          = true;
         this.debugValues   = debugValues;
-        singleStatements   = new HashMap<LockedPreparedStatement, List<String>>();
-        multipleStatements = new HashMap<LockedPreparedStatement, List<String>>();
         if (staticParameters != null) {
             this.staticParameters = staticParameters;
         } else {
@@ -152,9 +144,7 @@ public abstract class GenericReader  {
      * @throws java.sql.SQLException
      */
     private void initStatement() throws SQLException {
-        // no main query in sos
-        singleStatements      = new HashMap<LockedPreparedStatement, List<String>>();
-        multipleStatements    = new HashMap<LockedPreparedStatement, List<String>>();
+        
         final Queries queries = configuration.getQueries();
         if (queries != null) {
 
@@ -165,41 +155,29 @@ public abstract class GenericReader  {
             final Single single = queries.getSingle();
             if (single != null) {
                 for (Query query : single.getQuery()) {
-                    final List<String> varNames = new ArrayList<String>();
-                    if (query.getSelect() != null) {
-                        for (Column col : query.getSelect().getCol()) {
-                            varNames.add(col.getVar());
-                        }
-                    }
-                    final String textQuery = query.buildSQLQuery(staticParameters);
-                    LOGGER.finer("new Single query: " + textQuery);
+                    final List<String> varNames        = query.getVarNames();
+                    final String textQuery             = query.buildSQLQuery(staticParameters);
                     final LockedPreparedStatement stmt =  new LockedPreparedStatement(connection.prepareStatement(textQuery), textQuery);
-                    singleStatements.put(stmt, varNames);
+                    statements.put(stmt, varNames);
                 }
             } else {
-                LOGGER.severe("The configuration file is probably malformed, there is no single query.");
+                LOGGER.warning("The configuration file is probably malformed, there is no single query.");
             }
 
             // initialize the multiple statements
             final MultiFixed multi = queries.getMultiFixed();
             if (multi != null) {
                 for (Query query : multi.getQuery()) {
-                    final List<String> varNames = new ArrayList<String>();
-                    if (query.getSelect() != null) {
-                        for (Column col : query.getSelect().getCol()) {
-                            varNames.add(col.getVar());
-                        }
-                    }
-                    final String textQuery = query.buildSQLQuery(staticParameters);
-                    LOGGER.finer("new Multiple query: " + textQuery);
+                    final List<String> varNames        = query.getVarNames();
+                    final String textQuery             = query.buildSQLQuery(staticParameters);
                     final LockedPreparedStatement stmt =  new LockedPreparedStatement(connection.prepareStatement(textQuery), textQuery);
-                    multipleStatements.put(stmt, varNames);
+                    statements.put(stmt, varNames);
                 }
             } else {
-                LOGGER.severe("The configuration file is probably malformed, there is no single query.");
+                LOGGER.warning("The configuration file is probably malformed, there is no single query.");
             }
         } else {
-            LOGGER.severe("The configuration file is probably malformed, there is no queries part.");
+            LOGGER.warning("The configuration file is probably malformed, there is no queries part.");
         }
     }
 
@@ -233,7 +211,6 @@ public abstract class GenericReader  {
                 if (parameterValue.length() > 0) {
                     pValue = parameterValue.substring(0, parameterValue.length() - 1);
                 }
-                LOGGER.finer("PUT STATIC QUERY :" + varName + "-" + pValue);
                 staticParameters.put(varName, pValue);
             }
         }
@@ -286,30 +263,24 @@ public abstract class GenericReader  {
      */
     protected Values loadData(List<String> variables, List<String> parameters) throws CstlServiceException {
 
-        final Set<LockedPreparedStatement> subSingleStmts = new HashSet<LockedPreparedStatement>();
-        final Set<LockedPreparedStatement> subMultiStmts  = new HashSet<LockedPreparedStatement>();
+        final Set<LockedPreparedStatement> subStmts = new HashSet<LockedPreparedStatement>();
         Values values = null;
         for (String var : variables) {
-            LockedPreparedStatement stmt = getStatementFromSingleVar(var);
+            LockedPreparedStatement stmt = getStatementFromVar(var);
             if (stmt != null) {
-                if (!subSingleStmts.contains(stmt)) {
-                    subSingleStmts.add(stmt);
+                if (!subStmts.contains(stmt)) {
+                    subStmts.add(stmt);
                 }
             } else {
-                stmt = getStatementFromMultipleVar(var);
-                if (stmt != null) {
-                    if (!subMultiStmts.contains(stmt)) {
-                        subMultiStmts.add(stmt);
-                    }
+                
+                final String staticValue = staticParameters.get(var);
+                if (staticValue != null) {
+                    values = new Values();
+                    values.addToMultipleValue(var, staticValue);
                 } else {
-                    final String staticValue = staticParameters.get(var);
-                    if (staticValue != null) {
-                        values = new Values();
-                        values.singleValue.put(var, staticValue);
-                    } else {
-                        LOGGER.severe("no statement found for variable: " + var);
-                    }
+                    LOGGER.severe("no statement found for variable: " + var);
                 }
+                
             }
         }
         if (values != null) {
@@ -319,7 +290,7 @@ public abstract class GenericReader  {
         if (debugMode) {
             values = debugLoading(parameters);
         } else {
-            values = sequentialLoading(parameters, subSingleStmts, subMultiStmts);
+            values = loading(parameters, subStmts);
         }
         return values;
     }
@@ -343,14 +314,14 @@ public abstract class GenericReader  {
      * @param subSingleStmts
      * @param subMultiStmts
      */
-    private Values sequentialLoading(List<String> parameters, Set<LockedPreparedStatement> subSingleStmts, Set<LockedPreparedStatement> subMultiStmts) throws CstlServiceException {
+    private Values loading(List<String> parameters, Set<LockedPreparedStatement> subStmts) throws CstlServiceException {
         final Values values = new Values();
         
         //we extract the single values
-        for (LockedPreparedStatement stmt : subSingleStmts) {
+        for (LockedPreparedStatement stmt : subStmts) {
             try {
                 fillStatement(stmt, parameters);
-                fillSingleValues(stmt, values);
+                fillValues(stmt, statements.get(stmt), values);
             } catch (SQLException ex) {
                 /*
                  * If we get the error code 17008,
@@ -360,30 +331,9 @@ public abstract class GenericReader  {
                 if (ex.getErrorCode() == 17008) {
                     reloadConnection();
                 }
-                logError(singleStatements.get(stmt), ex, stmt);
+                logError(statements.get(stmt), ex, stmt.getSql());
             } catch (IllegalArgumentException ex) {
-                logError(singleStatements.get(stmt), ex, stmt);
-            }
-        }
-
-        //we extract the multiple values
-        for (LockedPreparedStatement stmt : subMultiStmts) {
-            try {
-                fillStatement(stmt, parameters);
-                fillMultipleValues(stmt, values);
-                
-            } catch (SQLException ex) {
-                /*
-                 * If we get the error code 17008,
-                 * this mean that we have lost the connection
-                 * So we try to reconnect.
-                 */
-                if (ex.getErrorCode() == 17008) {
-                    reloadConnection();
-                }
-                logError(multipleStatements.get(stmt), ex, stmt);
-            } catch (IllegalArgumentException ex) {
-                logError(multipleStatements.get(stmt), ex, stmt);
+                logError(statements.get(stmt), ex, stmt.getSql());
             }
         }
         return values;
@@ -444,31 +394,12 @@ public abstract class GenericReader  {
     }
 
     /**
-     * Add the correspounding values for the specified single statement result.
      *
      * @param stmt
      * @param values
      * @throws SQLException
      */
-    private void fillSingleValues(LockedPreparedStatement stmt, Values values) throws SQLException {
-        final ResultSet result = stmt.executeQuery();
-        if (result.next()) {
-            for (String varName : singleStatements.get(stmt)) {
-                values.addSingleValue(varName, result.getString(varName));
-            }
-        }
-        result.close();
-    }
-
-    /**
-     *
-     * @param stmt
-     * @param values
-     * @throws SQLException
-     */
-    private void fillMultipleValues(LockedPreparedStatement stmt, Values values) throws SQLException {
-        List<String> varNames = multipleStatements.get(stmt);
-        values.createNewMultipleValues(varNames);
+    private void fillValues(LockedPreparedStatement stmt, List<String> varNames, Values values) throws SQLException {
 
         final ResultSet result = stmt.executeQuery();
         while (result.next()) {
@@ -485,38 +416,24 @@ public abstract class GenericReader  {
      * @param varName
      * @return
      */
-    private LockedPreparedStatement getStatementFromSingleVar(String varName) {
-        for (LockedPreparedStatement stmt : singleStatements.keySet()) {
-            final List<String> vars = singleStatements.get(stmt);
-            if (vars.contains(varName))
+    private LockedPreparedStatement getStatementFromVar(String varName) {
+        for (LockedPreparedStatement stmt : statements.keySet()) {
+            final List<String> vars = statements.get(stmt);
+            if (vars.contains(varName)) {
                 return stmt;
+            }
         }
         return null;
     }
 
      /**
-     * Return the correspounding statement for the specified variable name.
-     *
-     * @param varName
-     * @return
-     */
-    private LockedPreparedStatement getStatementFromMultipleVar(String varName) {
-        for (LockedPreparedStatement stmt : multipleStatements.keySet()) {
-            final List<String> vars = multipleStatements.get(stmt);
-            if (vars.contains(varName))
-                return stmt;
-        }
-        return null;
-    }
-
-    /**
      * Log the list of variables involved in a query which launch a SQL exception.
      * (debugging purpose).
      *
      * @param varList a list of variable.
      * @param ex
      */
-    private void logError(List<String> varList, Exception ex, LockedPreparedStatement stmt) {
+    private void logError(List<String> varList, Exception ex, String sql) {
         final StringBuilder varlist = new StringBuilder();
         String value;
         if (varList != null) {
@@ -529,9 +446,9 @@ public abstract class GenericReader  {
         } else {
             value = "no variables";
         }
-        LOGGER.severe( ex.getClass().getSimpleName() +
-                      " occurs while executing query: "          + '\n' +
-                      "query: " + stmt.getSql()                  + '\n' +
+        LOGGER.severe( ex.getClass().getSimpleName()             + " " +
+                      "occurs while executing query: "           + '\n' +
+                      "query: " + sql                            + '\n' +
                       "cause: " + ex.getMessage()                + '\n' +
                       "for variable: " + value                   + '\n');
     }
@@ -564,15 +481,10 @@ public abstract class GenericReader  {
     public void destroy() {
         LOGGER.info("destroying generic reader");
         try {
-            for (LockedPreparedStatement stmt : singleStatements.keySet()) {
+            for (LockedPreparedStatement stmt : statements.keySet()) {
                 stmt.close();
             }
-            singleStatements.clear();
-
-            for (LockedPreparedStatement stmt : multipleStatements.keySet()) {
-                stmt.close();
-            }
-            multipleStatements.clear();
+            statements.clear();
 
         } catch (SQLException ex) {
             LOGGER.severe("SQLException while destroying Generic metadata reader");
