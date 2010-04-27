@@ -104,7 +104,7 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
                                     result.getString(indexOf(query.description)),
                                     sampledFeatureProp,
                                     new CurvePropertyType(p),
-                                    new MeasureType(result.getDouble(indexOf(query.length_value)), result.getString(indexOf(query.length_uom))));
+                                    new MeasureType(result.getDouble(indexOf(query.lengthValue)), result.getString(indexOf(query.lengthUom))));
         if (envelopes == null) {
             envelopes = getDatabase().getTable(EnvelopeTable.class);
         }
@@ -182,11 +182,11 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
             }
 
             if (station.getLength() != null) {
-                statement.setDouble(indexOf(query.length_value), station.getLength().getValue());
-                statement.setString(indexOf(query.length_uom), station.getLength().getUom());
+                statement.setDouble(indexOf(query.lengthValue), station.getLength().getValue());
+                statement.setString(indexOf(query.lengthUom), station.getLength().getUom());
             } else {
-                statement.setNull(indexOf(query.length_uom), java.sql.Types.VARCHAR);
-                statement.setNull(indexOf(query.length_value), java.sql.Types.DOUBLE);
+                statement.setNull(indexOf(query.lengthUom), java.sql.Types.VARCHAR);
+                statement.setNull(indexOf(query.lengthValue), java.sql.Types.DOUBLE);
             }
             updateSingleton(statement);
             success = true;

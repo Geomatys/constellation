@@ -35,7 +35,7 @@ public class SamplingCurveQuery extends Query {
     /** 
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column identifier, name, description, boundedby, sampledFeature, curveIdentifier, srsName, length_uom, length_value;
+    protected final Column identifier, name, description, boundedby, sampledFeature, curveIdentifier, srsName, lengthUom, lengthValue;
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
@@ -63,8 +63,8 @@ public class SamplingCurveQuery extends Query {
         description            = addColumn   ("description",        sli);
         boundedby              = addColumn   ("boundedby",          sli);
         sampledFeature         = addColumn   ("sampled_feature",    sli);
-        length_uom             = addColumn   ("length_uom",         sli);
-        length_value           = addColumn   ("length_value",       sli);
+        lengthUom              = addColumn   ("length_uom",         sli);
+        lengthValue            = addColumn   ("length_value",       sli);
         curveIdentifier        = addColumn   ("shape_id",           sli);
         srsName                = addColumn   ("shape_srsname",      sli);
 

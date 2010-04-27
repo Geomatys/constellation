@@ -34,7 +34,7 @@ public interface CSWMetadataWriter extends MetadataWriter {
      * @param metadataID The identifier of the metadata to Replace.
      * @param properties A List of property-value to replace in the specified metadata.
      */
-    public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException;
+    boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException;
 
-    public void setLogLevel(Level logLevel);
+    void setLogLevel(Level logLevel);
 }

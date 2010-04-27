@@ -299,8 +299,8 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
     }
 
     @Override
-    public void setLogLevel(Level LogLevel) {
-        super.setLogLevel(LogLevel);
+    public void setLogLevel(Level logLevel) {
+        super.setLogLevel(logLevel);
         if (this.indexer != null) {
             this.indexer.setLogLevel(logLevel);
         }

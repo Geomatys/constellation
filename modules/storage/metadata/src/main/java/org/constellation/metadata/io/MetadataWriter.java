@@ -29,14 +29,14 @@ public interface MetadataWriter {
      * @param obj The object to store in the datasource.
      * @return true if the storage succeed, false else.
      */
-    public boolean storeMetadata(Object obj) throws MetadataIoException;
+    boolean storeMetadata(Object obj) throws MetadataIoException;
 
     /**
      * Delete an object in the metadata database.
      * @param metadataID The identifier of the metadata to delete.
      * @return true if the delete succeed, false else.
      */
-    public boolean deleteMetadata(String metadataID) throws MetadataIoException;
+    boolean deleteMetadata(String metadataID) throws MetadataIoException;
 
 
     /**
@@ -45,20 +45,20 @@ public interface MetadataWriter {
      * @param metadataID The identifier of the metadata to Replace.
      * @param any The object to replace the matching metadata.
      */
-    public  boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException;
+     boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException;
 
     /**
      * Return true if the Writer supports the delete mecanism.
      */
-    public boolean deleteSupported();
+    boolean deleteSupported();
 
     /**
      * Return true if the Writer supports the update mecanism.
      */
-    public boolean updateSupported();
+    boolean updateSupported();
 
     /**
      * Destoy all the resource and close connection.
      */
-    public void destroy();
+    void destroy();
 }

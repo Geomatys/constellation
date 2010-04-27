@@ -34,7 +34,9 @@ import org.postgresql.ds.PGSimpleDataSource;
  */
 public class DatabasePool {
 
-    private final static Map<BDD, Database> DATABASE_MAP = new HashMap<BDD, Database>();
+    private static final Map<BDD, Database> DATABASE_MAP = new HashMap<BDD, Database>();
+
+    private DatabasePool(){}
 
     public static Database getDatabase(BDD bdd) throws IOException {
         Database db = DATABASE_MAP.get(bdd);
@@ -46,7 +48,7 @@ public class DatabasePool {
     }
 
     public static Connection getDatabaseConnection(BDD bdd) throws SQLException {
-        Database db =  DATABASE_MAP.get(bdd);
+        final Database db =  DATABASE_MAP.get(bdd);
         if (db != null) {
             return db.getConnection();
         }
@@ -56,13 +58,13 @@ public class DatabasePool {
     private static Database createDatabase(BDD bdd) throws IOException {
         final DataSource dataSource;
         if (bdd.getClassName() != null && bdd.getClassName().equals("org.postgresql.Driver")) {
-            final PGSimpleDataSource PGdataSource = new PGSimpleDataSource();
-            PGdataSource.setServerName(bdd.getHostName());
-            PGdataSource.setPortNumber(bdd.getPortNumber());
-            PGdataSource.setDatabaseName(bdd.getDatabaseName());
-            PGdataSource.setUser(bdd.getUser());
-            PGdataSource.setPassword(bdd.getPassword());
-            dataSource = PGdataSource;
+            final PGSimpleDataSource pgDataSource = new PGSimpleDataSource();
+            pgDataSource.setServerName(bdd.getHostName());
+            pgDataSource.setPortNumber(bdd.getPortNumber());
+            pgDataSource.setDatabaseName(bdd.getDatabaseName());
+            pgDataSource.setUser(bdd.getUser());
+            pgDataSource.setPassword(bdd.getPassword());
+            dataSource = pgDataSource;
         } else {
             dataSource = new DefaultDataSource(bdd.getConnectURL());
         }

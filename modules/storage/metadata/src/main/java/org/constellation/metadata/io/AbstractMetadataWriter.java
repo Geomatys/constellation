@@ -108,7 +108,7 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
     /**
      * @param LogLevel the LogLevel to set
      */
-    public void setLogLevel(Level LogLevel) {
-        this.logLevel = LogLevel;
+    public void setLogLevel(Level logLevel) {
+        this.logLevel = logLevel;
     }
 }

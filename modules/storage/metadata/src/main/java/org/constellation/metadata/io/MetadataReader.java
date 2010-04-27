@@ -37,38 +37,38 @@ public interface MetadataReader {
      * @return A marshallable metadata object.
      * @throws MetadataIoException
      */
-    public Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException;
+    Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException;
     
     /**
      * Return all the entries from the database
      */
-    public abstract List<? extends Object> getAllEntries() throws MetadataIoException;
+    abstract List<? extends Object> getAllEntries() throws MetadataIoException;
 
      /**
      * Return all the entries identifiers from the database
      */
-    public abstract List<String> getAllIdentifiers() throws MetadataIoException;
+    abstract List<String> getAllIdentifiers() throws MetadataIoException;
     
     /**
      * Destroy all the resource used by this reader.
      */
-    public abstract void destroy();
+    abstract void destroy();
 
     /**
      * Remove a metadata from the cache.
      * 
      * @param identifier The metadata identifier.
      */
-    public void removeFromCache(String identifier);
+    void removeFromCache(String identifier);
     
     
     /**
      * Return true is the cache mecanism is enabled.
      */
-    public boolean isCacheEnabled();
+    boolean isCacheEnabled();
 
     /**
      * Return true is the cache mecanism is enabled.
      */
-    public boolean isThreadEnabled();
+    boolean isThreadEnabled();
 }

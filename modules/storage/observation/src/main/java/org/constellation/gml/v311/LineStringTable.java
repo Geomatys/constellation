@@ -60,9 +60,9 @@ public class LineStringTable extends SingletonTable<DirectPositionEntry> {
     @Override
     protected DirectPositionEntry createEntry(ResultSet results) throws CatalogException, SQLException {
         final LineStringQuery query = (LineStringQuery) super.query;
-        Double x = results.getDouble(indexOf(query.x_value));
-        Double y = results.getDouble(indexOf(query.y_value));
-        Double z = results.getDouble(indexOf(query.z_value));
+        Double x = results.getDouble(indexOf(query.xValue));
+        Double y = results.getDouble(indexOf(query.yValue));
+        Double z = results.getDouble(indexOf(query.zValue));
         if (results.wasNull()) {
             z = null;
         }

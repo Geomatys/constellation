@@ -88,8 +88,8 @@ public final class Utils {
     public static List<String> getNetworkNames(final AbstractSensorML sensor) {
         final List<String> results = new ArrayList<String>();
         if (sensor != null && sensor.getMember().size() == 1) {
-            if (sensor.getMember().get(0).getRealProcess() instanceof AbstractProcess) {
-                final AbstractProcess component = (AbstractProcess) sensor.getMember().get(0).getRealProcess();
+            final AbstractProcess component = sensor.getMember().get(0).getRealProcess();
+            if (component != null) {
                 for (AbstractClassification cl : component.getClassification()) {
                     if (cl.getClassifierList() != null) {
                         for (AbstractClassifier classifier : cl.getClassifierList().getClassifier()) {

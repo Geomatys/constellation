@@ -38,7 +38,7 @@ public interface CSWMetadataReader extends MetadataReader {
     /**
      * Return a list of values for each specific fields specified as a coma separated String.
      */
-    public List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException;
+    List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException;
 
     /**
      * Return a metadata object from the specified identifier.
@@ -51,27 +51,27 @@ public interface CSWMetadataReader extends MetadataReader {
      * @return A marshallable metadata object.
      * @throws MetadataIoException
      */
-    public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException;
+    Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException;
 
     /**
      * Return the list of supported data types.
      */
-    public List<Integer> getSupportedDataTypes();
+    List<Integer> getSupportedDataTypes();
 
     /**
      * Return the list of QName for additional queryable element.
      */
-    public List<QName> getAdditionalQueryableQName();
+    List<QName> getAdditionalQueryableQName();
 
     /**
      * Return the list of path for the additional queryable element.
      */
-    public Map<String, List<String>> getAdditionalQueryablePathMap();
+    Map<String, List<String>> getAdditionalQueryablePathMap();
 
     /**
      * Return the list of Additional queryable element.
      */
-    public abstract Map<String, URI> getConceptMap();
+    abstract Map<String, URI> getConceptMap();
 
     /**
      * Execute a SQL query and return the result as a List of identifier;
@@ -80,7 +80,7 @@ public interface CSWMetadataReader extends MetadataReader {
      * @return
      * @throws MetadataIoException
      */
-    public abstract List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException;
+    abstract List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException;
 
-    public void setLogLevel(Level logLevel);
+    void setLogLevel(Level logLevel);
 }

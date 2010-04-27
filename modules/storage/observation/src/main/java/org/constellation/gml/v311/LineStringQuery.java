@@ -35,7 +35,7 @@ public class LineStringQuery extends Query {
     /** 
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column identifier, x_value, y_value, z_value;
+    protected final Column identifier, xValue, yValue, zValue;
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
@@ -53,10 +53,10 @@ public class LineStringQuery extends Query {
         final QueryType[] slif  = {SELECT, LIST, INSERT, FILTERED_LIST};
         final QueryType[] slief = {SELECT, LIST, INSERT, EXISTS, FILTERED_LIST};
         
-        identifier              = addColumn   ("id",                 slief);
-        x_value                 = addColumn   ("x",                  sli);
-        y_value                 = addColumn   ("y",                  sli);
-        z_value                 = addColumn   ("z",                  sli);
+        identifier             = addColumn   ("id",                 slief);
+        xValue                 = addColumn   ("x",                  sli);
+        yValue                 = addColumn   ("y",                  sli);
+        zValue                 = addColumn   ("z",                  sli);
 
         byIdentifier  = addParameter(identifier, SELECT, EXISTS, LIST);
         

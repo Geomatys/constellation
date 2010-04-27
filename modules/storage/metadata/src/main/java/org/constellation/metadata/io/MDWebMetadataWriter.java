@@ -124,21 +124,21 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         try {
 
             final DataSource dataSource = db.getDataSource();
-            boolean isPostgres          = db.getClassName().equals("org.postgresql.Driver");
+            final boolean isPostgres    = db.getClassName().equals("org.postgresql.Driver");
             String version              = null;
-            Connection mdConnection     = dataSource.getConnection();
-            Statement versionStmt       = mdConnection.createStatement();
-            ResultSet result            = versionStmt.executeQuery("Select * FROM \"version\"");
+            final Connection mdCon      = dataSource.getConnection();
+            final Statement versionStmt = mdCon.createStatement();
+            final ResultSet result      = versionStmt.executeQuery("Select * FROM \"version\"");
             if (result.next()) {
                 version = result.getString(1);
             }
             result.close();
             versionStmt.close();
-            mdConnection.close();
+            mdCon.close();
             
-            if (version.startsWith("2.0")) {
+            if (version != null && version.startsWith("2.0")) {
                 mdWriter = new Writer20(dataSource, isPostgres);
-            } else if (version.startsWith("2.1")) {
+            } else if (version != null &&  version.startsWith("2.1")) {
                 mdWriter = new Writer21(dataSource, isPostgres);
             } else {
                 throw new MetadataIoException("unexpected database version:" + version);
@@ -283,7 +283,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @return an MDWeb form representing the metadata object.
      */
     protected Form getFormFromObject(Object object) throws MD_IOException {
-        String title = findTitle(object);
+        final String title = findTitle(object);
         return getFormFromObject(object, defaultUser, mdRecordSet, null, title);
     }
 
@@ -342,7 +342,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     profile = mdWriter.getProfile("ISO_19115");
                 }
             }
-            UUID identifier = UUID.randomUUID();
+            final UUID identifier = UUID.randomUUID();
             final Form form = new Form(-1, identifier, recordSet, title, user, null, profile, creationDate, creationDate, null, false, false, "normalForm");
             
             final Classe rootClasse = getClasseFromObject(object);
@@ -890,7 +890,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (form != null) {
             try {
                 final long startWrite = System.currentTimeMillis();
-                int result = mdWriter.writeForm(form, false, true);
+                final int result = mdWriter.writeForm(form, false, true);
                 writeTime  = System.currentTimeMillis() - startWrite;
                 if (result == 1) {
                     LOGGER.log(logLevel, "The record have been skipped:" + form.getTitle());
