@@ -28,6 +28,7 @@ import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import oracle.jdbc.pool.OracleDataSource;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.Utilities;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -215,9 +216,14 @@ public class BDD {
             } else {
                 return null;
             }
+        } else if (className.equals("oracle.jdbc.driver.OracleDriver")) {
+            final OracleDataSource oraSource = new OracleDataSource();
+            oraSource.setURL(connectURL);
+            oraSource.setUser(user);
+            oraSource.setPassword(password);
+            source = oraSource;
         } else {
             source = new DefaultDataSource(connectURL);
-
         }
         return source;
     }

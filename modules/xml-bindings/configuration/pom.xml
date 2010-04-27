@@ -57,6 +57,11 @@
        <artifactId>geotk-utility</artifactId>
     </dependency>
     <dependency>
+      <groupId>ojdbc</groupId>
+      <artifactId>ojdbc</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
       <groupId>postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <scope>compile</scope>
