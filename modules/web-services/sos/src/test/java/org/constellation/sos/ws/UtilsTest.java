@@ -284,7 +284,7 @@ public class UtilsTest {
         collection.add(obs2);
         collection.add(obs3);
 
-        EnvelopeEntry result = Utils.getCollectionBound(collection);
+        EnvelopeEntry result = Utils.getCollectionBound(collection, "urn:ogc:def:crs:EPSG::4326");
 
         EnvelopeEntry expResult = new EnvelopeEntry(null, new DirectPositionType(-180.0, -90.0), new DirectPositionType(180.0, 90.0), "urn:ogc:def:crs:EPSG::4326");
         expResult.setSrsDimension(2);
@@ -309,7 +309,7 @@ public class UtilsTest {
         collection.add(obs2);
         collection.add(obs3);
 
-        result = Utils.getCollectionBound(collection);
+        result = Utils.getCollectionBound(collection, "urn:ogc:def:crs:EPSG::4326");
 
         expResult = new EnvelopeEntry(null, new DirectPositionType(-10.0, -10.0), new DirectPositionType(20.0, 15.0), "urn:ogc:def:crs:EPSG::4326");
         expResult.setSrsDimension(2);
