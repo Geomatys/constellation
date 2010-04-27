@@ -39,6 +39,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.util.ReflectionUtilities;
 import static org.constellation.metadata.CSWQueryable.*;
+import static org.constellation.metadata.CSWConstants.*;
 
 // geoAPI dependencies
 import org.opengis.metadata.citation.ResponsibleParty;
@@ -160,7 +161,7 @@ public class FileMetadataReader extends AbstractCSWMetadataReader {
      * @throws org.constellation.ws.MetadataIoException
      */
     private Object getObjectFromFile(String identifier) throws MetadataIoException {
-        final File metadataFile = new File (dataDirectory,  identifier + ".xml");
+        final File metadataFile = new File (dataDirectory,  identifier + XML_EXT);
         if (metadataFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
@@ -513,8 +514,8 @@ public class FileMetadataReader extends AbstractCSWMetadataReader {
     public List<? extends Object> getAllEntries() throws MetadataIoException {
         final List<Object> results = new ArrayList<Object>();
         for (File f : dataDirectory.listFiles()) {
-            if (f.getName().endsWith(".xml")) {
-                final String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
+            if (f.getName().endsWith(XML_EXT)) {
+                final String identifier = f.getName().substring(0, f.getName().indexOf(XML_EXT));
                 Unmarshaller unmarshaller = null;
                 try {
                     unmarshaller = marshallerPool.acquireUnmarshaller();
@@ -545,7 +546,7 @@ public class FileMetadataReader extends AbstractCSWMetadataReader {
     public List<String> getAllIdentifiers() throws MetadataIoException {
         final List<String> results = new ArrayList<String>();
         for (File f : dataDirectory.listFiles()) {
-            if (f.getName().endsWith(".xml")) {
+            if (f.getName().endsWith(XML_EXT)) {
                 final String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
                 results.add(identifier);
             } else {

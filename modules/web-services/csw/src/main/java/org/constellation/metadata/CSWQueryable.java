@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.namespace.QName;
 
+import static org.constellation.metadata.CSWConstants.*;
+
 /**
  * A container for list of queryable elements in different schemas used in CSW.
  * 
@@ -29,16 +31,16 @@ import javax.xml.namespace.QName;
  */
 public final class CSWQueryable {
 
-     public static final QName DEGREE_QNAME                               = new QName("http://www.inspire.org", "Degree",                          "ins");
-     public static final QName ACCESS_CONSTRAINTS_QNAME                   = new QName("http://www.inspire.org", "AccessConstraints",               "ins");
-     public static final QName OTHER_CONSTRAINTS_QNAME                    = new QName("http://www.inspire.org", "OtherConstraints",                "ins");
-     public static final QName INS_CLASSIFICATION_QNAME                   = new QName("http://www.inspire.org", "Classification",                  "ins");
-     public static final QName CONDITION_APPLYING_TO_ACCESS_AND_USE_QNAME = new QName("http://www.inspire.org", "ConditionApplyingToAccessAndUse", "ins");
-     public static final QName METADATA_POINT_OF_CONTACT_QNAME            = new QName("http://www.inspire.org", "MetadataPointOfContact",          "ins");
-     public static final QName LINEAGE_QNAME                              = new QName("http://www.inspire.org", "Lineage",                         "ins");
-     public static final QName SPECIFICATION_TITLE_QNAME                  = new QName("http://www.inspire.org", "SpecificationTitle",              "ins");
-     public static final QName SPECIFICATION_DATE_QNAME                   = new QName("http://www.inspire.org", "SpecificationDate",               "ins");
-     public static final QName SPECIFICATION_DATETYPE_QNAME               = new QName("http://www.inspire.org", "SpecificationDateType",           "ins");
+     public static final QName DEGREE_QNAME                               = new QName(INSPIRE, "Degree",                          "ins");
+     public static final QName ACCESS_CONSTRAINTS_QNAME                   = new QName(INSPIRE, "AccessConstraints",               "ins");
+     public static final QName OTHER_CONSTRAINTS_QNAME                    = new QName(INSPIRE, "OtherConstraints",                "ins");
+     public static final QName INS_CLASSIFICATION_QNAME                     = new QName(INSPIRE, "Classification",                  "ins");
+     public static final QName CONDITION_APPLYING_TO_ACCESS_AND_USE_QNAME = new QName(INSPIRE, "ConditionApplyingToAccessAndUse", "ins");
+     public static final QName METADATA_POINT_OF_CONTACT_QNAME           = new QName(INSPIRE, "MetadataPointOfContact",          "ins");
+     public static final QName LINEAGE_QNAME                               = new QName(INSPIRE, "Lineage",                         "ins");
+     public static final QName SPECIFICATION_TITLE_QNAME                    = new QName(INSPIRE, "SpecificationTitle",              "ins");
+     public static final QName SPECIFICATION_DATE_QNAME                   = new QName(INSPIRE, "SpecificationDate",               "ins");
+     public static final QName SPECIFICATION_DATETYPE_QNAME               = new QName(INSPIRE, "SpecificationDateType",           "ins");
 
      private CSWQueryable() {}
      

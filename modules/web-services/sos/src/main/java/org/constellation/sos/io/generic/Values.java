@@ -106,6 +106,17 @@ public class Values {
     }
 
     /**
+     * Add a new multiple field for the specified variable.
+     *
+     * @param varName The name of the variable.
+     */
+    public void createNewMultipleValues(List<String> varNames) {
+        for (String varName : varNames) {
+            multipleValue.put(varName, new ArrayList<String>());
+        }
+    }
+
+    /**
      * Add a new value to the specified multiple variable.
      *
      * @param varName The name of the variable.

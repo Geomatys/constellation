@@ -77,6 +77,9 @@ public class Queries {
      * @return the parameters
      */
     public HashMap<String, String> getParameters() {
+        if (parameters == null) {
+            parameters = new HashMap<String, String>();
+        }
         return parameters;
     }
 
