@@ -28,9 +28,12 @@ import javax.sql.DataSource;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
+import oracle.jdbc.pool.OracleConnectionPoolDataSource;
 import oracle.jdbc.pool.OracleDataSource;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.sql.WrappedDataSource;
 import org.geotoolkit.util.Utilities;
+import org.postgresql.ds.PGConnectionPoolDataSource;
 import org.postgresql.ds.PGSimpleDataSource;
 
 /**
@@ -222,6 +225,52 @@ public class BDD {
             oraSource.setUser(user);
             oraSource.setPassword(password);
             source = oraSource;
+        } else {
+            source = new DefaultDataSource(connectURL);
+        }
+        return source;
+    }
+
+    /**
+     * Return a new connection to the database.
+     *
+     * @return
+     * @throws java.sql.SQLException
+     *
+     * @todo The call to Class.forName(...) is not needed anymore since Java 6 and should be removed.
+     */
+    public DataSource getPooledDataSource() throws SQLException {
+        final DataSource source;
+        // by Default  we use the postgres driver.
+        if (className == null) {
+            className = "org.postgresql.Driver";
+        }
+        if (className.equals("org.postgresql.Driver")) {
+            if (connectURL != null && connectURL.startsWith("jdbc:postgresql://")) {
+                final PGConnectionPoolDataSource pgSource = new PGConnectionPoolDataSource();
+                // exemple : jdbc:postgresql://localhost:5432/mdweb-SML
+                String url          = connectURL.substring(18);
+                final String host   = url.substring(0, url.indexOf(':'));
+                url                 = url.substring(url.indexOf(':') + 1);
+                final String sPort  = url.substring(0, url.indexOf('/'));
+                final int port      = Integer.parseInt(sPort);
+                final String dbName = url.substring(url.indexOf('/') + 1);
+
+                pgSource.setServerName(host);
+                pgSource.setPortNumber(port);
+                pgSource.setDatabaseName(dbName);
+                pgSource.setUser(user);
+                pgSource.setPassword(password);
+                source = new WrappedDataSource(pgSource);
+            } else {
+                return null;
+            }
+        } else if (className.equals("oracle.jdbc.driver.OracleDriver")) {
+            final OracleConnectionPoolDataSource oraSource = new OracleConnectionPoolDataSource();
+            oraSource.setURL(connectURL);
+            oraSource.setUser(user);
+            oraSource.setPassword(password);
+            source = new WrappedDataSource(oraSource);
         } else {
             source = new DefaultDataSource(connectURL);
         }

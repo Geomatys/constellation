@@ -53,8 +53,8 @@
   -->
   <dependencies>
     <dependency>
-       <groupId>org.geotoolkit</groupId>
-       <artifactId>geotk-utility</artifactId>
+       <groupId>org.geotoolkit.pending</groupId>
+       <artifactId>geotk-utility-pending</artifactId>
     </dependency>
     <dependency>
       <groupId>ojdbc</groupId>
