@@ -67,7 +67,9 @@ import org.opengis.style.Symbolizer;
  *
  * @version $Id$
  * @author Johann Sorel (Geomatys)
+ * @deprecated replaced by coverage-file provider
  */
+@Deprecated
 class WorldImageLayerDetails implements CoverageLayerDetails {
     private final GridCoverageReader reader;
 

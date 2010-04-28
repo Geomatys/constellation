@@ -49,7 +49,9 @@ import org.opengis.feature.type.Name;
  *
  * @version $Id$
  * @author Johann Sorel (Geomatys)
+ * @deprecated replaced by coverage-file provider
  */
+@Deprecated
 public class WorldImageProvider extends AbstractLayerProvider{
 
     public static final String KEY_FOLDER_PATH = "path";

@@ -41,7 +41,9 @@ import static org.constellation.provider.wi.WorldImageProvider.*;
  * @version $Id$
  *
  * @author Johann Sorel (Geomatys)
+ * @deprecated replaced by coverage-file provider
  */
+@Deprecated
 public class WorldImageProviderService extends AbstractProviderService<Name,LayerDetails> implements LayerProviderService {
 
     /**
