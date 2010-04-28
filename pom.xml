@@ -634,6 +634,15 @@
       <name>GeoToolkit repository</name>
       <url>http://maven.geotoolkit.org</url>
     </repository>
+    <!-- TODO remove this repo when oracle jdbc driver will be deployed in geomatys repo -->
+     <repository>
+      <id>ifremer</id>
+      <name>IFREMER</name>
+      <url>http://www.ifremer.fr/maven/repository/</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
   </repositories>
   <pluginRepositories>
     <pluginRepository>
