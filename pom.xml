@@ -399,6 +399,11 @@
       <!-- Geotoolkit pending version -->
       <dependency>
         <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-coverageio-dimap</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-om</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
