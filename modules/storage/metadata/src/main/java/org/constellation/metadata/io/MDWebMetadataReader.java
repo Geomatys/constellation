@@ -470,6 +470,13 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 }
                 return TemporalUtilities.parseDateSafe(textValue,true);
 
+            } else if (classe.equals(Boolean.class)) {
+                if (textValue == null || textValue.isEmpty() || textValue.equals("null")) {
+                    return null;
+                }
+                return new Boolean(textValue);
+
+
             } else if (classe.equals(Locale.class)) {
                 for (Locale candidate : Locale.getAvailableLocales()) {
                     if (candidate.getISO3Language().equalsIgnoreCase(textValue)) {
