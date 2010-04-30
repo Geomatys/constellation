@@ -73,6 +73,7 @@ import org.geotoolkit.util.FileUtilities;
 import org.mdweb.io.sql.AbstractReader;
 import org.mdweb.io.sql.v21.Reader21;
 import org.mdweb.model.schemas.Classe;
+import org.opengis.metadata.Identifier;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
 
@@ -474,7 +475,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 if (textValue == null || textValue.isEmpty() || textValue.equals("null")) {
                     return null;
                 }
-                return new Boolean(textValue);
+                return Boolean.valueOf(textValue);
 
 
             } else if (classe.equals(Locale.class)) {
@@ -613,7 +614,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         attribName = "abbreviation";
                     } else if (attribName.equalsIgnoreCase("uom")) {
                         attribName = "unit";
-                    } else if (attribName.equalsIgnoreCase("codeSpace")) {
+                    } else if (attribName.equalsIgnoreCase("codeSpace") && result instanceof Identifier) {
                         attribName = "codespace";
                     }
                 }

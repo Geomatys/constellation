@@ -46,6 +46,7 @@ import org.constellation.util.ReflectionUtilities;
 import org.constellation.util.Util;
 
 // Geotoolkit dependencies
+import org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription;
 import org.geotoolkit.util.StringUtilities;
 
 // MDWeb dependencies
@@ -388,6 +389,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (object instanceof Collection) {
             final Collection c = (Collection) object;
             for (Object obj: c) {
+                if (path.getName().equals("geographicElement2") && obj instanceof DefaultGeographicDescription) {
+                    path = mdWriter.getPath("ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3");
+                }
                 result.addAll(addValueFromObject(form, obj, path, parentValue));
                 
             }
