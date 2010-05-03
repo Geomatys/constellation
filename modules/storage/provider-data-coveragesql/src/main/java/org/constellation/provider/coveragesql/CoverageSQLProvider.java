@@ -254,7 +254,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
      */
     private void visit() {
         try {
-            final Set<String> layers = CoverageDatabase.now(database.getLayers());
+            final Set<String> layers = database.getLayers().result();
 
             for(String name : layers){
                 test(name);
