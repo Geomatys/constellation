@@ -64,6 +64,7 @@ import org.mdweb.io.Reader;
 import org.geotoolkit.metadata.iso.MetadataEntity;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
+import org.geotoolkit.metadata.iso.DefaultIdentifier;
 import org.geotoolkit.naming.DefaultLocalName;
 import org.geotoolkit.naming.DefaultNameFactory;
 import org.geotoolkit.temporal.object.TemporalUtilities;
@@ -73,7 +74,6 @@ import org.geotoolkit.util.FileUtilities;
 import org.mdweb.io.sql.AbstractReader;
 import org.mdweb.io.sql.v21.Reader21;
 import org.mdweb.model.schemas.Classe;
-import org.opengis.metadata.Identifier;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.util.CodeList;
 
@@ -614,7 +614,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         attribName = "abbreviation";
                     } else if (attribName.equalsIgnoreCase("uom")) {
                         attribName = "unit";
-                    } else if (attribName.equalsIgnoreCase("codeSpace") && !(result instanceof Identifier)) {
+                    } else if (attribName.equalsIgnoreCase("codeSpace") && !(result instanceof DefaultIdentifier)) {
                         attribName = "codespace";
                     }
                 }
