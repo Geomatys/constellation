@@ -44,6 +44,8 @@ import org.postgresql.ds.PGSimpleDataSource;
 @XmlRootElement(name = "BDD")
 public class BDD {
 
+    public static final String POSTGRES_DRIVER_CLASS = "org.postgresql.Driver";
+
     private final static Map<BDD, Connection> CONNECTION_MAP = new HashMap<BDD, Connection>();
     /**
      * The className of the driver
@@ -171,7 +173,7 @@ public class BDD {
         if (conec == null || conec.isClosed()) {
             // by Default  we use the postgres driver.
             if (className == null) {
-                className = "org.postgresql.Driver";
+                className = POSTGRES_DRIVER_CLASS;
             }
             try {
                 Class.forName(className);
@@ -197,9 +199,9 @@ public class BDD {
         final DataSource source;
         // by Default  we use the postgres driver.
         if (className == null) {
-            className = "org.postgresql.Driver";
+            className = POSTGRES_DRIVER_CLASS;
         }
-        if (className.equals("org.postgresql.Driver")) {
+        if (className.equals(POSTGRES_DRIVER_CLASS)) {
             if (connectURL != null && connectURL.startsWith("jdbc:postgresql://")) {
                 final PGSimpleDataSource pgSource = new PGSimpleDataSource();
                 // exemple : jdbc:postgresql://localhost:5432/mdweb-SML
@@ -243,9 +245,9 @@ public class BDD {
         final DataSource source;
         // by Default  we use the postgres driver.
         if (className == null) {
-            className = "org.postgresql.Driver";
+            className = POSTGRES_DRIVER_CLASS;
         }
-        if (className.equals("org.postgresql.Driver")) {
+        if (className.equals(POSTGRES_DRIVER_CLASS)) {
             if (connectURL != null && connectURL.startsWith("jdbc:postgresql://")) {
                 final PGConnectionPoolDataSource pgSource = new PGConnectionPoolDataSource();
                 // exemple : jdbc:postgresql://localhost:5432/mdweb-SML
@@ -289,7 +291,7 @@ public class BDD {
 
         // by Default  we use the postgres driver.
         if (className == null) {
-            className = "org.postgresql.Driver";
+            className = POSTGRES_DRIVER_CLASS;
         }
         try {
             Class.forName(className);

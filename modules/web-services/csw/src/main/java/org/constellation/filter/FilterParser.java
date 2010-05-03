@@ -555,8 +555,8 @@ public abstract class FilterParser {
 
     protected boolean isDateField(String propertyName) {
         if (propertyName != null) {
-            return (propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")
-                     || propertyName.equalsIgnoreCase("TempExtent_begin") || propertyName.equalsIgnoreCase("TempExtent_end"));
+            return propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")
+                || propertyName.equalsIgnoreCase("TempExtent_begin") || propertyName.equalsIgnoreCase("TempExtent_end");
         }
         return false;
     }

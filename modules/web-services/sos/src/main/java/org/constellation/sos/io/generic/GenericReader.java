@@ -266,7 +266,7 @@ public abstract class GenericReader  {
         final Set<LockedPreparedStatement> subStmts = new HashSet<LockedPreparedStatement>();
         Values values = null;
         for (String var : variables) {
-            LockedPreparedStatement stmt = getStatementFromVar(var);
+            final LockedPreparedStatement stmt = getStatementFromVar(var);
             if (stmt != null) {
                 if (!subStmts.contains(stmt)) {
                     subStmts.add(stmt);

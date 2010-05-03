@@ -79,10 +79,10 @@ public class OMProviderService extends AbstractProviderService<Name,LayerDetails
     @Override
     protected void loadProvider(ProviderSource ps) {
         try {
-            OMProvider provider = new OMProvider(ps);
+            final OMProvider provider = new OMProvider(ps);
             PROVIDERS.add(provider);
             String msg = "[PROVIDER]> O&M provider created : ";
-            String sgbdType = provider.getSource().parameters.get(KEY_SGBDTYPE);
+            final String sgbdType = provider.getSource().parameters.get(KEY_SGBDTYPE);
             if (sgbdType != null && sgbdType.equals("derby")) {
                 msg = msg + "java DB: > "
                           + provider.getSource().parameters.get(KEY_DERBYURL);

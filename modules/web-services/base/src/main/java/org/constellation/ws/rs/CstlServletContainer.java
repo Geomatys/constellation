@@ -38,7 +38,7 @@ public class CstlServletContainer extends ServletContainer {
     protected void configure(final ServletConfig sc, ResourceConfig rc, WebApplication wa) {
         super.configure(sc, rc, wa);
         if (!configured) {
-            ContainerNotifierImpl cnImpl = new ContainerNotifierImpl();
+            final ContainerNotifierImpl cnImpl = new ContainerNotifierImpl();
             rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_NOTIFIER, cnImpl);
             rc.getSingletons().add(new ContextInjectableProvider<ContainerNotifierImpl>(ContainerNotifierImpl.class, cnImpl));
             configured = true;

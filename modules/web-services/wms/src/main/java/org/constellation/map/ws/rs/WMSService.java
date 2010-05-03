@@ -289,7 +289,7 @@ public class WMSService extends GridWebService {
         final ServiceExceptionReport report = new ServiceExceptionReport(version,
                 (locator == null) ? new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode()) :
                                     new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode(), locator));
-        StringWriter sw = new StringWriter();
+        final StringWriter sw = new StringWriter();
         /*
          * For WMS 1.1.1, we need to define another marshalling pool, with just the service exception
          * packages. Actually that package does not contain any reference to namespace, consequently

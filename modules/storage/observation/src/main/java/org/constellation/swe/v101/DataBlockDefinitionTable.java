@@ -143,7 +143,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
                 if (textBlockEncodings == null) {
                     textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
                 }
-                AbstractEncodingPropertyType encProp = databloc.getEncoding();
+                final AbstractEncodingPropertyType encProp = databloc.getEncoding();
                 statement.statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry) encProp.getEncoding()));
                 updateSingleton(statement.statement);
                 release(statement);

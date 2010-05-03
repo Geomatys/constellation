@@ -73,7 +73,7 @@ public class DirectPositionEntry implements Entry {
      */
     @Override
     public String toString() {
-        StringBuilder s = new StringBuilder("[DirectPositionEntry]:");
+        final StringBuilder s = new StringBuilder("[DirectPositionEntry]:");
         if (name != null) {
             s.append("Name = ").append(name).append('\n');
         }

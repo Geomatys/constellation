@@ -28,12 +28,9 @@ import java.util.Map;
  * @author Guilhem Legal (Geomatys)
  */
 public class Values {
+
     /**
-     * A Map of (varName) - (value) refreshed at every request.
-    
-    protected Map<String, String> singleValue; */
-    /**
-     * * A Map of (varName) - (list of values) refreshed at every request.
+     * A Map of (varName) - (list of values) refreshed at every request.
      */
     private final Map<String, List<String>> multipleValue;
 
@@ -41,7 +38,6 @@ public class Values {
      * Build a new values container.
      */
     public Values() {
-        //singleValue = new HashMap<String, String>();
         multipleValue = new HashMap<String, List<String>>();
     }
 
@@ -53,7 +49,6 @@ public class Values {
      * @param multipleValue A map of (variable name) - (list of values)
      */
     public Values(Map<String, List<String>> multipleValue) {
-        //this.singleValue   = singleValue;
         if (multipleValue != null) {
             this.multipleValue = multipleValue;
         } else {
@@ -68,7 +63,7 @@ public class Values {
      * @return
      */
     public String getVariable(String variable) {
-        List<String> result = multipleValue.get(variable);
+        final List<String> result = multipleValue.get(variable);
         if (result != null && result.size() > 0) {
             return result.get(0);
         }
