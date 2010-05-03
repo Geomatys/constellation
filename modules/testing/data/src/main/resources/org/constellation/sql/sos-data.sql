@@ -74,31 +74,31 @@ INSERT INTO "observation"."linestring" ("id", "x", "y" , "z") VALUES ('pr1_ls1',
 
 INSERT INTO "observation"."text_block_encodings" ("id_encoding", "token_separator", "block_separator", "decimal_separator") VALUES ('textblock', ',', '@@', '.');
 
-INSERT INTO "observation"."simple_data_records" ("id_datablock", "id_datarecord", "definition", "fixed") VALUES ('dataArray-0', 'datarecord', NULL, 0);
-INSERT INTO "observation"."simple_data_records" ("id_datablock", "id_datarecord", "definition", "fixed") VALUES ('dataArray-1', 'datarecord', NULL, 0);
-INSERT INTO "observation"."simple_data_records" ("id_datablock", "id_datarecord", "definition", "fixed") VALUES ('dataArray-2', 'datarecord', NULL, 0);
-INSERT INTO "observation"."simple_data_records" ("id_datablock", "id_datarecord", "definition", "fixed") VALUES ('dataArray-3', 'datarecord', NULL, 0);
-INSERT INTO "observation"."simple_data_records" ("id_datablock", "id_datarecord", "definition", "fixed") VALUES ('dataArray-4', 'datarecord', NULL, 0);
+INSERT INTO "observation"."simple_data_records" ("id_datablock", "id_datarecord", "definition", "fixed") VALUES ('dataArray-0', 'datarecord-0', NULL, 0);
+INSERT INTO "observation"."simple_data_records" ("id_datablock", "id_datarecord", "definition", "fixed") VALUES ('dataArray-1', 'datarecord-0', NULL, 0);
+INSERT INTO "observation"."simple_data_records" ("id_datablock", "id_datarecord", "definition", "fixed") VALUES ('dataArray-2', 'datarecord-0', NULL, 0);
+INSERT INTO "observation"."simple_data_records" ("id_datablock", "id_datarecord", "definition", "fixed") VALUES ('dataArray-3', 'datarecord-1', NULL, 0);
+INSERT INTO "observation"."simple_data_records" ("id_datablock", "id_datarecord", "definition", "fixed") VALUES ('dataArray-4', 'datarecord-1', NULL, 0);
 
-INSERT INTO "observation"."data_array_definition" ("id_array_definition", "element_count", "elementType", "encoding") VALUES ('dataArray-0', 0, 'datarecord', 'textblock');
-INSERT INTO "observation"."data_array_definition" ("id_array_definition", "element_count", "elementType", "encoding") VALUES ('dataArray-1', 0, 'datarecord', 'textblock');
-INSERT INTO "observation"."data_array_definition" ("id_array_definition", "element_count", "elementType", "encoding") VALUES ('dataArray-2', 5, 'datarecord', 'textblock');
-INSERT INTO "observation"."data_array_definition" ("id_array_definition", "element_count", "elementType", "encoding") VALUES ('dataArray-3', 0, 'datarecord', 'textblock');
-INSERT INTO "observation"."data_array_definition" ("id_array_definition", "element_count", "elementType", "encoding") VALUES ('dataArray-4', 5, 'datarecord', 'textblock');
+INSERT INTO "observation"."data_array_definition" ("id_array_definition", "element_count", "elementType", "encoding") VALUES ('dataArray-0', 0, 'datarecord-0', 'textblock');
+INSERT INTO "observation"."data_array_definition" ("id_array_definition", "element_count", "elementType", "encoding") VALUES ('dataArray-1', 0, 'datarecord-0', 'textblock');
+INSERT INTO "observation"."data_array_definition" ("id_array_definition", "element_count", "elementType", "encoding") VALUES ('dataArray-2', 5, 'datarecord-0', 'textblock');
+INSERT INTO "observation"."data_array_definition" ("id_array_definition", "element_count", "elementType", "encoding") VALUES ('dataArray-3', 0, 'datarecord-1', 'textblock');
+INSERT INTO "observation"."data_array_definition" ("id_array_definition", "element_count", "elementType", "encoding") VALUES ('dataArray-4', 5, 'datarecord-1', 'textblock');
 
 
-INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-0', 'datarecord', 'Time', 'urn:ogc:data:time:iso8601', 'Time', NULL, NULL, NULL);
-INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-0', 'datarecord', 'depth', 'urn:x-ogc:def:phenonmenon:GEOM:depth', 'Quantity', 'm', NULL, NULL);
-INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-1', 'datarecord', 'Time', 'urn:ogc:data:time:iso8601', 'Time', NULL, NULL, NULL);
-INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-1', 'datarecord', 'depth', 'urn:x-ogc:def:phenonmenon:GEOM:depth', 'Quantity', 'm', NULL, NULL);
-INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-2', 'datarecord', 'Time', 'urn:ogc:data:time:iso8601', 'Time', NULL, NULL, NULL);
-INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-2', 'datarecord', 'depth', 'urn:x-ogc:def:phenonmenon:GEOM:depth', 'Quantity', 'm', NULL, NULL);
-INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-3', 'datarecord', 'Time', 'urn:ogc:data:time:iso8601', 'Time', NULL, NULL, NULL);
-INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-3', 'datarecord', 'depth', 'urn:x-ogc:def:phenonmenon:GEOM:depth', 'Quantity', 'm', NULL, NULL);
-INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-3', 'datarecord', 'temperature', 'urn:x-ogc:def:phenonmenon:GEOM:temperature', 'Quantity', '°C', NULL, NULL);
-INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-4', 'datarecord', 'Time', 'urn:ogc:data:time:iso8601', 'Time', NULL, NULL, NULL);
-INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-4', 'datarecord', 'depth', 'urn:x-ogc:def:phenonmenon:GEOM:depth', 'Quantity', 'm', NULL, NULL);
-INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-4', 'datarecord', 'temperature', 'urn:x-ogc:def:phenonmenon:GEOM:temperature', 'Quantity', '°C', NULL, NULL);
+INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-0', 'datarecord-0', 'Time', 'urn:ogc:data:time:iso8601', 'Time', NULL, NULL, NULL);
+INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-0', 'datarecord-0', 'depth', 'urn:x-ogc:def:phenonmenon:GEOM:depth', 'Quantity', 'm', NULL, NULL);
+INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-1', 'datarecord-0', 'Time', 'urn:ogc:data:time:iso8601', 'Time', NULL, NULL, NULL);
+INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-1', 'datarecord-0', 'depth', 'urn:x-ogc:def:phenonmenon:GEOM:depth', 'Quantity', 'm', NULL, NULL);
+INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-2', 'datarecord-0', 'Time', 'urn:ogc:data:time:iso8601', 'Time', NULL, NULL, NULL);
+INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-2', 'datarecord-0', 'depth', 'urn:x-ogc:def:phenonmenon:GEOM:depth', 'Quantity', 'm', NULL, NULL);
+INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-3', 'datarecord-1', 'Time', 'urn:ogc:data:time:iso8601', 'Time', NULL, NULL, NULL);
+INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-3', 'datarecord-1', 'depth', 'urn:x-ogc:def:phenonmenon:GEOM:depth', 'Quantity', 'm', NULL, NULL);
+INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-3', 'datarecord-1', 'temperature', 'urn:x-ogc:def:phenonmenon:GEOM:temperature', 'Quantity', '°C', NULL, NULL);
+INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-4', 'datarecord-1', 'Time', 'urn:ogc:data:time:iso8601', 'Time', NULL, NULL, NULL);
+INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-4', 'datarecord-1', 'depth', 'urn:x-ogc:def:phenonmenon:GEOM:depth', 'Quantity', 'm', NULL, NULL);
+INSERT INTO "observation"."any_scalars" ("id_datablock", "id_datarecord", "name", "definition", "type", "uom_code", "uom_href", "value") VALUES ('dataArray-4', 'datarecord-1', 'temperature', 'urn:x-ogc:def:phenonmenon:GEOM:temperature', 'Quantity', '°C', NULL, NULL);
 
 INSERT INTO "observation"."any_results" ("id_result", "reference", "values", "definition") VALUES (1, NULL, '', 'dataArray-0');
 INSERT INTO "observation"."any_results" ("id_result", "reference", "values", "definition") VALUES (2, NULL, '', 'dataArray-1');

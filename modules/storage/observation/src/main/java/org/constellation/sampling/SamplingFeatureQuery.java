@@ -17,12 +17,12 @@
  */
 package org.constellation.sampling;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  * The query to execute for a {@link SamplingFeatureTable}.
@@ -48,12 +48,12 @@ public class SamplingFeatureQuery extends Query {
     public SamplingFeatureQuery(final Database database) {
         super(database, "sampling_features", "observation");
         final QueryType[] sli = {SELECT, LIST, INSERT};
-        final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
+        final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS, LIST_ID};
         
-        identifier              = addColumn   ("id",              slie);
-        name                    = addColumn   ("name",            sli);
-        description             = addColumn   ("description",     sli);
-        sampledFeature          = addColumn   ("sampled_feature", sli);
+        identifier              = addMandatoryColumn ("id",                    slie);
+        name                    = addMandatoryColumn ("name",                  sli);
+        description             = addOptionalColumn  ("description",     null, sli);
+        sampledFeature          = addOptionalColumn  ("sampled_feature", null, sli);
         
         byIdentifier  = addParameter(identifier, SELECT, EXISTS);
     }

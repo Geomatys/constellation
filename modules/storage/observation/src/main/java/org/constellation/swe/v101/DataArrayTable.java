@@ -21,10 +21,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.swe.xml.v101.AbstractEncodingEntry;
 import org.geotoolkit.swe.xml.v101.DataArrayEntry;
 import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
@@ -64,20 +65,34 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
      * Initialise l'identifiant de la table.
      */
     private DataArrayTable(final DataArrayQuery query) {
-        super(query);
-        setIdentifierParameters(query.byIdArray, null);
+        super(query,query.byIdArray);
+    }
+
+     /**
+     * Construit une nouvelle table non partagée
+     */
+    private DataArrayTable(final DataArrayTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected DataArrayTable clone() {
+        return new DataArrayTable(this);
     }
 
     /**
      * Construit un data block pour l'enregistrement courant.
      */
     @Override
-    protected DataArrayEntry createEntry(final ResultSet results) throws SQLException, CatalogException {
+    protected DataArrayEntry createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
         final DataArrayQuery query = (DataArrayQuery) super.query;
         final String idArray = results.getString(indexOf(query.idArray));
         if (dataRecords == null) {
             dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
-            dataRecords = new SimpleDataRecordTable(dataRecords);
         }
         dataRecords.setIdDataBlock(idArray);
         //for data array there is only one data record
@@ -108,51 +123,57 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
         final DataArrayQuery query  = (DataArrayQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        //first we get the identifier form sub object
-        int count = 0;
-        if (array.getElementCount() != null && array.getElementCount().getCount() != null) {
-            count = array.getElementCount().getCount().getValue();
-        }
-        
-        if (textBlockEncodings == null) {
-                textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
-        }
-        final String textBlockIdentifier = textBlockEncodings.getIdentifier((TextBlockEntry)array.getEncoding());
-            
-        try {
-            if (array.getId() != null) {
-                final PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.idArray), array.getId());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    return array.getId();
-                } else {
-                    id = array.getId();
-                }
-            } else {
-                id = searchFreeIdentifier("dataArray");
+        synchronized (getLock()) {
+            transactionBegin();
+            //first we get the identifier form sub object
+            int count = 0;
+            if (array.getElementCount() != null && array.getElementCount().getCount() != null) {
+                count = array.getElementCount().getCount().getValue();
             }
-        
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.idArray), id);
-            statement.setInt(indexOf(query.elementCount), count);
 
-            statement.setString(indexOf(query.encoding), textBlockIdentifier);
-            
-            if (dataRecords == null) {
-                dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
-                dataRecords = new SimpleDataRecordTable(dataRecords);
+            if (textBlockEncodings == null) {
+                    textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
             }
-            dataRecords.setIdDataBlock(id);
-            statement.setString(indexOf(query.elementType), dataRecords.getIdentifier((SimpleDataRecordEntry)array.getElementType(), id));
-            
-            updateSingleton(statement);
-        
-            success = true;
-        } finally {
-            transactionEnd(success);
+            final String textBlockIdentifier = textBlockEncodings.getIdentifier((TextBlockEntry)array.getEncoding());
+
+            try {
+                if (array.getId() != null) {
+                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    statement.statement.setString(indexOf(query.idArray), array.getId());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        result.close();
+                        release(statement);
+                        return array.getId();
+                    } else {
+                        id = array.getId();
+                    }
+                    result.close();
+                    release(statement);
+                } else {
+                    id = searchFreeIdentifier("dataArray");
+                }
+
+                final Stmt statement = getStatement(QueryType.INSERT);
+                statement.statement.setString(indexOf(query.idArray), id);
+                statement.statement.setInt(indexOf(query.elementCount), count);
+
+                statement.statement.setString(indexOf(query.encoding), textBlockIdentifier);
+
+                if (dataRecords == null) {
+                    dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
+                }
+                dataRecords.setIdDataBlock(id);
+                statement.statement.setString(indexOf(query.elementType), dataRecords.getIdentifier((SimpleDataRecordEntry)array.getElementType(), id));
+
+                updateSingleton(statement.statement);
+                release(statement);
+
+                success = true;
+            } finally {
+                transactionEnd(success);
+            }
         }
         return id;
     }
@@ -162,7 +183,7 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
      * and the super method is bounded.
      * @param base the base for identifier (base
      * @return a new id for the dataArray
-     */
+     
     @Override
     public String searchFreeIdentifier(String base) throws CatalogException, SQLException {
         final PreparedStatement stmt = this.getStatement("SELECT COUNT(\"id_array_definition\") FROM \"observation\".\"data_array_definition\"");
@@ -170,5 +191,5 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
         result.next();
         final int nbLine = result.getInt(1);
         return base + '-' + nbLine;
-    }
+    }*/
 }

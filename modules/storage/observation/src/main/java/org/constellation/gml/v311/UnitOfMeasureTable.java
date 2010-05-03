@@ -16,14 +16,14 @@
  */
 package org.constellation.gml.v311;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.gml.xml.v311.UnitOfMeasureEntry;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 
 /**
  * Connexion vers la table des {@linkplain UnitOfMeasure unit of measure}.
@@ -46,14 +46,30 @@ public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry> {
      * Initialise l'identifiant de la table.
      */
     private UnitOfMeasureTable(final UnitOfMeasureQuery query) {
-        super(query);
-        setIdentifierParameters(query.byId, null);
+        super(query, query.byId);
+    }
+
+    /**
+     * Construit une nouvelle table non partagée
+     */
+    private UnitOfMeasureTable(final UnitOfMeasureTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected UnitOfMeasureTable clone() {
+        return new UnitOfMeasureTable(this);
     }
 
     /**
      * Crée une entrée pour l'untié de mesure courante.
      */
-    protected UnitOfMeasureEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
+    @Override
+    protected UnitOfMeasureEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
           final UnitOfMeasureQuery query = (UnitOfMeasureQuery) super.query;
           return new UnitOfMeasureEntry(results.getString(indexOf(query.id )),
                                          results.getString(indexOf(query.name )),
@@ -67,36 +83,43 @@ public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry> {
      *
      * @param proc l' unité de mesure a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final UnitOfMeasureEntry uom) throws SQLException, CatalogException {
+    public String getIdentifier(final UnitOfMeasureEntry uom) throws SQLException, CatalogException {
         final UnitOfMeasureQuery query  = (UnitOfMeasureQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        try {
-            if (uom.getId() != null) {
-                final PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.id), uom.getId());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    return uom.getId();
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                if (uom.getId() != null) {
+                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    statement.statement.setString(indexOf(query.id), uom.getId());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        result.close();
+                        release(statement);
+                        return uom.getId();
+                    } else {
+                        id = uom.getId();
+                    }
+                    result.close();
+                    release(statement);
                 } else {
-                    id = uom.getId();
+                    id = searchFreeIdentifier("uom");
                 }
-            } else {
-                id = searchFreeIdentifier("uom");
+
+                final Stmt statement = getStatement(QueryType.INSERT);
+
+                statement.statement.setString(indexOf(query.id),           id);
+                statement.statement.setString(indexOf(query.name),         uom.getName());
+                statement.statement.setString(indexOf(query.quantityType), uom.getQuantityType());
+                statement.statement.setString(indexOf(query.unitSystem),   uom.getUnitsSystem());
+                updateSingleton(statement.statement);
+                release(statement);
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-        
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-        
-            statement.setString(indexOf(query.id),           id);
-            statement.setString(indexOf(query.name),         uom.getName());
-            statement.setString(indexOf(query.quantityType), uom.getQuantityType());
-            statement.setString(indexOf(query.unitSystem),   uom.getUnitsSystem());
-            updateSingleton(statement);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
         return id;
     }

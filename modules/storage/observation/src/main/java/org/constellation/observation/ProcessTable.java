@@ -17,13 +17,13 @@
  */
 package org.constellation.observation;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.observation.xml.v100.ProcessEntry;
 
 
@@ -50,14 +50,30 @@ public class ProcessTable extends SingletonTable<ProcessEntry> {
      * Initialise l'identifiant de la table.
      */
     private ProcessTable(final ProcessQuery query) {
-        super(query);
-        setIdentifierParameters(query.byName, null);
+        super(query, query.byName);
     }
-    
+
+    /**
+     * Construit une nouvelle table non partagée
+     */
+    private ProcessTable(final ProcessTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected ProcessTable clone() {
+        return new ProcessTable(this);
+    }
+
     /**
      * Construit une procédure pour l'enregistrement courant.
      */
-    protected ProcessEntry createEntry(final ResultSet results) throws SQLException {
+    @Override
+    protected ProcessEntry createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException {
         final ProcessQuery query = (ProcessQuery) super.query;
         return new ProcessEntry(results.getString(indexOf(query.name)));
     }
@@ -68,34 +84,41 @@ public class ProcessTable extends SingletonTable<ProcessEntry> {
      *
      * @param proc le capteur a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final ProcessEntry proc) throws SQLException, CatalogException {
+    public String getIdentifier(final ProcessEntry proc) throws SQLException, CatalogException {
         final ProcessQuery query  = (ProcessQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        try {
-            if (proc.getName() != null) {
-                final PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.name), proc.getName());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    return proc.getName();
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                if (proc.getName() != null) {
+                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    statement.statement.setString(indexOf(query.name), proc.getName());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        result.close();
+                        release(statement);
+                        return proc.getName();
+                    } else {
+                        id = proc.getName();
+                    }
+                    result.close();
+                    release(statement);
                 } else {
-                    id = proc.getName();
+                    id = searchFreeIdentifier("procedure");
                 }
-            } else {
-                id = searchFreeIdentifier("procedure");
+
+                final Stmt statement = getStatement(QueryType.INSERT);
+
+                statement.statement.setString(indexOf(query.name), id);
+                statement.statement.setNull(indexOf(query.remarks), java.sql.Types.VARCHAR);
+                updateSingleton(statement.statement);
+                release(statement);
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-        
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-        
-            statement.setString(indexOf(query.name), id);
-            statement.setNull(indexOf(query.remarks), java.sql.Types.VARCHAR);
-            updateSingleton(statement);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
         return id;
     }

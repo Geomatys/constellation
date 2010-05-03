@@ -179,11 +179,11 @@ public final class Util {
             in.close();
 
             final Statement stmt  = connection.createStatement();
-            String SqlQuery       = sw.toString();
-            int end               = SqlQuery.indexOf(';');
+            String sqlQuery       = sw.toString();
+            int end               = sqlQuery.indexOf(';');
             int nbQuery           = 0;
             while (end != -1) {
-                String singleQuery = SqlQuery.substring(0, end);
+                String singleQuery = sqlQuery.substring(0, end);
                 if (derbySource) {
                     singleQuery = singleQuery.replaceAll("true", "1");
                     singleQuery = singleQuery.replaceAll("false", "0");
@@ -194,8 +194,8 @@ public final class Util {
                 } catch (SQLException ex) {
                     LOGGER.severe("SQLException while executing: " + singleQuery + '\n' + ex.getMessage() + '\n' + " in file:" + path + " instruction n° " + nbQuery);
                 }
-                SqlQuery = SqlQuery.substring(end + 1);
-                end      = SqlQuery.indexOf(';');
+                sqlQuery = sqlQuery.substring(end + 1);
+                end      = sqlQuery.indexOf(';');
             }
         } catch (IOException ex) {
             LOGGER.severe("IOException creating statement:" + '\n' + ex.getMessage());

@@ -17,12 +17,12 @@
  */
 package org.constellation.swe.v101;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  * The query to execute for a {@link TextBlockTable}.
@@ -49,16 +49,16 @@ public class TextBlockQuery extends Query{
     public TextBlockQuery(final Database database) {
         super(database, "text_block_encodings", "observation");
         final QueryType[] si   = {SELECT, INSERT};
-        final QueryType[] sief = {SELECT, INSERT, EXISTS,  FILTERED_LIST};
-        id               = addColumn("id_encoding",       sief);
-        tokenSeparator   = addColumn("token_separator",   si);
-        blockSeparator   = addColumn("block_separator",   si);
-        decimalSeparator = addColumn("decimal_separator", si);
+        final QueryType[] sief = {SELECT, INSERT, EXISTS,  LIST};
+        id               = addMandatoryColumn("id_encoding",       sief);
+        tokenSeparator   = addMandatoryColumn("token_separator",   si);
+        blockSeparator   = addMandatoryColumn("block_separator",   si);
+        decimalSeparator = addMandatoryColumn("decimal_separator", si);
 
         byId               = addParameter(id, SELECT, EXISTS);
-        byBlockSeparator   = addParameter(blockSeparator,   FILTERED_LIST);
-        byDecimalSeparator = addParameter(decimalSeparator, FILTERED_LIST);
-        byTokenSeparator   = addParameter(tokenSeparator,   FILTERED_LIST);
+        byBlockSeparator   = addParameter(blockSeparator,   LIST);
+        byDecimalSeparator = addParameter(decimalSeparator, LIST);
+        byTokenSeparator   = addParameter(tokenSeparator,   LIST);
     }
     
 }

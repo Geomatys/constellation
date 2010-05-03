@@ -17,12 +17,12 @@
  */
 package org.constellation.gml.v311;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import static org.constellation.catalog.QueryType.*;
-import org.constellation.catalog.QueryType;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
+import org.geotoolkit.internal.sql.table.QueryType;
 
 /**
  * The query to execute for a {@link LineStringTable}.
@@ -50,13 +50,13 @@ public class LineStringQuery extends Query {
         super(database, "linestring", "observation");
         //final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         final QueryType[] sli   = {SELECT, LIST, INSERT};
-        final QueryType[] slif  = {SELECT, LIST, INSERT, FILTERED_LIST};
-        final QueryType[] slief = {SELECT, LIST, INSERT, EXISTS, FILTERED_LIST};
+        //final QueryType[] slif  = {SELECT, LIST, INSERT, FILTERED_LIST};
+        final QueryType[] slief = {SELECT, LIST, INSERT, EXISTS};
         
-        identifier             = addColumn   ("id",                 slief);
-        xValue                 = addColumn   ("x",                  sli);
-        yValue                 = addColumn   ("y",                  sli);
-        zValue                 = addColumn   ("z",                  sli);
+        identifier             = addMandatoryColumn("id",                 slief);
+        xValue                 = addMandatoryColumn("x",                  sli);
+        yValue                 = addMandatoryColumn("y",                  sli);
+        zValue                 = addOptionalColumn ("z",            null, sli);
 
         byIdentifier  = addParameter(identifier, SELECT, EXISTS, LIST);
         

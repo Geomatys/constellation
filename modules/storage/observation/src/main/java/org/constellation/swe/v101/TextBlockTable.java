@@ -17,13 +17,13 @@
  */
 package org.constellation.swe.v101;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.swe.xml.v101.TextBlockEntry;
 
 /**
@@ -47,8 +47,23 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
      * Initialise l'identifiant de la table.
      */
     private TextBlockTable(final TextBlockQuery query) {
-        super(query);
-        setIdentifierParameters(query.byId, null);
+        super(query, query.byId);
+    }
+
+     /**
+     * Construit une nouvelle table non partagée
+     */
+    private TextBlockTable(final TextBlockTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected TextBlockTable clone() {
+        return new TextBlockTable(this);
     }
 
     /**
@@ -56,12 +71,13 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
      *
      * @param results un resultSet contenant un tuple de la table de encodage textuel.
      */
-    protected TextBlockEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
-        final TextBlockQuery query = (TextBlockQuery) super.query;
-        return new TextBlockEntry(results.getString(indexOf(query.id )),
-                                  results.getString(indexOf(query.tokenSeparator )),
-                                  results.getString(indexOf(query.blockSeparator )),
-                                  results.getString(indexOf(query.decimalSeparator)));
+    @Override
+    protected TextBlockEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+        final TextBlockQuery localQuery = (TextBlockQuery) super.query;
+        return new TextBlockEntry(results.getString(indexOf(localQuery.id )),
+                                  results.getString(indexOf(localQuery.tokenSeparator )),
+                                  results.getString(indexOf(localQuery.blockSeparator )),
+                                  results.getString(indexOf(localQuery.decimalSeparator)));
     }
     
     /**
@@ -70,40 +86,47 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
      *
      * @param databloc le datablockDefinition a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final TextBlockEntry textbloc) throws SQLException, CatalogException {
-        final TextBlockQuery query  = (TextBlockQuery) super.query;
+    public String getIdentifier(final TextBlockEntry textbloc) throws SQLException, CatalogException {
+        final TextBlockQuery localQuery  = (TextBlockQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        try {
-            if (textbloc.getId() == null) {
-                final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
-                statement.setString(indexOf(query.byBlockSeparator), textbloc.getBlockSeparator());
-                statement.setString(indexOf(query.byDecimalSeparator), textbloc.getDecimalSeparator());
-                statement.setString(indexOf(query.byTokenSeparator), textbloc.getTokenSeparator());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                     return result.getString("id_encoding");
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                if (textbloc.getId() == null) {
+                    final Stmt statement = getStatement(QueryType.LIST);
+                    statement.statement.setString(indexOf(localQuery.byBlockSeparator), textbloc.getBlockSeparator());
+                    statement.statement.setString(indexOf(localQuery.byDecimalSeparator), textbloc.getDecimalSeparator());
+                    statement.statement.setString(indexOf(localQuery.byTokenSeparator), textbloc.getTokenSeparator());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        result.close();
+                        release(statement);
+                        return result.getString("id_encoding");
+                    } else {
+                        id = searchFreeIdentifier("textblock");
+                    }
+                    result.close();
+                    release(statement);
+                //if the id is not null we assume that the textBlock is already recorded int the database
                 } else {
-                    id = searchFreeIdentifier("textblock");
+                    id = textbloc.getId();
+                    return id;
                 }
-            //if the id is not null we assume that the textBlock is already recorded int the database    
-            } else {
-                id = textbloc.getId();
-                return id;
+
+                final Stmt statement = getStatement(QueryType.INSERT);
+                statement.statement.setString(indexOf(localQuery.id), id);
+                statement.statement.setString(indexOf(localQuery.decimalSeparator), textbloc.getDecimalSeparator());
+                statement.statement.setString(indexOf(localQuery.blockSeparator)  , textbloc.getBlockSeparator());
+                statement.statement.setString(indexOf(localQuery.tokenSeparator)  , textbloc.getTokenSeparator());
+
+                updateSingleton(statement.statement);
+                release(statement);
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-             
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.id), id);
-            statement.setString(indexOf(query.decimalSeparator), textbloc.getDecimalSeparator());
-            statement.setString(indexOf(query.blockSeparator)  , textbloc.getBlockSeparator());
-            statement.setString(indexOf(query.tokenSeparator)  , textbloc.getTokenSeparator());
-        
-            updateSingleton(statement);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
         return id;
     }

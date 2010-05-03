@@ -17,13 +17,13 @@
  */
 package org.constellation.swe.v101;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 
 // OpenGis dependencies
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
@@ -37,7 +37,7 @@ import org.opengis.observation.Phenomenon;
  * @author Martin Desruisseaux
  * @author Guilhem Legal
  */
-public class PhenomenonTable<EntryType extends Phenomenon> extends SingletonTable<PhenomenonEntry> {
+public class PhenomenonTable extends SingletonTable<PhenomenonEntry> {
    
     /**
      * Construit une table des phénomènes.
@@ -45,27 +45,40 @@ public class PhenomenonTable<EntryType extends Phenomenon> extends SingletonTabl
      * @param  database Connexion vers la base de données.
      */
     public PhenomenonTable(final Database database) {
-        super(new PhenomenonQuery(database));
-        final PhenomenonQuery query = new PhenomenonQuery(database);
-        setIdentifierParameters(query.byName, null);
+        this(new PhenomenonQuery(database));
     }
     
     /**
      * Initialise l'identifiant de la table.
      */
     protected PhenomenonTable(final PhenomenonQuery query) {
-        super(query);
-        setIdentifierParameters(query.byName, null);
+        super(query,query.byName);
     }
-    
+     /**
+     * Construit une nouvelle table non partagée
+     */
+    private PhenomenonTable(final PhenomenonTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected PhenomenonTable clone() {
+        return new PhenomenonTable(this);
+    }
+
     /**
      * Construit un phénomène pour l'enregistrement courant.
      */
-    protected PhenomenonEntry createEntry(final ResultSet results) throws SQLException, CatalogException {
-        final PhenomenonQuery query = (PhenomenonQuery) super.query;
-        return new PhenomenonEntry(results.getString(indexOf(query.identifier)),
-                                   results.getString(indexOf(query.name)),
-                                   results.getString(indexOf(query.remarks)));
+    @Override
+    protected PhenomenonEntry createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
+        final PhenomenonQuery LocalQuery = (PhenomenonQuery) super.query;
+        return new PhenomenonEntry(results.getString(indexOf(LocalQuery.identifier)),
+                                   results.getString(indexOf(LocalQuery.name)),
+                                   results.getString(indexOf(LocalQuery.remarks)));
     }
     
      /**
@@ -74,34 +87,41 @@ public class PhenomenonTable<EntryType extends Phenomenon> extends SingletonTabl
      *
      * @param result le resultat a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final PhenomenonEntry pheno) throws SQLException, CatalogException {
-        final PhenomenonQuery query  = (PhenomenonQuery) super.query;
+    public String getIdentifier(final PhenomenonEntry pheno) throws SQLException, CatalogException {
+        final PhenomenonQuery localQuery  = (PhenomenonQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        try {
-            if (pheno.getId() != null) {
-                final PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.identifier), pheno.getId());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    return pheno.getId();
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                if (pheno.getId() != null) {
+                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    statement.statement.setString(indexOf(localQuery.identifier), pheno.getId());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        result.close();
+                        release(statement);
+                        return pheno.getId();
+                    } else {
+                        id = pheno.getId();
+                    }
+                    result.close();
+                    release(statement);
                 } else {
-                    id = pheno.getId();
+                    id = searchFreeIdentifier("pheno");
                 }
-            } else {
-                id = searchFreeIdentifier("pheno");
+                final Stmt statement = getStatement(QueryType.INSERT);
+                statement.statement.setString(indexOf(localQuery.identifier), id);
+                statement.statement.setString(indexOf(localQuery.name), pheno.getName());
+                statement.statement.setString(indexOf(localQuery.remarks), pheno.getDescription());
+
+                updateSingleton(statement.statement);
+                release(statement);
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.identifier), id);
-            statement.setString(indexOf(query.name), pheno.getName());
-            statement.setString(indexOf(query.remarks), pheno.getDescription());
-        
-            updateSingleton(statement);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
         return id;
     }

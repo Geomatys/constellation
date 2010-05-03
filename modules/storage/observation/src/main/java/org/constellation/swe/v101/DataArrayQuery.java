@@ -17,12 +17,12 @@
  */
 package org.constellation.swe.v101;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  * The query to execute for a {@link DataArrayTable}.
@@ -50,16 +50,16 @@ public class DataArrayQuery extends Query{
     public DataArrayQuery(final Database database) {
         super(database, "data_array_definition", "observation");
         final QueryType[] si   = {SELECT, INSERT};
-        final QueryType[] sief = {SELECT, INSERT, EXISTS, FILTERED_LIST};
-        idArray        = addColumn ("id_array_definition", sief);
-        encoding       = addColumn ("encoding"           , si);
-        elementCount   = addColumn ("element_count"      , si);
-        elementType    = addColumn ("elementType"        , si);
+        final QueryType[] sief = {SELECT, INSERT, EXISTS, LIST};
+        idArray        = addMandatoryColumn ("id_array_definition", sief);
+        encoding       = addOptionalColumn ("encoding"           ,null, si);
+        elementCount   = addOptionalColumn ("element_count"      ,null, si);
+        elementType    = addOptionalColumn ("elementType"        ,null, si);
 
         byIdArray      = addParameter(idArray,      SELECT, EXISTS);
-        byElementCount = addParameter(elementCount, FILTERED_LIST);
-        byElementType  = addParameter(elementType,  FILTERED_LIST);
-        byEncoding     = addParameter(encoding,     FILTERED_LIST);
+        byElementCount = addParameter(elementCount, LIST);
+        byElementType  = addParameter(elementType,  LIST);
+        byEncoding     = addParameter(encoding,     LIST);
     }
     
 }

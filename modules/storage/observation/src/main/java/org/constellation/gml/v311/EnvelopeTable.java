@@ -21,12 +21,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
+
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.internal.sql.IdentifierGenerator;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 
 /**
  *
@@ -48,8 +54,27 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
      * Initialise l'identifiant de la table.
      */
     private EnvelopeTable(final EnvelopeQuery query) {
-        super(query);
-        setIdentifierParameters(query.byId, null);
+        super(query, query.byId);
+    }
+
+    /**
+     * Creates a new instance having the same configuration than the given table.
+     * This is a copy constructor used for obtaining a new instance to be used
+     * concurrently with the original instance.
+     *
+     * @param table The table to use as a template.
+     */
+    private EnvelopeTable(final EnvelopeTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected EnvelopeTable clone() {
+        return new EnvelopeTable(this);
     }
     
     /**
@@ -62,7 +87,7 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
      * @throws java.sql.SQLException
      */
     @Override
-    protected EnvelopeEntry createEntry(ResultSet results) throws CatalogException, SQLException {
+    protected EnvelopeEntry createEntry(ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final EnvelopeQuery query = (EnvelopeQuery) super.query;
         //on lit le premier point
         List<Double> value = new ArrayList<Double>();
@@ -89,61 +114,69 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
      *
      * @param off l'ofeering a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final EnvelopeEntry envelope) throws SQLException, CatalogException {
+    public String getIdentifier(final EnvelopeEntry envelope) throws SQLException, CatalogException {
         final EnvelopeQuery query = (EnvelopeQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        try {
-            if (envelope.getId() != null) {
-                final PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.id), envelope.getId());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    return envelope.getId();
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                if (envelope.getId() != null) {
+                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    statement.statement.setString(indexOf(query.id), envelope.getId());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        result.close();
+                        release(statement);
+                        return envelope.getId();
+                    } else {
+                        id = envelope.getId();
+                    }
+                    result.close();
+                    release(statement);
                 } else {
-                    id = envelope.getId();
+
+                    id = searchFreeIdentifier("envelope:");
                 }
-            } else {
-                id = searchFreeIdentifier("envelope:");
+                final Stmt statement = getStatement(QueryType.INSERT);
+                statement.statement.setString(indexOf(query.id), id);
+                if (envelope.getSrsName() != null) {
+                    statement.statement.setString(indexOf(query.srsName), envelope.getSrsName());
+                } else {
+                    statement.statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
+                }
+
+                if (envelope.getAxisLabels() != null && envelope.getAxisLabels().size() != 0) {
+                    log("getIdentifier", new LogRecord(Level.WARNING, "Axis Labels are not yet recordable"));
+                }
+
+                if (envelope.getLowerCorner() != null && envelope.getLowerCorner().getValue().size() == 2) {
+                    statement.statement.setDouble(indexOf(query.lowerCornerX), envelope.getLowerCorner().getValue().get(0));
+                    statement.statement.setDouble(indexOf(query.lowerCornerY), envelope.getLowerCorner().getValue().get(1));
+                } else {
+                    log("getIdentifier", new LogRecord(Level.WARNING, "lowerCorner null ou malformed"));
+                    statement.statement.setNull(indexOf(query.lowerCornerX), java.sql.Types.DOUBLE);
+                    statement.statement.setNull(indexOf(query.lowerCornerY), java.sql.Types.DOUBLE);
+                }
+
+                if (envelope.getUpperCorner() != null && envelope.getUpperCorner().getValue().size() == 2) {
+                    statement.statement.setDouble(indexOf(query.upperCornerX), envelope.getUpperCorner().getValue().get(0));
+                    statement.statement.setDouble(indexOf(query.upperCornerY), envelope.getUpperCorner().getValue().get(1));
+                } else {
+                    log("getIdentifier", new LogRecord(Level.WARNING, "upperCorner null ou malformed"));
+                    statement.statement.setNull(indexOf(query.upperCornerX), java.sql.Types.DOUBLE);
+                    statement.statement.setNull(indexOf(query.upperCornerY), java.sql.Types.DOUBLE);
+                }
+                updateSingleton(statement.statement);
+                release(statement);
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.id), id);
-            if (envelope.getSrsName() != null) {
-                statement.setString(indexOf(query.srsName), envelope.getSrsName());
-            } else {
-                statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
-            }
-        
-            if (envelope.getAxisLabels() != null && envelope.getAxisLabels().size() != 0) {
-                LOGGER.info("Axis Labels are not yet recordable");
-            }
-        
-            if (envelope.getLowerCorner() != null && envelope.getLowerCorner().getValue().size() == 2) {
-                statement.setDouble(indexOf(query.lowerCornerX), envelope.getLowerCorner().getValue().get(0));
-                statement.setDouble(indexOf(query.lowerCornerY), envelope.getLowerCorner().getValue().get(1));
-            } else {
-                LOGGER.info("lowerCorner null ou mal forme");
-                statement.setNull(indexOf(query.lowerCornerX), java.sql.Types.DOUBLE);
-                statement.setNull(indexOf(query.lowerCornerY), java.sql.Types.DOUBLE);
-            }
-        
-            if (envelope.getUpperCorner() != null && envelope.getUpperCorner().getValue().size() == 2) {
-                statement.setDouble(indexOf(query.upperCornerX), envelope.getUpperCorner().getValue().get(0));
-                statement.setDouble(indexOf(query.upperCornerY), envelope.getUpperCorner().getValue().get(1));
-            } else {
-                LOGGER.info("upperCorner null ou mal forme");
-                statement.setNull(indexOf(query.upperCornerX), java.sql.Types.DOUBLE);
-                statement.setNull(indexOf(query.upperCornerY), java.sql.Types.DOUBLE);
-            }
-            updateSingleton(statement);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
         return id;
     }
-    
+
 
 }

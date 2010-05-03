@@ -82,8 +82,8 @@ public class SMLProviderService extends AbstractProviderService<Name,LayerDetail
             SMLProvider provider = new SMLProvider(ps);
             PROVIDERS.add(provider);
             String msg = "[PROVIDER]> sensorML provider created :";
-            String SGBDType = provider.getSource().parameters.get(KEY_SGBDTYPE);
-            if (SGBDType != null && SGBDType.equals("derby")) {
+            String sgbdType = provider.getSource().parameters.get(KEY_SGBDTYPE);
+            if (sgbdType != null && sgbdType.equals("derby")) {
                 msg = msg + "java DB: > "
                           + provider.getSource().parameters.get(KEY_DERBYURL);
             } else {

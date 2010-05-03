@@ -22,10 +22,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.SingletonTable;
-import org.constellation.catalog.QueryType;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
+import org.geotoolkit.internal.sql.table.SingletonTable;
+import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
 import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
 import org.geotoolkit.util.Utilities;
@@ -64,18 +65,26 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
      * Initialise l'identifiant de la table.
      */
     private SimpleDataRecordTable(final SimpleDataRecordQuery query) {
-        super(query);
-        setIdentifierParameters(query.byIdDataRecord, null);
+        super(query,query.byIdDataRecord);
     }
     
     /**
      * Un constructeur qui prend en parametre un table partagée afin d'en creer
      * une qui ne l'ai pas.
      */
-    public SimpleDataRecordTable(final SimpleDataRecordTable table) {
+    private SimpleDataRecordTable(final SimpleDataRecordTable table) {
         super(table);
     }
-    
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected SimpleDataRecordTable clone() {
+        return new SimpleDataRecordTable(this);
+    }
+
     /**
      * retourne l'identifiant du DataBlock contenant le dataRecord qui possede ce champ.
      */
@@ -99,14 +108,13 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
      * Construit un data record pour l'enregistrement courant.
      */
     @Override
-    protected SimpleDataRecordEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
+    protected SimpleDataRecordEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
         final String idDataBlock = results.getString(indexOf(query.idBlock));
         final String idDataRecord = results.getString(indexOf(query.idDataRecord));
         
         if (fields == null) {
             fields = getDatabase().getTable(AnyScalarTable.class);
-            fields = new AnyScalarTable(fields);
         }
        
         fields.setIdDataBlock(idDataBlock);
@@ -138,55 +146,61 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
      *
      * @param datarecord le data record a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final SimpleDataRecordEntry datarecord, String dataBlockId) throws SQLException, CatalogException {
+    public String getIdentifier(final SimpleDataRecordEntry datarecord, String dataBlockId) throws SQLException, CatalogException {
         final SimpleDataRecordQuery query  = (SimpleDataRecordQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        try {
-            if (datarecord.getId() != null) {
-                final PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.idBlock),      dataBlockId);
-                statement.setString(indexOf(query.idDataRecord), datarecord.getId());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    return datarecord.getId();
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                if (datarecord.getId() != null) {
+                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    statement.statement.setString(indexOf(query.idBlock),      dataBlockId);
+                    statement.statement.setString(indexOf(query.idDataRecord), datarecord.getId());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        result.close();
+                        release(statement);
+                        return datarecord.getId();
+                    } else {
+                        id = datarecord.getId();
+                    }
+                    result.close();
+                    release(statement);
                 } else {
-                    id = datarecord.getId();
+                    id = searchFreeIdentifier("datarecord");
                 }
-            } else {
-                id = searchFreeIdentifier("datarecord");
+
+                final Stmt statement = getStatement(QueryType.INSERT);
+                statement.statement.setString(indexOf(query.idDataRecord), id);
+                statement.statement.setString(indexOf(query.idBlock),      dataBlockId);
+                if (datarecord.getDefinition() != null) {
+                    statement.statement.setString(indexOf(query.definition),   datarecord.getDefinition().toString());
+                } else {
+                    statement.statement.setNull(indexOf(query.definition),  java.sql.Types.VARCHAR);
+                }
+                statement.statement.setBoolean(indexOf(query.fixed),       datarecord.isFixed());
+                updateSingleton(statement.statement);
+                release(statement);
+
+                if (fields == null) {
+                    fields = getDatabase().getTable(AnyScalarTable.class);
+                    fields.setIdDataBlock(dataBlockId);
+                    fields.setIdDataRecord(id);
+                } else {
+                    fields.setIdDataBlock(dataBlockId);
+                    fields.setIdDataRecord(id);
+                }
+                final Iterator<AnyScalarPropertyType> i = datarecord.getField().iterator();
+
+                while (i.hasNext()) {
+                   fields.getIdentifier(i.next(), dataBlockId, id);
+                }
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-        
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.idDataRecord), id);
-            statement.setString(indexOf(query.idBlock),      dataBlockId);
-            if (datarecord.getDefinition() != null) {
-                statement.setString(indexOf(query.definition),   datarecord.getDefinition().toString());
-            } else {
-                statement.setNull(indexOf(query.definition),  java.sql.Types.VARCHAR);
-            }
-            statement.setBoolean(indexOf(query.fixed),       datarecord.isFixed());
-            updateSingleton(statement);
-         
-            if (fields == null) {
-                fields = getDatabase().getTable(AnyScalarTable.class);
-                fields = new AnyScalarTable(fields);
-                fields.setIdDataBlock(dataBlockId);
-                fields.setIdDataRecord(id);
-            } else {
-                fields.setIdDataBlock(dataBlockId);
-                fields.setIdDataRecord(id);
-            }
-            final Iterator<AnyScalarPropertyType> i = datarecord.getField().iterator();
-        
-            while (i.hasNext()) {
-               fields.getIdentifier(i.next(), dataBlockId, id);
-            }
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
         return id;
     }

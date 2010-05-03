@@ -17,12 +17,12 @@
  */
 package org.constellation.swe.v101;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  * The query to execute for a {@link PhenomenonTable}.
@@ -50,11 +50,11 @@ public class PhenomenonQuery extends Query{
     public PhenomenonQuery(final Database database) {
         super(database, "phenomenons", "observation");
         final QueryType[] sil = {SELECT, INSERT, LIST};
-        final QueryType[] siel = {SELECT, INSERT, EXISTS, LIST};
+        final QueryType[] siel = {SELECT, INSERT, EXISTS, LIST, LIST_ID};
         
-        identifier = addColumn ("id",          siel);
-        name       = addColumn ("name",        sil);
-        remarks    = addColumn ("description", sil);
+        identifier = addMandatoryColumn ("id",          siel);
+        name       = addMandatoryColumn ("name",        sil);
+        remarks    = addOptionalColumn ("description", null, sil);
         
         byName     = addParameter(identifier, SELECT, EXISTS);
     }

@@ -17,12 +17,12 @@
  */
 package org.constellation.swe.v101;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import static org.constellation.catalog.QueryType.*;
-import org.constellation.catalog.QueryType;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
+import org.geotoolkit.internal.sql.table.QueryType;
 
 /**
  * The query to execute for a {@link SimpleDataRecordTable}.
@@ -51,10 +51,10 @@ public class SimpleDataRecordQuery extends Query{
         super(database, "simple_data_records", "observation");
         final QueryType[] sli  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
-        idBlock       = addColumn("id_datablock",  slie);
-        idDataRecord  = addColumn("id_datarecord", slie);
-        definition    = addColumn("definition",    sli);
-        fixed         = addColumn("fixed",         sli);
+        idBlock       = addMandatoryColumn("id_datablock",  slie);
+        idDataRecord  = addMandatoryColumn("id_datarecord", slie);
+        definition    = addOptionalColumn("definition",    null, sli);
+        fixed         = addOptionalColumn("fixed",         null, sli);
         
         byIdBlock       = addParameter(idBlock, SELECT, LIST, EXISTS);
         byIdDataRecord  = addParameter(idDataRecord, SELECT, EXISTS);

@@ -17,20 +17,20 @@
  */
 package org.constellation.sampling;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 
 /**
@@ -49,10 +49,25 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
      * Initialise l'identifiant de la table.
      */
     private SamplingPointTable(final SamplingPointQuery query) {
-        super(query);
-        setIdentifierParameters(query.byIdentifier, null);
+        super(query, query.byIdentifier);
     }
-    
+
+    /**
+     * Construit une nouvelle table non partagée
+     */
+    private SamplingPointTable(final SamplingPointTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected SamplingPointTable clone() {
+        return new SamplingPointTable(this);
+    }
+
     /**
      * Construit une station pour l'enregistrement courant. L'implémentation par défaut extrait une
      * premiére série d'informations telles que le {@linkplain Station#getName nom de la station},
@@ -61,7 +76,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
     @Override
-    protected SamplingPointEntry createEntry(final ResultSet result) throws CatalogException, SQLException {
+    protected SamplingPointEntry createEntry(final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
         final SamplingPointQuery query = (SamplingPointQuery) super.query;
         
         final List<Double> value = new ArrayList<Double>();
@@ -87,83 +102,78 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
      *
      * @param result le resultat a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final SamplingPointEntry station) throws SQLException, CatalogException {
+    public String getIdentifier(final SamplingPointEntry station) throws SQLException, CatalogException {
         final SamplingPointQuery query  = (SamplingPointQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        try {
-            // the station recived by xml have no ID so we use the name as a second primary key
-            if (station.getName() != null) {
-                final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
-                statement.setString(indexOf(query.byName), station.getName());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    id = result.getString("id");
-                    station.setId(id);
-                    return id;
-                } else {
-                    if (station.getId() != null) {
-                        id = station.getId(); 
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                // the station recived by xml have no ID so we use the name as a second primary key
+                if (station.getName() != null) {
+                    final Stmt statement = getStatement(QueryType.LIST);
+                    statement.statement.setString(indexOf(query.byName), station.getName());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        id = result.getString("id");
+                        station.setId(id);
+                        result.close();
+                        release(statement);
+                        return id;
                     } else {
-                       id = searchFreeIdentifier("station"); 
+                        if (station.getId() != null) {
+                            id = station.getId();
+                        } else {
+                           id = searchFreeIdentifier("station");
+                        }
                     }
+                    result.close();
+                    release(statement);
+                    
+                } else {
+                   throw new CatalogException("the station must have a name");
                 }
-            } else {
-               throw new CatalogException("the station must have a name"); 
+                station.setId(id);
+                final Stmt statement = getStatement(QueryType.INSERT);
+                statement.statement.setString(indexOf(query.identifier), id);
+
+                if (station.getDescription() != null) {
+                    statement.statement.setString(indexOf(query.description), station.getDescription());
+                } else {
+                    statement.statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
+                }
+
+                statement.statement.setString(indexOf(query.name), station.getName());
+                final Iterator<FeaturePropertyType> i = station.getSampledFeatures().iterator();
+                if (i.hasNext()) {
+                    FeaturePropertyType fp = i.next();
+                    statement.statement.setString(indexOf(query.sampledFeature), (String)fp.getHref());
+                } else {
+                    statement.statement.setNull(indexOf(query.sampledFeature), java.sql.Types.VARCHAR);
+                }
+
+                if( station.getPosition() != null ) {
+                    statement.statement.setString(indexOf(query.pointIdentifier), station.getPosition().getId());
+                    statement.statement.setString(indexOf(query.srsName), station.getPosition().getPos().getSrsName());
+                    statement.statement.setDouble(indexOf(query.positionValueX), station.getPosition().getPos().getValue().get(0));
+                    statement.statement.setDouble(indexOf(query.positionValueY), station.getPosition().getPos().getValue().get(1));
+                    statement.statement.setInt(indexOf(query.srsDimension), station.getPosition().getPos().getDimension());
+                } else {
+                    statement.statement.setNull(indexOf(query.pointIdentifier), java.sql.Types.VARCHAR);
+                    statement.statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
+                    statement.statement.setNull(indexOf(query.positionValueX), java.sql.Types.DOUBLE);
+                    statement.statement.setNull(indexOf(query.positionValueY), java.sql.Types.DOUBLE);
+                    statement.statement.setNull(indexOf(query.srsDimension), java.sql.Types.INTEGER);
+                }
+                updateSingleton(statement.statement);
+                release(statement);
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-            station.setId(id);
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.identifier), id);
-        
-            if (station.getDescription() != null) {
-                statement.setString(indexOf(query.description), station.getDescription());
-            } else {
-                statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
-            }
-        
-            statement.setString(indexOf(query.name), station.getName());
-            final Iterator<FeaturePropertyType> i = station.getSampledFeatures().iterator();
-            if (i.hasNext()) {
-                FeaturePropertyType fp = i.next();
-                statement.setString(indexOf(query.sampledFeature), (String)fp.getHref());
-            } else {
-                statement.setNull(indexOf(query.sampledFeature), java.sql.Types.VARCHAR);
-            }
-        
-            if( station.getPosition() != null ) {
-                statement.setString(indexOf(query.pointIdentifier), station.getPosition().getId());
-                statement.setString(indexOf(query.srsName), station.getPosition().getPos().getSrsName());
-                statement.setDouble(indexOf(query.positionValueX), station.getPosition().getPos().getValue().get(0));
-                statement.setDouble(indexOf(query.positionValueY), station.getPosition().getPos().getValue().get(1));
-                statement.setInt(indexOf(query.srsDimension), station.getPosition().getPos().getDimension());
-            } else {
-                statement.setNull(indexOf(query.pointIdentifier), java.sql.Types.VARCHAR);
-                statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
-                statement.setNull(indexOf(query.positionValueX), java.sql.Types.DOUBLE);
-                statement.setNull(indexOf(query.positionValueY), java.sql.Types.DOUBLE);
-                statement.setNull(indexOf(query.srsDimension), java.sql.Types.INTEGER);
-            }
-            updateSingleton(statement); 
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
         return id;
     }
-    
-    /**
-     * patch
-     
-    private String freeIdentifier(String racine) throws SQLException {
-        Statement stmt = this.getDatabase().getConnection().createStatement();
-        ResultSet res = stmt.executeQuery("select id from sampling_points where id like '%" + racine + "%'");
-        int i = 0;
-        while (res.next()) {
-            i++;
-        }
-        return racine + "-" + i;
-    }*/
     
 }

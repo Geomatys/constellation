@@ -19,12 +19,13 @@ package org.constellation.sos;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.swe.v101.CompositePhenomenonTable;
 import org.constellation.swe.v101.PhenomenonTable;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
@@ -63,21 +64,28 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
     /**
      * Build a new offering phenomenon table not shared.
      */
-    public OfferingPhenomenonTable(final OfferingPhenomenonTable table) {
+    private OfferingPhenomenonTable(final OfferingPhenomenonTable table) {
         super(table);
     }
-    
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected OfferingPhenomenonTable clone() {
+        return new OfferingPhenomenonTable(this);
+    }
+
     /**
      * Initialize the table identifier.
      */
     private OfferingPhenomenonTable(final OfferingPhenomenonQuery query) {
-        super(query);
-        setIdentifierParameters(query.byPhenomenon, null);
+        super(query,query.byPhenomenon);
     }
     
     
     @Override
-    protected OfferingPhenomenonEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
+    protected OfferingPhenomenonEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingPhenomenonQuery query = (OfferingPhenomenonQuery) super.query;
         PhenomenonEntry phenomenon;
         
@@ -124,63 +132,69 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
      * Insere un nouveau capteur a un offering dans la base de donnée.
      *
      */
-    public synchronized void getIdentifier(OfferingPhenomenonEntry offPheno) throws SQLException, CatalogException {
+    public void getIdentifier(OfferingPhenomenonEntry offPheno) throws SQLException, CatalogException {
         final OfferingPhenomenonQuery query  = (OfferingPhenomenonQuery) super.query;
         String idPheno = "";
         boolean success = false;
-        transactionBegin();
-        try {
-            final PreparedStatement statement = getStatement(QueryType.EXISTS);
-        
-            statement.setString(indexOf(query.idOffering), offPheno.getIdOffering());
-        
-         
-            if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
-                if (compositePhenomenons == null) {
-                    compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                final Stmt statement = getStatement(QueryType.EXISTS);
+
+                statement.statement.setString(indexOf(query.idOffering), offPheno.getIdOffering());
+
+
+                if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
+                    if (compositePhenomenons == null) {
+                        compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
+                    }
+                    idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
+                    statement.statement.setString(indexOf(query.compositePhenomenon), idPheno);
+                    statement.statement.setString(indexOf(query.phenomenon), "");
+
+                } else {
+                    if ( phenomenons == null) {
+                        phenomenons = getDatabase().getTable(PhenomenonTable.class);
+                    }
+                    idPheno = phenomenons.getIdentifier(offPheno.getComponent());
+                    statement.statement.setString(indexOf(query.phenomenon), idPheno);
+                    statement.statement.setString(indexOf(query.compositePhenomenon), "");
+
                 }
-                idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
-                statement.setString(indexOf(query.compositePhenomenon), idPheno);
-                statement.setString(indexOf(query.phenomenon), "");
-        
-            } else {
+                final ResultSet result = statement.statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    result.close();
+                    release(statement);
+                    return;
+                }
+                result.close();
+                release(statement);
+
+                final Stmt insert    = getStatement(QueryType.INSERT);
+                insert.statement.setString(indexOf(query.idOffering), offPheno.getIdOffering());
+                if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
+                    if (compositePhenomenons == null) {
+                        compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
+                    }
+                    idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
+                    insert.statement.setString(indexOf(query.compositePhenomenon), idPheno);
+                    insert.statement.setString(indexOf(query.phenomenon), "");
+                } else {
                 if ( phenomenons == null) {
-                    phenomenons = getDatabase().getTable(PhenomenonTable.class);
+                        phenomenons = getDatabase().getTable(PhenomenonTable.class);
                 }
                 idPheno = phenomenons.getIdentifier(offPheno.getComponent());
-                statement.setString(indexOf(query.phenomenon), idPheno);
-                statement.setString(indexOf(query.compositePhenomenon), "");
-            
-            }
-            final ResultSet result = statement.executeQuery();
-            if(result.next()) {
-                success = true;
-                return;
-            }
-        
-            final PreparedStatement insert    = getStatement(QueryType.INSERT);
-            insert.setString(indexOf(query.idOffering), offPheno.getIdOffering());
-            if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
-                if (compositePhenomenons == null) {
-                    compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
+                    insert.statement.setString(indexOf(query.phenomenon), idPheno);
+                    insert.statement.setString(indexOf(query.compositePhenomenon), "");
+
                 }
-                idPheno = compositePhenomenons.getIdentifier((CompositePhenomenonEntry)offPheno.getComponent());
-                insert.setString(indexOf(query.compositePhenomenon), idPheno);
-                insert.setString(indexOf(query.phenomenon), "");
-            } else {
-            if ( phenomenons == null) {
-                    phenomenons = getDatabase().getTable(PhenomenonTable.class);
+                updateSingleton(insert.statement);
+                release(insert);
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-            idPheno = phenomenons.getIdentifier(offPheno.getComponent());
-                insert.setString(indexOf(query.phenomenon), idPheno);
-                insert.setString(indexOf(query.compositePhenomenon), "");
-            
-            }
-            updateSingleton(insert);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
-              
     }
 }

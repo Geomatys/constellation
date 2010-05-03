@@ -47,6 +47,7 @@ import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
 import org.geotoolkit.swe.xml.v101.TextBlockEntry;
 import org.geotoolkit.swe.xml.v101.TimeType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
@@ -237,7 +238,13 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         final DirectPositionType pos = new DirectPositionType(srsName, srsDimension, coordinates);
         final PointType location     = new PointType(pointID, pos);
 
-        return  new SamplingPointEntry(samplingFeatureId, name, description, null, new PointPropertyType(location));
+        final FeaturePropertyType sampleFeatureProperty;
+        if (sampledFeature != null) {
+            sampleFeatureProperty = new FeaturePropertyType(sampledFeature);
+        } else {
+            sampleFeatureProperty = null;
+        }
+        return  new SamplingPointEntry(samplingFeatureId, name, description, sampleFeatureProperty, new PointPropertyType(location));
     }
 
     private List<Double> getCoordinates(String samplingFeatureId) throws CstlServiceException {

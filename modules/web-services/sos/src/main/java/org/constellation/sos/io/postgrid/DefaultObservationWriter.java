@@ -24,10 +24,10 @@ import java.sql.Statement;
 // constellation dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.ConfigurationKey;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.NoSuchTableException;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.ConfigurationKey;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.NoSuchTableException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.observation.MeasurementTable;
@@ -95,7 +95,7 @@ public class DefaultObservationWriter implements ObservationWriter {
      * @param dataSourceOM
      * @param observationIdBase
      * @throws java.io.IOException
-     * @throws org.constellation.catalog.NoSuchTableException
+     * @throws org.geotoolkit.internal.sql.table.NoSuchTableException
      * @throws java.sql.SQLException
      */
     public DefaultObservationWriter(Automatic configuration) throws CstlServiceException {
@@ -110,10 +110,10 @@ public class DefaultObservationWriter implements ObservationWriter {
         isPostgres = db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver");
         try {
             omDatabase = DatabasePool.getDatabase(db);
-            omDatabase.setProperty(ConfigurationKey.READONLY, "false");
+            /*omDatabase.setProperty(ConfigurationKey.READONLY, "false");
             if (!isPostgres) {
                 omDatabase.setProperty(ConfigurationKey.ISPOSTGRES, "false");
-            }
+            }*/
             
             //we build the database table frequently used.
             obsTable  = omDatabase.getTable(ObservationTable.class);
@@ -191,7 +191,7 @@ public class DefaultObservationWriter implements ObservationWriter {
 
     @Override
     public void updateOfferings() {
-        offTable.flush();
+        //offTable.flush();
     }
 
     @Override
@@ -199,7 +199,7 @@ public class DefaultObservationWriter implements ObservationWriter {
         if (position == null || position.getValue().size() < 2 || !isPostgres)
             return;
         try {
-            final Statement stmt2    = omDatabase.getConnection().createStatement();
+            final Statement stmt2    = omDatabase.getDataSource(true).getConnection().createStatement();
             final ResultSet result2;
             String request = "SELECT * FROM ";
             boolean insert = true;
@@ -253,11 +253,11 @@ public class DefaultObservationWriter implements ObservationWriter {
 
     @Override
     public void destroy() {
-        try {
+        /*try {
             omDatabase.close();
         } catch (SQLException ex) {
             LOGGER.severe("SQL exception while destroying observation writer");
-        }
+        }*/
     }
 
 }

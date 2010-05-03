@@ -23,7 +23,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.constellation.catalog.Database;
+import org.geotoolkit.internal.sql.table.Database;
 import org.constellation.generic.database.BDD;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -32,7 +32,7 @@ import org.postgresql.ds.PGSimpleDataSource;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class DatabasePool {
+public final class DatabasePool {
 
     private static final Map<BDD, Database> DATABASE_MAP = new HashMap<BDD, Database>();
 
@@ -50,7 +50,7 @@ public class DatabasePool {
     public static Connection getDatabaseConnection(BDD bdd) throws SQLException {
         final Database db =  DATABASE_MAP.get(bdd);
         if (db != null) {
-            return db.getConnection();
+            return db.getDataSource(true).getConnection();
         }
         return null;
     }
@@ -69,6 +69,6 @@ public class DatabasePool {
             dataSource = new DefaultDataSource(bdd.getConnectURL());
         }
 
-        return new Database(dataSource);
+        return new Database(dataSource, null);
     }
 }

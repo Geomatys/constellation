@@ -17,12 +17,12 @@
  */
 package org.constellation.swe.v101;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import static org.constellation.catalog.QueryType.*;
-import org.constellation.catalog.QueryType;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
+import org.geotoolkit.internal.sql.table.QueryType;
 
 
 /**
@@ -52,12 +52,12 @@ public class CompositePhenomenonQuery extends Query{
     public CompositePhenomenonQuery(final Database database) {
         super(database, "composite_phenomenons", "observation");
         final QueryType[] sil  = {SELECT, INSERT, LIST};
-        final QueryType[] siel = {SELECT, INSERT, EXISTS, LIST};
+        final QueryType[] siel = {SELECT, INSERT, EXISTS, LIST, LIST_ID};
         
-        identifier = addColumn ("id",          siel);
-        name       = addColumn ("name",        sil);
-        remarks    = addColumn ("description", sil);
-        dimension  = addColumn ("dimension",   sil);
+        identifier = addMandatoryColumn ("id",          siel);
+        name       = addMandatoryColumn ("name",        sil);
+        remarks    = addOptionalColumn ("description", null, sil);
+        dimension  = addOptionalColumn ("dimension",   null, sil);
         
         byName     = addParameter(identifier, SELECT, EXISTS);
     }

@@ -20,10 +20,11 @@ package org.constellation.swe.v101;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.swe.xml.v101.AbstractDataComponentEntry;
 import org.geotoolkit.swe.xml.v101.AnyScalarPropertyType;
 import org.geotoolkit.swe.xml.v101.BooleanType;
@@ -65,18 +66,24 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
      * Initialise l'identifiant de la table.
      */
     private AnyScalarTable(final AnyScalarQuery query) {
-        super(query);
-        setIdentifierParameters(query.byName, null);
+        super(query, query.byName);
     }
     
      /**
      * Un constructeur qui prend en parametre un table partagée afin d'en creer
      * une qui ne l'ai pas.
      */
-    public AnyScalarTable(final AnyScalarTable table) {
+    private AnyScalarTable(final AnyScalarTable table) {
         super(table);
     }
-    
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected AnyScalarTable clone() {
+        return new AnyScalarTable(this);
+    }
     /**
      * retourne l'identifiant du DataBlock contenant le dataRecord qui possede ce champ.
      */
@@ -119,7 +126,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
      * Construit un data block pour l'enregistrement courant.
      */
     @Override
-    protected AnyScalarPropertyType createEntry(final ResultSet results) throws SQLException {
+    protected AnyScalarPropertyType createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException {
         final AnyScalarQuery query = (AnyScalarQuery) super.query;
         AbstractDataComponentEntry component = null;
         if (results.getString(indexOf(query.type)).equals("Quantity")) {
@@ -160,89 +167,96 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
      *
      * @param datarecord le data record a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final AnyScalarPropertyType field, String blockId, String dataRecordId) throws SQLException, CatalogException {
+    public String getIdentifier(final AnyScalarPropertyType field, String blockId, String dataRecordId) throws SQLException, CatalogException {
         final AnyScalarQuery query  = (AnyScalarQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        try {
-            if (field.getName() != null) {
-                final PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.byIdDataBlock), blockId);
-                statement.setString(indexOf(query.idDataRecord),  dataRecordId);
-                statement.setString(indexOf(query.name),          field.getName());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    return field.getName();
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                if (field.getName() != null) {
+                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    statement.statement.setString(indexOf(query.byIdDataBlock), blockId);
+                    statement.statement.setString(indexOf(query.idDataRecord),  dataRecordId);
+                    statement.statement.setString(indexOf(query.name),          field.getName());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        result.close();
+                        release(statement);
+                        return field.getName();
+                    } else {
+                        id = field.getName();
+                    }
+                    result.close();
+                    release(statement);
                 } else {
-                    id = field.getName();
+                    id = searchFreeIdentifier("field");
                 }
-            } else {
-                id = searchFreeIdentifier("field");
+
+                final Stmt statement = getStatement(QueryType.INSERT);
+                statement.statement.setString(indexOf(query.idDataRecord), dataRecordId);
+                statement.statement.setString(indexOf(query.idDataBlock),  blockId);
+                statement.statement.setString(indexOf(query.name),         id);
+                if (field.getValue() != null && field.getValue().getDefinition() != null) {
+                    statement.statement.setString(indexOf(query.definition),   field.getValue().getDefinition().toString());
+                } else {
+                    statement.statement.setNull(indexOf(query.definition), java.sql.Types.VARCHAR);
+                }
+
+                if (field.getValue() instanceof QuantityType) {
+                    final QuantityType q = (QuantityType) field.getValue();
+
+                    statement.statement.setString(indexOf(query.type), "Quantity");
+                    if ( q.getUom().getCode() != null)
+                        statement.statement.setString(indexOf(query.uomCode), q.getUom().getCode());
+                    else
+                        statement.statement.setNull(indexOf(query.uomCode), java.sql.Types.VARCHAR);
+
+                    if ( q.getUom().getHref() != null)
+                        statement.statement.setString(indexOf(query.uomHref), q.getUom().getHref());
+                    else
+                        statement.statement.setNull(indexOf(query.uomHref), java.sql.Types.VARCHAR);
+
+                    statement.statement.setNull(indexOf(query.value), java.sql.Types.BOOLEAN);
+
+                } else if (field.getValue() instanceof TimeType) {
+                    final TimeType t = (TimeType) field.getValue();
+
+                    statement.statement.setString(indexOf(query.type), "Time");
+                    if ( t.getUom() != null && t.getUom().getCode() != null)
+                        statement.statement.setString(indexOf(query.uomCode), t.getUom().getCode());
+                    else
+                        statement.statement.setNull(indexOf(query.uomCode), java.sql.Types.VARCHAR);
+
+                    if ( t.getUom() != null && t.getUom().getHref() != null)
+                        statement.statement.setString(indexOf(query.uomHref), t.getUom().getHref());
+                    else
+                        statement.statement.setNull(indexOf(query.uomHref), java.sql.Types.VARCHAR);
+
+                    statement.statement.setNull(indexOf(query.value), java.sql.Types.BOOLEAN);
+
+                } else if (field.getValue() instanceof BooleanType) {
+                    final BooleanType b = (BooleanType) field.getValue();
+
+                    statement.statement.setString(indexOf(query.type), "Boolean");
+                    if (b.isValue() != null)
+                        statement.statement.setBoolean(indexOf(query.value), b.isValue());
+                    else
+                        statement.statement.setNull(indexOf(query.value), java.sql.Types.BOOLEAN);
+
+                    statement.statement.setNull(indexOf(query.uomHref), java.sql.Types.VARCHAR);
+                    statement.statement.setNull(indexOf(query.uomCode), java.sql.Types.VARCHAR);
+
+                } else {
+                    throw new CatalogException("Unexpected scalar Type:" + field.getValue());
+                }
+                updateSingleton(statement.statement);
+                release(statement);
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-        
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.idDataRecord), dataRecordId);
-            statement.setString(indexOf(query.idDataBlock),  blockId);
-            statement.setString(indexOf(query.name),         id);
-            if (field.getValue() != null && field.getValue().getDefinition() != null) {
-                statement.setString(indexOf(query.definition),   field.getValue().getDefinition().toString());
-            } else {
-                statement.setNull(indexOf(query.definition), java.sql.Types.VARCHAR);   
-            }
-            
-            if (field.getValue() instanceof QuantityType) {
-                final QuantityType q = (QuantityType) field.getValue();
-            
-                statement.setString(indexOf(query.type), "Quantity");
-                if ( q.getUom().getCode() != null)
-                    statement.setString(indexOf(query.uomCode), q.getUom().getCode());
-                else
-                    statement.setNull(indexOf(query.uomCode), java.sql.Types.VARCHAR);
-            
-                if ( q.getUom().getHref() != null)
-                    statement.setString(indexOf(query.uomHref), q.getUom().getHref());
-                else
-                    statement.setNull(indexOf(query.uomHref), java.sql.Types.VARCHAR);
-            
-                statement.setNull(indexOf(query.value), java.sql.Types.BOOLEAN);
-            
-            } else if (field.getValue() instanceof TimeType) {
-                final TimeType t = (TimeType) field.getValue();
-            
-                statement.setString(indexOf(query.type), "Time");
-                if ( t.getUom() != null && t.getUom().getCode() != null)
-                    statement.setString(indexOf(query.uomCode), t.getUom().getCode());
-                else
-                    statement.setNull(indexOf(query.uomCode), java.sql.Types.VARCHAR);
-            
-                if ( t.getUom() != null && t.getUom().getHref() != null)
-                    statement.setString(indexOf(query.uomHref), t.getUom().getHref());
-                else
-                    statement.setNull(indexOf(query.uomHref), java.sql.Types.VARCHAR);
-            
-                statement.setNull(indexOf(query.value), java.sql.Types.BOOLEAN);
-            
-            } else if (field.getValue() instanceof BooleanType) {
-                final BooleanType b = (BooleanType) field.getValue();
-            
-                statement.setString(indexOf(query.type), "Boolean");
-                if (b.isValue() != null)
-                    statement.setBoolean(indexOf(query.value), b.isValue());
-                else
-                    statement.setNull(indexOf(query.value), java.sql.Types.BOOLEAN);
-            
-                statement.setNull(indexOf(query.uomHref), java.sql.Types.VARCHAR);
-                statement.setNull(indexOf(query.uomCode), java.sql.Types.VARCHAR);
-            
-            } else {
-                throw new CatalogException("Unexpected scalar Type:" + field.getValue());            
-            }
-            updateSingleton(statement);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
         return id;
     }

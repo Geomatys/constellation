@@ -17,12 +17,12 @@
  */
 package org.constellation.sampling;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import static org.constellation.catalog.QueryType.*;
-import org.constellation.catalog.QueryType;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
+import org.geotoolkit.internal.sql.table.QueryType;
 
 /**
  * The query to execute for a {@link SamplingCurveTable}.
@@ -55,22 +55,22 @@ public class SamplingCurveQuery extends Query {
         super(database, "sampling_curves", "observation");
         //final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         final QueryType[] sli   = {SELECT, LIST, INSERT};
-        final QueryType[] slif  = {SELECT, LIST, INSERT, FILTERED_LIST};
-        final QueryType[] slief = {SELECT, LIST, INSERT, EXISTS, FILTERED_LIST};
+        final QueryType[] slif  = {SELECT, LIST, INSERT};
+        final QueryType[] slief = {SELECT, LIST, INSERT, EXISTS, LIST_ID};
         
-        identifier             = addColumn   ("id",                 slief);
-        name                   = addColumn   ("name",               slif);
-        description            = addColumn   ("description",        sli);
-        boundedby              = addColumn   ("boundedby",          sli);
-        sampledFeature         = addColumn   ("sampled_feature",    sli);
-        lengthUom              = addColumn   ("length_uom",         sli);
-        lengthValue            = addColumn   ("length_value",       sli);
-        curveIdentifier        = addColumn   ("shape_id",           sli);
-        srsName                = addColumn   ("shape_srsname",      sli);
+        identifier             = addMandatoryColumn   ("id",                 slief);
+        name                   = addMandatoryColumn   ("name",               slif);
+        description            = addOptionalColumn    ("description",        null ,sli);
+        boundedby              = addOptionalColumn    ("boundedby",          null ,sli);
+        sampledFeature         = addOptionalColumn    ("sampled_feature",    null ,sli);
+        lengthUom              = addOptionalColumn    ("length_uom",         null ,sli);
+        lengthValue            = addOptionalColumn    ("length_value",       null ,sli);
+        curveIdentifier        = addOptionalColumn    ("shape_id",           null ,sli);
+        srsName                = addOptionalColumn    ("shape_srsname",      null ,sli);
 
         
         byIdentifier  = addParameter(identifier, SELECT, EXISTS);
-        byName        = addParameter(name, FILTERED_LIST);
+        byName        = addParameter(name, LIST);
     }
     
 }

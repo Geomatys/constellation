@@ -17,16 +17,18 @@
  */
 package org.constellation.swe.v101;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.ConfigurationKey;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.gml.v311.ReferenceTable;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.swe.xml.v101.AnyResultEntry;
 import org.geotoolkit.swe.xml.v101.DataArrayEntry;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
@@ -64,15 +66,30 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
      * Initialise l'identifiant de la table.
      */
     private AnyResultTable(final AnyResultQuery query) {
-        super(query);
-        setIdentifierParameters(null, query.byIdResult);
+        super(query, query.byIdResult);
+    }
+
+     /**
+     * Construit une nouvelle table non partagée
+     */
+    private AnyResultTable(final AnyResultTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected AnyResultTable clone() {
+        return new AnyResultTable(this);
     }
    
     /**
      * Construit une reference pour l'enregistrement courant.
      */
     @Override
-    protected AnyResultEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
+    protected AnyResultEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
          final AnyResultQuery query = (AnyResultQuery) super.query;
          final String idRef = results.getString(indexOf(query.reference));
          if (idRef != null) {
@@ -102,120 +119,126 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
      *
      * @param result le resultat a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final Object result) throws SQLException, CatalogException {
+    public String getIdentifier(final Object result) throws SQLException, CatalogException {
         final AnyResultQuery query = (AnyResultQuery) super.query;
         boolean success = false;
-        transactionBegin();
-        try {
-            if (result instanceof AnyResultEntry) {
-                final DataArrayEntry array = ((AnyResultEntry)result).getArray();
-                final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
-                statement.setString(indexOf(query.values),array.getValues());
-                statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
-                statement.setString(indexOf(query.definition), array.getId());
-                final ResultSet results = statement.executeQuery();
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                Stmt statement = getStatement(QueryType.LIST);
+                ResultSet results;
+                if (result instanceof AnyResultEntry) {
+                    final DataArrayEntry array = ((AnyResultEntry)result).getArray();
+                    statement.statement.setString(indexOf(query.values),array.getValues());
+                    statement.statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
+                    statement.statement.setString(indexOf(query.definition), array.getId());
+                    results = statement.statement.executeQuery();
+                } else if (result instanceof DataArrayPropertyType) {
+                    final DataArrayEntry array = ((DataArrayPropertyType)result).getDataArray();
+                    if (array == null)
+                        throw new CatalogException("The data array is null!");
+                    statement.statement.setString(indexOf(query.values),array.getValues());
+                    statement.statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
+                    statement.statement.setString(indexOf(query.definition), array.getId());
+                    results = statement.statement.executeQuery();
+                } else if (result instanceof ReferenceEntry) {
+                    statement.statement.setString(indexOf(query.reference), ((ReferenceEntry)result).getId());
+                    statement.statement.setNull(indexOf(query.values), java.sql.Types.VARCHAR);
+                    results = statement.statement.executeQuery();
+                } else {
+                    throw new CatalogException(" this kind of result is not allowed");
+                }
+                String r = null;
                 if(results.next()){
-                    success = true;
-                    return results.getString(1);
+                    r = results.getString(1);
                 }
-            } else if (result instanceof DataArrayPropertyType) {
-                final DataArrayEntry array = ((DataArrayPropertyType)result).getDataArray();
-                if (array == null)
-                    throw new CatalogException("The data array is null!");
-                final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
-                statement.setString(indexOf(query.values),array.getValues());
-                statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
-                statement.setString(indexOf(query.definition), array.getId());
-                final ResultSet results = statement.executeQuery();
-                if(results.next()){
+                results.close();
+                if (r != null) {
                     success = true;
-                    return results.getString(1);
+                    release(statement);
+                    return r;
                 }
-            } else if (result instanceof ReferenceEntry) {
-                final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
-                statement.setString(indexOf(query.reference), ((ReferenceEntry)result).getId());
-                statement.setNull(indexOf(query.values), java.sql.Types.VARCHAR);
-                final ResultSet results = statement.executeQuery();
-                if(results.next()) {
-                    success = true;
-                    return results.getString(1);
-                }
-            } else {
-                throw new CatalogException(" this kind of result is not allowed");
-            }
-        
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
+                release(statement);
 
-            final PreparedStatement p = getDatabase().getConnection().prepareStatement("SELECT max(\"id_result\") FROM \"observation\".\"any_results\"" );
-            final ResultSet r         = p.executeQuery();
-            if (r.next()) {
-                final String res = r.getString(1);
-                try {
-                    final int id = Integer.parseInt(res);
-                    statement.setInt(indexOf(query.idResult), id + 1);
-                } catch (NumberFormatException ex) {
-                    LOGGER.severe("unable to parse the result id:" + res);
-                    statement.setInt(indexOf(query.idResult), 1);
+                final Statement p = getConnection().createStatement();
+                statement = getStatement(QueryType.INSERT);
+
+                results = p.executeQuery("SELECT max(\"id_result\") FROM \"observation\".\"any_results\"");
+                if (results.next()) {
+                    r = results.getString(1);
+                    try {
+                        final int id = Integer.parseInt(r);
+                        statement.statement.setInt(indexOf(query.idResult), id + 1);
+                    } catch (NumberFormatException ex) {
+                        log("getIdentifier", new LogRecord(Level.WARNING, "unable to parse the result id:" + r));
+                        statement.statement.setInt(indexOf(query.idResult), 1);
+                    }
+                } else {
+                    statement.statement.setInt(indexOf(query.idResult), 1);
                 }
-            } else {
-                statement.setInt(indexOf(query.idResult), 1);
-            }
-            p.close();
-            
-            if (result instanceof AnyResultEntry) {
-                final DataArrayEntry array = ((AnyResultEntry)result).getArray();
-                statement.setString(indexOf(query.values), array.getValues());
-                statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
-                if(dataArrays == null) {
-                    dataArrays = getDatabase().getTable(DataArrayTable.class);
+                results.close();
+
+                if (result instanceof AnyResultEntry) {
+                    final DataArrayEntry array = ((AnyResultEntry)result).getArray();
+                    statement.statement.setString(indexOf(query.values), array.getValues());
+                    statement.statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
+                    if(dataArrays == null) {
+                        dataArrays = getDatabase().getTable(DataArrayTable.class);
+                    }
+                    final String idArray = dataArrays.getIdentifier(array);
+                    statement.statement.setString(indexOf(query.definition), idArray);
+
+                } else if (result instanceof DataArrayPropertyType) {
+                    final DataArrayEntry array = ((DataArrayPropertyType)result).getDataArray();
+                    //we cleanup a little the values
+                    String values = array.getValues();
+                    values = values.replace("\n", " ");
+                    values = values.replace("\t", " ");
+                    while (values.indexOf("  ") != -1) {
+                        values = values.replaceAll("  ", "");
+                    }
+                    statement.statement.setString(indexOf(query.values), values);
+                    statement.statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
+                    if(dataArrays == null) {
+                        dataArrays = getDatabase().getTable(DataArrayTable.class);
+                    }
+                    final String idArray = dataArrays.getIdentifier(array);
+                    statement.statement.setString(indexOf(query.definition), idArray);
+
+                } else if (result instanceof ReferenceEntry) {
+                    final ReferenceEntry ref = (ReferenceEntry) result;
+                    String idRef;
+
+                    if(references == null) {
+                        references = getDatabase().getTable(ReferenceTable.class);
+                    }
+                    idRef = references.getIdentifier(ref);
+
+                    statement.statement.setString(indexOf(query.reference), idRef);
+                    statement.statement.setNull(indexOf(query.values), java.sql.Types.VARCHAR);
+                } else {
+                    throw new CatalogException(" this kind of result is not allowed");
                 }
-                final String idArray = dataArrays.getIdentifier(array);
-                statement.setString(indexOf(query.definition), idArray);
-            
-            } else if (result instanceof DataArrayPropertyType) {
-                final DataArrayEntry array = ((DataArrayPropertyType)result).getDataArray();
-                //we cleanup a little the values
-                String values = array.getValues();
-                values = values.replace("\n", " ");
-                values = values.replace("\t", " ");
-                while (values.indexOf("  ") != -1) {
-                    values = values.replaceAll("  ", "");
-                }
-                statement.setString(indexOf(query.values), values);
-                statement.setNull(indexOf(query.reference), java.sql.Types.VARCHAR);
-                if(dataArrays == null) {
-                    dataArrays = getDatabase().getTable(DataArrayTable.class);
-                }
-                final String idArray = dataArrays.getIdentifier(array);
-                statement.setString(indexOf(query.definition), idArray);
-            
-            } else if (result instanceof ReferenceEntry) {
-                final ReferenceEntry ref = (ReferenceEntry) result;
-                String idRef;
+
+                updateSingleton(statement.statement);
+                release(statement);
                 
-                if(references == null) {
-                    references = getDatabase().getTable(ReferenceTable.class);
+                //we get the new id generated
+                results = p.executeQuery("SELECT max(\"id_result\") FROM \"observation\".\"any_results\"" );
+                final String id;
+                if (results.next()) {
+                    id = results.getString(1);
+                } else {
+                    id = null;
                 }
-                idRef = references.getIdentifier(ref);
-                
-                statement.setString(indexOf(query.reference), idRef);
-                statement.setNull(indexOf(query.values), java.sql.Types.VARCHAR);
-            } else {
-                throw new CatalogException(" this kind of result is not allowed");
+                results.close();
+                p.close();
+                success = true;
+                return id;
+            } finally {
+                transactionEnd(success);
             }
-               
-            updateSingleton(statement);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
-        //we get the new id generated
-        final PreparedStatement p = getStatement("SELECT max(\"id_result\") FROM \"observation\".\"any_results\"" );
-        final ResultSet r = p.executeQuery();
-        if (r.next())
-            return r.getString(1);
-        else
-            return null;
     }
     
 }

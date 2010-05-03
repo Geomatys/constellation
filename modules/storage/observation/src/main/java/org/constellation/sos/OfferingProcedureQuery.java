@@ -16,12 +16,12 @@
  */
 package org.constellation.sos;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  *
@@ -49,8 +49,8 @@ public class OfferingProcedureQuery extends Query {
         //final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         
-        idOffering  = addColumn("id_offering", slie);
-        procedure   = addColumn("procedure",  slie);
+        idOffering  = addMandatoryColumn("id_offering", slie);
+        procedure   = addMandatoryColumn("procedure",  slie);
         
         byOffering  = addParameter(idOffering, SELECT, LIST, EXISTS);
         byProcedure = addParameter(procedure,  SELECT, EXISTS);

@@ -16,18 +16,17 @@
  */
 package org.constellation.sampling;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.NoSuchTableException;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.NoSuchTableException;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.gml.v311.DirectPositionEntry;
 import org.constellation.gml.v311.EnvelopeTable;
 import org.constellation.gml.v311.LineStringTable;
@@ -37,6 +36,7 @@ import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.gml.xml.v311.LineStringType;
 import org.geotoolkit.gml.xml.v311.MeasureType;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 
 /**
@@ -67,8 +67,23 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
      * Initialise l'identifiant de la table.
      */
     private SamplingCurveTable(final SamplingCurveQuery query) {
-        super(query);
-        setIdentifierParameters(query.byIdentifier, null);
+        super(query, query.byIdentifier);
+    }
+
+    /**
+     * Construit une nouvelle table non partagée
+     */
+    private SamplingCurveTable(final SamplingCurveTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected SamplingCurveTable clone() {
+        return new SamplingCurveTable(this);
     }
     
     /**
@@ -79,14 +94,13 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
     @Override
-    protected SamplingCurveType createEntry(final ResultSet result) throws CatalogException, SQLException {
+    protected SamplingCurveType createEntry(final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
         final SamplingCurveQuery query = (SamplingCurveQuery) super.query;
         final String curveId = result.getString(indexOf(query.curveIdentifier));
 
         linestrings = getLineStringTable();
-        linestrings.setIdLineString(curveId);
 
-        final Collection<DirectPositionEntry> entries = linestrings.getEntries();
+        final Collection<DirectPositionEntry> entries = linestrings.getEntries(curveId);
         final Collection<DirectPositionType> positions = new ArrayList<DirectPositionType>();
         for (DirectPositionEntry entry : entries) {
             positions.add(entry.getPosition());
@@ -94,12 +108,12 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
                 
         final LineStringType p = new LineStringType(curveId, result.getString(indexOf(query.srsName)), positions);
 
-        String sampledFeature = result.getString(indexOf(query.sampledFeature));
+        final String sampledFeature = result.getString(indexOf(query.sampledFeature));
         FeaturePropertyType sampledFeatureProp = null;
         if (sampledFeature != null) {
             sampledFeatureProp = new FeaturePropertyType(sampledFeature);
         }
-        SamplingCurveType entry = new SamplingCurveType(result.getString(indexOf(query.identifier)),
+        final SamplingCurveType entry = new SamplingCurveType(result.getString(indexOf(query.identifier)),
                                     result.getString(indexOf(query.name)),
                                     result.getString(indexOf(query.description)),
                                     sampledFeatureProp,
@@ -108,7 +122,7 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
         if (envelopes == null) {
             envelopes = getDatabase().getTable(EnvelopeTable.class);
         }
-        EnvelopeEntry env = envelopes.getEntry(result.getString(indexOf(query.boundedby)));
+        final EnvelopeEntry env = envelopes.getEntry(result.getString(indexOf(query.boundedby)));
         entry.setBoundedBy(env);
         return entry;
     }
@@ -119,79 +133,86 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
      *
      * @param result le resultat a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final SamplingCurveType station) throws SQLException, CatalogException {
+    public String getIdentifier(final SamplingCurveType station) throws SQLException, CatalogException {
         final SamplingCurveQuery query  = (SamplingCurveQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        try {
-            // the station recived by xml have no ID so we use the name as a second primary key
-            if (station.getName() != null) {
-                final PreparedStatement statement = getStatement(QueryType.FILTERED_LIST);
-                statement.setString(indexOf(query.byName), station.getName());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    id = result.getString("id");
-                    station.setId(id);
-                    return id;
-                } else {
-                    if (station.getId() != null) {
-                        id = station.getId(); 
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                // the station recived by xml have no ID so we use the name as a second primary key
+                if (station.getName() != null) {
+                    final Stmt statement = getStatement(QueryType.LIST);
+                    statement.statement.setString(indexOf(query.byName), station.getName());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        id = result.getString("id");
+                        station.setId(id);
+                        result.close();
+                        release(statement);
+                        return id;
                     } else {
-                       id = searchFreeIdentifier("station"); 
+                        if (station.getId() != null) {
+                            id = station.getId();
+                        } else {
+                           id = searchFreeIdentifier("station");
+                        }
                     }
+                    result.close();
+                    release(statement);
+                } else {
+                   throw new CatalogException("the station must have a name");
                 }
-            } else {
-               throw new CatalogException("the station must have a name"); 
-            }
-            station.setId(id);
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.identifier), id);
-        
-            if (station.getDescription() != null) {
-                statement.setString(indexOf(query.description), station.getDescription());
-            } else {
-                statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
-            }
-        
-            statement.setString(indexOf(query.name), station.getName());
-            final Iterator<FeaturePropertyType> i = station.getSampledFeatures().iterator();
-            if (i.hasNext()) {
-                FeaturePropertyType fp = i.next();
-                statement.setString(indexOf(query.sampledFeature), (String)fp.getHref());
-            } else {
-                statement.setNull(indexOf(query.sampledFeature), java.sql.Types.VARCHAR);
-            }
-        
-            if( station.getShape() != null && station.getShape().getAbstractCurve() != null && station.getShape().getAbstractCurve().getValue() != null) {
-                LineStringType lineString = (LineStringType) station.getShape().getAbstractCurve().getValue();
+                station.setId(id);
+                final Stmt statement = getStatement(QueryType.INSERT);
+                statement.statement.setString(indexOf(query.identifier), id);
 
-                statement.setString(indexOf(query.curveIdentifier), lineString.getId());
-                statement.setString(indexOf(query.srsName), lineString.getSrsName());
-
-                linestrings = getLineStringTable();
-                final List<DirectPositionType> positions = lineString.getPositions();
-                for (DirectPositionType position : positions) {
-                    linestrings.getIdentifier(id, position);
+                if (station.getDescription() != null) {
+                    statement.statement.setString(indexOf(query.description), station.getDescription());
+                } else {
+                    statement.statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
                 }
 
-            } else {
-                statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
-                statement.setNull(indexOf(query.curveIdentifier), java.sql.Types.VARCHAR);
-            }
+                statement.statement.setString(indexOf(query.name), station.getName());
+                final Iterator<FeaturePropertyType> i = station.getSampledFeatures().iterator();
+                if (i.hasNext()) {
+                    final FeaturePropertyType fp = i.next();
+                    statement.statement.setString(indexOf(query.sampledFeature), (String)fp.getHref());
+                } else {
+                    statement.statement.setNull(indexOf(query.sampledFeature), java.sql.Types.VARCHAR);
+                }
 
-            if (station.getLength() != null) {
-                statement.setDouble(indexOf(query.lengthValue), station.getLength().getValue());
-                statement.setString(indexOf(query.lengthUom), station.getLength().getUom());
-            } else {
-                statement.setNull(indexOf(query.lengthUom), java.sql.Types.VARCHAR);
-                statement.setNull(indexOf(query.lengthValue), java.sql.Types.DOUBLE);
+                if( station.getShape() != null && station.getShape().getAbstractCurve() != null && station.getShape().getAbstractCurve().getValue() != null) {
+                    final LineStringType lineString = (LineStringType) station.getShape().getAbstractCurve().getValue();
+
+                    statement.statement.setString(indexOf(query.curveIdentifier), lineString.getId());
+                    statement.statement.setString(indexOf(query.srsName), lineString.getSrsName());
+
+                    linestrings = getLineStringTable();
+                    final List<DirectPositionType> positions = lineString.getPositions();
+                    for (DirectPositionType position : positions) {
+                        linestrings.getIdentifier(id, position);
+                    }
+
+                } else {
+                    statement.statement.setNull(indexOf(query.srsName), java.sql.Types.VARCHAR);
+                    statement.statement.setNull(indexOf(query.curveIdentifier), java.sql.Types.VARCHAR);
+                }
+
+                if (station.getLength() != null) {
+                    statement.statement.setDouble(indexOf(query.lengthValue), station.getLength().getValue());
+                    statement.statement.setString(indexOf(query.lengthUom), station.getLength().getUom());
+                } else {
+                    statement.statement.setNull(indexOf(query.lengthUom), java.sql.Types.VARCHAR);
+                    statement.statement.setNull(indexOf(query.lengthValue), java.sql.Types.DOUBLE);
+                }
+                updateSingleton(statement.statement);
+                release(statement);
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-            updateSingleton(statement);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
         return id;
     }
@@ -199,7 +220,6 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
     public LineStringTable getLineStringTable() throws NoSuchTableException {
         if (linestrings == null) {
             linestrings =  getDatabase().getTable(LineStringTable.class);
-            linestrings =  new LineStringTable(linestrings);
         }
         return linestrings;
     }

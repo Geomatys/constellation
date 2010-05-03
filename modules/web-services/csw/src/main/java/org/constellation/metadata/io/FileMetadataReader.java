@@ -224,14 +224,8 @@ public class FileMetadataReader extends AbstractCSWMetadataReader {
                         if (setter != null) {
                             ReflectionUtilities.invokeMethod(setter, customRecord, param);
                         } else {
-                            String paramDesc = "null";
-                            String localPart = "null";
-                            if (param != null) {
-                                paramDesc = param.getClass() + "";
-                            }
-                            if (qn != null) {
-                                localPart = qn.getLocalPart();
-                            }
+                            String paramDesc = param.getClass() + "";
+                            String localPart = qn.getLocalPart();
                             LOGGER.warning("No setter have been found for attribute " + localPart +" of type " + paramDesc + " in the class RecordType");
                         }
 
@@ -361,8 +355,9 @@ public class FileMetadataReader extends AbstractCSWMetadataReader {
                     formats.add(new SimpleLiteral(f.getName().toString()));
                 }
             }
-            if (formats.size() == 0);
+            if (formats.size() == 0) {
                 formats = null;
+            }
             if (elementName != null && elementName.contains(_Format_QNAME)) {
                 customRecord.setFormat(formats);
             }

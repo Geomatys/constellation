@@ -20,10 +20,11 @@ package org.constellation.swe.v101;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.swe.xml.v101.ComponentEntry;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.geotoolkit.util.Utilities;
@@ -57,20 +58,29 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
     /**
      * Construit une nouvelle table non partagée
      */
-    public ComponentTable(final ComponentTable table) {
+    private ComponentTable(final ComponentTable table) {
         super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected ComponentTable clone() {
+        return new ComponentTable(this);
     }
     
     /**
      * Initialise l'identifiant de la table.
      */
     private ComponentTable(final ComponentQuery query) {
-        super(query);
-        setIdentifierParameters(query.byComponent, null);
+        super(query, query.byComponent);
     }
     
     
-    protected ComponentEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
+    @Override
+    protected ComponentEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final ComponentQuery query = (ComponentQuery) super.query;
         
         if (phenomenons == null) {
@@ -110,32 +120,39 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
      *Insere un nouveau composant d'une phenomene composé dans la base de donnée.
      *
      */
-    public synchronized void getIdentifier(String idComposite, PhenomenonEntry pheno) throws SQLException, CatalogException {
+    public void getIdentifier(String idComposite, PhenomenonEntry pheno) throws SQLException, CatalogException {
         final ComponentQuery query  = (ComponentQuery) super.query;
         boolean success = false;
-        transactionBegin();
-        try {
-            if (phenomenons == null) {
-                phenomenons = getDatabase().getTable(PhenomenonTable.class);
-            }
-            final String idPheno = phenomenons.getIdentifier(pheno);
-        
-            PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
-            statement.setString(indexOf(query.idComponent), idPheno);
-            final ResultSet result = statement.executeQuery();
-            if(result.next()) {
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                if (phenomenons == null) {
+                    phenomenons = getDatabase().getTable(PhenomenonTable.class);
+                }
+                final String idPheno = phenomenons.getIdentifier(pheno);
+
+                Stmt statement = getStatement(QueryType.EXISTS);
+                statement.statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
+                statement.statement.setString(indexOf(query.idComponent), idPheno);
+                final ResultSet result = statement.statement.executeQuery();
+                if(result.next()) {
+                    result.close();
+                    release(statement);
+                    success = true;
+                    return ;
+                }
+                result.close();
+                release(statement);
+
+                statement = getStatement(QueryType.INSERT);
+                statement.statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
+                statement.statement.setString(indexOf(query.idComponent), idPheno);
+                updateSingleton(statement.statement);
+                release(statement);
                 success = true;
-                return ;
+            } finally {
+                transactionEnd(success);
             }
-              
-            statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
-            statement.setString(indexOf(query.idComponent), idPheno);
-            updateSingleton(statement);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
     }
     

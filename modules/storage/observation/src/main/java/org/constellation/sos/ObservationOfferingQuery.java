@@ -16,12 +16,12 @@
  */
 package org.constellation.sos;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 /**
  *
  * @author Guilhem Legal
@@ -48,17 +48,17 @@ public class ObservationOfferingQuery extends Query {
     public ObservationOfferingQuery(final Database database) {
         super (database, "observation_offerings", "sos");
         final QueryType[] sil  = {SELECT, INSERT, LIST};
-        final QueryType[] siel = {SELECT,INSERT, EXISTS, LIST};
-        id                   = addColumn("id",                     siel);
-        name                 = addColumn("name",                   sil);
-        description          = addColumn("description",            sil);
-        srsName              = addColumn("srs_name",               sil);
-        eventTimeBegin       = addColumn("event_time_begin",       sil);
-        eventTimeEnd         = addColumn("event_time_end",         sil);
-        boundedBy            = addColumn("bounded_by",             sil);
-        resultModelNamespace = addColumn("result_model_namespace", sil);
-        resultModelLocalPart = addColumn("result_model_localpart", sil);
-        responseFormat       = addColumn("response_format",        sil);
+        final QueryType[] siel = {SELECT,INSERT, EXISTS, LIST, LIST_ID};
+        id                   = addMandatoryColumn("id",                         siel);
+        name                 = addMandatoryColumn("name",                        sil);
+        description          = addOptionalColumn("description",            null, sil);
+        srsName              = addOptionalColumn("srs_name",               null, sil);
+        eventTimeBegin       = addOptionalColumn("event_time_begin",       null, sil);
+        eventTimeEnd         = addOptionalColumn("event_time_end",         null, sil);
+        boundedBy            = addOptionalColumn("bounded_by",             null, sil);
+        resultModelNamespace = addOptionalColumn("result_model_namespace", null, sil);
+        resultModelLocalPart = addOptionalColumn("result_model_localpart", null, sil);
+        responseFormat       = addOptionalColumn("response_format",        null, sil);
         
         byId                 = addParameter(id, SELECT, EXISTS);
     }

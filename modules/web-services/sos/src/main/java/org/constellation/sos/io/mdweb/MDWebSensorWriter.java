@@ -114,7 +114,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
 
     @Override
     public int replaceSensor(String sensorid, AbstractSensorML process) throws CstlServiceException {
-        boolean deleted = deleteSensor(sensorid);
+        final boolean deleted = deleteSensor(sensorid);
         int result;
         if (deleted) {
             result = REPLACED;
@@ -137,8 +137,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
             LOGGER.finer("describesensor id: " + dbId);
             LOGGER.finer("describesensor mdweb id: " + id);
 
-            String identifier = id + ":SMLC";
-            return super.deleteMetadata(identifier);
+            return super.deleteMetadata(id + ":SMLC");
 
         } catch (MD_IOException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -161,8 +160,8 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     public void deleteAllSensor() throws CstlServiceException {
         try {
             
-            RecordSet smlCat      = mdWriter.getRecordSet("SMLC");
-            List<String> allTitle = mdWriter.getFormsTitle(smlCat);
+            final RecordSet smlCat      = mdWriter.getRecordSet("SMLC");
+            final List<String> allTitle = mdWriter.getFormsTitle(smlCat);
 
             for (String title : allTitle) {
                 // we find the form id describing the sensor.
@@ -170,8 +169,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
                 LOGGER.finer("describesensor id: " + title);
                 LOGGER.finer("describesensor mdweb id: " + id);
 
-                String identifier = id + ":SMLC";
-                super.deleteMetadata(identifier);
+                super.deleteMetadata(id + ":SMLC");
             }
 
         } catch (MD_IOException ex) {

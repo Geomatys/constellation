@@ -25,7 +25,7 @@ import org.geotoolkit.lang.Immutable;
  * @author Guilhem Legal (Geomatys)
  */
 @Immutable
-public class WFSConstants {
+public final class WFSConstants {
 
     private WFSConstants() {}
 

@@ -736,12 +736,16 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         
         } else if (obj instanceof DefaultPosition) {
             final DefaultPosition pos = (DefaultPosition) obj;
-            result = DATE_FORMAT.format(pos.getDate());
+            synchronized(DATE_FORMAT) {
+                result = DATE_FORMAT.format(pos.getDate());
+            }
             
         } else if (obj instanceof DefaultInstant) {
             final DefaultInstant inst = (DefaultInstant)obj;
             if (inst.getPosition() != null && inst.getPosition().getDate() != null) {
-                result = DATE_FORMAT.format(inst.getPosition().getDate());
+                synchronized(DATE_FORMAT) {
+                    result = DATE_FORMAT.format(inst.getPosition().getDate());
+                }
             } else {
                 result = NULL_VALUE;
             }

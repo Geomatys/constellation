@@ -17,12 +17,12 @@
  */
 package org.constellation.swe.v101;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  * The query to execute for a {@link AnyResultTable}.
@@ -49,19 +49,19 @@ public class AnyResultQuery extends Query {
      */
     public AnyResultQuery(final Database database) {
         super(database, "any_results", "observation");
-        final QueryType[] ssi  = {SELECT, SELECT_BY_NUMBER, INSERT, FILTERED_LIST};
+        final QueryType[] ssi  = {SELECT, INSERT, LIST};
         //final QueryType[] SSIE = {SELECT, SELECT_BY_NUMBER, INSERT, EXISTS};
-        final QueryType[] ssie   = {SELECT,SELECT_BY_NUMBER,  INSERT, EXISTS};
+        final QueryType[] ssie   = {SELECT,  INSERT, EXISTS};
 
-        idResult     = addColumn("id_result",  ssie);
-        reference    = addColumn("reference",  ssi);
-        values       = addColumn("values",     ssi);
-        definition   = addColumn("definition", ssi);
+        idResult     = addMandatoryColumn("id_result",  ssie);
+        reference    = addOptionalColumn("reference",  null, ssi);
+        values       = addOptionalColumn("values",     null, ssi);
+        definition   = addOptionalColumn("definition", null, ssi);
 
-        byIdResult   = addParameter(idResult,  SELECT, EXISTS, SELECT_BY_NUMBER);
-        byValues     = addParameter(values, FILTERED_LIST);
-        byRef        = addParameter(reference, FILTERED_LIST);
-        byDefinition = addParameter(definition, FILTERED_LIST);
+        byIdResult   = addParameter(idResult,  SELECT, EXISTS);
+        byValues     = addParameter(values, LIST);
+        byRef        = addParameter(reference, LIST);
+        byDefinition = addParameter(definition, LIST);
     }
     
 }

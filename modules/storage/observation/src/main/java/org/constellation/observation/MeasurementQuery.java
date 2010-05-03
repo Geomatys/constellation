@@ -16,12 +16,12 @@
  */
 package org.constellation.observation;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  * The query to execute for a {@link MeasurementTable}.
@@ -52,19 +52,19 @@ public class MeasurementQuery extends Query{
         final QueryType[] si  = {SELECT, INSERT};
         final QueryType[] sie = {SELECT, INSERT, EXISTS};
         
-        name                      = addColumn("name",                        sie);
-        description               = addColumn("description",                 si);
-        featureOfInterest         = addColumn("feature_of_interest",         si);
-        featureOfInterestPoint    = addColumn("feature_of_interest_point",   si);
-        featureOfInterestCurve    = addColumn("feature_of_interest_curve",   si);
-        procedure                 = addColumn("procedure",                   si);
-        observedProperty          = addColumn("observed_property",           si);
-        observedPropertyComposite = addColumn("observed_property_composite", si);
-        distribution              = addColumn("distribution",                si);
-        samplingTimeBegin         = addColumn("sampling_time_begin",         si);
-        samplingTimeEnd           = addColumn("sampling_time_end",           si);
-        result                    = addColumn("result",                      si);
-        resultDefinition          = addColumn("result_definition",           si);
+        name                      = addMandatoryColumn("name",                        sie);
+        description               = addOptionalColumn("description",             null, si);
+        featureOfInterest         = addOptionalColumn("feature_of_interest",         null,si);
+        featureOfInterestPoint    = addOptionalColumn("feature_of_interest_point",   null,si);
+        featureOfInterestCurve    = addOptionalColumn("feature_of_interest_curve",   null,si);
+        procedure                 = addMandatoryColumn("procedure",                 si);
+        observedProperty          = addOptionalColumn("observed_property",           null,si);
+        observedPropertyComposite = addOptionalColumn("observed_property_composite",null, si);
+        distribution              = addOptionalColumn("distribution",                null,si);
+        samplingTimeBegin         = addOptionalColumn("sampling_time_begin",        null, si);
+        samplingTimeEnd           = addOptionalColumn("sampling_time_end",          null, si);
+        result                    = addOptionalColumn("result",                      null,si);
+        resultDefinition          = addOptionalColumn("result_definition",           null,si);
 /*
         observationMetadata       = addColumn("observationMetadata",         SI);
         quality                   = addColumn("quality",                     SI);

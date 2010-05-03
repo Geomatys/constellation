@@ -17,16 +17,16 @@
  */
 package org.constellation.sampling;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 
 /**
  * Connexion vers la table des {@linkplain Station stations}.
@@ -50,19 +50,32 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
      * Construit une nouvelle connexion vers la table des stations.
      */
     public SamplingFeatureTable(final Database database) {
-        super(new SamplingFeatureQuery(database));
-        final SamplingFeatureQuery query = new SamplingFeatureQuery(database);
-        setIdentifierParameters(query.byIdentifier, null);
+        this(new SamplingFeatureQuery(database));
     }
     
     /**
      * Initialise l'identifiant de la table.
      */
     private SamplingFeatureTable(final SamplingFeatureQuery query) {
-        super(query);
-        setIdentifierParameters(query.byIdentifier, null);
+        super(query, query.byIdentifier);
     }
-   
+
+    /**
+     * Construit une nouvelle table non partagée
+     */
+    private SamplingFeatureTable(final SamplingFeatureTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected SamplingFeatureTable clone() {
+        return new SamplingFeatureTable(this);
+    }
+
     /**
      * Indique si cette table est autorisée à construire des objets {@link Station}
      * qui contiennent moins d'informations. Cet allègement permet de réduire le nombre de
@@ -99,7 +112,8 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
      * <code>{@linkplain #createEntry(int,String,Platform,DataQuality,Citation,ResultSet)
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
-    protected SamplingFeatureEntry createEntry(final ResultSet result) throws CatalogException, SQLException {
+    @Override
+    protected SamplingFeatureEntry createEntry(final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
         final SamplingFeatureQuery query = (SamplingFeatureQuery) super.query;
         // TODO result.getString(indexOf(query.sampledFeature))
         return new SamplingFeatureEntry(result.getString(indexOf(query.identifier)),
@@ -117,12 +131,12 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
      * est l'un de ceux qui ont été spécifiés à la méthode {@link #acceptableProvider(Citation)
      * acceptableProvider}. Si la station ne donne pas d'indication sur le fournisseur, alors
      * cette méthode va l'accepter comme approche conservative.
-     */
+     
     @Override
     protected boolean accept(final SamplingFeatureEntry entry) throws CatalogException, SQLException {
         
         return super.accept(entry);
-    }
+    }*/
     
     /**
      * Retourne un nouvel identifier (ou l'identifier de la station passée en parametre si non-null)
@@ -130,43 +144,50 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
      *
      * @param result le resultat a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final SamplingFeatureEntry station) throws SQLException, CatalogException {
+    public String getIdentifier(final SamplingFeatureEntry station) throws SQLException, CatalogException {
         final SamplingFeatureQuery query  = (SamplingFeatureQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        try {
-            if (station.getId() != null) {
-                final PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.identifier), station.getId());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    return station.getId();
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                if (station.getId() != null) {
+                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    statement.statement.setString(indexOf(query.identifier), station.getId());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        result.close();
+                        release(statement);
+                        return station.getId();
+                    } else {
+                        id = station.getId();
+                    }
+                    result.close();
+                    release(statement);
                 } else {
-                    id = station.getId();
+                    id = searchFreeIdentifier("station");
                 }
-            } else {
-                id = searchFreeIdentifier("station");
+
+                final Stmt statement = getStatement(QueryType.INSERT);
+                statement.statement.setString(indexOf(query.identifier), id);
+
+                if (station.getDescription() != null) {
+                    statement.statement.setString(indexOf(query.description), station.getDescription());
+                } else {
+                    statement.statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
+                }
+
+                statement.statement.setString(indexOf(query.name), station.getName());
+                final Iterator i = station.getSampledFeatures().iterator();
+                statement.statement.setString(indexOf(query.sampledFeature), (String)i.next());
+
+                updateSingleton(statement.statement);
+                release(statement);
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-        
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.identifier), id);
-        
-            if (station.getDescription() != null) {
-                statement.setString(indexOf(query.description), station.getDescription());
-            } else {
-                statement.setNull(indexOf(query.description), java.sql.Types.VARCHAR);
-            }
-        
-            statement.setString(indexOf(query.name), station.getName());
-            final Iterator i = station.getSampledFeatures().iterator();
-            statement.setString(indexOf(query.sampledFeature), (String)i.next());
-        
-            updateSingleton(statement);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
         return id;
     }

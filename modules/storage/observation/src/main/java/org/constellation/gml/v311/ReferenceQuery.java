@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2008, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -16,12 +16,12 @@
  */
 package org.constellation.gml.v311;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import static org.constellation.catalog.QueryType.*;
-import org.constellation.catalog.QueryType;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
+import org.geotoolkit.internal.sql.table.QueryType;
 
 /**
  *
@@ -48,26 +48,26 @@ public class ReferenceQuery extends Query {
     public ReferenceQuery(final Database database) {
         super(database, "references", "observation");
         final QueryType[] sli   = {SELECT, LIST, INSERT};
-        final QueryType[] slief = {SELECT, INSERT, LIST, EXISTS, FILTERED_LIST};
-        idReference = addColumn("id_reference", slief);
-        actuate     = addColumn("actuate"     , sli);
-        arcrole     = addColumn("arcrole"     , sli);
-        href        = addColumn("href"        , sli);
-        role        = addColumn("role"        , sli);
-        show        = addColumn("show"        , sli);
-        title       = addColumn("title"       , sli);
-        type        = addColumn("type"        , sli);
-        owns        = addColumn("owns"        , sli);
+        final QueryType[] slief = {SELECT, INSERT, LIST, EXISTS, LIST_ID};
+        idReference = addMandatoryColumn("id_reference", slief);
+        actuate     = addOptionalColumn("actuate", null, sli);
+        arcrole     = addOptionalColumn("arcrole", null, sli);
+        href        = addOptionalColumn("href",    null, sli);
+        role        = addOptionalColumn("role",    null, sli);
+        show        = addOptionalColumn("show",    null, sli);
+        title       = addOptionalColumn("title",   null, sli);
+        type        = addOptionalColumn("type",    null, sli);
+        owns        = addOptionalColumn("owns",    null, sli);
         
         byIdReference = addParameter(idReference, SELECT, EXISTS);
-        byActuate     = addParameter(actuate,     FILTERED_LIST);
-        byArcrole     = addParameter(arcrole,     FILTERED_LIST);
-        byHref        = addParameter(href,        FILTERED_LIST);
-        byRole        = addParameter(role,        FILTERED_LIST);
-        byShow        = addParameter(show,        FILTERED_LIST);
-        byTitle       = addParameter(title,       FILTERED_LIST);
-        byType        = addParameter(type,        FILTERED_LIST);
-        byOwns        = addParameter(owns,        FILTERED_LIST);
+        byActuate     = addParameter(actuate,     LIST_ID);
+        byArcrole     = addParameter(arcrole,     LIST_ID);
+        byHref        = addParameter(href,        LIST_ID);
+        byRole        = addParameter(role,        LIST_ID);
+        byShow        = addParameter(show,        LIST_ID);
+        byTitle       = addParameter(title,       LIST_ID);
+        byType        = addParameter(type,        LIST_ID);
+        byOwns        = addParameter(owns,        LIST_ID);
         
     }
     

@@ -16,12 +16,12 @@
  */
 package org.constellation.gml.v311;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import static org.constellation.catalog.QueryType.*;
-import org.constellation.catalog.QueryType;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
+import org.geotoolkit.internal.sql.table.QueryType;
 
 /**
  *
@@ -50,10 +50,10 @@ public class UnitOfMeasureQuery extends Query{
         final QueryType[] sli  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         
-        id           = addColumn("id",            slie);
-        name         = addColumn("name",          sli);
-        quantityType = addColumn("quantity_type", sli);
-        unitSystem   = addColumn("unit_system",   sli);
+        id           = addMandatoryColumn("id",                  slie);
+        name         = addMandatoryColumn("name",                sli);
+        quantityType = addOptionalColumn ("quantity_type", null, sli);
+        unitSystem   = addOptionalColumn ("unit_system",   null, sli);
         
         byId         = addParameter(id, SELECT, EXISTS);
     }

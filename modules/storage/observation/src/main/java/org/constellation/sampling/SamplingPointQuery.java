@@ -17,12 +17,12 @@
  */
 package org.constellation.sampling;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import static org.constellation.catalog.QueryType.*;
-import org.constellation.catalog.QueryType;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
+import org.geotoolkit.internal.sql.table.QueryType;
 
 /**
  * The query to execute for a {@link SamplingPointTable}.
@@ -55,21 +55,20 @@ public class SamplingPointQuery extends Query {
         super(database, "sampling_points", "observation");
         //final QueryType[] SLIE = {SELECT, LIST, INSERT, EXISTS};
         final QueryType[] sli   = {SELECT, LIST, INSERT};
-        final QueryType[] slif  = {SELECT, LIST, INSERT, FILTERED_LIST};
-        final QueryType[] slief = {SELECT, LIST, INSERT, EXISTS, FILTERED_LIST};
+        final QueryType[] slief = {SELECT, LIST, INSERT, EXISTS, LIST_ID};
         
-        identifier             = addColumn   ("id",                 slief);
-        name                   = addColumn   ("name",               slif);
-        description            = addColumn   ("description",        sli);
-        sampledFeature         = addColumn   ("sampled_feature",    sli);
-        pointIdentifier        = addColumn   ("point_id",           sli);
-        srsName                = addColumn   ("point_srsname",      sli);
-        srsDimension           = addColumn   ("point_srsdimension", sli);
-        positionValueX         = addColumn   ("x_value",            sli);
-        positionValueY         = addColumn   ("y_value",            sli);
+        identifier             = addMandatoryColumn ("id",                 slief);
+        name                   = addMandatoryColumn ("name",               sli);
+        description            = addOptionalColumn  ("description",       null, sli);
+        sampledFeature         = addOptionalColumn  ("sampled_feature",    null,sli);
+        pointIdentifier        = addMandatoryColumn ("point_id",           sli);
+        srsName                = addMandatoryColumn ("point_srsname",      sli);
+        srsDimension           = addMandatoryColumn ("point_srsdimension", sli);
+        positionValueX         = addMandatoryColumn ("x_value",            sli);
+        positionValueY         = addMandatoryColumn ("y_value",            sli);
         
         byIdentifier  = addParameter(identifier, SELECT, EXISTS);
-        byName        = addParameter(name, FILTERED_LIST);
+        byName        = addParameter(name, LIST);
     }
     
 }

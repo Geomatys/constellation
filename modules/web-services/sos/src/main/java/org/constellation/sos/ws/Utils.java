@@ -196,6 +196,12 @@ public final class Utils {
           }
     }
 
+    /**
+     * Transform a Lucene Date syntax string into a yyyy-MM-dd hh:mm:ss Date format String.
+     *
+     * @param luceneTimeValue A String on Lucene date format
+     * @return A String on yyy-MM-dd hh:mm:ss Date format
+     */
     public static String unLuceneTimeValue(String luceneTimeValue) {
         final String year     = luceneTimeValue.substring(0, 4);
         luceneTimeValue = luceneTimeValue.substring(4);
@@ -208,11 +214,17 @@ public final class Utils {
         final String min      = luceneTimeValue.substring(0, 2);
         luceneTimeValue = luceneTimeValue.substring(2);
         final String sec      = luceneTimeValue.substring(0, 2);
-        luceneTimeValue = luceneTimeValue.substring(2);
 
         return year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec;
     }
 
+    /**
+     * Return a time description on the form "Xmin Ys Zms" from a millisecond time.
+     *
+     * @param time A time value in millisecond
+     *
+     * @return A string on the form "Xmin Ys Zms".
+     */
     public static String getPeriodDescription(long time) {
         long temp = time / 1000;
         final long ms   = time - (temp * 1000);
@@ -232,7 +244,6 @@ public final class Utils {
 
         temp      = time / 60;
         final long min  = time - (temp * 60);
-        time      = time - min;
 
         return min + "min " + sec + "s " + ms + "ms";
     }
@@ -297,7 +308,7 @@ public final class Utils {
             maxy = 90.0;
         }
 
-        EnvelopeEntry env =  new EnvelopeEntry(null, new DirectPositionType(minx, miny), new DirectPositionType(maxx, maxy), srsName);
+        final EnvelopeEntry env =  new EnvelopeEntry(null, new DirectPositionType(minx, miny), new DirectPositionType(maxx, maxy), srsName);
         env.setSrsDimension(2);
         env.setAxisLabels("Y X");
         return env;

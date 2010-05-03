@@ -17,12 +17,12 @@
  */
 package org.constellation.observation;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  * The query to execute for a {@link MeasureTable}.
@@ -52,9 +52,9 @@ public class MeasureQuery extends Query{
         final QueryType[] sli  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         
-        name    = addColumn   ("name",  slie);
-        uom     = addColumn   ("uom",   sli);
-        value   = addColumn   ("value", sli);
+        name    = addMandatoryColumn ("name",          slie);
+        uom     = addOptionalColumn   ("uom",   null,  sli);
+        value   = addOptionalColumn   ("value",  null, sli);
         
         byName  = addParameter(name, SELECT, EXISTS);
     }

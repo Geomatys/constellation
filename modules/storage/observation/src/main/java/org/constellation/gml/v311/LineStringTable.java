@@ -20,23 +20,20 @@ package org.constellation.gml.v311;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import java.util.ArrayList;
+import java.util.List;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
-import org.geotoolkit.util.Utilities;
+import org.geotoolkit.internal.sql.table.LocalCache;
+import org.geotoolkit.internal.sql.table.Table;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class LineStringTable extends SingletonTable<DirectPositionEntry> {
-
-    /**
-     * identifiant secondaire de la table.
-     */
-    private String idlineString;
+public class LineStringTable extends Table {
 
     public LineStringTable(final Database database) {
         this(new LineStringQuery(database));
@@ -47,62 +44,57 @@ public class LineStringTable extends SingletonTable<DirectPositionEntry> {
      */
     private LineStringTable(final LineStringQuery query) {
         super(query);
-        setIdentifierParameters(query.byIdentifier, null);
     }
 
     /**
      * Construit une nouvelle table non partagée
      */
-    public LineStringTable(final LineStringTable table) {
+    private LineStringTable(final LineStringTable table) {
         super(table);
     }
 
-    @Override
-    protected DirectPositionEntry createEntry(ResultSet results) throws CatalogException, SQLException {
-        final LineStringQuery query = (LineStringQuery) super.query;
-        Double x = results.getDouble(indexOf(query.xValue));
-        Double y = results.getDouble(indexOf(query.yValue));
-        Double z = results.getDouble(indexOf(query.zValue));
-        if (results.wasNull()) {
-            z = null;
-        }
-        DirectPositionType pos;
-        if (z != null) {
-            pos = new DirectPositionType(x, y, z);
-        } else {
-            pos = new DirectPositionType(x, y);
-        }
-        String name = results.getString(indexOf(query.identifier)) + "/" + x + "/" + y + "/" + z;
-        return new DirectPositionEntry(name, pos);
-
-    }
-
     /**
-     * Specifie les parametres a utiliser dans la requetes de type "type".
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
-        super.configure(type, statement);
-        final LineStringQuery query = (LineStringQuery) super.query;
-        if (! type.equals(QueryType.INSERT))
-            statement.setString(indexOf(query.byIdentifier), idlineString);
-
+    protected LineStringTable clone() {
+        return new LineStringTable(this);
     }
 
-
-    public synchronized void getIdentifier(String idline, DirectPositionType position) throws SQLException, CatalogException {
-
-    }
-    
-    public String getIdLineString() {
-        return idlineString;
-    }
-
-    public synchronized void setIdLineString(String idlineString) {
-        if (!Utilities.equals(this.idlineString, idlineString)) {
-            this.idlineString = idlineString;
-            fireStateChanged("idlineString");
+    public List<DirectPositionEntry> getEntries(final String idLineString) throws CatalogException, SQLException {
+        final LineStringQuery query = (LineStringQuery) this.query;
+        final List<DirectPositionEntry> positions = new ArrayList<DirectPositionEntry>();
+        synchronized (getLock()) {
+            final LocalCache.Stmt ce = getStatement(QueryType.LIST);
+            final PreparedStatement statement = ce.statement;
+            statement.setString(indexOf(query.byIdentifier), idLineString);
+            final int  xIndex = indexOf(query.xValue);
+            final int  yIndex = indexOf(query.yValue);
+            final int  zIndex = indexOf(query.zValue);
+            final int idIndex = indexOf(query.identifier);
+            final ResultSet results = statement.executeQuery();
+            while (results.next()) {
+                final DirectPositionType pos;
+                final double x = results.getDouble(xIndex);
+                final double y = results.getDouble(yIndex);
+                final double z = results.getDouble(zIndex);
+                if (results.wasNull()) {
+                    pos = new DirectPositionType(x, y);
+                } else {
+                    pos = new DirectPositionType(x, y, z);
+                }
+                String name = results.getString(idIndex) + '/' + x + '/' + y + '/' + z;
+                positions.add(new DirectPositionEntry(name, pos));
+            }
+            results.close();
+            release(ce);
         }
-
+        return positions;
     }
+
+    public void getIdentifier(String idline, DirectPositionType position) throws SQLException, CatalogException {
+        System.out.println("Attention implementation manquante getIdentifer LineString");
+    }
+
 }

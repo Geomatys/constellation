@@ -17,13 +17,14 @@
 package org.constellation.gml.v311;
 
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
+import org.geotoolkit.internal.sql.table.Entry;
 import org.geotoolkit.util.Utilities;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class DirectPositionEntry {
+public class DirectPositionEntry implements Entry {
 
     private DirectPositionType position;
 
@@ -52,6 +53,11 @@ public class DirectPositionEntry {
      * @return the name
      */
     public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getIdentifier() {
         return name;
     }
 

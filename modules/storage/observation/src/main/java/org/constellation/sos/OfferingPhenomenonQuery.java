@@ -16,12 +16,12 @@
  */
 package org.constellation.sos;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  *
@@ -49,9 +49,9 @@ public class OfferingPhenomenonQuery extends Query {
         //final QueryType[] SLI  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
         
-        idOffering          = addColumn("id_offering", slie);
-        phenomenon          = addColumn("phenomenon",  slie);
-        compositePhenomenon = addColumn("composite_phenomenon",  slie);
+        idOffering          = addMandatoryColumn("id_offering", slie);
+        phenomenon          = addOptionalColumn("phenomenon",  null, slie);
+        compositePhenomenon = addOptionalColumn("composite_phenomenon",  null, slie);
         
         byOffering            = addParameter(idOffering, SELECT, LIST, EXISTS);
         byPhenomenon          = addParameter(phenomenon,  SELECT, EXISTS);

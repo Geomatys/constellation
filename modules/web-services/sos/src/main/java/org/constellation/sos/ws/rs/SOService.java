@@ -167,7 +167,7 @@ public class SOService extends OGCWebService {
                                                      OPERATION_NOT_SUPPORTED, "GetFeatureOfInterest");
                 }
                 if (gf.getVersion() != null)
-                    serviceDef = getVersionFromNumber(gf.getVersion().toString());
+                    serviceDef = getVersionFromNumber(gf.getVersion());
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getFeatureOfInterest(gf), sw);
 

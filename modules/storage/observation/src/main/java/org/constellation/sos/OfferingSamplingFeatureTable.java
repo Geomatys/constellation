@@ -19,12 +19,13 @@ package org.constellation.sos;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.gml.v311.ReferenceTable;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureEntry;
 import org.geotoolkit.util.Utilities;
 
@@ -66,7 +67,7 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
     /**
      * Build a new table not shared.
      */
-    public OfferingSamplingFeatureTable(final OfferingSamplingFeatureTable table) {
+    private OfferingSamplingFeatureTable(final OfferingSamplingFeatureTable table) {
         super(table);
     }
 
@@ -74,12 +75,20 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
      * Initialize the table identifier.
      */
     private OfferingSamplingFeatureTable(final OfferingSamplingFeatureQuery query) {
-        super(query);
-        setIdentifierParameters(query.bySamplingFeature, null);
+        super(query, query.bySamplingFeature);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected OfferingSamplingFeatureTable clone() {
+        return new OfferingSamplingFeatureTable(this);
     }
 
     @Override
-    protected OfferingSamplingFeatureEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
+    protected OfferingSamplingFeatureEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingSamplingFeatureQuery query = (OfferingSamplingFeatureQuery) super.query;
         ReferenceEntry samplingFeature;
         
@@ -119,37 +128,46 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
      * Insere un nouveau capteur a un offering dans la base de donnée.
      *
      */
-    public synchronized void getIdentifier(OfferingSamplingFeatureEntry offSamplingFeature) throws SQLException, CatalogException {
+    public void getIdentifier(OfferingSamplingFeatureEntry offSamplingFeature) throws SQLException, CatalogException {
         final OfferingSamplingFeatureQuery query  = (OfferingSamplingFeatureQuery) super.query;
         String idSF = "";
         boolean success = false;
-        transactionBegin();
-        try {
-            final PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
-            if ( samplingFeatures == null) {
-                samplingFeatures = getDatabase().getTable(ReferenceTable.class);
-            }
-            idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
-            statement.setString(indexOf(query.samplingFeature), idSF);
- 
-            final ResultSet result = statement.executeQuery();
-            if(result.next()) {
-                success = true;
-                return;
-            }
-            final PreparedStatement insert    = getStatement(QueryType.INSERT);
-            insert.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
-            if ( samplingFeatures == null) {
-                samplingFeatures = getDatabase().getTable(ReferenceTable.class);
-            }
-            idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
-            insert.setString(indexOf(query.samplingFeature), idSF);
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                final Stmt statement = getStatement(QueryType.EXISTS);
+                statement.statement.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
+                if ( samplingFeatures == null) {
+                    samplingFeatures = getDatabase().getTable(ReferenceTable.class);
+                }
+                idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
+                statement.statement.setString(indexOf(query.samplingFeature), idSF);
 
-            updateSingleton(insert);
-            success = true;
-        } finally {
-            transactionEnd(success);
+                final ResultSet result = statement.statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    result.close();
+                    release(statement);
+                    return;
+                }
+                result.close();
+                release(statement);
+                
+                final Stmt insert    = getStatement(QueryType.INSERT);
+                insert.statement.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
+                if ( samplingFeatures == null) {
+                    samplingFeatures = getDatabase().getTable(ReferenceTable.class);
+                }
+                idSF = samplingFeatures.getIdentifier(offSamplingFeature.getComponent());
+                insert.statement.setString(indexOf(query.samplingFeature), idSF);
+
+                updateSingleton(insert.statement);
+                release(insert);
+                
+                success = true;
+            } finally {
+                transactionEnd(success);
+            }
         }
     }
 }

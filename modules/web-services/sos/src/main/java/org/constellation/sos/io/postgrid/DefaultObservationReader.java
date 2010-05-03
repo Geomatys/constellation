@@ -19,8 +19,7 @@ package org.constellation.sos.io.postgrid;
 
 // J2SE dependencies
 import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -33,11 +32,9 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.ConfigurationKey;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.NoSuchRecordException;
-import org.constellation.catalog.NoSuchTableException;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.NoSuchRecordException;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.gml.v311.ReferenceTable;
@@ -45,6 +42,7 @@ import org.constellation.observation.MeasureTable;
 import org.constellation.observation.MeasurementTable;
 import org.constellation.observation.ObservationTable;
 import org.constellation.observation.ProcessTable;
+import org.constellation.observation.SpecialOperationsTable;
 import org.constellation.sampling.SamplingCurveTable;
 import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointTable;
@@ -110,28 +108,16 @@ public class DefaultObservationReader implements ObservationReader {
     private final ReferenceTable refTable;
 
     /**
-     * An SQL statement finding the last Observation ID recorded
-     */
-    private final PreparedStatement newObservationIDStmt;
-
-    /**
-     * An SQL statement finding the last Measurement ID recorded
-     */
-    private final PreparedStatement newMeasurementIDStmt;
-
-    /**
      * An SQL statement verying if the specified observation already exist.
      */
-    private final PreparedStatement observationExistStmt;
+    private final SpecialOperationsTable specialTable;
 
-    /**
-     * An SQL statement get the minimal eventime for the observation offering
-     */
-    private final PreparedStatement getMinEventTimeOffering;
 
     private static final String SQL_ERROR_MSG = "The service has throw a SQL Exception:";
 
     private static final String CAT_ERROR_MSG = "The service has throw a Catalog Exception:";
+
+
     /**
      *
      * @param dataSourceOM
@@ -149,22 +135,20 @@ public class DefaultObservationReader implements ObservationReader {
         }
         try {
             omDatabase = DatabasePool.getDatabase(db);
-            omDatabase.setProperty(ConfigurationKey.READONLY, "false");
+            //verify the validity of the connection
+            Connection c = omDatabase.getDataSource(true).getConnection();
+            c.close();
+            //omDatabase.setProperty(ConfigurationKey.READONLY, "false");
             
             //we build the database table frequently used.
-            obsTable  = omDatabase.getTable(ObservationTable.class);
-            measTable = omDatabase.getTable(MeasurementTable.class);
-            offTable  = omDatabase.getTable(ObservationOfferingTable.class);
-            refTable  = omDatabase.getTable(ReferenceTable.class);
-            //we build the prepared Statement
-            newObservationIDStmt    = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observation\".\"observations\" WHERE \"name\" LIKE '%" + observationIdBase + "%' ");
-            newMeasurementIDStmt    = omDatabase.getConnection().prepareStatement("SELECT Count(*) FROM \"observation\".\"measurements\" WHERE \"name\" LIKE '%" + observationIdBase + "%' ");
-            observationExistStmt    = omDatabase.getConnection().prepareStatement("SELECT \"name\" FROM \"observation\".\"observations\" WHERE \"name\"=? UNION SELECT \"name\" FROM \"observation\".\"measurements\" WHERE \"name\"=?");
-            getMinEventTimeOffering = omDatabase.getConnection().prepareStatement("select MIN(\"event_time_begin\") from \"sos\".\"observation_offerings\"");
+            obsTable     = omDatabase.getTable(ObservationTable.class);
+            measTable    = omDatabase.getTable(MeasurementTable.class);
+            offTable     = omDatabase.getTable(ObservationOfferingTable.class);
+            refTable     = omDatabase.getTable(ReferenceTable.class);
+            specialTable = omDatabase.getTable(SpecialOperationsTable.class);
+
         } catch (SQLException ex) {
             throw new CstlServiceException("SQL Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
-        } catch (NoSuchTableException ex) {
-            throw new CstlServiceException("NoSuchTable Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (IOException ex) {
              throw new CstlServiceException("IO Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
@@ -181,10 +165,6 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
-        } catch (CatalogException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(),
-                    NO_APPLICABLE_CODE);
         }
     }
 
@@ -216,11 +196,7 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
-        } catch (CatalogException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(),
-                    NO_APPLICABLE_CODE);
-        } catch (Throwable e) {
+        }  catch (Throwable e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("The service has throw a Runtime Exception:\n" +
                                            "Type:"      + e.getClass().getSimpleName() +
@@ -240,11 +216,7 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
-        } catch (CatalogException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(),
-                    NO_APPLICABLE_CODE);
-        }
+        } 
     }
 
     @Override
@@ -262,11 +234,7 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
-        } catch (CatalogException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(),
-                    NO_APPLICABLE_CODE);
-        }
+        } 
     }
 
     @Override
@@ -293,10 +261,6 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
-        } catch (CatalogException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(),
-                    NO_APPLICABLE_CODE);
         }
     }
 
@@ -317,10 +281,6 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
 
-        } catch (CatalogException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(),
-                    NO_APPLICABLE_CODE);
         }
     }
 
@@ -390,7 +350,8 @@ public class DefaultObservationReader implements ObservationReader {
             } else if (ex.getCause() != null) {
                 msg = ex.getCause().getMessage();
             }
-            throw new CstlServiceException("Catalog exception while getting the observation with identifier: " + identifier +  " of type " + resultModel.getLocalPart() + msg,
+            ex.printStackTrace();
+            throw new CstlServiceException("Catalog exception while getting the observation with identifier: " + identifier +  " of type " + resultModel.getLocalPart() + " " + msg,
                     NO_APPLICABLE_CODE, "getObservation");
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -448,23 +409,12 @@ public class DefaultObservationReader implements ObservationReader {
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                 NO_APPLICABLE_CODE);
 
-        } catch (CatalogException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException(CAT_ERROR_MSG + ex.getMessage(),
-                    NO_APPLICABLE_CODE);
         }
     }
 
     @Override
     public void destroy() {
-        try {
-            newObservationIDStmt.close();
-            observationExistStmt.close();
-            getMinEventTimeOffering.close();
-            omDatabase.close();
-        } catch (SQLException ex) {
-            LOGGER.log(Level.SEVERE, "SQL Exception while destroy observation reader");
-        }
+        
     }
 
     /**
@@ -473,32 +423,17 @@ public class DefaultObservationReader implements ObservationReader {
     @Override
     public String getNewObservationId() throws CstlServiceException {
         try {
-            ResultSet res = newMeasurementIDStmt.executeQuery();
-            int nbMeas = 0;
-            if (res.next()) {
-                nbMeas = res.getInt(1);
-            }
-            res.close();
-            
-            int nbObs = 0;
-            res = newObservationIDStmt.executeQuery();
-            if (res.next()) {
-                nbObs = res.getInt(1);
-            }
-            res.close();
-
-
+            final int nbMeas = specialTable.measureCount(observationIdBase);
+            final int nbObs  = specialTable.observationCount(observationIdBase);
             int id = nbMeas + nbObs;
 
             //there is a possibility that someone delete some observation manually.
             // so we must verify that this id is not already assigned. if it is we must find a free identifier
+            boolean again;
             do {
                 id ++;
-                observationExistStmt.setString(1, observationIdBase + id);
-                observationExistStmt.setString(2, observationIdBase + id);
-                res = observationExistStmt.executeQuery();
-            } while (res.next());
-            res.close();
+                again = specialTable.observationExists(observationIdBase + id);
+            } while (again);
             return observationIdBase + id;
         } catch( SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -514,24 +449,19 @@ public class DefaultObservationReader implements ObservationReader {
     public List<String> getEventTime() throws CstlServiceException {
         String ret = null;
         try {
-            final ResultSet res = getMinEventTimeOffering.executeQuery();
-            Timestamp t = null;
-            while (res.next()) {
-                t = res.getTimestamp(1);
-            }
-
+            
+            final Timestamp t = specialTable.getMinTimeOffering();
             if (t != null) {
                 ret = t.toString();
             }
-            res.close();
-
         } catch (SQLException ex) {
            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
            throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                                          NO_APPLICABLE_CODE);
         }
-        if  (ret != null)
+        if  (ret != null) {
             return Arrays.asList(ret);
+        }
         return null;
     }
 

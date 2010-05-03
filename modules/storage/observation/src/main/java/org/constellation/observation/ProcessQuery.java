@@ -17,12 +17,12 @@
  */
 package org.constellation.observation;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  * The query to execute for a {@link ProcessTable}.
@@ -49,9 +49,9 @@ public class ProcessQuery extends Query{
     public ProcessQuery(final Database database) {
         super(database, "process", "observation");
         final QueryType[] sli  = {SELECT, INSERT, LIST};
-        final QueryType[] slie = {SELECT, EXISTS, INSERT, LIST};
-        name    = addColumn   ("name",        slie);
-        remarks = addColumn   ("description", sli);
+        final QueryType[] slie = {SELECT, EXISTS, INSERT, LIST, LIST_ID};
+        name    = addMandatoryColumn   ("name",        slie);
+        remarks = addOptionalColumn   ("description", null, sli);
 
         byName  = addParameter(name, SELECT, EXISTS);
     }

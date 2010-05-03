@@ -17,12 +17,12 @@
  */
 package org.constellation.observation;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  * The query to execute for a {@link SurveyProcedureTable}
@@ -50,16 +50,16 @@ public class SurveyProcedureQuery extends Query {
     public SurveyProcedureQuery(final Database database) {
         super(database, "SurveyProcedure", "observation");
         final QueryType[] usage = {SELECT, LIST};
-        name              = addColumn   ("name",              usage);
-        operator          = addColumn   ("operator",          usage);
-        elevationDatum    = addColumn   ("elevationDatum",    usage);
-        elevationMethod   = addColumn   ("elevationMethod",   usage);
-        elevationAccuracy = addColumn   ("elevationAccuracy", usage);
-        geodeticDatum     = addColumn   ("geodeticDatum",     usage);
-        positionMethod    = addColumn   ("positionMethod",    usage);
-        positionAccuracy  = addColumn   ("positionAccuracy",  usage);
-        projection        = addColumn   ("projection",        usage);
-        surveyTime        = addColumn   ("surveyTime",        usage);
+        name              = addMandatoryColumn   ("name",              usage);
+        operator          = addOptionalColumn   ("operator",          null ,usage);
+        elevationDatum    = addOptionalColumn   ("elevationDatum",    null ,usage);
+        elevationMethod   = addOptionalColumn   ("elevationMethod",   null ,usage);
+        elevationAccuracy = addOptionalColumn   ("elevationAccuracy", null ,usage);
+        geodeticDatum     = addOptionalColumn   ("geodeticDatum",     null ,usage);
+        positionMethod    = addOptionalColumn   ("positionMethod",    null ,usage);
+        positionAccuracy  = addOptionalColumn   ("positionAccuracy",  null ,usage);
+        projection        = addOptionalColumn   ("projection",        null ,usage);
+        surveyTime        = addOptionalColumn   ("surveyTime",        null ,usage);
         
         byName  = addParameter(name, SELECT);
     }

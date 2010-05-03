@@ -17,16 +17,15 @@
  */
 package org.constellation.swe.v101;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
-import org.geotoolkit.swe.xml.DataBlockDefinition;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.swe.xml.v101.DataBlockDefinitionEntry;
 import org.geotoolkit.swe.xml.v101.SimpleDataRecordEntry;
 import org.geotoolkit.swe.xml.v101.TextBlockEntry;
@@ -38,7 +37,7 @@ import org.geotoolkit.swe.xml.v101.AbstractEncodingPropertyType;
  * @version $Id:
  * @author Guilhem Legal
  */
-public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition>{
+public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinitionEntry>{
     
     /**
      * Connexion vers la table des {@linkplain TextBlock text block encoding}.
@@ -66,21 +65,35 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
      * Initialise l'identifiant de la table.
      */
     private DataBlockDefinitionTable(final DataBlockDefinitionQuery query) {
-        super(query);
-        setIdentifierParameters(query.byId, null);
+        super(query, query.byId);
+    }
+
+     /**
+     * Construit une nouvelle table non partagée
+     */
+    private DataBlockDefinitionTable(final DataBlockDefinitionTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected DataBlockDefinitionTable clone() {
+        return new DataBlockDefinitionTable(this);
     }
 
     /**
      * Construit un data block pour l'enregistrement courant.
      */
     @Override
-    protected DataBlockDefinition createEntry(final ResultSet results) throws SQLException, CatalogException {
+    protected DataBlockDefinitionEntry createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
         final DataBlockDefinitionQuery query = (DataBlockDefinitionQuery) super.query;
         final String idDataBlock = results.getString(indexOf(query.id));
         
         if (dataRecords == null) {
             dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
-            dataRecords = new SimpleDataRecordTable(dataRecords);
         }
         dataRecords.setIdDataBlock(idDataBlock);
         final Collection<SimpleDataRecordEntry> entries = dataRecords.getEntries();
@@ -100,50 +113,55 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
      *
      * @param databloc le datablockDefinition a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final DataBlockDefinitionEntry databloc) throws SQLException, CatalogException {
+    public String getIdentifier(final DataBlockDefinitionEntry databloc) throws SQLException, CatalogException {
         final DataBlockDefinitionQuery query  = (DataBlockDefinitionQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        try {
-            if (databloc.getId() != null) {
-                final PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.id), databloc.getId());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    return databloc.getId();
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                if (databloc.getId() != null) {
+                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    statement.statement.setString(indexOf(query.id), databloc.getId());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        result.close();
+                        release(statement);
+                        return databloc.getId();
+                    } else {
+                        id = databloc.getId();
+                    }
+                    result.close();
                 } else {
-                    id = databloc.getId();
+                    id = searchFreeIdentifier("datablockDef");
                 }
-            } else {
-                id = searchFreeIdentifier("datablockDef");
-            }
-        
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.id), id);
 
-            if (textBlockEncodings == null) {
-                textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
+                final Stmt statement = getStatement(QueryType.INSERT);
+                statement.statement.setString(indexOf(query.id), id);
+
+                if (textBlockEncodings == null) {
+                    textBlockEncodings = getDatabase().getTable(TextBlockTable.class);
+                }
+                AbstractEncodingPropertyType encProp = databloc.getEncoding();
+                statement.statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry) encProp.getEncoding()));
+                updateSingleton(statement.statement);
+                release(statement);
+                
+                if (dataRecords == null) {
+                    dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
+                    dataRecords.setIdDataBlock(id);
+                } else {
+                    dataRecords.setIdDataBlock(id);
+                }
+                final Iterator i = databloc.getComponents().iterator();
+                while (i.hasNext()) {
+                    dataRecords.getIdentifier((SimpleDataRecordEntry) i.next(), id);
+                }
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-            AbstractEncodingPropertyType encProp = databloc.getEncoding();
-            statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry) encProp.getEncoding()));
-            updateSingleton(statement);
-        
-            if (dataRecords == null) {
-                dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
-                dataRecords = new SimpleDataRecordTable(dataRecords);
-                dataRecords.setIdDataBlock(id);
-            } else {
-                dataRecords.setIdDataBlock(id);
-            }
-            final Iterator i = databloc.getComponents().iterator();
-            while (i.hasNext()) {
-                dataRecords.getIdentifier((SimpleDataRecordEntry) i.next(), id);
-            }
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
         return id;
     }

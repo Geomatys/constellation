@@ -19,10 +19,11 @@ package org.constellation.sos;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.sos.xml.v100.OfferingResponseModeEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.util.Utilities;
@@ -52,7 +53,7 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
    /**
      * Construit une nouvelle table non partagée
      */
-    public OfferingResponseModeTable(final OfferingResponseModeTable table) {
+    private OfferingResponseModeTable(final OfferingResponseModeTable table) {
         super(table);
     }
     
@@ -60,13 +61,20 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
      * Initialise l'identifiant de la table.
      */
     private OfferingResponseModeTable(final OfferingResponseModeQuery query) {
-        super(query);
-        setIdentifierParameters(query.byMode, null);
+        super(query, query.byMode);
     }
     
-    
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
     @Override
-    protected OfferingResponseModeEntry createEntry(final ResultSet results) throws CatalogException, SQLException {
+    protected OfferingResponseModeTable clone() {
+        return new OfferingResponseModeTable(this);
+    }
+
+    @Override
+    protected OfferingResponseModeEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingResponseModeQuery query = (OfferingResponseModeQuery) super.query;
         
         
@@ -104,27 +112,34 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
      * Insere un nouveau capteur a un offering dans la base de donnée.
      *
      */
-    public synchronized void getIdentifier(OfferingResponseModeEntry offres) throws SQLException, CatalogException {
+    public void getIdentifier(OfferingResponseModeEntry offres) throws SQLException, CatalogException {
         final OfferingResponseModeQuery query  = (OfferingResponseModeQuery) super.query;
         boolean success = false;
-        transactionBegin();
-        try {
-            final PreparedStatement statement = getStatement(QueryType.EXISTS);
-            statement.setString(indexOf(query.idOffering), offres.getIdOffering());
-            statement.setString(indexOf(query.mode), offres.getMode().name());
-            final ResultSet result = statement.executeQuery();
-            if(result.next()) {
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                final Stmt statement = getStatement(QueryType.EXISTS);
+                statement.statement.setString(indexOf(query.idOffering), offres.getIdOffering());
+                statement.statement.setString(indexOf(query.mode), offres.getMode().name());
+                final ResultSet result = statement.statement.executeQuery();
+                if(result.next()) {
+                    success = true;
+                    result.close();
+                    release(statement);
+                    return;
+                }
+                result.close();
+                release(statement);
+
+                final Stmt insert    = getStatement(QueryType.INSERT);
+                insert.statement.setString(indexOf(query.idOffering), offres.getIdOffering());
+                insert.statement.setString(indexOf(query.mode), offres.getMode().name() );
+                updateSingleton(insert.statement);
                 success = true;
-                return;
+                release(insert);
+            } finally {
+                transactionEnd(success);
             }
-        
-            final PreparedStatement insert    = getStatement(QueryType.INSERT);
-            insert.setString(indexOf(query.idOffering), offres.getIdOffering());
-            insert.setString(indexOf(query.mode), offres.getMode().name() );
-            updateSingleton(insert);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
     }
     

@@ -17,12 +17,12 @@
  */
 package org.constellation.swe.v101;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Column;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  * The query to execute for a {@link DataRecordFieldTable}.
@@ -51,14 +51,14 @@ public class AnyScalarQuery extends Query{
         super (database, "any_scalars", "observation");
         final QueryType[] sli  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
-        idDataRecord  = addColumn("id_datarecord", slie);
-        idDataBlock   = addColumn("id_datablock",  slie);
-        name          = addColumn("name",          slie);
-        definition    = addColumn("definition",    sli);
-        type          = addColumn("type",          sli);
-        uomCode       = addColumn("uom_code",      sli);
-        uomHref       = addColumn("uom_href",      sli);
-        value         = addColumn("value",         sli);
+        idDataRecord  = addMandatoryColumn("id_datarecord", slie);
+        idDataBlock   = addMandatoryColumn("id_datablock",  slie);
+        name          = addOptionalColumn("name",          null, slie);
+        definition    = addOptionalColumn("definition",    null, sli);
+        type          = addOptionalColumn("type",          null,  sli);
+        uomCode       = addOptionalColumn("uom_code",      null, sli);
+        uomHref       = addOptionalColumn("uom_href",      null, sli);
+        value         = addOptionalColumn("value",         null, sli);
         
         byName         = addParameter(name, SELECT, EXISTS);
         byIdDataRecord = addParameter(idDataRecord, SELECT, LIST, EXISTS);

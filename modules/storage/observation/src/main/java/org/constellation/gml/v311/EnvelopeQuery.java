@@ -16,12 +16,12 @@
  */
 package org.constellation.gml.v311;
 
-import org.constellation.catalog.Column;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.Parameter;
-import org.constellation.catalog.Query;
-import org.constellation.catalog.QueryType;
-import static org.constellation.catalog.QueryType.*;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.Parameter;
+import org.geotoolkit.internal.sql.table.Query;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.Column;
+import static org.geotoolkit.internal.sql.table.QueryType.*;
 /**
  * Represent a rectangle in the space. 
  * 
@@ -48,12 +48,12 @@ public class EnvelopeQuery extends Query {
         super (database, "envelopes","sos");
         final QueryType[] sli  = {SELECT, LIST, INSERT};
         final QueryType[] slie = {SELECT, LIST, INSERT, EXISTS};
-        id           = addColumn("id",             slie);
-        srsName      = addColumn("srs_name",       sli);
-        lowerCornerX = addColumn("lower_corner_x", sli);
-        lowerCornerY = addColumn("lower_corner_y", sli);
-        upperCornerX = addColumn("upper_corner_x", sli);
-        upperCornerY = addColumn("upper_corner_y", sli);
+        id           = addMandatoryColumn("id",             slie);
+        srsName      = addMandatoryColumn("srs_name",       sli);
+        lowerCornerX = addMandatoryColumn("lower_corner_x", sli);
+        lowerCornerY = addMandatoryColumn("lower_corner_y", sli);
+        upperCornerX = addMandatoryColumn("upper_corner_x", sli);
+        upperCornerY = addMandatoryColumn("upper_corner_y", sli);
         
         byId         = addParameter(id, SELECT, EXISTS);
     }

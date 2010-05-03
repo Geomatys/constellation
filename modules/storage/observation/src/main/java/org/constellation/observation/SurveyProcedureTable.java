@@ -19,9 +19,10 @@ package org.constellation.observation;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.SingletonTable;
+import org.geotoolkit.observation.xml.v100.SurveyProcedureEntry;
 import org.opengis.observation.sampling.SurveyProcedure;
 
 /**
@@ -32,7 +33,7 @@ import org.opengis.observation.sampling.SurveyProcedure;
  *
  * @author Guilhem Legal
  */
-public class SurveyProcedureTable extends SingletonTable<SurveyProcedure>{
+public class SurveyProcedureTable extends SingletonTable<SurveyProcedureEntry>{
     
    /**
     * Construit une table des survey procedures.
@@ -40,13 +41,37 @@ public class SurveyProcedureTable extends SingletonTable<SurveyProcedure>{
     * @param  database Connexion vers la base de donn�es.
     */
     public SurveyProcedureTable(final Database database) {
-         super(new SurveyProcedureQuery(database)); 
+         this(new SurveyProcedureQuery(database));
+    }
+
+    /**
+     * Initialise l'identifiant de la table.
+     */
+    private SurveyProcedureTable(final SurveyProcedureQuery query) {
+        super(query, query.byName);
+    }
+
+    /**
+     * Construit une nouvelle table non partagée
+     */
+    private SurveyProcedureTable(final SurveyProcedureTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected SurveyProcedureTable clone() {
+        return new SurveyProcedureTable(this);
     }
 
     /**
      * Construit une survey procedure pour l'enregistrement courant.
      */
-    protected SurveyProcedure createEntry(final ResultSet results) throws CatalogException, SQLException {
+    @Override
+    protected SurveyProcedureEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
          final SurveyProcedureQuery query = (SurveyProcedureQuery) super.query;
          return null;/* new SurveyProcedureEntry(results.getString(indexOf(query.name   )),
                                          results.getString(indexOf(query.operator)),

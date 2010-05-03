@@ -17,15 +17,15 @@
  */
 package org.constellation.observation;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.gml.v311.UnitOfMeasureTable;
 import org.geotoolkit.gml.xml.v311.UnitOfMeasureEntry;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.observation.xml.v100.MeasureEntry;
 
 /**
@@ -54,15 +54,31 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
      * Initialise l'identifiant de la table.
      */
     private MeasureTable(final MeasureQuery query) {
-        super(query);
-        setIdentifierParameters(query.byName, null);
+        super(query, query.byName);
+    }
+
+    /**
+     * Construit une nouvelle table non partagée
+     */
+    private MeasureTable(final MeasureTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected MeasureTable clone() {
+        return new MeasureTable(this);
     }
     
 
     /**
      * Construit un resultat de mesure pour l'enregistrement courant.
      */
-    protected MeasureEntry createEntry(final ResultSet results) throws SQLException, CatalogException {
+    @Override
+    protected MeasureEntry createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
         final MeasureQuery query = (MeasureQuery) super.query;
         if(uoms == null) {
             uoms =  getDatabase().getTable(UnitOfMeasureTable.class);
@@ -79,43 +95,49 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
      *
      * @param meas le resultat de mesure a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final MeasureEntry meas) throws SQLException, CatalogException {
+    public String getIdentifier(final MeasureEntry meas) throws SQLException, CatalogException {
         final MeasureQuery query  = (MeasureQuery) super.query;
         String id;
         boolean success = false;
+        synchronized (getLock()) {
         transactionBegin();
-        try {
-            if (meas.getName() != null) {
-                final PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.name), meas.getName());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    return meas.getName();
+            try {
+                if (meas.getName() != null) {
+                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    statement.statement.setString(indexOf(query.name), meas.getName());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        result.close();
+                        release(statement);
+                        return meas.getName();
+                    } else {
+                        id = meas.getName();
+                    }
+                    result.close();
+                    release(statement);
                 } else {
-                    id = meas.getName();
+                    id = searchFreeIdentifier("mesure");
                 }
-                result.close();
-            } else {
-                id = searchFreeIdentifier("mesure");
+
+                final Stmt statement = getStatement(QueryType.INSERT);
+
+                statement.statement.setString(indexOf(query.name), id);
+                if (uoms == null) {
+                    uoms =  getDatabase().getTable(UnitOfMeasureTable.class);
+                }
+                if (meas.getUom() != null) {
+                    statement.statement.setString(indexOf(query.uom), uoms.getIdentifier(meas.getUom()));
+                } else {
+                    statement.statement.setNull(indexOf(query.uom), java.sql.Types.VARCHAR);
+                }
+                statement.statement.setDouble(indexOf(query.value), meas.getValue());
+                updateSingleton(statement.statement);
+                release(statement);
+                success = true;
+            } finally {
+                transactionEnd(success);
             }
-        
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-        
-            statement.setString(indexOf(query.name), id);
-            if (uoms == null) {
-                uoms =  getDatabase().getTable(UnitOfMeasureTable.class);
-            }
-            if (meas.getUom() != null) {
-                statement.setString(indexOf(query.uom), uoms.getIdentifier(meas.getUom()));
-            } else {
-                statement.setNull(indexOf(query.uom), java.sql.Types.VARCHAR);
-            }
-            statement.setDouble(indexOf(query.value), meas.getValue());
-            updateSingleton(statement);
-            success = true;
-        } finally {
-            transactionEnd(success);
         }
         return id;
     }

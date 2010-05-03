@@ -17,14 +17,13 @@
  */
 package org.constellation.observation;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import org.constellation.catalog.CatalogException;
-import org.constellation.catalog.Database;
-import org.constellation.catalog.QueryType;
-import org.constellation.catalog.SingletonTable;
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.sampling.SamplingCurveTable;
 import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointTable;
@@ -34,6 +33,7 @@ import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.observation.xml.v100.MeasureEntry;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ProcessEntry;
@@ -43,7 +43,6 @@ import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
 import org.opengis.observation.Measurement;
-import org.opengis.observation.sampling.SamplingCurve;
 
 /**
  * Connexion vers la table des {@linkplain Measurement mesures}.
@@ -56,7 +55,7 @@ import org.opengis.observation.sampling.SamplingCurve;
  * @see MergedMeasurementTable
  * @see org.constellation.measervation.coverage.MeasurementTableFiller
  */
-public class MeasurementTable extends SingletonTable<Measurement> {
+public class MeasurementTable extends SingletonTable<MeasurementEntry> {
     
     /**
      * Connexion vers la table des stations.
@@ -125,16 +124,31 @@ public class MeasurementTable extends SingletonTable<Measurement> {
      * @param  database Connexion vers la base de données des measervations.
      */
     protected MeasurementTable(MeasurementQuery query) {
-        super(query);
-        setIdentifierParameters(query.byName, null);
+        super(query, query.byName);
     }
     
+
+    /**
+     * Construit une nouvelle table non partagée
+     */
+    private MeasurementTable(final MeasurementTable table) {
+        super(table);
+    }
+
+    /**
+     * Returns a copy of this table. This is a copy constructor used for obtaining
+     * a new instance to be used concurrently with the original instance.
+     */
+    @Override
+    protected MeasurementTable clone() {
+        return new MeasurementTable(this);
+    }
     
     /**
      * Construit une mesure pour l'enregistrement courant
      */
     @Override
-    public MeasurementEntry createEntry(final ResultSet result) throws SQLException, CatalogException {
+    public MeasurementEntry createEntry(final ResultSet result, Comparable<?> identifier) throws SQLException, CatalogException {
         final MeasurementQuery query = (MeasurementQuery) super.query;
         
         if (phenomenons == null) {
@@ -218,148 +232,154 @@ public class MeasurementTable extends SingletonTable<Measurement> {
      *
      * @param l'measervation a inserer dans la base de donnée.
      */
-    public synchronized String getIdentifier(final Measurement meas) throws SQLException, CatalogException {
+    public String getIdentifier(final Measurement meas) throws SQLException, CatalogException {
         final MeasurementQuery query = (MeasurementQuery) super.query;
         String id;
         boolean success = false;
-        transactionBegin();
-        try {
-            if (meas.getName() != null) {
-                final PreparedStatement statement = getStatement(QueryType.EXISTS);
-                statement.setString(indexOf(query.name), meas.getName());
-                final ResultSet result = statement.executeQuery();
-                if(result.next()) {
-                    success = true;
-                    return meas.getName();
-                } else {
-                    id = meas.getName();
-                }
-                result.close();
-            } else {
-                id = searchFreeIdentifier("urn:BRGM:measurement:");
-            }
-            final PreparedStatement statement = getStatement(QueryType.INSERT);
-            statement.setString(indexOf(query.name),         id);
-            statement.setString(indexOf(query.description),  meas.getDefinition());
-            statement.setString(indexOf(query.distribution), "normale");
-        
-            // on insere la station qui a effectué cette measervation
-            if (meas.getFeatureOfInterest() instanceof SamplingPointEntry){
-                final SamplingPointEntry station = (SamplingPointEntry)meas.getFeatureOfInterest();
-                if (stationPoints == null) {
-                    stationPoints = getDatabase().getTable(SamplingPointTable.class);
-                }
-                statement.setString(indexOf(query.featureOfInterestPoint),stationPoints.getIdentifier(station));
-                statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
-                statement.setNull(indexOf(query.featureOfInterestCurve),    java.sql.Types.VARCHAR);
-
-            } else  if (meas.getFeatureOfInterest() instanceof SamplingCurveType){
-                final SamplingCurveType station = (SamplingCurveType)meas.getFeatureOfInterest();
-                if (stationCurves == null) {
-                    stationCurves = getDatabase().getTable(SamplingCurveTable.class);
-                }
-                statement.setString(indexOf(query.featureOfInterestCurve),stationCurves.getIdentifier(station));
-                statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
-                statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
-
-
-            } else  if (meas.getFeatureOfInterest() instanceof SamplingFeatureEntry){
-                final SamplingFeatureEntry station = (SamplingFeatureEntry)meas.getFeatureOfInterest();
-                if (stations == null) {
-                    stations = getDatabase().getTable(SamplingFeatureTable.class);
-                }
-                statement.setString(indexOf(query.featureOfInterest),stations.getIdentifier(station));
-                statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
-                statement.setNull(indexOf(query.featureOfInterestCurve),    java.sql.Types.VARCHAR);
-            
-            } else {
-                statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
-                statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
-                statement.setNull(indexOf(query.featureOfInterestCurve),    java.sql.Types.VARCHAR);
-            }
-        
-            // on insere le phenomene measervé
-            if(meas.getObservedProperty() instanceof CompositePhenomenonEntry){
-                final CompositePhenomenonEntry pheno = (CompositePhenomenonEntry)meas.getObservedProperty();
-                if (compositePhenomenons == null) {
-                    compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
-                }
-                statement.setString(indexOf(query.observedPropertyComposite), compositePhenomenons.getIdentifier(pheno));
-                statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
-        
-            } else if(meas.getObservedProperty() instanceof PhenomenonEntry){
-                final PhenomenonEntry pheno = (PhenomenonEntry)meas.getObservedProperty();
-                if (phenomenons == null) {
-                    phenomenons = getDatabase().getTable(PhenomenonTable.class);
-                }
-                statement.setString(indexOf(query.observedProperty), phenomenons.getIdentifier(pheno));
-                statement.setNull(indexOf(query.observedPropertyComposite), java.sql.Types.VARCHAR);
-        
-            } else {
-                statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
-                statement.setNull(indexOf(query.observedPropertyComposite), java.sql.Types.VARCHAR);
-            }
-        
-            //on insere le capteur
-            if (meas.getProcedure() != null) {
-                final ProcessEntry process = (ProcessEntry)meas.getProcedure();
-                if (procedures == null) {
-                    procedures = getDatabase().getTable(ProcessTable.class);
-                }
-                statement.setString(indexOf(query.procedure), procedures.getIdentifier(process));
-            } else {
-                statement.setNull(indexOf(query.procedure), java.sql.Types.VARCHAR);
-            }
-        
-            // on insere le resultat
-            if (meas.getResult() != null){
-                if (measures == null) {
-                    measures = getDatabase().getTable(MeasureTable.class);
-                }
-                statement.setString(indexOf(query.result), measures.getIdentifier((MeasureEntry)meas.getResult()));
-            } else {
-                statement.setNull(indexOf(query.result), java.sql.Types.VARCHAR);
-            }
-        
-            // on insere le "samplingTime""
-            if (meas.getSamplingTime() != null){
-                if (meas.getSamplingTime() instanceof TimePeriodType) {
-                    
-                    final TimePeriodType sampTime = (TimePeriodType)meas.getSamplingTime();
-                    final String s = sampTime.getBeginPosition().getValue();
-                    Timestamp date = Timestamp.valueOf(s);
-                    statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
-                    
-                    if (sampTime.getEndPosition().getIndeterminatePosition() == null) {
-                       
-                        sampTime.getEndPosition().getValue();
-                        date = Timestamp.valueOf(s);
-                        statement.setTimestamp(indexOf(query.samplingTimeEnd),  date);
-                   
+        synchronized (getLock()) {
+            transactionBegin();
+            try {
+                if (meas.getName() != null) {
+                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    statement.statement.setString(indexOf(query.name), meas.getName());
+                    final ResultSet result = statement.statement.executeQuery();
+                    if(result.next()) {
+                        success = true;
+                        result.close();
+                        release(statement);
+                        return meas.getName();
                     } else {
-                        statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.DATE);
+                        id = meas.getName();
                     }
-                    
-                } else if (meas.getSamplingTime() instanceof TimeInstantType) {
-                    final TimeInstantType sampTime = (TimeInstantType)meas.getSamplingTime();
-                    final String s = sampTime.getTimePosition().getValue();
-                    final Timestamp date = Timestamp.valueOf(s);
-                    statement.setTimestamp(indexOf(query.samplingTimeBegin),  date);
-                    statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
-                    
+                    result.close();
+                    release(statement);
                 } else {
-                    throw new IllegalArgumentException("type allowed for sampling time: TimePeriod or TimeInstant");
+                    id = searchFreeIdentifier("urn:BRGM:measurement:");
                 }
-            } else {
-                statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.DATE);
-                statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.DATE);
-            }
-            statement.setNull(indexOf(query.resultDefinition),   java.sql.Types.VARCHAR);
+                final Stmt statement = getStatement(QueryType.INSERT);
+                statement.statement.setString(indexOf(query.name),         id);
+                statement.statement.setString(indexOf(query.description),  meas.getDefinition());
+                statement.statement.setString(indexOf(query.distribution), "normale");
 
-            updateSingleton(statement);
-            success = true;
-        } finally {
-            transactionEnd(success);
+                // on insere la station qui a effectué cette measervation
+                if (meas.getFeatureOfInterest() instanceof SamplingPointEntry){
+                    final SamplingPointEntry station = (SamplingPointEntry)meas.getFeatureOfInterest();
+                    if (stationPoints == null) {
+                        stationPoints = getDatabase().getTable(SamplingPointTable.class);
+                    }
+                    statement.statement.setString(indexOf(query.featureOfInterestPoint),stationPoints.getIdentifier(station));
+                    statement.statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
+                    statement.statement.setNull(indexOf(query.featureOfInterestCurve),    java.sql.Types.VARCHAR);
+
+                } else  if (meas.getFeatureOfInterest() instanceof SamplingCurveType){
+                    final SamplingCurveType station = (SamplingCurveType)meas.getFeatureOfInterest();
+                    if (stationCurves == null) {
+                        stationCurves = getDatabase().getTable(SamplingCurveTable.class);
+                    }
+                    statement.statement.setString(indexOf(query.featureOfInterestCurve),stationCurves.getIdentifier(station));
+                    statement.statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
+                    statement.statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
+
+
+                } else  if (meas.getFeatureOfInterest() instanceof SamplingFeatureEntry){
+                    final SamplingFeatureEntry station = (SamplingFeatureEntry)meas.getFeatureOfInterest();
+                    if (stations == null) {
+                        stations = getDatabase().getTable(SamplingFeatureTable.class);
+                    }
+                    statement.statement.setString(indexOf(query.featureOfInterest),stations.getIdentifier(station));
+                    statement.statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
+                    statement.statement.setNull(indexOf(query.featureOfInterestCurve),    java.sql.Types.VARCHAR);
+
+                } else {
+                    statement.statement.setNull(indexOf(query.featureOfInterest),    java.sql.Types.VARCHAR);
+                    statement.statement.setNull(indexOf(query.featureOfInterestPoint),    java.sql.Types.VARCHAR);
+                    statement.statement.setNull(indexOf(query.featureOfInterestCurve),    java.sql.Types.VARCHAR);
+                }
+
+                // on insere le phenomene measervé
+                if(meas.getObservedProperty() instanceof CompositePhenomenonEntry){
+                    final CompositePhenomenonEntry pheno = (CompositePhenomenonEntry)meas.getObservedProperty();
+                    if (compositePhenomenons == null) {
+                        compositePhenomenons = getDatabase().getTable(CompositePhenomenonTable.class);
+                    }
+                    statement.statement.setString(indexOf(query.observedPropertyComposite), compositePhenomenons.getIdentifier(pheno));
+                    statement.statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
+
+                } else if(meas.getObservedProperty() instanceof PhenomenonEntry){
+                    final PhenomenonEntry pheno = (PhenomenonEntry)meas.getObservedProperty();
+                    if (phenomenons == null) {
+                        phenomenons = getDatabase().getTable(PhenomenonTable.class);
+                    }
+                    statement.statement.setString(indexOf(query.observedProperty), phenomenons.getIdentifier(pheno));
+                    statement.statement.setNull(indexOf(query.observedPropertyComposite), java.sql.Types.VARCHAR);
+
+                } else {
+                    statement.statement.setNull(indexOf(query.observedProperty), java.sql.Types.VARCHAR);
+                    statement.statement.setNull(indexOf(query.observedPropertyComposite), java.sql.Types.VARCHAR);
+                }
+
+                //on insere le capteur
+                if (meas.getProcedure() != null) {
+                    final ProcessEntry process = (ProcessEntry)meas.getProcedure();
+                    if (procedures == null) {
+                        procedures = getDatabase().getTable(ProcessTable.class);
+                    }
+                    statement.statement.setString(indexOf(query.procedure), procedures.getIdentifier(process));
+                } else {
+                    statement.statement.setNull(indexOf(query.procedure), java.sql.Types.VARCHAR);
+                }
+
+                // on insere le resultat
+                if (meas.getResult() != null){
+                    if (measures == null) {
+                        measures = getDatabase().getTable(MeasureTable.class);
+                    }
+                    statement.statement.setString(indexOf(query.result), measures.getIdentifier((MeasureEntry)meas.getResult()));
+                } else {
+                    statement.statement.setNull(indexOf(query.result), java.sql.Types.VARCHAR);
+                }
+
+                // on insere le "samplingTime""
+                if (meas.getSamplingTime() != null){
+                    if (meas.getSamplingTime() instanceof TimePeriodType) {
+
+                        final TimePeriodType sampTime = (TimePeriodType)meas.getSamplingTime();
+                        final String s = sampTime.getBeginPosition().getValue();
+                        Timestamp date = Timestamp.valueOf(s);
+                        statement.statement.setTimestamp(indexOf(query.samplingTimeBegin), date);
+
+                        if (sampTime.getEndPosition().getIndeterminatePosition() == null) {
+
+                            sampTime.getEndPosition().getValue();
+                            date = Timestamp.valueOf(s);
+                            statement.statement.setTimestamp(indexOf(query.samplingTimeEnd),  date);
+
+                        } else {
+                            statement.statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.DATE);
+                        }
+
+                    } else if (meas.getSamplingTime() instanceof TimeInstantType) {
+                        final TimeInstantType sampTime = (TimeInstantType)meas.getSamplingTime();
+                        final String s = sampTime.getTimePosition().getValue();
+                        final Timestamp date = Timestamp.valueOf(s);
+                        statement.statement.setTimestamp(indexOf(query.samplingTimeBegin),  date);
+                        statement.statement.setNull(indexOf(query.samplingTimeEnd), java.sql.Types.DATE);
+
+                    } else {
+                        throw new IllegalArgumentException("type allowed for sampling time: TimePeriod or TimeInstant");
+                    }
+                } else {
+                    statement.statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.DATE);
+                    statement.statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.DATE);
+                }
+                statement.statement.setNull(indexOf(query.resultDefinition),   java.sql.Types.VARCHAR);
+
+                updateSingleton(statement.statement);
+                release(statement);
+                success = true;
+            } finally {
+                transactionEnd(success);
+            }
         }
         return id;
     }
