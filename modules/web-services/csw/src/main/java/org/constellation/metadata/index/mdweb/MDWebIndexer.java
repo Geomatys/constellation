@@ -399,24 +399,41 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 }
 
                //we add the geometry parts
-                String coord = "null";
+                List<String> coord = null;
                 try {
-                    coord = getValues("WestBoundLongitude", form, ISO_QUERYABLE, -1);
-                    final double minx = Double.parseDouble(coord);
+                    coord = getValueList(form, ISO_QUERYABLE.get("WestBoundLongitude"), -1);
+                    final List<Double> minxs = new ArrayList<Double>();
+                    for (String minx : coord) {
+                        minxs.add(Double.parseDouble(minx));
+                    }
 
-                    coord = getValues("EastBoundLongitude", form, ISO_QUERYABLE, -1);
-                    final double maxx = Double.parseDouble(coord);
 
-                    coord = getValues("NorthBoundLatitude", form, ISO_QUERYABLE, -1);
-                    final double maxy = Double.parseDouble(coord);
+                    coord = getValueList(form, ISO_QUERYABLE.get("EastBoundLongitude"), -1);
+                    final List<Double> maxxs = new ArrayList<Double>();
+                    for (String maxx : coord) {
+                        maxxs.add(Double.parseDouble(maxx));
+                    }
 
-                    coord = getValues("SouthBoundLatitude", form, ISO_QUERYABLE, -1);
-                    final double miny = Double.parseDouble(coord);
 
-                    addBoundingBox(doc, minx, maxx, miny, maxy, SRID_4326);
+                    coord = getValueList(form, ISO_QUERYABLE.get("NorthBoundLatitude"), -1);
+                    final List<Double> maxys = new ArrayList<Double>();
+                    for (String maxy : coord) {
+                        maxys.add(Double.parseDouble(maxy));
+                    }
+
+                    coord = getValueList(form, ISO_QUERYABLE.get("SouthBoundLatitude"), -1);
+                    final List<Double> minys = new ArrayList<Double>();
+                    for (String miny : coord) {
+                        minys.add(Double.parseDouble(miny));
+                    }
+
+
+                    for (int i = 0; i < minxs.size(); i++) {
+                    addBoundingBox(doc, minxs.get(i), maxxs.get(i), minys.get(i), maxys.get(i), SRID_4326);
+                }
 
                 } catch (NumberFormatException e) {
-                    if (!coord.equals("null"))
+                    if (!coord.equals(null))
                         LOGGER.warning("unable to spatially index form: " + form.getTitle() + '\n' +
                                        "cause:  unable to parse double: " + coord);
                 }
@@ -473,38 +490,54 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
 
             //we add the geometry parts
-            String coord = "null";
+            List<String> coord = null;
             try {
-                coord = getValues("WestBoundLongitude", form, DUBLIN_CORE_QUERYABLE, 1);
-                final double minx = Double.parseDouble(coord);
+                coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"), 1);
+                final List<Double> minxs = new ArrayList<Double>();
+                for (String minx : coord) {
+                    minxs.add(Double.parseDouble(minx));
+                }
 
-                coord = getValues("EastBoundLongitude", form, DUBLIN_CORE_QUERYABLE, 1);
-                final double maxx = Double.parseDouble(coord);
+                coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("EastBoundLongitude"), 1);
+                final List<Double> maxxs = new ArrayList<Double>();
+                for (String maxx : coord) {
+                    maxxs.add(Double.parseDouble(maxx));
+                }
 
-                coord = getValues("NorthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
-                final double maxy = Double.parseDouble(coord);
+                coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("NorthBoundLatitude"), 1);
+                final List<Double> maxys = new ArrayList<Double>();
+                for (String maxy : coord) {
+                    maxys.add(Double.parseDouble(maxy));
+                }
 
-                coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
-                final double miny = Double.parseDouble(coord);
+                coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("SouthBoundLatitude"), 1);
+                final List<Double> minys = new ArrayList<Double>();
+                for (String miny : coord) {
+                    minys.add(Double.parseDouble(miny));
+                }
 
-                coord = getValues("SouthBoundLatitude", form, DUBLIN_CORE_QUERYABLE, 2);
 
-                String crs = getValues("CRS", form, DUBLIN_CORE_QUERYABLE, -1);
-
+                /*String crs = getValueList("CRS", form, DUBLIN_CORE_QUERYABLE.get("CRS"), -1);
                 if(crs == null || "null".equalsIgnoreCase(crs)){
                     crs = "CRS:84";
-                }
+                }*/
+                String crs = crs = "CRS:84";
                 int srid = 4326;
                 try {
                     srid = SRIDGenerator.toSRID(crs, Version.V1);
                 } catch(IllegalArgumentException ex) {
                     LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
                 }
-                
-                addBoundingBox(doc, minx, maxx, miny, maxy, srid);
+
+                if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
+                    for (int i = 0; i < minxs.size(); i++) {
+                        addBoundingBox(doc, minxs.get(i), maxxs.get(i), minys.get(i), maxys.get(i), srid);
+                    }
+                } else {
+                    LOGGER.warning("There is not the same number of coordinate: " + minxs.size() + " " + minys.size() + " " +  maxxs.size() + " " +  maxys.size());
+                }
 
             } catch (NumberFormatException e) {
-                if (!coord.equals("null"))
                     LOGGER.warning("unable to spatially index form: " + form.getTitle() + '\n' +
                                   "cause:  unable to parse double: " + coord);
             }
@@ -539,97 +572,15 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
         if (paths != null) {
             for (String fullPathID: paths) {
-                final Path path;
-                final String pathID;
-                Path conditionalPath     = null;
-                String conditionalPathID = null;
-                String conditionalValue  = null;
-
-                // if the path ID contains a # we have a conditional value (codeList element) next to the searched value.
-                final int separator = fullPathID.indexOf('#');
-                if (separator != -1) {
-                    pathID            = fullPathID.substring(0, separator);
-                    conditionalPathID = pathID.substring(0, pathID.lastIndexOf(':') + 1) + fullPathID.substring(separator + 1, fullPathID.indexOf('='));
-                    conditionalValue  = fullPathID.substring(fullPathID.indexOf('=') + 1);
-                    LOGGER.finer("pathID           : " + pathID            + '\n' +
-                                "conditionalPathID: " + conditionalPathID + '\n' +
-                                "conditionalValue : " + conditionalValue);
-                } else {
-                    if (fullPathID.indexOf('[') != -1) {
-                        fullPathID = fullPathID.substring(0, fullPathID.indexOf('['));
-                    }
-                    pathID = fullPathID;
-                }
-
-                if (mdWebReader != null) {
-                    path = mdWebReader.getPath(pathID);
-                    if (conditionalPathID != null)
-                        conditionalPath = mdWebReader.getPath(conditionalPathID);
-                } else {
-                    path = pathMap.get(pathID);
-                    if (conditionalPathID != null)
-                        conditionalPath = pathMap.get(conditionalPathID);
-                }
-
-                final List<Value> values;
-                if (conditionalPath == null) {
-                    values = form.getValueFromPath(path);
-                } else {
-                    values = Collections.singletonList(
-                            form.getConditionalValueFromPath(path, conditionalPath, conditionalValue));
-                }
-
+                final List<Value> values = getValuesFromPathID(fullPathID, form);
                 for (final Value v: values) {
                     //only handle textvalue
                     if (!(v instanceof TextValue)) continue;
+                    
                     final TextValue tv = (TextValue) v;
 
                     if (ordinal == -1 || ordinal == tv.getOrdinal()) {
-
-                        //for a codelist value we don't write the code but the codelistElement value.
-                        if (tv.getType() instanceof CodeList) {
-                            final CodeList cl = (CodeList) tv.getType();
-
-                            // we look if the codelist contains locale element.
-                            boolean locale = false;
-                            final List<Property> props = cl.getProperties();
-                            if (props != null && props.size() > 0) {
-                                locale = props.get(0) instanceof Locale;
-                            }
-
-                            if (locale) {
-                                response.append(tv.getValue()).append(',');
-
-                            } else {
-                                int code = 1;
-                                try {
-                                    code = Integer.parseInt(tv.getValue());
-                                } catch (NumberFormatException ex) {
-                                    LOGGER.warning("NumberFormat Exception while parsing a codelist code: " + tv.getValue());
-                                }
-                                final CodeListElement element = cl.getElementByCode(code);
-
-                                if (element != null) {
-                                    response.append(element.getName()).append(',');
-                                } else {
-                                    LOGGER.warning("Unable to find a codelistElement for the code: " + code + " in the codelist: " + cl.getName());
-                                }
-                            }
-                        } else if (tv.getType().getName().equals("Date")) {
-                            String value = tv.getValue();
-                            if (value != null) {
-                                value = value.replaceAll("-", "");
-                            
-                                // TODO use time
-                                if (value.indexOf('T') != -1) {
-                                    value = value.substring(0, value.indexOf('T'));
-                                }
-                            }
-                            response.append(value).append(',');
-                        // else we write the text value.
-                        } else {
-                            response.append(tv.getValue()).append(',');
-                        }
+                        response.append(getTextValueStringDescription(tv)).append(',');
                     }
                 }
             }
@@ -643,6 +594,190 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         }
 
         return response.toString();
+    }
+
+    /**
+     * Return a string description for the specified terms.
+     *
+     * @param term An ISO queryable term defined in CSWWorker (like Title, Subject, Abstract,...)
+     * @param form An MDWeb formular from whitch we extract the values correspounding to the specified term.
+     * @param ordinal If we want only one value for a path we add an ordinal to select the value we want. else put -1.
+     *
+     * @return A string concataining the differents values correspounding to the specified term, coma separated.
+     */
+    private List<String> getValueList(final Form form, final List<String> paths, final int ordinal) throws MD_IOException {
+
+        final List<String> response   = new ArrayList<String>();
+
+        if (paths != null) {
+            for (String fullPathID: paths) {
+                final List<Value> values = getValuesFromPathID(fullPathID, form);
+                for (final Value v: values) {
+                    //only handle textvalue
+                    if (!(v instanceof TextValue)) continue;
+                    final TextValue tv = (TextValue) v;
+
+                    if (ordinal == -1 || ordinal == tv.getOrdinal()) {
+
+                        final String value = getTextValueStringDescription(tv);
+                        if (value != null) {
+                            response.add(value);
+                        }
+                    }
+                }
+            }
+        }
+        return response;
+    }
+
+
+    /**
+     * Return the String description of An MDWeb textValue :
+     * For almost all the value it return TextValue.getValue()
+     * but for the value with codeList type it return the label of the codelist element
+     * instead of the code.
+     * 
+     * @param tv A TextValue
+     *
+     * @return S String label
+     */
+    private String getTextValueStringDescription(final TextValue tv) {
+        final String value;
+
+        if (tv.getType() instanceof CodeList) {
+            value = getCodeListValue(tv);
+
+        } else if (tv.getType().getName().equals("Date")) {
+            value = toLuceneDateSyntax(tv.getValue());
+
+        } else {
+            value = tv.getValue();
+        }
+        return value;
+    }
+    
+    /**
+     *  Return a List of MDWeb Value from the specified path.
+     * 
+     * @param fullPathID
+     * @param form
+     * @return A list of Values.
+     *
+     * @throws MD_IOException
+     */
+    private List<Value> getValuesFromPathID(String fullPathID, final Form form) throws MD_IOException {
+        final String pathID;
+        Path conditionalPath = null;
+        String conditionalPathID = null;
+        String conditionalValue = null;
+
+        // if the path ID contains a # we have a conditional value (codeList element) next to the searched value.
+        final int separator = fullPathID.indexOf('#');
+        if (separator != -1) {
+            pathID = fullPathID.substring(0, separator);
+            conditionalPathID = pathID.substring(0, pathID.lastIndexOf(':') + 1) + fullPathID.substring(separator + 1, fullPathID.indexOf('='));
+            conditionalValue = fullPathID.substring(fullPathID.indexOf('=') + 1);
+            LOGGER.finer("pathID           : " + pathID + '\n'
+                    + "conditionalPathID: " + conditionalPathID + '\n'
+                    + "conditionalValue : " + conditionalValue);
+        } else {
+            if (fullPathID.indexOf('[') != -1) {
+                fullPathID = fullPathID.substring(0, fullPathID.indexOf('['));
+            }
+            pathID = fullPathID;
+        }
+        final Path path;
+        if (mdWebReader != null) {
+            path = mdWebReader.getPath(pathID);
+            if (conditionalPathID != null) {
+                conditionalPath = mdWebReader.getPath(conditionalPathID);
+            }
+        } else {
+            path = pathMap.get(pathID);
+            if (conditionalPathID != null) {
+                conditionalPath = pathMap.get(conditionalPathID);
+            }
+        }
+
+
+        final List<Value> values;
+        if (conditionalPath == null) {
+            values = form.getValueFromPath(path);
+        } else {
+            values = Collections.singletonList(form.getConditionalValueFromPath(path, conditionalPath, conditionalValue));
+        }
+        return values;
+    }
+
+    /**
+     * Return a Date representation in ISO syntax into Lucene date format
+     * 
+     * @param value
+     * @return
+     */
+    private String toLuceneDateSyntax(String value) {
+        if (value != null) {
+            value = value.replaceAll("-", "");
+
+            // TODO use time
+            if (value.indexOf('T') != -1) {
+                value = value.substring(0, value.indexOf('T'));
+            }
+        }
+        return value;
+    }
+
+    /**
+     * Return true if the specified Codelist contains locale Element
+     *
+     * @param cl An MDWeb CodeList
+     *
+     * @return True is the specified CodeList conatins Locale element.
+     */
+    private boolean isLocale(CodeList cl) {
+        boolean locale = false;
+        final List<Property> props = cl.getProperties();
+        if (props != null && props.size() > 0) {
+            locale = props.get(0) instanceof Locale;
+        }
+        return locale;
+    }
+
+    /**
+     * Return the text associed with a codeList textValue.
+     * 
+     * @param tv A TextValue with a type instanceof CodeList.
+     *
+     * @return A text description of the codeList element.
+     */
+    private String getCodeListValue(TextValue tv) {
+        //for a codelist value we don't write the code but the codelistElement value.
+        final CodeList cl = (CodeList) tv.getType();
+        final String result;
+
+        // we look if the codelist contains locale element.
+        final boolean locale = isLocale(cl);
+
+        if (locale) {
+            result = tv.getValue();
+
+        } else {
+            int code = 1;
+            try {
+                code = Integer.parseInt(tv.getValue());
+            } catch (NumberFormatException ex) {
+                LOGGER.warning("NumberFormat Exception while parsing a codelist code: " + tv.getValue());
+            }
+            final CodeListElement element = cl.getElementByCode(code);
+
+            if (element != null) {
+                result = element.getName();
+            } else {
+                LOGGER.warning("Unable to find a codelistElement for the code: " + code + " in the codelist: " + cl.getName());
+                return null;
+            }
+        }
+        return result;
     }
 
     @Override
