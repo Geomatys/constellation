@@ -135,6 +135,27 @@ public class MDWebMetadataReaderTest {
     }
 
     /**
+     * Tests the getMetadata method for ISO 19119 data
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getMetadataISOFRATest() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object result = reader.getMetadata("16:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta-fra1.xml"));
+
+        assertTrue(result instanceof DefaultMetadata);
+        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+
+
+        pool.release(unmarshaller);
+    }
+
+
+    /**
      * Tests the getMetadata method for SML data
      *
      * @throws java.lang.Exception

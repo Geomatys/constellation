@@ -75,10 +75,10 @@ public class PhenomenonTable extends SingletonTable<PhenomenonEntry> {
      */
     @Override
     protected PhenomenonEntry createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
-        final PhenomenonQuery LocalQuery = (PhenomenonQuery) super.query;
-        return new PhenomenonEntry(results.getString(indexOf(LocalQuery.identifier)),
-                                   results.getString(indexOf(LocalQuery.name)),
-                                   results.getString(indexOf(LocalQuery.remarks)));
+        final PhenomenonQuery localQuery = (PhenomenonQuery) super.query;
+        return new PhenomenonEntry(results.getString(indexOf(localQuery.identifier)),
+                                   results.getString(indexOf(localQuery.name)),
+                                   results.getString(indexOf(localQuery.remarks)));
     }
     
      /**

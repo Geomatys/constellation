@@ -2026,6 +2026,10 @@ public class CSWworkerTest {
                 assertEquals(idExpResult.getLanguages(), idResult.getLanguages());
                 assertEquals(idExpResult.getPointOfContacts(), idResult.getPointOfContacts());
                 assertEquals(idExpResult.getPurpose(), idResult.getPurpose());
+                assertEquals(idExpResult.getResourceConstraints().size(), idResult.getResourceConstraints().size());
+                if (idExpResult.getResourceConstraints().size() > 0) {
+                    assertEquals(idExpResult.getResourceConstraints().iterator().next(), idResult.getResourceConstraints().iterator().next());
+                }
                 assertEquals(idExpResult.getResourceConstraints(), idResult.getResourceConstraints());
                 assertEquals(idExpResult.getResourceFormats(), idResult.getResourceFormats());
                 assertEquals(idExpResult.getResourceMaintenances(), idResult.getResourceMaintenances());
@@ -2048,10 +2052,15 @@ public class CSWworkerTest {
         assertEquals(expResult.getMetadataStandardVersion(), result.getMetadataStandardVersion());
         assertEquals(expResult.getParentIdentifier(), result.getParentIdentifier());
         assertEquals(expResult.getPortrayalCatalogueInfo(), result.getPortrayalCatalogueInfo());
+        assertEquals(expResult.getReferenceSystemInfo().size(), result.getReferenceSystemInfo().size());
         if (expResult.getReferenceSystemInfo().iterator().hasNext()) {
-            assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getAuthority(), result.getReferenceSystemInfo().iterator().next().getName().getAuthority());
-            assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getCodeSpace(), result.getReferenceSystemInfo().iterator().next().getName().getCodeSpace());
-            assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName(), result.getReferenceSystemInfo().iterator().next().getName());
+            if (expResult.getReferenceSystemInfo().iterator().next() != null) {
+                if (expResult.getReferenceSystemInfo().iterator().next().getName() != null) {
+                    assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getAuthority(), result.getReferenceSystemInfo().iterator().next().getName().getAuthority());
+                    assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName().getCodeSpace(), result.getReferenceSystemInfo().iterator().next().getName().getCodeSpace());
+                }
+                assertEquals(expResult.getReferenceSystemInfo().iterator().next().getName(), result.getReferenceSystemInfo().iterator().next().getName());
+            }
             assertEquals(expResult.getReferenceSystemInfo().iterator().next(), result.getReferenceSystemInfo().iterator().next());
         }
         assertEquals(expResult.getReferenceSystemInfo(), result.getReferenceSystemInfo());

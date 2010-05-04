@@ -25,7 +25,6 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geotoolkit.internal.sql.table.CatalogException;
-import org.geotoolkit.internal.sql.table.ConfigurationKey;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.NoSuchTableException;
 import org.constellation.generic.database.Automatic;

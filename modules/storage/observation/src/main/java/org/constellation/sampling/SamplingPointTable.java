@@ -147,7 +147,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
                 statement.statement.setString(indexOf(query.name), station.getName());
                 final Iterator<FeaturePropertyType> i = station.getSampledFeatures().iterator();
                 if (i.hasNext()) {
-                    FeaturePropertyType fp = i.next();
+                    final FeaturePropertyType fp = i.next();
                     statement.statement.setString(indexOf(query.sampledFeature), (String)fp.getHref());
                 } else {
                     statement.statement.setNull(indexOf(query.sampledFeature), java.sql.Types.VARCHAR);

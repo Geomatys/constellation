@@ -224,8 +224,8 @@ public class FileMetadataReader extends AbstractCSWMetadataReader {
                         if (setter != null) {
                             ReflectionUtilities.invokeMethod(setter, customRecord, param);
                         } else {
-                            String paramDesc = param.getClass() + "";
-                            String localPart = qn.getLocalPart();
+                            final String paramDesc = param.getClass() + "";
+                            final String localPart = qn.getLocalPart();
                             LOGGER.warning("No setter have been found for attribute " + localPart +" of type " + paramDesc + " in the class RecordType");
                         }
 

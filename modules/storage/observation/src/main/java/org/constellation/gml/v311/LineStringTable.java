@@ -84,7 +84,7 @@ public class LineStringTable extends Table {
                 } else {
                     pos = new DirectPositionType(x, y, z);
                 }
-                String name = results.getString(idIndex) + '/' + x + '/' + y + '/' + z;
+                final String name = results.getString(idIndex) + '/' + x + '/' + y + '/' + z;
                 positions.add(new DirectPositionEntry(name, pos));
             }
             results.close();

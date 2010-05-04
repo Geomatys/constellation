@@ -23,8 +23,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import org.geotoolkit.internal.sql.table.Database;
-import org.geotoolkit.internal.sql.table.LocalCache;
-import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.Table;
 
 /**

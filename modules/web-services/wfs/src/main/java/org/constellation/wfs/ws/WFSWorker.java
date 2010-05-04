@@ -39,7 +39,6 @@ import org.geotoolkit.xsd.xml.v2001.Schema;
 
 // GeoAPI dependencies
 import org.opengis.feature.type.FeatureType;
-import org.opengis.webservice.capability.GetCapabilities;
 
 /**
  *
@@ -50,7 +49,7 @@ public interface WFSWorker extends Worker {
     /**
      * Describe the capabilities and the layers available of this service.
      *
-     * @param getCapab       The {@linkplain GetCapabilities get capabilities} request.
+     * @param getCapab       The {@linkplain GetCapabilitiesType get capabilities} request.
      * @return a WFSCapabilities XML document describing the capabilities of the service.
      *
      * @throws CstlServiceException

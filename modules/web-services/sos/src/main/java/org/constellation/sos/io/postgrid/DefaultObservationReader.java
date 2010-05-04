@@ -136,7 +136,7 @@ public class DefaultObservationReader implements ObservationReader {
         try {
             omDatabase = DatabasePool.getDatabase(db);
             //verify the validity of the connection
-            Connection c = omDatabase.getDataSource(true).getConnection();
+            final Connection c = omDatabase.getDataSource(true).getConnection();
             c.close();
             //omDatabase.setProperty(ConfigurationKey.READONLY, "false");
             
@@ -350,11 +350,11 @@ public class DefaultObservationReader implements ObservationReader {
             } else if (ex.getCause() != null) {
                 msg = ex.getCause().getMessage();
             }
-            ex.printStackTrace();
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new CstlServiceException("Catalog exception while getting the observation with identifier: " + identifier +  " of type " + resultModel.getLocalPart() + " " + msg,
                     NO_APPLICABLE_CODE, "getObservation");
         } catch (SQLException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             throw new CstlServiceException(SQL_ERROR_MSG + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
