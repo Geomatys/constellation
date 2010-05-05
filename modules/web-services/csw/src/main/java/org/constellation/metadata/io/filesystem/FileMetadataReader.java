@@ -37,7 +37,8 @@ import javax.xml.namespace.QName;
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.generic.GenericIndexer;
-import org.constellation.metadata.io.AbstractCSWMetadataReader;
+import org.constellation.metadata.io.AbstractMetadataReader;
+import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.util.ReflectionUtilities;
 import static org.constellation.metadata.CSWQueryable.*;
@@ -88,12 +89,12 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class FileMetadataReader extends AbstractCSWMetadataReader {
+public class FileMetadataReader extends AbstractMetadataReader implements CSWMetadataReader {
 
     /**
      * A date formatter used to display the Date object for dublin core translation.
      */
-    private final DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    private final static DateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
     /**
      * The directory containing the data XML files.
@@ -132,7 +133,12 @@ public class FileMetadataReader extends AbstractCSWMetadataReader {
             throw new MetadataIoException("cause: JAXB exception while creating unmarshaller", ex, NO_APPLICABLE_CODE);
         }
     }
-    
+
+    @Override
+    public Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException {
+        return getMetadata(identifier, mode, ElementSetType.FULL, elementName);
+    }
+
     /**
      * Return a metadata object from the specified identifier.
      * 
@@ -366,7 +372,10 @@ public class FileMetadataReader extends AbstractCSWMetadataReader {
 
             final SimpleLiteral modified;
             if (metadata.getDateStamp() != null) {
-                String dateValue = formatter.format(metadata.getDateStamp());
+                String dateValue;
+                synchronized (FORMATTER) {
+                    dateValue = FORMATTER.format(metadata.getDateStamp());
+                }
                 dateValue = dateValue.substring(0, dateValue.length() - 2);
                 dateValue = dateValue + ":00";
                 modified = new SimpleLiteral(dateValue);

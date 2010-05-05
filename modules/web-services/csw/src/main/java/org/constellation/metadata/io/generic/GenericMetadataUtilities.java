@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.io;
+package org.constellation.metadata.io.generic;
 
 // J2SE dependencies
 import java.text.DateFormat;

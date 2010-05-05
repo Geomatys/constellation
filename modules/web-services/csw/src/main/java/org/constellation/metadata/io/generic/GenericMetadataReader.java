@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.io;
+package org.constellation.metadata.io.generic;
 
 // J2SE dependencies
 import java.io.File;
@@ -53,6 +53,9 @@ import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
+import org.constellation.metadata.io.AbstractMetadataReader;
+import org.constellation.metadata.io.CSWMetadataReader;
+import org.constellation.metadata.io.MetadataIoException;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotoolkit dependencies
@@ -70,7 +73,7 @@ import org.opengis.metadata.citation.Role;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
+public abstract class GenericMetadataReader extends AbstractMetadataReader implements CSWMetadataReader {
     
     /**
      * An unmarshaller used for getting EDMO data.
@@ -537,7 +540,12 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
         LOGGER.severe("SQLException while executing query: " + ex.getMessage() + '\n' +
                       "for variable: " + varlist.toString());
     }
-    
+
+    @Override
+    public Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException {
+        return getMetadata(identifier, mode, ElementSetType.FULL, elementName);
+    }
+
     /**
      * Return a new Metadata object read from the database for the specified identifier.
      *  
