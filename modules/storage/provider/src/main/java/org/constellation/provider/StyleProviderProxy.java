@@ -45,9 +45,9 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
 
     private static final Collection<StyleProviderService> SERVICES = new ArrayList<StyleProviderService>();
 
-    private static String CONFIG_PATH = null;
+    private static String configPath = null;
 
-    private static StyleProviderProxy INSTANCE = null;
+    private static StyleProviderProxy instance = null;
 
     private StyleProviderProxy(){}
 
@@ -164,16 +164,16 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
 
     }
 
-    public static synchronized void init(final String configPath){
-        if(configPath == null){
+    public static synchronized void init(final String confPath){
+        if(confPath == null){
             throw new NullPointerException("Configuration path can not be null.");
         }
 
-        if(CONFIG_PATH != null){
+        if(configPath != null){
             throw new IllegalStateException("The style provider proxy has already been initialize");
         }
 
-        CONFIG_PATH = configPath;
+        configPath = confPath;
         loadServices();
     }
 
@@ -191,7 +191,7 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
              * No config file in the resources, then we try with the default config directory.
              */
             if (configFile == null || !configFile.exists()) {
-                final String path = CONFIG_PATH + fileName;
+                final String path = configPath + fileName;
                 configFile = new File(path);
             }
             service.setConfiguration(configFile);
@@ -218,12 +218,12 @@ public final class StyleProviderProxy extends AbstractStyleProvider{
      *                          defined, {@code false} if we do not want.
      */
     public static synchronized StyleProviderProxy getInstance(final boolean createIfNotExists){
-        if(INSTANCE == null && createIfNotExists){
+        if(instance == null && createIfNotExists){
             init(ConfigDirectory.getConfigDirectory().getPath() + File.separator);
-            INSTANCE = new StyleProviderProxy();
+            instance = new StyleProviderProxy();
         }
 
-        return INSTANCE;
+        return instance;
     }
 
 }

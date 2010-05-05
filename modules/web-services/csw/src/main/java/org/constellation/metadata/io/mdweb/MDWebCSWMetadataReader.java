@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.io;
+package org.constellation.metadata.io.mdweb;
 
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -31,6 +31,9 @@ import java.util.StringTokenizer;
 import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.metadata.io.CSWMetadataReader;
+import org.constellation.metadata.io.MDWebMetadataReader;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.util.ReflectionUtilities;
 
 import static org.constellation.metadata.CSWQueryable.*;

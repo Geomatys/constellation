@@ -21,7 +21,6 @@ package org.constellation.metadata.index.generic;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -156,7 +155,6 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     /** 
      * Create a new Index from a generic database.
      * 
-     * @throws java.sql.SQLException
      */
     @Override
     public void createIndex() throws IndexingException {
@@ -213,7 +211,6 @@ public class GenericIndexer extends AbstractIndexer<Object> {
     /**
      * Create a new Index from a generic database.
      *
-     * @throws java.sql.SQLException
      */
     @Override
     public void createIndex(List<? extends Object> toIndex) throws IndexingException {

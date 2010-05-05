@@ -15,7 +15,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.metadata.io;
+package org.constellation.metadata.io.filesystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +48,8 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.AbstractCSWMetadataWriter;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.util.ReflectionUtilities;
 
 // GeoApi dependencies

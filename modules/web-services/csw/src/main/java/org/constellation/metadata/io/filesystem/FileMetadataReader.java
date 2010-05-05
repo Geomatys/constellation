@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.metadata.io;
+package org.constellation.metadata.io.filesystem;
 
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
@@ -37,6 +37,8 @@ import javax.xml.namespace.QName;
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.generic.GenericIndexer;
+import org.constellation.metadata.io.AbstractCSWMetadataReader;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.util.ReflectionUtilities;
 import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;

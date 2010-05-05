@@ -24,11 +24,7 @@ import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +45,7 @@ import org.geotoolkit.csw.xml.DomainValues;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.constellation.concurrent.BoundedCompletionService;
+import org.constellation.generic.Values;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.Column;
@@ -56,24 +53,16 @@ import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
-import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.metadata.iso.citation.DefaultCitationDate;
 import org.geotoolkit.metadata.iso.citation.DefaultResponsibleParty;
-import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
-import org.geotoolkit.util.SimpleInternationalString;
 
 //geoAPI dependencies
 import org.geotoolkit.xml.MarshallerPool;
-import org.opengis.metadata.citation.DateType;
-import org.opengis.util.InternationalString;
-import org.opengis.metadata.citation.CitationDate;
 import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
-import org.opengis.metadata.extent.GeographicExtent;
 
 /**
  * A database Reader using a generic configuration to request an unknown database.
@@ -84,45 +73,19 @@ import org.opengis.metadata.extent.GeographicExtent;
 public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
     
     /**
-     * A date Formater.
-     */
-    protected static final List<DateFormat> DATE_FORMATS;
-    static {
-        DATE_FORMATS = new ArrayList<DateFormat>();
-        DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
-        DATE_FORMATS.add(new SimpleDateFormat("yyyy-MM-dd"));
-        DATE_FORMATS.add(new SimpleDateFormat("yyyy"));
-    }
-    
-    /**
      * An unmarshaller used for getting EDMO data.
      */
     protected final MarshallerPool marshallerPool;
     
     /**
-     * A list of precompiled SQL request returning single value.
-     */
-    private Map<PreparedStatement, List<String>> singleStatements;
-    
-    /**
      * A list of precompiled SQL request returning multiple value.
      */
-    private Map<PreparedStatement, List<String>> multipleStatements;
+    private Map<PreparedStatement, List<String>> statements;
     
     /**
      * A precompiled Statement requesting all The identifiers
      */
     private PreparedStatement mainStatement;
-    
-    /**
-     * A Map of varName - value refreshed at every request.
-     */
-    private Map<String, String> singleValue;
-    
-    /**
-     * * A Map of varName - list of value refreshed at every request.
-     */
-    private Map<String, List<String>> multipleValue;
     
     /**
      * A map of the already retrieved contact from EDMO WS.
@@ -175,8 +138,6 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
         try {
             this.connection  = db.getConnection();
             initStatement();
-            singleValue      = new HashMap<String, String>();
-            multipleValue    = new HashMap<String, List<String>>();
             marshallerPool   = new MarshallerPool(getJAXBContext());
             contacts         = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
         } catch (SQLException ex) {
@@ -209,8 +170,6 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
         try {
             this.connection  = db.getConnection();
             initStatement();
-            singleValue      = new HashMap<String, String>();
-            multipleValue    = new HashMap<String, List<String>>();
             contacts         = new HashMap<String, ResponsibleParty>();
             marshallerPool   = new MarshallerPool(getJAXBContext());
             contacts         = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
@@ -238,10 +197,7 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
         this.configuration = configuration;
         try {
             this.connection    = null;
-            singleStatements   = new HashMap<PreparedStatement, List<String>>();
-            multipleStatements = new HashMap<PreparedStatement, List<String>>();
-            singleValue        = new HashMap<String, String>();
-            multipleValue      = new HashMap<String, List<String>>();
+            statements         = new HashMap<PreparedStatement, List<String>>();
             this.contacts      = contacts;
             marshallerPool     = new MarshallerPool(getJAXBContext());
 
@@ -267,8 +223,8 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
             LOGGER.severe("The configuration file is malformed, unable to reach the main query");
         }
         
-        singleStatements      = new HashMap<PreparedStatement, List<String>>();
-        multipleStatements    = new HashMap<PreparedStatement, List<String>>();
+        //singleStatements      = new HashMap<PreparedStatement, List<String>>();
+        statements            = new HashMap<PreparedStatement, List<String>>();
         final Queries queries = configuration.getQueries();
         if (queries != null) {
             
@@ -285,7 +241,7 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
                     final String textQuery = query.buildSQLQuery();
                     LOGGER.finer("new Single query: " + textQuery);
                     final PreparedStatement stmt =  connection.prepareStatement(textQuery);
-                    singleStatements.put(stmt, varNames);
+                    statements.put(stmt, varNames);
                 }
             } else {
                 LOGGER.severe("The configuration file is probably malformed, there is no single query.");
@@ -302,7 +258,7 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
                         }
                     }
                     final PreparedStatement stmt =  connection.prepareStatement(query.buildSQLQuery());
-                    multipleStatements.put(stmt, varNames);
+                    statements.put(stmt, varNames);
                 }
             } else {
                 LOGGER.severe("The configuration file is probably malformed, there is no single query.");
@@ -403,24 +359,9 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
      * @param varName
      * @return
      */
-    private PreparedStatement getStatementFromSingleVar(String varName) {
-        for (PreparedStatement stmt : singleStatements.keySet()) {
-            final List<String> vars = singleStatements.get(stmt);
-            if (vars.contains(varName))
-                return stmt;
-        }
-        return null;
-    }
-    
-     /**
-     * Return the correspounding statement for the specified variable name.
-     * 
-     * @param varName
-     * @return
-     */
-    private PreparedStatement getStatementFromMultipleVar(String varName) {
-        for (PreparedStatement stmt : multipleStatements.keySet()) {
-            final List<String> vars = multipleStatements.get(stmt);
+    private PreparedStatement getStatementFromVar(String varName) {
+        for (PreparedStatement stmt : statements.keySet()) {
+            final List<String> vars = statements.get(stmt);
             if (vars.contains(varName))
                 return stmt;
         }
@@ -431,19 +372,16 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    private void loadData(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
+    private Values loadData(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
         LOGGER.finer("loading data for " + identifier);
-        singleValue.clear();
-        multipleValue.clear();
 
         // we get a sub list of all the statement
-        Set<PreparedStatement> subSingleStmts;
-        Set<PreparedStatement> subMultiStmts;
+        Set<PreparedStatement> subStmts;
 
         //for ISO mode we load all variables
         if (mode == ISO_19115) {
-            subSingleStmts = singleStatements.keySet();
-            subMultiStmts  = multipleStatements.keySet();
+            subStmts = statements.keySet();
+
         } else {
             List<String> variables;
             if (mode == DUBLINCORE) {
@@ -453,28 +391,25 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
             } else {
                 throw new IllegalArgumentException("unknow mode");
             }
-            subSingleStmts = new HashSet<PreparedStatement>();
-            subMultiStmts  = new HashSet<PreparedStatement>();
+            subStmts = new HashSet<PreparedStatement>();
             for (String var: variables) {
-                PreparedStatement stmt = getStatementFromSingleVar(var);
+                PreparedStatement stmt = getStatementFromVar(var);
                 if (stmt != null) {
-                    if (!subSingleStmts.contains(stmt))
-                        subSingleStmts.add(stmt);
-                } else {
-                    stmt = getStatementFromMultipleVar(var);
-                    if (stmt != null) {
-                        if (!subMultiStmts.contains(stmt))
-                            subMultiStmts.add(stmt);
-                    } else {
-                        LOGGER.severe("no statement found for variable: " + var);
-                    }
+                    if (!subStmts.contains(stmt))
+                        subStmts.add(stmt);
+                }  else {
+                   LOGGER.severe("no statement found for variable: " + var);
                 }
             }
         }
-        if (isThreadEnabled())
-            paraleleLoading(identifier, subSingleStmts, subMultiStmts);
-        else
-            sequentialLoading(identifier, subSingleStmts, subMultiStmts);
+
+        final Values values;
+        if (isThreadEnabled()) {
+            values = paraleleLoading(identifier, subStmts);
+        } else {
+            values = sequentialLoading(identifier, subStmts);
+        }
+        return values;
     }
 
     /**
@@ -506,33 +441,22 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
      * @param subSingleStmts
      * @param subMultiStmts
      */
-    private void sequentialLoading(String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) throws MetadataIoException {
-        //we extract the single values
-        for (PreparedStatement stmt : subSingleStmts) {
+    private Values sequentialLoading(String identifier, Set<PreparedStatement> subStmts) throws MetadataIoException {
+        final Values values = new Values();
+
+        //we extract the values
+        for (PreparedStatement stmt : subStmts) {
             try {
                 fillStatement(stmt, identifier);
-                fillSingleValues(stmt);
+                fillValues(stmt, statements.get(stmt), values);
             } catch (SQLException ex) {
                 if (ex.getErrorCode() == 17008) {
                     reloadConnection();
                 }
-                logSqlError(singleStatements.get(stmt), ex);
+                logSqlError(statements.get(stmt), ex);
             }
         }
-
-        //we extract the multiple values
-        for (PreparedStatement stmt : subMultiStmts) {
-            try {
-                fillStatement(stmt, identifier);
-                fillMultipleValues(stmt);
-            } catch (SQLException ex) {
-                if (ex.getErrorCode() == 17008) {
-                    reloadConnection();
-                }
-                logSqlError(multipleStatements.get(stmt), ex);
-            }
-
-        }
+        return values;
     }
 
     /**
@@ -541,23 +465,25 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
      *
      * @param identifier
      */
-    private void paraleleLoading(final String identifier, Set<PreparedStatement> subSingleStmts, Set<PreparedStatement> subMultiStmts) throws MetadataIoException {
+    private Values paraleleLoading(final String identifier, Set<PreparedStatement> subStmts) throws MetadataIoException {
+        final Values values = new Values();
+        
         //we extract the single values
         CompletionService cs = new BoundedCompletionService(this.pool, 5);
-        for (final PreparedStatement stmt : subSingleStmts) {
+        for (final PreparedStatement stmt : subStmts) {
             cs.submit(new Callable() {
 
                 @Override
                 public Object call() throws MetadataIoException {
                     try {
                         fillStatement(stmt, identifier);
-                        fillSingleValues(stmt);
+                        fillValues(stmt, statements.get(stmt), values);
 
                     } catch (SQLException ex) {
                         if (ex.getErrorCode() == 17008) {
                             reloadConnection();
                         }
-                        logSqlError(singleStatements.get(stmt), ex);
+                        logSqlError(statements.get(stmt), ex);
 
                     }
                     return null;
@@ -565,7 +491,7 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
             });
         }
 
-        for (int i = 0; i < subSingleStmts.size(); i++) {
+        for (int i = 0; i < subStmts.size(); i++) {
             try {
                 cs.take().get();
             } catch (InterruptedException ex) {
@@ -578,65 +504,19 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
                 }
             }
         }
-        //we extract the multiple values
-        cs = new BoundedCompletionService(this.pool, 5);
-        for (final PreparedStatement stmt : subMultiStmts) {
-            cs.submit(new Callable() {
-
-                @Override
-                public Object call() throws MetadataIoException {
-                    try {
-                        fillStatement(stmt, identifier);
-                        fillMultipleValues(stmt);
-                        
-                    } catch (SQLException ex) {
-                        if (ex.getErrorCode() == 17008) {
-                            reloadConnection();
-                        }
-                        logSqlError(multipleStatements.get(stmt), ex);
-                    }
-                    return null;
-                }
-            });
-        }
-
-        for (int i = 0; i < subMultiStmts.size(); i++) {
-            try {
-                cs.take().get();
-            } catch (InterruptedException ex) {
-               LOGGER.severe("InterruptedException in parralele load data:" + '\n' + ex.getMessage());
-            } catch (ExecutionException ex) {
-                if (ex.getCause() instanceof MetadataIoException) {
-                    throw (MetadataIoException) ex.getCause();
-                } else {
-                    LOGGER.severe("ExecutionException in parralele load data:" + '\n' + ex.getMessage());
-                }
-            }
-        }
+        return values;
     }
 
-    private void fillSingleValues(PreparedStatement stmt) throws SQLException {
+    private void fillValues(PreparedStatement stmt, List<String> varNames, Values values) throws SQLException {
         final ResultSet result = stmt.executeQuery();
-        if (result.next()) {
-            for (String varName : singleStatements.get(stmt)) {
-                singleValue.put(varName, result.getString(varName));
-            }
-        }
-        result.close();
-    }
-
-    private void fillMultipleValues(PreparedStatement stmt) throws SQLException {
-        final ResultSet result = stmt.executeQuery();
-        for (String varName : multipleStatements.get(stmt)) {
-            multipleValue.put(varName, new ArrayList<String>());
-        }
         while (result.next()) {
-            for (String varName : multipleStatements.get(stmt)) {
-                multipleValue.get(varName).add(result.getString(varName));
+            for (String varName : varNames) {
+                values.addToValue(varName, result.getString(varName));
             }
         }
         result.close();
     }
+
 
     /**
      * Log the list of variables involved in a query which launch a SQL exception.
@@ -672,16 +552,16 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
      */
     @Override
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
-        Object result = null;
         
         //TODO we verify that the identifier exists
-        loadData(identifier, mode, type, elementName);
-        
+        final Values values = loadData(identifier, mode, type, elementName);
+
+        final Object result;
         if (mode == ISO_19115) {
-            result = getISO(identifier);
+            result = getISO(identifier, values);
             
         } else if (mode == DUBLINCORE) {
-            result = getDublinCore(identifier, type, elementName);
+            result = getDublinCore(identifier, type, elementName, values);
             
         } else {
             throw new IllegalArgumentException("Unknow or unAuthorized standard mode: " + mode);
@@ -697,7 +577,7 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
      * @param elementName
      * @return
      */
-    protected abstract AbstractRecordType getDublinCore(String identifier, ElementSetType type, List<QName> elementName);
+    protected abstract AbstractRecordType getDublinCore(String identifier, ElementSetType type, List<QName> elementName, Values values);
     
     /**
      * return a metadata in ISO representation.
@@ -705,7 +585,7 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
      * @param identifier
      * @return
      */
-    protected abstract DefaultMetadata getISO(String identifier);
+    protected abstract DefaultMetadata getISO(String identifier, Values values);
     
     /**
      * Return a list of variables name used for the dublicore representation.
@@ -722,222 +602,6 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
      * Return a list of package ':' separated use to create JAXBContext for the unmarshaller.
      */
     protected abstract Class[] getJAXBContext();
-    
-    /**
-     * return a list of value for the specified variable name.
-     * 
-     * @param variables
-     * @return
-     */
-    protected List<String> getVariables(String variable) {
-        return multipleValue.get(variable);
-    }
-    
-    /**
-     * return the value for the specified variable name.
-     * 
-     * @param variable
-     * @return
-     */
-    protected String getVariable(String variable) {
-        return singleValue.get(variable);
-    }
-    
-    /**
-     * Avoid the IllegalArgumentException when the variable value is null.
-     * 
-     */
-    protected InternationalString getInternationalStringVariable(String variable) {
-        final String value = getVariable(variable);
-        if (value != null)
-            return new SimpleInternationalString(value);
-        else return null;
-    }
-    
-    /**
-     * Parse the specified date and return a CitationDate with the dateType code REVISION.
-     * 
-     * @param date
-     * @return
-     */
-    protected CitationDate createRevisionDate(String date) {
-        final DefaultCitationDate revisionDate = new DefaultCitationDate();
-        revisionDate.setDateType(DateType.REVISION);
-        final Date d = parseDate(date);
-        if (d != null)
-            revisionDate.setDate(d);
-        else LOGGER.finer("revision date null: " + date);
-        return revisionDate;
-    }
-    
-    /**
-     * Parse the specified date and return a CitationDate with the dateType code PUBLICATION.
-     * 
-     * @param date
-     * @return
-     */
-    protected CitationDate createPublicationDate(String date) {
-        final DefaultCitationDate revisionDate = new DefaultCitationDate();
-        revisionDate.setDateType(DateType.PUBLICATION);
-        final Date d = parseDate(date);
-        if (d != null)
-            revisionDate.setDate(d);
-        else LOGGER.finer("publication date null: " + date);
-        return revisionDate;
-    }
-
-    /**
-     * 
-     */
-    protected Date parseDate(String date) {
-        if (date == null)
-            return null;
-        int i = 0;
-        while (i < DATE_FORMATS.size()) {
-            final DateFormat dateFormat = DATE_FORMATS.get(i);
-            try {
-                Date d;
-                synchronized (dateFormat) {
-                    d = dateFormat.parse(date);
-                }
-                return d;
-            } catch (ParseException ex) {
-                i++;
-            }
-        }
-        LOGGER.severe("unable to parse the date: " + date);
-        return null;
-    }
-    
-    /**
-     * 
-     * @param westVar
-     * @param eastVar
-     * @param southVar
-     * @param northVar
-     * @return
-     */
-    protected List<GeographicExtent> createGeographicExtent(String westVar, String eastVar, String southVar, String northVar) {
-        final List<GeographicExtent> result = new ArrayList<GeographicExtent>();
-        
-        final List<String> w = getVariables(westVar);
-        final List<String> e = getVariables(eastVar);
-        final List<String> s = getVariables(southVar);
-        final List<String> n = getVariables(northVar);
-        if (w == null || e == null || s == null || n == null) {
-            LOGGER.severe("One or more extent coordinates are null");
-            return result;
-        }
-        if (!(w.size() == e.size() &&  e.size() == s.size() && s.size() == n.size())) {
-            LOGGER.severe("There is not the same number of geographic extent coordinates");
-            return result;
-        }
-        final int size = w.size();
-        for (int i = 0; i < size; i++) {
-            double west = 0; double east = 0; double south = 0; double north = 0;
-            String westValue  = null; String eastValue  = null;
-            String southValue = null; String northValue = null;
-            try {
-                westValue = w.get(i);
-                if (westValue != null) {
-                    if (westValue.indexOf(',') != -1) {
-                        westValue = westValue.substring(0, westValue.indexOf(','));
-                    }
-                    west = Double.parseDouble(westValue);
-                }
-                eastValue = e.get(i);
-                if (eastValue != null) {
-                    if (eastValue.indexOf(',') != -1) {
-                        eastValue = eastValue.substring(0, eastValue.indexOf(','));
-                    }
-                    east = Double.parseDouble(eastValue);
-                }
-                southValue = s.get(i);
-                if (southValue != null) {
-                    if (southValue.indexOf(',') != -1) {
-                        southValue = southValue.substring(0, southValue.indexOf(','));
-                    }
-                    south = Double.parseDouble(southValue);
-                }
-                northValue = n.get(i);
-                if (northValue != null) {
-                    north = Double.parseDouble(northValue);
-                }
-
-                // for point BBOX we replace the westValue equals to 0 by the eastValue (respectively for  north/south)
-                if (east == 0) {
-                    east = west;
-                }
-                if (north == 0) {
-                    north = south;
-                }
-            } catch (NumberFormatException ex) {
-                LOGGER.severe("Number format exception while parsing boundingBox: " + '\n' +
-                        "current box: " + westValue + ',' + eastValue + ',' + southValue + ',' + northValue);
-            }
-            final GeographicExtent geo = new DefaultGeographicBoundingBox(west, east, south, north);
-            result.add(geo);
-        }
-        return result;
-    }
-    
-    /**
-     * 
-     * @param westVar
-     * @param eastVar
-     * @param southVar
-     * @param northVar
-     * @return
-     */
-    protected List<BoundingBoxType> createBoundingBoxes(String westVar, String eastVar, String southVar, String northVar) {
-        final List<BoundingBoxType> result = new ArrayList<BoundingBoxType>();
-        
-        final List<String> w = getVariables(westVar);
-        final List<String> e = getVariables(eastVar);
-        final List<String> s = getVariables(southVar);
-        final List<String> n = getVariables(northVar);
-        if (w == null || e == null || s == null || n == null) {
-            LOGGER.severe("One or more BBOX coordinates are null");
-            return result;
-        }
-        if (!(w.size() == e.size() &&  e.size() == s.size() && s.size() == n.size())) {
-            LOGGER.severe("There is not the same number of geographic BBOX coordinates");
-            return result;
-        }
-        final int size = w.size();
-        for (int i = 0; i < size; i++) {
-            double west = 0; double east = 0; double south = 0; double north = 0;
-            try {
-                if (w.get(i) != null) {
-                    west = Double.parseDouble(w.get(i));
-                }
-                if (e.get(i) != null) {
-                    east = Double.parseDouble(e.get(i));
-                }
-                if (s.get(i) != null) {
-                    south = Double.parseDouble(s.get(i));
-                }
-                if (n.get(i) != null) {
-                    north = Double.parseDouble(n.get(i));
-                }
-
-                // for point BBOX we replace the westValue equals to 0 by the eastValue (respectively for  north/south)
-                if (east == 0) {
-                    east = west;
-                }
-                if (north == 0) {
-                    north = south;
-                }
-            } catch (NumberFormatException ex) {
-                LOGGER.severe("Number format exception while parsing boundingBox: " + '\n' +
-                        "current box: " + w.get(i) + ',' + e.get(i) + ',' + s.get(i) + ',' + n.get(i));
-            }
-            //TODO CRS
-            final BoundingBoxType bbox = new BoundingBoxType("EPSG:4326", west, south, east, north);
-            result.add(bbox);
-        }
-        return result;
-    }
     
     /**
      * Return all the entries from the database.
@@ -980,15 +644,15 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
      * @return
      * @throws org.constellation.ws.MetadataIoException
      */
-    public List<String> getAllContactID() throws MetadataIoException {
+    public List<String> getAllContactID(Values values) throws MetadataIoException {
         final List<String> results = new ArrayList<String>();
         final List<String> identifiers = getAllIdentifiers();
         for (String id : identifiers) {
             loadData(id, CONTACT, null, null);
             for(String var: getVariablesForContact()) {
-                final String contactID = getVariable(var);
+                final String contactID = values.getVariable(var);
                 if (contactID == null) {
-                    final List<String> contactIDs = getVariables(var);
+                    final List<String> contactIDs = values.getVariables(var);
                     if (contactIDs != null) {
                         for (String cID : contactIDs) {
                             if (!results.contains(cID))
@@ -1020,15 +684,10 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
     @Override
     public void destroy() {
         try {
-            for (PreparedStatement stmt : singleStatements.keySet()) {
+            for (PreparedStatement stmt : statements.keySet()) {
                 stmt.close();
             }
-            singleStatements.clear();
-
-            for (PreparedStatement stmt : multipleStatements.keySet()) {
-                stmt.close();
-            }
-            multipleStatements.clear();
+            statements.clear();
 
             if (mainStatement != null) {
                 mainStatement.close();
@@ -1039,8 +698,6 @@ public abstract class GenericMetadataReader extends AbstractCSWMetadataReader {
         } catch (SQLException ex) {
             LOGGER.severe("SQLException while destroying Generic metadata reader");
         }
-        singleValue.clear();
-        multipleValue.clear();
         contacts.clear();
         LOGGER.info("destroying generic metadata reader");
     }

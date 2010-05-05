@@ -67,17 +67,17 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.constellation.storage</groupId>
+      <artifactId>cstl-store-generic</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-xml-sensorML</artifactId>
     </dependency>
     <dependency>
       <groupId>org.constellation.web-services</groupId>
       <artifactId>cstl-web-ogc</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.xml-bindings</groupId>
-      <artifactId>cstl-xml-configuration</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

@@ -94,7 +94,11 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
         switch (type) {
             case DEFAULT   : return new DefaultObservationReader(configuration, observationIdBase);
 
-            case GENERIC   : return new DefaultGenericObservationReader(observationIdBase, configuration);
+            case GENERIC   : try {
+                                return new DefaultGenericObservationReader(observationIdBase, configuration);
+                             } catch (MetadataIoException ex) {
+                                throw new CstlServiceException(ex);
+                             }
 
             case FILESYSTEM: return new FileObservationReader(observationIdBase, configuration);
 
@@ -117,38 +121,30 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
     }
 
     @Override
-    public SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException {
+    public SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws MetadataIoException {
         if (type == null) {
             return null;
         }
         switch (type) {
             case FILE_SYSTEM: return new FileSensorReader(configuration);
 
-            case MDWEB:
-                try {
-                    return new MDWebSensorReader(configuration, map);
-                } catch (MetadataIoException ex) {
-                    throw new CstlServiceException(ex);
-                }
+            case MDWEB: return new MDWebSensorReader(configuration, map);
+                
 
             default: throw new IllegalArgumentException("Unknow SML dataSource type: " + type);
         }
     }
 
     @Override
-    public SensorWriter getSensorWriter(DataSourceType type,  Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException {
+    public SensorWriter getSensorWriter(DataSourceType type,  Automatic configuration, String sensorIdBase, Properties map) throws MetadataIoException {
         if (type == null) {
             return null;
         }
         switch (type) {
             case FILE_SYSTEM: return new FileSensorWriter(configuration, sensorIdBase);
 
-            case MDWEB:
-                try {
-                    return new MDWebSensorWriter(configuration, sensorIdBase, map);
-                } catch (MetadataIoException ex) {
-                    throw new CstlServiceException(ex);
-                }
+            case MDWEB: return new MDWebSensorWriter(configuration, sensorIdBase, map);
+                
 
             default: throw new IllegalArgumentException("Unknow SML dataSource type: " + type);
         }

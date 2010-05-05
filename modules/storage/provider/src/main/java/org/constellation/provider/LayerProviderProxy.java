@@ -46,9 +46,9 @@ public class LayerProviderProxy extends AbstractLayerProvider{
 
     private static final Collection<LayerProviderService> SERVICES = new ArrayList<LayerProviderService>();
 
-    private static String CONFIG_PATH = null;
+    private static String configPath = null;
 
-    private static LayerProviderProxy INSTANCE = null;
+    private static LayerProviderProxy instance = null;
 
 
     private LayerProviderProxy(){}
@@ -175,16 +175,16 @@ public class LayerProviderProxy extends AbstractLayerProvider{
 
     }
 
-    private static synchronized void init(final String configPath){
-        if(configPath == null){
+    private static synchronized void init(final String confPath){
+        if (confPath == null) {
             throw new NullPointerException("Configuration path can not be null.");
         }
 
-        if(CONFIG_PATH != null){
+        if (configPath != null) {
             throw new IllegalStateException("The layer provider proxy has already been initialize");
         }
 
-        CONFIG_PATH = configPath;
+        configPath = confPath;
 
         loadServices();
 
@@ -204,7 +204,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
              * No config file in the resources, then we try with the default config directory.
              */
             if (configFile == null || !configFile.exists()) {
-                final String path = CONFIG_PATH + fileName;
+                final String path = configPath + fileName;
                 configFile = new File(path);
             }
             /*
@@ -242,12 +242,12 @@ public class LayerProviderProxy extends AbstractLayerProvider{
      *                          defined, {@code false} if we do not want.
      */
     public static synchronized LayerProviderProxy getInstance(final boolean createIfNotExists){
-        if(INSTANCE == null && createIfNotExists){
+        if(instance == null && createIfNotExists){
             init(ConfigDirectory.getConfigDirectory().getPath() + File.separator);
-            INSTANCE = new LayerProviderProxy();
+            instance = new LayerProviderProxy();
         }
         
-        return INSTANCE;
+        return instance;
     }
 
 }

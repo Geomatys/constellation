@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io.generic;
+package org.constellation.generic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,13 +32,13 @@ public class Values {
     /**
      * A Map of (varName) - (list of values) refreshed at every request.
      */
-    private final Map<String, List<String>> multipleValue;
+    private final Map<String, List<String>> values;
 
     /**
      * Build a new values container.
      */
     public Values() {
-        multipleValue = new HashMap<String, List<String>>();
+        values = new HashMap<String, List<String>>();
     }
 
     /**
@@ -48,11 +48,11 @@ public class Values {
      * @param singleValue   A map of (variable name) - (value)
      * @param multipleValue A map of (variable name) - (list of values)
      */
-    public Values(Map<String, List<String>> multipleValue) {
-        if (multipleValue != null) {
-            this.multipleValue = multipleValue;
+    public Values(Map<String, List<String>> values) {
+        if (values != null) {
+            this.values = values;
         } else {
-            this.multipleValue = new HashMap<String, List<String>>();
+            this.values = new HashMap<String, List<String>>();
         }
     }
 
@@ -63,7 +63,7 @@ public class Values {
      * @return
      */
     public String getVariable(String variable) {
-        final List<String> result = multipleValue.get(variable);
+        final List<String> result = values.get(variable);
         if (result != null && result.size() > 0) {
             return result.get(0);
         }
@@ -77,12 +77,12 @@ public class Values {
      * @return
      */
     public List<String> getVariables(String variable) {
-        if (multipleValue != null) {
-            List<String> values = multipleValue.get(variable);
-            if (values == null) {
-                values = new ArrayList<String>();
+        if (values != null) {
+            List<String> result = values.get(variable);
+            if (result == null) {
+                result = new ArrayList<String>();
             }
-            return values;
+            return result;
         }
         return null;
     }
@@ -93,10 +93,10 @@ public class Values {
      * @param varName The name of the variable.
      * @param value   The value to add.
      */
-    public void addToMultipleValue(String varName, String value) {
-        if (multipleValue.get(varName) == null) {
-           multipleValue.put(varName, new ArrayList<String>());
+    public void addToValue(String varName, String value) {
+        if (values.get(varName) == null) {
+           values.put(varName, new ArrayList<String>());
         }
-        multipleValue.get(varName).add(value);
+        values.get(varName).add(value);
     }
 }

@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.metadata.io;
+package org.constellation.metadata.io.mdweb;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.CSWMetadataWriter;
+import org.constellation.metadata.io.MDWebMetadataWriter;
+import org.constellation.metadata.io.MetadataIoException;
 
 import org.geotoolkit.csw.xml.Record;
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
@@ -69,7 +72,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
         this.indexer = index;
     }
 
-    protected MDWebCSWMetadataWriter() throws MetadataIoException {
+    public MDWebCSWMetadataWriter() throws MetadataIoException {
         super();
         indexer = null;
     }
@@ -194,7 +197,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      * @return the founded title or UNKNOW_TITLE
      */
     @Override
-    protected String findTitle(Object obj) {
+    public String findTitle(Object obj) {
 
         //here we try to get the title
         AbstractSimpleLiteral titleSL = null;

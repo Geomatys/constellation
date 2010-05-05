@@ -31,6 +31,7 @@ import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.MetadataIoException;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
@@ -52,7 +53,7 @@ public class FileSensorReader implements SensorReader {
 
     private File dataDirectory;
     
-    public FileSensorReader(Automatic configuration) throws CstlServiceException  {
+    public FileSensorReader(Automatic configuration) throws MetadataIoException  {
         try {
             //we initialize the unmarshaller
             marshallerPool = new MarshallerPool("org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
@@ -60,7 +61,7 @@ public class FileSensorReader implements SensorReader {
             this.dataDirectory  = configuration.getDataDirectory();
         } catch (JAXBException ex) {
             Logger.getAnonymousLogger().log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("JAXBException while starting the file system Sensor reader", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("JAXBException while starting the file system Sensor reader", ex, NO_APPLICABLE_CODE);
         } 
     }
 

@@ -23,6 +23,7 @@ import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.ObservationWriterType;
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationReader;
 import org.constellation.sos.io.ObservationWriter;
@@ -49,8 +50,8 @@ public abstract class AbstractSOSFactory extends Factory {
 
     public abstract ObservationWriter getObservationWriter(ObservationWriterType type, String observationTemplateIdBase, Automatic configuration) throws CstlServiceException;
 
-    public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException;
+    public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws MetadataIoException;
 
-    public abstract SensorWriter getSensorWriter(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws CstlServiceException;
+    public abstract SensorWriter getSensorWriter(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws MetadataIoException;
 
 }

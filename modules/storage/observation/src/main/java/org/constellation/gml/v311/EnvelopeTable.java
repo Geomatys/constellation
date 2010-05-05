@@ -30,7 +30,6 @@ import org.geotoolkit.internal.sql.table.SingletonTable;
 
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
-import org.geotoolkit.internal.sql.IdentifierGenerator;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 
 /**

@@ -95,6 +95,7 @@
   <!-- =========================================================== -->
   <modules>
     <module>metadata</module>
+    <module>generic</module>
     <module>observation</module>
     <module>provider</module>
     <module>provider-data-coveragesql</module>

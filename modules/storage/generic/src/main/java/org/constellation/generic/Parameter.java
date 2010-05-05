@@ -16,9 +16,10 @@
  */
 
 
-package org.constellation.sos.io.generic;
+package org.constellation.generic;
 
 /**
+ * Not yet used
  *
  * @author Guilhem Legal (Geomatys)
  */

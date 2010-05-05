@@ -18,6 +18,7 @@
 package org.constellation.metadata.io;
 
 import java.util.Arrays;
+import org.constellation.metadata.io.mdweb.MDWebCSWMetadataWriter;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.metadata.iso.DefaultMetadata;

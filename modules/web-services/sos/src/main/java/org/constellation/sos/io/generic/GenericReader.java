@@ -32,6 +32,7 @@ import java.util.Set;
 
 // constellation dependecies
 import java.util.logging.Logger;
+import org.constellation.generic.Values;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.MultiFixed;
@@ -39,8 +40,9 @@ import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
 import org.constellation.generic.database.Static;
-import org.constellation.ws.CstlServiceException;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.constellation.metadata.io.MetadataIoException;
+//import org.constellation.ws.CstlServiceException;
+//import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *
@@ -102,7 +104,7 @@ public abstract class GenericReader  {
      *                      and all the SQL queries.
      * @throws CstlServiceException
      */
-    public GenericReader(Automatic configuration) throws CstlServiceException {
+    public GenericReader(Automatic configuration) throws MetadataIoException {
         this.configuration = configuration;
         advancedJdbcDriver = true;
         try {
@@ -111,12 +113,12 @@ public abstract class GenericReader  {
                 this.connection = bdd.getConnection();
                 initStatement();
             } else {
-                throw new CstlServiceException("The database par of the generic configuration file is null", NO_APPLICABLE_CODE);
+                throw new MetadataIoException("The database par of the generic configuration file is null");
             }
         } catch (SQLException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            throw new MetadataIoException(ex);
         } catch (IllegalArgumentException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            throw new MetadataIoException(ex);
         }
     }
 
@@ -127,7 +129,7 @@ public abstract class GenericReader  {
      * @param staticParameters
      * @throws CstlServiceException
      */
-    protected GenericReader(Map<List<String>, Values> debugValues, HashMap<String, String> staticParameters) throws CstlServiceException {
+    protected GenericReader(Map<List<String>, Values> debugValues, HashMap<String, String> staticParameters) throws MetadataIoException {
         advancedJdbcDriver = true;
         debugMode          = true;
         this.debugValues   = debugValues;
@@ -220,7 +222,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(String variable) throws CstlServiceException {
+    protected Values loadData(String variable) throws MetadataIoException {
         return loadData(Arrays.asList(variable), new ArrayList<String>());
     }
 
@@ -228,7 +230,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(String variable, String parameter) throws CstlServiceException {
+    protected Values loadData(String variable, String parameter) throws MetadataIoException {
         return loadData(Arrays.asList(variable), Arrays.asList(parameter));
     }
 
@@ -236,7 +238,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(List<String> variables, String parameter) throws CstlServiceException {
+    protected Values loadData(List<String> variables, String parameter) throws MetadataIoException {
         return loadData(variables, Arrays.asList(parameter));
     }
 
@@ -244,7 +246,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(String variable, List<String> parameter) throws CstlServiceException {
+    protected Values loadData(String variable, List<String> parameter) throws MetadataIoException {
         return loadData(Arrays.asList(variable), parameter);
     }
 
@@ -252,7 +254,7 @@ public abstract class GenericReader  {
      * Load all the data for the specified Identifier from the database.
      * @param identifier
      */
-    protected Values loadData(List<String> variables) throws CstlServiceException {
+    protected Values loadData(List<String> variables) throws MetadataIoException {
         return loadData(variables, new ArrayList<String>());
     }
 
@@ -261,7 +263,7 @@ public abstract class GenericReader  {
      *
      * @param identifier
      */
-    protected Values loadData(List<String> variables, List<String> parameters) throws CstlServiceException {
+    protected Values loadData(List<String> variables, List<String> parameters) throws MetadataIoException {
 
         final Set<LockedPreparedStatement> subStmts = new HashSet<LockedPreparedStatement>();
         Values values = null;
@@ -276,7 +278,7 @@ public abstract class GenericReader  {
                 final String staticValue = staticParameters.get(var);
                 if (staticValue != null) {
                     values = new Values();
-                    values.addToMultipleValue(var, staticValue);
+                    values.addToValue(var, staticValue);
                 } else {
                     LOGGER.severe("no statement found for variable: " + var);
                 }
@@ -314,7 +316,7 @@ public abstract class GenericReader  {
      * @param subSingleStmts
      * @param subMultiStmts
      */
-    private Values loading(List<String> parameters, Set<LockedPreparedStatement> subStmts) throws CstlServiceException {
+    private Values loading(List<String> parameters, Set<LockedPreparedStatement> subStmts) throws MetadataIoException {
         final Values values = new Values();
         
         //we extract the single values
@@ -404,7 +406,7 @@ public abstract class GenericReader  {
         final ResultSet result = stmt.executeQuery();
         while (result.next()) {
             for (String varName : varNames) {
-                values.addToMultipleValue(varName, result.getString(varName));
+                values.addToValue(varName, result.getString(varName));
             }
         }
         result.close();
@@ -458,7 +460,7 @@ public abstract class GenericReader  {
      *
      * @throws org.constellation.ws.CstlServiceException
      */
-    public void reloadConnection() throws CstlServiceException {
+    public void reloadConnection() throws MetadataIoException {
         if (!isReconnecting) {
             try {
                LOGGER.info("refreshing the connection");
@@ -472,7 +474,7 @@ public abstract class GenericReader  {
                 isReconnecting = false;
             }
         }
-        throw new CstlServiceException("The database connection has been lost, the service is trying to reconnect", NO_APPLICABLE_CODE);
+        throw new MetadataIoException("The database connection has been lost, the service is trying to reconnect");
     }
 
     /**

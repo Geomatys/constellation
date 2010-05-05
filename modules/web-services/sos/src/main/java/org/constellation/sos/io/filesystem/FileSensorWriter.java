@@ -26,6 +26,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.AbstractMetadataWriter;
+import org.constellation.metadata.io.MetadataIoException;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
@@ -54,20 +55,20 @@ public class FileSensorWriter implements SensorWriter {
 
     private String sensorIdBase;
 
-    public FileSensorWriter(Automatic configuration, String sensorIdBase) throws CstlServiceException {
+    public FileSensorWriter(Automatic configuration, String sensorIdBase) throws MetadataIoException {
         if (configuration == null) {
-            throw new CstlServiceException("The sensor configuration object is null", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The sensor configuration object is null", NO_APPLICABLE_CODE);
         }
         this.sensorIdBase = sensorIdBase;
         uncommittedFiles = new ArrayList<File>();
         if (configuration.getDataDirectory() == null) {
-            throw new CstlServiceException("The sensor data directory is null", NO_APPLICABLE_CODE);
+            throw new MetadataIoException("The sensor data directory is null", NO_APPLICABLE_CODE);
         }
         this.dataDirectory = configuration.getDataDirectory();
         try {
             marshallerPool = new MarshallerPool("org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
         } catch (JAXBException ex) {
-            throw new CstlServiceException("Unable to initialize the fileSensorWriter JAXB context", ex, NO_APPLICABLE_CODE);
+            throw new MetadataIoException("Unable to initialize the fileSensorWriter JAXB context", ex, NO_APPLICABLE_CODE);
         }
 
     }

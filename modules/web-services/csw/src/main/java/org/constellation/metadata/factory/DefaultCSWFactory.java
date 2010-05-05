@@ -22,17 +22,16 @@ import java.io.File;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
-import org.constellation.metadata.CSWworker;
 import org.constellation.metadata.index.generic.GenericIndexer;
 import org.constellation.metadata.index.generic.GenericIndexSearcher;
 import org.constellation.metadata.index.mdweb.MDWebIndexer;
 import org.constellation.metadata.index.mdweb.MDWebIndexSearcher;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
-import org.constellation.metadata.io.FileMetadataReader;
-import org.constellation.metadata.io.FileMetadataWriter;
-import org.constellation.metadata.io.MDWebCSWMetadataReader;
-import org.constellation.metadata.io.MDWebCSWMetadataWriter;
+import org.constellation.metadata.io.filesystem.FileMetadataReader;
+import org.constellation.metadata.io.filesystem.FileMetadataWriter;
+import org.constellation.metadata.io.mdweb.MDWebCSWMetadataReader;
+import org.constellation.metadata.io.mdweb.MDWebCSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import static org.constellation.generic.database.Automatic.*;
 import org.geotoolkit.lucene.IndexingException;

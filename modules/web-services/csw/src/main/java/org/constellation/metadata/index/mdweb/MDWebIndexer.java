@@ -433,9 +433,10 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 }
 
                 } catch (NumberFormatException e) {
-                    if (!coord.equals(null))
+                    if (coord != null) {
                         LOGGER.warning("unable to spatially index form: " + form.getTitle() + '\n' +
                                        "cause:  unable to parse double: " + coord);
+                    }
                 }
 
                 for (String term :INSPIRE_QUERYABLE.keySet()) {

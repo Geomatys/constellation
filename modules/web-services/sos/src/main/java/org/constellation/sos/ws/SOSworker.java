@@ -57,6 +57,7 @@ import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.AbstractMetadataWriter;
+import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.ObservationFilter;
@@ -453,6 +454,9 @@ public class SOSworker {
             isStarted = false;
         } catch (FactoryNotFoundException ex) {
             LOGGER.warning(notWorkingMsg + '\n' + "cause: Unable to find a SOS Factory");
+            isStarted = false;
+        } catch (MetadataIoException ex) {
+            LOGGER.warning(notWorkingMsg + '\n' + "cause: MetadataIOException wile initializing the sensor reader/writer:\n" + ex.getMessage());
             isStarted = false;
         } catch (CstlServiceException ex) {
             LOGGER.warning(notWorkingMsg + '\n' + "cause:" + ex.getMessage());
