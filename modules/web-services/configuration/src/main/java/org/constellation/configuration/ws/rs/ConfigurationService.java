@@ -389,6 +389,24 @@ public final class ConfigurationService extends AbstractWebService  {
             return new AcknowlegementType("Success", "The indexation have been stopped");
         }
     }
+
+    private void verifyBaseAttribute(final String service, final String fileName) throws CstlServiceException {
+         if ( service == null) {
+            throw new CstlServiceException("You must specify the service parameter.",
+                                              MISSING_PARAMETER_VALUE, Parameters.SERVICE);
+        } else if (!SERVCE_DIRECTORY.keySet().contains(service)) {
+            final StringBuilder msg = new StringBuilder("Invalid value for the service parameter: ").append(service).append('\n');
+            msg.append("accepted values are:");
+            for (String s: SERVCE_DIRECTORY.keySet()) {
+                msg .append(s).append(',');
+            }
+            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, Parameters.SERVICE);
+        }
+
+        if (fileName == null) {
+             throw new CstlServiceException("You must specify the fileName parameter.", MISSING_PARAMETER_VALUE, "fileName");
+        }
+    }
     
     /**
      * Update a properties file on the server file system.
@@ -404,22 +422,7 @@ public final class ConfigurationService extends AbstractWebService  {
         final String fileName = request.getFileName();
         final Map<String, String> newProperties = request.getProperties();
         
-        if ( service == null) {
-            throw new CstlServiceException("You must specify the service parameter.",
-                                              MISSING_PARAMETER_VALUE, Parameters.SERVICE);
-        } else if (!SERVCE_DIRECTORY.keySet().contains(service)) {
-            final StringBuilder msg = new StringBuilder("Invalid value for the service parameter: ").append(service).append('\n');
-            msg.append("accepted values are:");
-            for (String s: SERVCE_DIRECTORY.keySet()) {
-                msg .append(s).append(',');
-            }
-            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, Parameters.SERVICE);
-            
-        }
-        
-        if (fileName == null) {
-             throw new CstlServiceException("You must specify the fileName parameter.", MISSING_PARAMETER_VALUE, "fileName");
-        }
+        verifyBaseAttribute(service, fileName);
         
         if (newProperties == null || newProperties.size() == 0) {
              throw new CstlServiceException("You must specify a non empty properties parameter.", MISSING_PARAMETER_VALUE, 
@@ -462,22 +465,7 @@ public final class ConfigurationService extends AbstractWebService  {
         final String fileName   = request.getFileName();
         final Object newContent = request.getXmlContent();
 
-        if ( service == null) {
-            throw new CstlServiceException("You must specify the service parameter.",
-                                              MISSING_PARAMETER_VALUE, Parameters.SERVICE);
-        } else if (!SERVCE_DIRECTORY.keySet().contains(service)) {
-            final StringBuilder msg = new StringBuilder("Invalid value for the service parameter: ").append(service).append('\n');
-            msg.append("accepted values are:");
-            for (String s: SERVCE_DIRECTORY.keySet()) {
-                msg.append(s).append(',');
-            }
-            throw new CstlServiceException(msg.toString(), MISSING_PARAMETER_VALUE, Parameters.SERVICE);
-
-        }
-
-        if (fileName == null) {
-             throw new CstlServiceException("You must specify the fileName parameter.", MISSING_PARAMETER_VALUE, "fileName");
-        }
+        verifyBaseAttribute(service, fileName);
 
         if (newContent == null) {
              throw new CstlServiceException("You must specify a non empty xml content parameter.", MISSING_PARAMETER_VALUE,

@@ -964,27 +964,13 @@ public class SOSworker {
                                             INVALID_PARAMETER_VALUE);
                                 if (station instanceof SamplingPointEntry) {
                                     final SamplingPointEntry sp = (SamplingPointEntry) station;
-                                    if (sp.getPosition() != null && sp.getPosition().getPos() != null && sp.getPosition().getPos().getValue().size() >= 2) {
-
-                                        final double stationX  = sp.getPosition().getPos().getValue().get(0);
-                                        final double stationY  = sp.getPosition().getPos().getValue().get(1);
-                                        final double minx      = e.getLowerCorner().getValue().get(0);
-                                        final double maxx      = e.getUpperCorner().getValue().get(0);
-                                        final double miny      = e.getLowerCorner().getValue().get(1);
-                                        final double maxy      = e.getUpperCorner().getValue().get(1);
-                                        
-                                        // we look if the station if contained in the BBOX
-                                        if (stationX < maxx && stationX > minx &&
-                                            stationY < maxy && stationY > miny) {
-
-                                            matchingFeatureOfInterest.add(sp.getId());
-                                            add = true;
-                                        } else {
-                                            LOGGER.finer(" the feature of interest " + sp.getId() + " is not in the BBOX");
-                                        }
+                                    if (samplingPointMatchEnvelope(sp, e)) {
+                                        matchingFeatureOfInterest.add(sp.getId());
+                                        add = true;
                                     } else {
-                                        LOGGER.warning(" the feature of interest " + sp.getId() + " does not have proper position");
+                                        LOGGER.finer(" the feature of interest " + sp.getId() + " is not in the BBOX");
                                     }
+                                    
                                 } else if (station instanceof SamplingCurveType) {
                                     final SamplingCurveType sc = (SamplingCurveType) station;
                                     if (sc.getBoundedBy() != null && sc.getBoundedBy().getEnvelope() != null &&
@@ -1170,6 +1156,22 @@ public class SOSworker {
         return response;
     }
 
+    private boolean samplingPointMatchEnvelope(SamplingPointEntry sp, EnvelopeEntry e) {
+        if (sp.getPosition() != null && sp.getPosition().getPos() != null && sp.getPosition().getPos().getValue().size() >= 2) {
+
+            final double stationX = sp.getPosition().getPos().getValue().get(0);
+            final double stationY = sp.getPosition().getPos().getValue().get(1);
+            final double minx     = e.getLowerCorner().getValue().get(0);
+            final double maxx     = e.getUpperCorner().getValue().get(0);
+            final double miny     = e.getLowerCorner().getValue().get(1);
+            final double maxy     = e.getUpperCorner().getValue().get(1);
+
+            // we look if the station if contained in the BBOX
+            return stationX < maxx && stationX > minx && stationY < maxy && stationY > miny;
+        }
+        LOGGER.warning(" the feature of interest " + sp.getId() + " does not have proper position");
+        return false;
+    }
     
     /**
      * Web service operation
@@ -1541,24 +1543,10 @@ public class SOSworker {
                     }
                     if (station instanceof SamplingPointEntry) {
                         final SamplingPointEntry sp = (SamplingPointEntry) station;
-                        if (sp.getPosition() != null && sp.getPosition().getPos() != null && sp.getPosition().getPos().getValue().size() >= 2) {
-
-                            final double stationX  = sp.getPosition().getPos().getValue().get(0);
-                            final double stationY  = sp.getPosition().getPos().getValue().get(1);
-                            final double minx      = e.getLowerCorner().getValue().get(0);
-                            final double maxx      = e.getUpperCorner().getValue().get(0);
-                            final double miny      = e.getLowerCorner().getValue().get(1);
-                            final double maxy      = e.getUpperCorner().getValue().get(1);
-
-                            // we look if the station if contained in the BBOX
-                            if (stationX < maxx && stationX > minx && stationY < maxy && stationY > miny) {
-
-                                matchingFeatureOfInterest.add(sp);
-                            } else {
-                                LOGGER.finer(" the feature of interest " + sp.getId() + " is not in the BBOX");
-                            }
+                        if (samplingPointMatchEnvelope(sp, e)) {
+                            matchingFeatureOfInterest.add(sp);
                         } else {
-                            LOGGER.warning(" the feature of interest " + sp.getId() + " does not have proper position");
+                            LOGGER.finer(" the feature of interest " + sp.getId() + " is not in the BBOX");
                         }
                     } else {
                         LOGGER.warning("unknow implementation:" + station.getClass().getName());
