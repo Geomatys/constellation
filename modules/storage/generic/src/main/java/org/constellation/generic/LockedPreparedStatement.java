@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io.generic;
+package org.constellation.generic;
 
 import java.sql.Date;
 import java.sql.ParameterMetaData;

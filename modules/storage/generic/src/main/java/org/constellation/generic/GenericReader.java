@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.io.generic;
+package org.constellation.generic;
 
 import java.sql.Connection;
 import java.sql.ParameterMetaData;
@@ -32,7 +32,6 @@ import java.util.Set;
 
 // constellation dependecies
 import java.util.logging.Logger;
-import org.constellation.generic.Values;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.MultiFixed;
@@ -41,8 +40,6 @@ import org.constellation.generic.database.Query;
 import org.constellation.generic.database.Single;
 import org.constellation.generic.database.Static;
 import org.constellation.metadata.io.MetadataIoException;
-//import org.constellation.ws.CstlServiceException;
-//import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  *

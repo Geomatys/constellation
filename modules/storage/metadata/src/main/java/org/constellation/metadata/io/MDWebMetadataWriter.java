@@ -462,8 +462,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
             String value;
             if (object instanceof java.util.Date) {
-                synchronized (dateFormat) {
-                    value = dateFormat.get(1).format(object);
+                synchronized (DATE_FORMAT) {
+                    value = DATE_FORMAT.get(1).format(object);
                 }
             } else {
                 value = object + "";

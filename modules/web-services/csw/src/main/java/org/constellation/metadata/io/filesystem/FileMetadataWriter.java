@@ -304,23 +304,13 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                 while (xpath.indexOf('/') != -1) {
                     
                     //Then we get the next Property name
-                    int ordinal = -1;
+                    
                     String propertyName = xpath.substring(0, xpath.indexOf('/'));
-
-                    //we extract the ordinal if there is one
+                    int ordinal         = extractOrdinal(propertyName);
                     if (propertyName.indexOf('[') != -1) {
-                        if (propertyName.indexOf(']') != -1) {
-                            try {
-                                final String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
-                                ordinal = Integer.parseInt(ordinalValue);
-                            } catch (NumberFormatException ex) {
-                                throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
-                            }
-                            propertyName = propertyName.substring(0, propertyName.indexOf('['));
-                        } else {
-                            throw new MetadataIoException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
-                        }
+                        propertyName = propertyName.substring(0, propertyName.indexOf('['));
                     }
+
                     LOGGER.finer("propertyName:" + propertyName + " ordinal=" + ordinal);
 
                     Class parentClass;
@@ -387,6 +377,25 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         return false;
     }
 
+    private int extractOrdinal(String propertyName) throws MetadataIoException {
+        int ordinal = -1;
+
+        //we extract the ordinal if there is one
+        if (propertyName.indexOf('[') != -1) {
+            if (propertyName.indexOf(']') != -1) {
+                try {
+                    final String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
+                    ordinal = Integer.parseInt(ordinalValue);
+                } catch (NumberFormatException ex) {
+                    throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
+                }
+            } else {
+                throw new MetadataIoException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
+            }
+        }
+        return ordinal;
+    }
+    
     /**
      * Update an object by calling the setter of the specified property with the specified value
      * 
@@ -401,20 +410,9 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         LOGGER.finer("parameter type:" + parameterType);
 
         final String fullPropertyName = propertyName;
-        //we extract the ordinal if there is one
-        int ordinal = -1;
+        final int ordinal             = extractOrdinal(propertyName);
         if (propertyName.indexOf('[') != -1) {
-            if (propertyName.indexOf(']') != -1) {
-                try {
-                    final String ordinalValue = propertyName.substring(propertyName.indexOf('[') + 1, propertyName.indexOf(']'));
-                    ordinal = Integer.parseInt(ordinalValue);
-                } catch (NumberFormatException ex) {
-                    throw new MetadataIoException("The xpath is malformed, the brackets value is not an integer", NO_APPLICABLE_CODE);
-                }
-                propertyName = propertyName.substring(0, propertyName.indexOf('['));
-            } else {
-                throw new MetadataIoException("The xpath is malformed, unclosed bracket", NO_APPLICABLE_CODE);
-            }
+            propertyName = propertyName.substring(0, propertyName.indexOf('['));
         }
 
         //Special case for language
@@ -635,13 +633,13 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         Date result = null;
         boolean success = true;
         try {
-            result = dateFormat.get(0).parse((String) dateValue);
+            result = DATE_FORMAT.get(0).parse((String) dateValue);
         } catch (ParseException ex) {
             success = false;
         }
         if (!success) {
             try {
-               result = dateFormat.get(1).parse((String) dateValue);
+               result = DATE_FORMAT.get(1).parse((String) dateValue);
             } catch (ParseException ex) {
                 throw new MetadataIoException("There service was unable to parse the date:" + dateValue, INVALID_PARAMETER_VALUE);
             }

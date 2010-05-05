@@ -39,8 +39,12 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
     /**
      * Record the date format in the metadata.
      */
-    protected final List<DateFormat> dateFormat = new ArrayList<DateFormat>();
-
+    protected final static List<DateFormat> DATE_FORMAT = new ArrayList<DateFormat>();
+    static {
+        DATE_FORMAT.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
+        DATE_FORMAT.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+    }
+    
     public final static int INSERTED = 0;
 
     public final static int REPLACED = 1;
@@ -56,8 +60,6 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
      * @param MDReader an MDWeb database reader.
      */
     public AbstractMetadataWriter() throws MetadataIoException {
-        dateFormat.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
-        dateFormat.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
     }
 
     /**

@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
+import org.constellation.generic.GenericReader;
 import org.constellation.generic.Values;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.MetadataIoException;

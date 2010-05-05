@@ -53,11 +53,15 @@
       <artifactId>cstl-lib-base</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!--dependency>
+    <dependency>
       <groupId>org.constellation.xml-bindings</groupId>
       <artifactId>cstl-xml-configuration</artifactId>
       <version>${project.version}</version>
-    </dependency-->
+    </dependency>
+      <dependency>
+        <groupId>org.geotoolkit</groupId>
+        <artifactId>geotk-metadata-sql</artifactId>
+      </dependency>
   </dependencies>
 
 </project>

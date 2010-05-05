@@ -41,7 +41,7 @@ public class MetadataIoException extends Exception {
      * @param message The detail message.
      */
     public MetadataIoException(final String message) {
-        this(message, null);
+        this(message, null );
     }
 
     /**
