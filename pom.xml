@@ -464,6 +464,11 @@
       </dependency>
       <dependency>
         <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-svg</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-temporal</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>
