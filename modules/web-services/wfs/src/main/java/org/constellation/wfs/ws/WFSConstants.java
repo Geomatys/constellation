@@ -34,4 +34,6 @@ public final class WFSConstants {
     public static final String VERSION = "version";
     public static final String NAMESPACE = "namespace";
     public static final String FILTER = "filter";
+
+    public static final String UNKNOW_TYPENAME= "The specified TypeNames does not exist:";
 }

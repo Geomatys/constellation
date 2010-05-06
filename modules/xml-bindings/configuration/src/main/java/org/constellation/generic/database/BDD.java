@@ -35,6 +35,7 @@ import org.geotoolkit.sql.WrappedDataSource;
 import org.geotoolkit.util.Utilities;
 import org.postgresql.ds.PGConnectionPoolDataSource;
 import org.postgresql.ds.PGSimpleDataSource;
+import org.postgresql.ds.common.BaseDataSource;
 
 /**
  *
@@ -204,19 +205,7 @@ public class BDD {
         if (className.equals(POSTGRES_DRIVER_CLASS)) {
             if (connectURL != null && connectURL.startsWith("jdbc:postgresql://")) {
                 final PGSimpleDataSource pgSource = new PGSimpleDataSource();
-                // exemple : jdbc:postgresql://localhost:5432/mdweb-SML
-                String url          = connectURL.substring(18);
-                final String host   = url.substring(0, url.indexOf(':'));
-                url                 = url.substring(url.indexOf(':') + 1);
-                final String sPort  = url.substring(0, url.indexOf('/'));
-                final int port      = Integer.parseInt(sPort);
-                final String dbName = url.substring(url.indexOf('/') + 1);
-
-                pgSource.setServerName(host);
-                pgSource.setPortNumber(port);
-                pgSource.setDatabaseName(dbName);
-                pgSource.setUser(user);
-                pgSource.setPassword(password);
+                fillSourceFromURL(pgSource);
                 source = pgSource;
             } else {
                 return null;
@@ -250,19 +239,7 @@ public class BDD {
         if (className.equals(POSTGRES_DRIVER_CLASS)) {
             if (connectURL != null && connectURL.startsWith("jdbc:postgresql://")) {
                 final PGConnectionPoolDataSource pgSource = new PGConnectionPoolDataSource();
-                // exemple : jdbc:postgresql://localhost:5432/mdweb-SML
-                String url          = connectURL.substring(18);
-                final String host   = url.substring(0, url.indexOf(':'));
-                url                 = url.substring(url.indexOf(':') + 1);
-                final String sPort  = url.substring(0, url.indexOf('/'));
-                final int port      = Integer.parseInt(sPort);
-                final String dbName = url.substring(url.indexOf('/') + 1);
-
-                pgSource.setServerName(host);
-                pgSource.setPortNumber(port);
-                pgSource.setDatabaseName(dbName);
-                pgSource.setUser(user);
-                pgSource.setPassword(password);
+                fillSourceFromURL(pgSource);
                 source = new WrappedDataSource(pgSource);
             } else {
                 return null;
@@ -277,6 +254,22 @@ public class BDD {
             source = new DefaultDataSource(connectURL);
         }
         return source;
+    }
+
+    private void fillSourceFromURL(BaseDataSource pgSource) {
+         // exemple : jdbc:postgresql://localhost:5432/mdweb-SML
+         String url = connectURL.substring(18);
+        final String host = url.substring(0, url.indexOf(':'));
+        url = url.substring(url.indexOf(':') + 1);
+        final String sPort = url.substring(0, url.indexOf('/'));
+        final int port = Integer.parseInt(sPort);
+        final String dbName = url.substring(url.indexOf('/') + 1);
+
+        pgSource.setServerName(host);
+        pgSource.setPortNumber(port);
+        pgSource.setDatabaseName(dbName);
+        pgSource.setUser(user);
+        pgSource.setPassword(password);
     }
 
     /**

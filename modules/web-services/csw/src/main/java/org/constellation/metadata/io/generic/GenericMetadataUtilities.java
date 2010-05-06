@@ -109,6 +109,22 @@ public class GenericMetadataUtilities {
     }
 
     /**
+     * Parse the specified date and return a CitationDate with the dateType code CREATION.
+     *
+     * @param date
+     * @return
+     */
+    public static CitationDate createCreationDate(String date) {
+        final DefaultCitationDate creationDate = new DefaultCitationDate();
+        creationDate.setDateType(DateType.CREATION);
+        final Date d = parseDate(date);
+        if (d != null)
+            creationDate.setDate(d);
+        else LOGGER.finer("publication date null: " + date);
+        return creationDate;
+    }
+
+    /**
      *
      */
     public static Date parseDate(String date) {

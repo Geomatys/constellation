@@ -40,6 +40,7 @@ import org.constellation.provider.LayerProviderProxy;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
+import static org.constellation.wfs.ws.WFSConstants.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.data.DataStore;
@@ -93,10 +94,10 @@ import org.geotoolkit.wfs.xml.v110.PropertyType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
-import org.opengis.feature.Feature;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.FeatureType;
@@ -111,6 +112,8 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
 import org.opengis.util.CodeList;
+
+// W3c dependencies
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -323,13 +326,13 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             for (final QName name : names) {
                 final Name n = Utils.getNameFromQname(name);
                 if (!wfsNames.contains(n)) {
-                    throw new CstlServiceException("The specified TypeNames does not exist:" + name);
+                    throw new CstlServiceException(UNKNOW_TYPENAME + name);
                 }
 
                 final LayerDetails layer = namedProxy.get(n);
                 
                 if(!(layer instanceof FeatureLayerDetails)) {
-                    throw new CstlServiceException("The specified TypeNames does not exist:" + name);
+                    throw new CstlServiceException(UNKNOW_TYPENAME + name);
                 }
 
                 final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
@@ -447,7 +450,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
                 final LayerDetails layerD = namedProxy.get(Utils.getNameFromQname(typeName), ServiceDef.Specification.WFS.name());
                 if (layerD == null) {
-                    throw new CstlServiceException("The specified TypeNames does not exist:" + typeName);
+                    throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
                 }
 
                 if (!(layerD instanceof FeatureLayerDetails)) continue;
@@ -601,7 +604,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         final Name typeName             = feature.getFeatureType().getName();
                         final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(typeName, ServiceDef.Specification.WFS.name());
                         if (layer == null) {
-                            throw new CstlServiceException("The specified TypeNames does not exist:" + feature.getFeatureType().getName());
+                            throw new CstlServiceException(UNKNOW_TYPENAME + feature.getFeatureType().getName());
                         }
                         try {
                             final List<FeatureId> features = layer.getStore().addFeatures(typeName, Collections.singleton(feature));
@@ -622,7 +625,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         final Name typeName = featureCollection.getFeatureType().getName();
                         final FeatureLayerDetails layer = (FeatureLayerDetails) namedProxy.get(typeName, ServiceDef.Specification.WFS.name());
                         if (layer == null) {
-                            throw new CstlServiceException("The specified TypeNames does not exist:" + featureCollection.getFeatureType().getName());
+                            throw new CstlServiceException(UNKNOW_TYPENAME + featureCollection.getFeatureType().getName());
                         }
                         try {
                             final List<FeatureId> features = layer.getStore().addFeatures(typeName, featureCollection);
@@ -657,7 +660,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
                 final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(Utils.getNameFromQname(deleteRequest.getTypeName()), ServiceDef.Specification.WFS.name());
                 if (layer == null) {
-                    throw new CstlServiceException("The specified TypeNames does not exist:" + deleteRequest.getTypeName());
+                    throw new CstlServiceException(UNKNOW_TYPENAME + deleteRequest.getTypeName());
                 }
 
                 try {
@@ -703,7 +706,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         Utils.getNameFromQname(updateRequest.getTypeName()), ServiceDef.Specification.WFS.name());
 
                 if (layer == null) {
-                    throw new CstlServiceException("The specified TypeNames does not exist:" + updateRequest.getTypeName());
+                    throw new CstlServiceException(UNKNOW_TYPENAME + updateRequest.getTypeName());
                 }
                 try {
                     final FeatureType ft = layer.getStore().getFeatureType(layer.getGroupName());
