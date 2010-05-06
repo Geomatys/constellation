@@ -47,6 +47,8 @@ import org.opengis.util.InternationalString;
  */
 public class GenericMetadataUtilities {
 
+    private GenericMetadataUtilities() {}
+    
     /**
      * A date Formater.
      */

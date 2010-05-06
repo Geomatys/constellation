@@ -47,7 +47,13 @@ public class Automatic {
     public static final int MDWEB      = 4;
     @XmlTransient
     public static final int FILESYSTEM  = 5;
-            
+    @XmlTransient
+    public static final int PRODLINE    = 6;
+    @XmlTransient
+    public static final int PRODSPEC   = 7;
+    @XmlTransient
+    public static final int SERV       = 8;
+
     private BDD bdd;
 
     private List<BDD> thesaurus;
@@ -154,6 +160,12 @@ public class Automatic {
             return MDWEB;
         else if ("filesystem".equals(format))
             return FILESYSTEM;
+        else if ("serv".equals(format))
+            return SERV;
+        else if ("prodline".equals(format))
+            return PRODLINE;
+        else if ("prodspec".equals(format))
+            return PRODSPEC;
         else
             return DEFAULT;
     }

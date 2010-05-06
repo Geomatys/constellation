@@ -36,6 +36,8 @@ public final class ReflectionUtilities {
 
     private static final Logger LOGGER = Logging.getLogger(ReflectionUtilities.class);
 
+    private static final String INCLASS = " in the class ";
+
     private ReflectionUtilities() {}
 
     /**
@@ -310,11 +312,11 @@ public final class ReflectionUtilities {
             method = classe.getMethod(propertyName);
 
         } catch (IllegalArgumentException ex) {
-            LOGGER.warning("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
+            LOGGER.warning("illegal argument exception while invoking the method " + propertyName + INCLASS + classe.getName());
         } catch (NoSuchMethodException ex) {
             LOGGER.warning("The method " + propertyName + " does not exists in the classe " + classe.getName());
         } catch (SecurityException ex) {
-            LOGGER.warning("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
+            LOGGER.warning("Security exception while getting the method " + propertyName + INCLASS + classe.getName());
         }
         return method;
     }
@@ -335,11 +337,11 @@ public final class ReflectionUtilities {
             method = classe.getMethod(propertyName, parameterClass);
 
         } catch (IllegalArgumentException ex) {
-            LOGGER.warning("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
+            LOGGER.warning("illegal argument exception while invoking the method " + propertyName + INCLASS + classe.getName());
         } catch (NoSuchMethodException ex) {
             LOGGER.warning("The method " + propertyName + " does not exists in the classe " + classe.getName());
         } catch (SecurityException ex) {
-            LOGGER.warning("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
+            LOGGER.warning("Security exception while getting the method " + propertyName + INCLASS + classe.getName());
         }
         return method;
     }
@@ -359,11 +361,11 @@ public final class ReflectionUtilities {
             method = classe.getMethod(propertyName, parameterClass);
 
         } catch (IllegalArgumentException ex) {
-            LOGGER.warning("illegal argument exception while invoking the method " + propertyName + " in the classe " + classe.getName());
+            LOGGER.warning("illegal argument exception while invoking the method " + propertyName + INCLASS + classe.getName());
         } catch (NoSuchMethodException ex) {
             LOGGER.warning("The method " + propertyName + " does not exists in the classe " + classe.getName());
         } catch (SecurityException ex) {
-            LOGGER.warning("Security exception while getting the method " + propertyName + " in the classe " + classe.getName());
+            LOGGER.warning("Security exception while getting the method " + propertyName + INCLASS + classe.getName());
         }
         return method;
     }
@@ -541,41 +543,42 @@ public final class ReflectionUtilities {
 
             } catch (NoSuchMethodException e) {
 
+                final String msg = "The setter ";
                 /**
                  * This switch is for debugging purpose
                  */
                 switch (occurenceType) {
 
                     case 0: {
-                        LOGGER.finer("The setter " + methodName + "(" + paramClass.getName() + ") does not exist");
+                        LOGGER.finer(msg + methodName + "(" + paramClass.getName() + ") does not exist");
                         occurenceType = 1;
                         break;
                     }
                     case 1: {
-                        LOGGER.finer("The setter " + methodName + "(long) does not exist");
+                        LOGGER.finer(msg + methodName + "(long) does not exist");
                         occurenceType = 2;
                         break;
                     }
                     case 2: {
                         if (interfacee != null) {
-                            LOGGER.finer("The setter " + methodName + "(" + interfacee.getName() + ") does not exist");
+                            LOGGER.finer(msg + methodName + "(" + interfacee.getName() + ") does not exist");
                         }
                         occurenceType = 3;
                         break;
                     }
                     case 3: {
-                        LOGGER.finer("The setter " + methodName + "(Collection<" + paramClass.getName() + ">) does not exist");
+                        LOGGER.finer(msg + methodName + "(Collection<" + paramClass.getName() + ">) does not exist");
                         occurenceType = 4;
                         break;
                     }
                     case 4: {
-                        LOGGER.finer("The setter " + methodName + "s(Collection<" + paramClass.getName() + ">) does not exist");
+                        LOGGER.finer(msg + methodName + "s(Collection<" + paramClass.getName() + ">) does not exist");
                         occurenceType = 5;
                         break;
                     }
                     case 5: {
                         if (argumentSuperClass != null) {
-                            LOGGER.finer("The setter " + methodName + "(" + argumentSuperClass.getName() + ") does not exist");
+                            LOGGER.finer(msg + methodName + "(" + argumentSuperClass.getName() + ") does not exist");
                             argumentSuperClass     = argumentSuperClass.getSuperclass();
                             occurenceType = 5;
 
@@ -586,7 +589,7 @@ public final class ReflectionUtilities {
                     }
                     case 6: {
                         if (argumentSuperInterface != null) {
-                            LOGGER.finer("The setter " + methodName + "(" + argumentSuperInterface.getName() + ") does not exist");
+                            LOGGER.finer(msg + methodName + "(" + argumentSuperInterface.getName() + ") does not exist");
                         }
                         occurenceType = 7;
                         break;

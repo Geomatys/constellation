@@ -144,11 +144,9 @@ public abstract class GenericMetadataReader extends AbstractMetadataReader imple
             marshallerPool   = new MarshallerPool(getJAXBContext());
             contacts         = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
         } catch (SQLException ex) {
-            throw new MetadataIoException("SQLException while initializing the Generic reader:" + '\n' +
-                    "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new MetadataIoException("SQLException while initializing the Generic reader: \n cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
-            throw new MetadataIoException("JAXBException while initializing the Generic reader:" + '\n' +
-                    "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new MetadataIoException("JAXBException while initializing the Generic reader: \n cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
     
@@ -177,11 +175,9 @@ public abstract class GenericMetadataReader extends AbstractMetadataReader imple
             marshallerPool   = new MarshallerPool(getJAXBContext());
             contacts         = loadContacts(new File(configuration.getConfigurationDirectory(), "contacts"));
         } catch (SQLException ex) {
-            throw new MetadataIoException("SQLException while initializing the Generic reader:" + '\n' +
-                    "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new MetadataIoException("SQLException while initializing the Generic reader: \n cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         } catch (JAXBException ex) {
-            throw new MetadataIoException("JAXBException while initializing the Generic reader:" + '\n' +
-                    "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new MetadataIoException("JAXBException while initializing the Generic reader: \n cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
 
@@ -205,8 +201,7 @@ public abstract class GenericMetadataReader extends AbstractMetadataReader imple
             marshallerPool     = new MarshallerPool(getJAXBContext());
 
         } catch (JAXBException ex) {
-            throw new MetadataIoException("JAXBException while initializing the Generic reader:" + '\n' +
-                    "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
+            throw new MetadataIoException("JAXBException while initializing the Generic reader: \n cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
         }
     }
     

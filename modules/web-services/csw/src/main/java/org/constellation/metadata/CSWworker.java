@@ -360,16 +360,26 @@ public class CSWworker {
      * we search the deployed war directory /WEB-INF/classes/csw_configuration
      */
     private File getConfigDirectory() {
+
+        /* Ifremer's server does not contain any .constellation directory, so the
+         * configuration files are put under the WEB-INF/classes/configuration/ directory of the WAR file.
+         */
+        File configDir = FileUtilities.getDirectoryFromResource("configuration");
+
         final String configUrl = "csw_configuration";
 
         /*
          * if the configuration files are put under the WEB-INF/classes/csw_configuration directory of the WAR file.
          */
-        File configDir = FileUtilities.getDirectoryFromResource(configUrl);
+        if (configDir == null || !configDir.exists()) {
+            configDir = FileUtilities.getDirectoryFromResource("csw_configuration");
+        }
         
+       // else we search the .constellation directory
         if (configDir == null || !configDir.exists()) {
             configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
         }
+        
         if (configDir != null) {
             LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
         }

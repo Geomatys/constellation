@@ -367,7 +367,20 @@ public abstract class WebService {
         List<String> values = parameters.get(parameterName);
 
         //maybe the parameterName is case sensitive.
-        if(values == null){
+        if (values == null) {
+            for(final String key : parameters.keySet()){
+                if(key.equalsIgnoreCase(parameterName)){
+                    values = parameters.get(key);
+                    break;
+                }
+            }
+        }
+
+        // we look also in Path parameters
+        final MultivaluedMap<String,String> pathParameters = uriContext.getPathParameters();
+        values = pathParameters.get(parameterName);
+
+        if (values == null) {
             for(final String key : parameters.keySet()){
                 if(key.equalsIgnoreCase(parameterName)){
                     values = parameters.get(key);

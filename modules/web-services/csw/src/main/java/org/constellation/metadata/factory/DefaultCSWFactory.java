@@ -46,11 +46,9 @@ import org.geotoolkit.lucene.index.AbstractIndexer;
  */
 public class DefaultCSWFactory extends AbstractCSWFactory {
 
-    /*public DefaultCSWFactory() {
-        super();
-    }*/
-
     private static final String UNKNOW_DATABASE_TYPE = "Unknow database type: ";
+
+    private static final String DEFAULT_FACTORY = " In Default CSW Factory.";
 
     /**
      * Return a Metadata reader for the specified database type.
@@ -68,7 +66,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return new FileMetadataReader(configuration);
             default:
-                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type);
+                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type + DEFAULT_FACTORY);
         }
     }
     
@@ -90,7 +88,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return new FileMetadataWriter(configuration, indexer);
             default:
-                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type);
+                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type + DEFAULT_FACTORY);
         }
     }
     
@@ -115,7 +113,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return new GenericIndexer(reader, configuration, serviceID);
             default:
-                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type);
+                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + type + DEFAULT_FACTORY);
         }
     }
     
@@ -127,7 +125,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case FILESYSTEM:
                 return new GenericIndexSearcher(configDirectory, serviceID);
             default:
-                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + dbType);
+                throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + dbType + DEFAULT_FACTORY);
         }
     }
 }

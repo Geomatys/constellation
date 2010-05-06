@@ -419,7 +419,7 @@ public class CSWService extends OGCWebService {
                 if (SectionsType.getExistingSections().contains(token)){
                     requestedSections.add(token);
                 } else {
-                    throw new CstlServiceException("The section " + token + " does not exist",
+                    throw new CstlServiceException("The section " + token + NOT_EXIST,
                                                   INVALID_PARAMETER_VALUE, "Sections");
                 }   
             }
@@ -452,7 +452,7 @@ public class CSWService extends OGCWebService {
             try {
                 resultType = ResultType.fromValue(resultTypeName);
             } catch (IllegalArgumentException e){
-               throw new CstlServiceException("The resultType " + resultTypeName + " does not exist",
+               throw new CstlServiceException("The resultType " + resultTypeName + NOT_EXIST,
                                              INVALID_PARAMETER_VALUE, "ResultType");
             }
         }
@@ -476,7 +476,7 @@ public class CSWService extends OGCWebService {
             try {
                 startPosition = Integer.valueOf(startPos);
             } catch (NumberFormatException e){
-               throw new CstlServiceException("The positif integer " + startPos + " is malformed",
+               throw new CstlServiceException("The positif integer " + startPos + MALFORMED,
                                              INVALID_PARAMETER_VALUE, "startPosition");
             }
         } 
@@ -488,7 +488,7 @@ public class CSWService extends OGCWebService {
             try {
                 maxRecords = Integer.valueOf(maxRec);
             } catch (NumberFormatException e){
-               throw new CstlServiceException("The positif integer " + maxRec + " is malformed",
+               throw new CstlServiceException("The positif integer " + maxRec + MALFORMED,
                                              INVALID_PARAMETER_VALUE, "maxRecords");
             }
         } 
@@ -518,7 +518,7 @@ public class CSWService extends OGCWebService {
                 final String localPart = token.substring(token.indexOf(':') + 1);
                 typeNames.add(new QName(namespaces.get(prefix), localPart, prefix));
             } else {
-                throw new CstlServiceException("The QName " + token + " is malformed",
+                throw new CstlServiceException("The QName " + token + MALFORMED,
                         INVALID_PARAMETER_VALUE, NAMESPACE);
             }
         }
@@ -530,7 +530,7 @@ public class CSWService extends OGCWebService {
                 elementSet = ElementSetType.fromValue(eSetName);
             
             } catch (IllegalArgumentException e){
-               throw new CstlServiceException("The ElementSet Name " + eSetName + " does not exist",
+               throw new CstlServiceException("The ElementSet Name " + eSetName + NOT_EXIST,
                                                 INVALID_PARAMETER_VALUE, "ElementSetName");
             }
         }
@@ -551,12 +551,12 @@ public class CSWService extends OGCWebService {
                     try {
                         orderType = SortOrderType.fromValue(order);
                     } catch (IllegalArgumentException e){
-                        throw new CstlServiceException("The SortOrder Name " + order + " does not exist",
+                        throw new CstlServiceException("The SortOrder Name " + order + NOT_EXIST,
                                                       INVALID_PARAMETER_VALUE, "SortBy");
                     }
                     sorts.add(new SortPropertyType(propName, orderType));
                 } else {
-                     throw new CstlServiceException("The expression " + token + " is malformed",
+                     throw new CstlServiceException("The expression " + token + MALFORMED,
                                                       INVALID_PARAMETER_VALUE, "SortBy");
                 }
             }
@@ -614,7 +614,7 @@ public class CSWService extends OGCWebService {
                 try {
                     hopCount = Integer.parseInt(count);
                 } catch (NumberFormatException e){
-                    throw new CstlServiceException("The positif integer " + count + " is malformed",
+                    throw new CstlServiceException("The positif integer " + count + MALFORMED,
                                                   INVALID_PARAMETER_VALUE, "HopCount");
                 }
             }
@@ -658,7 +658,7 @@ public class CSWService extends OGCWebService {
                         final String url    = token.substring(token.indexOf('=') + 1);
                         namespaces.put(prefix, url);
                     } else {
-                         throw new CstlServiceException("The namespace " + token + " is malformed",
+                         throw new CstlServiceException("The namespace " + token + MALFORMED,
                                                        INVALID_PARAMETER_VALUE, NAMESPACE);
                     }
                 } else {
@@ -686,7 +686,7 @@ public class CSWService extends OGCWebService {
                 elementSet = ElementSetType.fromValue(eSetName);
             
             } catch (IllegalArgumentException e){
-               throw new CstlServiceException("The ElementSet Name " + eSetName + " does not exist",
+               throw new CstlServiceException("The ElementSet Name " + eSetName + NOT_EXIST,
                                              INVALID_PARAMETER_VALUE, "ElementSetName");
             }
         }
@@ -759,7 +759,7 @@ public class CSWService extends OGCWebService {
                     final String localPart = token.substring(token.indexOf(':') + 1);
                     typeNames.add(new QName(namespaces.get(prefix), localPart, null));
                 } else {
-                     throw new CstlServiceException("The QName " + token + " is malformed",
+                     throw new CstlServiceException("The QName " + token + MALFORMED,
                                                    INVALID_PARAMETER_VALUE, NAMESPACE);
                 }
         }
@@ -815,7 +815,7 @@ public class CSWService extends OGCWebService {
                 final DatatypeFactory factory = DatatypeFactory.newInstance();
                 harvestInterval               = factory.newDuration(interval) ;
             } catch (DatatypeConfigurationException ex) {
-                throw new CstlServiceException("The Duration " + interval + " is malformed",
+                throw new CstlServiceException("The Duration " + interval + MALFORMED,
                                               INVALID_PARAMETER_VALUE, "HarvestInsterval");
             }
         }

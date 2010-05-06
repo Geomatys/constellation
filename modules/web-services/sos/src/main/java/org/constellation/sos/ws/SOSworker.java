@@ -2123,14 +2123,16 @@ public class SOSworker {
          */
         File configDir = FileUtilities.getDirectoryFromResource("configuration");
 
-        // if not find we search also in WEB-INF//classes/sos_configuration
+         final String configUrl = "sos_configuration";
+
+        // if not find we search also in WEB-INF/classes/sos_configuration
         if (configDir == null || !configDir.exists()) {
-            configDir = FileUtilities.getDirectoryFromResource("sos_configuration");
+            configDir = FileUtilities.getDirectoryFromResource(configUrl);
         }
 
         // else we search the .constellation directory
         if (configDir == null || !configDir.exists()) {
-            configDir = new File(ConfigDirectory.getConfigDirectory(), "sos_configuration");
+            configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
         }
 
         if (configDir != null) {

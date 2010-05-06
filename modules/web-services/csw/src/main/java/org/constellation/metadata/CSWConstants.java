@@ -51,6 +51,14 @@ public abstract class CSWConstants {
     public static final String EBRIM_30 = "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0";
     public static final String INSPIRE  = "http://www.inspire.org";
 
+    /**
+     * Error message
+     */
+
+    public static final String NOT_EXIST = " does not exist";
+
+    public static final String MALFORMED = " is malformed";
+    
     private CSWConstants() {}
 
 }
