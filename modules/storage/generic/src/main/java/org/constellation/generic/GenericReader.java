@@ -19,6 +19,7 @@ package org.constellation.generic;
 
 import java.sql.Connection;
 import java.sql.ParameterMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -52,6 +53,11 @@ public abstract class GenericReader  {
      */
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
 
+    /**
+     * A precompiled Statement requesting all The identifiers
+     */
+    private PreparedStatement mainStatement;
+    
     /**
      * A list of precompiled SQL request returning single and multiple values.
      */
@@ -150,6 +156,12 @@ public abstract class GenericReader  {
             // initialize the static parameters obtained by a static query (no parameters & 1 ouput param)
             intStaticParameters(queries);
             
+            //initialize the main statement
+            if (queries.getMain() != null) {
+                final Query mainQuery = queries.getMain().getQuery();
+                mainStatement         = connection.prepareStatement(mainQuery.buildSQLQuery());
+            }
+
             // initialize the single statements
             final Single single = queries.getSingle();
             if (single != null) {
@@ -213,6 +225,19 @@ public abstract class GenericReader  {
                 staticParameters.put(varName, pValue);
             }
         }
+    }
+
+    protected List<String> getMainQueryResult() throws MetadataIoException {
+        final List<String> result = new ArrayList<String>();
+        try {
+            final ResultSet res = mainStatement.executeQuery();
+            while (res.next()) {
+                result.add(res.getString(1));
+            }
+        } catch (SQLException ex) {
+            throw new MetadataIoException("SQL Exception while executing main query: " + ex.getMessage());
+        }
+        return result;
     }
 
     /**
@@ -480,6 +505,11 @@ public abstract class GenericReader  {
     public void destroy() {
         LOGGER.info("destroying generic reader");
         try {
+            if (mainStatement != null) {
+                mainStatement.close();
+                mainStatement = null;
+            }
+
             for (LockedPreparedStatement stmt : statements.keySet()) {
                 stmt.close();
             }
