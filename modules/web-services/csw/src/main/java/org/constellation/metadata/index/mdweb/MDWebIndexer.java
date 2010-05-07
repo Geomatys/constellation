@@ -34,9 +34,7 @@ import javax.sql.DataSource;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
 import org.apache.lucene.store.SimpleFSDirectory;
@@ -181,12 +179,6 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 writer.optimize();
                 writer.close();
 
-            } catch (CorruptIndexException ex) {
-                LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
-                throw new IndexingException(CORRUPTED_MULTI_MSG, ex);
-            } catch (LockObtainFailedException ex) {
-                LOGGER.severe(LOCK_SINGLE_MSG + ex.getMessage());
-                throw new IndexingException(LOCK_MULTI_MSG, ex);
             } catch (IOException ex) {
                 LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
                 throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
@@ -238,12 +230,6 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             writer.optimize();
             writer.close();
 
-        } catch (CorruptIndexException ex) {
-            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
-            throw new IndexingException(CORRUPTED_MULTI_MSG, ex);
-        } catch (LockObtainFailedException ex) {
-            LOGGER.severe(LOCK_SINGLE_MSG + ex.getMessage());
-            throw new IndexingException(LOCK_MULTI_MSG, ex);
         } catch (IOException ex) {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
@@ -287,12 +273,6 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             writer.optimize();
             writer.close();
 
-        } catch (CorruptIndexException ex) {
-            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
-            throw new IndexingException(CORRUPTED_MULTI_MSG, ex);
-        } catch (LockObtainFailedException ex) {
-            LOGGER.severe(LOCK_SINGLE_MSG + ex.getMessage());
-            throw new IndexingException(LOCK_MULTI_MSG, ex);
         } catch (IOException ex) {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
@@ -316,9 +296,6 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
         } catch (IndexingException ex) {
             LOGGER.severe("IndexingException " + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (CorruptIndexException ex) {
-            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
@@ -347,9 +324,6 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
         } catch (IndexingException ex) {
             LOGGER.severe("IndexingException " + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (CorruptIndexException ex) {
-            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());

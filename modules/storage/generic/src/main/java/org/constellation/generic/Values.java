@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * A container for values retrieved from a database by a generic reader.
@@ -99,4 +100,17 @@ public class Values {
         }
         values.get(varName).add(value);
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[Values]").append('\n');
+        for (Entry<String, List<String>> entry : values.entrySet()) {
+            sb.append(entry.getKey()).append(':').append('\n');
+            for (String val : entry.getValue()) {
+                sb.append('\t').append(val).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+    
 }

@@ -74,12 +74,6 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
     private static final int CONTACT = 10;
 
     /**
-     * The configuration Object
-     */
-    //private final Automatic configuration;
-
-
-    /**
      * Build a new Generic metadata reader and initialize the statement.
      * @param configuration
      */
@@ -205,13 +199,11 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
     private Values loadData(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
         LOGGER.finer("loading data for " + identifier);
 
-        final Values values;
-        //for ISO mode we load all variables
+        final List<String> variables;
+        
         if (mode == ISO_19115) {
-            values =  loadData(new ArrayList<String>(), identifier);// we want all
-
+            variables = getVariablesForISO();
         } else {
-            List<String> variables;
             if (mode == DUBLINCORE) {
                 variables = getVariablesForDublinCore(type, elementName);
             } else if (mode == CONTACT) {
@@ -219,10 +211,8 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
             } else {
                 throw new IllegalArgumentException("unknow mode");
             }
-            values = loadData(variables, identifier);
         }
-
-        return values;
+        return loadData(variables, identifier);
     }
 
     @Override
@@ -284,6 +274,13 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * @return
      */
     protected abstract List<String> getVariablesForDublinCore(ElementSetType type, List<QName> elementName);
+
+    /**
+     * Return a list of variables name used for the ISO representation.
+     * @return
+     */
+    protected abstract List<String> getVariablesForISO();
+
        
     /**
      * Return a list of contact id used in this database.

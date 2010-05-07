@@ -44,9 +44,7 @@ import javax.xml.bind.JAXBElement;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.store.LockObtainFailedException;
 
 // constellation dependencies
 import org.apache.lucene.store.SimpleFSDirectory;
@@ -178,27 +176,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     indexDocument(writer, entry);
                 } else {
                      LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
-                     writer.optimize();
-                     writer.close();
-                     NIOUtilities.deleteDirectory(getFileDirectory());
-                     if (indexationToStop.contains(serviceID)) {
-                        indexationToStop.remove(serviceID);
-                    }
-                    if (indexationToStop.size() == 0) {
-                        stopIndexing = false;
-                    }
+                     stopIndexation(writer, serviceID);
                      return;
                 }
             }
             writer.optimize();
             writer.close();
 
-        } catch (CorruptIndexException ex) {
-            LOGGER.severe("CorruptIndexException while indexing document: " + ex.getMessage());
-            throw new IndexingException("CorruptIndexException while indexing documents.", ex);
-        } catch (LockObtainFailedException ex) {
-            LOGGER.severe("LockObtainException while indexing document: " + ex.getMessage());
-            throw new IndexingException("LockObtainException while indexing documents.", ex);
         } catch (IOException ex) {
             LOGGER.severe("IOException while indexing document: " + ex.getMessage());
             throw new IndexingException("IOException while indexing documents.", ex);
@@ -230,27 +214,13 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     indexDocument(writer, entry);
                 } else {
                      LOGGER.info("Index creation stopped after " + (System.currentTimeMillis() - time) + " ms for service:" + serviceID);
-                     writer.optimize();
-                     writer.close();
-                     NIOUtilities.deleteDirectory(getFileDirectory());
-                     if (indexationToStop.contains(serviceID)) {
-                        indexationToStop.remove(serviceID);
-                     }
-                     if (indexationToStop.size() == 0) {
-                        stopIndexing = false;
-                     }
+                     stopIndexation(writer, serviceID);
                      return;
                 }
             }
             writer.optimize();
             writer.close();
 
-        } catch (CorruptIndexException ex) {
-            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (LockObtainFailedException ex) {
-            LOGGER.severe(LOCK_SINGLE_MSG + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -259,6 +229,18 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 " documents indexed: " + nbEntries);
     }
 
+    private void stopIndexation(IndexWriter writer, String serviceID) throws IOException {
+        writer.optimize();
+        writer.close();
+        NIOUtilities.deleteDirectory(getFileDirectory());
+        if (indexationToStop.contains(serviceID)) {
+            indexationToStop.remove(serviceID);
+        }
+        if (indexationToStop.size() == 0) {
+            stopIndexing = false;
+        }
+    }
+    
     /**
      * This method add to index of lucene a new document based on a geotoolkit Metadata object.
      * (implements AbstractIndex.indexDocument() )
@@ -280,9 +262,6 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             }
         } catch (IndexingException ex) {
             LOGGER.severe("indexingException " + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (CorruptIndexException ex) {
-            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
@@ -316,9 +295,6 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
         } catch (IndexingException ex) {
             LOGGER.severe("IndexingException " + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (CorruptIndexException ex) {
-            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } catch (IOException ex) {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
