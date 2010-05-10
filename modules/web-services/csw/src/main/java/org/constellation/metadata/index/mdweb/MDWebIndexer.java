@@ -496,7 +496,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 if(crs == null || "null".equalsIgnoreCase(crs)){
                     crs = "CRS:84";
                 }*/
-                String crs = crs = "CRS:84";
+                String crs = "CRS:84";
                 int srid = 4326;
                 try {
                     srid = SRIDGenerator.toSRID(crs, Version.V1);

@@ -30,7 +30,7 @@ import org.opengis.util.CodeList;
  *
  * @todo Rename as {@code ExceptionCode} and move to {@link org.opengis.webservice}.
  */
-public class ExceptionCode extends CodeList<ExceptionCode> {
+public final class ExceptionCode extends CodeList<ExceptionCode> {
     /**
      * For cross-version compatibility.
      */

@@ -45,9 +45,9 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.store.SimpleFSDirectory;
 
 // constellation dependencies
-import org.apache.lucene.store.SimpleFSDirectory;
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.AbstractMetadataReader;
@@ -64,9 +64,9 @@ import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
+import org.geotoolkit.resources.NIOUtilities;
 
 // geoAPI dependencies
-import org.geotoolkit.resources.NIOUtilities;
 import org.opengis.util.InternationalString;
 
 
@@ -367,40 +367,16 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             String coord = NULL_VALUE;
             try {
                 coord = getValues(metadata, ISO_QUERYABLE.get("WestBoundLongitude"));
-                StringTokenizer tokens = new StringTokenizer(coord, ",;");
-                final double[] minx = new double[tokens.countTokens()];
-                int i = 0;
-                while (tokens.hasMoreTokens()) {
-                    minx[i] = Double.parseDouble(tokens.nextToken());
-                    i++;
-                }
+                final double[] minx = extractPositions(coord);
 
                 coord = getValues(metadata, ISO_QUERYABLE.get("EastBoundLongitude"));
-                tokens = new StringTokenizer(coord, ",;");
-                final double[] maxx = new double[tokens.countTokens()];
-                i = 0;
-                while (tokens.hasMoreTokens()) {
-                    maxx[i] = Double.parseDouble(tokens.nextToken());
-                    i++;
-                }
+                final double[] maxx = extractPositions(coord);
 
                 coord = getValues(metadata, ISO_QUERYABLE.get("NorthBoundLatitude"));
-                tokens = new StringTokenizer(coord, ",;");
-                final double[] maxy = new double[tokens.countTokens()];
-                i = 0;
-                while (tokens.hasMoreTokens()) {
-                    maxy[i] = Double.parseDouble(tokens.nextToken());
-                    i++;
-                }
+                final double[] maxy = extractPositions(coord);
 
                 coord = getValues(metadata, ISO_QUERYABLE.get("SouthBoundLatitude"));
-                tokens = new StringTokenizer(coord, ",;");
-                final double[] miny = new double[tokens.countTokens()];
-                i = 0;
-                while (tokens.hasMoreTokens()) {
-                    miny[i] = Double.parseDouble(tokens.nextToken());
-                    i++;
-                }
+                final double[] miny = extractPositions(coord);
 
                 if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
                     for (int j = 0; j < minx.length; j++)  {
@@ -461,40 +437,16 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         String coord = NULL_VALUE;
         try {
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"));
-            StringTokenizer tokens = new StringTokenizer(coord, ",;");
-            final double[] minx = new double[tokens.countTokens()];
-            int i = 0;
-            while (tokens.hasMoreTokens()) {
-                minx[i] = Double.parseDouble(tokens.nextToken());
-                i++;
-            }
+            final double[] minx = extractPositions(coord);
 
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("EastBoundLongitude"));
-            tokens = new StringTokenizer(coord, ",;");
-            final double[] maxx = new double[tokens.countTokens()];
-            i = 0;
-            while (tokens.hasMoreTokens()) {
-                maxx[i] = Double.parseDouble(tokens.nextToken());
-                i++;
-            }
+            final double[] maxx = extractPositions(coord);
 
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("NorthBoundLatitude"));
-            tokens = new StringTokenizer(coord, ",;");
-            final double[] maxy = new double[tokens.countTokens()];
-            i = 0;
-            while (tokens.hasMoreTokens()) {
-                maxy[i] = Double.parseDouble(tokens.nextToken());
-                i++;
-            }
+            final double[] maxy = extractPositions(coord);
 
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("SouthBoundLatitude"));
-            tokens = new StringTokenizer(coord, ",;");
-            final double[] miny = new double[tokens.countTokens()];
-            i = 0;
-            while (tokens.hasMoreTokens()) {
-                miny[i] = Double.parseDouble(tokens.nextToken());
-                i++;
-            }
+            final double[] miny = extractPositions(coord);
 
             // String crs = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("CRS"));
 
@@ -553,6 +505,23 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
 
         return doc;
+    }
+
+    /**
+     * Extract the double coordinate in a comma separated String.
+     *
+     * @param coord
+     * @return
+     */
+    private double[] extractPositions(final String coord) {
+        StringTokenizer tokens = new StringTokenizer(coord, ",;");
+        final double[] coordinate = new double[tokens.countTokens()];
+        int i = 0;
+        while (tokens.hasMoreTokens()) {
+            coordinate[i] = Double.parseDouble(tokens.nextToken());
+            i++;
+        }
+        return coordinate;
     }
     
     /**

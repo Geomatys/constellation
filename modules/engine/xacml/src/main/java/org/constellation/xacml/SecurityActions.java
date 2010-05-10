@@ -29,7 +29,7 @@ import java.security.PrivilegedAction;
  *  @since  Jul 10, 2007 
  *  @version $Revision$
  */
-public class SecurityActions {
+public final class SecurityActions {
 
     private SecurityActions() {}
     

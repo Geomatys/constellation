@@ -45,7 +45,7 @@ import org.opengis.util.InternationalString;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class GenericMetadataUtilities {
+public final class GenericMetadataUtilities {
 
     private GenericMetadataUtilities() {}
     

@@ -79,6 +79,14 @@ import org.apache.myfaces.custom.fileupload.UploadedFile;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.gml.xml.v311.CodeListType;
+import org.geotoolkit.ows.xml.AbstractAddress;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesBase;
+import org.geotoolkit.ows.xml.AbstractContact;
+import org.geotoolkit.ows.xml.AbstractKeywords;
+import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.AbstractTelephone;
 import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.feature.type.Name;
 
@@ -254,16 +262,12 @@ public class ServicesBean {
     /**
      * fill The formular with OWS 1.1.0 Object
      */
-    private void fillFormFromOWS110(CapabilitiesBaseType cap) {
+    private void fillFormFromOWS(AbstractCapabilitiesBase cap) {
 
         //we fill the default value of Service Identification
-        final ServiceIdentification si = cap.getServiceIdentification();
-        if (si.getTitle().size() > 0) {
-            this.title = si.getTitle().get(0).getValue();
-        }
-        if (si.getAbstract().size() > 0) {
-            this._abstract = si.getAbstract().get(0).getValue();
-        }
+        final AbstractServiceIdentification si = cap.getServiceIdentification();
+        this.title = si.getFirstTitle();
+        this._abstract = si.getFirstAbstract();
         if (si.getKeywords().size() > 0) {
             this.keywords = keywordsToSelectItem(si.getKeywords().get(0));
         }
@@ -275,70 +279,15 @@ public class ServicesBean {
         }
 
         //we fill the value of ServiceProvider
-        final ServiceProvider sp            = cap.getServiceProvider();
-        final ResponsiblePartySubsetType sc = sp.getServiceContact();
-        final ContactType ci                = sc.getContactInfo();
-        final TelephoneType t               = ci.getPhone();
-        final AddressType a                 = ci.getAddress();
-        this.providerName                   = sp.getProviderName();
-        this.providerSite                   = sp.getProviderSite().getHref();
-        this.individualName                 = sc.getIndividualName();
-        this.positionName                   = sc.getPositionName();
-
-        // Phone party
-        if (t.getVoice().size() > 0) {
-            this.phoneVoice = t.getVoice().get(0);
-        }
-        if (t.getFacsimile().size() > 0) {
-            this.phoneFacsimile = t.getFacsimile().get(0);
-        }
-
-        //address party
-        if (a.getDeliveryPoint().size() > 0) {
-            this.deliveryPoint = a.getDeliveryPoint().get(0);
-        }
-        this.city = a.getCity();
-        this.administrativeArea = a.getAdministrativeArea();
-        this.postalCode = a.getPostalCode();
-        this.country = a.getCountry();
-        if (a.getElectronicMailAddress().size() > 0) {
-            this.electronicAddress = a.getElectronicMailAddress().get(0);
-        }
-        if (sc.getRole() != null) {
-            this.role = sc.getRole().getValue();
-        }
-    }
-
-    /**
-     * fill The formular with OWS 1.0.0 Object
-     */
-    private void fillFormFromOWS100(org.geotoolkit.ows.xml.v100.CapabilitiesBaseType cap) {
-
-        //we fill the default value of Service Identification
-        final org.geotoolkit.ows.xml.v100.ServiceIdentification si = cap.getServiceIdentification();
-        this.title     = si.getTitle();
-        this._abstract = si.getAbstract();
-        if (si.getKeywords().size() > 0) {
-            this.keywords = keywordsToSelectItem(si.getKeywords().get(0));
-        }
-
-        this.serviceType = si.getServiceType().getValue();
-        this.versions    = stringToSelectItem(si.getServiceTypeVersion());
-        this.fees        = si.getFees();
-        if (si.getAccessConstraints().size() > 0) {
-            this.accessConstraints = si.getAccessConstraints().get(0);
-        }
-
-        //we fill the value of ServiceProvider
-        final org.geotoolkit.ows.xml.v100.ServiceProvider sp            = cap.getServiceProvider();
-        final org.geotoolkit.ows.xml.v100.ResponsiblePartySubsetType sc = sp.getServiceContact();
-        final org.geotoolkit.ows.xml.v100.ContactType ci                = sc.getContactInfo();
-        final org.geotoolkit.ows.xml.v100.TelephoneType t               = ci.getPhone();
-        final org.geotoolkit.ows.xml.v100.AddressType a                 = ci.getAddress();
-        this.providerName   = sp.getProviderName();
-        this.providerSite   = sp.getProviderSite().getHref();
-        this.individualName = sc.getIndividualName();
-        this.positionName   = sc.getPositionName();
+        final AbstractServiceProvider sp        = cap.getServiceProvider();
+        final AbstractResponsiblePartySubset sc = sp.getServiceContact();
+        final AbstractContact ci                = sc.getContactInfo();
+        final AbstractTelephone t               = ci.getPhone();
+        final AbstractAddress a                 = ci.getAddress();
+        this.providerName                       = sp.getProviderName();
+        this.providerSite                       = sp.getProviderSite().getHref();
+        this.individualName                     = sc.getIndividualName();
+        this.positionName                       = sc.getPositionName();
 
         // Phone party
         if (t.getVoice().size() > 0) {
@@ -416,30 +365,15 @@ public class ServicesBean {
     }
 
     /**
-     * Transform a list of languageString in a Keyword Object into a list of SelectItem.
-     * 
-     * @param keywords
-     * @return
-     */
-    private List<SelectItem> keywordsToSelectItem(KeywordsType keywords) {
-        final List<SelectItem> results = new ArrayList<SelectItem>();
-        for (LanguageStringType keyword : keywords.getKeyword()) {
-            results.add(new SelectItem(keyword.getValue()));
-        }
-
-        return results;
-    }
-
-    /**
      * Transform a list of String in a Keyword Object into a list of SelectItem.
      * 
      * @param keywords
      * @return
      */
-    private List<SelectItem> keywordsToSelectItem(org.geotoolkit.ows.xml.v100.KeywordsType keywords) {
+    private List<SelectItem> keywordsToSelectItem(AbstractKeywords keywords) {
         final List<SelectItem> results = new ArrayList<SelectItem>();
 
-        for (String keyword : keywords.getKeyword()) {
+        for (String keyword : keywords.getKeywordList()) {
             results.add(new SelectItem(keyword));
         }
 
@@ -979,7 +913,7 @@ public class ServicesBean {
         if (capabilitiesFile[0].exists()) {
             
             capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
-            fillFormFromOWS110((Capabilities) capabilities[0]);
+            fillFormFromOWS((Capabilities) capabilities[0]);
 
         } else {
             LOGGER.severe("WCS capabilities file version 1.1.1 not found at :" + path);
@@ -1013,7 +947,7 @@ public class ServicesBean {
         if (capabilitiesFile[0].exists()) {
             final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
-            fillFormFromOWS110((CapabilitiesBaseType) capabilities[0]);
+            fillFormFromOWS((CapabilitiesBaseType) capabilities[0]);
             marshallerPool.release(unmarshaller);
 
         } else {
@@ -1035,7 +969,7 @@ public class ServicesBean {
         if (capabilitiesFile[0].exists()) {
             final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
             capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
-            fillFormFromOWS100((org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) capabilities[0]);
+            fillFormFromOWS((org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) capabilities[0]);
             marshallerPool.release(unmarshaller);
 
         } else {

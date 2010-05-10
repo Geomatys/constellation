@@ -40,7 +40,7 @@ import org.geotoolkit.xacml.xml.context.AttributeValueType;
  *  @since  Jul 20, 2007 
  *  @version $Revision$
  */
-public class RequestAttributeFactory {
+public final class RequestAttributeFactory {
 
     private RequestAttributeFactory() {}
     

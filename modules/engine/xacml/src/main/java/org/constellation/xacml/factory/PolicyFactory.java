@@ -43,7 +43,7 @@ import org.geotoolkit.xacml.xml.policy.PolicyType;
  *  @since  Jul 5, 2007 
  *  @version $Revision$
  */
-public class PolicyFactory {
+public final class PolicyFactory {
 
     private static final Logger LOGGER = Logger.getLogger("org.constellation.xacml");
     

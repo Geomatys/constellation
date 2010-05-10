@@ -22,6 +22,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.QueryType;
@@ -94,7 +96,7 @@ public class LineStringTable extends Table {
     }
 
     public void getIdentifier(String idline, DirectPositionType position) throws SQLException, CatalogException {
-        System.out.println("Attention implementation manquante getIdentifer LineString");
+        log("getIdentifier", new LogRecord(Level.WARNING, "Attention implementation manquante getIdentifer LineString"));
     }
 
 }

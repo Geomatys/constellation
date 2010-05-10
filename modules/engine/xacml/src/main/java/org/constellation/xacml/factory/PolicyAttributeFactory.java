@@ -41,7 +41,7 @@ import org.geotoolkit.xacml.xml.policy.SubjectAttributeDesignatorType;
  *  @since  Jul 20, 2007 
  *  @version $Revision$
  */
-public class PolicyAttributeFactory {
+public final class PolicyAttributeFactory {
 
     private PolicyAttributeFactory() {}
 
