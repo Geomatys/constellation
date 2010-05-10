@@ -112,7 +112,7 @@ public class CSWService {
                             ,ExceptionReport.class, org.geotoolkit.ows.xml.v110.ExceptionReport.class
                             ,org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.class);
 
-           worker = new CSWworker("", marshallerPool);
+           worker = new CSWworker("", marshallerPool, null);
            //TODO find real url
            worker.setServiceURL("http://localhost:8080/CSWServer/CSWService");
        } catch (JAXBException ex){

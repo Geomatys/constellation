@@ -73,6 +73,14 @@ public class Queries {
         this.single = single;
     }
 
+    public Query getQueryByName(String queryName) {
+        Query q = single.getQueryByName(queryName);
+        if (q == null) {
+            q = multiFixed.getQueryByName(queryName);
+        }
+        return q;
+    }
+    
     /**
      * @return the parameters
      */

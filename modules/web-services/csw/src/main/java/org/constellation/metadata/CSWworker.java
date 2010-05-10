@@ -180,7 +180,7 @@ public class CSWworker {
     /**
      * A unMarshaller to get object from harvested resource.
      */
-    private final MarshallerPool marshallerPool;
+    private MarshallerPool marshallerPool;
     
     /**
      * A lucene index searcher to make quick search on the metadatas.
@@ -264,17 +264,6 @@ public class CSWworker {
     private Level logLevel = Level.INFO;
     
     /**
-     * Default constructor for CSW worker.
-     *
-     * @param serviceID The service identifier (used in multiple CSW context). default value is "".
-     * @param unmarshaller
-     * @param marshaller
-     */
-    public CSWworker(final String serviceID, final MarshallerPool marshallerPool) {
-        this(serviceID, marshallerPool, null);
-    }
-    
-    /**
      * Build a new CSW worker with the specified configuration directory
      *
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
@@ -306,25 +295,7 @@ public class CSWworker {
                  isStarted = false;
             } else {
                 final Automatic configuration = (Automatic) configUnmarshaller.unmarshal(configFile);
-
-                // we assign the configuration directory
-                configuration.setConfigurationDirectory(configDir);
-
-                // we load the factory from the available classes
-                final AbstractCSWFactory cswfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null,null);
-                LOGGER.finer("CSW factory loaded:" + cswfactory.getClass().getName());
-
-                final int datasourceType = configuration.getType();
-                //we initialize all the data retriever (reader/writer) and index worker
-                mdReader              = cswfactory.getMetadataReader(configuration);
-                profile               = configuration.getProfile();
-                final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID);
-                indexSearcher         = cswfactory.getIndexSearcher(datasourceType, configDir, serviceID);
-                if (profile == TRANSACTIONAL) {
-                    mdWriter              = cswfactory.getMetadataWriter(configuration, indexer);
-                    catalogueHarvester    = new CatalogueHarvester(marshallerPool, mdWriter);
-                    harvestTaskSchreduler = new HarvestTaskSchreduler(marshallerPool, configDir, catalogueHarvester);
-                }
+                init(configuration, serviceID, configDir);
                 initializeSupportedTypeNames();
                 initializeAcceptedResourceType();
                 initializeAnchorsMap();
@@ -352,40 +323,68 @@ public class CSWworker {
             isStarted = false;
         }
     }
-    
+
     /**
-     * In some implementations there is no sicade directory.
-     * So if we don't find The .constellation/csw_configuration directory
-     * IFREMER hack
-     * we search the deployed war directory /WEB-INF/classes/csw_configuration
+     * Build a new CSW worker with the specified configuration directory
+     *
+     * @param serviceID The service identifier (used in multiple CSW context). default value is "".
+     * @param marshaller A JAXB marshaller to send xml to another CSW service.
+     * @param unmarshaller  An Unmarshaller to get object from harvested resource.
+     *
      */
-    private File getConfigDirectory() {
-
-        /* Ifremer's server does not contain any .constellation directory, so the
-         * configuration files are put under the WEB-INF/classes/configuration/ directory of the WAR file.
-         */
-        File configDir = FileUtilities.getDirectoryFromResource("configuration");
-
-        final String configUrl = "csw_configuration";
-
-        /*
-         * if the configuration files are put under the WEB-INF/classes/csw_configuration directory of the WAR file.
-         */
-        if (configDir == null || !configDir.exists()) {
-            configDir = FileUtilities.getDirectoryFromResource("csw_configuration");
+    public CSWworker(final String serviceID, File configDir, Automatic configuration) {
+        final String notWorkingMsg = "The CSW service is not working!";
+        isStarted = true;
+        try {
+            // we initialize the filterParsers
+            init(configuration, serviceID, configDir);
+            initializeSupportedTypeNames();
+            initializeAcceptedResourceType();
+            initializeAnchorsMap();
+            loadCascadedService(configDir);
+            String suffix = "";
+            if (profile == TRANSACTIONAL) {
+                suffix = "-T";
+            }
+            LOGGER.info("CSW" + suffix + " service (" + configuration.getFormat() + ") running");
+            
+        } catch (FactoryNotFoundException ex) {
+            LOGGER.warning(notWorkingMsg + "\nCause: Unable to find a CSW Factory");
+            isStarted = false;
+        } catch (MetadataIoException e) {
+            LOGGER.warning(notWorkingMsg + "\nCause:" + e.getMessage());
+            isStarted = false;
+        } catch (IndexingException e) {
+            LOGGER.warning(notWorkingMsg + "\nCause:" + e.getMessage());
+            isStarted = false;
+        } catch (IllegalArgumentException e) {
+            LOGGER.warning(notWorkingMsg + "\nCause: IllegalArgumentException: " + e.getMessage());
+            isStarted = false;
         }
-        
-       // else we search the .constellation directory
-        if (configDir == null || !configDir.exists()) {
-            configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
-        }
-        
-        if (configDir != null) {
-            LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
-        }
-        return configDir;
     }
 
+    private void init(final Automatic configuration, String serviceID, File configDir) throws MetadataIoException, IndexingException {
+
+        // we assign the configuration directory
+        configuration.setConfigurationDirectory(configDir);
+
+        // we load the factory from the available classes
+        final AbstractCSWFactory cswfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null,null);
+        LOGGER.finer("CSW factory loaded:" + cswfactory.getClass().getName());
+
+        final int datasourceType = configuration.getType();
+        //we initialize all the data retriever (reader/writer) and index worker
+        mdReader              = cswfactory.getMetadataReader(configuration);
+        profile               = configuration.getProfile();
+        final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID);
+        indexSearcher         = cswfactory.getIndexSearcher(datasourceType, configDir, serviceID);
+        if (profile == TRANSACTIONAL) {
+            mdWriter              = cswfactory.getMetadataWriter(configuration, indexer);
+            catalogueHarvester    = new CatalogueHarvester(marshallerPool, mdWriter);
+            harvestTaskSchreduler = new HarvestTaskSchreduler(marshallerPool, configDir, catalogueHarvester);
+        }
+    }
+    
     /**
      * Initialize the supported type names in function of the reader capacity.
      */
@@ -1240,7 +1239,7 @@ public class CSWworker {
         LOGGER.log(logLevel, "DescribeRecords request processing" + '\n');
         final long startTime = System.currentTimeMillis();
         DescribeRecordResponseType response;
-        Unmarshaller unmarshaller;
+        Unmarshaller unmarshaller = null;
         try {
             verifyBaseRequest(request);
             unmarshaller = this.marshallerPool.acquireUnmarshaller();
@@ -1299,6 +1298,10 @@ public class CSWworker {
             
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB Exception when trying to parse xsd file", ex, NO_APPLICABLE_CODE);
+        } finally {
+            if (unmarshaller != null) {
+                this.marshallerPool.release(unmarshaller);
+            }
         }
         LOGGER.log(logLevel, "DescribeRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
         return response;
@@ -1787,6 +1790,39 @@ public class CSWworker {
         }
     }
 
+     /**
+     * In some implementations there is no sicade directory.
+     * So if we don't find The .constellation/csw_configuration directory
+     * IFREMER hack
+     * we search the deployed war directory /WEB-INF/classes/csw_configuration
+     */
+    public static File getConfigDirectory() {
+
+        /* Ifremer's server does not contain any .constellation directory, so the
+         * configuration files are put under the WEB-INF/classes/configuration/ directory of the WAR file.
+         */
+        File configDir = FileUtilities.getDirectoryFromResource("configuration");
+
+        final String configUrl = "csw_configuration";
+
+        /*
+         * if the configuration files are put under the WEB-INF/classes/csw_configuration directory of the WAR file.
+         */
+        if (configDir == null || !configDir.exists()) {
+            configDir = FileUtilities.getDirectoryFromResource("csw_configuration");
+        }
+
+       // else we search the .constellation directory
+        if (configDir == null || !configDir.exists()) {
+            configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
+        }
+
+        if (configDir != null) {
+            LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
+        }
+        return configDir;
+    }
+
     /**
      * Throw and exception if the service is not working
      * 
@@ -1831,5 +1867,12 @@ public class CSWworker {
         if (mdReader != null) {
             mdReader.setLogLevel(logLevel);
         }
+    }
+
+    /**
+     * @param marshallerPool the marshallerPool to set
+     */
+    public void setMarshallerPool(MarshallerPool marshallerPool) {
+        this.marshallerPool = marshallerPool;
     }
 }

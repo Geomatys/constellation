@@ -159,7 +159,7 @@ public abstract class GenericReader  {
             //initialize the main statement
             if (queries.getMain() != null) {
                 final Query mainQuery = queries.getMain().getQuery();
-                mainStatement         = connection.prepareStatement(mainQuery.buildSQLQuery());
+                mainStatement         = connection.prepareStatement(mainQuery.buildSQLQuery(staticParameters));
             }
 
             // initialize the single statements

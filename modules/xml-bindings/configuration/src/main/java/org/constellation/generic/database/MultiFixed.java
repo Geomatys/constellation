@@ -51,6 +51,17 @@ public class MultiFixed {
             query = new ArrayList<Query>();
         return query;
     }
+
+    public Query getQueryByName(String name) {
+        if (query != null) {
+            for (Query q : query) {
+                if (name.equals(q.getName())) {
+                    return q;
+                }
+            }
+        }
+        return null;
+    }
     
     @Override
     public String toString() {

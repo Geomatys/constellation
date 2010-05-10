@@ -96,7 +96,7 @@ import static org.constellation.metadata.CSWConstants.*;
 @Singleton
 public class CSWService extends OGCWebService {
     
-    private CSWworker worker;
+    protected Map<String, CSWworker> workers;
 
     private final String serviceID;
     
@@ -112,21 +112,18 @@ public class CSWService extends OGCWebService {
      * used by subClasses.
      */
     protected CSWService(final String serviceID) {
+        this(null, serviceID);
+    }
+
+    /**
+     * Build a new Restfull CSW service.
+     * used by subClasses.
+     */
+    protected CSWService(final String serviceID, final Map<String, CSWworker> workers) {
         super(ServiceDef.CSW_2_0_2);
         this.serviceID = serviceID;
-        try {
-            Class[] classes = EBRIMClassesContext.getAllClasses();
-            classes = XArrays.resize(classes, classes.length + 1);
-            classes[classes.length - 1] = HarvestTasks.class;
-
-            setXMLContext("", classes);
-            worker = new CSWworker(serviceID, getMarshallerPool());
-
-        } catch (JAXBException ex){
-            LOGGER.severe("The CSW service is not running."       + '\n' +
-                          " cause  : Error creating XML context." + '\n' +
-                          " error  : " + ex.getMessage()          + '\n' +
-                          " details: " + ex.toString());
+        if (setClassesContext()) {
+            this.workers = workers;
         }
     }
 
@@ -134,23 +131,33 @@ public class CSWService extends OGCWebService {
      * Build a new Restfull CSW service.
      * used by subClasses.
      */
-    protected CSWService(final File configDirectory) {
+    protected CSWService(final File configDirectory, String serviceID) {
         super(ServiceDef.CSW_2_0_2);
-        this.serviceID = "";
+        this.serviceID = serviceID;
+        if (setClassesContext()) {
+            final CSWworker worker = new CSWworker(serviceID, getMarshallerPool(), configDirectory);
+            this.workers = new HashMap<String, CSWworker>();
+            workers.put(serviceID, worker);
+        }
+
+        
+    }
+
+    private boolean setClassesContext() {
         try {
             Class[] classes = EBRIMClassesContext.getAllClasses();
             classes = XArrays.resize(classes, classes.length + 1);
             classes[classes.length - 1] = HarvestTasks.class;
-            
-            setXMLContext("", classes);
-            worker = new CSWworker(serviceID, getMarshallerPool(), configDirectory);
 
+            setXMLContext("", classes);
+            return true;
         } catch (JAXBException ex){
             LOGGER.severe("The CSW service is not running."       + '\n' +
                           " cause  : Error creating XML context." + '\n' +
                           " error  : " + ex.getMessage()          + '\n' +
                           " details: " + ex.toString());
         }
+        return false;
     }
 
      /**
@@ -165,6 +172,11 @@ public class CSWService extends OGCWebService {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+        final CSWworker worker = workers.get(serviceID);
+        return treatIncomingRequest(objectRequest, worker);
+    }
+
+    protected Response treatIncomingRequest(Object objectRequest, CSWworker worker) throws JAXBException {
         Catching.Marshaller marshaller    = null;
         ServiceDef serviceDef           = null;
         final MarshallWarnings warnings = new MarshallWarnings();
@@ -173,24 +185,24 @@ public class CSWService extends OGCWebService {
             marshaller.setObjectConverters(warnings);
 
             if (worker != null) {
-            
+
                 worker.setServiceURL(getServiceURL());
                 logParameters();
                 String request = "";
-                
+
                 if (objectRequest instanceof JAXBElement) {
                     objectRequest = ((JAXBElement)objectRequest).getValue();
                 }
-                
+
                 // if the request is not an xml request we fill the request parameter.
                 if (objectRequest == null) {
                     request = (String) getParameter("REQUEST", true);
-                } 
+                }
 
                 if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
-                
+
                     GetCapabilities gc = (GetCapabilities)objectRequest;
-                
+
                     if (gc == null) {
                          /*
                           * if the parameters have been send by GET or POST kvp,
@@ -200,18 +212,18 @@ public class CSWService extends OGCWebService {
                     }
                     serviceDef = getVersionFromNumber(gc.getVersion().toString());
                     worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
-                
+
                     final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getCapabilities(gc), sw);
-        
+
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-                    
+
                 }
 
                 if (request.equalsIgnoreCase("GetRecords") || (objectRequest instanceof GetRecordsRequest)) {
-                
+
                     GetRecordsRequest gr = (GetRecordsRequest)objectRequest;
-                
+
                     if (gr == null) {
                         /*
                         * if the parameters have been send by GET or POST kvp,
@@ -222,15 +234,15 @@ public class CSWService extends OGCWebService {
                     serviceDef = getVersionFromNumber(gr.getVersion());
                     final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getRecords(gr), sw);
-        
+
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-                
+
                 }
 
                 if (request.equalsIgnoreCase("GetRecordById") || (objectRequest instanceof GetRecordById)) {
-                
+
                     GetRecordById grbi = (GetRecordById)objectRequest;
-                
+
                     if (grbi == null) {
                         /*
                         * if the parameters have been send by GET or POST kvp,
@@ -241,15 +253,15 @@ public class CSWService extends OGCWebService {
                     serviceDef = getVersionFromNumber(grbi.getVersion());
                     final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getRecordById(grbi), sw);
-        
+
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-                
+
                 }
 
                 if (request.equalsIgnoreCase("DescribeRecord") || (objectRequest instanceof DescribeRecord)) {
-                
+
                     DescribeRecord dr = (DescribeRecord)objectRequest;
-                
+
                     if (dr == null) {
                         /*
                          * if the parameters have been send by GET or POST kvp,
@@ -260,15 +272,15 @@ public class CSWService extends OGCWebService {
                     serviceDef = getVersionFromNumber(dr.getVersion());
                     final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.describeRecord(dr), sw);
-        
+
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-                
+
                 }
 
                 if (request.equalsIgnoreCase("GetDomain") || (objectRequest instanceof GetDomain)) {
-                
+
                     GetDomain gd = (GetDomain)objectRequest;
-                
+
                     if (gd == null) {
                         /*
                         * if the parameters have been send by GET or POST kvp,
@@ -278,18 +290,18 @@ public class CSWService extends OGCWebService {
                     }
                     serviceDef = getVersionFromNumber(gd.getVersion());
                     worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
-                    
+
                     final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.getDomain(gd), sw);
-        
+
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-                
+
                 }
 
                 if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof Transaction)) {
-                
+
                     final Transaction t = (Transaction)objectRequest;
-                
+
                     if (t == null) {
                          throw new CstlServiceException("The Operation transaction is not available in KVP",
                                                        OPERATION_NOT_SUPPORTED, "transaction");
@@ -297,15 +309,15 @@ public class CSWService extends OGCWebService {
                     serviceDef = getVersionFromNumber(t.getVersion());
                     final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.transaction(t), sw);
-        
+
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-                
+
                 }
 
                 if (request.equalsIgnoreCase("Harvest") || (objectRequest instanceof HarvestType)) {
-                
+
                     HarvestType h = (HarvestType)objectRequest;
-                
+
                     if (h == null) {
                         /*
                          * if the parameters have been send by GET or POST kvp,
@@ -316,9 +328,9 @@ public class CSWService extends OGCWebService {
                     serviceDef = getVersionFromNumber(h.getVersion());
                     final StringWriter sw = new StringWriter();
                     marshaller.marshal(worker.harvest(h), sw);
-        
+
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-                
+
                 }
 
                 if (request.equals("") && objectRequest != null) {
@@ -333,7 +345,7 @@ public class CSWService extends OGCWebService {
             } else {
                 throw new CstlServiceException("The CSW service is not running", NO_APPLICABLE_CODE);
             }
-        
+
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, serviceDef);
 
@@ -840,6 +852,7 @@ public class CSWService extends OGCWebService {
             id = '(' + serviceID + ')';
 
         LOGGER.info("Shutting down the REST CSW service facade " + id + '.');
+        CSWworker worker = workers.get(serviceID);
         if (worker != null) {
             worker.destroy();
         }
