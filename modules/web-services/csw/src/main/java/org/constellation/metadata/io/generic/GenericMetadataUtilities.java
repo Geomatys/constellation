@@ -143,7 +143,7 @@ public final class GenericMetadataUtilities {
                 i++;
             }
         }
-        LOGGER.severe("unable to parse the date: " + date);
+        LOGGER.warning("unable to parse the date: " + date);
         return null;
     }
 

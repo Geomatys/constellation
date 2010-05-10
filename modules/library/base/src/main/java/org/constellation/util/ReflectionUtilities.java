@@ -409,6 +409,10 @@ public final class ReflectionUtilities {
                    propertyName.equals("northBoundLatitude") || propertyName.equals("southBoundLatitude"))
                    && rootClass.getName().equals("org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription")) {
             return null;
+        // avoid unnecesary log flood
+        } else if ((propertyName.equals("accessConstraints"))
+                   && rootClass.getName().equals("org.geotoolkit.metadata.iso.constraint.DefaultConstraints")) {
+            return null;
         } else if (propertyName.equals("geographicIdentifier") && rootClass.getName().equals("org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox")) {
             return null;
         } else if (propertyName.equals("position") && (rootClass.getName().equals("org.geotoolkit.temporal.object.DefaultPeriod"))) {
