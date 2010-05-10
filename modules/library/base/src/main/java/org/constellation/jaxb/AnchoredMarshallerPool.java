@@ -35,6 +35,8 @@ public class AnchoredMarshallerPool extends MarshallerPool {
         super();
     }
 
+    private String schemaLocation = null;
+
     /**
      * Creates a new factory for the given class to be bound, with a default empty namespace.
      *
@@ -64,7 +66,8 @@ public class AnchoredMarshallerPool extends MarshallerPool {
      * @throws JAXBException    If the JAXB context can not be created.
      */
     public AnchoredMarshallerPool(final String rootNamespace, final String schemaLocation, final Class<?>... classesToBeBound) throws JAXBException {
-        super(getProperties(rootNamespace, schemaLocation), classesToBeBound);
+        super(getProperties(rootNamespace), classesToBeBound);
+        this.schemaLocation = schemaLocation;
     }
 
     /**
@@ -101,7 +104,8 @@ public class AnchoredMarshallerPool extends MarshallerPool {
      * @throws JAXBException    If the JAXB context can not be created.
      */
     public AnchoredMarshallerPool(final String rootNamespace, final String packages, final String schemaLocation) throws JAXBException {
-        super(getProperties(rootNamespace, schemaLocation), packages);
+        super(getProperties(rootNamespace), packages);
+        this.schemaLocation = schemaLocation;
     
     }
 
@@ -112,11 +116,17 @@ public class AnchoredMarshallerPool extends MarshallerPool {
      * @param schemaLocation The main xsd schema location for all the returned xml.
      * @return
      */
-    public static Map<String, String> getProperties(String rootNamespace, String schemaLocation) {
+    public static Map<String, String> getProperties(String rootNamespace) {
         final Map<String, String> properties = new HashMap<String, String>();
         properties.put(ROOT_NAMESPACE_KEY, rootNamespace);
-        properties.put(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
         return properties;
+    }
+
+    @Override
+    protected Marshaller createMarshaller() throws JAXBException {
+        final Marshaller marshaller = super.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
+        return marshaller;
     }
 
     @Override
