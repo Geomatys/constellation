@@ -852,8 +852,7 @@ public class CSWService extends OGCWebService {
             id = '(' + serviceID + ')';
 
         LOGGER.info("Shutting down the REST CSW service facade " + id + '.');
-        final CSWworker worker = workers.get(serviceID);
-        if (worker != null) {
+        for (final CSWworker worker : workers.values()) {
             worker.destroy();
         }
     }

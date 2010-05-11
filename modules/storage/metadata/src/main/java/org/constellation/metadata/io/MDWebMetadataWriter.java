@@ -107,6 +107,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     private Map<Object, Value> alreadyWrite;
 
     protected static final String UNKNOW_TITLE = "unknow title";
+
+    private boolean noLink = false;
     
     /**
      * Build a new metadata writer.
@@ -417,7 +419,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
         
         //we look if the object have been already write
-        final Value linkedValue = alreadyWrite.get(object);
+        final Value linkedValue;
+        if (isNoLink()) {
+            linkedValue = null;
+        } else {
+            linkedValue = alreadyWrite.get(object);
+        }
         
         // if its a primitive type we create a TextValue
         if (isPrimitive(classe) || classe.getName().equals("LocalName")) {
@@ -1119,6 +1126,20 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
         }
         return property;
+    }
+
+    /**
+     * @return the noLink
+     */
+    public boolean isNoLink() {
+        return noLink;
+    }
+
+    /**
+     * @param noLink the noLink to set
+     */
+    public void setNoLink(boolean noLink) {
+        this.noLink = noLink;
     }
 
     protected static final class MixedPath {
