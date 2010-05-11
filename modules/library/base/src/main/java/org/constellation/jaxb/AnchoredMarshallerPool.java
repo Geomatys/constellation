@@ -125,7 +125,9 @@ public class AnchoredMarshallerPool extends MarshallerPool {
     @Override
     protected Marshaller createMarshaller() throws JAXBException {
         final Marshaller marshaller = super.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
+        if (schemaLocation != null) {
+            marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
+        }
         return marshaller;
     }
 

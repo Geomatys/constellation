@@ -591,7 +591,7 @@ public class CSWworkerTest {
         /*
          *  TEST 5 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE 90008411%
          */
-        LOGGER.info("TEST - 5 begin");
+        LOGGER.finer("TEST - 5 begin");
         
         typeNames        = Arrays.asList(RECORD_QNAME);
         List<QName> cust = new ArrayList<QName>();
@@ -641,7 +641,7 @@ public class CSWworkerTest {
         assertEquals(expCustomResult1, customResult1);
         assertEquals(expCustomResult2, customResult2);
 
-        LOGGER.info("TEST - 5 end");
+        LOGGER.finer("TEST - 5 end");
 
         /*
          *  TEST 6 : getRecords with RESULTS - DC mode (Custom) - CQL text: Title LIKE 90008411%
@@ -1093,7 +1093,7 @@ public class CSWworkerTest {
     public void transactionDeleteTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
-        LOGGER.info("\n\n--- TRANSACTION DELETE TEST --- \n\n");
+        LOGGER.finer("\n\n--- TRANSACTION DELETE TEST --- \n\n");
         
         /*
          *  TEST 1 : we delete the metadata 42292_5p_19900609195600
@@ -1146,7 +1146,7 @@ public class CSWworkerTest {
      */
     public void transactionInsertTest() throws Exception {
 
-        LOGGER.info("\n\n--- TRANSACTION INSERT TEST --- \n\n");
+        LOGGER.finer("\n\n--- TRANSACTION INSERT TEST --- \n\n");
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         /*
@@ -1211,7 +1211,7 @@ public class CSWworkerTest {
     public void transactionUpdateTest() throws Exception {
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
-        LOGGER.info("\n\n--- TRANSACTION UPDATE TEST ---\n\n");
+        LOGGER.finer("\n\n--- TRANSACTION UPDATE TEST ---\n\n");
         /*
          *  TEST 1 : we update the metadata 42292_5p_19900609195600 by replacing it by another metadata
          */
