@@ -27,11 +27,10 @@ import org.geotoolkit.internal.sql.table.SingletonTable;
 
 // OpenGis dependencies
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
-import org.opengis.observation.Phenomenon;
 
 
 /**
- * Connexion vers la table des {@linkplain Phenomenon phénomènes}.
+ * Connexion to the phenomenon table.
  *
  * @version $Id$
  * @author Martin Desruisseaux

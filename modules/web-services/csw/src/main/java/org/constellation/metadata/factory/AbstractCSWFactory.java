@@ -38,10 +38,6 @@ import org.geotoolkit.lucene.index.AbstractIndexer;
  */
 public abstract class AbstractCSWFactory extends Factory {
 
-    public AbstractCSWFactory() {
-        super();
-    }
-    
     public abstract CSWMetadataReader getMetadataReader(Automatic configuration) throws MetadataIoException;
 
     public abstract CSWMetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer index) throws MetadataIoException;

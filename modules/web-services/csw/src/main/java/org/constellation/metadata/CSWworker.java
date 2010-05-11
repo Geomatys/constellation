@@ -656,7 +656,7 @@ public class CSWworker {
             
         c = new Capabilities(si, sp, om, CSW_202_VERSION, null, fc);
 
-        LOGGER.log(logLevel, "GetCapabilities request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "GetCapabilities request processed in " + (System.currentTimeMillis() - startTime) + MS);
         return c;
     }
     
@@ -938,7 +938,7 @@ public class CSWworker {
         }
         
         response = new GetRecordsResponseType(id, System.currentTimeMillis(), request.getVersion(), searchResults);
-        LOGGER.log(logLevel, "GetRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "GetRecords request processed in " + (System.currentTimeMillis() - startTime) + MS);
         return response;
     }
     
@@ -1200,7 +1200,7 @@ public class CSWworker {
             response = null;
         }
         
-        LOGGER.log(logLevel, "GetRecordById request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "GetRecordById request processed in " + (System.currentTimeMillis() - startTime) + MS);
         return response;
     }
     
@@ -1303,7 +1303,7 @@ public class CSWworker {
                 this.marshallerPool.release(unmarshaller);
             }
         }
-        LOGGER.log(logLevel, "DescribeRecords request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "DescribeRecords request processed in " + (System.currentTimeMillis() - startTime) + MS);
         return response;
     }
     
@@ -1389,7 +1389,7 @@ public class CSWworker {
             throw new CstlServiceException("One of propertyName or parameterName must be filled",
                                           MISSING_PARAMETER_VALUE, "parameterName, propertyName");
         }
-        LOGGER.log(logLevel, "GetDomain request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "GetDomain request processed in " + (System.currentTimeMillis() - startTime) + MS);
 
         return CswXmlFactory.getDomainResponse(actingVersion.version.toString(), responseList);
     }
@@ -1547,7 +1547,7 @@ public class CSWworker {
                                                                           totalDeleted,
                                                                           requestID);
         final TransactionResponseType response = new TransactionResponseType(summary, null, request.getVersion());
-        LOGGER.log(logLevel, "Transaction request processed in " + (System.currentTimeMillis() - startTime) + " ms");
+        LOGGER.log(logLevel, "Transaction request processed in " + (System.currentTimeMillis() - startTime) + MS);
         return response;
     }
     

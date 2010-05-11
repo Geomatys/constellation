@@ -90,7 +90,7 @@ public class Query {
      * @return
      */
     public List<String> getVarNames() {
-        List<String> varNames = new ArrayList<String>();
+        final List<String> varNames = new ArrayList<String>();
         if (select != null) {
             for (Column col : select.getCol()) {
                 varNames.add(col.getVar());

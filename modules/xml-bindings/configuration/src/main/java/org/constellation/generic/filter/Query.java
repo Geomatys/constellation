@@ -38,13 +38,9 @@ import org.constellation.generic.database.Static;
 @XmlType(name = "", propOrder = {
     "parameters",
     "statique",
-    "paramsSql",
     "select",
-    "nestedSelect",
     "from",
     "where",
-    "union",
-    "complement",
     "orderby",
     "groupby"
 })
@@ -62,17 +58,11 @@ public class Query {
 
     private Static statique;
 
-    @XmlElement(name = "params_sql")
-    private ParamsSql paramsSql;
     @XmlElement(required = true)
     private List<Select> select;
-    @XmlElement(name = "nested_select")
-    private List<NestedSelect> nestedSelect;
     @XmlElement(required = true)
     private List<From> from;
     private List<Where> where;
-    private List<Union> union;
-    private List<Complement> complement;
     private List<Orderby> orderby;
     private List<Groupby> groupby;
 
@@ -105,20 +95,6 @@ public class Query {
     }
 
     /**
-     * Gets the value of the paramsSql property.
-     */
-    public ParamsSql getParamsSql() {
-        return paramsSql;
-    }
-
-    /**
-     * Sets the value of the paramsSql property.
-     */
-    public void setParamsSql(ParamsSql value) {
-        this.paramsSql = value;
-    }
-
-    /**
      * Gets the value of the select property.
      */
     public List<Select> getSelect() {
@@ -142,16 +118,6 @@ public class Query {
 
     public void addSelect(Select select) {
         this.getSelect().add(select);
-    }
-
-    /**
-     * Gets the value of the nestedSelect property.
-     */
-    public List<NestedSelect> getNestedSelect() {
-        if (nestedSelect == null) {
-            nestedSelect = new ArrayList<NestedSelect>();
-        }
-        return this.nestedSelect;
     }
 
     /**
@@ -206,26 +172,6 @@ public class Query {
         this.getWhere().add(where);
     }
     
-    /**
-     * Gets the value of the union property.
-     */
-    public List<Union> getUnion() {
-        if (union == null) {
-            union = new ArrayList<Union>();
-        }
-        return this.union;
-    }
-
-    /**
-     * Gets the value of the complement property.
-     */
-    public List<Complement> getComplement() {
-        if (complement == null) {
-            complement = new ArrayList<Complement>();
-        }
-        return this.complement;
-    }
-
     /**
      * Gets the value of the orderby property.
      */
@@ -323,18 +269,6 @@ public class Query {
             }
             
         }
-        /*if (union != null) {
-            sb.append("UNION ");
-            for (Union s : union) {
-                sb.append(s).append(" ");
-            }
-        }
-        if (complement != null) {
-            sb.append("COMPLEMENT: ");
-            for (Complement s : complement) {
-                sb.append(s).append(" ");
-            }
-        }*/
         if (orderby != null) {
             sb.append(" ORDER BY ");
             for (Orderby s : orderby) {
@@ -357,18 +291,9 @@ public class Query {
         if (option != null) {
             sb.append(" option: ").append(option);
         }
-        if (paramsSql != null) {
-            sb.append("param SQL: ").append(paramsSql);
-        }
         if (select != null) {
             sb.append("SELECT: ");
             for (Select s : select) {
-                sb.append(s).append('\n');
-            }
-        }
-        if (nestedSelect != null) {
-            sb.append("NESTED SELECT: ");
-            for (NestedSelect s : nestedSelect) {
                 sb.append(s).append('\n');
             }
         }
@@ -381,18 +306,6 @@ public class Query {
         if (where != null) {
             sb.append("WHERE: ");
             for (Where s : where) {
-                sb.append(s).append('\n');
-            }
-        }
-        if (union != null) {
-            sb.append("UNION: ");
-            for (Union s : union) {
-                sb.append(s).append('\n');
-            }
-        }
-        if (complement != null) {
-            sb.append("COMPLEMENT: ");
-            for (Complement s : complement) {
                 sb.append(s).append('\n');
             }
         }

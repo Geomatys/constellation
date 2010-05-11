@@ -166,35 +166,25 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             }
 
             if (nameGetter != null) {
-                try {
-                    final Object objT = nameGetter.invoke(obj);
-                    if (objT instanceof String) {
-                        identifier = (String) obj;
-
-                    } else if (objT instanceof AbstractSimpleLiteral) {
-                        identifierSL = (AbstractSimpleLiteral) objT;
-                        if (identifierSL.getContent().size() > 0)
-                            identifier = identifierSL.getContent().get(0);
-                        else identifier = UNKNOW_IDENTIFIER;
-
+               
+                final Object objT = ReflectionUtilities.invokeMethod(obj, nameGetter);
+                if (objT instanceof String) {
+                    identifier = (String) obj;
+                } else if (objT instanceof AbstractSimpleLiteral) {
+                    identifierSL = (AbstractSimpleLiteral) objT;
+                    if (identifierSL.getContent().size() > 0) {
+                        identifier = identifierSL.getContent().get(0);
                     } else {
                         identifier = UNKNOW_IDENTIFIER;
                     }
+                } else {
+                    identifier = UNKNOW_IDENTIFIER;
+                }
 
-                    if (identifier == null)
-                        identifier = UNKNOW_IDENTIFIER;
-                } catch (IllegalAccessException ex) {
-                    LOGGER.warning("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' +
-                                  "cause: " + ex.getMessage());
-                } catch (IllegalArgumentException ex) {
-                    LOGGER.warning("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
-                                  "cause: " + ex.getMessage());
-                } catch (InvocationTargetException ex) {
-                    LOGGER.warning("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
-                                  "cause: " + ex.getMessage());
+                if (identifier == null) {
+                    identifier = UNKNOW_IDENTIFIER;
                 }
             }
-
             if (identifier.equals(UNKNOW_IDENTIFIER))
                 LOGGER.warning("unknow type: " + obj.getClass().getName() + " unable to find an identifier, using default then.");
         }
@@ -306,7 +296,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                     //Then we get the next Property name
                     
                     String propertyName = xpath.substring(0, xpath.indexOf('/'));
-                    int ordinal         = extractOrdinal(propertyName);
+                    final int ordinal         = extractOrdinal(propertyName);
                     if (propertyName.indexOf('[') != -1) {
                         propertyName = propertyName.substring(0, propertyName.indexOf('['));
                     }

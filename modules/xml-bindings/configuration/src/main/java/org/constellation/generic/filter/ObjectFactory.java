@@ -40,27 +40,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link In }
-     * 
-     */
-    public In createIn() {
-        return new In();
-    }
-
-    /**
      * Create an instance of {@link Where }
      * 
      */
     public Where createWhere() {
         return new Where();
-    }
-
-    /**
-     * Create an instance of {@link Link }
-     * 
-     */
-    public Link createLink() {
-        return new Link();
     }
 
     /**
@@ -72,30 +56,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link NestedSelect }
-     * 
-     */
-    public NestedSelect createNestedSelect() {
-        return new NestedSelect();
-    }
-
-    /**
-     * Create an instance of {@link Complement }
-     * 
-     */
-    public Complement createComplement() {
-        return new Complement();
-    }
-
-    /**
-     * Create an instance of {@link ParamsSql }
-     * 
-     */
-    public ParamsSql createParamsSql() {
-        return new ParamsSql();
-    }
-
-    /**
      * Create an instance of {@link Query }
      * 
      */
@@ -104,43 +64,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ParamSql }
-     * 
-     */
-    public ParamSql createParamSql() {
-        return new ParamSql();
-    }
-
-    /**
-     * Create an instance of {@link Union }
-     * 
-     */
-    public Union createUnion() {
-        return new Union();
-    }
-
-    /**
      * Create an instance of {@link Select }
      * 
      */
     public Select createSelect() {
         return new Select();
-    }
-
-    /**
-     * Create an instance of {@link Subselect }
-     * 
-     */
-    public Subselect createSubselect() {
-        return new Subselect();
-    }
-
-    /**
-     * Create an instance of {@link Subquery }
-     * 
-     */
-    public Subquery createSubquery() {
-        return new Subquery();
     }
 
     /**

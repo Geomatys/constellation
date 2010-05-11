@@ -19,7 +19,6 @@ package org.constellation.metadata.io.generic;
 
 // J2SE dependencies
 import java.io.File;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -229,7 +228,6 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * @param elementName A list of QName describing the requested fields. (implies type == null)
      * @return A metadata Object (dublin core Record / geotoolkit metadata)
      * 
-     * @throws java.sql.SQLException
      * @throws MetadataIoException
      */
     @Override
@@ -296,7 +294,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * Return all the entries from the database.
      * 
      * @return
-     * @throws java.sql.SQLException
+     * @throws MetadataIoException
      */
     @Override
     public List<DefaultMetadata> getAllEntries() throws MetadataIoException {

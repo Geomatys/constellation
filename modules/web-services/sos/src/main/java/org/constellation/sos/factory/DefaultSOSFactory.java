@@ -49,10 +49,6 @@ import org.constellation.ws.CstlServiceException;
  */
 public class DefaultSOSFactory extends AbstractSOSFactory {
 
-    public DefaultSOSFactory() {
-        super();
-    }
-
     @Override
     public ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
         if (type == null) {

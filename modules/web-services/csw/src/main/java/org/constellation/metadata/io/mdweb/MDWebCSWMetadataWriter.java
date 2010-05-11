@@ -17,7 +17,6 @@
 
 package org.constellation.metadata.io.mdweb;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.util.Collection;
@@ -28,6 +27,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.MDWebMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.util.ReflectionUtilities;
 
 import org.geotoolkit.csw.xml.Record;
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
@@ -266,37 +266,29 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
             }
 
             if (nameGetter != null) {
-                try {
-                    final Object objT = nameGetter.invoke(obj);
-                    if (objT instanceof String) {
-                        title = (String) obj;
+                final Object objT = ReflectionUtilities.invokeMethod(obj, nameGetter);
+                if (objT instanceof String) {
+                    title = (String) obj;
 
-                    } else if (objT instanceof AbstractSimpleLiteral) {
-                        titleSL = (AbstractSimpleLiteral) objT;
-                        if (titleSL.getContent().size() > 0)
-                            title = titleSL.getContent().get(0);
-                        else title = UNKNOW_TITLE;
-
+                } else if (objT instanceof AbstractSimpleLiteral) {
+                    titleSL = (AbstractSimpleLiteral) objT;
+                    if (titleSL.getContent().size() > 0) {
+                        title = titleSL.getContent().get(0);
                     } else {
                         title = UNKNOW_TITLE;
                     }
+                } else {
+                    title = UNKNOW_TITLE;
+                }
 
-                    if (title == null)
-                        title = UNKNOW_TITLE;
-                } catch (IllegalAccessException ex) {
-                    LOGGER.warning("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' +
-                                  "cause: " + ex.getMessage());
-                } catch (IllegalArgumentException ex) {
-                    LOGGER.warning("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
-                                  "cause: " + ex.getMessage());
-                } catch (InvocationTargetException ex) {
-                    LOGGER.warning("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
-                                  "cause: " + ex.getMessage());
+                if (title == null) {
+                    title = UNKNOW_TITLE;
                 }
             }
 
-            if (title.equals(UNKNOW_TITLE))
+            if (title.equals(UNKNOW_TITLE)) {
                 LOGGER.warning("unknow type: " + obj.getClass().getName() + " unable to find a title, using default then.");
+            }
         }
         return title;
     }

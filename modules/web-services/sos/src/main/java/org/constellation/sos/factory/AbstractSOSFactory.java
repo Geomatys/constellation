@@ -38,10 +38,6 @@ import org.geotoolkit.factory.Factory;
  */
 public abstract class AbstractSOSFactory extends Factory {
 
-    public AbstractSOSFactory() {
-        super();
-    }
-
     public abstract ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException;
 
     public abstract ObservationFilter cloneObservationFilter(ObservationFilter omFilter) throws CstlServiceException;

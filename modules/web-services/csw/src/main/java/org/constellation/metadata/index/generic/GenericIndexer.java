@@ -514,7 +514,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @return
      */
     private double[] extractPositions(final String coord) {
-        StringTokenizer tokens = new StringTokenizer(coord, ",;");
+        final StringTokenizer tokens = new StringTokenizer(coord, ",;");
         final double[] coordinate = new double[tokens.countTokens()];
         int i = 0;
         while (tokens.hasMoreTokens()) {

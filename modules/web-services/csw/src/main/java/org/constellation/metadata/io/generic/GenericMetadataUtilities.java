@@ -63,7 +63,7 @@ public final class GenericMetadataUtilities {
     /**
      * A debugging logger
      */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.ioc");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.io.generic");
 
     /**
      * Avoid the IllegalArgumentException when the variable value is null.
