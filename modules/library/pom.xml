@@ -68,7 +68,6 @@
   <!-- =========================================================== -->
   <modules>
     <module>base</module>
-    <!--module>postgrid-schema</module-->
   </modules>
 
 </project>
