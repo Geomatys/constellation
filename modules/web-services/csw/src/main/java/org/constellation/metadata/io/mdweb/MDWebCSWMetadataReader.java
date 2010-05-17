@@ -48,6 +48,7 @@ import org.geotoolkit.csw.xml.v202.BriefRecordType;
 import org.geotoolkit.csw.xml.v202.SummaryRecordType;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.util.StringUtilities;
 
@@ -232,6 +233,16 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                 } else {
                     LOGGER.finer("getting from cache: " + identifier);
                 }
+
+                if (mode == ISO_19115 && !(result instanceof DefaultMetadata)) {
+                    LOGGER.info("The metadata:" + identifier + " is not a iso type");
+                    return null;
+                }
+
+                /*if (mode == SENSORML && !(result instanceof AbstractSensorML)) {
+                    LOGGER.info("The metadata:" + identifier + " is not a SML type");
+                    return null;
+                }*/
 
                 result = applyElementSet(result, type, elementName);
 

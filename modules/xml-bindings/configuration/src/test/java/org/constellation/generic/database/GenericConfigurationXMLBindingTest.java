@@ -157,7 +157,7 @@ public class GenericConfigurationXMLBindingTest {
         marshaller.marshal(sosConfig, sw);
 
         result = sw.toString();
-        System.out.println("result:" + result);
+        //System.out.println("result:" + result);
         expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"            + '\n' +
         "<ns2:SOSConfiguration xmlns:ns2=\"http://www.constellation.org/config\">" + '\n' +

@@ -320,6 +320,7 @@ public class CSWworker {
             isStarted = false;
         } catch (IllegalArgumentException e) {
             LOGGER.warning(notWorkingMsg + "\nCause: IllegalArgumentException: " + e.getMessage());
+            LOGGER.log(Level.FINER, null, e);
             isStarted = false;
         }
     }
@@ -359,6 +360,7 @@ public class CSWworker {
             isStarted = false;
         } catch (IllegalArgumentException e) {
             LOGGER.warning(notWorkingMsg + "\nCause: IllegalArgumentException: " + e.getMessage());
+            LOGGER.log(Level.FINER, null, e);
             isStarted = false;
         }
     }
@@ -885,7 +887,7 @@ public class CSWworker {
                     if (obj == null && (max + 1) < results.size()) {
                         max++;
 
-                    } else {
+                    } else if (obj != null) {
                         if (mode == DUBLINCORE)
                             abstractRecords.add((AbstractRecordType)obj);
                         else
