@@ -104,9 +104,14 @@ public interface LayerDetails {
     GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException;
 
     /**
-     * @see Layer#getLegend(Dimension)
+     * Returns the legend graphic representation for the layer.
+     *
+     * @param dimension The dimension of the output legend graphic.
+     * @param template The legend template to apply for the legend response.
+     * @return A legend graphic for this data.
+     * @throws PortrayalException if an error occurs while trying to generate the legend graphic.
      */
-    BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template);
+    BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template) throws PortrayalException;
 
     /**
      * Returns the preferred size for the legend.

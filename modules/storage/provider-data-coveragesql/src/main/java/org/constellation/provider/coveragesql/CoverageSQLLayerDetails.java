@@ -240,7 +240,13 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template) {
+    public BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template)
+                                                                          throws PortrayalException
+    {
+        if (getFavoriteStyles().isEmpty()) {
+            throw new PortrayalException("Unable to get the list of favorites style to apply for the" +
+                    " getlegend graphic request.");
+        }
         final MutableStyle style = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
         try {
             final MapLayer layer = getMapLayer(style, null);

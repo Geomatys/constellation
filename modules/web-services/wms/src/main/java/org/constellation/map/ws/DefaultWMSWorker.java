@@ -665,7 +665,12 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             dims = null;
         }
         
-        final BufferedImage image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate());
+        final BufferedImage image;
+        try {
+            image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate());
+        } catch (PortrayalException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
         if (image == null) {
             throw new CstlServiceException("The requested layer \""+ layer.getName() +
                     "\" does not support GetLegendGraphic request",
