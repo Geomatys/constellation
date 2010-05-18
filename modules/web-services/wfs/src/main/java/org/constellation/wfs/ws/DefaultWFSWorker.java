@@ -508,7 +508,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     if (getUriContext() != null) {
                         String describeRequest = getUriContext().getBaseUri().toString() + "wfs?request=DescribeFeatureType&version=1.1.0&service=WFS";
                         describeRequest        = describeRequest + "&namespace=xmlns(" + prefix + "=" + namespace + ")";
-                        describeRequest        = describeRequest + "&Typename=" + prefix + ':' + typeName.getLocalPart() + "";
+                        describeRequest        = describeRequest + "&Typename=" + prefix + ':' + typeName.getLocalPart();
                         schemaLocations.put(namespace, describeRequest);
                     }
                 }

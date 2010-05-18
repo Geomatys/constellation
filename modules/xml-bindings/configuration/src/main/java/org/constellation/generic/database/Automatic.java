@@ -210,56 +210,6 @@ public class Automatic {
     public void setName(String name) {
         this.name = name;
     }
-    
-    @Override
-    public String toString() {
-        final StringBuilder s = new StringBuilder("[Automatic]");
-        if (name != null) {
-            s.append("name: ").append(name).append('\n');
-        }
-        if (format != null) {
-            s.append("format: ").append(format).append('\n');
-        }
-        if (bdd != null) {
-            s.append("BDD:").append(bdd).append('\n');
-        }
-        if (dataDirectory != null) {
-            s.append("dataDirectory:").append(dataDirectory).append('\n');
-        }
-        if (queries != null) {
-            s.append("queries ").append(": ").append(queries).append('\n');
-        }
-        return s.toString();
-    }
-    
-    /**
-     * Verify if this entry is identical to the specified object.
-     */
-    @Override
-    public boolean equals(final Object object) {
-        if (object == this) {
-            return true;
-        }
-        if (object instanceof Automatic) {
-            final Automatic that = (Automatic) object;
-
-            return Utilities.equals(this.bdd,      that.bdd)         &&
-                   Utilities.equals(this.name  ,   that.name) &&
-                   Utilities.equals(this.format  , that.format) &&
-                   Utilities.equals(this.queries,  that.queries);
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 37 * hash + (this.bdd != null ? this.bdd.hashCode() : 0);
-        hash = 37 * hash + (this.format != null ? this.format.hashCode() : 0);
-        hash = 37 * hash + (this.queries != null ? this.queries.hashCode() : 0);
-        hash = 37 * hash + (this.name != null ? this.name.hashCode() : 0);
-        return hash;
-    }
 
     /**
      * @return the enableThread
@@ -317,5 +267,89 @@ public class Automatic {
         this.defaultRecordSet = defaultRecordSet;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder s = new StringBuilder("[Automatic]");
+        if (name != null) {
+            s.append("name: ").append(name).append('\n');
+        }
+        if (format != null) {
+            s.append("format: ").append(format).append('\n');
+        }
+        if (bdd != null) {
+            s.append("BDD:").append(bdd).append('\n');
+        }
+        if (thesaurus != null) {
+            s.append("thesaurus:").append(thesaurus).append('\n');
+        }
+        if (dataDirectory != null) {
+            s.append("dataDirectory:").append(dataDirectory).append('\n');
+        }
+        if (configurationDirectory != null) {
+            s.append("configurationDirectory:").append(configurationDirectory).append('\n');
+        }
+        if (defaultRecordSet != null) {
+            s.append("defaultRecordSet:").append(defaultRecordSet).append('\n');
+        }
+        if (enableCache != null) {
+            s.append("enableCache:").append(enableCache).append('\n');
+        }
+        if (enableThread != null) {
+            s.append("enableThread:").append(enableThread).append('\n');
+        }
+        if (profile != null) {
+            s.append("profile:").append(profile).append('\n');
+        }
+        if (storeMapping != null) {
+            s.append("storeMapping:").append(storeMapping).append('\n');
+        }
+        if (queries != null) {
+            s.append("queries: ").append(queries).append('\n');
+        }
+        return s.toString();
+    }
+    
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof Automatic) {
+            final Automatic that = (Automatic) object;
+
+            return Utilities.equals(this.bdd,              that.bdd)              &&
+                   Utilities.equals(this.name  ,           that.name)             &&
+                   Utilities.equals(this.format  ,         that.format)           &&
+                   Utilities.equals(this.dataDirectory,    that.dataDirectory)    &&
+                   Utilities.equals(this.defaultRecordSet, that.defaultRecordSet) &&
+                   Utilities.equals(this.enableCache,      that.enableCache)      &&
+                   Utilities.equals(this.enableThread,     that.enableThread)     &&
+                   Utilities.equals(this.profile,          that.profile)          &&
+                   Utilities.equals(this.storeMapping,     that.storeMapping)     &&
+                   Utilities.equals(this.thesaurus,        that.thesaurus)        &&
+                   Utilities.equals(this.queries,          that.queries);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + (this.bdd != null ? this.bdd.hashCode() : 0);
+        hash = 37 * hash + (this.format != null ? this.format.hashCode() : 0);
+        hash = 37 * hash + (this.queries != null ? this.queries.hashCode() : 0);
+        hash = 37 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 37 * hash + (this.thesaurus != null ? this.thesaurus.hashCode() : 0);
+        hash = 37 * hash + (this.profile != null ? this.profile.hashCode() : 0);
+        hash = 37 * hash + (this.enableThread != null ? this.enableThread.hashCode() : 0);
+        hash = 37 * hash + (this.enableCache != null ? this.enableCache.hashCode() : 0);
+        hash = 37 * hash + (this.storeMapping != null ? this.storeMapping.hashCode() : 0);
+        hash = 37 * hash + (this.dataDirectory != null ? this.dataDirectory.hashCode() : 0);
+        hash = 37 * hash + (this.defaultRecordSet != null ? this.defaultRecordSet.hashCode() : 0);
+        return hash;
+    }
 
 }

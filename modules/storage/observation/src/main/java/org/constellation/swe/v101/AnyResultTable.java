@@ -97,7 +97,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                  references = getDatabase().getTable(ReferenceTable.class);
             }
             final ReferenceEntry ref = references.getEntry(idRef);
-            return new AnyResultEntry(results.getInt(indexOf(query.idResult)) + "", ref);
+            return new AnyResultEntry(Integer.toString(results.getInt(indexOf(query.idResult))), ref);
          } else {
 
             if(dataArrays == null) {
@@ -109,7 +109,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                                                       entry.getElementType(),
                                                       entry.getEncoding(),
                                                       results.getString(indexOf(query.values))); 
-            return new AnyResultEntry(results.getInt(indexOf(query.idResult)) + "", array);
+            return new AnyResultEntry(Integer.toString(results.getInt(indexOf(query.idResult))), array);
          }
     }
     

@@ -343,7 +343,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         final Document doc = new Document();
         try {
 
-            doc.add(new Field("id",        form.getId() + "",             Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("id",        Integer.toString(form.getId()),             Field.Store.YES, Field.Index.ANALYZED));
             doc.add(new Field("recordSet", form.getRecordSet().getCode() , Field.Store.YES, Field.Index.ANALYZED));
             doc.add(new Field("Title",     form.getTitle(),                Field.Store.YES, Field.Index.ANALYZED));
 

@@ -105,7 +105,7 @@ public class PeriodUtilities {
 
             if (previousGap != gap) {
                 if (nbDataInGap >= 2) {
-                    final String firstDate = dateFormat.format(first) + "";
+                    final String firstDate = dateFormat.format(first);
                     if (response.indexOf(firstDate + ',') != -1) {
                         final int pos = response.indexOf(firstDate);
                         response.delete(pos, pos + firstDate.length() + 1);
@@ -129,7 +129,7 @@ public class PeriodUtilities {
 
         if (nbDataInGap > 0) {
             if (nbDataInGap >= 2) {
-                final String firstDate = dateFormat.format(first) + "";
+                final String firstDate = dateFormat.format(first);
                 if (response.indexOf(firstDate + ',') != -1) {
                     final int pos = response.indexOf(firstDate);
                     response.delete(pos, pos + firstDate.length() + 1);

@@ -658,7 +658,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             final InternationalString is = (InternationalString) obj;
             result = is.toString();
         } else if (obj instanceof Double) {
-            result = obj + "";
+            result = obj.toString();
         } else if (obj instanceof java.util.Locale) {
             try {
                 result = ((java.util.Locale)obj).getISO3Language();

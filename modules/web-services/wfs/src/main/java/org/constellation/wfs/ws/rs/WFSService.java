@@ -540,7 +540,7 @@ public class WFSService extends OGCWebService {
             try {
                 maxFeature = Integer.parseInt(max);
             } catch (NumberFormatException ex) {
-                throw new CstlServiceException("Unable to parse the integer maxfeatures parameter" + max + "",
+                throw new CstlServiceException("Unable to parse the integer maxfeatures parameter" + max,
                                                   INVALID_PARAMETER_VALUE, "MaxFeatures");
             }
 

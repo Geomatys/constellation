@@ -473,7 +473,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     value = DATE_FORMAT.get(1).format(object);
                 }
             } else {
-                value = object + "";
+                value = object.toString();
             }
             
             final TextValue textValue = new TextValue(path, form , ordinal, value, classe, parentValue);

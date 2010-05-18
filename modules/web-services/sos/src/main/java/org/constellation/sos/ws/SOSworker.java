@@ -1634,7 +1634,7 @@ public class SOSworker {
             } 
 
             if (id.isEmpty()) {
-                num = smlWriter.getNewSensorId() + "";
+                num = Integer.toString(smlWriter.getNewSensorId());
                 id  = sensorIdBase + num;
             }
             

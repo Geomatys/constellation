@@ -333,7 +333,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                     } else {
                         String paramDesc = "null";
                         if (param != null) {
-                            paramDesc = param.getClass() + "";
+                            paramDesc = param.getClass().getName();
                         }
                         LOGGER.warning("No setter have been found for attribute " + qn.getLocalPart() +" of type " + paramDesc + " in the class " + recordClass);
                     }
