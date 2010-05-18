@@ -397,7 +397,7 @@ public abstract class WebService {
             return null;
         } else {
             final String value = values.get(0);
-            if ((value == null || value.equals("")) && mandatory) {
+            if ((value == null || value.isEmpty()) && mandatory) {
                 /* For the STYLE/STYLES parameters, they are mandatory in the GetMap request.
                  * Nevertheless we do not know what to put in for raster, that's why for these
                  * parameters we will just return the value, even if it is empty.

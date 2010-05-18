@@ -74,6 +74,8 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     private final File dataDirectory;
 
     private static final String UNKNOW_IDENTIFIER = "unknow_identifier";
+
+    private static final String IN_CLASS_MSG = " in the class:";
      
     /**
      * 
@@ -318,7 +320,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                     //we try to find a getter for this property
                     final Method getter = ReflectionUtilities.getGetterFromName(propertyName, parentClass);
                     if (getter == null) {
-                        throw new MetadataIoException("There is no getter for the property:" + propertyName + " in the class:" + type.getSimpleName(), INVALID_PARAMETER_VALUE);
+                        throw new MetadataIoException("There is no getter for the property:" + propertyName + IN_CLASS_MSG + type.getSimpleName(), INVALID_PARAMETER_VALUE);
                     } else {
                         // we execute the getter
                         if (!(parent instanceof Collection)) {
@@ -335,7 +337,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                     if (ordinal != -1) {
 
                         if (!(parent instanceof Collection)) {
-                            throw new MetadataIoException("The property:" + propertyName + " in the class:" + parentClass + " is not a collection", INVALID_PARAMETER_VALUE);
+                            throw new MetadataIoException("The property:" + propertyName + IN_CLASS_MSG + parentClass + " is not a collection", INVALID_PARAMETER_VALUE);
                         }
                         Object tmp = null;
                         for (Object child : (Collection) parent) {
@@ -444,17 +446,17 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         if (ordinal != -1) {
             final Method getter = ReflectionUtilities.getGetterFromName(propertyName, parent.getClass());
             if (getter == null) {
-                throw new MetadataIoException("There is no getter for the property:" + propertyName + " in the class:" + parent.getClass(), INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException("There is no getter for the property:" + propertyName + IN_CLASS_MSG + parent.getClass(), INVALID_PARAMETER_VALUE);
             }
             final Object existant = ReflectionUtilities.invokeMethod(parent, getter);
 
             if (!(existant instanceof Collection)) {
-                throw new MetadataIoException("The property:" + propertyName + " in the class:" + parent.getClass() + " is not a collection", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException("The property:" + propertyName + IN_CLASS_MSG + parent.getClass() + " is not a collection", INVALID_PARAMETER_VALUE);
             } 
 
             final Collection c = (Collection) existant;
             if (c.size() < ordinal) {
-                throw new MetadataIoException("The property:" + propertyName + " in the class:" + parent.getClass() + " got only" + c.size() + " elements", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException("The property:" + propertyName + IN_CLASS_MSG + parent.getClass() + " got only" + c.size() + " elements", INVALID_PARAMETER_VALUE);
             }
 
             if (parameterType.equals(String.class) && c.iterator().hasNext() && c.iterator().next() instanceof InternationalString) {
@@ -482,7 +484,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         }
 
         if (setter == null) {
-            throw new MetadataIoException("There is no setter for the property:" + propertyName + " in the class:" + parent.getClass(), INVALID_PARAMETER_VALUE);
+            throw new MetadataIoException("There is no setter for the property:" + propertyName + IN_CLASS_MSG + parent.getClass(), INVALID_PARAMETER_VALUE);
         } else {
             final String baseMessage = "Unable to invoke the method " + setter + ": ";
             try {

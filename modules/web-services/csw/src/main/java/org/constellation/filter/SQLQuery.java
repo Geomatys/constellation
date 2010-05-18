@@ -83,7 +83,7 @@ public class SQLQuery {
     @Override
     public String toString() {
         final StringBuilder s =new StringBuilder("[SQLquery]").append('\n');
-        if (query != null && !query.equals(""))
+        if (query != null && !query.isEmpty())
             s.append("query= ").append(query).append('\n');
         if (spatialFilter != null) {
             s.append("spatialFilter").append(spatialFilter).append('\n');

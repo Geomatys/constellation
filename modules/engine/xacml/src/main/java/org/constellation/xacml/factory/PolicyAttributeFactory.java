@@ -138,7 +138,7 @@ public final class PolicyAttributeFactory {
             final String id, final String dataType, final String issuer,
             final boolean mustBePresent, final String subjectCategory)
     {
-        AttributeDesignatorType adt = createAttributeDesignatorType(id, dataType, issuer, mustBePresent);
+        final AttributeDesignatorType adt = createAttributeDesignatorType(id, dataType, issuer, mustBePresent);
         final SubjectAttributeDesignatorType sadt = new SubjectAttributeDesignatorType(adt, subjectCategory);
                 
         return sadt;

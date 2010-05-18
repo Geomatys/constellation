@@ -158,7 +158,7 @@ public class LuceneFilterParser extends FilterParser {
                     writeOperator = false;
                 } else {
                         
-                    if (subQuery.equals("")) {
+                    if (subQuery.isEmpty()) {
                         writeOperator = false;
                     } else  {
                         queryBuilder.append(subQuery);
@@ -214,7 +214,7 @@ public class LuceneFilterParser extends FilterParser {
 
                 } else {
 
-                    if (!subQuery.equals("")) {
+                    if (!subQuery.isEmpty()) {
                         queryBuilder.append(subQuery);
                     }
                     if (subFilter != null) {
@@ -233,7 +233,7 @@ public class LuceneFilterParser extends FilterParser {
         final Filter spatialFilter  = getSpatialFilterFromList(logicalOperand, filters, query);
 
         // here the logical operand NOT is contained in the spatial filter
-        if (query.equals("") && logicalOperand == SerialChainFilter.NOT) {
+        if (query.isEmpty() && logicalOperand == SerialChainFilter.NOT) {
             logicalOperand = SerialChainFilter.AND;
         }
         final SpatialQuery response = new SpatialQuery(query, spatialFilter, logicalOperand);

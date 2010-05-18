@@ -39,15 +39,15 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
     /**
      * Record the date format in the metadata.
      */
-    protected final static List<DateFormat> DATE_FORMAT = new ArrayList<DateFormat>();
+    protected static final List<DateFormat> DATE_FORMAT = new ArrayList<DateFormat>();
     static {
         DATE_FORMAT.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
         DATE_FORMAT.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
     }
     
-    public final static int INSERTED = 0;
+    public static final int INSERTED = 0;
 
-    public final static int REPLACED = 1;
+    public static final int REPLACED = 1;
 
     /**
      * The default level for logging non essential informations (ToSee => finer)

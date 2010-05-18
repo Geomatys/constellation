@@ -561,14 +561,14 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 
                 if (conditionalAttribute == null) {
                     final String value = getValuesFromPath(pathID, metadata);
-                    if (value != null && !value.equals("") && !value.equals(NULL_VALUE))
+                    if (value != null && !value.isEmpty() && !value.equals(NULL_VALUE))
                         response.append(value).append(',');
                 } else {
                     response.append(getConditionalValuesFromPath(pathID, conditionalAttribute, conditionalValue, metadata)).append(',');
                 }
             }
         }
-        if (response.toString().equals("")) {
+        if (response.toString().isEmpty()) {
             response.append(NULL_VALUE);
         } else {
             // we remove the last ','
@@ -609,7 +609,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             }
             
             //for each part of the path we execute a (many) getter
-            while (!pathID.equals("")) {
+            while (!pathID.isEmpty()) {
                 String attributeName;
                 if (pathID.indexOf(':') != -1) {
                     attributeName = pathID.substring(0, pathID.indexOf(':'));
@@ -721,7 +721,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             pathID = pathID.substring(22);
             
             //for each part of the path we execute a (many) getter
-            while (!pathID.equals("")) {
+            while (!pathID.isEmpty()) {
                 String attributeName;
                 if (pathID.indexOf(':') != -1) {
                     attributeName = pathID.substring(0, pathID.indexOf(':'));
@@ -733,7 +733,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 
                 if (metadata instanceof Collection) {
                     final List<Object> tmp = new ArrayList<Object>();
-                    if (pathID.equals("")) {
+                    if (pathID.isEmpty()) {
                         for (Object subMeta: (Collection)metadata) {
                             if (matchCondition(subMeta, conditionalAttribute, conditionalValue)) {
                                 tmp.add(getAttributeValue(subMeta, attributeName));
@@ -756,7 +756,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     else metadata = tmp;
                     
                 } else {
-                    if (pathID.equals("")) {
+                    if (pathID.isEmpty()) {
                         if (matchCondition(metadata, conditionalAttribute, conditionalValue)) {
                             metadata = getAttributeValue(metadata, attributeName);
                         } else {

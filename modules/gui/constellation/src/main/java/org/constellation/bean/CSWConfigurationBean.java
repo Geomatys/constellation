@@ -35,7 +35,7 @@ public class CSWConfigurationBean extends ConfigurationBean {
 
     private String recordIdentifiers;
 
-    private final static String SYNCHRONE = "synchrone";
+    private static final String SYNCHRONE = "synchrone";
 
     public CSWConfigurationBean() {
         

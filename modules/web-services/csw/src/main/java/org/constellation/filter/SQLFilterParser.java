@@ -182,14 +182,14 @@ public class SQLFilterParser extends FilterParser {
                 final Filter subFilter = query.getSpatialFilter();
                     
                 //if the sub spatial query contains both term search and spatial search we create a subQuery 
-                if ((subFilter != null && !subQuery.equals("")) 
+                if ((subFilter != null && !subQuery.isEmpty())
                     || query.getSubQueries().size() != 0) {
                         
                     subQueries.add(query);
                     writeOperator = false;
                 } else {
                         
-                    if (subQuery.equals("")) {
+                    if (subQuery.isEmpty()) {
                         writeOperator = false;
                     } else  {
                         if (operator.equalsIgnoreCase("OR")) {
@@ -257,13 +257,13 @@ public class SQLFilterParser extends FilterParser {
                 final String subQuery  = sq.getQuery();
                 final Filter subFilter = sq.getSpatialFilter();
                     
-               /* if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.equals("")) ||
+               /* if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.isEmpty()) ||
                     (sq.getLogicalOperator() == SerialChainFilter.NOT)) {
                     subQueries.add(sq);
                    
                   } else {*/
 
-                if (!subQuery.equals("")) {
+                if (!subQuery.isEmpty()) {
                     queryBuilder.append(subQuery);
                 }
                 if (subFilter != null) {

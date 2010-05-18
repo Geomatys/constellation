@@ -419,7 +419,7 @@ public class WMSService extends GridWebService {
                     version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_J_V111 : KEY_J_V130);
         }
         final Integer featureCount;
-        if (strFeatureCount == null || strFeatureCount.equals("")) {
+        if (strFeatureCount == null || strFeatureCount.isEmpty()) {
             featureCount = null;
         } else {
             featureCount = RequestsUtilities.toInt(strFeatureCount);

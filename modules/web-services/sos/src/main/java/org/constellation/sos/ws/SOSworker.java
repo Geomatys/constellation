@@ -411,7 +411,7 @@ public class SOSworker {
             int h, m;
             try {
                 String validTime = configuration.getTemplateValidTime();
-                if (validTime == null || validTime.equals("") || validTime.indexOf(':') == -1) {
+                if (validTime == null || validTime.isEmpty() || validTime.indexOf(':') == -1) {
                     validTime = "1:00";
                     LOGGER.info("using default template valid time: one hour.\n");
                 }
@@ -1029,7 +1029,7 @@ public class SOSworker {
 
                 final String propertyName  = result.getPropertyIsLessThan().getPropertyName();
                 final LiteralType literal  = result.getPropertyIsLessThan().getLiteral() ;
-                if (literal == null || propertyName == null || propertyName.equals("")) {
+                if (literal == null || propertyName == null || propertyName.isEmpty()) {
                     throw new CstlServiceException(" to use the operation Less Than you must specify the propertyName and the litteral",
                                                   MISSING_PARAMETER_VALUE, "lessThan");
                 }
@@ -1039,7 +1039,7 @@ public class SOSworker {
 
                 final String propertyName  = result.getPropertyIsGreaterThan().getPropertyName();
                 final LiteralType literal  = result.getPropertyIsGreaterThan().getLiteral();
-                if (propertyName == null || propertyName.equals("") || literal == null) {
+                if (propertyName == null || propertyName.isEmpty() || literal == null) {
                     throw new CstlServiceException(" to use the operation Greater Than you must specify the propertyName and the litteral",
                                                  MISSING_PARAMETER_VALUE, "greaterThan");
                 }
@@ -1048,7 +1048,7 @@ public class SOSworker {
 
                 final String propertyName  = result.getPropertyIsEqualTo().getPropertyName();
                 final LiteralType literal  = result.getPropertyIsEqualTo().getLiteral();
-                if (propertyName == null || propertyName.equals("") || literal == null) {
+                if (propertyName == null || propertyName.isEmpty() || literal == null) {
                      throw new CstlServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
                                                    INVALID_PARAMETER_VALUE, "propertyIsEqualTo"); // cite test
                 }
@@ -1068,7 +1068,7 @@ public class SOSworker {
                 final LiteralType lowerLiteral  = result.getPropertyIsBetween().getLowerBoundary().getLiteral();
                 final LiteralType upperLiteral  = result.getPropertyIsBetween().getUpperBoundary().getLiteral();
 
-                if (propertyName == null || propertyName.equals("") || lowerLiteral == null || upperLiteral == null) {
+                if (propertyName == null || propertyName.isEmpty() || lowerLiteral == null || upperLiteral == null) {
                         throw new CstlServiceException("This property name, lower and upper literal must be specify",
                                                       INVALID_PARAMETER_VALUE, "result");
                 }
@@ -1633,7 +1633,7 @@ public class SOSworker {
                 }
             } 
 
-            if (id.equals("")) {
+            if (id.isEmpty()) {
                 num = smlWriter.getNewSensorId() + "";
                 id  = sensorIdBase + num;
             }
@@ -2151,7 +2151,7 @@ public class SOSworker {
      */
     private void initLogger(String id, String filePath) {
         try {
-            if (id != null && !id.equals("")) {
+            if (id != null && !id.isEmpty()) {
                 id = id + '-';
             }
             final FileHandler handler  = new FileHandler(filePath + '/'+ id + "cstl-sos.log");

@@ -47,7 +47,8 @@ public class BDD {
 
     public static final String POSTGRES_DRIVER_CLASS = "org.postgresql.Driver";
 
-    private final static Map<BDD, Connection> CONNECTION_MAP = new HashMap<BDD, Connection>();
+    private static final Map<BDD, Connection> CONNECTION_MAP = new HashMap<BDD, Connection>();
+    
     /**
      * The className of the driver
      */

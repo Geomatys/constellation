@@ -89,7 +89,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
         final OfferingPhenomenonQuery query = (OfferingPhenomenonQuery) super.query;
         PhenomenonEntry phenomenon;
         
-        if (!results.getString(indexOf(query.phenomenon)).equals("")) {
+        if (!results.getString(indexOf(query.phenomenon)).isEmpty()) {
             if (phenomenons == null) {
                 phenomenons = getDatabase().getTable(PhenomenonTable.class);
             }

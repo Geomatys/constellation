@@ -94,8 +94,9 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     /**
      * A date formatter used to display the Date object for dublin core translation.
      */
-    private final static DateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    private static final DateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
 
+    private static final String METAFILE_MSG = "The metadata file : ";
     /**
      * The directory containing the data XML files.
      */
@@ -183,7 +184,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 }
                 return metadata;
             } catch (JAXBException ex) {
-                throw new MetadataIoException("The metadataFile : " + identifier + ".xml can not be unmarshalled" + "\n" +
+                throw new MetadataIoException(METAFILE_MSG + identifier + ".xml can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             } finally {
                 if (unmarshaller != null) {
@@ -191,7 +192,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 }
             }
         } else {
-            throw new MetadataIoException("The metadataFile : " + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
+            throw new MetadataIoException(METAFILE_MSG + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
         }
     }
 
@@ -494,7 +495,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                         result.add(value);
                     }
                 } catch (JAXBException ex) {
-                    throw new MetadataIoException("The metadataFile : " + metadataFile.getName() + " can not be unmarshalled" + "\n" +
+                    throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
                             "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
                 }
             }
@@ -534,7 +535,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                     }
                     results.add(metadata);
                 } catch (JAXBException ex) {
-                    throw new MetadataIoException("The metadataFile : " + f.getPath() + " can not be unmarshalled" + "\n" +
+                    throw new MetadataIoException(METAFILE_MSG + f.getPath() + " can not be unmarshalled" + "\n" +
                             "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
                 } finally {
                     if (unmarshaller != null) {
@@ -542,7 +543,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                     }
                 }
             } else {
-                throw new MetadataIoException("The metadataFile : " + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
             }
         }
         return results;
@@ -556,7 +557,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 final String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
                 results.add(identifier);
             } else {
-                throw new MetadataIoException("The metadataFile : " + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
             }
         }
         return results;

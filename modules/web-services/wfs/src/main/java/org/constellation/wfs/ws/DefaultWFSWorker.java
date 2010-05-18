@@ -952,7 +952,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     private void verifyBaseRequest(final RequestBase request, boolean versionMandatory, boolean getCapabilities) throws CstlServiceException {
         if (request != null) {
             if (request.getService() != null) {
-                if (request.getService().equals("")) {
+                if (request.getService().isEmpty()) {
                   // we let pass (CITE test)
                 } else if (!request.getService().equalsIgnoreCase("WFS"))  {
                     throw new CstlServiceException("service must be \"WFS\"!",
@@ -964,7 +964,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             }
             if (request.getVersion() != null) {
                 if (request.getVersion().toString().equals("1.1.0") || request.getVersion().toString().equals("1.1") || 
-                        request.getVersion().toString().equals("")  || request.getVersion().toString().equals("1.0.0") ) { // hack for openScale accept 1.0.0
+                        request.getVersion().toString().isEmpty()  || request.getVersion().toString().equals("1.0.0") ) { // hack for openScale accept 1.0.0
                     this.actingVersion = ServiceDef.WFS_1_1_0;
 
                 } else {

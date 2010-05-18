@@ -235,7 +235,7 @@ public class PEP {
     * @throws Exception
     */
    public int getDecision(RequestContext request) {
-      ResponseContext response = pdp.evaluate(request);
+      final ResponseContext response = pdp.evaluate(request);
       return response.getDecision();
    }
 }

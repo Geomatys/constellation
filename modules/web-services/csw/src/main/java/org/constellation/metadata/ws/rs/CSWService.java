@@ -333,9 +333,9 @@ public class CSWService extends OGCWebService {
 
                 }
 
-                if (request.equals("") && objectRequest != null) {
+                if (request.isEmpty() && objectRequest != null) {
                     request = objectRequest.getClass().getName();
-                } else if (request.equals("") && objectRequest == null) {
+                } else if (request.isEmpty() && objectRequest == null) {
                     request = "undefined request";
                 }
 
@@ -848,7 +848,7 @@ public class CSWService extends OGCWebService {
     @Override
     public void destroy() {
         String id = "";
-        if (serviceID != null && !serviceID.equals(""))
+        if (serviceID != null && !serviceID.isEmpty())
             id = '(' + serviceID + ')';
 
         LOGGER.info("Shutting down the REST CSW service facade " + id + '.');

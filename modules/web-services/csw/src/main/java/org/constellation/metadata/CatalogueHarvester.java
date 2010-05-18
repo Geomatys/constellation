@@ -528,7 +528,7 @@ public class CatalogueHarvester {
                 final List<String> availableOutputSchema = StringUtilities.cleanStrings(outputDomain.getValue());
                 final String defaultValue                = outputDomain.getDefaultValue();
                 
-                if (defaultValue != null && !defaultValue.equals("") && !availableOutputSchema.contains(defaultValue))
+                if (defaultValue != null && !defaultValue.isEmpty() && !availableOutputSchema.contains(defaultValue))
                     availableOutputSchema.add(defaultValue);
                 
                 
@@ -573,7 +573,7 @@ public class CatalogueHarvester {
                 final List<String> typeNames  = typeNameDomain.getValue();
                 
                 final String defaultValue = typeNameDomain.getDefaultValue();
-                if (defaultValue != null && !defaultValue.equals(""))
+                if (defaultValue != null && !defaultValue.isEmpty())
                     typeNames.add(defaultValue);
                 
                 report.append("TypeNames supported:").append('\n');

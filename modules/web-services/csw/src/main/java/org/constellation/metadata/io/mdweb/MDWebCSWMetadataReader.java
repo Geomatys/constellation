@@ -443,7 +443,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         for (Value v: topicCategoriesValues) {
             if (v instanceof TextValue) {
                 final String value = ((TextValue)v).getValue();
-                if (value == null || value.equals("")) {
+                if (value == null || value.isEmpty()) {
                     continue;
                 }
                 if (v.getType() instanceof org.mdweb.model.schemas.CodeList) {

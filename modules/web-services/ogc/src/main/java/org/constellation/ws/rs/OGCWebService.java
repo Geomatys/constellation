@@ -334,7 +334,7 @@ public abstract class OGCWebService extends AbstractWebService {
             }
         }
         final ServiceDef firstSpecifiedVersion = supportedVersions.get(0);
-        if (number == null || number.equals("")) {
+        if (number == null || number.isEmpty()) {
             return firstSpecifiedVersion;
         }
         final ServiceDef.Version wrongVersion = new ServiceDef.Version(number);

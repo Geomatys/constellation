@@ -210,7 +210,7 @@ public class Query {
         }
 
         final String varBegin = ":${";
-        if (where != null && where.size() > 0 && where.get(0) != null && !where.get(0).getvalue().equals("")) {
+        if (where != null && where.size() > 0 && where.get(0) != null && !where.get(0).getvalue().isEmpty()) {
             String sql = where.get(0).getvalue();
             while (sql.indexOf(varBegin) != -1 && sql.indexOf('}') != -1) {
                 final String paramName   = sql.substring(sql.indexOf(varBegin) + 3, sql.indexOf('}'));
@@ -228,7 +228,7 @@ public class Query {
             sql = sql.replace(":$", "?");
             mainQuery.append(" WHERE ").append(sql);
         }
-        if (orderBy != null && orderBy.size() > 0 && orderBy.get(0) != null && !orderBy.get(0).getvalue().equals("")) {
+        if (orderBy != null && orderBy.size() > 0 && orderBy.get(0) != null && !orderBy.get(0).getvalue().isEmpty()) {
             String sql = orderBy.get(0).getvalue();
             sql = sql.replace("':$'", "?");
             mainQuery.append(" ORDER BY ").append(sql);

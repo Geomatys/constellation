@@ -75,7 +75,7 @@ public class CstlXACMLPolicy implements XACMLPolicy {
      */
     public CstlXACMLPolicy(final InputStream is, final int type, final PolicyFinder theFinder) throws IOException, SAXException {
         final AbstractPolicy policy;
-        XACMLPolicyUtil policyUtil = new XACMLPolicyUtil();
+        final XACMLPolicyUtil policyUtil = new XACMLPolicyUtil();
         policyType = type;
         if (type == XACMLPolicy.POLICYSET) {
             policy = policyUtil.createPolicySet(is, (theFinder != null) ? theFinder : finder);

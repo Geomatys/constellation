@@ -1221,7 +1221,7 @@ public class CSWworker {
         if (value.lastIndexOf(',') != -1) {
             value = value.substring(0, identifiers.length() - 1);
         }
-        if (value.equals("")) {
+        if (value.isEmpty()) {
             throw new CstlServiceException("The record does not correspound to the specified outputSchema.",
                                              INVALID_PARAMETER_VALUE, OUTPUT_SCHEMA);
         } else {
@@ -1779,7 +1779,7 @@ public class CSWworker {
      */
     private void initLogger(String id, String filePath) {
         try {
-            if (id != null && !id.equals("")) {
+            if (id != null && !id.isEmpty()) {
                 id = id + '-';
             }
             final FileHandler handler = new FileHandler(filePath + '/'+ id + "cstl-csw.log");
