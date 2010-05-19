@@ -20,10 +20,12 @@ package org.constellation.wfs;
 import com.vividsolutions.jts.geom.Geometry;
 import java.io.File;
 import java.io.InputStream;
+import java.io.StringWriter;
 
 import java.sql.Connection;
 import org.constellation.util.Util;
 import org.constellation.wfs.utils.PostgisUtils;
+import org.constellation.wfs.utils.GlobalUtils;
 
 import org.geotoolkit.data.DataUtilities;
 import org.geotoolkit.data.FeatureReader;
@@ -41,10 +43,10 @@ import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
 
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.FeatureType;
 
 import org.junit.*;
+import org.opengis.feature.Feature;
 import static org.junit.Assert.*;
 
 /**
@@ -118,13 +120,15 @@ public class StreamOMFeatureXmlBindingTest {
     @Test
     public void featureMarshallTest() throws Exception {
         FeatureIterator ite = fcoll.iterator();
-        SimpleFeature feature = null;
+        Feature feature = null;
         if (ite.hasNext()) {
-            feature = (SimpleFeature) ite.next();
+            feature = ite.next();
         }
         ite.close();
 
-        String result = featureWriter.write(feature);
+        StringWriter writer = new StringWriter();
+        featureWriter.write(feature,writer);
+        String result = writer.toString();
 
         String expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPoint-1.xml"));
 
@@ -133,8 +137,8 @@ public class StreamOMFeatureXmlBindingTest {
         expresult = expresult.replaceAll("> *<", "><");
         expresult = expresult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
 
-        expresult = removeXmlns(expresult);
-        result    = removeXmlns(result);
+        expresult = GlobalUtils.removeXmlns(expresult);
+        result    = GlobalUtils.removeXmlns(result);
         
         assertEquals(expresult, result);
     }
@@ -145,7 +149,9 @@ public class StreamOMFeatureXmlBindingTest {
      */
     @Test
     public void featureCollectionMarshallTest() throws Exception {
-        String result = featureWriter.write(fcoll);
+        StringWriter writer = new StringWriter();
+        featureWriter.write(fcoll,writer);
+        String result = writer.toString();
 
         String expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection.xml"));
 
@@ -154,8 +160,8 @@ public class StreamOMFeatureXmlBindingTest {
         expresult = expresult.replaceAll("> *<", "><");
         expresult = expresult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
 
-        expresult = removeXmlns(expresult);
-        result    = removeXmlns(result);
+        expresult = GlobalUtils.removeXmlns(expresult);
+        result    = GlobalUtils.removeXmlns(result);
         
         // and we replace the space for the specified data
         assertEquals(expresult, result);
@@ -163,23 +169,22 @@ public class StreamOMFeatureXmlBindingTest {
 
     /**
      * test the feature unmarshall
-     *
      */
     @Test
     public void featureUnMarshallTest() throws Exception {
 
         FeatureIterator ite = fcoll.iterator();
-        SimpleFeature expResult = null;
+        Feature expResult = null;
         if (ite.hasNext()) {
-            expResult = (SimpleFeature) ite.next();
+            expResult = ite.next();
         }
         ite.close();
 
         InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/samplingPoint-1.xml");
-        SimpleFeature result = (SimpleFeature) featureReader.read(stream);
+        Feature result = (Feature) featureReader.read(stream);
         assertTrue(result != null);
         
-        featureEquals(expResult, result);
+        GlobalUtils.featureEquals(expResult, result);
     }
 
     /**
@@ -200,12 +205,10 @@ public class StreamOMFeatureXmlBindingTest {
 
         FeatureIterator expIterator = fcoll.iterator();
         FeatureIterator resIterator = result.iterator();
-        SimpleFeature temp          = null;
         while (expIterator.hasNext()) {
-            SimpleFeature expFeature = (SimpleFeature)expIterator.next();
-            SimpleFeature resFeature = (SimpleFeature)resIterator.next();
-
-            featureEquals(expFeature, resFeature);
+            Feature expFeature = expIterator.next();
+            Feature resFeature = resIterator.next();
+            GlobalUtils.featureEquals(expFeature, resFeature);
         }
         expIterator.close();
         resIterator.close();
@@ -235,42 +238,9 @@ public class StreamOMFeatureXmlBindingTest {
         String expResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org/constellation/wfs/xsd/sampling.xsd"));
         String result    = featureTypeWriter.write(featureType);
 
-        expResult = removeXmlns(expResult);
-        result    = removeXmlns(result);
+        expResult = GlobalUtils.removeXmlns(expResult);
+        result    = GlobalUtils.removeXmlns(result);
         assertEquals(expResult, result);
     }
 
-
-    public void featureEquals(SimpleFeature expResult, SimpleFeature result) {
-        assertEquals(expResult.getIdentifier(), result.getIdentifier());
-        assertEquals(expResult.getID(), result.getID());
-
-
-        assertEquals(expResult.getFeatureType(), result.getFeatureType());
-        assertEquals(expResult.getAttributeCount(), result.getAttributeCount());
-
-        for (int j = 0; j < expResult.getAttributeCount(); j++) {
-            if (expResult.getAttributes().get(j) instanceof Geometry) {
-                assertTrue(((Geometry) expResult.getAttributes().get(j)).equals((Geometry) result.getAttributes().get(j)));
-            } else {
-                assertEquals(expResult.getAttributes().get(j), result.getAttributes().get(j));
-            }
-        }
-        assertEquals(expResult, result);
-    }
-
-    public String removeXmlns(String xml) {
-
-        String s = xml;
-        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
-
-        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
-
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
-
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
-
-
-        return s;
-    }
 }

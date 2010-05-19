@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 // JAXB dependencies
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.JAXBElement;
@@ -52,6 +53,7 @@ import javax.ws.rs.core.Response;
 // constellation dependencies
 import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.ValidationEvent;
+import javax.xml.stream.XMLStreamException;
 import org.constellation.ServiceDef;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
@@ -322,7 +324,11 @@ public class WFSService extends OGCWebService {
                     try {
                         final XmlFeatureReader featureReader = new JAXPStreamFeatureReader(worker.getFeatureTypes());
                         if (xml.contains("<wfs:Transaction")) {
-                            featuresToInsert =  featureReader.read(xml);
+                            try {
+                                featuresToInsert = featureReader.read(xml);
+                            } catch (XMLStreamException ex) {
+                                Logger.getLogger(WFSService.class.getName()).log(Level.WARNING, null, ex);
+                            }
                         }
                         worker.setprefixMapping(featureReader.extractNamespace(xml));
                     } catch (IllegalArgumentException ex) {

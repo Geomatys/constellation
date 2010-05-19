@@ -82,7 +82,7 @@ public class PostgisUtils {
        return null;
    }
 
-    public static FeatureReader createEmbeddedSMLLayer(String url, Name featureType) throws DataStoreException {
+    public static FeatureCollection createEmbeddedSMLLayer(String url, Name featureType) throws DataStoreException {
 
        final Map params = new HashMap<String, Object>();
 
@@ -91,10 +91,7 @@ public class PostgisUtils {
        params.put(SMLDataStoreFactory.DERBYURL.getName().toString(), url);
 
        final DataStore store = DataStoreFinder.getDataStore(params);
-       if (store != null) {
-            return store.getFeatureReader(QueryBuilder.all(featureType));
-       }
-       return null;
+       return store.createSession(false).getFeatureCollection(QueryBuilder.all(featureType));
    }
 
     /*public static FeatureSource createPostGISLayer(String host, int port, String schema, String databaseName, String user, String pass, String featureSource) throws IOException{

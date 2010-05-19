@@ -14,20 +14,17 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.wfs;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.sql.Connection;
 
 import org.constellation.util.Util;
 import org.constellation.wfs.utils.PostgisUtils;
+import org.constellation.wfs.utils.GlobalUtils;
 
-import org.geotoolkit.data.DataUtilities;
-import org.geotoolkit.data.FeatureReader;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.feature.DefaultName;
@@ -43,11 +40,9 @@ import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
 
 import org.opengis.feature.type.FeatureType;
-import org.opengis.feature.simple.SimpleFeature;
 
 import org.junit.*;
-import org.opengis.feature.type.Name;
-import org.opengis.feature.type.PropertyDescriptor;
+import org.opengis.feature.Feature;
 import static org.junit.Assert.*;
 
 /**
@@ -57,17 +52,11 @@ import static org.junit.Assert.*;
 public class SMLFeatureXmlBindingTest {
 
     private static DefaultDataSource ds = null;
-
     private static FeatureCollection fcoll;
-
     private XmlFeatureWriter featureWriter;
-
     private XmlFeatureReader featureReader;
-
     private XmlFeatureTypeReader featureTypeReader;
-
     private XmlFeatureTypeWriter featureTypeWriter;
-
     private static FeatureType featureType;
 
     @BeforeClass
@@ -75,7 +64,7 @@ public class SMLFeatureXmlBindingTest {
         final String url = "jdbc:derby:memory:TestSML;create=true";
         ds = new DefaultDataSource(url);
 
-        Connection con = ds.getConnection();
+        final Connection con = ds.getConnection();
 
         Util.executeSQLScript("org/constellation/sql/structure-mdweb.sql", con);
         Util.executeSQLScript("org/constellation/sql/mdweb-base-data.sql", con);
@@ -84,15 +73,8 @@ public class SMLFeatureXmlBindingTest {
         Util.executeSQLScript("org/constellation/sql/sml-schema.sql", con);
         Util.executeSQLScript("org/constellation/sql/sml-data.sql", con);
 
-        FeatureReader fr = PostgisUtils.createEmbeddedSMLLayer(url, new DefaultName("http://www.opengis.net/sml/1.0", "System"));
-        featureType      = fr.getFeatureType();
-        if (featureType == null)
-            System.out.println("WARNING: The featureType is null");
-        fcoll            = DataUtilities.collection("id", featureType);
-        while (fr.hasNext()) {
-            fcoll.add(fr.next());
-        }
-        fr.close();
+        fcoll = PostgisUtils.createEmbeddedSMLLayer(url, new DefaultName("http://www.opengis.net/sml/1.0", "System"));
+        featureType = fcoll.getFeatureType();
     }
 
     @AfterClass
@@ -106,12 +88,10 @@ public class SMLFeatureXmlBindingTest {
         }
     }
 
-
-
     @Before
     public void setUp() throws Exception {
-        featureWriter     = new JAXPStreamFeatureWriter();
-        featureReader     = new JAXPStreamFeatureReader(featureType);
+        featureWriter = new JAXPStreamFeatureWriter();
+        featureReader = new JAXPStreamFeatureReader(featureType);
         featureTypeReader = new JAXBFeatureTypeReader();
         featureTypeWriter = new JAXBFeatureTypeWriter();
     }
@@ -126,23 +106,25 @@ public class SMLFeatureXmlBindingTest {
      */
     @Test
     public void featureMarshallTest() throws Exception {
-        FeatureIterator ite = fcoll.iterator();
-        SimpleFeature feature = null;
+        final FeatureIterator ite = fcoll.iterator();
+        Feature feature = null;
         if (ite.hasNext()) {
-            feature = (SimpleFeature) ite.next();
+            feature = ite.next();
         }
         ite.close();
 
-        String result = featureWriter.write(feature);
-
+        StringWriter writer = new StringWriter();
+        featureWriter.write(feature, writer);
+        String result = writer.toString();
+        
         String expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.system-1.xml"));
 
         //we unformat the expected result
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
 
-        expresult = removeXmlns(expresult);
-        result    = removeXmlns(result);
+        expresult = GlobalUtils.removeXmlns(expresult);
+        result = GlobalUtils.removeXmlns(result);
 
         assertEquals(expresult, result);
     }
@@ -153,7 +135,9 @@ public class SMLFeatureXmlBindingTest {
      */
     @Test
     public void featureCollectionMarshallTest() throws Exception {
-        String result = featureWriter.write(fcoll);
+        StringWriter writer = new StringWriter();
+        featureWriter.write(fcoll, writer);
+        String result = writer.toString();
 
         String expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"));
 
@@ -161,9 +145,9 @@ public class SMLFeatureXmlBindingTest {
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
 
-        expresult = removeXmlns(expresult);
-        result    = removeXmlns(result);
-        
+        expresult = GlobalUtils.removeXmlns(expresult);
+        result = GlobalUtils.removeXmlns(result);
+
         // and we replace the space for the specified data
         assertEquals(expresult, result);
     }
@@ -176,17 +160,17 @@ public class SMLFeatureXmlBindingTest {
     public void featureUnMarshallTest() throws Exception {
 
         FeatureIterator ite = fcoll.iterator();
-        SimpleFeature expResult = null;
+        Feature expResult = null;
         if (ite.hasNext()) {
-            expResult = (SimpleFeature) ite.next();
+            expResult = ite.next();
         }
         ite.close();
 
         InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/system-1.xml");
-        SimpleFeature result = (SimpleFeature) featureReader.read(stream);
+        Feature result = (Feature) featureReader.read(stream);
         assertTrue(result != null);
 
-        featureEquals(expResult, result);
+        GlobalUtils.featureEquals(expResult, result);
     }
 
     /**
@@ -207,12 +191,12 @@ public class SMLFeatureXmlBindingTest {
 
         FeatureIterator expIterator = fcoll.iterator();
         FeatureIterator resIterator = result.iterator();
-        SimpleFeature temp          = null;
+        Feature temp = null;
         while (expIterator.hasNext()) {
-            SimpleFeature expFeature = (SimpleFeature)expIterator.next();
-            SimpleFeature resFeature = (SimpleFeature)resIterator.next();
+            Feature expFeature = (Feature) expIterator.next();
+            Feature resFeature = (Feature) resIterator.next();
 
-            featureEquals(expFeature, resFeature);
+            GlobalUtils.featureEquals(expFeature, resFeature);
         }
         expIterator.close();
         resIterator.close();
@@ -227,62 +211,23 @@ public class SMLFeatureXmlBindingTest {
     public void featuretypeUnMarshallTest() throws Exception {
 
         InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xsd/system.xsd");
-        FeatureType result  = featureTypeReader.read(stream, "SamplingPoint");
+        FeatureType result = featureTypeReader.read(stream, "SamplingPoint");
 
 //        assertEquals(featureType, result);
 
     }
 
-     /**
+    /**
      * test the feature unmarshall
      *
      */
     @Test
     public void featuretypeMarshallTest() throws Exception {
         String expResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org/constellation/wfs/xsd/system.xsd"));
-        String result    = featureTypeWriter.write(featureType);
+        String result = featureTypeWriter.write(featureType);
 
-        expResult = removeXmlns(expResult);
-        result    = removeXmlns(result);
+        expResult = GlobalUtils.removeXmlns(expResult);
+        result = GlobalUtils.removeXmlns(result);
         assertEquals(expResult, result);
-    }
-
-
-    public void featureEquals(SimpleFeature expResult, SimpleFeature result) {
-        assertEquals(expResult.getIdentifier(), result.getIdentifier());
-        assertEquals(expResult.getID(), result.getID());
-
-
-        assertEquals(expResult.getFeatureType(), result.getFeatureType());
-        assertEquals(expResult.getAttributeCount(), result.getAttributeCount());
-
-        PropertyDescriptor[] descriptors = featureType.getDescriptors().toArray(new PropertyDescriptor[featureType.getDescriptors().size()]);
-
-        for (int j = 0; j < expResult.getAttributeCount(); j++) {
-            if (expResult.getAttributes().get(j) instanceof Geometry) {
-                assertTrue(((Geometry) expResult.getAttributes().get(j)).equals((Geometry) result.getAttributes().get(j)));
-            } else {
-
-                Name n = descriptors[j].getName();
-                assertEquals("attribute:" + n + " exp value:" + expResult.getAttributes().get(j) + " res value:" + result.getAttributes().get(j),
-                             expResult.getAttributes().get(j), result.getAttributes().get(j));
-            }
-        }
-        assertEquals(expResult, result);
-    }
-
-    public String removeXmlns(String xml) {
-
-        String s = xml;
-        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
-
-        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
-
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
-
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
-
-
-        return s;
     }
 }

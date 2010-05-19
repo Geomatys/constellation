@@ -98,8 +98,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
 import org.opengis.feature.Feature;
-import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
@@ -205,9 +203,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 final LayerDetails layer = namedProxy.get(layerName);
                 if (layer instanceof FeatureLayerDetails){
                     final FeatureLayerDetails fld = (FeatureLayerDetails) layer;
-                    final SimpleFeatureType type;
+                    final FeatureType type;
                     try {
-                        type  = (SimpleFeatureType) fld.getStore().getFeatureType(fld.getGroupName());
+                        type  = fld.getStore().getFeatureType(fld.getGroupName());
                     } catch (DataStoreException ex) {
                         LOGGER.severe("error while getting featureType for:" + fld.getGroupName() + '\n' +
                                       "cause:" + ex.getMessage());
@@ -313,9 +311,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 if (!(layer instanceof FeatureLayerDetails)) continue;
 
                 final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
-                final SimpleFeatureType sft;
+                final FeatureType sft;
                 try {
-                    sft = (SimpleFeatureType) fld.getStore().getFeatureType(fld.getGroupName());
+                    sft = fld.getStore().getFeatureType(fld.getGroupName());
                     types.add(sft);
                 } catch (DataStoreException ex) {
                     LOGGER.severe("error while getting featureType for:" + fld.getGroupName());
@@ -336,9 +334,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 }
 
                 final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
-                final SimpleFeatureType sft;
+                final FeatureType sft;
                 try {
-                    sft = (SimpleFeatureType) fld.getStore().getFeatureType(fld.getGroupName());
+                    sft = fld.getStore().getFeatureType(fld.getGroupName());
                     types.add(sft);
                 } catch (DataStoreException ex) {
                     LOGGER.severe("error while getting featureType for:" + fld.getGroupName());
@@ -349,7 +347,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         final int size = types.size();
         for (int i = 0; i < size; i++) {
             try {
-                types.set(i, FeatureTypeUtilities.excludePrimaryKeyFields((SimpleFeatureType) types.get(i)));
+                types.set(i, FeatureTypeUtilities.excludePrimaryKeyFields(types.get(i)));
             } catch (SchemaException ex) {
                 LOGGER.log(Level.SEVERE, "error while excluding primary keys", ex);
             }
@@ -599,12 +597,12 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 final IdentifierGenerationOptionType idGen = insertRequest.getIdgen();
 
                 for (Object featureObject : insertRequest.getFeature()) {
-                    if (featureObject instanceof SimpleFeature) {
-                        final SimpleFeature feature     = (SimpleFeature) featureObject;
-                        final Name typeName             = feature.getFeatureType().getName();
+                    if (featureObject instanceof Feature) {
+                        final Feature feature = (Feature) featureObject;
+                        final Name typeName = feature.getType().getName();
                         final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(typeName, ServiceDef.Specification.WFS.name());
                         if (layer == null) {
-                            throw new CstlServiceException(UNKNOW_TYPENAME + feature.getFeatureType().getName());
+                            throw new CstlServiceException(UNKNOW_TYPENAME + feature.getType().getName());
                         }
                         try {
                             final List<FeatureId> features = layer.getStore().addFeatures(typeName, Collections.singleton(feature));
@@ -901,7 +899,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             }
         }
         
-        if (!((Boolean)filter.accept(new IsValidSpatialFilterVisitor((SimpleFeatureType)ft), null))) {
+        if (!((Boolean)filter.accept(new IsValidSpatialFilterVisitor(ft), null))) {
             throw new CstlServiceException("The filter try to apply spatial operators on non-spatial property", INVALID_PARAMETER_VALUE, "filter");
         }
     }
@@ -1005,7 +1003,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
             final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
             try {
-                final SimpleFeatureType sft   = (SimpleFeatureType) fld.getStore().getFeatureType(fld.getGroupName());
+                final FeatureType sft = (FeatureType) fld.getStore().getFeatureType(fld.getGroupName());
                 types.add(sft);
             } catch (DataStoreException ex) {
                 LOGGER.severe("DataStore exception while getting featureType");

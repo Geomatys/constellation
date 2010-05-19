@@ -16,6 +16,7 @@
  */
 package org.constellation.cite;
 
+import java.io.StringWriter;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import java.util.ArrayList;
@@ -132,8 +133,10 @@ public class WFSCIteWorkerTest {
 
         FeatureCollection collection = (FeatureCollection)result;
 
-        String xmlResult    = featureWriter.write(collection);
-        
+        StringWriter writer = new StringWriter();
+        featureWriter.write(collection,writer);
+        writer.flush();
+        String xmlResult = writer.toString();
         assertEquals(1, collection.size());
 
         /**

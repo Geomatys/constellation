@@ -17,12 +17,13 @@
 
 package org.constellation.wfs;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.io.InputStream;
-
+import java.io.StringWriter;
 import java.net.URL;
+
 import org.constellation.util.Util;
 import org.constellation.wfs.utils.PostgisUtils;
+import org.constellation.wfs.utils.GlobalUtils;
 
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
@@ -30,10 +31,10 @@ import org.geotoolkit.feature.xml.XmlFeatureReader;
 import org.geotoolkit.feature.xml.XmlFeatureTypeReader;
 import org.geotoolkit.feature.xml.XmlFeatureTypeWriter;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureReader;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
 import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPEventFeatureWriter;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
+import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.util.FileUtilities;
 
 import org.opengis.feature.simple.SimpleFeature;
@@ -89,8 +90,8 @@ public class ShapeFeatureXmlBindingTest {
 
     @Before
     public void setUp() throws Exception {
-        featureWriter     = new JAXPEventFeatureWriter();
-        featureReader     = new JAXPEventFeatureReader(bridgeFeatureType);
+        featureWriter     = new JAXPStreamFeatureWriter();
+        featureReader     = new JAXPStreamFeatureReader(bridgeFeatureType);
         featureTypeReader = new JAXBFeatureTypeReader();
         featureTypeWriter = new JAXBFeatureTypeWriter();
     }
@@ -112,7 +113,9 @@ public class ShapeFeatureXmlBindingTest {
         }
         ite.close();
 
-        String result = featureWriter.write(feature);
+        StringWriter writer = new StringWriter();
+        featureWriter.write(feature,writer);
+        String result = writer.toString();
 
         String expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridge.xml"));
         
@@ -120,8 +123,8 @@ public class ShapeFeatureXmlBindingTest {
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
 
-        expresult = removeXmlns(expresult);
-        result    = removeXmlns(result);
+        expresult = GlobalUtils.removeXmlns(expresult);
+        result    = GlobalUtils.removeXmlns(result);
         
         assertEquals(expresult, result);
 
@@ -131,8 +134,10 @@ public class ShapeFeatureXmlBindingTest {
             feature = (SimpleFeature) ite.next();
         }
         ite.close();
-        
-        result = featureWriter.write(feature);
+
+        writer = new StringWriter();
+        featureWriter.write(feature,writer);
+        result = writer.toString();
         
         
         expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.polygon.xml"));
@@ -142,8 +147,8 @@ public class ShapeFeatureXmlBindingTest {
         expresult = expresult.replaceAll("> *<", "><");
         expresult = expresult.replaceAll("ID></gml:ID", "ID> </gml:ID");
 
-        expresult = removeXmlns(expresult);
-        result    = removeXmlns(result);
+        expresult = GlobalUtils.removeXmlns(expresult);
+        result    = GlobalUtils.removeXmlns(result);
         
         assertEquals(expresult, result);
     }
@@ -154,7 +159,9 @@ public class ShapeFeatureXmlBindingTest {
      */
     @Test
     public void featureCollectionMarshallTest() throws Exception {
-        String result = featureWriter.write(fcollBridge);
+        StringWriter writer = new StringWriter();
+        featureWriter.write(fcollBridge,writer);
+        String result = writer.toString();
 
         String expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"));
 
@@ -162,12 +169,14 @@ public class ShapeFeatureXmlBindingTest {
         expresult = expresult.replace("\n", "");
         expresult = expresult.replaceAll("> *<", "><");
 
-        expresult = removeXmlns(expresult);
-        result    = removeXmlns(result);
+        expresult = GlobalUtils.removeXmlns(expresult);
+        result    = GlobalUtils.removeXmlns(result);
         
         assertEquals(expresult, result);
 
-        result = featureWriter.write(fcollPolygons);
+        writer = new StringWriter();
+        featureWriter.write(fcollPolygons,writer);
+        result = writer.toString();
 
         expresult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.polygonCollection.xml"));
 
@@ -177,8 +186,8 @@ public class ShapeFeatureXmlBindingTest {
 
         expresult = expresult.replaceAll("ID></gml:ID", "ID> </gml:ID");
 
-        expresult = removeXmlns(expresult);
-        result    = removeXmlns(result);
+        expresult = GlobalUtils.removeXmlns(expresult);
+        result    = GlobalUtils.removeXmlns(result);
         
         // and we replace the space for the specified data
         assertEquals(expresult, result);
@@ -201,7 +210,7 @@ public class ShapeFeatureXmlBindingTest {
         InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xml/bridge.xml");
         SimpleFeature result = (SimpleFeature) featureReader.read(stream);
 
-        featureEquals(expResult, result);
+        GlobalUtils.featureEquals(expResult, result);
 
         featureReader.setFeatureType(fcollPolygons.getFeatureType());
         ite = fcollPolygons.iterator();
@@ -214,7 +223,7 @@ public class ShapeFeatureXmlBindingTest {
         stream = Util.getResourceAsStream("org/constellation/wfs/xml/polygon.xml");
         result = (SimpleFeature) featureReader.read(stream);
 
-        featureEquals(expResult, result);
+        GlobalUtils.featureEquals(expResult, result);
     }
 
     /**
@@ -240,7 +249,7 @@ public class ShapeFeatureXmlBindingTest {
             SimpleFeature expFeature  = (SimpleFeature)expIterator.next();
             SimpleFeature  resFeature = (SimpleFeature)resIterator.next();
 
-            featureEquals(expFeature, resFeature);
+            GlobalUtils.featureEquals(expFeature, resFeature);
         }
 
         featureReader.setFeatureType(fcollPolygons.getFeatureType());
@@ -261,10 +270,8 @@ public class ShapeFeatureXmlBindingTest {
             SimpleFeature expFeature  = (SimpleFeature)expIterator.next();
             SimpleFeature  resFeature = (SimpleFeature)resIterator.next();
 
-            featureEquals(expFeature, resFeature);
+            GlobalUtils.featureEquals(expFeature, resFeature);
         }
-
-
 
     }
 
@@ -296,49 +303,16 @@ public class ShapeFeatureXmlBindingTest {
         String expResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org/constellation/wfs/xsd/bridge.xsd"));
         String result    = featureTypeWriter.write(bridgeFeatureType);
 
-        expResult = removeXmlns(expResult);
-        result    = removeXmlns(result);
+        expResult = GlobalUtils.removeXmlns(expResult);
+        result    = GlobalUtils.removeXmlns(result);
         assertEquals(expResult, result);
 
         expResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org/constellation/wfs/xsd/polygon.xsd"));
         result    = featureTypeWriter.write(polygonFeatureType);
 
-        expResult = removeXmlns(expResult);
-        result    = removeXmlns(result);
+        expResult = GlobalUtils.removeXmlns(expResult);
+        result    = GlobalUtils.removeXmlns(result);
         assertEquals(expResult, result);
     }
     
-
-    public void featureEquals(SimpleFeature expResult, SimpleFeature result) {
-        assertEquals(expResult.getIdentifier(), result.getIdentifier());
-        assertEquals(expResult.getID(), result.getID());
-
-
-        assertEquals(expResult.getFeatureType(), result.getFeatureType());
-        assertEquals(expResult.getAttributeCount(), result.getAttributeCount());
-
-        for (int j = 0; j < expResult.getAttributeCount(); j++) {
-            if (expResult.getAttributes().get(j) instanceof Geometry) {
-                assertTrue(((Geometry) expResult.getAttributes().get(j)).equals((Geometry) result.getAttributes().get(j)));
-            } else {
-                assertEquals(expResult.getAttributes().get(j), result.getAttributes().get(j));
-            }
-        }
-        assertEquals(expResult, result);
-    }
-
-    public String removeXmlns(String xml) {
-
-        String s = xml;
-        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
-
-        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
-
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
-
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
-
-
-        return s;
-    }
 }
