@@ -222,7 +222,14 @@ class CoverageFileLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template) {
-        final MutableStyle style = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
+        MutableStyle style = null;
+        if(!getFavoriteStyles().isEmpty()){
+            style = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
+        }
+        if(style == null){
+            style = StyleProviderProxy.STYLE_FACTORY.style(StyleProviderProxy.STYLE_FACTORY.rasterSymbolizer());
+        }
+
         try {
             final MapLayer layer = getMapLayer(style, null);
             final MapContext context = MapBuilder.createContext(DefaultGeographicCRS.WGS84);

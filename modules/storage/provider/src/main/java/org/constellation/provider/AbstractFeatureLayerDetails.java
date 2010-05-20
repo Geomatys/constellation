@@ -315,6 +315,14 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
         return new MeasurementRange<?>[0];
     }
 
+    private MutableStyle createDefaultStyle(){
+        try {
+            return StyleProviderProxy.STYLE_RANDOM_FACTORY.createDefaultVectorStyle(store.getFeatureType(groupName));
+        } catch (DataStoreException ex) {
+            return StyleProviderProxy.STYLE_RANDOM_FACTORY.createPolygonStyle();
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -322,11 +330,14 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     public BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template)
                                                                           throws PortrayalException
     {
-        if (getFavoriteStyles().isEmpty()) {
-            throw new PortrayalException("Unable to get the list of favorites style to apply for the" +
-                    " getlegend graphic request.");
+        MutableStyle style = null;
+        if(!getFavoriteStyles().isEmpty()){
+            style = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
         }
-        final MutableStyle style = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
+        if(style == null){
+            style = createDefaultStyle();
+        }
+
         try {
             final MapLayer layer = getMapLayer(style, null);
             final MapContext context = MapBuilder.createContext(DefaultGeographicCRS.WGS84);

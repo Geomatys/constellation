@@ -25,7 +25,10 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.constellation.provider.configuration.ConfigDirectory;
+import org.geotoolkit.factory.FactoryFinder;
+import org.geotoolkit.factory.Hints;
 import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.style.MutableStyleFactory;
 import org.geotoolkit.util.FileUtilities;
 
 
@@ -38,10 +41,10 @@ import org.geotoolkit.util.FileUtilities;
  */
 public final class StyleProviderProxy extends AbstractStyleProvider{
 
-    /**
-     * Default logger.
-     
-    private static final Logger LOGGER = Logger.getLogger(LayerProviderProxy.class.getName());*/
+    public static final MutableStyleFactory STYLE_FACTORY = (MutableStyleFactory)
+            FactoryFinder.getStyleFactory(new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
+
+    public static final RandomStyleFactory STYLE_RANDOM_FACTORY = new RandomStyleFactory();
 
     private static final Collection<StyleProviderService> SERVICES = new ArrayList<StyleProviderService>();
 
