@@ -18,6 +18,7 @@ package org.constellation.query.wms;
 
 import org.constellation.query.QueryRequest;
 import org.constellation.ws.MimeType;
+
 import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.util.Version;
 
@@ -41,7 +42,7 @@ public final class GetCapabilities extends WMSQuery {
     }
 
     public GetCapabilities(final Version version, final String format) {
-        super(version);
+        super(version, null);
         this.format = format;
     }
 

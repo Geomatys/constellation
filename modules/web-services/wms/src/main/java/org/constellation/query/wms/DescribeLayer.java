@@ -17,8 +17,10 @@
 package org.constellation.query.wms;
 
 import java.util.List;
+
 import org.constellation.query.QueryRequest;
 import org.constellation.ws.MimeType;
+
 import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
@@ -43,7 +45,7 @@ public final class DescribeLayer extends WMSQuery {
      * Builds a {@code DescribeLayer} request, using the layer and mime-type specified.
      */
     public DescribeLayer(final List<String> layers, final Version version) {
-        super(version);
+        super(version,null);
         this.layers = UnmodifiableArrayList.wrap(layers.toArray(new String[layers.size()]));
     }
 

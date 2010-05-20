@@ -16,6 +16,7 @@
  */
 package org.constellation.query.wms;
 
+import javax.ws.rs.core.MultivaluedMap;
 import org.constellation.query.Query;
 import org.constellation.query.QueryService;
 import org.constellation.query.DefaultQueryService;
@@ -148,20 +149,26 @@ public abstract class WMSQuery implements Query {
     /** Parameter used in getFeatureInfo */
     public static final String KEY_GETMETADATA = "GetMetadata";
     /** Parameter used in getMap */
-    public static final String KEY_DIM_RANGE = "DIM_RANGE";
-    /** Parameter used in getMap */
     public static final String KEY_AZIMUTH = "AZIMUTH";
     /** Parameter used in GetCapabilities, for backward compatibility with WMS 1.0.0 */
     public static final String KEY_WMTVER = "WMTVER";
+    /** Parameter used to store additional parameters from the query, the value object is a MultiValueMap */
+    public static final String KEY_EXTRA_PARAMETERS = "EXTRA";
 
     private final Version version;
+    /**
+     * All query parameters, this might hold additional parameters that providers
+     * or renderers may understand.
+     */
+    protected final MultivaluedMap<String,String> parameters;
 
 
-    protected WMSQuery(final Version version) {
+    protected WMSQuery(final Version version, MultivaluedMap<String,String> parameters) {
         if (version == null) {
             throw new NullPointerException("Version should not be null !");
         }
         this.version = version;
+        this.parameters = parameters;
     }
 
     /**
@@ -178,6 +185,10 @@ public abstract class WMSQuery implements Query {
     @Override
     public final Version getVersion() {
         return version;
+    }
+
+    public MultivaluedMap<String, String> getParameters() {
+        return parameters;
     }
 
     /**

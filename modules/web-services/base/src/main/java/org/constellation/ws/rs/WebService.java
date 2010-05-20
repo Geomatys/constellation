@@ -419,6 +419,10 @@ public abstract class WebService {
         }
     }
 
+    public MultivaluedMap<String,String> getParameters(){
+        return uriContext.getQueryParameters();
+    }
+
     /**
      * Extract all The parameters from the query and write it in the console.
      * It is a debug method.

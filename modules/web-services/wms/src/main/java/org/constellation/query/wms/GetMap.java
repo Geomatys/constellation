@@ -22,14 +22,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.constellation.query.QueryRequest;
 import org.constellation.ws.MimeType;
+
 import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.geometry.ImmutableEnvelope;
-import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
+
 import org.opengis.geometry.Envelope;
 import org.opengis.sld.StyledLayerDescriptor;
 
@@ -74,11 +77,6 @@ public class GetMap extends WMSQuery {
     private final Date time;
 
     /**
-     * Range value to define a color pal.
-     */
-    private final MeasurementRange dimRange;
-
-    /**
      * Dimension of the output file, which matches with the {@code Width} and {@code Height} parameters.
      */
     private final Dimension size;
@@ -112,18 +110,19 @@ public class GetMap extends WMSQuery {
      * Default minimal constructor to generate a {@code GetMap} request.
      */
     public GetMap(final Envelope envelope, final Version version, final String format,
-                  final List<String> layers, final Dimension size)
+                  final List<String> layers, final Dimension size, MultivaluedMap<String,String> parameters)
     {
-        this(envelope, version, format, layers, new ArrayList<String>(), size);
+        this(envelope, version, format, layers, new ArrayList<String>(), size, parameters);
     }
 
     /**
      * GetMap with a list of styles defined.
      */
     public GetMap(final Envelope envelope, final Version version, final String format,
-                  final List<String> layers, final List<String> styles, final Dimension size)
+                  final List<String> layers, final List<String> styles, final Dimension size,
+                  MultivaluedMap<String,String> parameters)
     {
-        this(envelope, version, format, layers, styles, null, null, size);
+        this(envelope, version, format, layers, styles, null, null, size, parameters);
     }
 
     /**
@@ -131,19 +130,9 @@ public class GetMap extends WMSQuery {
      */
     public GetMap(final Envelope envelope, final Version version, final String format,
                   final List<String> layers, final List<String> styles, final Double elevation,
-                  final Date date, final Dimension size)
+                  final Date date, final Dimension size, MultivaluedMap<String,String> parameters)
     {
-        this(envelope, version, format, layers, styles, elevation, date, null, size);
-    }
-
-    /**
-     * GetMap with a list of styles, an elevation, a time value and a {@code dim_range}.
-     */
-    public GetMap(final Envelope envelope, final Version version, final String format,
-                  final List<String> layers, final List<String> styles, final Double elevation,
-                  final Date date, final MeasurementRange dimRange, final Dimension size)
-    {
-        this(envelope, version, format, layers, styles, null, elevation, date, dimRange, size, null, null, 0, null);
+        this(envelope, version, format, layers, styles, null, elevation, date, size, null, null, 0, null, parameters);
     }
 
     /**
@@ -152,10 +141,11 @@ public class GetMap extends WMSQuery {
     public GetMap(final Envelope envelope, final Version version, final String format,
                   final List<String> layers, final List<String> styles,
                   final StyledLayerDescriptor sld, final Double elevation, final Date date,
-                  final MeasurementRange dimRange, final Dimension size, final Color background,
-                  final Boolean transparent, double azimuth, final String exceptions)
+                  final Dimension size, final Color background,
+                  final Boolean transparent, double azimuth, final String exceptions,
+                  final MultivaluedMap<String,String> parameters)
     {
-        super(version);
+        super(version,parameters);
         this.envelope = new ImmutableEnvelope(envelope);
         this.format = format;
         this.layers = UnmodifiableArrayList.wrap(layers.toArray(new String[layers.size()]));
@@ -163,7 +153,6 @@ public class GetMap extends WMSQuery {
         this.sld = sld;
         this.elevation = elevation;
         this.time = date;
-        this.dimRange = dimRange;
         this.size = size;
         this.background = background;
         this.transparent = transparent;
@@ -180,12 +169,12 @@ public class GetMap extends WMSQuery {
                 getMap.sld,
                 getMap.elevation,
                 getMap.time,
-                getMap.dimRange,
                 getMap.size,
                 getMap.background,
                 transparent,
                 getMap.azimuth,
-                getMap.exceptions);
+                getMap.exceptions,
+                getMap.parameters);
     }
 
     /**
@@ -205,12 +194,12 @@ public class GetMap extends WMSQuery {
                 getMap.sld,
                 getMap.elevation,
                 getMap.time,
-                getMap.dimRange,
                 getMap.size,
                 getMap.background,
                 getMap.transparent,
                 getMap.azimuth,
-                getMap.exceptions);
+                getMap.exceptions,
+                getMap.parameters);
     }
 
     /**
@@ -231,12 +220,12 @@ public class GetMap extends WMSQuery {
                 getMap.sld,
                 getMap.elevation,
                 getMap.time,
-                getMap.dimRange,
                 getMap.size,
                 getMap.background,
                 getMap.transparent,
                 getMap.azimuth,
-                getMap.exceptions);
+                getMap.exceptions,
+                getMap.parameters);
     }
 
     /**
@@ -251,12 +240,12 @@ public class GetMap extends WMSQuery {
                 getMap.sld,
                 getMap.elevation,
                 getMap.time,
-                getMap.dimRange,
                 getMap.size,
                 getMap.background,
                 getMap.transparent,
                 getMap.azimuth,
-                getMap.exceptions);
+                getMap.exceptions,
+                getMap.parameters);
     }
 
     /**
@@ -271,13 +260,6 @@ public class GetMap extends WMSQuery {
      */
     public Date getTime() {
         return time;
-    }
-
-    /**
-     * Returns the range value to define a color pal, or {@code null} if not defined.
-     */
-    public MeasurementRange getDimRange() {
-        return dimRange;
     }
 
     /**
@@ -395,9 +377,6 @@ public class GetMap extends WMSQuery {
         }
         if (time != null) {
             kvp.append('&').append(KEY_TIME).append('=').append(time);
-        }
-        if (dimRange != null) {
-            kvp.append('&').append(KEY_DIM_RANGE).append('=').append(dimRange);
         }
         if (background != null) {
             kvp.append('&').append(KEY_BGCOLOR).append('=').append(background);

@@ -20,12 +20,15 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.util.Date;
 import java.util.List;
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.constellation.query.QueryRequest;
+
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
-import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
+
 import org.opengis.geometry.Envelope;
 
 
@@ -80,12 +83,13 @@ public final class GetFeatureInfo extends GetMap {
     public GetFeatureInfo(final Envelope envelope, final Version version,
                   final String format, final List<String> layers, final List<String> styles,
                   final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
-                  final MeasurementRange dimRange, final Dimension size, final Color background,
+                  final Dimension size, final Color background,
                   final Boolean transparent, final String exceptions, final int x, final int y,
-                  final List<String> queryLayers, final String infoFormat, final Integer featureCount)
+                  final List<String> queryLayers, final String infoFormat, final Integer featureCount,
+                  final MultivaluedMap<String,String> parameters)
     {
-        super(envelope, version, format, layers, styles, sld, elevation, date, dimRange, size,
-                background, transparent, 0,exceptions);
+        super(envelope, version, format, layers, styles, sld, elevation, date, size,
+                background, transparent, 0,exceptions, parameters);
         this.x = x;     
         this.y = y;
         this.queryLayers = UnmodifiableArrayList.wrap(queryLayers.toArray(new String[queryLayers.size()]));

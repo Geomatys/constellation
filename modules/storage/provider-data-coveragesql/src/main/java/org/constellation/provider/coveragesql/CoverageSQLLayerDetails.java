@@ -136,12 +136,20 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
 
 
         // DIM_RANGE extra parameter ///////////////////////////////////////////
-        final MeasurementRange dimRange = (MeasurementRange) params.get(KEY_DIM_RANGE);
-        if(dimRange != null){
-            //a dim range is define, it replace any given style.
-            final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
-            style = STYLE_FACTORY.style(symbol);
-            return MapBuilder.createCoverageLayer(reader, style, getName());
+        final Map<String,?> extras = (Map<String, ?>) params.get(KEY_EXTRA_PARAMETERS);
+        if(extras != null){
+            for(String key : extras.keySet()){
+                if(key.equalsIgnoreCase("dim_range")){
+                    final String strDimRange = ((List)extras.get(key)).get(0).toString();
+                    final MeasurementRange dimRange = toMeasurementRange(strDimRange);
+                    if(dimRange != null){
+                        //a dim range is define, it replace any given style.
+                        final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
+                        style = STYLE_FACTORY.style(symbol);
+                        return MapBuilder.createCoverageLayer(reader, style, getName());
+                    }
+                }
+            }
         }
         ////////////////////////////////////////////////////////////////////////
 
@@ -337,6 +345,16 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
     @Override
     public TYPE getType() {
         return TYPE.COVERAGE;
+    }
+
+    public static MeasurementRange toMeasurementRange(final String strDimRange) {
+        if (strDimRange == null) {
+            return null;
+        }
+        final String[] split = strDimRange.split(",");
+        final double min = Double.valueOf(split[0]);
+        final double max = Double.valueOf(split[1]);
+        return MeasurementRange.create(min, max, null);
     }
 
 }

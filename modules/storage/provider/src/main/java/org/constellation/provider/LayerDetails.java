@@ -56,7 +56,7 @@ public interface LayerDetails {
         FEATURE;
     };
 
-    String KEY_DIM_RANGE = "DIM_RANGE";
+    String KEY_EXTRA_PARAMETERS = "EXTRA";
 
     MutableStyleFactory STYLE_FACTORY = (MutableStyleFactory)FactoryFinder.getStyleFactory(
                             new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));

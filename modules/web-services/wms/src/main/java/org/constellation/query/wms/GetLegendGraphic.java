@@ -19,6 +19,7 @@ package org.constellation.query.wms;
 import org.constellation.ServiceDef;
 import org.constellation.query.QueryRequest;
 import org.constellation.ws.MimeType;
+
 import org.geotoolkit.lang.Immutable;
 
 
@@ -58,7 +59,7 @@ public final class GetLegendGraphic extends WMSQuery {
     public GetLegendGraphic(final String layer, final String format,
                             final Integer width, final Integer height)
     {
-        super(ServiceDef.WMS_1_1_1_SLD.version);
+        super(ServiceDef.WMS_1_1_1_SLD.version,null);
         this.layer  = layer;
         this.format = format;
         this.width  = width;

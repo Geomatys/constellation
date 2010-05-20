@@ -27,7 +27,6 @@ import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
-import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.logging.Logging;
 import org.opengis.referencing.FactoryException;
@@ -77,16 +76,6 @@ public final class QueryAdapter {
             }
         }*/
         return queryLayers;
-    }
-
-    public static MeasurementRange toMeasurementRange(final String strDimRange) {
-        if (strDimRange == null) {
-            return null;
-        }
-        final String[] split = strDimRange.split(",");
-        final double min = Double.valueOf(split[0]);
-        final double max = Double.valueOf(split[1]);
-        return MeasurementRange.create(min, max, null);
     }
 
     public static MutableStyledLayerDescriptor toSLD(final String sldURL) throws MalformedURLException {

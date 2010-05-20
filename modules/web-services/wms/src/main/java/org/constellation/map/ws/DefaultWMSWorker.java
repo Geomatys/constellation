@@ -724,9 +724,8 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
 
         final List<MutableStyle> styles = getStyles(layerRefs, sld, styleNames);
         //       -- create the rendering parameter Map
-        final MeasurementRange<?> dimRange     = getMap.getDimRange();
         final Map<String, Object> params       = new HashMap<String, Object>();
-        params.put(WMSQuery.KEY_DIM_RANGE, dimRange);
+        params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
         final SceneDef sdef = new SceneDef();
         sdef.extensions().add(WMSMapDecoration.getExtension());
 

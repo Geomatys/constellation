@@ -70,7 +70,6 @@ import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
-import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
@@ -497,7 +496,6 @@ public class WMSService extends GridWebService {
         final String strHeight       = getParameter(KEY_HEIGHT,          true);
         final String strElevation    = getParameter(KEY_ELEVATION,      false);
         final String strTime         = getParameter(KEY_TIME,           false);
-        final String strDimRange     = getParameter(KEY_DIM_RANGE,      false);
         final String strBGColor      = getParameter(KEY_BGCOLOR,        false);
         final String strTransparent  = getParameter(KEY_TRANSPARENT,    false);
         //final String strRemoteOwsType = getParameter(KEY_REMOTE_OWS_TYPE, false);
@@ -548,7 +546,6 @@ public class WMSService extends GridWebService {
         } catch (NumberFormatException n) {
             throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, KEY_ELEVATION.toLowerCase());
         }
-        final MeasurementRange dimRange = QueryAdapter.toMeasurementRange(strDimRange);
         final Date date;
         try {
             date = TimeParser.toDate(strTime);
@@ -611,7 +608,7 @@ public class WMSService extends GridWebService {
 
         // Builds the request.
         return new GetMap(env, new Version(version), format, layers, styles, sld, elevation,
-                    date, dimRange, size, background, transparent, azimuth, strExceptions);
+                    date, size, background, transparent, azimuth, strExceptions, getParameters());
     }
 
     
