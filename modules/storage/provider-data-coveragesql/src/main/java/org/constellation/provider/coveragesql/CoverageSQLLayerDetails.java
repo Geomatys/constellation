@@ -42,6 +42,7 @@ import org.geotoolkit.coverage.sql.Layer;
 import org.geotoolkit.coverage.sql.LayerCoverageReader;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display2d.ext.dimrange.DimRangeSymbolizer;
 import org.geotoolkit.display2d.ext.legend.DefaultLegendService;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.service.DefaultGlyphService;
@@ -132,6 +133,17 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      */
     @Override
     public MapLayer getMapLayer(MutableStyle style, final Map<String, Object> params) {
+
+
+        // DIM_RANGE extra parameter ///////////////////////////////////////////
+        final MeasurementRange dimRange = (MeasurementRange) params.get(KEY_DIM_RANGE);
+        if(dimRange != null){
+            //a dim range is define, it replace any given style.
+            final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
+            style = STYLE_FACTORY.style(symbol);
+            return MapBuilder.createCoverageLayer(reader, style, getName());
+        }
+        ////////////////////////////////////////////////////////////////////////
 
         if(style == null && favorites.size() > 0){
             //no style provided, try to get the favorite one
