@@ -17,20 +17,21 @@
 package org.constellation.cite;
 
 import java.io.StringWriter;
-import org.constellation.wfs.ws.WFSWorker;
-import org.constellation.wfs.ws.DefaultWFSWorker;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
+
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.configuration.ProviderConfig;
 import org.constellation.provider.configuration.ProviderSource;
 import org.constellation.provider.postgis.PostGisProvider;
 import org.constellation.provider.postgis.PostGisProviderService;
-import org.constellation.util.Util;
+import org.constellation.wfs.ws.WFSWorker;
+import org.constellation.wfs.ws.DefaultWFSWorker;
+
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
@@ -38,13 +39,8 @@ import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.gml.xml.v311.MultiPointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
-import org.geotoolkit.ogc.xml.v110.AndType;
-import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.EqualsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.ogc.xml.v110.LiteralType;
-import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
-import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;

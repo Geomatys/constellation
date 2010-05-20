@@ -17,12 +17,11 @@
 
 package org.constellation.wfs;
 
-import com.vividsolutions.jts.geom.Geometry;
 import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
-
 import java.sql.Connection;
+
 import org.constellation.util.Util;
 import org.constellation.wfs.utils.PostgisUtils;
 import org.constellation.wfs.utils.GlobalUtils;
@@ -33,20 +32,16 @@ import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.feature.xml.XmlFeatureReader;
-import org.geotoolkit.feature.xml.XmlFeatureTypeReader;
-import org.geotoolkit.feature.xml.XmlFeatureTypeWriter;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
-import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.util.FileUtilities;
 
+import org.opengis.feature.Feature;
 import org.opengis.feature.type.FeatureType;
 
 import org.junit.*;
-import org.opengis.feature.Feature;
 import static org.junit.Assert.*;
 
 /**
@@ -62,10 +57,6 @@ public class StreamOMFeatureXmlBindingTest {
     private XmlFeatureWriter featureWriter;
 
     private XmlFeatureReader featureReader;
-
-    private XmlFeatureTypeReader featureTypeReader;
-
-    private XmlFeatureTypeWriter featureTypeWriter;
 
     private static FeatureType featureType;
 
@@ -99,14 +90,10 @@ public class StreamOMFeatureXmlBindingTest {
         }
     }
 
-
-
     @Before
     public void setUp() throws Exception {
         featureWriter     = new JAXPStreamFeatureWriter();
         featureReader     = new JAXPStreamFeatureReader(featureType);
-        featureTypeReader = new JAXBFeatureTypeReader();
-        featureTypeWriter = new JAXBFeatureTypeWriter();
     }
 
     @After
@@ -213,34 +200,6 @@ public class StreamOMFeatureXmlBindingTest {
         expIterator.close();
         resIterator.close();
 
-    }
-
-    /**
-     * test the feature unmarshall
-     *
-     */
-    @Test
-    public void featuretypeUnMarshallTest() throws Exception {
-
-        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xsd/sampling.xsd");
-        FeatureType result  = featureTypeReader.read(stream, "SamplingPoint");
-
-//        assertEquals(featureType, result);
-
-    }
-
-     /**
-     * test the feature unmarshall
-     *
-     */
-    @Test
-    public void featuretypeMarshallTest() throws Exception {
-        String expResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org/constellation/wfs/xsd/sampling.xsd"));
-        String result    = featureTypeWriter.write(featureType);
-
-        expResult = GlobalUtils.removeXmlns(expResult);
-        result    = GlobalUtils.removeXmlns(result);
-        assertEquals(expResult, result);
     }
 
 }

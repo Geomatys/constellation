@@ -109,7 +109,6 @@ public class WFSWorkerTest {
     private static WFSWorker worker ;
     static {
         try {
-
             worker = new DefaultWFSWorker(pool);
             worker.setLogLevel(Level.FINER);
         } catch (Exception ex) {
@@ -118,7 +117,6 @@ public class WFSWorkerTest {
     }
 
     
-
     private static DefaultDataSource ds = null;
 
     private static DefaultDataSource ds2 = null;
@@ -129,8 +127,6 @@ public class WFSWorkerTest {
     public static void setUpClass() throws Exception {
         initFeatureSource();
     }
-
-    
 
     @AfterClass
     public static void tearDownClass() throws Exception {

@@ -28,11 +28,7 @@ import org.constellation.wfs.utils.GlobalUtils;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.feature.xml.XmlFeatureReader;
-import org.geotoolkit.feature.xml.XmlFeatureTypeReader;
-import org.geotoolkit.feature.xml.XmlFeatureTypeWriter;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeReader;
-import org.geotoolkit.feature.xml.jaxb.JAXBFeatureTypeWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureReader;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.util.FileUtilities;
@@ -56,13 +52,7 @@ public class ShapeFeatureXmlBindingTest {
 
     private XmlFeatureReader featureReader;
 
-    private XmlFeatureTypeReader featureTypeReader;
-
-    private XmlFeatureTypeWriter featureTypeWriter;
-
     private static FeatureType bridgeFeatureType;
-
-    private static FeatureType polygonFeatureType;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -76,7 +66,6 @@ public class ShapeFeatureXmlBindingTest {
 
         url                = classloader.getResource("org/constellation/ws/embedded/wms111/shapefiles/BasicPolygons.shp");
         fcollPolygons      = PostgisUtils.createShapeLayer(url, "http://www.opengis.net/gml");
-        polygonFeatureType = fcollPolygons.getFeatureType();
         if (bridgeFeatureType == null) {
             System.out.println("WARNING feature Type for polygon NULL");
         }
@@ -92,8 +81,6 @@ public class ShapeFeatureXmlBindingTest {
     public void setUp() throws Exception {
         featureWriter     = new JAXPStreamFeatureWriter();
         featureReader     = new JAXPStreamFeatureReader(bridgeFeatureType);
-        featureTypeReader = new JAXBFeatureTypeReader();
-        featureTypeWriter = new JAXBFeatureTypeWriter();
     }
 
     @After
@@ -273,46 +260,6 @@ public class ShapeFeatureXmlBindingTest {
             GlobalUtils.featureEquals(expFeature, resFeature);
         }
 
-    }
-
-    /**
-     * test the feature unmarshall
-     *
-     */
-    @Test
-    public void featuretypeUnMarshallTest() throws Exception {
-        
-        InputStream stream = Util.getResourceAsStream("org/constellation/wfs/xsd/bridge.xsd");
-        FeatureType result = featureTypeReader.read(stream, "Bridges");
-
-//        assertEquals(featureType, result);
-        
-        stream = Util.getResourceAsStream("org/constellation/wfs/xsd/polygon.xsd");
-        result = featureTypeReader.read(stream, "BasicPolygons");
-
-//        assertEquals(featureType, result);
-        
-    }
-
-     /**
-     * test the feature unmarshall
-     *
-     */
-    @Test
-    public void featuretypeMarshallTest() throws Exception {
-        String expResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org/constellation/wfs/xsd/bridge.xsd"));
-        String result    = featureTypeWriter.write(bridgeFeatureType);
-
-        expResult = GlobalUtils.removeXmlns(expResult);
-        result    = GlobalUtils.removeXmlns(result);
-        assertEquals(expResult, result);
-
-        expResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org/constellation/wfs/xsd/polygon.xsd"));
-        result    = featureTypeWriter.write(polygonFeatureType);
-
-        expResult = GlobalUtils.removeXmlns(expResult);
-        result    = GlobalUtils.removeXmlns(result);
-        assertEquals(expResult, result);
     }
     
 }
