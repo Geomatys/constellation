@@ -17,6 +17,7 @@
 package org.constellation.wfs;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import java.io.File;
@@ -80,6 +81,7 @@ import org.geotoolkit.wfs.xml.v110.TransactionType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.v110.ValueType;
 import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
+import org.geotoolkit.xml.DomCompare;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
 
@@ -87,6 +89,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 import org.junit.*;
 import static org.junit.Assert.*;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -96,24 +99,18 @@ import static org.junit.Assert.*;
 public class WFSWorkerTest {
 
     private static MarshallerPool pool;
+    private static WFSWorker worker ;
     static {
         try {
             pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110" +
             		  ":org.geotoolkit.ogc.xml.v110" +
             		  ":org.geotoolkit.gml.xml.v311" +
                           ":org.geotoolkit.xsd.xml.v2001");
-        } catch (Exception ex) {
-            
-        }
 
-    }
-    private static WFSWorker worker ;
-    static {
-        try {
             worker = new DefaultWFSWorker(pool);
             worker.setLogLevel(Level.FINER);
         } catch (Exception ex) {
-            
+            ex.printStackTrace();
         }
     }
 
@@ -141,7 +138,7 @@ public class WFSWorkerTest {
 
     @Before
     public void setUp() throws Exception {
-        featureWriter     = new JAXPStreamFeatureWriter();
+        featureWriter = new JAXPStreamFeatureWriter();
     }
 
     @After
@@ -153,58 +150,48 @@ public class WFSWorkerTest {
      *
      */
     @Test
-    public void getCapabilitiesTest() throws JAXBException, CstlServiceException, IOException {
-        Marshaller marshaller = pool.acquireMarshaller();
+    public void getCapabilitiesTest() throws JAXBException, CstlServiceException, IOException, ParserConfigurationException, SAXException {
+        final Marshaller marshaller = pool.acquireMarshaller();
 
         GetCapabilitiesType request = new GetCapabilitiesType("WFS");
         WFSCapabilitiesType result = worker.getCapabilities(request);
 
         StringWriter sw = new StringWriter();
         marshaller.marshal(result, sw);
-        String xmlResult    = removeXmlns(sw.toString());
-        String xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml")));
-
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml"),
+                sw.toString());
 
         AcceptVersionsType acceptVersion = new AcceptVersionsType("2.3.0");
         request = new GetCapabilitiesType(acceptVersion, null, null, null, "WFS");
 
-        boolean exlaunched = false;
         try {
             result = worker.getCapabilities(request);
+            fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            exlaunched = true;
             assertEquals(ex.getExceptionCode(), VERSION_NEGOTIATION_FAILED);
             assertEquals(ex.getLocator(), "version");
-
         }
-        assertTrue(exlaunched);
 
         request = new GetCapabilitiesType(acceptVersion, null, null, null, "WPS");
 
-        exlaunched = false;
         try {
             result = worker.getCapabilities(request);
+            fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            exlaunched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "service");
-
         }
-        assertTrue(exlaunched);
 
         request = new GetCapabilitiesType(null);
 
-        exlaunched = false;
         try {
             result = worker.getCapabilities(request);
+            fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            exlaunched = true;
             assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "service");
-
         }
-        assertTrue(exlaunched);
 
 
         acceptVersion = new AcceptVersionsType("1.1.0");
@@ -216,10 +203,9 @@ public class WFSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        xmlResult    = removeXmlns(sw.toString());
-        xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml")));
-
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml"),
+                sw.toString());
 
         acceptVersion = new AcceptVersionsType("1.1.0");
         sections      = new SectionsType("operationsMetadata");
@@ -230,10 +216,9 @@ public class WFSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        xmlResult    = removeXmlns(sw.toString());
-        xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-om.xml")));
-
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-om.xml"),
+                sw.toString());
 
         acceptVersion = new AcceptVersionsType("1.1.0");
         sections      = new SectionsType("serviceIdentification");
@@ -244,10 +229,9 @@ public class WFSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        xmlResult    = removeXmlns(sw.toString());
-        xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-si.xml")));
-
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-si.xml"),
+                sw.toString());
 
         acceptVersion = new AcceptVersionsType("1.1.0");
         sections      = new SectionsType("serviceProvider");
@@ -258,10 +242,10 @@ public class WFSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        xmlResult    = removeXmlns(sw.toString());
-        xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml")));
-
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml"),
+                sw.toString());
+        
     }
 
      /**
@@ -275,33 +259,26 @@ public class WFSWorkerTest {
          */
         GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
-        boolean exLaunched = false;
         Object result = null;
         try {
             result = worker.getFeature(request);
-
+            fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            exLaunched = true;
+            //ok
         }
-
-        assertTrue(exLaunched);
 
         /**
          * Test 2 : bad version => error
          */
         request = new GetFeatureType("WFS", "1.2.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
-        exLaunched = false;
         try {
             result = worker.getFeature(request);
-
+            fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            exLaunched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "version");
         }
-
-        assertTrue(exLaunched);
     }
 
      /**
@@ -314,7 +291,6 @@ public class WFSWorkerTest {
         /**
          * Test 1 : query on typeName samplingPoint
          */
-
         List<QueryType> queries = new ArrayList<QueryType>();
         queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
         GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
@@ -323,15 +299,10 @@ public class WFSWorkerTest {
 
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        String xmlResult = writer.toString();
 
-        String xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"),
+                writer.toString());
 
         /**
          * Test 2 : query on typeName samplingPoint whith HITS result type
@@ -349,7 +320,6 @@ public class WFSWorkerTest {
         /**
          * Test 3 : query on typeName samplingPoint with propertyName = {gml:name}
          */
-
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.getPropertyNameOrXlinkPropertyNameOrFunction().add("gml:name");
@@ -360,19 +330,15 @@ public class WFSWorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        xmlResult = writer.toString();
-        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-5.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-5.xml"),
+                writer.toString());
+
 
         /**
          * Test 4 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
          */
-
         queries = new ArrayList<QueryType>();
         ComparisonOpsType pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("name"), Boolean.TRUE);
         FilterType filter = new FilterType(pe);
@@ -383,14 +349,10 @@ public class WFSWorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        xmlResult = writer.toString();
-        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"),
+                writer.toString());
 
         /**
          * Test 5 : query on typeName samplingPoint with sort on gml:name
@@ -406,19 +368,14 @@ public class WFSWorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        xmlResult = writer.toString();
-        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6.xml"),
+                writer.toString());
 
         /**
          * Test 6 : query on typeName samplingPoint with sort on gml:name
          */
-
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
         query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.DESC))));
@@ -429,15 +386,10 @@ public class WFSWorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        xmlResult = writer.toString();
-        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
-        assertEquals(xmlExpResult, xmlResult);
-
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7.xml"),
+                writer.toString());
 
         /**
          * Test 7 : query on typeName samplingPoint whith HITS result type
@@ -462,14 +414,12 @@ public class WFSWorkerTest {
         queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
-        boolean exLaunched = false;
         try {
             result = worker.getFeature(request);
+            fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            exLaunched = true;
+            //ok
         }
-
-        assertTrue(exLaunched);
 
         /**
          * Test 9 : query on typeName samplingPoint whith a an unexpected property in propertyNames
@@ -481,15 +431,12 @@ public class WFSWorkerTest {
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
-        exLaunched = false;
         try {
             result = worker.getFeature(request);
+            fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            exLaunched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
         }
-
-        assertTrue(exLaunched);
     }
     
     /**
@@ -511,6 +458,7 @@ public class WFSWorkerTest {
 
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
+
         String xmlResult = writer.toString();
         String xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"));
 
@@ -538,15 +486,10 @@ public class WFSWorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        xmlResult = writer.toString();
-        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3.xml"));
 
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3.xml"),
+                writer.toString());
 
         /**
          * Test 3 : query on typeName sml:System with propertyName = {sml:keywords, sml:phenomenons}
@@ -598,19 +541,14 @@ public class WFSWorkerTest {
 
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        String xmlResult = writer.toString();
-        String xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"),
+                writer.toString());
 
-         /**
+        /**
          * Test 2 : query on typeName bridges with propertyName = {FID}
          */
-
         queries = new ArrayList<QueryType>();
         QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "Bridges")), null);
         query.getPropertyNameOrXlinkPropertyNameOrFunction().add("FID");
@@ -621,14 +559,10 @@ public class WFSWorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        xmlResult = writer.toString();
-        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection-2.xml"));
 
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection-2.xml"),
+                writer.toString());
 
         /**
          * Test 3 : query on typeName NamedPlaces
@@ -642,12 +576,10 @@ public class WFSWorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        xmlResult = writer.toString();
-        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"),
+                writer.toString());
 
         /**
          * Test 4 : query on typeName NamedPlaces with resultType = HITS
@@ -677,15 +609,11 @@ public class WFSWorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        xmlResult = writer.toString();
-        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
-        assertEquals(xmlExpResult, xmlResult);
-
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"),
+                writer.toString());
+        
         /**
          * Test 6 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
          */
@@ -696,59 +624,34 @@ public class WFSWorkerTest {
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
-        boolean exLaunched = false;
         try {
             result = worker.getFeature(request);
             writer = new StringWriter();
             featureWriter.write((FeatureCollection)result,writer);
-            xmlResult = writer.toString();
-
+            String xmlResult = writer.toString();
+            fail("Should have raised an error.");
         } catch (DataStoreRuntimeException ex) {
-            exLaunched = true;
+            //ok
         }
 
-        assertTrue(exLaunched);
-        /*
-
-        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-
-        assertEquals(xmlExpResult, xmlResult);
-
-         /**
+        /**
          * Test 7 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
          */
-
         queries = new ArrayList<QueryType>();
         query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null);
         query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.ASC))));
         queries.add(query);
         request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
 
-        exLaunched = false;
         try {
             result = worker.getFeature(request);
             writer = new StringWriter();
             featureWriter.write((FeatureCollection)result,writer);
-            xmlResult = writer.toString();
-
+            String xmlResult = writer.toString();
+            fail("Should have raised an error.");
         } catch (DataStoreRuntimeException ex) {
-            exLaunched = true;
+            //ok
         }
-
-        assertTrue(exLaunched);
-
-        /*
-        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-
-        assertEquals(xmlExpResult, xmlResult);*/
 
     }
     
@@ -819,16 +722,14 @@ public class WFSWorkerTest {
         update.setInputFormat("bad inputFormat");
         request.getInsertOrUpdateOrDelete().add(update);
 
-        boolean exLanched = false;
         try {
             worker.transaction(request);
+            fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            exLanched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "inputFormat");
         }
 
-        assertTrue(exLanched);
 
         /**
          * Test 2 : transaction update for Feature type bridges with a bad property
@@ -841,16 +742,14 @@ public class WFSWorkerTest {
         properties.add(new PropertyType(new QName("whatever"), new ValueType("someValue")));
         request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, null, typeName, null));
 
-        exLanched = false;
         try {
             worker.transaction(request);
+            fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            exLanched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml}Bridges does not has such a property: whatever");
         }
 
-        assertTrue(exLanched);
 
         /**
          * Test 3 : transaction update for Feature type bridges with a bad property in filter
@@ -865,16 +764,13 @@ public class WFSWorkerTest {
         FilterType filter        = new FilterType(pe);
         request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, filter, typeName, null));
 
-        exLanched = false;
         try {
             worker.transaction(request);
+            fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            exLanched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml}Bridges does not has such a property: bad");
         }
-
-        assertTrue(exLanched);
 
         /**
          * Test 4 : transaction update for Feature type NamedPlaces with a property in filter
@@ -908,48 +804,37 @@ public class WFSWorkerTest {
 
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
-        String xmlResult = writer.toString();
-        String xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-3.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-3.xml"),
+                writer.toString());
+
     }
 
-    /**
-     *
-     *
-     */
     @Test
     public void TransactionDeleteTest() throws Exception {
 
         /**
          * Test 1 : transaction delete for Feature type bridges with a bad property in filter
          */
-
         QName typeName           = new QName("http://www.opengis.net/gml", "Bridges");
         ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("bad"), Boolean.TRUE);
         FilterType filter        = new FilterType(pe);
         DeleteElementType delete = new DeleteElementType(filter, null, typeName);
         TransactionType request  = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, delete);
 
-        boolean exLanched = false;
         try {
             worker.transaction(request);
+            fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            exLanched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml}Bridges does not has such a property: bad");
         }
 
-        assertTrue(exLanched);
 
         /**
          * Test 2 : transaction delete for Feature type NamedPlaces with a property in filter
          */
-
         typeName = new QName("http://www.opengis.net/gml", "NamedPlaces");
         pe       = new PropertyIsEqualToType(new LiteralType("Ashton"), new PropertyNameType("NAME"), Boolean.TRUE);
         filter   = new FilterType(pe);
@@ -974,49 +859,10 @@ public class WFSWorkerTest {
 
         StringWriter writer = new StringWriter();
         featureWriter.write((FeatureCollection)resultGF,writer);
-        String xmlResult = writer.toString();
-        String xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-2.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
 
-        assertEquals(xmlExpResult, xmlResult);
-
-        /**
-         * Test 3 : transaction delete for Feature type SamplingPoint with a property in filter
-         
-
-        typeName = new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint");
-        pe       = new PropertyIsEqualToType(new LiteralType("10972X0137-PLOUF"), new PropertyNameType("name"), Boolean.TRUE);
-        filter   = new FilterType(pe);
-        delete   = new DeleteElementType(filter, null, typeName);
-        request  = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, delete);
-
-        result = worker.transaction(request);
-
-        sum = new TransactionSummaryType(0, 0, 1);
-        expresult = new TransactionResponseType(sum, null, null, "1.1.0");
-
-        assertEquals(expresult, result);
-
-        /**
-         * we verify that the feature have been deleted
-         
-        queries = new ArrayList<QueryType>();
-        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-        requestGF = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-
-        resultGF = worker.getFeature(requestGF);
-
-        xmlResult    = featureWriter.write((FeatureCollection)resultGF);
-        xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-2.xml"));
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-
-        assertEquals(xmlExpResult, xmlResult);*/
+         DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-2.xml"),
+                writer.toString());
     }
     /**
      *
@@ -1029,24 +875,20 @@ public class WFSWorkerTest {
          * Test 1 : transaction insert for Feature type bridges with a bad inputFormat
          */
 
-        QName typeName = new QName("http://www.opengis.net/gml", "Bridges");
-        TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
+        final QName typeName = new QName("http://www.opengis.net/gml", "Bridges");
+        final TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
 
-        InsertElementType insert = new InsertElementType();
+        final InsertElementType insert = new InsertElementType();
         insert.setInputFormat("bad inputFormat");
         request.getInsertOrUpdateOrDelete().add(insert);
 
-        boolean exLanched = false;
         try {
             worker.transaction(request);
+            fail("Should have raised an error.");
         } catch (CstlServiceException ex) {
-            exLanched = true;
             assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
             assertEquals(ex.getLocator(), "inputFormat");
         }
-
-        assertTrue(exLanched);
-
     }
 
     private static void initFeatureSource() throws Exception {
@@ -1219,16 +1061,6 @@ public class WFSWorkerTest {
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             service.setConfiguration(new ProviderConfig());
         }
-    }
-
-
-    public static String removeXmlns(String xml) {
-        String s = xml;
-        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
-        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
-        return s;
     }
 
 }

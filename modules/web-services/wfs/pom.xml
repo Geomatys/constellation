@@ -105,6 +105,14 @@
     </dependency>
 
     <!-- Test dependencies -->
+
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-jaxp-core</artifactId>
+      <version>${geotoolkit.version}</version>
+      <scope>test</scope>
+      <classifier>tests</classifier>
+    </dependency>
     <dependency>
       <groupId>org.constellation.testing</groupId>
       <artifactId>cstl-test-data</artifactId>

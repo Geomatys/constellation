@@ -18,10 +18,8 @@
 
 package org.constellation.util;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
@@ -33,11 +31,11 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.geotoolkit.internal.sql.ScriptRunner;
 
 /**
  * Utility methods of general use.
@@ -169,34 +167,8 @@ public final class Util {
     public static void executeSQLScript(String path, Connection connection, boolean derbySource) {
 
         try {
-            final BufferedReader in = new BufferedReader(new InputStreamReader(getResourceAsStream(path), "UTF-8"));
-            final StringWriter sw   = new StringWriter();
-            final char[] buffer     = new char[1024];
-            int size;
-            while ((size = in.read(buffer, 0, 1024)) > 0) {
-                sw.append(new String(buffer, 0, size));
-            }
-            in.close();
-
-            final Statement stmt  = connection.createStatement();
-            String sqlQuery       = sw.toString();
-            int end               = sqlQuery.indexOf(';');
-            int nbQuery           = 0;
-            while (end != -1) {
-                String singleQuery = sqlQuery.substring(0, end);
-                if (derbySource) {
-                    singleQuery = singleQuery.replaceAll("true", "1");
-                    singleQuery = singleQuery.replaceAll("false", "0");
-                }
-                try {
-                    stmt.execute(singleQuery);
-                    nbQuery++;
-                } catch (SQLException ex) {
-                    LOGGER.severe("SQLException while executing: " + singleQuery + '\n' + ex.getMessage() + '\n' + " in file:" + path + " instruction n° " + nbQuery);
-                }
-                sqlQuery = sqlQuery.substring(end + 1);
-                end      = sqlQuery.indexOf(';');
-            }
+            ScriptRunner runner = new ScriptRunner(connection);
+            runner.run(getResourceAsStream(path));
         } catch (IOException ex) {
             LOGGER.severe("IOException creating statement:" + '\n' + ex.getMessage());
         } catch (SQLException ex) {
