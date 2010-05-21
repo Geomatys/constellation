@@ -686,6 +686,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             availableStandards.add(Standard.ISO_19103);
             availableStandards.add(Standard.ISO_19119);
             availableStandards.add(Standard.ISO_19110);
+            availableStandards.add(mdWriter.getStandard("NATSDI"));
         
         // CSW standard    
         } else if (Standard.CSW.equals(mainStandard)) {

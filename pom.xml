@@ -554,6 +554,11 @@
       </dependency>
       <dependency>
         <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-xml-natSDI</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-jaxp-gml</artifactId>
         <version>${geotoolkit.version}</version>
       </dependency>

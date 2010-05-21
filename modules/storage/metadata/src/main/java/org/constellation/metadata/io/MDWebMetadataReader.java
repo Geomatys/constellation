@@ -64,7 +64,6 @@ import org.mdweb.io.Reader;
 import org.geotoolkit.metadata.iso.MetadataEntity;
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
-import org.geotoolkit.metadata.iso.DefaultIdentifier;
 import org.geotoolkit.naming.DefaultLocalName;
 import org.geotoolkit.naming.DefaultNameFactory;
 import org.geotoolkit.temporal.object.TemporalUtilities;
@@ -122,6 +121,11 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * A list of package containing the SWE implementation
      */
     private List<String> swePackage;
+
+    /**
+     * A list of package containing the natureSDI implementation
+     */
+    private List<String> natureSDIPackage;
 
     /**
      * A list of package containing the GML implementation (JAXB binding not referencing)
@@ -272,6 +276,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                                                         "org.geotoolkit.ogc.xml");
         this.ebrimV3Package     = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
         this.ebrimV25Package    = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
+        this.natureSDIPackage   = FileUtilities.searchSubPackage("org.geotoolkit.naturesdi");
     }
 
     /**
@@ -655,7 +660,6 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         while (tryAgain) {
             try {
                 metaMap.put(attribName, param);
-                tryAgain = false;
                 return true;
             } catch (IllegalArgumentException e) {
                 LOGGER.finer(e.getMessage());
@@ -736,7 +740,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * @param className the standard name of a class. 
      * @return a primitive class.
      */
-    private Class getPrimitiveTypeFromName(String className, String standardName) {
+    private static Class getPrimitiveTypeFromName(String className, String standardName) {
 
         if (className.equalsIgnoreCase("CharacterString")) {
             return String.class;
@@ -766,6 +770,48 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Return a set of package to explore in function on the standard of the mdweb Classe and the mode.
+     *
+     * @param standardName
+     * @param className
+     * @param mode
+     * @return
+     */
+    private List<String> getPackageFromStandard(String standardName, String className, int mode) {
+        final List<String> packagesName;
+        if (standardName.equals("Catalog Web Service") || standardName.equals("DublinCore") ||
+            standardName.equals("OGC Web Service")     || standardName.equals("OGC Filter")) {
+            packagesName = cswPackage;
+
+        } else if (standardName.equals("Ebrim v3.0") || standardName.equals("Web Registry Service v1.0")) {
+            packagesName = ebrimV3Package;
+
+        } else if (standardName.equals("Ebrim v2.5") || standardName.equals("Web Registry Service v0.9")) {
+            packagesName = ebrimV25Package;
+
+        } else if (standardName.equals("NATSDI")) {
+            packagesName = natureSDIPackage;
+
+        } else if (standardName.equals("SensorML")) {
+            packagesName = sensorMLPackage;
+
+        } else if (standardName.equals("Sensor Web Enablement")) {
+            packagesName = swePackage;
+
+        } else if (standardName.equals("ISO 19108") && mode == SENSORML) {
+            packagesName = gmlPackage;
+
+        } else {
+            if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType") && !className.equals("AxisDirection")) {
+                packagesName = geotoolkitPackage;
+            } else {
+                packagesName = opengisPackage;
+            }
+        }
+        return packagesName;
     }
 
     /**
@@ -804,34 +850,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             className = "ReferenceSystemMetadata";
         }
 
-        List<String> packagesName;
-        if (standardName.equals("Catalog Web Service") || standardName.equals("DublinCore") || 
-            standardName.equals("OGC Web Service")     || standardName.equals("OGC Filter")) {
-            packagesName = cswPackage;
-            
-        } else if (standardName.equals("Ebrim v3.0") || standardName.equals("Web Registry Service v1.0")) {
-            packagesName = ebrimV3Package;
-            
-        } else if (standardName.equals("Ebrim v2.5") || standardName.equals("Web Registry Service v0.9")) {
-            packagesName = ebrimV25Package;
-        
-        } else if (standardName.equals("SensorML")) {
-            packagesName = sensorMLPackage;
-
-        } else if (standardName.equals("Sensor Web Enablement")) {
-            packagesName = swePackage;
-
-        } else if (standardName.equals("ISO 19108") && mode == SENSORML) {
-            packagesName = gmlPackage;
-
-        } else {
-            if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType") && !className.equals("AxisDirection")) {
-                packagesName = geotoolkitPackage;
-            } else {
-                packagesName = opengisPackage;
-            }
-        }
-
+        List<String> packagesName = getPackageFromStandard(standardName, className, mode);
 
         for (String packageName : packagesName) {
             

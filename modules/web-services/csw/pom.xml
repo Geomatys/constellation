@@ -120,6 +120,10 @@
       <artifactId>geotk-xml-feature-catalogue</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-xml-natSDI</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-epsg</artifactId>
     </dependency>
