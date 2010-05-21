@@ -343,7 +343,7 @@
         <groupId>org.geotoolkit</groupId>
         <artifactId>geotk-epsg</artifactId>
         <version>${geotoolkit.version}</version>
-        <scope>runtime</scope>  <!-- Required only when creating the embedded EPSG database -->
+        <scope>runtime</scope> <!-- Required only when creating the embedded EPSG database -->
       </dependency>
       <dependency>
         <groupId>org.geotoolkit</groupId>
