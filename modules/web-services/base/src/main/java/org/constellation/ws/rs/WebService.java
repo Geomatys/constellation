@@ -29,6 +29,7 @@ import com.sun.jersey.api.core.HttpContext;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map.Entry;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
@@ -368,9 +369,9 @@ public abstract class WebService {
 
         //maybe the parameterName is case sensitive.
         if (values == null) {
-            for(final String key : parameters.keySet()){
-                if(key.equalsIgnoreCase(parameterName)){
-                    values = parameters.get(key);
+            for(final Entry<String, List<String>> key : parameters.entrySet()){
+                if(key.getKey().equalsIgnoreCase(parameterName)){
+                    values = key.getValue();
                     break;
                 }
             }

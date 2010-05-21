@@ -22,6 +22,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -41,8 +42,13 @@ public abstract class AbstractMetadataWriter implements MetadataWriter {
      */
     protected static final List<DateFormat> DATE_FORMAT = new ArrayList<DateFormat>();
     static {
-        DATE_FORMAT.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ"));
-        DATE_FORMAT.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ"));
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        df.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+        DATE_FORMAT.add(df);
+        
+        df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        df.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+        DATE_FORMAT.add(df);
     }
     
     public static final int INSERTED = 0;

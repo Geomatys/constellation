@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.SortedSet;
+import java.util.TimeZone;
 import java.util.TreeSet;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -60,6 +61,7 @@ public class PeriodUtilitiesTest {
     @Test
     public void getDatesRespresentation() throws ParseException {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        df.setTimeZone(TimeZone.getTimeZone("GMT+0"));
         PeriodUtilities instance = new PeriodUtilities(df);
         SortedSet<Date> dates;
         
@@ -207,7 +209,7 @@ public class PeriodUtilitiesTest {
         //isolated date
         dates.add(df.parse("2011-10-31T00:00:00Z"));
         
-        expResult = "2003-01-07T00:00:00Z,2004-01-07T00:00:00Z,2004-01-28T00:00:00Z/2004-03-17T00:00:00Z/P1W,2005-03-02T00:00:00Z,2005-07-20T00:00:00Z,2005-11-09T00:00:00Z/2005-11-30T00:00:00Z/P1W,2009-10-31T00:00:00Z,2010-10-31T00:00:00Z,2011-10-31T00:00:00Z";
+        expResult = "2003-01-07T00:00:00Z,2004-01-07T00:00:00Z,2004-01-28T00:00:00Z/2004-03-17T00:00:00Z/P1W,2005-03-02T00:00:00Z,2005-07-20T00:00:00Z,2005-11-09T00:00:00Z/2005-11-30T00:00:00Z/P1W,2009-10-31T00:00:00Z/2011-10-31T00:00:00Z/P12M";
         result = instance.getDatesRespresentation(dates);
         assertEquals(expResult, result);
         
@@ -220,6 +222,7 @@ public class PeriodUtilitiesTest {
     @Test
     public void getPeriodDescription() throws ParseException {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        df.setTimeZone(TimeZone.getTimeZone("GMT+0"));
         PeriodUtilities instance = new PeriodUtilities(df);
         
         SortedSet<Date> dates;
@@ -284,6 +287,7 @@ public class PeriodUtilitiesTest {
         
         
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        df.setTimeZone(TimeZone.getTimeZone("GMT+0"));
         PeriodUtilities instance = new PeriodUtilities(df);
         SortedSet<Date> expResult;
         
@@ -418,6 +422,7 @@ public class PeriodUtilitiesTest {
     @Test
     public void getTimeFromPeriodDescription() {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        df.setTimeZone(TimeZone.getTimeZone("GMT+0"));
         PeriodUtilities instance = new PeriodUtilities(df);
         
         /**

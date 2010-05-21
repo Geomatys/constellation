@@ -614,9 +614,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         attribName = "abbreviation";
                     } else if (attribName.equalsIgnoreCase("uom")) {
                         attribName = "unit";
-                    } else if (attribName.equalsIgnoreCase("codeSpace") && !(result instanceof DefaultIdentifier)) {
+                    } /*else if (attribName.equalsIgnoreCase("codeSpace") && !(result instanceof DefaultIdentifier)) {
                         attribName = "codespace";
-                    }
+                    }*/
                 }
 
                 boolean putSuceed = false;

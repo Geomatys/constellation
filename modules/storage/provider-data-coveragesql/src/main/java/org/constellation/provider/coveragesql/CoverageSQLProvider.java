@@ -100,10 +100,10 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         //parse string if old format : exemple jdbc:postgresql://server/database
         String oldDataBase = properties.getProperty(KEY_DATABASE);
         if(oldDataBase.contains("/")){
-            int index = oldDataBase.lastIndexOf("/");
+            int index = oldDataBase.lastIndexOf('/');
             dbName = oldDataBase.substring(index+1, oldDataBase.length());
             oldDataBase = oldDataBase.substring(0, index);
-            index = oldDataBase.lastIndexOf("/");
+            index = oldDataBase.lastIndexOf('/');
             server = oldDataBase.substring(index+1, oldDataBase.length());
 
             if(server.contains(":")){

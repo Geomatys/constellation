@@ -95,9 +95,9 @@
                     <gmd:code>
                         <gmx:Anchor xlink:href="SDN:L101:2:4326">EPSG:4326</gmx:Anchor>
                     </gmd:code>
-                    <gmd:codespace>
+                    <gmd:codeSpace>
                         <gco:CharacterString>L101</gco:CharacterString>
-                    </gmd:codespace>
+                    </gmd:codeSpace>
                     <gmd:authority>
                         <gmd:CI_Citation>
                             <gmd:title>
@@ -541,7 +541,7 @@
             <gmd:transferOptions>
                 <gmd:MD_DigitalTransferOptions>
                     <gmd:transferSize>
-                        <gco:Decimal>2.431640625</gco:Decimal>
+                        <gco:Real>2.431640625</gco:Real>
                     </gmd:transferSize>
                     <gmd:onLine>
                         <gmd:CI_OnlineResource>

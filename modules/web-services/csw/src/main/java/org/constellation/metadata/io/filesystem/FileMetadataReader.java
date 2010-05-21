@@ -29,6 +29,7 @@ import java.util.Map;
 
 // JAXB dependencies
 import java.util.StringTokenizer;
+import java.util.TimeZone;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -94,7 +95,11 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     /**
      * A date formatter used to display the Date object for dublin core translation.
      */
-    private static final DateFormat FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+    private static final DateFormat FORMATTER;
+    static {
+        FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        //FORMATTER.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+    }
 
     private static final String METAFILE_MSG = "The metadata file : ";
     /**
