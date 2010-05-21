@@ -45,8 +45,8 @@ import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.provider.sml.SMLProvider;
 import org.constellation.provider.sml.SMLProviderService;
 import org.constellation.util.Util;
-import org.constellation.wfs.utils.GlobalUtils;
 import org.constellation.ws.CstlServiceException;
+
 import org.geotoolkit.data.DataStoreRuntimeException;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.feature.xml.XmlFeatureWriter;
@@ -81,9 +81,10 @@ import org.geotoolkit.wfs.xml.v110.UpdateElementType;
 import org.geotoolkit.wfs.xml.v110.ValueType;
 import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.xsd.xml.v2001.Schema;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
-import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -160,8 +161,8 @@ public class WFSWorkerTest {
 
         StringWriter sw = new StringWriter();
         marshaller.marshal(result, sw);
-        String xmlResult    = GlobalUtils.removeXmlns(sw.toString());
-        String xmlExpResult = GlobalUtils.removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml")));
+        String xmlResult    = removeXmlns(sw.toString());
+        String xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml")));
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -215,8 +216,8 @@ public class WFSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        xmlResult    = GlobalUtils.removeXmlns(sw.toString());
-        xmlExpResult = GlobalUtils.removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml")));
+        xmlResult    = removeXmlns(sw.toString());
+        xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml")));
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -229,8 +230,8 @@ public class WFSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        xmlResult    = GlobalUtils.removeXmlns(sw.toString());
-        xmlExpResult = GlobalUtils.removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-om.xml")));
+        xmlResult    = removeXmlns(sw.toString());
+        xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-om.xml")));
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -243,8 +244,8 @@ public class WFSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        xmlResult    = GlobalUtils.removeXmlns(sw.toString());
-        xmlExpResult = GlobalUtils.removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-si.xml")));
+        xmlResult    = removeXmlns(sw.toString());
+        xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-si.xml")));
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -257,8 +258,8 @@ public class WFSWorkerTest {
 
         sw = new StringWriter();
         marshaller.marshal(result, sw);
-        xmlResult    = GlobalUtils.removeXmlns(sw.toString());
-        xmlExpResult = GlobalUtils.removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml")));
+        xmlResult    = removeXmlns(sw.toString());
+        xmlExpResult = removeXmlns(FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml")));
 
         assertEquals(xmlExpResult, xmlResult);
     }
@@ -1218,6 +1219,16 @@ public class WFSWorkerTest {
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             service.setConfiguration(new ProviderConfig());
         }
+    }
+
+
+    public static String removeXmlns(String xml) {
+        String s = xml;
+        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
+        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
+        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
+        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
+        return s;
     }
 
 }
