@@ -144,301 +144,301 @@ public class WFSWorkerTest {
     @After
     public void tearDown() throws Exception {
     }
-//
-//    /**
-//     * test the feature marshall
-//     *
-//     */
-//    @Test
-//    public void getCapabilitiesTest() throws JAXBException, CstlServiceException, IOException, ParserConfigurationException, SAXException {
-//        final Marshaller marshaller = pool.acquireMarshaller();
-//
-//        GetCapabilitiesType request = new GetCapabilitiesType("WFS");
-//        WFSCapabilitiesType result = worker.getCapabilities(request);
-//
-//        StringWriter sw = new StringWriter();
-//        marshaller.marshal(result, sw);
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml"),
-//                sw.toString());
-//
-//        AcceptVersionsType acceptVersion = new AcceptVersionsType("2.3.0");
-//        request = new GetCapabilitiesType(acceptVersion, null, null, null, "WFS");
-//
-//        try {
-//            result = worker.getCapabilities(request);
-//            fail("Should have raised an error.");
-//        } catch (CstlServiceException ex) {
-//            assertEquals(ex.getExceptionCode(), VERSION_NEGOTIATION_FAILED);
-//            assertEquals(ex.getLocator(), "version");
-//        }
-//
-//        request = new GetCapabilitiesType(acceptVersion, null, null, null, "WPS");
-//
-//        try {
-//            result = worker.getCapabilities(request);
-//            fail("Should have raised an error.");
-//        } catch (CstlServiceException ex) {
-//            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-//            assertEquals(ex.getLocator(), "service");
-//        }
-//
-//        request = new GetCapabilitiesType(null);
-//
-//        try {
-//            result = worker.getCapabilities(request);
-//            fail("Should have raised an error.");
-//        } catch (CstlServiceException ex) {
-//            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
-//            assertEquals(ex.getLocator(), "service");
-//        }
-//
-//
-//        acceptVersion = new AcceptVersionsType("1.1.0");
-//        SectionsType sections = new SectionsType("featureTypeList");
-//        request       = new GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
-//
-//        result = worker.getCapabilities(request);
-//
-//
-//        sw = new StringWriter();
-//        marshaller.marshal(result, sw);
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml"),
-//                sw.toString());
-//
-//        acceptVersion = new AcceptVersionsType("1.1.0");
-//        sections      = new SectionsType("operationsMetadata");
-//        request       = new GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
-//
-//        result = worker.getCapabilities(request);
-//
-//
-//        sw = new StringWriter();
-//        marshaller.marshal(result, sw);
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-om.xml"),
-//                sw.toString());
-//
-//        acceptVersion = new AcceptVersionsType("1.1.0");
-//        sections      = new SectionsType("serviceIdentification");
-//        request       = new GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
-//
-//        result = worker.getCapabilities(request);
-//
-//
-//        sw = new StringWriter();
-//        marshaller.marshal(result, sw);
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-si.xml"),
-//                sw.toString());
-//
-//        acceptVersion = new AcceptVersionsType("1.1.0");
-//        sections      = new SectionsType("serviceProvider");
-//        request       = new GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
-//
-//        result = worker.getCapabilities(request);
-//
-//
-//        sw = new StringWriter();
-//        marshaller.marshal(result, sw);
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml"),
-//                sw.toString());
-//
-//    }
-//
-//     /**
-//     * test the Getfeature operations with bad parameter causing exception return
-//     *
-//     */
-//    @Test
-//    public void getFeatureErrorTest() throws Exception {
-//        /**
-//         * Test 1 : empty query => error
-//         */
-//        GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        Object result = null;
-//        try {
-//            result = worker.getFeature(request);
-//            fail("Should have raised an error.");
-//        } catch (CstlServiceException ex) {
-//            //ok
-//        }
-//
-//        /**
-//         * Test 2 : bad version => error
-//         */
-//        request = new GetFeatureType("WFS", "1.2.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        try {
-//            result = worker.getFeature(request);
-//            fail("Should have raised an error.");
-//        } catch (CstlServiceException ex) {
-//            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-//            assertEquals(ex.getLocator(), "version");
-//        }
-//    }
-//
-//     /**
-//     * test the feature marshall
-//     *
-//     */
-//    @Test
-//    public void getFeatureOMTest() throws Exception {
-//
-//        /**
-//         * Test 1 : query on typeName samplingPoint
-//         */
-//        List<QueryType> queries = new ArrayList<QueryType>();
-//        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-//        GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        Object result = worker.getFeature(request);
-//
-//        StringWriter writer = new StringWriter();
-//        featureWriter.write((FeatureCollection)result,writer);
-//
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"),
-//                writer.toString());
-//
-//        /**
-//         * Test 2 : query on typeName samplingPoint whith HITS result type
-//         */
-//        queries = new ArrayList<QueryType>();
-//        QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
-//        queries.add(query);
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
-//
-//        FeatureCollectionType resultHits = (FeatureCollectionType) worker.getFeature(request);
-//
-//        assertTrue(resultHits.getNumberOfFeatures() == 2);
-//
-//
-//        /**
-//         * Test 3 : query on typeName samplingPoint with propertyName = {gml:name}
-//         */
-//        queries = new ArrayList<QueryType>();
-//        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
-//        query.getPropertyNameOrXlinkPropertyNameOrFunction().add("gml:name");
-//        queries.add(query);
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        result = worker.getFeature(request);
-//
-//        writer = new StringWriter();
-//        featureWriter.write((FeatureCollection)result,writer);
-//
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-5.xml"),
-//                writer.toString());
-//
-//
-//        /**
-//         * Test 4 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
-//         */
-//        queries = new ArrayList<QueryType>();
-//        ComparisonOpsType pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("name"), Boolean.TRUE);
-//        FilterType filter = new FilterType(pe);
-//        queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        result = worker.getFeature(request);
-//
-//        writer = new StringWriter();
-//        featureWriter.write((FeatureCollection)result,writer);
-//
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"),
-//                writer.toString());
-//
-//        /**
-//         * Test 5 : query on typeName samplingPoint with sort on gml:name
-//         */
-//
-//        queries = new ArrayList<QueryType>();
-//        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
-//        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.ASC))));
-//        queries.add(query);
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        result = worker.getFeature(request);
-//
-//        writer = new StringWriter();
-//        featureWriter.write((FeatureCollection)result,writer);
-//
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6.xml"),
-//                writer.toString());
-//
-//        /**
-//         * Test 6 : query on typeName samplingPoint with sort on gml:name
-//         */
-//        queries = new ArrayList<QueryType>();
-//        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
-//        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.DESC))));
-//        queries.add(query);
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        result = worker.getFeature(request);
-//
-//        writer = new StringWriter();
-//        featureWriter.write((FeatureCollection)result,writer);
-//
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7.xml"),
-//                writer.toString());
-//
-//        /**
-//         * Test 7 : query on typeName samplingPoint whith HITS result type
-//         */
-//        queries = new ArrayList<QueryType>();
-//        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
-//        queries.add(query);
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
-//
-//        resultHits = (FeatureCollectionType) worker.getFeature(request);
-//
-//        assertTrue(resultHits.getNumberOfFeatures() == 2);
-//
-//
-//        /**
-//         * Test 8 : query on typeName samplingPoint whith a filter with unexpected property
-//         */
-//
-//        queries = new ArrayList<QueryType>();
-//        pe = new PropertyIsEqualToType(new LiteralType("whatever"), new PropertyNameType("wrongProperty"), Boolean.TRUE);
-//        filter = new FilterType(pe);
-//        queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        try {
-//            result = worker.getFeature(request);
-//            fail("Should have raised an error.");
-//        } catch (CstlServiceException ex) {
-//            //ok
-//        }
-//
-//        /**
-//         * Test 9 : query on typeName samplingPoint whith a an unexpected property in propertyNames
-//         */
-//
-//        queries = new ArrayList<QueryType>();
-//        query = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
-//        query.getPropertyNameOrXlinkPropertyNameOrFunction().add("wrongProperty");
-//        queries.add(query);
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        try {
-//            result = worker.getFeature(request);
-//            fail("Should have raised an error.");
-//        } catch (CstlServiceException ex) {
-//            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-//        }
-//    }
-//
+
+    /**
+     * test the feature marshall
+     *
+     */
+    @Test
+    public void getCapabilitiesTest() throws JAXBException, CstlServiceException, IOException, ParserConfigurationException, SAXException {
+        final Marshaller marshaller = pool.acquireMarshaller();
+
+        GetCapabilitiesType request = new GetCapabilitiesType("WFS");
+        WFSCapabilitiesType result = worker.getCapabilities(request);
+
+        StringWriter sw = new StringWriter();
+        marshaller.marshal(result, sw);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0.xml"),
+                sw.toString());
+
+        AcceptVersionsType acceptVersion = new AcceptVersionsType("2.3.0");
+        request = new GetCapabilitiesType(acceptVersion, null, null, null, "WFS");
+
+        try {
+            result = worker.getCapabilities(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), VERSION_NEGOTIATION_FAILED);
+            assertEquals(ex.getLocator(), "version");
+        }
+
+        request = new GetCapabilitiesType(acceptVersion, null, null, null, "WPS");
+
+        try {
+            result = worker.getCapabilities(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "service");
+        }
+
+        request = new GetCapabilitiesType(null);
+
+        try {
+            result = worker.getCapabilities(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "service");
+        }
+
+
+        acceptVersion = new AcceptVersionsType("1.1.0");
+        SectionsType sections = new SectionsType("featureTypeList");
+        request       = new GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
+
+        result = worker.getCapabilities(request);
+
+
+        sw = new StringWriter();
+        marshaller.marshal(result, sw);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-ftl.xml"),
+                sw.toString());
+
+        acceptVersion = new AcceptVersionsType("1.1.0");
+        sections      = new SectionsType("operationsMetadata");
+        request       = new GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
+
+        result = worker.getCapabilities(request);
+
+
+        sw = new StringWriter();
+        marshaller.marshal(result, sw);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-om.xml"),
+                sw.toString());
+
+        acceptVersion = new AcceptVersionsType("1.1.0");
+        sections      = new SectionsType("serviceIdentification");
+        request       = new GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
+
+        result = worker.getCapabilities(request);
+
+
+        sw = new StringWriter();
+        marshaller.marshal(result, sw);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-si.xml"),
+                sw.toString());
+
+        acceptVersion = new AcceptVersionsType("1.1.0");
+        sections      = new SectionsType("serviceProvider");
+        request       = new GetCapabilitiesType(acceptVersion, sections, null, null, "WFS");
+
+        result = worker.getCapabilities(request);
+
+
+        sw = new StringWriter();
+        marshaller.marshal(result, sw);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml"),
+                sw.toString());
+
+    }
+
+     /**
+     * test the Getfeature operations with bad parameter causing exception return
+     *
+     */
+    @Test
+    public void getFeatureErrorTest() throws Exception {
+        /**
+         * Test 1 : empty query => error
+         */
+        GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        Object result = null;
+        try {
+            result = worker.getFeature(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            //ok
+        }
+
+        /**
+         * Test 2 : bad version => error
+         */
+        request = new GetFeatureType("WFS", "1.2.0", null, Integer.MAX_VALUE, null, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        try {
+            result = worker.getFeature(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "version");
+        }
+    }
+
+     /**
+     * test the feature marshall
+     *
+     */
+    @Test
+    public void getFeatureOMTest() throws Exception {
+
+        /**
+         * Test 1 : query on typeName samplingPoint
+         */
+        List<QueryType> queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
+        GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        Object result = worker.getFeature(request);
+
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-3.xml"),
+                writer.toString());
+
+        /**
+         * Test 2 : query on typeName samplingPoint whith HITS result type
+         */
+        queries = new ArrayList<QueryType>();
+        QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
+
+        FeatureCollectionType resultHits = (FeatureCollectionType) worker.getFeature(request);
+
+        assertTrue(resultHits.getNumberOfFeatures() == 2);
+
+
+        /**
+         * Test 3 : query on typeName samplingPoint with propertyName = {gml:name}
+         */
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
+        query.getPropertyNameOrXlinkPropertyNameOrFunction().add("gml:name");
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-5.xml"),
+                writer.toString());
+
+
+        /**
+         * Test 4 : query on typeName samplingPoint whith a filter name = 10972X0137-PONT
+         */
+        queries = new ArrayList<QueryType>();
+        ComparisonOpsType pe = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("name"), Boolean.TRUE);
+        FilterType filter = new FilterType(pe);
+        queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-4.xml"),
+                writer.toString());
+
+        /**
+         * Test 5 : query on typeName samplingPoint with sort on gml:name
+         */
+
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
+        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.ASC))));
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-6.xml"),
+                writer.toString());
+
+        /**
+         * Test 6 : query on typeName samplingPoint with sort on gml:name
+         */
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
+        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("http://www.opengis.net/gml:name", SortOrderType.DESC))));
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.samplingPointCollection-7.xml"),
+                writer.toString());
+
+        /**
+         * Test 7 : query on typeName samplingPoint whith HITS result type
+         */
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
+
+        resultHits = (FeatureCollectionType) worker.getFeature(request);
+
+        assertTrue(resultHits.getNumberOfFeatures() == 2);
+
+
+        /**
+         * Test 8 : query on typeName samplingPoint whith a filter with unexpected property
+         */
+
+        queries = new ArrayList<QueryType>();
+        pe = new PropertyIsEqualToType(new LiteralType("whatever"), new PropertyNameType("wrongProperty"), Boolean.TRUE);
+        filter = new FilterType(pe);
+        queries.add(new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        try {
+            result = worker.getFeature(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            //ok
+        }
+
+        /**
+         * Test 9 : query on typeName samplingPoint whith a an unexpected property in propertyNames
+         */
+
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(filter, Arrays.asList(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint")), null);
+        query.getPropertyNameOrXlinkPropertyNameOrFunction().add("wrongProperty");
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        try {
+            result = worker.getFeature(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+        }
+    }
+
     /**
      * test the feature marshall
      *
@@ -457,11 +457,11 @@ public class WFSWorkerTest {
         Object result = worker.getFeature(request);
 
         StringWriter writer = new StringWriter();
-//        featureWriter.write((FeatureCollection)result,writer);
-//
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"),
-//                writer.toString());
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-1.xml"),
+                writer.toString());
 
 
         /**
@@ -500,389 +500,381 @@ public class WFSWorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        String xmlResult = writer.toString();
-        String xmlExpResult = FileUtilities.getStringFromFile(FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-2.xml"));
 
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-
-        // to see
-        xmlExpResult = xmlExpResult.replaceAll("srsName=\"\"", "srsName=\"urn:ogc:def:crs:epsg:7.5.0.1:27582\"");
-
-        assertEquals(xmlExpResult, xmlResult);
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-2.xml"),
+                writer.toString());
 
     }
-//
-//    /**
-//     * test the feature marshall
-//     *
-//     */
-//    @Test
-//    public void getFeatureShapeFileTest() throws Exception {
-//
-//        /**
-//         * Test 1 : query on typeName bridges
-//         */
-//
-//        List<QueryType> queries = new ArrayList<QueryType>();
-//        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "Bridges")), null));
-//        GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        Object result = worker.getFeature(request);
-//
-//        StringWriter writer = new StringWriter();
-//        featureWriter.write((FeatureCollection)result,writer);
-//
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"),
-//                writer.toString());
-//
-//        /**
-//         * Test 2 : query on typeName bridges with propertyName = {FID}
-//         */
-//        queries = new ArrayList<QueryType>();
-//        QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "Bridges")), null);
-//        query.getPropertyNameOrXlinkPropertyNameOrFunction().add("FID");
-//        queries.add(query);
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        result = worker.getFeature(request);
-//
-//        writer = new StringWriter();
-//        featureWriter.write((FeatureCollection)result,writer);
-//
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection-2.xml"),
-//                writer.toString());
-//
-//        /**
-//         * Test 3 : query on typeName NamedPlaces
-//         */
-//
-//        queries = new ArrayList<QueryType>();
-//        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        result = worker.getFeature(request);
-//
-//        writer = new StringWriter();
-//        featureWriter.write((FeatureCollection)result,writer);
-//
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"),
-//                writer.toString());
-//
-//        /**
-//         * Test 4 : query on typeName NamedPlaces with resultType = HITS
-//         */
-//
-//        queries = new ArrayList<QueryType>();
-//        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
-//
-//        result = worker.getFeature(request);
-//
-//        FeatureCollectionType resultHits = (FeatureCollectionType) worker.getFeature(request);
-//
-//        assertTrue(resultHits.getNumberOfFeatures() == 2);
-//
-//        /**
-//         * Test 5 : query on typeName NamedPlaces with srsName = EPSG:27582
-//         */
-//
-//        queries = new ArrayList<QueryType>();
-//        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null);
-//        query.setSrsName("EPSG:27582");
-//        queries.add(query);
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        result = worker.getFeature(request);
-//
-//        writer = new StringWriter();
-//        featureWriter.write((FeatureCollection)result,writer);
-//
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"),
-//                writer.toString());
-//
-//        /**
-//         * Test 6 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
-//         */
-//
-//        queries = new ArrayList<QueryType>();
-//        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null);
-//        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.DESC))));
-//        queries.add(query);
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        try {
-//            result = worker.getFeature(request);
-//            writer = new StringWriter();
-//            featureWriter.write((FeatureCollection)result,writer);
-//            String xmlResult = writer.toString();
-//            fail("Should have raised an error.");
-//        } catch (DataStoreRuntimeException ex) {
-//            //ok
-//        }
-//
-//        /**
-//         * Test 7 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
-//         */
-//        queries = new ArrayList<QueryType>();
-//        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null);
-//        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.ASC))));
-//        queries.add(query);
-//        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        try {
-//            result = worker.getFeature(request);
-//            writer = new StringWriter();
-//            featureWriter.write((FeatureCollection)result,writer);
-//            String xmlResult = writer.toString();
-//            fail("Should have raised an error.");
-//        } catch (DataStoreRuntimeException ex) {
-//            //ok
-//        }
-//
-//    }
-//
-//    /**
-//     *
-//     *
-//     */
-//    @Test
-//    public void DescribeFeatureTest() throws Exception {
-//        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-//
-//        /**
-//         * Test 1 : describe Feature type bridges
-//         */
-//        List<QName> typeNames = new ArrayList<QName>();
-//        typeNames.add(new QName("http://www.opengis.net/gml", "Bridges"));
-//        DescribeFeatureTypeType request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
-//
-//        Schema result = worker.describeFeatureType(request);
-//
-//        Schema ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/bridge.xsd"));
-//
-//        assertEquals(ExpResult, result);
-//
-//        /**
-//         * Test 2 : describe Feature type Sampling point
-//         */
-//        typeNames = new ArrayList<QName>();
-//        typeNames.add(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
-//        request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
-//
-//        result = worker.describeFeatureType(request);
-//
-//        ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/sampling.xsd"));
-//
-//        assertEquals(ExpResult, result);
-//
-//        /**
-//         * Test 3 : describe Feature type System
-//         */
-//        typeNames = new ArrayList<QName>();
-//        typeNames.add(new QName("http://www.opengis.net/sml/1.0", "System"));
-//        request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
-//
-//        result = worker.describeFeatureType(request);
-//
-//        ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system.xsd"));
-//
-//        assertEquals(ExpResult, result);
-//    }
-//
-//    /**
-//     *
-//     *
-//     */
-//    @Test
-//    public void TransactionUpdateTest() throws Exception {
-//
-//        /**
-//         * Test 1 : transaction update for Feature type bridges with a bad inputFormat
-//         */
-//
-//        QName typeName = new QName("http://www.opengis.net/gml", "Bridges");
-//        TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
-//
-//        List<PropertyType> properties = new ArrayList<PropertyType>();
-//        UpdateElementType update = new UpdateElementType(properties, null, typeName, null);
-//        update.setInputFormat("bad inputFormat");
-//        request.getInsertOrUpdateOrDelete().add(update);
-//
-//        try {
-//            worker.transaction(request);
-//            fail("Should have raised an error.");
-//        } catch (CstlServiceException ex) {
-//            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-//            assertEquals(ex.getLocator(), "inputFormat");
-//        }
-//
-//
-//        /**
-//         * Test 2 : transaction update for Feature type bridges with a bad property
-//         */
-//
-//        typeName = new QName("http://www.opengis.net/gml", "Bridges");
-//        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
-//
-//        properties = new ArrayList<PropertyType>();
-//        properties.add(new PropertyType(new QName("whatever"), new ValueType("someValue")));
-//        request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, null, typeName, null));
-//
-//        try {
-//            worker.transaction(request);
-//            fail("Should have raised an error.");
-//        } catch (CstlServiceException ex) {
-//            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-//            assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml}Bridges does not has such a property: whatever");
-//        }
-//
-//
-//        /**
-//         * Test 3 : transaction update for Feature type bridges with a bad property in filter
-//         */
-//
-//        typeName = new QName("http://www.opengis.net/gml", "Bridges");
-//        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
-//
-//        properties = new ArrayList<PropertyType>();
-//        properties.add(new PropertyType(new QName("NAME"), new ValueType("someValue")));
-//        ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("bad"), Boolean.TRUE);
-//        FilterType filter        = new FilterType(pe);
-//        request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, filter, typeName, null));
-//
-//        try {
-//            worker.transaction(request);
-//            fail("Should have raised an error.");
-//        } catch (CstlServiceException ex) {
-//            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-//            assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml}Bridges does not has such a property: bad");
-//        }
-//
-//        /**
-//         * Test 4 : transaction update for Feature type NamedPlaces with a property in filter
-//         */
-//
-//        typeName = new QName("http://www.opengis.net/gml", "NamedPlaces");
-//        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
-//
-//        properties = new ArrayList<PropertyType>();
-//        properties.add(new PropertyType(new QName("FID"), new ValueType("999")));
-//        pe     = new PropertyIsEqualToType(new LiteralType("Ashton"), new PropertyNameType("NAME"), Boolean.TRUE);
-//        filter = new FilterType(pe);
-//        request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, filter, typeName, null));
-//
-//
-//        TransactionResponseType result = worker.transaction(request);
-//
-//        TransactionSummaryType sum = new TransactionSummaryType(0, 1, 0);
-//        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, null, "1.1.0");
-//
-//        assertEquals(ExpResult, result);
-//
-//        /**
-//         * we verify that the feature have been updated
-//         */
-//         List<QueryType> queries = new ArrayList<QueryType>();
-//        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
-//        GetFeatureType requestGF = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        Object resultGF = worker.getFeature(requestGF);
-//
-//        StringWriter writer = new StringWriter();
-//        featureWriter.write((FeatureCollection)resultGF,writer);
-//
-//        DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-3.xml"),
-//                writer.toString());
-//
-//    }
-//
-//    @Test
-//    public void TransactionDeleteTest() throws Exception {
-//
-//        /**
-//         * Test 1 : transaction delete for Feature type bridges with a bad property in filter
-//         */
-//        QName typeName           = new QName("http://www.opengis.net/gml", "Bridges");
-//        ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("bad"), Boolean.TRUE);
-//        FilterType filter        = new FilterType(pe);
-//        DeleteElementType delete = new DeleteElementType(filter, null, typeName);
-//        TransactionType request  = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, delete);
-//
-//        try {
-//            worker.transaction(request);
-//            fail("Should have raised an error.");
-//        } catch (CstlServiceException ex) {
-//            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-//            assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml}Bridges does not has such a property: bad");
-//        }
-//
-//
-//        /**
-//         * Test 2 : transaction delete for Feature type NamedPlaces with a property in filter
-//         */
-//        typeName = new QName("http://www.opengis.net/gml", "NamedPlaces");
-//        pe       = new PropertyIsEqualToType(new LiteralType("Ashton"), new PropertyNameType("NAME"), Boolean.TRUE);
-//        filter   = new FilterType(pe);
-//        delete   = new DeleteElementType(filter, null, typeName);
-//        request  = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, delete);
-//
-//        TransactionResponseType result = worker.transaction(request);
-//
-//        TransactionSummaryType sum = new TransactionSummaryType(0, 0, 1);
-//        TransactionResponseType expresult = new TransactionResponseType(sum, null, null, "1.1.0");
-//
-//        assertEquals(expresult, result);
-//
-//        /**
-//         * we verify that the feature have been deleted
-//         */
-//        List<QueryType> queries = new ArrayList<QueryType>();
-//        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
-//        GetFeatureType requestGF = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
-//
-//        Object resultGF = worker.getFeature(requestGF);
-//
-//        StringWriter writer = new StringWriter();
-//        featureWriter.write((FeatureCollection)resultGF,writer);
-//
-//         DomCompare.compare(
-//                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-2.xml"),
-//                writer.toString());
-//    }
-//    /**
-//     *
-//     *
-//     */
-//    @Test
-//    public void TransactionInsertTest() throws Exception {
-//
-//        /**
-//         * Test 1 : transaction insert for Feature type bridges with a bad inputFormat
-//         */
-//
-//        final QName typeName = new QName("http://www.opengis.net/gml", "Bridges");
-//        final TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
-//
-//        final InsertElementType insert = new InsertElementType();
-//        insert.setInputFormat("bad inputFormat");
-//        request.getInsertOrUpdateOrDelete().add(insert);
-//
-//        try {
-//            worker.transaction(request);
-//            fail("Should have raised an error.");
-//        } catch (CstlServiceException ex) {
-//            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-//            assertEquals(ex.getLocator(), "inputFormat");
-//        }
-//    }
+
+    /**
+     * test the feature marshall
+     *
+     */
+    @Test
+    public void getFeatureShapeFileTest() throws Exception {
+
+        /**
+         * Test 1 : query on typeName bridges
+         */
+
+        List<QueryType> queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "Bridges")), null));
+        GetFeatureType request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        Object result = worker.getFeature(request);
+
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection.xml"),
+                writer.toString());
+
+        /**
+         * Test 2 : query on typeName bridges with propertyName = {FID}
+         */
+        queries = new ArrayList<QueryType>();
+        QueryType query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "Bridges")), null);
+        query.getPropertyNameOrXlinkPropertyNameOrFunction().add("FID");
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.bridgeCollection-2.xml"),
+                writer.toString());
+
+        /**
+         * Test 3 : query on typeName NamedPlaces
+         */
+
+        queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"),
+                writer.toString());
+
+        /**
+         * Test 4 : query on typeName NamedPlaces with resultType = HITS
+         */
+
+        queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.HITS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        FeatureCollectionType resultHits = (FeatureCollectionType) worker.getFeature(request);
+
+        assertTrue(resultHits.getNumberOfFeatures() == 2);
+
+        /**
+         * Test 5 : query on typeName NamedPlaces with srsName = EPSG:27582
+         */
+
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null);
+        query.setSrsName("EPSG:27582");
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.getFeature(request);
+
+        writer = new StringWriter();
+        featureWriter.write((FeatureCollection)result,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"),
+                writer.toString());
+
+        /**
+         * Test 6 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
+         */
+
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null);
+        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.DESC))));
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        try {
+            result = worker.getFeature(request);
+            writer = new StringWriter();
+            featureWriter.write((FeatureCollection)result,writer);
+            String xmlResult = writer.toString();
+            fail("Should have raised an error.");
+        } catch (DataStoreRuntimeException ex) {
+            //ok
+        }
+
+        /**
+         * Test 7 : query on typeName NamedPlaces with DESC sortBy on NAME property (not supported)
+         */
+        queries = new ArrayList<QueryType>();
+        query = new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null);
+        query.setSortBy(new SortByType(Arrays.asList(new SortPropertyType("NAME", SortOrderType.ASC))));
+        queries.add(query);
+        request = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        try {
+            result = worker.getFeature(request);
+            writer = new StringWriter();
+            featureWriter.write((FeatureCollection)result,writer);
+            String xmlResult = writer.toString();
+            fail("Should have raised an error.");
+        } catch (DataStoreRuntimeException ex) {
+            //ok
+        }
+
+    }
+
+    /**
+     *
+     *
+     */
+    @Test
+    public void DescribeFeatureTest() throws Exception {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+
+        /**
+         * Test 1 : describe Feature type bridges
+         */
+        List<QName> typeNames = new ArrayList<QName>();
+        typeNames.add(new QName("http://www.opengis.net/gml", "Bridges"));
+        DescribeFeatureTypeType request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
+
+        Schema result = worker.describeFeatureType(request);
+
+        Schema ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/bridge.xsd"));
+
+        assertEquals(ExpResult, result);
+
+        /**
+         * Test 2 : describe Feature type Sampling point
+         */
+        typeNames = new ArrayList<QName>();
+        typeNames.add(new QName("http://www.opengis.net/sampling/1.0", "SamplingPoint"));
+        request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.describeFeatureType(request);
+
+        ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/sampling.xsd"));
+
+        assertEquals(ExpResult, result);
+
+        /**
+         * Test 3 : describe Feature type System
+         */
+        typeNames = new ArrayList<QName>();
+        typeNames.add(new QName("http://www.opengis.net/sml/1.0", "System"));
+        request = new DescribeFeatureTypeType("WFS", "1.1.0", null, typeNames, "text/gml; subtype=gml/3.1.1");
+
+        result = worker.describeFeatureType(request);
+
+        ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system.xsd"));
+
+        assertEquals(ExpResult, result);
+    }
+
+    /**
+     *
+     *
+     */
+    @Test
+    public void TransactionUpdateTest() throws Exception {
+
+        /**
+         * Test 1 : transaction update for Feature type bridges with a bad inputFormat
+         */
+
+        QName typeName = new QName("http://www.opengis.net/gml", "Bridges");
+        TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
+
+        List<PropertyType> properties = new ArrayList<PropertyType>();
+        UpdateElementType update = new UpdateElementType(properties, null, typeName, null);
+        update.setInputFormat("bad inputFormat");
+        request.getInsertOrUpdateOrDelete().add(update);
+
+        try {
+            worker.transaction(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "inputFormat");
+        }
+
+
+        /**
+         * Test 2 : transaction update for Feature type bridges with a bad property
+         */
+
+        typeName = new QName("http://www.opengis.net/gml", "Bridges");
+        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
+
+        properties = new ArrayList<PropertyType>();
+        properties.add(new PropertyType(new QName("whatever"), new ValueType("someValue")));
+        request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, null, typeName, null));
+
+        try {
+            worker.transaction(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml}Bridges does not has such a property: whatever");
+        }
+
+
+        /**
+         * Test 3 : transaction update for Feature type bridges with a bad property in filter
+         */
+
+        typeName = new QName("http://www.opengis.net/gml", "Bridges");
+        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
+
+        properties = new ArrayList<PropertyType>();
+        properties.add(new PropertyType(new QName("NAME"), new ValueType("someValue")));
+        ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("bad"), Boolean.TRUE);
+        FilterType filter        = new FilterType(pe);
+        request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, filter, typeName, null));
+
+        try {
+            worker.transaction(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml}Bridges does not has such a property: bad");
+        }
+
+        /**
+         * Test 4 : transaction update for Feature type NamedPlaces with a property in filter
+         */
+
+        typeName = new QName("http://www.opengis.net/gml", "NamedPlaces");
+        request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
+
+        properties = new ArrayList<PropertyType>();
+        properties.add(new PropertyType(new QName("FID"), new ValueType("999")));
+        pe     = new PropertyIsEqualToType(new LiteralType("Ashton"), new PropertyNameType("NAME"), Boolean.TRUE);
+        filter = new FilterType(pe);
+        request.getInsertOrUpdateOrDelete().add(new UpdateElementType(properties, filter, typeName, null));
+
+
+        TransactionResponseType result = worker.transaction(request);
+
+        TransactionSummaryType sum = new TransactionSummaryType(0, 1, 0);
+        TransactionResponseType ExpResult = new TransactionResponseType(sum, null, null, "1.1.0");
+
+        assertEquals(ExpResult, result);
+
+        /**
+         * we verify that the feature have been updated
+         */
+         List<QueryType> queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
+        GetFeatureType requestGF = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        Object resultGF = worker.getFeature(requestGF);
+
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)resultGF,writer);
+
+        DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-3.xml"),
+                writer.toString());
+
+    }
+
+    @Test
+    public void TransactionDeleteTest() throws Exception {
+
+        /**
+         * Test 1 : transaction delete for Feature type bridges with a bad property in filter
+         */
+        QName typeName           = new QName("http://www.opengis.net/gml", "Bridges");
+        ComparisonOpsType pe     = new PropertyIsEqualToType(new LiteralType("10972X0137-PONT"), new PropertyNameType("bad"), Boolean.TRUE);
+        FilterType filter        = new FilterType(pe);
+        DeleteElementType delete = new DeleteElementType(filter, null, typeName);
+        TransactionType request  = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, delete);
+
+        try {
+            worker.transaction(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getMessage(), "The feature Type {http://www.opengis.net/gml}Bridges does not has such a property: bad");
+        }
+
+
+        /**
+         * Test 2 : transaction delete for Feature type NamedPlaces with a property in filter
+         */
+        typeName = new QName("http://www.opengis.net/gml", "NamedPlaces");
+        pe       = new PropertyIsEqualToType(new LiteralType("Ashton"), new PropertyNameType("NAME"), Boolean.TRUE);
+        filter   = new FilterType(pe);
+        delete   = new DeleteElementType(filter, null, typeName);
+        request  = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, delete);
+
+        TransactionResponseType result = worker.transaction(request);
+
+        TransactionSummaryType sum = new TransactionSummaryType(0, 0, 1);
+        TransactionResponseType expresult = new TransactionResponseType(sum, null, null, "1.1.0");
+
+        assertEquals(expresult, result);
+
+        /**
+         * we verify that the feature have been deleted
+         */
+        List<QueryType> queries = new ArrayList<QueryType>();
+        queries.add(new QueryType(null, Arrays.asList(new QName("http://www.opengis.net/gml", "NamedPlaces")), null));
+        GetFeatureType requestGF = new GetFeatureType("WFS", "1.1.0", null, Integer.MAX_VALUE, queries, ResultTypeType.RESULTS, "text/gml; subtype=gml/3.1.1");
+
+        Object resultGF = worker.getFeature(requestGF);
+
+        StringWriter writer = new StringWriter();
+        featureWriter.write((FeatureCollection)resultGF,writer);
+
+         DomCompare.compare(
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-2.xml"),
+                writer.toString());
+    }
+    /**
+     *
+     *
+     */
+    @Test
+    public void TransactionInsertTest() throws Exception {
+
+        /**
+         * Test 1 : transaction insert for Feature type bridges with a bad inputFormat
+         */
+
+        final QName typeName = new QName("http://www.opengis.net/gml", "Bridges");
+        final TransactionType request = new TransactionType("WFS", "1.1.0", null, AllSomeType.ALL, null);
+
+        final InsertElementType insert = new InsertElementType();
+        insert.setInputFormat("bad inputFormat");
+        request.getInsertOrUpdateOrDelete().add(insert);
+
+        try {
+            worker.transaction(request);
+            fail("Should have raised an error.");
+        } catch (CstlServiceException ex) {
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "inputFormat");
+        }
+    }
 
     private static void initFeatureSource() throws Exception {
 
