@@ -29,11 +29,14 @@ import java.util.StringTokenizer;
 
 // JAXB dependencies
 import java.util.logging.Logger;
+import javax.xml.bind.UnmarshalException;
+import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
 
 // jersey dependencies
@@ -51,15 +54,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 // constellation dependencies
-import javax.xml.bind.UnmarshalException;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.stream.XMLStreamException;
 import org.constellation.ServiceDef;
 import org.constellation.wfs.ws.DefaultWFSWorker;
 import org.constellation.wfs.ws.WFSWorker;
 import org.constellation.ws.CstlServiceException;
-//import org.constellation.ws.ExceptionReport;
-//import org.constellation.ws.ExceptionType;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 
@@ -91,10 +89,11 @@ import org.geotoolkit.wfs.xml.v110.LockType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionType;
-
 import org.geotoolkit.xml.MarshallerPool;
+
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.sort.SortOrder;
+
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.query.wfs.WFSQuery.*;
 import static org.constellation.wfs.ws.WFSConstants.*;

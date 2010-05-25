@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<wfs:WFS_Capabilities version="1.1.0" xmlns:wfs="http://www.opengis.net/wfs" xmlns:ows="http://www.opengis.net/ows" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ins="http://www.inspire.org" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<wfs:WFS_Capabilities version="1.1.0" 
+    xmlns:wfs="http://www.opengis.net/wfs"
+    xmlns:ows="http://www.opengis.net/ows"
+    xmlns:ogc="http://www.opengis.net/ogc"
+    xmlns:gml="http://www.opengis.net/gml"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:ins="http://www.inspire.org"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        
     <ows:ServiceIdentification>
         <ows:Title>Web Feature Service (Constellation)</ows:Title>
         <ows:Abstract>Features provided by constellation SDI server.</ows:Abstract>
@@ -163,7 +171,7 @@
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>
-            <wfs:Name >sml:System</wfs:Name>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:System</wfs:Name>
             <wfs:Title>System</wfs:Title>
             <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
@@ -207,20 +215,9 @@
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>
-            <wfs:Name >sml:Component</wfs:Name>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:Component</wfs:Name>
             <wfs:Title>Component</wfs:Title>
-            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:27582</wfs:DefaultSRS>
-            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
-            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
-            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
-                <ows:LowerCorner>-3.4038558208715486 27.137727560825525</ows:LowerCorner>
-                <ows:UpperCorner>-3.4038558208715486 27.137727560825525</ows:UpperCorner>
-            </ows:WGS84BoundingBox>
-        </wfs:FeatureType>
-        <wfs:FeatureType>
-            <wfs:Name >sml:DataSourceType</wfs:Name>
-            <wfs:Title>DataSourceType</wfs:Title>
-            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:27582</wfs:DefaultSRS>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
@@ -229,7 +226,18 @@
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>
-            <wfs:Name >sampling:SamplingPoint</wfs:Name>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:DataSourceType</wfs:Name>
+            <wfs:Title>DataSourceType</wfs:Title>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
+            <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
+            <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
+                <ows:LowerCorner>-180.0 -90.0</ows:LowerCorner>
+                <ows:UpperCorner>180.0 90.0</ows:UpperCorner>
+            </ows:WGS84BoundingBox>
+        </wfs:FeatureType>
+        <wfs:FeatureType>
+            <wfs:Name xmlns:sampling="http://www.opengis.net/sampling/1.0">sampling:SamplingPoint</wfs:Name>
             <wfs:Title>SamplingPoint</wfs:Title>
             <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
@@ -284,9 +292,9 @@
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>
-            <wfs:Name >sml:ProcessModel</wfs:Name>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:ProcessModel</wfs:Name>
             <wfs:Title>ProcessModel</wfs:Title>
-            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:27582</wfs:DefaultSRS>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">
@@ -306,9 +314,9 @@
             </ows:WGS84BoundingBox>
         </wfs:FeatureType>
         <wfs:FeatureType>
-            <wfs:Name >sml:ProcessChain</wfs:Name>
+            <wfs:Name xmlns:sml="http://www.opengis.net/sml/1.0">sml:ProcessChain</wfs:Name>
             <wfs:Title>ProcessChain</wfs:Title>
-            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:27582</wfs:DefaultSRS>
+            <wfs:DefaultSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:DefaultSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:4326</wfs:OtherSRS>
             <wfs:OtherSRS>urn:x-ogc:def:crs:EPSG:7.01:3395</wfs:OtherSRS>
             <ows:WGS84BoundingBox dimensions="2" crs="urn:ogc:def:crs:OGC:2:84">

@@ -910,25 +910,18 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      */
     private static WGS84BoundingBoxType toBBox(DataStore source, Name groupName) throws CstlServiceException{
         try {
-            final Envelope env = source.getEnvelope(QueryBuilder.all(groupName));
+            Envelope env = source.getEnvelope(QueryBuilder.all(groupName));
             final CoordinateReferenceSystem epsg4326 = CRS.decode("urn:ogc:def:crs:OGC:2:84");
             if (env != null) {
-                if (CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), epsg4326)) {
-                   return new WGS84BoundingBoxType(
-                           "urn:ogc:def:crs:OGC:2:84",
-                           env.getMinimum(0),
-                           env.getMinimum(1),
-                           env.getMaximum(0),
-                           env.getMaximum(1));
-                } else {
-                    final Envelope enveloppe = CRS.transform(env, epsg4326);
-                    return new WGS84BoundingBoxType(
-                            "urn:ogc:def:crs:OGC:2:84",
-                           enveloppe.getMinimum(0),
-                           enveloppe.getMinimum(1),
-                           enveloppe.getMaximum(0),
-                           enveloppe.getMaximum(1));
+                if (!CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), epsg4326)) {
+                    env = CRS.transform(env, epsg4326);
                 }
+                return new WGS84BoundingBoxType(
+                       "urn:ogc:def:crs:OGC:2:84",
+                       env.getMinimum(0),
+                       env.getMinimum(1),
+                       env.getMaximum(0),
+                       env.getMaximum(1));
             } else {
                 return new WGS84BoundingBoxType("urn:ogc:def:crs:OGC:2:84", -180, -90, 180, 90);
             }

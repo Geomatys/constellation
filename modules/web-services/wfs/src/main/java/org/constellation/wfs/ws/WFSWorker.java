@@ -18,9 +18,10 @@
 package org.constellation.wfs.ws;
 
 
-// Constellation dependencies
 import java.util.List;
 import java.util.Map;
+
+// Constellation dependencies
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.Worker;
 
