@@ -356,6 +356,8 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                 registryObject = mdWebReader.getClasse("RegistryObject", Standard.EBRIM_V2_5);
             }
 
+            boolean alreadySpatiallyIndexed = false;
+            
             if (form.getTopValue() == null) {
                 LOGGER.warning("unable to index form:" + form.getId() + " top value is null");
 
@@ -402,9 +404,13 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
                     }
 
 
-                    for (int i = 0; i < minxs.size(); i++) {
-                    addBoundingBox(doc, minxs.get(i), maxxs.get(i), minys.get(i), maxys.get(i), SRID_4326);
-                }
+                    if (minxs.size() == 1) {
+                        addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
+                        alreadySpatiallyIndexed = true;
+                    } else if (minxs.size() > 0) {
+                        addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
+                        alreadySpatiallyIndexed = true;
+                    }
 
                 } catch (NumberFormatException e) {
                     if (coord != null) {
@@ -464,57 +470,60 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             //we add the anyText values
             doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
 
-            //we add the geometry parts
-            List<String> coord = null;
-            try {
-                coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"), 1);
-                final List<Double> minxs = new ArrayList<Double>();
-                for (String minx : coord) {
-                    minxs.add(Double.parseDouble(minx));
-                }
-
-                coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("EastBoundLongitude"), 1);
-                final List<Double> maxxs = new ArrayList<Double>();
-                for (String maxx : coord) {
-                    maxxs.add(Double.parseDouble(maxx));
-                }
-
-                coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("NorthBoundLatitude"), 1);
-                final List<Double> maxys = new ArrayList<Double>();
-                for (String maxy : coord) {
-                    maxys.add(Double.parseDouble(maxy));
-                }
-
-                coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("SouthBoundLatitude"), 1);
-                final List<Double> minys = new ArrayList<Double>();
-                for (String miny : coord) {
-                    minys.add(Double.parseDouble(miny));
-                }
-
-
-                /*String crs = getValueList("CRS", form, DUBLIN_CORE_QUERYABLE.get("CRS"), -1);
-                if(crs == null || "null".equalsIgnoreCase(crs)){
-                    crs = "CRS:84";
-                }*/
-                final String crs = "CRS:84";
-                int srid = 4326;
+            if (!alreadySpatiallyIndexed) {
+                //we add the geometry parts
+                List<String> coord = null;
                 try {
-                    srid = SRIDGenerator.toSRID(crs, Version.V1);
-                } catch(IllegalArgumentException ex) {
-                    LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-                }
-
-                if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
-                    for (int i = 0; i < minxs.size(); i++) {
-                        addBoundingBox(doc, minxs.get(i), maxxs.get(i), minys.get(i), maxys.get(i), srid);
+                    coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"), 1);
+                    final List<Double> minxs = new ArrayList<Double>();
+                    for (String minx : coord) {
+                        minxs.add(Double.parseDouble(minx));
                     }
-                } else {
-                    LOGGER.warning("There is not the same number of coordinate: " + minxs.size() + " " + minys.size() + " " +  maxxs.size() + " " +  maxys.size());
+
+                    coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("EastBoundLongitude"), 1);
+                    final List<Double> maxxs = new ArrayList<Double>();
+                    for (String maxx : coord) {
+                        maxxs.add(Double.parseDouble(maxx));
+                    }
+
+                    coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("NorthBoundLatitude"), 1);
+                    final List<Double> maxys = new ArrayList<Double>();
+                    for (String maxy : coord) {
+                        maxys.add(Double.parseDouble(maxy));
+                    }
+
+                    coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("SouthBoundLatitude"), 1);
+                    final List<Double> minys = new ArrayList<Double>();
+                    for (String miny : coord) {
+                        minys.add(Double.parseDouble(miny));
+                    }
+
+
+                    /*String crs = getValueList("CRS", form, DUBLIN_CORE_QUERYABLE.get("CRS"), -1);
+                    if(crs == null || "null".equalsIgnoreCase(crs)){
+                        crs = "CRS:84";
+                    }*/
+                    final String crs = "CRS:84";
+                    int srid = 4326;
+                    try {
+                        srid = SRIDGenerator.toSRID(crs, Version.V1);
+                    } catch(IllegalArgumentException ex) {
+                        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                    }
+
+                    if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
+                        for (int i = 0; i < minxs.size(); i++) {
+                            addBoundingBox(doc, minxs.get(i), maxxs.get(i), minys.get(i), maxys.get(i), srid);
+                        }
+                    } else {
+                        LOGGER.warning("There is not the same number of coordinate: " + minxs.size() + " " + minys.size() + " " +  maxxs.size() + " " +  maxys.size());
+                    }
+
+                } catch (NumberFormatException e) {
+                        LOGGER.warning("unable to spatially index form: " + form.getTitle() + '\n' +
+                                      "cause:  unable to parse double: " + coord);
                 }
 
-            } catch (NumberFormatException e) {
-                    LOGGER.warning("unable to spatially index form: " + form.getTitle() + '\n' +
-                                  "cause:  unable to parse double: " + coord);
             }
 
             // add a default meta field to make searching all documents easy
