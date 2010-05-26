@@ -332,7 +332,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.ANALYZED));
         doc.add(new Field("id", identifier,  Field.Store.YES, Field.Index.NOT_ANALYZED));
 
-        final StringBuilder anyText = new StringBuilder();
+        final StringBuilder anyText     = new StringBuilder();
+        boolean alreadySpatiallyIndexed = false;
 
         if (metadata instanceof DefaultMetadata) {
             LOGGER.finer("indexing ISO 19119 MD_Metadata");
@@ -367,20 +368,22 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             String coord = NULL_VALUE;
             try {
                 coord = getValues(metadata, ISO_QUERYABLE.get("WestBoundLongitude"));
-                final double[] minx = extractPositions(coord);
+                final List<Double> minxs = extractPositions(coord);
 
                 coord = getValues(metadata, ISO_QUERYABLE.get("EastBoundLongitude"));
-                final double[] maxx = extractPositions(coord);
+                final List<Double> maxxs = extractPositions(coord);
 
                 coord = getValues(metadata, ISO_QUERYABLE.get("NorthBoundLatitude"));
-                final double[] maxy = extractPositions(coord);
+                final List<Double> maxys = extractPositions(coord);
 
                 coord = getValues(metadata, ISO_QUERYABLE.get("SouthBoundLatitude"));
-                final double[] miny = extractPositions(coord);
+                final List<Double> minys = extractPositions(coord);
 
-                if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
-                    for (int j = 0; j < minx.length; j++)  {
-                        addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
+                if (minxs.size() == maxxs.size() && maxxs.size() == minys.size() && minys.size() == maxys.size()) {
+                    if (minxs.size() == 1) {
+                        addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
+                    } else if (minxs.size() > 0) {
+                        addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
                     }
                 } else {
                     LOGGER.warning(NOT_SPATIALLY_INDEXABLE + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
@@ -437,23 +440,24 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         String coord = NULL_VALUE;
         try {
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"));
-            final double[] minx = extractPositions(coord);
+            final List<Double> minxs = extractPositions(coord);
 
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("EastBoundLongitude"));
-            final double[] maxx = extractPositions(coord);
+            final List<Double> maxxs = extractPositions(coord);
 
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("NorthBoundLatitude"));
-            final double[] maxy = extractPositions(coord);
+            final List<Double> maxys = extractPositions(coord);
 
             coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("SouthBoundLatitude"));
-            final double[] miny = extractPositions(coord);
+            final List<Double> minys = extractPositions(coord);
 
             // String crs = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("CRS"));
 
-            if (minx.length == maxx.length && maxx.length == miny.length && miny.length == maxy.length) {
-                for (int j = 0; j < minx.length; j++)  {
-                    LOGGER.finer("added new bbox:" + minx[j] + " " + maxx[j] + " " + miny[j] + " " + maxy[j] + " for identifier:" + identifier);
-                    addBoundingBox(doc, minx[j], maxx[j], miny[j], maxy[j], SRID_4326);
+            if (minxs.size() == maxxs.size() && maxxs.size() == minys.size() && minys.size() == maxys.size()) {
+                if (minxs.size() == 1) {
+                    addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
+                } else if (minxs.size() > 0) {
+                    addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
                 }
             } else {
                 if (metadata instanceof DefaultMetadata) {
@@ -513,12 +517,12 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param coord
      * @return
      */
-    private double[] extractPositions(final String coord) {
+    private List<Double> extractPositions(final String coord) {
         final StringTokenizer tokens = new StringTokenizer(coord, ",;");
-        final double[] coordinate = new double[tokens.countTokens()];
+        final List<Double> coordinate = new ArrayList<Double>(tokens.countTokens());
         int i = 0;
         while (tokens.hasMoreTokens()) {
-            coordinate[i] = Double.parseDouble(tokens.nextToken());
+            coordinate.add(Double.parseDouble(tokens.nextToken()));
             i++;
         }
         return coordinate;

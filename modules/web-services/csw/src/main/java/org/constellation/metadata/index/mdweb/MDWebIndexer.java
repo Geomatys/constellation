@@ -367,62 +367,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             // For an ISO 19115 form
             } else if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
 
-                LOGGER.finer("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
-                //TODO add ANyText
-                for (String term :ISO_QUERYABLE.keySet()) {
-                    doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.ANALYZED));
-                    doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.NOT_ANALYZED));
-                }
-
-               //we add the geometry parts
-                List<String> coord = null;
-                try {
-                    coord = getValueList(form, ISO_QUERYABLE.get("WestBoundLongitude"), -1);
-                    final List<Double> minxs = new ArrayList<Double>();
-                    for (String minx : coord) {
-                        minxs.add(Double.parseDouble(minx));
-                    }
-
-
-                    coord = getValueList(form, ISO_QUERYABLE.get("EastBoundLongitude"), -1);
-                    final List<Double> maxxs = new ArrayList<Double>();
-                    for (String maxx : coord) {
-                        maxxs.add(Double.parseDouble(maxx));
-                    }
-
-
-                    coord = getValueList(form, ISO_QUERYABLE.get("NorthBoundLatitude"), -1);
-                    final List<Double> maxys = new ArrayList<Double>();
-                    for (String maxy : coord) {
-                        maxys.add(Double.parseDouble(maxy));
-                    }
-
-                    coord = getValueList(form, ISO_QUERYABLE.get("SouthBoundLatitude"), -1);
-                    final List<Double> minys = new ArrayList<Double>();
-                    for (String miny : coord) {
-                        minys.add(Double.parseDouble(miny));
-                    }
-
-
-                    if (minxs.size() == 1) {
-                        addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
-                        alreadySpatiallyIndexed = true;
-                    } else if (minxs.size() > 0) {
-                        addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
-                        alreadySpatiallyIndexed = true;
-                    }
-
-                } catch (NumberFormatException e) {
-                    if (coord != null) {
-                        LOGGER.warning("unable to spatially index form: " + form.getTitle() + '\n' +
-                                       "cause:  unable to parse double: " + coord);
-                    }
-                }
-
-                for (String term :INSPIRE_QUERYABLE.keySet()) {
-                    doc.add(new Field(term, getValues(term,  form, INSPIRE_QUERYABLE, -1),   Field.Store.YES, Field.Index.ANALYZED));
-                    doc.add(new Field(term + "_sort", getValues(term,  form, INSPIRE_QUERYABLE, -1),   Field.Store.YES, Field.Index.NOT_ANALYZED));
-                }
+                alreadySpatiallyIndexed = indexMetadata(doc, form);
 
              // For an ebrim v 3.0 form
             } else if (form.getTopValue().getType().isSubClassOf(identifiable)) {
@@ -453,78 +398,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
 
             // All form types must be compatible with dublinCore.
-
-            final StringBuilder anyText = new StringBuilder();
-            for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
-
-                final String values = getValues(term,  form, DUBLIN_CORE_QUERYABLE, -1);
-                if (!values.equals("null")) {
-                    LOGGER.finer("put " + term + " values: " + values);
-                    anyText.append(values).append(" ");
-                }
-    
-                doc.add(new Field(term, values,   Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
-            }
-
-            //we add the anyText values
-            doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
-
-            if (!alreadySpatiallyIndexed) {
-                //we add the geometry parts
-                List<String> coord = null;
-                try {
-                    coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"), 1);
-                    final List<Double> minxs = new ArrayList<Double>();
-                    for (String minx : coord) {
-                        minxs.add(Double.parseDouble(minx));
-                    }
-
-                    coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("EastBoundLongitude"), 1);
-                    final List<Double> maxxs = new ArrayList<Double>();
-                    for (String maxx : coord) {
-                        maxxs.add(Double.parseDouble(maxx));
-                    }
-
-                    coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("NorthBoundLatitude"), 1);
-                    final List<Double> maxys = new ArrayList<Double>();
-                    for (String maxy : coord) {
-                        maxys.add(Double.parseDouble(maxy));
-                    }
-
-                    coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("SouthBoundLatitude"), 1);
-                    final List<Double> minys = new ArrayList<Double>();
-                    for (String miny : coord) {
-                        minys.add(Double.parseDouble(miny));
-                    }
-
-
-                    /*String crs = getValueList("CRS", form, DUBLIN_CORE_QUERYABLE.get("CRS"), -1);
-                    if(crs == null || "null".equalsIgnoreCase(crs)){
-                        crs = "CRS:84";
-                    }*/
-                    final String crs = "CRS:84";
-                    int srid = 4326;
-                    try {
-                        srid = SRIDGenerator.toSRID(crs, Version.V1);
-                    } catch(IllegalArgumentException ex) {
-                        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-                    }
-
-                    if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
-                        for (int i = 0; i < minxs.size(); i++) {
-                            addBoundingBox(doc, minxs.get(i), maxxs.get(i), minys.get(i), maxys.get(i), srid);
-                        }
-                    } else {
-                        LOGGER.warning("There is not the same number of coordinate: " + minxs.size() + " " + minys.size() + " " +  maxxs.size() + " " +  maxys.size());
-                    }
-
-                } catch (NumberFormatException e) {
-                        LOGGER.warning("unable to spatially index form: " + form.getTitle() + '\n' +
-                                      "cause:  unable to parse double: " + coord);
-                }
-
-            }
+            indexDublinCore(doc, form, alreadySpatiallyIndexed);
 
             // add a default meta field to make searching all documents easy
             doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
@@ -533,6 +407,163 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             throw new IndexingException(ex.getMessage());
         }
         return doc;
+    }
+
+    /**
+     * Index a form of type MD_Metadata.
+     *
+     * @param doc The Lucene document to write on.
+     * @param form The mdweb Form.
+     *
+     * @return true is the document already contains spatial information.
+     * @throws MD_IOException
+     */
+    private boolean indexMetadata(Document doc, Form form) throws MD_IOException {
+        LOGGER.finer("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
+
+        boolean alreadySpatiallyIndexed = false;
+
+        //TODO add ANyText
+        for (String term :ISO_QUERYABLE.keySet()) {
+            doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.NOT_ANALYZED));
+        }
+
+       //we add the geometry parts
+        List<String> coord = null;
+        try {
+            coord = getValueList(form, ISO_QUERYABLE.get("WestBoundLongitude"), -1);
+            final List<Double> minxs = new ArrayList<Double>();
+            for (String minx : coord) {
+                minxs.add(Double.parseDouble(minx));
+            }
+
+
+            coord = getValueList(form, ISO_QUERYABLE.get("EastBoundLongitude"), -1);
+            final List<Double> maxxs = new ArrayList<Double>();
+            for (String maxx : coord) {
+                maxxs.add(Double.parseDouble(maxx));
+            }
+
+
+            coord = getValueList(form, ISO_QUERYABLE.get("NorthBoundLatitude"), -1);
+            final List<Double> maxys = new ArrayList<Double>();
+            for (String maxy : coord) {
+                maxys.add(Double.parseDouble(maxy));
+            }
+
+            coord = getValueList(form, ISO_QUERYABLE.get("SouthBoundLatitude"), -1);
+            final List<Double> minys = new ArrayList<Double>();
+            for (String miny : coord) {
+                minys.add(Double.parseDouble(miny));
+            }
+
+
+            if (minxs.size() == 1) {
+                addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
+                alreadySpatiallyIndexed = true;
+            } else if (minxs.size() > 0) {
+                addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
+                alreadySpatiallyIndexed = true;
+            }
+
+        } catch (NumberFormatException e) {
+            if (coord != null) {
+                LOGGER.warning("unable to spatially index form: " + form.getTitle() + '\n' +
+                               "cause:  unable to parse double: " + coord);
+            }
+        }
+
+        for (String term :INSPIRE_QUERYABLE.keySet()) {
+            doc.add(new Field(term, getValues(term,  form, INSPIRE_QUERYABLE, -1),   Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field(term + "_sort", getValues(term,  form, INSPIRE_QUERYABLE, -1),   Field.Store.YES, Field.Index.NOT_ANALYZED));
+        }
+
+        return alreadySpatiallyIndexed;
+    }
+
+    /**
+     * Index a form of all type with the common queryable element of Dublin Core.
+     *
+     * @param doc The Lucene document to write on.
+     * @param form The mdweb Form.
+     * @param alreadySpatiallyIndexed a flag indicating if the document already contains spatial information.
+     * @throws MD_IOException
+     */
+    private void indexDublinCore(Document doc, Form form, boolean alreadySpatiallyIndexed) throws MD_IOException {
+        final StringBuilder anyText = new StringBuilder();
+        for (String term :DUBLIN_CORE_QUERYABLE.keySet()) {
+
+            final String values = getValues(term,  form, DUBLIN_CORE_QUERYABLE, -1);
+            if (!values.equals("null")) {
+                LOGGER.finer("put " + term + " values: " + values);
+                anyText.append(values).append(" ");
+            }
+
+            doc.add(new Field(term, values,   Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
+        }
+
+        //we add the anyText values
+        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
+
+        if (!alreadySpatiallyIndexed) {
+            //we add the geometry parts
+            List<String> coord = null;
+            try {
+                coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"), 1);
+                final List<Double> minxs = new ArrayList<Double>();
+                for (String minx : coord) {
+                    minxs.add(Double.parseDouble(minx));
+                }
+
+                coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("EastBoundLongitude"), 1);
+                final List<Double> maxxs = new ArrayList<Double>();
+                for (String maxx : coord) {
+                    maxxs.add(Double.parseDouble(maxx));
+                }
+
+                coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("NorthBoundLatitude"), 1);
+                final List<Double> maxys = new ArrayList<Double>();
+                for (String maxy : coord) {
+                    maxys.add(Double.parseDouble(maxy));
+                }
+
+                coord = getValueList(form, DUBLIN_CORE_QUERYABLE.get("SouthBoundLatitude"), 1);
+                final List<Double> minys = new ArrayList<Double>();
+                for (String miny : coord) {
+                    minys.add(Double.parseDouble(miny));
+                }
+
+
+                /*String crs = getValueList("CRS", form, DUBLIN_CORE_QUERYABLE.get("CRS"), -1);
+                if(crs == null || "null".equalsIgnoreCase(crs)){
+                    crs = "CRS:84";
+                }*/
+                final String crs = "CRS:84";
+                int srid = 4326;
+                try {
+                    srid = SRIDGenerator.toSRID(crs, Version.V1);
+                } catch(IllegalArgumentException ex) {
+                    LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                }
+
+                if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
+                    if (minxs.size() == 1) {
+                        addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
+                    } else if (minxs.size() > 0) {
+                        addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
+                    }
+
+                } else {
+                    LOGGER.warning("There is not the same number of coordinate: " + minxs.size() + " " + minys.size() + " " +  maxxs.size() + " " +  maxys.size());
+                }
+
+            } catch (NumberFormatException e) {
+                    LOGGER.warning("unable to spatially index form: " + form.getTitle() + '\n' +
+                                  "cause:  unable to parse double: " + coord);
+            }
+        }
     }
 
     /**
