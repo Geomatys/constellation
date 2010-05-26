@@ -114,11 +114,14 @@ public class PostGisProvider extends AbstractLayerProvider{
         final String user       = source.parameters.get(KEY_USER);
         final String passwd     = source.parameters.get(KEY_PASSWD);
         final String namespace     = source.parameters.get(KEY_NAMESPACE);
+        final String validateConnec = source.parameters.get(KEY_VALIDATECONN);
         params.put(KEY_SCHEMA, schema);
         params.put(KEY_DATABASE, database);
         params.put(KEY_USER, user);
         params.put(KEY_PASSWD, passwd);
         params.put(KEY_NAMESPACE, namespace);
+        final Boolean validate = Boolean.valueOf(validateConnec);
+        params.put(KEY_VALIDATECONN, validate);
 
         store = (DataStore) DataStoreFinder.getDataStore(params);
 
