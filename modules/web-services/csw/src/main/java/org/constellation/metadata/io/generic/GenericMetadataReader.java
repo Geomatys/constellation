@@ -148,7 +148,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
     @Override
     public List<DefaultMetadata> getAllEntries() throws MetadataIoException {
         final List<DefaultMetadata> result = new ArrayList<DefaultMetadata>();
-        final List<String> identifiers  = getAllIdentifiers();
+        final List<String> identifiers     = getAllIdentifiers();
         for (String id : identifiers) {
             result.add((DefaultMetadata) getMetadata(id, ISO_19115, ElementSetType.FULL, null));
         }

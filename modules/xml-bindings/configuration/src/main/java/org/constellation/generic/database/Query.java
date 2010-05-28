@@ -98,6 +98,19 @@ public class Query {
         }
         return varNames;
     }
+
+    /**
+     * Return the name of the first variable in a List.
+     * @return
+     */
+    public String getFirstVarName() {
+        if (select != null) {
+            for (Column col : select.getCol()) {
+                return col.getVar();
+            }
+        }
+        return null;
+    }
     
     /**
      * Sets the value of the name property.

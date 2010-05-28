@@ -35,10 +35,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.generic.database.MultiFixed;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
-import org.constellation.generic.database.Single;
 import org.constellation.generic.database.Static;
 import org.constellation.metadata.io.MetadataIoException;
 
@@ -99,7 +97,13 @@ public abstract class GenericReader  {
      * A connection to the database.
      */
     private Connection connection;
-    
+
+    /**
+     * A list of unbounded variable.
+     * Used to avoid to search for an unexistant statement each time.
+     */
+    private final List<String> unboundedVariable = new ArrayList<String>();
+
     /**
      * Build a new generic Reader.
      *
@@ -162,30 +166,13 @@ public abstract class GenericReader  {
                 mainStatement         = connection.prepareStatement(mainQuery.buildSQLQuery(staticParameters));
             }
 
-            // initialize the single statements
-            final Single single = queries.getSingle();
-            if (single != null) {
-                for (Query query : single.getQuery()) {
-                    final List<String> varNames        = query.getVarNames();
-                    final String textQuery             = query.buildSQLQuery(staticParameters);
-                    final LockedPreparedStatement stmt =  new LockedPreparedStatement(connection.prepareStatement(textQuery), textQuery);
-                    statements.put(stmt, varNames);
-                }
-            } else {
-                LOGGER.warning("The configuration file is probably malformed, there is no single query.");
-            }
-
-            // initialize the multiple statements
-            final MultiFixed multi = queries.getMultiFixed();
-            if (multi != null) {
-                for (Query query : multi.getQuery()) {
-                    final List<String> varNames        = query.getVarNames();
-                    final String textQuery             = query.buildSQLQuery(staticParameters);
-                    final LockedPreparedStatement stmt =  new LockedPreparedStatement(connection.prepareStatement(textQuery), textQuery);
-                    statements.put(stmt, varNames);
-                }
-            } else {
-                LOGGER.warning("The configuration file is probably malformed, there is no single query.");
+            // initialize the statements
+            final List<Query> allQueries = queries.getAllQueries();
+            for (Query query : allQueries) {
+                final List<String> varNames        = query.getVarNames();
+                final String textQuery             = query.buildSQLQuery(staticParameters);
+                final LockedPreparedStatement stmt =  new LockedPreparedStatement(connection.prepareStatement(textQuery), textQuery);
+                statements.put(stmt, varNames);
             }
         } else {
             LOGGER.warning("The configuration file is probably malformed, there is no queries part.");
@@ -203,20 +190,16 @@ public abstract class GenericReader  {
         staticParameters = queries.getParameters();
         final Static statique = queries.getStatique();
         if (statique != null) {
+            final Statement stmt   = connection.createStatement();
             for (Query query : statique.getQuery()) {
-                String varName = null;
-                if (query.getSelect() != null && query.getSelect().getCol() != null) {
-                    varName = query.getSelect().getCol().get(0).getVar();
-                }
+                final String varName   = query.getFirstVarName();
                 final String textQuery = query.buildSQLQuery(staticParameters);
-                final Statement stmt   = connection.createStatement();
                 final ResultSet res    = stmt.executeQuery(textQuery);
                 final StringBuilder parameterValue = new StringBuilder();
                 while (res.next()) {
                     parameterValue.append("'").append(res.getString(1)).append("',");
                 }
                 res.close();
-                stmt.close();
                 //we remove the last ','
                 String pValue = parameterValue.toString();
                 if (parameterValue.length() > 0) {
@@ -224,6 +207,7 @@ public abstract class GenericReader  {
                 }
                 staticParameters.put(varName, pValue);
             }
+            stmt.close();
         }
     }
 
@@ -234,6 +218,7 @@ public abstract class GenericReader  {
             while (res.next()) {
                 result.add(res.getString(1));
             }
+            res.close();
         } catch (SQLException ex) {
             throw new MetadataIoException("SQL Exception while executing main query: " + ex.getMessage());
         }
@@ -290,6 +275,8 @@ public abstract class GenericReader  {
         final Set<LockedPreparedStatement> subStmts = new HashSet<LockedPreparedStatement>();
         Values values = null;
         for (String var : variables) {
+            if (unboundedVariable.contains(var)) continue;
+            
             final LockedPreparedStatement stmt = getStatementFromVar(var);
             if (stmt != null) {
                 if (!subStmts.contains(stmt)) {
@@ -302,7 +289,8 @@ public abstract class GenericReader  {
                     values = new Values();
                     values.addToValue(var, staticValue);
                 } else {
-                    LOGGER.severe("no statement found for variable: " + var);
+                    unboundedVariable.add(var);
+                    LOGGER.warning("no statement found for variable: " + var);
                 }
                 
             }

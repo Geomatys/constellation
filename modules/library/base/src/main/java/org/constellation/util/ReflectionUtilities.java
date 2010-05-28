@@ -405,13 +405,18 @@ public final class ReflectionUtilities {
             propertyName = "geographicElement";
 
         // avoid unnecesary log flood
-        } else if ((propertyName.equals("westBoundLongitude") || propertyName.equals("eastBoundLongitude") ||
-                   propertyName.equals("northBoundLatitude") || propertyName.equals("southBoundLatitude"))
-                   && rootClass.getName().equals("org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription")) {
+        } else if (rootClass.getName().equals("org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription") &&
+                  (propertyName.equals("westBoundLongitude") || propertyName.equals("eastBoundLongitude") ||
+                   propertyName.equals("northBoundLatitude") || propertyName.equals("southBoundLatitude"))) {
             return null;
         // avoid unnecesary log flood
         } else if ((propertyName.equals("accessConstraints"))
                    && rootClass.getName().equals("org.geotoolkit.metadata.iso.constraint.DefaultConstraints")) {
+            return null;
+        // avoid unnecesary log flood
+        } else if (rootClass.getName().equals("org.geotoolkit.service.ServiceIdentificationImpl") &&
+                  (propertyName.equals("spatialResolution") || propertyName.equals("language") ||
+                   propertyName.equals("topicCategory"))) {
             return null;
         } else if (propertyName.equals("geographicIdentifier") && rootClass.getName().equals("org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox")) {
             return null;

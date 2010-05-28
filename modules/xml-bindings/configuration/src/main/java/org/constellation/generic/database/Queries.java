@@ -18,7 +18,9 @@
 
 package org.constellation.generic.database;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import org.geotoolkit.util.Utilities;
@@ -71,6 +73,17 @@ public class Queries {
 
     public void setSingle(Single single) {
         this.single = single;
+    }
+
+    public List<Query> getAllQueries() {
+        final List<Query> queries = new ArrayList<Query>();
+        if (single != null) {
+            queries.addAll(this.single.getQuery());
+        }
+        if (multiFixed != null) {
+            queries.addAll(this.multiFixed.getQuery());
+        }
+        return queries;
     }
 
     public Query getQueryByName(String queryName) {

@@ -200,7 +200,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             final LayerProviderProxy namedProxy    = LayerProviderProxy.getInstance();
             for (final Name layerName : namedProxy.getKeys(ServiceDef.Specification.WFS.name())) {
                 final LayerDetails layer = namedProxy.get(layerName);
-                if (layer instanceof FeatureLayerDetails){
+                if (layer instanceof FeatureLayerDetails) {
                     final FeatureLayerDetails fld = (FeatureLayerDetails) layer;
                     final FeatureType type;
                     try {
@@ -719,7 +719,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         if (updateProperty.getValue() instanceof ElementNSImpl) {
                             final String strValue = getXMLFromElementNSImpl((ElementNSImpl)updateProperty.getValue());
                             value = null;
-                            LOGGER.info(">> updating : "+ updatePropertyValue +"   => " + strValue);
+                            LOGGER.finer(">> updating : "+ updatePropertyValue +"   => " + strValue);
                         } else {
                             value = updateProperty.getValue();
                             if (value instanceof AbstractGeometryType) {
@@ -733,9 +733,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                                     throw new CstlServiceException(ex);
                                 }
                             }
-                            LOGGER.info(">> updating : "+ updatePropertyValue +"   => " + value);
+                            LOGGER.finer(">> updating : "+ updatePropertyValue +"   => " + value);
                             if (value != null) {
-                                LOGGER.info("type : " + value.getClass());
+                                LOGGER.finer("type : " + value.getClass());
                             }
                         }
                         values.put(ft.getDescriptor(updatePropertyValue), value);

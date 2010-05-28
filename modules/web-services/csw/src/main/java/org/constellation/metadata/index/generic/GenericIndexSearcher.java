@@ -68,7 +68,7 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
                 LOGGER.warning("There is no document in the index");
                 maxRecords = 1;
             }
-            LOGGER.log(logLevel, "TermQuery: " + query.toString());
+            //LOGGER.log(logLevel, "TermQuery: " + query.toString());
             final TopDocs hits = searcher.search(query, maxRecords);
             for (ScoreDoc doc : hits.scoreDocs) {
                 results.add(searcher.doc(doc.doc, new IDFieldSelector()).get("id"));
