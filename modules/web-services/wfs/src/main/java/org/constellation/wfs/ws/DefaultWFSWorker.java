@@ -165,9 +165,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         // we verify the base attribute
         verifyBaseRequest(request, false, true);
 
-        if (request.getAcceptFormats() != null && request.getAcceptFormats().getOutputFormat() != null && request.getAcceptFormats().getOutputFormat().size() > 0) {
-            outputFormat =  request.getAcceptFormats().getOutputFormat().get(0);
-        } else {
+        outputFormat = request.getFirstAcceptFormat();
+        if (outputFormat == null) {
             outputFormat = "application/xml";
         }
         
@@ -192,7 +191,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         final WFSCapabilitiesType result = new WFSCapabilitiesType("1.1.0");
 
 
-        if (request.getSections() == null || request.getSections().getSection().contains("featureTypeList")) {
+        if (request.getSections() == null || request.containsSection("featureTypeList")) {
             final List<FeatureTypeType> types = new ArrayList<FeatureTypeType>();
 
             /*
@@ -216,10 +215,11 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
                         final String defaultCRS;
                         if (type.getGeometryDescriptor() != null && type.getGeometryDescriptor().getCoordinateReferenceSystem() != null) {
+                            final CoordinateReferenceSystem crs = type.getGeometryDescriptor().getCoordinateReferenceSystem();
                             //todo wait for martin fix
-                            String id  = CRS.lookupIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem(), true);
+                            String id  = CRS.lookupIdentifier(crs, true);
                             if (id == null) {
-                                id = CRS.getDeclaredIdentifier(type.getGeometryDescriptor().getCoordinateReferenceSystem());
+                                id = CRS.getDeclaredIdentifier(crs);
                             }
 
                             if (id != null) {
@@ -251,17 +251,17 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             result.setFeatureTypeList(null);
         }
         //todo ...etc...--------------------------------------------------------
-        if (request.getSections() != null && !request.getSections().getSection().contains("operationsMetadata")) {
+        if (request.getSections() != null && !request.containsSection("operationsMetadata")) {
             result.setOperationsMetadata(null);
         } else {
             result.setOperationsMetadata(inCapabilities.getOperationsMetadata());
         }
-        if (request.getSections() != null && !request.getSections().getSection().contains("serviceProvider")) {
+        if (request.getSections() != null && !request.containsSection("serviceProvider")) {
             result.setServiceProvider(null);
         } else {
             result.setServiceProvider(inCapabilities.getServiceProvider());
         }
-        if (request.getSections() != null && !request.getSections().getSection().contains("serviceIdentification")) {
+        if (request.getSections() != null && !request.containsSection("serviceIdentification")) {
             result.setServiceIdentification(null);
         } else {
             result.setServiceIdentification(inCapabilities.getServiceIdentification());
@@ -399,7 +399,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
             final List<QName> typeNames;
             if (featureId != null && query.getTypeName().isEmpty()) {
-                typeNames = getQNameListFromNameSet(namedProxy.getKeys(ServiceDef.Specification.WFS.name()));
+                typeNames = Utils.getQNameListFromNameSet(namedProxy.getKeys(ServiceDef.Specification.WFS.name()));
             } else {
                 typeNames = query.getTypeName();
             }
@@ -711,7 +711,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     // we verify that the update property are contained in the feature type
                     for (final PropertyType updateProperty : updateRequest.getProperty()) {
                         final String updatePropertyValue = updateProperty.getName().getLocalPart();
-                        final PropertyAccessor pa = Accessors.getAccessor(FeatureType.class, updatePropertyValue, null);
+                        final PropertyAccessor pa        = Accessors.getAccessor(FeatureType.class, updatePropertyValue, null);
                         if (pa == null || pa.get(ft, updatePropertyValue, null) == null) {
                             throw new CstlServiceException("The feature Type " + updateRequest.getTypeName() + " does not has such a property: " + updatePropertyValue, INVALID_PARAMETER_VALUE);
                         }
@@ -1002,16 +1002,4 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
        this.namespaceMapping = namespaceMapping;
     }
 
-    /**
-     * Return a List of QName from a Set Of Name.
-     * @param typeNames
-     * @return
-     */
-    private List<QName> getQNameListFromNameSet(Set<Name> typeNames) {
-        final List<QName> result = new ArrayList<QName>(typeNames.size());
-        for (Name typeName : typeNames) {
-            result.add(Utils.getQnameFromName(typeName));
-        }
-        return result;
-    }
 }

@@ -528,23 +528,23 @@ public class CSWworker {
         }
         
         //according to CITE test a GetCapabilities must always return Filter_Capabilities
-        if (!sections.getSection().contains(FILTER_CAPABILITIES) || sections.getSection().contains(ALL))
+        if (!sections.containsSection(FILTER_CAPABILITIES) || sections.containsSection(ALL))
             sections.add(FILTER_CAPABILITIES);
         
         //we enter the information for service identification.
-        if (sections.getSection().contains("ServiceIdentification") || sections.getSection().contains(ALL)) {
+        if (sections.containsSection("ServiceIdentification") || sections.containsSection(ALL)) {
                 
             si = skeletonCapabilities.getServiceIdentification();
         }
             
         //we enter the information for service provider.
-        if (sections.getSection().contains("ServiceProvider") || sections.getSection().contains(ALL)) {
+        if (sections.containsSection("ServiceProvider") || sections.containsSection(ALL)) {
            
             sp = skeletonCapabilities.getServiceProvider();
         }
             
         //we enter the operation Metadata
-        if (sections.getSection().contains("OperationsMetadata") || sections.getSection().contains(ALL)) {
+        if (sections.containsSection("OperationsMetadata") || sections.containsSection(ALL)) {
                 
             om = skeletonCapabilities.getOperationsMetadata();
             
@@ -650,7 +650,7 @@ public class CSWworker {
         }
             
         //we enter the information filter capablities.
-        if (sections.getSection().contains(FILTER_CAPABILITIES) || sections.getSection().contains(ALL)) {
+        if (sections.containsSection(FILTER_CAPABILITIES) || sections.containsSection(ALL)) {
             
             fc = skeletonCapabilities.getFilterCapabilities();
         }
