@@ -205,7 +205,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     final FeatureLayerDetails fld = (FeatureLayerDetails) layer;
                     final FeatureType type;
                     try {
-                        type  = fld.getStore().getFeatureType(fld.getGroupName());
+                        type  = getFeatureTypeFromLayer(fld);
                     } catch (DataStoreException ex) {
                         LOGGER.severe("error while getting featureType for:" + fld.getGroupName() + '\n' +
                                       "cause:" + ex.getMessage());
@@ -310,16 +310,14 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 final LayerDetails layer = namedProxy.get(name);
                 if (!(layer instanceof FeatureLayerDetails)) continue;
 
-                final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
-                final FeatureType sft;
                 try {
-                    sft = fld.getStore().getFeatureType(fld.getGroupName());
-                    types.add(sft);
+                    types.add(getFeatureTypeFromLayer((FeatureLayerDetails)layer));
                 } catch (DataStoreException ex) {
-                    LOGGER.severe("error while getting featureType for:" + fld.getGroupName());
+                    LOGGER.severe("error while getting featureType for:" + layer.getName());
                 }
             }
         } else {
+
             //search only the given list
             for (final QName name : names) {
                 final Name n = Utils.getNameFromQname(name);
@@ -333,13 +331,10 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     throw new CstlServiceException(UNKNOW_TYPENAME + name);
                 }
 
-                final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
-                final FeatureType sft;
                 try {
-                    sft = fld.getStore().getFeatureType(fld.getGroupName());
-                    types.add(sft);
+                    types.add(getFeatureTypeFromLayer((FeatureLayerDetails)layer));
                 } catch (DataStoreException ex) {
-                    LOGGER.severe("error while getting featureType for:" + fld.getGroupName());
+                    LOGGER.severe("error while getting featureType for:" + layer.getName());
                 }
             }
         }
@@ -355,6 +350,17 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         LOGGER.log(logLevel, "DescribeFeatureType treated in " + (System.currentTimeMillis() - start) + "ms");
         return writer.getSchemaFromFeatureType(types);
     }
+
+    /**
+     * Extract a FatureType from a FeatureLayerDetails
+     * 
+     * @param fld
+     * @return
+     */
+    private FeatureType getFeatureTypeFromLayer(FeatureLayerDetails fld) throws DataStoreException {
+        return fld.getStore().getFeatureType(fld.getGroupName());
+    }
+
 
     /**
      * {@inheritDoc }
@@ -457,7 +463,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
                 final FeatureType ft;
                 try {
-                    ft = layer.getStore().getFeatureType(layer.getGroupName());
+                    ft = getFeatureTypeFromLayer(layer);
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
                 }
@@ -590,56 +596,44 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 }
 
                 // what to do with the CRS ?
-                final String srsName = insertRequest.getSrsName();
-                final CoordinateReferenceSystem insertCRS = extractCRS(srsName);
+                final CoordinateReferenceSystem insertCRS = extractCRS(insertRequest.getSrsName());
 
                 // what to do with that, whitch ones are supported ??
                 final IdentifierGenerationOptionType idGen = insertRequest.getIdgen();
 
                 for (Object featureObject : insertRequest.getFeature()) {
+                    final Name typeName;
+                    final Collection<? extends Feature> featureCollection;
+
                     if (featureObject instanceof Feature) {
                         final Feature feature = (Feature) featureObject;
-                        final Name typeName = feature.getType().getName();
-                        final FeatureLayerDetails layer = (FeatureLayerDetails)namedProxy.get(typeName, ServiceDef.Specification.WFS.name());
-                        if (layer == null) {
-                            throw new CstlServiceException(UNKNOW_TYPENAME + feature.getType().getName());
-                        }
-                        try {
-                            final List<FeatureId> features = layer.getStore().addFeatures(typeName, Collections.singleton(feature));
-
-                            final String fid = features.get(0).getID(); // get the id of the inserted feature
-                            inserted.add(new InsertedFeatureType(new FeatureIdType(fid), handle));
-                            totalInserted++;
-                            LOGGER.finer("simpleInsert fid inserted: " + fid + " total:" + totalInserted);
-                        } catch (DataStoreException ex) {
-                            Logging.unexpectedException(LOGGER, ex);
-                            throw new CstlServiceException("Error while inserting the Feature:" + ex.getMessage(), NO_APPLICABLE_CODE);
-                        } catch (ClassCastException ex) {
-                            Logging.unexpectedException(LOGGER, ex);
-                            throw new CstlServiceException("The specified Datastore does not suport the write operations.");
-                        }
+                        typeName = feature.getType().getName();
+                        featureCollection = Collections.singleton(feature);
                     } else if (featureObject instanceof FeatureCollection) {
-                        final FeatureCollection featureCollection = (FeatureCollection) featureObject;
-                        final Name typeName = featureCollection.getFeatureType().getName();
-                        final FeatureLayerDetails layer = (FeatureLayerDetails) namedProxy.get(typeName, ServiceDef.Specification.WFS.name());
-                        if (layer == null) {
-                            throw new CstlServiceException(UNKNOW_TYPENAME + featureCollection.getFeatureType().getName());
-                        }
-                        try {
-                            final List<FeatureId> features = layer.getStore().addFeatures(typeName, featureCollection);
+                        featureCollection = (FeatureCollection) featureObject;
+                        typeName = ((FeatureCollection)featureCollection).getFeatureType().getName();
+                    } else {
+                        throw new CstlServiceException("Unexpected Object to insert");
+                    }
+                    
+                    final FeatureLayerDetails layer = (FeatureLayerDetails) namedProxy.get(typeName, ServiceDef.Specification.WFS.name());
+                    if (layer == null) {
+                        throw new CstlServiceException(UNKNOW_TYPENAME + typeName);
+                    }
+                    try {
+                        final List<FeatureId> features = layer.getStore().addFeatures(typeName, featureCollection);
 
-                            for (FeatureId fid :features){
-                                final String id = fid.getID(); // get the id of the inserted feature
-                                inserted.add(new InsertedFeatureType(new FeatureIdType(id), handle));
-                                totalInserted++;
-                                LOGGER.finer("collectionInsert fid inserted: " + fid + " total:" + totalInserted);
-                            }
-                        } catch (DataStoreException ex) {
-                            Logging.unexpectedException(LOGGER, ex);
-                        } catch (ClassCastException ex) {
-                            Logging.unexpectedException(LOGGER, ex);
-                            throw new CstlServiceException("The specified Datastore does not suport the write operations.");
+                        for (FeatureId fid : features) {
+                            final String id = fid.getID(); // get the id of the inserted feature
+                            inserted.add(new InsertedFeatureType(new FeatureIdType(id), handle));
+                            totalInserted++;
+                            LOGGER.finer("fid inserted: " + fid + " total:" + totalInserted);
                         }
+                    } catch (DataStoreException ex) {
+                        Logging.unexpectedException(LOGGER, ex);
+                    } catch (ClassCastException ex) {
+                        Logging.unexpectedException(LOGGER, ex);
+                        throw new CstlServiceException("The specified Datastore does not suport the write operations.");
                     }
                 }
 
@@ -662,7 +656,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 }
 
                 try {
-                    final FeatureType ft = layer.getStore().getFeatureType(layer.getGroupName());
+                    final FeatureType ft = getFeatureTypeFromLayer(layer);
 
                     // we verify that all the properties contained in the filter are known by the feature type.
                     verifyFilterProperty(ft, filter);
@@ -707,7 +701,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     throw new CstlServiceException(UNKNOW_TYPENAME + updateRequest.getTypeName());
                 }
                 try {
-                    final FeatureType ft = layer.getStore().getFeatureType(layer.getGroupName());
+                    final FeatureType ft = getFeatureTypeFromLayer(layer);
                     if (ft == null) {
                         throw new CstlServiceException("Unable to find the featuretype:" + layer.getGroupName());
                     }
@@ -994,10 +988,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
             final LayerDetails layer = namedProxy.get(name);
             if (!(layer instanceof FeatureLayerDetails)) continue;
 
-            final FeatureLayerDetails fld = (FeatureLayerDetails)layer;
             try {
-                final FeatureType sft = (FeatureType) fld.getStore().getFeatureType(fld.getGroupName());
-                types.add(sft);
+                types.add(getFeatureTypeFromLayer((FeatureLayerDetails)layer));
             } catch (DataStoreException ex) {
                 LOGGER.severe("DataStore exception while getting featureType");
             }
