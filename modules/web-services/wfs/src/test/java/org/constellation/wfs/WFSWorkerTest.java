@@ -478,7 +478,6 @@ public class WFSWorkerTest {
 
         writer = new StringWriter();
         featureWriter.write((FeatureCollection)result,writer);
-        featureWriter.write((FeatureCollection)result,new File("output.xml"));
 
         DomCompare.compare(
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.systemCollection-3.xml"),
