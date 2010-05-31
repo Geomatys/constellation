@@ -1,8 +1,8 @@
 
 INSERT INTO "Storage"."Catalogs" ("code", "name") VALUES ('SMLC', 'SensorML Data catalog');
 
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (12, 'SMLC', 'urn:ogc:object:sensor:GEOM:1', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'normalForm');
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (13, 'SMLC', 'urn:ogc:object:sensor:GEOM:2', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'normalForm');
+INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (12, 'SMLC', 'urn:ogc:object:sensor:GEOM:1', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (13, 'SMLC', 'urn:ogc:object:sensor:GEOM:2', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALFORM');
 
 
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (12, 'SensorML:SensorML', 1, 'SensorML', 'SensorML', 'SensorML:SensorML.1');

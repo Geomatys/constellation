@@ -1,4 +1,4 @@
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (15, 'CSWCat', 'protected vectors', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'normalForm');
+INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (15, 'CSWCat', 'protected vectors', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'NORMALFORM');
 
 
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (15, 'ISO 19115:MD_Metadata', 1, 'MD_Metadata', 'ISO 19115', 'ISO 19115:MD_Metadata.1');
@@ -151,7 +151,7 @@ INSERT INTO "Storage"."LinkedValues" ("form", "path", "ordinal", "type", "typeSt
 INSERT INTO "Storage"."LinkedValues" ("form", "path", "ordinal", "type", "typeStandard", "id_value", "linkedForm", "linkedPath") VALUES (15, 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo', 1, 'CI_Contact', 'ISO 19115', 'ISO 19115:MD_Metadata.1:distributionInfo.1:distributor.1:distributorContact.1:contactInfo.1', 15, 'ISO 19115:MD_Metadata.1:contact.1:contactInfo.1');
 
 
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (16, 'CSWCat', 'fra data', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'normalForm');
+INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (16, 'CSWCat', 'fra data', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'NORMALFORM');
 
 
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (16, 'ISO 19115:MD_Metadata', 1, 'MD_Metadata', 'ISO 19115', 'ISO 19115:MD_Metadata.1');

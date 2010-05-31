@@ -1,4 +1,4 @@
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (14, 'SMLC', 'urn:ogc:object:sensor:GEOM:3', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'normalForm');
+INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (14, 'SMLC', 'urn:ogc:object:sensor:GEOM:3', 'admin', NULL, NULL, '2008-05-14', 1, 1, 'NORMALFORM');
 
 
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (14, 'SensorML:SensorML', 1, 'SensorML', 'SensorML', 'SensorML:SensorML.1');

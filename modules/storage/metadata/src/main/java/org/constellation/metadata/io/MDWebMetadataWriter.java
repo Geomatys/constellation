@@ -346,7 +346,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 }
             }
             final UUID identifier = UUID.randomUUID();
-            final Form form = new Form(-1, identifier, recordSet, title, user, null, profile, creationDate, creationDate, null, false, false, "normalForm");
+            final Form form = new Form(-1, identifier, recordSet, title, user, null, profile, creationDate, creationDate, null, false, false, Form.TYPE.NORMALFORM);
             
             final Classe rootClasse = getClasseFromObject(object);
             if (rootClasse != null) {

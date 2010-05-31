@@ -2,11 +2,11 @@
 
 INSERT INTO "Storage"."Catalogs" ("code", "name") VALUES ('CSWCat', 'CSW Data Catalog');
 
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (2, 'CSWCat', '90008411.ctd', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'normalForm');
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (3, 'CSWCat', '90008411-2.ctd', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'normalForm');
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (4, 'CSWCat', '75000111.ctd', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'normalForm');
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (5, 'CSWCat', '64061411.bot', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'normalForm');
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (6, 'CSWCat', '92005711.ctd', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'normalForm');
+INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (2, 'CSWCat', '90008411.ctd', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (3, 'CSWCat', '90008411-2.ctd', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (4, 'CSWCat', '75000111.ctd', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (5, 'CSWCat', '64061411.bot', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (6, 'CSWCat', '92005711.ctd', 'admin', NULL, 'ISO_19115', '2009-08-27', 1, 1, 'NORMALFORM');
 
 
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (2, 'ISO 19115:MD_Metadata', 1, 'MD_Metadata', 'ISO 19115', 'ISO 19115:MD_Metadata.1');

@@ -2,7 +2,7 @@
 INSERT INTO "Storage"."Catalogs" ("code", "name") VALUES ('MDATA', 'MDWEB data');
 
 INSERT INTO "Users"."Users" ("login", "password", "form", "creationDate", "expirationDate") VALUES ('admin', 'adminadmin', NULL, '2008-01-01', '2010-01-01');
-INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (1, 'MDATA', 'description of admin', 'admin', NULL, NULL, '2008-04-16', 1, 1, 'templateForm');
+INSERT INTO "Storage"."Forms" ("identifier", "catalog", "title", "inputLogin", "validationLogin", "profile", "updateDate", "isValidated", "isPublished", "type") VALUES (1, 'MDATA', 'description of admin', 'admin', NULL, NULL, '2008-04-16', 1, 1, 'UNSHAREDTEMPL');
 UPDATE "Users"."Users" SET "form"=1;
 
 INSERT INTO "Storage"."Values" ("form", "path", "ordinal", "type", "typeStandard", "id_value") VALUES (1, 'ISO 19115:CI_ResponsibleParty', 1, 'CI_ResponsibleParty', 'ISO 19115', 'ISO 19115:CI_ResponsibleParty.1');

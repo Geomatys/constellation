@@ -1,4 +1,4 @@
-INSERT INTO "Storage"."Forms" VALUES (9, 'CSWCat', 'WMS Server for CORINE Land Cover France', 'admin', 'admin', 'inspire_core_service', '2009-07-01', 0, 1, 'normalForm');
+INSERT INTO "Storage"."Forms" VALUES (9, 'CSWCat', 'WMS Server for CORINE Land Cover France', 'admin', 'admin', 'inspire_core_service', '2009-07-01', 0, 1, 'NORMALFORM');
 
 INSERT INTO "Storage"."Values" VALUES (9, 'ISO 19115:MD_Metadata', 1, 'MD_Metadata', 'ISO 19115', 'ISO 19115:MD_Metadata.1');
 INSERT INTO "Storage"."Values" VALUES (9, 'ISO 19115:MD_Metadata:identificationInfo', 1, 'SV_ServiceIdentification', 'ISO 19119', 'ISO 19115:MD_Metadata.1:identificationInfo.1');
