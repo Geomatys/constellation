@@ -36,23 +36,23 @@ public class Queries {
 
     private QueryPropertyType main;
 
-    private Static statique;
+    private QueryList statique;
     
-    private Single single;
+    private QueryList single;
     
-    private MultiFixed multiFixed;
+    private QueryList multiFixed;
 
     public Queries() {
 
     }
 
-    public Queries(QueryPropertyType main, Single single, MultiFixed multiFixed) {
+    public Queries(QueryPropertyType main, QueryList single, QueryList multiFixed) {
         this.main       = main;
         this.single     = single;
         this.multiFixed = multiFixed;
     }
 
-    public Queries(QueryPropertyType main, Single single, MultiFixed multiFixed, HashMap<String, String> parameters) {
+    public Queries(QueryPropertyType main, QueryList single, QueryList multiFixed, HashMap<String, String> parameters) {
         this.main       = main;
         this.single     = single;
         this.multiFixed = multiFixed;
@@ -63,15 +63,15 @@ public class Queries {
         return main;
     }
     
-    public MultiFixed getMultiFixed() {
+    public QueryList getMultiFixed() {
         return multiFixed;
     }
     
-      public Single getSingle() {
+      public QueryList getSingle() {
         return single;
     }
 
-    public void setSingle(Single single) {
+    public void setSingle(QueryList single) {
         this.single = single;
     }
 
@@ -110,6 +110,21 @@ public class Queries {
     public void setParameters(HashMap<String, String> parameters) {
         this.parameters = parameters;
     }
+    
+    /**
+     * @return the statique
+     */
+    public QueryList getStatique() {
+        return statique;
+    }
+
+    /**
+     * @param statique the statique to set
+     */
+    public void setStatique(QueryList statique) {
+        this.statique = statique;
+    }
+
 
     @Override
     public String toString() {
@@ -152,19 +167,5 @@ public class Queries {
         hash = 53 * hash + (this.single != null ? this.single.hashCode() : 0);
         hash = 53 * hash + (this.multiFixed != null ? this.multiFixed.hashCode() : 0);
         return hash;
-    }
-
-    /**
-     * @return the statique
-     */
-    public Static getStatique() {
-        return statique;
-    }
-
-    /**
-     * @param statique the statique to set
-     */
-    public void setStatique(Static statique) {
-        this.statique = statique;
     }
 }

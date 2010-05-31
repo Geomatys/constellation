@@ -74,13 +74,13 @@ public class GenericConfigurationXMLBindingTest {
         parameters.put("staticVar02", "blavl, bloub");
 
         Query query = new Query("singleQuery1", new Select("var01", "pp.label"), new From("physical_parameter pp"));
-        Single single = new Single(query);
+        QueryList single = new QueryList(query);
 
         Query mquery = new Query("multiQuery1", new Select(Arrays.asList(new Column("var02", "pp.name"), new Column("var03", "tr.id"))),
                                                 new From("physical_parameter pp, transduction tr"),
                                                 new Where("tr.parameter=pp.id"));
 
-        MultiFixed multi = new MultiFixed(mquery);
+        QueryList multi = new QueryList(mquery);
 
         Queries queries = new Queries(null, single, multi, parameters);
         Automatic config = new Automatic("MDWEB", bdd, queries);
@@ -110,7 +110,7 @@ public class GenericConfigurationXMLBindingTest {
         "            </entry>"                                                         + '\n' +
         "        </parameters>"                                                        + '\n' +
         "        <single>"                                                             + '\n' +
-	    "            <query name=\"singleQuery1\">"                                    + '\n' +
+	"            <query name=\"singleQuery1\">"                                    + '\n' +
         "                <select>"                                                     + '\n' +
         "                    <col>"                                                    + '\n' +
         "                        <var>var01</var>"                                     + '\n' +
@@ -268,13 +268,13 @@ public class GenericConfigurationXMLBindingTest {
         parameters.put("staticVar02", "blavl, bloub");
 
         Query query = new Query("singleQuery1", new Select("var01", "pp.label"), new From("physical_parameter pp"));
-        Single single = new Single(query);
+        QueryList single = new QueryList(query);
 
         Query mquery = new Query("multiQuery1", new Select(Arrays.asList(new Column("var02", "pp.name"), new Column("var03", "tr.id"))),
                                                 new From("physical_parameter pp, transduction tr"),
                                                 new Where("tr.parameter=pp.id"));
 
-        MultiFixed multi = new MultiFixed(mquery);
+        QueryList multi = new QueryList(mquery);
 
         Queries queries     = new Queries(null, single, multi, parameters);
         Automatic expResult = new Automatic("MDWEB", bdd, queries);

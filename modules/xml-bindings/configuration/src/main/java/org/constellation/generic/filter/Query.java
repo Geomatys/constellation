@@ -28,8 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.constellation.generic.database.Static;
-
+import org.constellation.generic.database.QueryList;
 
 /**
  * 
@@ -56,7 +55,7 @@ public class Query {
 
     private HashMap<String, String> parameters;
 
-    private Static statique;
+    private QueryList statique;
 
     @XmlElement(required = true)
     private List<Select> select;
@@ -327,14 +326,14 @@ public class Query {
     /**
      * @return the statique
      */
-    public Static getStatique() {
+    public QueryList getStatique() {
         return statique;
     }
 
     /**
      * @param statique the statique to set
      */
-    public void setStatique(Static statique) {
+    public void setStatique(QueryList statique) {
         this.statique = statique;
     }
 }

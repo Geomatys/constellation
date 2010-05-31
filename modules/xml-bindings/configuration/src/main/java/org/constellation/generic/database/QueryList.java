@@ -2,7 +2,8 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2005, Institut de Recherche pour le Développement
+ *    (C) 2007 - 2008, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -15,6 +16,7 @@
  *    Lesser General Public License for more details.
  */
 
+
 package org.constellation.generic.database;
 
 import java.util.ArrayList;
@@ -25,23 +27,24 @@ import org.geotoolkit.util.Utilities;
 
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-public class Single {
+public class QueryList {
+
 
     private List<Query> query;
 
-    public Single() {
+    public QueryList() {
 
     }
 
-    public Single(Query query) {
+    public QueryList(Query query) {
         this.query = new ArrayList<Query>();
         this.query.add(query);
     }
 
-    public Single(List<Query> query) {
+    public QueryList(List<Query> query) {
         this.query = query;
     }
 
@@ -61,10 +64,10 @@ public class Single {
         }
         return null;
     }
-    
+
     @Override
     public String toString() {
-        final StringBuilder s = new StringBuilder("[Single]");
+        final StringBuilder s = new StringBuilder("[QueryList]");
         if (query != null && query.size() != 0) {
             int i = 0;
             for (Query q: query) {
@@ -74,7 +77,7 @@ public class Single {
         }
         return s.toString();
     }
-    
+
     /**
      * Verify if this entry is identical to the specified object.
      */
@@ -83,8 +86,8 @@ public class Single {
         if (object == this) {
             return true;
         }
-        if (object instanceof Single) {
-            final Single that = (Single) object;
+        if (object instanceof QueryList) {
+            final QueryList that = (QueryList) object;
 
             return Utilities.equals(this.query, that.query) ;
         }

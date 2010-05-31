@@ -37,7 +37,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.Queries;
 import org.constellation.generic.database.Query;
-import org.constellation.generic.database.Static;
+import org.constellation.generic.database.QueryList;
 import org.constellation.metadata.io.MetadataIoException;
 
 /**
@@ -188,7 +188,7 @@ public abstract class GenericReader  {
      */
     private void intStaticParameters(final Queries queries) throws SQLException {
         staticParameters = queries.getParameters();
-        final Static statique = queries.getStatique();
+        final QueryList statique = queries.getStatique();
         if (statique != null) {
             final Statement stmt   = connection.createStatement();
             for (Query query : statique.getQuery()) {
