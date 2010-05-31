@@ -109,6 +109,11 @@ public class WFSService extends OGCWebService {
     private final WFSWorker worker;
 
     private static Map<String, String> schemaLocations;
+    static {
+        System.setProperty("javax.xml.stream.XmlInputFactory", "com.ctc.wstx.stax.WstxInputFactory");
+        System.setProperty("javax.xml.stream.XmlEventFactory", "com.ctc.wstx.stax.WstxEventFactory");
+        System.setProperty("javax.xml.stream.XmlOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
+    }
 
     /**
      * Build a new Restfull WFS service.

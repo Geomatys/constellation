@@ -103,6 +103,14 @@
         <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-sensorML</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.geotoolkit.pending</groupId>
+      <artifactId>geotk-jaxp-gml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.woodstox</groupId>
+      <artifactId>wstx-asl</artifactId>
+    </dependency>
 
     <!-- Test dependencies -->
 

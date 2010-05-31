@@ -224,6 +224,11 @@
         <version>2.2</version>
       </dependency>
       <dependency>
+        <groupId>org.codehaus.woodstox</groupId>
+        <artifactId>wstx-asl</artifactId>
+        <version>3.2.3</version>
+      </dependency>
+      <dependency>
         <groupId>com.sun.grizzly</groupId>
         <artifactId>grizzly-servlet-webserver</artifactId>
         <version>1.9.9</version>
