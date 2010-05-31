@@ -220,11 +220,6 @@
     </dependency>
     <dependency>
       <groupId>org.constellation.storage</groupId>
-      <artifactId>cstl-store-data-worldimage</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-style-sld</artifactId>
       <version>${project.version}</version>
     </dependency>

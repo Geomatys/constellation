@@ -104,7 +104,6 @@
     <module>provider-data-postgis</module>
     <module>provider-data-shapefile</module>
     <module>provider-data-sml</module>
-    <module>provider-data-worldimage</module>
     <module>provider-style-sld</module>
     <module>provider-style-unnormalize</module>
   </modules>
