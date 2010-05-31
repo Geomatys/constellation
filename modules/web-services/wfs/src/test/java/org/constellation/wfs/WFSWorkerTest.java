@@ -134,6 +134,11 @@ public class WFSWorkerTest {
         if (ds2 != null) {
             ds2.shutdown();
         }
+
+        File derbyLog = new File("derby.log");
+        if (derbyLog.exists()) {
+            derbyLog.delete();
+        }
     }
 
     @Before

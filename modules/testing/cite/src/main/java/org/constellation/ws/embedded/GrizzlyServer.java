@@ -263,6 +263,10 @@ public final class GrizzlyServer {
                 LOGGER.info("No write permission for "+ outputDir.getAbsolutePath());
             }
         }
+        File f = new File("derby.log");
+        if (f.exists()) {
+            f.delete();
+        }
     }
 
     /**

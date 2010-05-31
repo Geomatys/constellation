@@ -21,6 +21,7 @@ import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.server.impl.application.WebApplicationContext;
 import com.sun.jersey.server.impl.application.WebApplicationImpl;
 import com.sun.jersey.spi.container.ContainerRequest;
+import java.io.File;
 import java.net.URI;
 import java.util.List;
 import org.constellation.Cstl;
@@ -36,6 +37,7 @@ import org.constellation.provider.coveragesql.CoverageSQLProvider;
 import org.constellation.provider.coveragesql.CoverageSQLProviderService;
 import org.constellation.register.RegisterException;
 import org.geotoolkit.xml.MarshallerPool;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import static org.junit.Assume.*;
@@ -119,6 +121,14 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
         } catch (RegisterException ex) {
             LAYERS = null;
             assumeNoException(ex);
+        }
+    }
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        File derbyLog = new File("derby.log");
+        if (derbyLog.exists()) {
+            derbyLog.delete();
         }
     }
 

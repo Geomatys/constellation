@@ -18,6 +18,7 @@ package org.constellation.ws.embedded;
 
 // J2SE dependencies
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -112,6 +113,10 @@ public class WMSAxesOrderTest extends AbstractGrizzlyServer {
     @AfterClass
     public static void finish() {
         layers = null;
+        File f = new File("derby.log");
+        if (f.exists()) {
+            f.delete();
+        }
     }
 
     /**
