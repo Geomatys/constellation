@@ -366,6 +366,11 @@
         <version>${geotoolkit.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-utility-jdbc</artifactId>
+        <version>${geotoolkit.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.geotoolkit</groupId>
         <artifactId>geotk-referencing</artifactId>
         <version>${geotoolkit.version}</version>

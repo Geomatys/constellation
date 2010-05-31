@@ -37,7 +37,7 @@ import org.geotoolkit.coverage.sql.LayerCoverageReader;
 import org.geotoolkit.feature.DefaultName;
 
 import org.geotoolkit.map.ElevationModel;
-import org.geotoolkit.sql.WrappedDataSource;
+import org.geotoolkit.jdbc.WrappedDataSource;
 import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.feature.type.Name;

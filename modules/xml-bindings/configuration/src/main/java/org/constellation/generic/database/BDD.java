@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import oracle.jdbc.pool.OracleConnectionPoolDataSource;
 import oracle.jdbc.pool.OracleDataSource;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.sql.WrappedDataSource;
+import org.geotoolkit.jdbc.WrappedDataSource;
 import org.geotoolkit.util.Utilities;
 import org.postgresql.ds.PGConnectionPoolDataSource;
 import org.postgresql.ds.PGSimpleDataSource;
