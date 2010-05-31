@@ -32,6 +32,7 @@ import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.CSWClassesContext;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.resources.NIOUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 
@@ -65,17 +66,18 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
 
             Connection con = ds.getConnection();
 
-            Util.executeSQLScript("org/constellation/sql/structure-mdweb.sql", con);
-            Util.executeSQLScript("org/constellation/sql/mdweb-base-data.sql", con);
-            Util.executeSQLScript("org/constellation/sql/ISO19115-base-data.sql", con);
-            Util.executeSQLScript("org/constellation/sql/ISO19115-data.sql", con);
-            Util.executeSQLScript("org/constellation/sql/ISO19119-data.sql", con);
-            Util.executeSQLScript("org/constellation/sql/mdweb-user-data.sql", con);
-            Util.executeSQLScript("org/constellation/sql/DC-schema.sql", con);
-            Util.executeSQLScript("org/constellation/sql/ebrim-schema.sql", con);
-            Util.executeSQLScript("org/constellation/metadata/sql/csw-data.sql", con);
-            Util.executeSQLScript("org/constellation/metadata/sql/csw-data-3.sql", con);
-            Util.executeSQLScript("org/constellation/metadata/sql/csw-data-4.sql", con);
+            ScriptRunner sr = new ScriptRunner(con);
+            sr.run(Util.getResourceAsStream("org/constellation/sql/structure-mdweb.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-base-data.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-base-data.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-data.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19119-data.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/DC-schema.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/ebrim-schema.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-3.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-4.sql"));
 
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");

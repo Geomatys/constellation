@@ -44,6 +44,7 @@ import org.geotoolkit.factory.Hints;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
@@ -88,16 +89,17 @@ public class MdwebIndexTest {
 
         Connection con = ds.getConnection();
 
-        Util.executeSQLScript("org/constellation/sql/structure-mdweb.sql", con);
-        Util.executeSQLScript("org/constellation/sql/mdweb-base-data.sql", con);
-        Util.executeSQLScript("org/constellation/sql/ISO19115-base-data.sql", con);
-        Util.executeSQLScript("org/constellation/sql/ISO19115-data.sql", con);
-        Util.executeSQLScript("org/constellation/sql/ISO19119-data.sql", con);
-        Util.executeSQLScript("org/constellation/sql/mdweb-user-data.sql", con);
-        Util.executeSQLScript("org/constellation/sql/DC-schema.sql", con);
-        Util.executeSQLScript("org/constellation/sql/ebrim-schema.sql", con);
-        Util.executeSQLScript("org/constellation/metadata/sql/csw-data.sql", con);
-        Util.executeSQLScript("org/constellation/metadata/sql/csw-data-2.sql", con);
+        ScriptRunner sr = new ScriptRunner(con);
+        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-mdweb.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-base-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-base-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19119-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/DC-schema.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/ebrim-schema.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-2.sql"));
 
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");

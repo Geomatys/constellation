@@ -32,6 +32,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.resources.NIOUtilities;
 import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.xml.MarshallerPool;
@@ -56,20 +57,22 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
         Connection con2 = ds2.getConnection();
 
-        Util.executeSQLScript("org/constellation/sql/structure-mdweb.sql", con2);
-        Util.executeSQLScript("org/constellation/sql/mdweb-base-data.sql", con2);
-        Util.executeSQLScript("org/constellation/sql/ISO19115-base-data.sql", con2);
-        Util.executeSQLScript("org/constellation/sql/mdweb-user-data.sql", con2);
-        Util.executeSQLScript("org/constellation/sql/sml-schema_v2.sql", con2, true);
-        Util.executeSQLScript("org/constellation/sql/sml-data_v2.sql", con2);
+        ScriptRunner sr = new ScriptRunner(con2);
+        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-mdweb.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-base-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-base-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-schema_v2.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
 
         final String url = "jdbc:derby:memory:Test1;create=true";
         ds = new DefaultDataSource(url);
 
         Connection con = ds.getConnection();
 
-        Util.executeSQLScript("org/constellation/sql/structure-observations.sql", con);
-        Util.executeSQLScript("org/constellation/sql/sos-data.sql", con);
+        sr = new ScriptRunner(con);
+        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
        
 
         MarshallerPool pool   = new MarshallerPool(org.constellation.configuration.ObjectFactory.class);

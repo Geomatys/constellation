@@ -52,6 +52,7 @@ import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.internal.sql.ScriptRunner;
 import org.junit.*;
 import static org.junit.Assume.*;
 
@@ -141,8 +142,9 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
 
             Connection con = ds.getConnection();
 
-            Util.executeSQLScript("org/constellation/sql/structure-observations.sql", con);
-            Util.executeSQLScript("org/constellation/sql/sos-data.sql", con);
+            ScriptRunner sr = new ScriptRunner(con);
+            sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
 
             con.close();
 
@@ -166,6 +168,8 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
             }
 
         } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, rootDir, ex);
+        } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, rootDir, ex);
         }
 

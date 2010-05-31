@@ -54,6 +54,7 @@ import org.geotoolkit.feature.xml.XmlFeatureWriter;
 import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
@@ -948,8 +949,9 @@ public class WFSWorkerTest {
 
         Connection con = ds.getConnection();
 
-        Util.executeSQLScript("org/constellation/sql/structure-observations.sql", con);
-        Util.executeSQLScript("org/constellation/sql/sos-data.sql", con);
+        ScriptRunner sr = new ScriptRunner(con);
+        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
 
         con.close();
         
@@ -983,13 +985,13 @@ public class WFSWorkerTest {
 
         con = ds2.getConnection();
 
-        Util.executeSQLScript("org/constellation/sql/structure-mdweb.sql", con);
-        Util.executeSQLScript("org/constellation/sql/mdweb-base-data.sql", con);
-        Util.executeSQLScript("org/constellation/sql/ISO19115-base-data.sql", con);
-        Util.executeSQLScript("org/constellation/sql/mdweb-user-data.sql", con);
-        Util.executeSQLScript("org/constellation/sql/sml-schema.sql", con);
-        Util.executeSQLScript("org/constellation/sql/sml-data.sql", con);
-
+        sr = new ScriptRunner(con);
+        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-mdweb.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-base-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-base-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-schema.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
 
         con.close();
 
