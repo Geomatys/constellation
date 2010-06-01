@@ -29,7 +29,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.generic.database.From;
+import org.constellation.generic.database.Orderby;
 import org.constellation.generic.database.QueryList;
+import org.constellation.generic.database.Where;
 import org.geotoolkit.util.Utilities;
 
 /**

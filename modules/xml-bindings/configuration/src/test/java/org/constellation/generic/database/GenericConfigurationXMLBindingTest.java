@@ -342,15 +342,15 @@ public class GenericConfigurationXMLBindingTest {
         select.setType("text");
         select.setvalue("loc.location_date");
 
-        org.constellation.generic.filter.From from = new org.constellation.generic.filter.From();
+        From from = new From();
         from.setGroup("observations");
         from.setvalue("location loc, physical_parameter pp");
 
-        org.constellation.generic.filter.Where where = new org.constellation.generic.filter.Where();
+        Where where = new Where();
         where.setGroup("observations");
         where.setvalue("loc.location_id = lm.location_id");
 
-        org.constellation.generic.filter.Orderby order = new org.constellation.generic.filter.Orderby();
+        Orderby order = new Orderby();
         order.setGroup("observations");
         order.setvalue("loc.platform_code, loc.instrument_code");
         order.setSens("ASC");
@@ -425,15 +425,15 @@ public class GenericConfigurationXMLBindingTest {
         select.setType("text");
         select.setvalue("loc.location_date");
 
-        org.constellation.generic.filter.From from = new org.constellation.generic.filter.From();
+        From from = new From();
         from.setGroup("observations");
         from.setvalue("location loc, physical_parameter pp");
 
-        org.constellation.generic.filter.Where where = new org.constellation.generic.filter.Where();
+        Where where = new Where();
         where.setGroup("observations");
         where.setvalue("loc.location_id = lm.location_id");
 
-        org.constellation.generic.filter.Orderby order = new org.constellation.generic.filter.Orderby();
+        Orderby order = new Orderby();
         order.setGroup("observations");
         order.setvalue("loc.platform_code, loc.instrument_code");
         order.setSens("ASC");

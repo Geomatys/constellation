@@ -15,9 +15,10 @@
  *    Lesser General Public License for more details.
  */
 
-
 package org.constellation.generic.database;
 
+import java.util.HashMap;
+import java.util.Map.Entry;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -31,7 +32,7 @@ import org.geotoolkit.util.Utilities;
 
 
 /**
- * 
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -55,6 +56,14 @@ public class Where {
 
     public Where(String value) {
         this.value = value;
+    }
+    
+    public Where(Where original) {
+        if (original != null) {
+            this.group    = original.group;
+            this.operator = original.operator;
+            this.value    = original.value;
+        }
     }
 
     /**
@@ -98,19 +107,40 @@ public class Where {
     public void setvalue(String value) {
         this.value = value;
     }
-    
+
+    public void replaceVariable(String varName, String varValue, boolean withQuote) {
+        if (varValue != null) {
+            if (withQuote) {
+                value = value.replaceAll('&' + varName, "'" + varValue + "'");
+            } else {
+                value = value.replaceAll('&' + varName, varValue);
+            }
+        }
+    }
+
+
+
+    public void replaceVariable(HashMap<String, String> parameters) {
+        for (Entry<String, String> entry : parameters.entrySet()) {
+            value = value.replaceAll('&' + entry.getKey(), entry.getValue());
+        }
+    }
+
     @Override
     public String toString() {
-        final StringBuilder s = new StringBuilder("[Where]");
-        if (operator != null)
-            s.append("operator: ").append(operator).append('\n');
-        if (group != null)
-            s.append("group:").append(group).append('\n');
-        if (value != null)
-            s.append("value : ").append(value).append('\n');
-        return s.toString();
-    }
-    
+        final StringBuilder sb = new StringBuilder("[WHERE]:").append('\n');
+        if (value != null) {
+            sb.append("value: ").append(value).append('\n');
+        }
+        if (group != null) {
+            sb.append("group: ").append(group).append('\n');
+        }
+        if (operator != null) {
+            sb.append("operator: ").append(operator).append('\n');
+        }
+        return sb.toString();
+     }
+
     /**
      * Verify if this entry is identical to the specified object.
      */
@@ -137,5 +167,4 @@ public class Where {
         hash = 47 * hash + (this.value != null ? this.value.hashCode() : 0);
         return hash;
     }
-
 }

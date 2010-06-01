@@ -40,14 +40,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Where }
-     * 
-     */
-    public Where createWhere() {
-        return new Where();
-    }
-
-    /**
      * Create an instance of {@link Groupby }
      * 
      */
@@ -70,21 +62,4 @@ public class ObjectFactory {
     public Select createSelect() {
         return new Select();
     }
-
-    /**
-     * Create an instance of {@link From }
-     * 
-     */
-    public From createFrom() {
-        return new From();
-    }
-
-    /**
-     * Create an instance of {@link Orderby }
-     * 
-     */
-    public Orderby createOrderby() {
-        return new Orderby();
-    }
-
 }
