@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotoolkit.util.Utilities;
 
 
 /**
@@ -104,4 +105,30 @@ public class Orderby {
         return sb.toString();
     }
 
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof Orderby) {
+            final Orderby that = (Orderby) object;
+
+            return Utilities.equals(this.sens,  that.sens)  &&
+                   Utilities.equals(this.group, that.group) &&
+                   Utilities.equals(this.value, that.value);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 43 * hash + (this.sens != null ? this.sens.hashCode() : 0);
+        hash = 43 * hash + (this.group != null ? this.group.hashCode() : 0);
+        hash = 43 * hash + (this.value != null ? this.value.hashCode() : 0);
+        return hash;
+    }
 }

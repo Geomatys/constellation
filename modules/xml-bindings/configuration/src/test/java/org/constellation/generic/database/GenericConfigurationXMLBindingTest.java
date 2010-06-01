@@ -44,7 +44,7 @@ public class GenericConfigurationXMLBindingTest {
 
     @Before
     public void setUp() throws JAXBException {
-        pool = new MarshallerPool(Automatic.class, SOSConfiguration.class);
+        pool = new MarshallerPool(Automatic.class, SOSConfiguration.class, org.constellation.generic.filter.Query.class);
         unmarshaller = pool.acquireUnmarshaller();
         marshaller   = pool.acquireMarshaller();
     }
@@ -65,7 +65,7 @@ public class GenericConfigurationXMLBindingTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void marshalingTest() throws Exception {
+    public void genericMarshalingTest() throws Exception {
 
         BDD bdd = new BDD("org.driver.test", "http://somehost/blablabla", "bobby", "juanito");
         
@@ -80,6 +80,11 @@ public class GenericConfigurationXMLBindingTest {
                                                 new From("physical_parameter pp, transduction tr"),
                                                 new Where("tr.parameter=pp.id"));
 
+        Orderby order = new Orderby();
+        order.setSens("ASC");
+        order.setvalue("blav");
+        mquery.getOrderby().add(order);
+
         QueryList multi = new QueryList(mquery);
 
         Queries queries = new Queries(null, single, multi, parameters);
@@ -89,9 +94,10 @@ public class GenericConfigurationXMLBindingTest {
         marshaller.marshal(config, sw);
 
         String result = sw.toString();
+        //System.out.println(result);
         String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                + '\n' +
-        "<automatic format=\"MDWEB\" xmlns:ns2=\"http://www.constellation.org/config\">" + '\n' +
+        "<automatic format=\"MDWEB\" xmlns:ns2=\"http://www.constellation.org/config\" xmlns:ns3=\"http://constellation.generic.filter.org\">" + '\n' +
         "    <bdd>"                                                                    + '\n' +
         "        <className>org.driver.test</className>"                               + '\n' +
         "        <connectURL>http://somehost/blablabla</connectURL>"                   + '\n' +
@@ -134,6 +140,7 @@ public class GenericConfigurationXMLBindingTest {
         "                </select>"                                                    + '\n' +
         "                <from>physical_parameter pp, transduction tr</from>"          + '\n' +
         "                <where>tr.parameter=pp.id</where>"                            + '\n' +
+        "                <orderBy sens=\"ASC\">blav</orderBy>"                         + '\n' +
         "            </query>"                                                         + '\n' +
         "        </multiFixed>"                                                        + '\n' +
         "    </queries>"                                                               + '\n' +
@@ -141,11 +148,14 @@ public class GenericConfigurationXMLBindingTest {
 
         assertEquals(expResult, result);
 
+    }
 
-        bdd = new BDD("org.driver.test", "http://somehost/blablabla", "bobby", "juanito");
+    @Test
+    public void sosConfigMarshalingTest() throws Exception {
+        BDD bdd = new BDD("org.driver.test", "http://somehost/blablabla", "bobby", "juanito");
 
 
-        config = new Automatic("MDWEB", bdd, null);
+        Automatic config = new Automatic("MDWEB", bdd, null);
 
         SOSConfiguration sosConfig = new SOSConfiguration(config, config);
 
@@ -153,14 +163,14 @@ public class GenericConfigurationXMLBindingTest {
         config2.setName("coriolis");
         sosConfig.getExtensions().add(config2);
         
-        sw = new StringWriter();
+        StringWriter sw = new StringWriter();
         marshaller.marshal(sosConfig, sw);
 
-        result = sw.toString();
+        String result = sw.toString();
         //System.out.println("result:" + result);
-        expResult =
+        String expResult =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"            + '\n' +
-        "<ns2:SOSConfiguration xmlns:ns2=\"http://www.constellation.org/config\">" + '\n' +
+        "<ns2:SOSConfiguration xmlns:ns2=\"http://www.constellation.org/config\" xmlns:ns3=\"http://constellation.generic.filter.org\">" + '\n' +
         "    <ns2:SMLConfiguration format=\"MDWEB\">"                              + '\n' +
         "        <bdd>"                                                            + '\n' +
         "            <className>org.driver.test</className>"                       + '\n' +
@@ -199,7 +209,7 @@ public class GenericConfigurationXMLBindingTest {
      * @throws java.lang.Exception
      */
     @Test
-    public void unmarshalingTest() throws Exception {
+    public void genericUnmarshalingTest() throws Exception {
 
 
         String xml =
@@ -223,7 +233,7 @@ public class GenericConfigurationXMLBindingTest {
         "            </entry>"                                                         + '\n' +
         "        </parameters>"                                                        + '\n' +
         "        <single>"                                                             + '\n' +
-	    "            <query name=\"singleQuery1\">"                                    + '\n' +
+	"            <query name=\"singleQuery1\">"                                    + '\n' +
         "                <select>"                                                     + '\n' +
         "                    <col>"                                                    + '\n' +
         "                        <var>var01</var>"                                     + '\n' +
@@ -247,6 +257,7 @@ public class GenericConfigurationXMLBindingTest {
         "                </select>"                                                    + '\n' +
         "                <from>physical_parameter pp, transduction tr</from>"          + '\n' +
         "                <where>tr.parameter=pp.id</where>"                            + '\n' +
+        "                <orderBy sens=\"ASC\">blav</orderBy>"                         + '\n' +
         "            </query>"                                                         + '\n' +
         "        </multiFixed>"                                                        + '\n' +
         "    </queries>"                                                               + '\n' +
@@ -274,11 +285,185 @@ public class GenericConfigurationXMLBindingTest {
                                                 new From("physical_parameter pp, transduction tr"),
                                                 new Where("tr.parameter=pp.id"));
 
+        Orderby order = new Orderby();
+        order.setSens("ASC");
+        order.setvalue("blav");
+        mquery.getOrderby().add(order);
+        
         QueryList multi = new QueryList(mquery);
 
         Queries queries     = new Queries(null, single, multi, parameters);
         Automatic expResult = new Automatic("MDWEB", bdd, queries);
 
+        assertEquals(expResult, result);
+    }
+
+    /**
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void filterUnmarshalingTest() throws Exception {
+
+        String xml =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"                                                            + '\n' +
+        "<filter:query name=\"ObservationAffinage\" xmlns:filter=\"http://constellation.generic.filter.org\">"  + '\n' +
+        " <parameters>"                                                                                         + '\n' +
+        "     <entry>"                                                                                          + '\n' +
+        "       <key>st1</key>"                                                                                 + '\n' +
+        "       <value>plouf</value>"                                                                           + '\n' +
+        "     </entry>"                                                                                         + '\n' +
+        " </parameters>"                                                                                        + '\n' +
+        " <statique>"                                                                                           + '\n' +
+        "  	   <query name=\"platformList\">"                                                                   + '\n' +
+        "        <select>"                                                                                      + '\n' +
+        "           <col>"                                                                                      + '\n' +
+        "              <var>platformList</var>"                                                                 + '\n' +
+        "              <sql>platf</sql>"                                                                        + '\n' +
+        "           </col>"                                                                                     + '\n' +
+        "        </select>"                                                                                     + '\n' +
+        "        <from>(select '13471' from dual)</from>"                                                       + '\n' +
+        "        <orderBy>name</orderBy>"                                                                           + '\n' +
+        "     </query>"                                                                                         + '\n' +
+        "</statique>"                                                                                           + '\n' +
+        "<select group=\"filterObservation\" type=\"text\">loc.location_date</select>"                          + '\n' +
+        "<from group=\"observations\">location loc, physical_parameter pp</from>"                               + '\n' +
+        "<where group=\"observations\">loc.location_id = lm.location_id</where>"                                + '\n' +
+        "<orderby group=\"observations\" sens=\"ASC\">loc.platform_code, loc.instrument_code</orderby>"         + '\n' +
+        "</filter:query>";
+
+        StringReader sr = new StringReader(xml);
+
+        org.constellation.generic.filter.Query result = (org.constellation.generic.filter.Query) unmarshaller.unmarshal(sr);
+
+
+        org.constellation.generic.filter.Select select = new org.constellation.generic.filter.Select();
+        select.setGroup("filterObservation");
+        select.setType("text");
+        select.setvalue("loc.location_date");
+
+        org.constellation.generic.filter.From from = new org.constellation.generic.filter.From();
+        from.setGroup("observations");
+        from.setvalue("location loc, physical_parameter pp");
+
+        org.constellation.generic.filter.Where where = new org.constellation.generic.filter.Where();
+        where.setGroup("observations");
+        where.setvalue("loc.location_id = lm.location_id");
+
+        org.constellation.generic.filter.Orderby order = new org.constellation.generic.filter.Orderby();
+        order.setGroup("observations");
+        order.setvalue("loc.platform_code, loc.instrument_code");
+        order.setSens("ASC");
+
+        org.constellation.generic.filter.Query expResult = new org.constellation.generic.filter.Query();
+        expResult.setName("ObservationAffinage");
+        expResult.addSelect(select);
+        expResult.addFrom(from);
+        expResult.addWhere(where);
+        expResult.addOrderby(order);
+
+        HashMap<String, String> parameters = new HashMap<String, String>();
+       
+        parameters.put("st1", "plouf");
+
+        expResult.setParameters(parameters);
+        
+        Query query = new Query("platformList", new Select("platformList", "platf"), new From("(select '13471' from dual)"));
+        Orderby order2 = new Orderby();
+        order2.setvalue("name");
+        query.getOrderby().add(order2);
+
+        expResult.setStatique(new QueryList(query));
+
+        assertEquals(expResult.getStatique(), result.getStatique());
+        assertEquals(expResult.getParameters(), result.getParameters());
+        assertEquals(expResult.getFrom(), result.getFrom());
+        assertEquals(expResult.getOrderby(), result.getOrderby());
+        assertEquals(expResult.getSelect(), result.getSelect());
+        assertEquals(expResult.getGroupby(), result.getGroupby());
+        assertEquals(expResult.getName(), result.getName());
+        assertEquals(expResult.getWhere(), result.getWhere());
+        assertEquals(expResult, result);
+    }
+
+    /**
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void filterMarshalingTest() throws Exception {
+
+        String expResult =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"                                                            + '\n' +
+        "<ns3:query name=\"ObservationAffinage\" xmlns:ns2=\"http://www.constellation.org/config\" xmlns:ns3=\"http://constellation.generic.filter.org\">"  + '\n' +
+        "    <parameters>"                                                                                         + '\n' +
+        "        <entry>"                                                                                          + '\n' +
+        "            <key>st1</key>"                                                                                 + '\n' +
+        "            <value>plouf</value>"                                                                           + '\n' +
+        "        </entry>"                                                                                         + '\n' +
+        "    </parameters>"                                                                                        + '\n' +
+        "    <statique>"                                                                                           + '\n' +
+        "        <query name=\"platformList\">"                                                                   + '\n' +
+        "            <select>"                                                                                      + '\n' +
+        "                <col>"                                                                                      + '\n' +
+        "                    <var>platformList</var>"                                                                 + '\n' +
+        "                    <sql>platf</sql>"                                                                        + '\n' +
+        "                </col>"                                                                                     + '\n' +
+        "            </select>"                                                                                     + '\n' +
+        "            <from>(select '13471' from dual)</from>"                                                       + '\n' +
+        "            <orderBy>name</orderBy>"                                                                           + '\n' +
+        "        </query>"                                                                                         + '\n' +
+        "    </statique>"                                                                                           + '\n' +
+        "    <select group=\"filterObservation\" type=\"text\">loc.location_date</select>"                          + '\n' +
+        "    <from group=\"observations\">location loc, physical_parameter pp</from>"                               + '\n' +
+        "    <where group=\"observations\">loc.location_id = lm.location_id</where>"                                + '\n' +
+        "    <orderby group=\"observations\" sens=\"ASC\">loc.platform_code, loc.instrument_code</orderby>"         + '\n' +
+        "</ns3:query>" + '\n';
+
+        org.constellation.generic.filter.Select select = new org.constellation.generic.filter.Select();
+        select.setGroup("filterObservation");
+        select.setType("text");
+        select.setvalue("loc.location_date");
+
+        org.constellation.generic.filter.From from = new org.constellation.generic.filter.From();
+        from.setGroup("observations");
+        from.setvalue("location loc, physical_parameter pp");
+
+        org.constellation.generic.filter.Where where = new org.constellation.generic.filter.Where();
+        where.setGroup("observations");
+        where.setvalue("loc.location_id = lm.location_id");
+
+        org.constellation.generic.filter.Orderby order = new org.constellation.generic.filter.Orderby();
+        order.setGroup("observations");
+        order.setvalue("loc.platform_code, loc.instrument_code");
+        order.setSens("ASC");
+
+        org.constellation.generic.filter.Query query = new org.constellation.generic.filter.Query();
+        query.setName("ObservationAffinage");
+        query.addSelect(select);
+        query.addFrom(from);
+        query.addWhere(where);
+        query.addOrderby(order);
+
+        HashMap<String, String> parameters = new HashMap<String, String>();
+
+        parameters.put("st1", "plouf");
+
+        query.setParameters(parameters);
+
+        Query querys = new Query("platformList", new Select("platformList", "platf"), new From("(select '13471' from dual)"));
+        Orderby order2 = new Orderby();
+        order2.setvalue("name");
+        querys.getOrderby().add(order2);
+
+        query.setStatique(new QueryList(querys));
+
+        StringWriter sw = new StringWriter();
+
+        marshaller.marshal(query, sw);
+
+        String result = sw.toString();
+        
         assertEquals(expResult, result);
     }
 }

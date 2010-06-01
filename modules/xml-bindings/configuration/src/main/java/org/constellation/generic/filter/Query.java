@@ -20,6 +20,7 @@ package org.constellation.generic.filter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -29,6 +30,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.constellation.generic.database.QueryList;
+import org.geotoolkit.util.Utilities;
 
 /**
  * 
@@ -286,9 +288,18 @@ public class Query {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[Query]:").append('\n');
-        sb.append("name: ").append(name);
+        sb.append("name: ").append(name).append('\n');
         if (option != null) {
             sb.append(" option: ").append(option);
+        }
+        if (statique != null) {
+            sb.append("Statique: ").append(statique).append('\n');
+        }
+        if (parameters != null) {
+            sb.append("Parameters: ");
+            for (Entry<String, String> e : parameters.entrySet()) {
+                sb.append(e.getKey()).append('=').append(e.getValue()).append('\n');
+            }
         }
         if (select != null) {
             sb.append("SELECT: ");
@@ -335,5 +346,29 @@ public class Query {
      */
     public void setStatique(QueryList statique) {
         this.statique = statique;
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof Query) {
+            final Query that = (Query) object;
+
+            return Utilities.equals(this.from,    that.from) &&
+                   Utilities.equals(this.name,    that.name) &&
+                   Utilities.equals(this.groupby, that.groupby) &&
+                   Utilities.equals(this.select,  that.select) &&
+                   Utilities.equals(this.where,   that.where) &&
+                   Utilities.equals(this.option,  that.option) &&
+                   Utilities.equals(this.orderby,  that.orderby) &&
+                   Utilities.equals(this.parameters, that.parameters) &&
+                   Utilities.equals(this.statique, that.statique);
+        }
+        return false;
     }
 }

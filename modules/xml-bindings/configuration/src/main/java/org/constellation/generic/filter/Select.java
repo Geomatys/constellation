@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlValue;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.geotoolkit.util.Utilities;
 
 
 /**
@@ -182,5 +183,40 @@ public class Select {
             sb.append("width: ").append(width).append('\n');
         }
         return sb.toString();
+    }
+
+    /**
+     * Verify if this entry is identical to the specified object.
+     */
+    @Override
+    public boolean equals(final Object object) {
+        if (object == this) {
+            return true;
+        }
+        if (object instanceof Select) {
+            final Select that = (Select) object;
+
+            return Utilities.equals(this.alias, that.alias) &&
+                   Utilities.equals(this.align, that.align) &&
+                   Utilities.equals(this.group, that.group) &&
+                   Utilities.equals(this.tooltip, that.tooltip) &&
+                   Utilities.equals(this.type, that.type) &&
+                   Utilities.equals(this.value, that.value) &&
+                   Utilities.equals(this.width, that.width);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 79 * hash + (this.alias != null ? this.alias.hashCode() : 0);
+        hash = 79 * hash + (this.type != null ? this.type.hashCode() : 0);
+        hash = 79 * hash + (this.tooltip != null ? this.tooltip.hashCode() : 0);
+        hash = 79 * hash + (this.align != null ? this.align.hashCode() : 0);
+        hash = 79 * hash + (this.width != null ? this.width.hashCode() : 0);
+        hash = 79 * hash + (this.group != null ? this.group.hashCode() : 0);
+        hash = 79 * hash + (this.value != null ? this.value.hashCode() : 0);
+        return hash;
     }
 }
