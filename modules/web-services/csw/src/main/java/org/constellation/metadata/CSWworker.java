@@ -809,20 +809,15 @@ public class CSWworker {
             final SortByType sortBy = query.getSortBy();
             if (sortBy != null && sortBy.getSortProperty().size() > 0) {
                 final SortPropertyType first = sortBy.getSortProperty().get(0);
-                if (first.getPropertyName() == null || first.getPropertyName().getPropertyName() == null || first.getPropertyName().getPropertyName().equals(""))
+                if (first.getPropertyName() == null || first.getPropertyName().getPropertyName() == null || first.getPropertyName().getPropertyName().isEmpty()) {
                     throw new CstlServiceException("A SortBy filter must specify a propertyName.",
                                                   NO_APPLICABLE_CODE);
-                final String propertyName = StringUtilities.removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
-
-                final SortField sf;
-                if (first.getSortOrder().equals(SortOrder.ASCENDING)) {
-                    sf = new SortField(propertyName, SortField.STRING, false);
-                    LOGGER.log(logLevel, "sort ASC");
-                } else {
-                    sf = new SortField(propertyName, SortField.STRING, true);
-                    LOGGER.log(logLevel, "sort DSC");
                 }
-                final Sort sortFilter = new Sort(sf);
+
+                final String propertyName = StringUtilities.removePrefix(first.getPropertyName().getPropertyName()) + "_sort";
+                final boolean desc        = !first.getSortOrder().equals(SortOrder.ASCENDING);
+                final SortField sf        = new SortField(propertyName, SortField.STRING, desc);
+                final Sort sortFilter     = new Sort(sf);
                 luceneQuery.setSort(sortFilter);
             }
         
@@ -1017,191 +1012,72 @@ public class CSWworker {
         
         //we begin to build the result
         GetRecordByIdResponseType response;
-        final List<String> unexistingID = new ArrayList<String>();
-        
-        //we build dublin core object
-        if (outputSchema.equals(Namespaces.CSW_202)) {
-            final List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
-            for (String id:request.getId()) {
-                
-                //we verify if  the identifier of the metadata exist
-                final String saved = id;
-                id = executeIdentifierQuery(id);
-                if (id == null){
-                    unexistingID.add(saved);
-                    LOGGER.severe("unexisting metadata id: " + saved);
-                    continue;
-                }
-                //we get the metadata object
-                try {
-                    final Object o = mdReader.getMetadata(id, DUBLINCORE, set, null);
-                    if (o instanceof AbstractRecordType)
-                        records.add((AbstractRecordType)o);
-                } catch (MetadataIoException ex) {
-                    CodeList execptionCode = ex.getExceptionCode();
-                    if (execptionCode == null) {
-                        execptionCode = NO_APPLICABLE_CODE;
-                    }
-                    throw new CstlServiceException(ex, execptionCode);
-                }
-            }
-            if (records.size() == 0) {
-                throwUnexistingIdentifierException(unexistingID);
-            }
-            response = new GetRecordByIdResponseType(records, null);
-            
-        //we build ISO 19139 object    
-        } else if (outputSchema.equals(Namespaces.GMD)) {
-           final List<DefaultMetadata> records = new ArrayList<DefaultMetadata>();
-           for (String id:request.getId()) {
-               
-               //we get the form ID and catalog code
-               final String saved = id;
-                id = executeIdentifierQuery(id);
-                if (id == null) {
-                    unexistingID.add(saved);
-                    LOGGER.severe("unexisting metadata id:" + saved);
-                    continue;
-                }
-                
-                //we get the metadata object
-                try {
-                    final Object o = mdReader.getMetadata(id, ISO_19115, set, null);
-                    if (o instanceof DefaultMetadata) {
-                        records.add((DefaultMetadata)o);
-                    } else {
-                        LOGGER.severe("the form " + id + " is not a ISO object");
-                    }
-               } catch (MetadataIoException ex) {
-                   CodeList execptionCode = ex.getExceptionCode();
-                   if (execptionCode == null) {
-                       execptionCode = NO_APPLICABLE_CODE;
-                   }
-                   throw new CstlServiceException(ex, execptionCode);
-               }
-           }
-           if (records.size() == 0) {
-                throwUnexistingIdentifierException(unexistingID);
-            }
-        
-           response = new GetRecordByIdResponseType(null, records);      
-        
-        //we build a Feature catalogue object
-        } else if (outputSchema.equals(Namespaces.GFC)) {
-           final List<Object> records = new ArrayList<Object>();
-           for (String id:request.getId()) {
-               
-               //we get the form ID and catalog code
-               final String saved = id;
-                id = executeIdentifierQuery(id);
-                if (id == null) {
-                    unexistingID.add(saved);
-                    LOGGER.severe("unexisting id:" + saved);
-                    continue;
-                }
+        final List<String> unexistingID        = new ArrayList<String>();
+        final List<AbstractRecordType> records = new ArrayList<AbstractRecordType>();
+        final List<Object> otherRecords        = new ArrayList<Object>();
 
-                try {
-                    //we get the metadata object
-                    final Object o = mdReader.getMetadata(id, ISO_19115, set, null);
-                    if (o != null) {
-                        records.add(o);
-                    } else {
-                        LOGGER.severe("GFC object is null");
-                    }
-                } catch (MetadataIoException ex) {
-                   CodeList execptionCode = ex.getExceptionCode();
-                   if (execptionCode == null) {
-                       execptionCode = NO_APPLICABLE_CODE;
-                   }
-                   throw new CstlServiceException(ex, execptionCode);
-               }
-           }
-           if (records.size() == 0) {
-                throwUnexistingIdentifierException(unexistingID);
-            }
-        
-           response = new GetRecordByIdResponseType(null, records);      
-        
-        //we build a Ebrim 3.0 object
+        final Class expectedType;
+        final int mode;
+        if (outputSchema.equals(Namespaces.CSW_202)) {
+            expectedType = AbstractRecordType.class;
+            mode         = DUBLINCORE;
+        } else if (outputSchema.equals(Namespaces.GMD))  {
+            expectedType = DefaultMetadata.class;
+            mode         = ISO_19115;
+        } else if (outputSchema.equals(Namespaces.GFC)) {
+            expectedType = null;
+            mode         = ISO_19115;
         } else if (outputSchema.equals(EBRIM_30)) {
-           final List<Object> records = new ArrayList<Object>();
-           for (String id:request.getId()) {
-               
-               //we get the form ID and catalog code
-               final String saved = id;
-                id = executeIdentifierQuery(id);
-                if (id == null) {
-                    unexistingID.add(saved);
-                    LOGGER.severe("unexisting metadata id: " + saved);
-                    continue;
-                }
-                
-                //we get the metadata object
-                try {
-                    final Object o = mdReader.getMetadata(id, EBRIM, set, null);
-                    if (o instanceof IdentifiableType) {
-                        records.add(o);
-                    } else {
-                        LOGGER.severe("The form " + id + " is not a EBRIM v3.0 object");
-                    }
-                } catch (MetadataIoException ex) {
-                   CodeList execptionCode = ex.getExceptionCode();
-                   if (execptionCode == null) {
-                       execptionCode = NO_APPLICABLE_CODE;
-                   }
-                   throw new CstlServiceException(ex, execptionCode);
-               }
-           }
-           if (records.size() == 0) {
-                throwUnexistingIdentifierException(unexistingID);
-            }
-        
-           response = new GetRecordByIdResponseType(null, records);      
-      
-         //we build a Ebrim 2.5 object
+             expectedType = IdentifiableType.class;
+             mode         = EBRIM;
         } else if (outputSchema.equals(EBRIM_25)) {
-           final List<Object> records = new ArrayList<Object>();
-           for (String id:request.getId()) {
-               
-                //we get the form ID and catalog code
-                final String saved = id;
-                id = executeIdentifierQuery(id);
-                if (id == null) {
-                    unexistingID.add(saved);
-                    LOGGER.severe("unexisting id:" + saved);
-                    continue;
-                }
-                
-                //we get the metadata object
-                try {
-                    final Object o = mdReader.getMetadata(id, EBRIM, set, null);
-                    if (o instanceof org.geotoolkit.ebrim.xml.v250.RegistryObjectType) {
-                        records.add(o);
-                    } else {
-                        if (o == null)
-                            LOGGER.severe("The form " + id + " has not be read is null.");
-                        else
-                            LOGGER.severe("The form " + id + " is not a EBRIM v2.5 object.");
-                    }
-               } catch (MetadataIoException ex) {
-                   CodeList execptionCode = ex.getExceptionCode();
-                   if (execptionCode == null) {
-                       execptionCode = NO_APPLICABLE_CODE;
-                   }
-                   throw new CstlServiceException(ex, execptionCode);
-               }
-           }
-           if (records.size() == 0) {
-                throwUnexistingIdentifierException(unexistingID);
-            }
-        
-           response = new GetRecordByIdResponseType(null, records);  
-           
-        // this case must never append
+            expectedType = org.geotoolkit.ebrim.xml.v250.RegistryObjectType.class;
+            mode         = EBRIM;
         } else {
-            response = null;
+            throw new CstlServiceException("Unexpected outputSchema");
         }
-        
+
+        for (String id : request.getId()) {
+
+            //we get the form ID and catalog code
+            final String saved = id;
+            id = executeIdentifierQuery(id);
+            if (id == null) {
+                unexistingID.add(saved);
+                LOGGER.severe("unexisting id:" + saved);
+                continue;
+            }
+
+            //we get the metadata object
+            try {
+                final Object o = mdReader.getMetadata(id, mode, set, null);
+                if (o != null) {
+                    if (expectedType != null && !expectedType.isInstance(o)) {
+                        LOGGER.severe("The form " + id + " is not a " + expectedType.getSimpleName() + "object.");
+                        continue;
+                    }
+                    if (mode == DUBLINCORE) {
+                        records.add((AbstractRecordType)o);
+                    } else {
+                        otherRecords.add(o);
+                    }
+                } else {
+                    LOGGER.severe("The form " + id + " has not be read is null.");
+                }
+            } catch (MetadataIoException ex) {
+                CodeList execptionCode = ex.getExceptionCode();
+                if (execptionCode == null) {
+                    execptionCode = NO_APPLICABLE_CODE;
+                }
+                throw new CstlServiceException(ex, execptionCode);
+            }
+        }
+
+        if (records.size() == 0 && otherRecords.size() == 0) {
+            throwUnexistingIdentifierException(unexistingID);
+        }
+
+        response = new GetRecordByIdResponseType(records, otherRecords);
         LOGGER.log(logLevel, "GetRecordById request processed in " + (System.currentTimeMillis() - startTime) + MS);
         return response;
     }
