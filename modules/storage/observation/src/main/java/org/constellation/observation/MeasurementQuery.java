@@ -28,19 +28,19 @@ import static org.geotoolkit.internal.sql.table.QueryType.*;
  *
  * @author Guilhem Legal
  */
-public class MeasurementQuery extends Query{
+public class MeasurementQuery extends ObservationQuery {
     
     /**
      * Column to appear after the {@code "SELECT"} clause.
-     */
+     
     protected final Column name, featureOfInterest, featureOfInterestPoint, featureOfInterestCurve, procedure, observedProperty, observedPropertyComposite,
-            distribution, samplingTimeBegin, samplingTimeEnd, result, resultDefinition, description;
+            distribution, samplingTimeBegin, samplingTimeEnd, result, resultDefinition, description;*/
     // quality, , observationMetadata, procedureTime, procedureParameter,
  
     /**
      * Parameter to appear after the {@code "FROM"} clause.
-     */
-    protected final Parameter byName;
+    
+    protected final Parameter byName; */
     
     /**
      * Creates a new query for the specified database.
@@ -49,7 +49,7 @@ public class MeasurementQuery extends Query{
      */
     public MeasurementQuery(final Database database) {
         super(database, "measurements", "observation");
-        final QueryType[] si  = {SELECT, INSERT};
+/*        final QueryType[] si  = {SELECT, INSERT};
         final QueryType[] sie = {SELECT, INSERT, EXISTS};
         
         name                      = addMandatoryColumn("name",                        sie);
@@ -65,15 +65,15 @@ public class MeasurementQuery extends Query{
         samplingTimeEnd           = addOptionalColumn("sampling_time_end",          null, si);
         result                    = addOptionalColumn("result",                      null,si);
         resultDefinition          = addOptionalColumn("result_definition",           null,si);
-/*
+
         observationMetadata       = addColumn("observationMetadata",         SI);
         quality                   = addColumn("quality",                     SI);
         result                    = addColumn("result",                      SI);
         procedureTime             = addColumn("procedureTime",               SI);
-        procedureParameter        = addColumn("procedureParameter",          SI);*/
+        procedureParameter        = addColumn("procedureParameter",          SI);
                 
         
-        byName = addParameter(name, SELECT, EXISTS);
+        byName = addParameter(name, SELECT, EXISTS);*/
     }
-    
+
 }

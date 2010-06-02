@@ -36,14 +36,14 @@ public class ObservationQuery extends Query {
     /**
      * Column to appear after the {@code "SELECT"} clause.
      */
-    protected final Column name, featureOfInterest, featureOfInterestPoint, featureOfInterestCurve, procedure, observedProperty, observedPropertyComposite,
-            distribution, samplingTimeBegin, samplingTimeEnd, result, description;
+    protected Column name, featureOfInterest, featureOfInterestPoint, featureOfInterestCurve, procedure, observedProperty, observedPropertyComposite,
+            distribution, samplingTimeBegin, resultDefinition, samplingTimeEnd, result, description;
  // quality, , observationMetadata, procedureTime, procedureParameter,
  
     /**
      * Parameter to appear after the {@code "FROM"} clause.
      */
-    protected final Parameter byName;
+    protected Parameter byName;
     
     /**
      * Creates a new query for the specified database.
@@ -52,9 +52,25 @@ public class ObservationQuery extends Query {
      */
     public ObservationQuery(final Database database) {
         super(database, "observations", "observation");
+        initColumn();
+    }
+
+    /**
+     * Creates a new query for the specified database.
+     * this constructor is for subClasses.
+     *
+     * @param database The database for which this query is created.
+     */
+    protected ObservationQuery(final Database database, String shema, String tableName) {
+        super(database, shema, tableName);
+        initColumn();
+    }
+
+    private void initColumn() {
+
         final QueryType[] si  = {SELECT, INSERT};
         final QueryType[] sie = {SELECT, INSERT, EXISTS};
-        
+
         name                      = addMandatoryColumn("name",                        sie);
         description               = addOptionalColumn("description",                 null,si);
         featureOfInterest         = addOptionalColumn("feature_of_interest",         null,si);
@@ -67,15 +83,15 @@ public class ObservationQuery extends Query {
         samplingTimeBegin         = addOptionalColumn("sampling_time_begin",         null,si);
         samplingTimeEnd           = addOptionalColumn("sampling_time_end",           null,si);
         result                    = addOptionalColumn("result",                      null,si);
+        resultDefinition          = addOptionalColumn("result_definition",           null,si);
 /*
         observationMetadata       = addColumn("observationMetadata",         SI);
         quality                   = addColumn("quality",                     SI);
         result                    = addColumn("result",                      SI);
         procedureTime             = addColumn("procedureTime",               SI);
         procedureParameter        = addColumn("procedureParameter",          SI);*/
-                
-        
+
+
         byName = addParameter(name, SELECT, EXISTS);
     }
-    
 }

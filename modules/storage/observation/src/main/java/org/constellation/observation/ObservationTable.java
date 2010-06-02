@@ -491,7 +491,8 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
                     statement.statement.setNull(indexOf(query.samplingTimeBegin), java.sql.Types.DATE);
                     statement.statement.setNull(indexOf(query.samplingTimeEnd),   java.sql.Types.DATE);
                 }
-
+                statement.statement.setNull(indexOf(query.resultDefinition),   java.sql.Types.VARCHAR);
+                
                 updateSingleton(statement.statement);
                 release(statement);
                 success = true;
