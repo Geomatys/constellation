@@ -273,7 +273,7 @@ public abstract class GenericReader  {
     protected Values loadData(List<String> variables, List<String> parameters) throws MetadataIoException {
 
         final Set<LockedPreparedStatement> subStmts = new HashSet<LockedPreparedStatement>();
-        Values values = null;
+        final Values staticValues = new Values();
         for (String var : variables) {
             if (unboundedVariable.contains(var)) continue;
             
@@ -286,8 +286,7 @@ public abstract class GenericReader  {
                 
                 final String staticValue = staticParameters.get(var);
                 if (staticValue != null) {
-                    values = new Values();
-                    values.addToValue(var, staticValue);
+                    staticValues.addToValue(var, staticValue);
                 } else {
                     unboundedVariable.add(var);
                     LOGGER.warning("no statement found for variable: " + var);
@@ -295,15 +294,18 @@ public abstract class GenericReader  {
                 
             }
         }
-        if (values != null) {
-            return values;
+        // if there is only static parameters
+        if (subStmts.size() == 0) {
+            return staticValues;
         }
-        
+        final Values values;
         if (debugMode) {
             values = debugLoading(parameters);
         } else {
             values = loading(parameters, subStmts);
         }
+        //we add the static value to the result
+        values.mergedValues(staticValues);
         return values;
     }
 

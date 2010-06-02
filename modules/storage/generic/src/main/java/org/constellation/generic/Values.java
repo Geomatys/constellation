@@ -101,6 +101,18 @@ public class Values {
         values.get(varName).add(value);
     }
 
+    /**
+     * Add all the map of the specified Values to the current map.
+     *
+     * @param varName The name of the variable.
+     * @param value   The value to add.
+     */
+    public void mergedValues(Values value) {
+        if (value != null) {
+            this.values.putAll(value.values);
+        }
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("[Values]").append('\n');
