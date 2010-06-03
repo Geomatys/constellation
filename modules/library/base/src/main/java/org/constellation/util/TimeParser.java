@@ -16,11 +16,18 @@
  */
 package org.constellation.util;
 
-import java.util.*;
 import java.text.DateFormat;
 import java.text.ParsePosition;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.TimeZone;
 import org.geotoolkit.resources.Errors;
 import org.geotoolkit.util.logging.LoggedFormat;
 

@@ -125,8 +125,9 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
             case FILE_SYSTEM: return new FileSensorReader(configuration);
 
             case MDWEB: return new MDWebSensorReader(configuration, map);
-                
 
+            case NONE: return null;
+                
             default: throw new IllegalArgumentException("Unknow SML dataSource type: " + type);
         }
     }
@@ -140,7 +141,8 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
             case FILE_SYSTEM: return new FileSensorWriter(configuration, sensorIdBase);
 
             case MDWEB: return new MDWebSensorWriter(configuration, sensorIdBase, map);
-                
+
+            case NONE: return null;
 
             default: throw new IllegalArgumentException("Unknow SML dataSource type: " + type);
         }

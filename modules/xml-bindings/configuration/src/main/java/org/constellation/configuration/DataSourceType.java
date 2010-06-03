@@ -30,6 +30,8 @@ public enum DataSourceType {
 
     POSTGRID_O_M,
 
-    GENERIC_O_M
+    GENERIC_O_M,
+
+    NONE
 
 }

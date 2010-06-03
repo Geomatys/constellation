@@ -29,7 +29,6 @@ import java.util.Map;
 
 // JAXB dependencies
 import java.util.StringTokenizer;
-import java.util.TimeZone;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;

@@ -292,10 +292,18 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
 
     private List<Double> getCoordinates(String samplingFeatureId) throws CstlServiceException {
         try {
-            final Values values = loadData(Arrays.asList("var25"), samplingFeatureId);
+            final Values values = loadData(Arrays.asList("var25", "var45"), samplingFeatureId);
             final List<Double> result = new ArrayList<Double>();
-            final List<String> coordinates = values.getVariables("var25");
-            for (String coordinate : coordinates) {
+            String coordinate = values.getVariable("var25");
+            if (coordinate != null) {
+                try {
+                    result.add(Double.parseDouble(coordinate));
+                } catch (NumberFormatException ex) {
+                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+                }
+            }
+            coordinate = values.getVariable("var45");
+            if (coordinate != null) {
                 try {
                     result.add(Double.parseDouble(coordinate));
                 } catch (NumberFormatException ex) {

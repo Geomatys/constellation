@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<automatic format="cdi" >
+   <bdd>
+      <className>org.apache.derby.jdbc.EmbeddedDriver</className>
+      <connectURL>??</connectURL>
+      <user></user>
+      <password></password>
+   </bdd>
+   <queries>
+      <!--main>
+         <query>
+            <select>
+               <col>
+                  <var>:$</var>
+                  <sql>TODO</sql>
+               </col>
+            </select>
+            <from>TODO</from>
+            <where></where>
+            <orderBy></orderBy>
+         </query>
+      </main-->
+      <!--                  -->
+      <!-- Single queries   -->
+      <!--                  -->
+      <single>
+	 <!-- new identifier query (not needed in discovery profile)-->
+         <query>
+            <select>
+               <col>
+                  <var>var05</var>
+                  <sql>count(*)</sql>
+               </col>
+            </select>
+            <from>"observation"."observations"</from>
+            <where>"name" LIKE '%:$%'</where>
+            <orderBy></orderBy>
+         </query>
+         <!-- Observation id already exist (not needed in discovery profile)-->
+         <query>
+            <select>
+               <col>
+                  <var>var44</var>
+                  <sql>"name"</sql>
+               </col>
+            </select>
+            <from>"observation"."observations"</from>
+            <where>"name"=:$</where>
+            <orderBy></orderBy>
+         </query>
+	 <!-- minimal time event for offering -->
+         <query>
+            <select>
+               <col>
+                  <var>var06</var>
+                  <sql>MIN("event_time_begin")</sql>
+               </col>
+            </select>
+            <from>"sos"."observation_offerings"</from>
+            <where></where>
+            <orderBy></orderBy>
+         </query>
+         <!-- time bound for an offering -->
+         <query>
+            <select>
+               <col>
+                  <var>var08</var>
+                  <sql>"event_time_begin"</sql>
+               </col>
+               <col>
+                  <var>var09</var>
+                  <sql>"event_time_end"</sql>
+               </col>
+            </select>
+            <from>"sos"."observation_offerings"</from>
+            <where>"id"=:$</where>
+            <orderBy></orderBy>
+         </query>
+	 <!-- simple phenomenon -->
+         <query>
+            <select>
+               <col>
+                  <var>var13</var>
+                  <sql>"name"</sql>
+               </col>
+               <col>
+                  <var>var14</var>
+                  <sql>"description"</sql>
+               </col>
+            </select>
+            <from>"observation"."phenomenons"</from>
+            <where>"id"=:$</where>
+            <orderBy></orderBy>
+         </query>
+         <!-- composite phenomenon -->
+         <query>
+            <select>
+               <col>
+                  <var>var15</var>
+                  <sql>"name"</sql>
+               </col>
+               <col>
+                  <var>var16</var>
+                  <sql>"description"</sql>
+               </col>
+            </select>
+            <from>"observation"."composite_phenomenons"</from>
+            <where>"id"=:$</where>
+            <orderBy></orderBy>
+         </query>
+	 <!-- feature of interest (samplingPoint)-->
+         <query>
+            <select>
+               <col>
+                  <var>var19</var>
+                  <sql>"name"</sql>
+               </col>
+               <col>
+                  <var>var20</var>
+                  <sql>"description"</sql>
+               </col>
+               <col>
+                  <var>var21</var>
+                  <sql>"sampled_feature"</sql>
+               </col>
+               <col>
+                  <var>var22</var>
+                  <sql>"point_id"</sql>
+               </col>
+               <col>
+                  <var>var23</var>
+                  <sql>"point_srsname"</sql>
+               </col>
+               <col>
+                  <var>var24</var>
+                  <sql>"point_srsdimension"</sql>
+               </col>
+            </select>
+            <from>"observation"."sampling_points"</from>
+            <where>"id"=:$</where>
+            <orderBy></orderBy>
+         </query>
+	 <!-- observation -->
+         <query>
+            <select>
+               <col>
+                  <var>var26</var>
+                  <sql>"feature_of_interest_point"</sql>
+               </col>
+               <col>
+                  <var>var27</var>
+                  <sql>"observed_property"</sql>
+               </col>
+               <col>
+                  <var>var28</var>
+                  <sql>"procedure"</sql>
+               </col>
+               <col>
+                  <var>var29</var>
+                  <sql>"sampling_time_begin"</sql>
+               </col>
+               <col>
+                  <var>var30</var>
+                  <sql>"sampling_time_end"</sql>
+               </col>
+               <col>
+                  <var>var31</var>
+                  <sql>"result"</sql>
+               </col>
+            </select>
+            <from>"observation"."observations"</from>
+            <where>"name"=:$</where>
+            <orderBy></orderBy>
+         </query>
+	 <!-- result -->
+         <query>
+            <select>
+               <col>
+                  <var>var32</var>
+                  <sql>"element_count"</sql>
+               </col>
+               <col>
+                  <var>var33</var>
+                  <sql>"values"</sql>
+               </col>
+	       <col>
+                  <var>var34</var>
+                  <sql>"id_encoding"</sql>
+               </col>
+               <col>
+                  <var>var35</var>
+                  <sql>"token_separator"</sql>
+               </col>
+               <col>
+                  <var>var36</var>
+                  <sql>"decimal_separator"</sql>
+               </col>
+               <col>
+                  <var>var37</var>
+                  <sql>"block_separator"</sql>
+               </col>
+               <col>
+                  <var>var38</var>
+                  <sql>r."definition"</sql>
+               </col>
+               <col>
+                  <var>var39</var>
+                  <sql>"elementType"</sql>
+               </col>
+            </select>
+            <from>"observation"."any_results" r, "observation"."data_array_definition" d, "observation"."text_block_encodings" e</from>
+            <where>r."definition" = d."id_array_definition" AND d."encoding"=e."id_encoding" AND r."id_result"=:$</where>
+            <orderBy></orderBy>
+         </query>
+      </single>
+      <!--                  -->
+      <!-- Multiple queries -->
+      <!--                  -->
+      <multiFixed>
+         <!-- feature of interest coordinates -->
+         <query>
+            <select>
+               <col>
+                  <var>var25</var>
+                  <sql>"x_value"</sql>
+               </col>
+            </select>
+            <from>"observation"."sampling_points"</from>
+            <where>"id"=:$</where>
+            <orderBy></orderBy>
+        </query>
+        <query>
+            <select>
+                <col>
+                    <var>var45</var>
+                    <sql>"y_value"</sql>
+                </col>
+            </select>
+            <from>"observation"."sampling_points"</from>
+            <where>"id"=:$</where>
+        </query>
+        <!-- all offering id-->
+        <query>
+            <select>
+               <col>
+                  <var>var01</var>
+                  <sql>"id"</sql>
+               </col>
+            </select>
+            <from>"sos"."observation_offerings"</from>
+            <where></where>
+            <orderBy></orderBy>
+         </query>
+	 <!-- all procedure id -->
+         <query>
+            <select>
+               <col>
+                  <var>var02</var>
+                  <sql>"name"</sql>
+               </col>
+            </select>
+            <from>"observation"."process"</from>
+            <where></where>
+            <orderBy></orderBy>
+         </query>
+         <!-- all phenomenon names-->
+         <query>
+            <select>
+               <col>
+                  <var>var03</var>
+                  <sql>"name"</sql>
+               </col>
+            </select>
+            <from>"observation"."phenomenons"</from>
+            <where></where>
+            <orderBy></orderBy>
+         </query>
+	<!-- all feature of interest name -->
+         <query>
+            <select>
+               <col>
+                  <var>var04</var>
+                  <sql>"name"</sql>
+               </col>
+            </select>
+            <from>"observation"."sampling_points"</from>
+            <where></where>
+            <orderBy></orderBy>
+         </query>
+         <!-- observation offering -->
+         <query>
+            <select>
+               <col>
+                  <var>var07</var>
+                  <sql>"srs_name"</sql>
+               </col>
+            </select>
+            <from>"sos"."observation_offerings"</from>
+            <where>"id"=:$</where>
+            <orderBy></orderBy>
+         </query>
+         <!-- procedure for an offering -->
+         <query>
+            <select>
+               <col>
+                  <var>var10</var>
+                  <sql>"href"</sql>
+               </col>
+            </select>
+            <from>"sos"."offering_procedures" p, "observation"."references" r</from>
+            <where>p."procedure"=r."id_reference" AND p."id_offering"=:$</where>
+            <orderBy></orderBy>
+         </query>
+	 <!-- simple phenomenon for an offering -->
+         <query>
+            <select>
+               <col>
+                  <var>var11</var>
+                  <sql>"phenomenon"</sql>
+               </col>
+            </select>
+            <from>"sos"."offering_phenomenons"</from>
+            <where>"id_offering"=:$</where>
+            <orderBy></orderBy>
+         </query>
+         <!-- composite phenomenon for an offering -->
+         <query>
+            <select>
+               <col>
+                  <var>var12</var>
+                  <sql>"composite_phenomenon"</sql>
+               </col>
+            </select>
+            <from>"sos"."offering_phenomenons"</from>
+            <where>"id_offering"=:$</where>
+            <orderBy></orderBy>
+         </query>
+         <!-- composite phenomenon for an offering -->
+         <query>
+            <select>
+               <col>
+                  <var>var18</var>
+                  <sql>"href"</sql>
+               </col>
+            </select>
+            <from>"sos"."offering_sampling_features" sp, "observation"."references" r</from>
+            <where>sp."sampling_feature"=r."id_reference" AND sp."id_offering"=:$</where>
+            <orderBy></orderBy>
+         </query>
+         <!-- component for a composite phenomenon -->
+         <query>
+            <select>
+               <col>
+                  <var>var17</var>
+                  <sql>"component"</sql>
+               </col>
+            </select>
+            <from>"observation"."components"</from>
+            <where>"composite_phenomenon"=:$</where>
+            <orderBy>"component" ASC</orderBy>
+         </query>
+         <!-- result -->
+         <query>
+            <select>
+               <col>
+                  <var>var40</var>
+                  <sql>a."name"</sql>
+               </col>
+               <col>
+                  <var>var41</var>
+                  <sql>a."definition"</sql>
+               </col>
+	       <col>
+                  <var>var42</var>
+                  <sql>a."type"</sql>
+               </col>
+               <col>
+                  <var>var43</var>
+                  <sql>a."uom_code"</sql>
+               </col>
+            </select>
+            <from>"observation"."any_results" r, "observation"."data_array_definition" d, "observation"."any_scalars" a</from>
+            <where>r."definition" = d."id_array_definition" AND r."definition"=a."id_datablock" AND r."id_result"=:$</where>
+            <orderBy></orderBy>
+         </query>
+      </multiFixed>
+   </queries>
+</automatic>

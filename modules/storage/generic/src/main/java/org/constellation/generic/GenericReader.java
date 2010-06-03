@@ -81,7 +81,7 @@ public abstract class GenericReader  {
     /**
      * A map of static variable to replace in the statements.
      */
-    private HashMap<String, String> staticParameters;
+    private HashMap<String, String> staticParameters = new HashMap<String, String>();
 
     /**
      * A flag indicating that the service is trying to reconnect the database.
@@ -187,7 +187,10 @@ public abstract class GenericReader  {
      * @throws SQLException
      */
     private void intStaticParameters(final Queries queries) throws SQLException {
-        staticParameters = queries.getParameters();
+        staticParameters         = queries.getParameters();
+        if (staticParameters == null) {
+            staticParameters = new HashMap<String, String>();
+        }
         final QueryList statique = queries.getStatique();
         if (statique != null) {
             final Statement stmt   = connection.createStatement();

@@ -739,6 +739,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 
             String name = className;
             int nameType = 0;
+            final String codeSuffix = "Code";
             while (nameType < 12) {
                 
                 LOGGER.finer("searching: " + standard.getName() + ":" + name);
@@ -760,7 +761,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         //we add the prefix MD_ + the suffix "Code"
                         case 1: {
                             nameType = 2;
-                            name = "MD_" + className + "Code";    
+                            name = "MD_" + className + codeSuffix;
                             break;
                         }
                         //we add the prefix CI_
@@ -772,7 +773,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         //we add the prefix CI_ + the suffix "Code"
                         case 3: {
                             nameType = 4;
-                            name = "CI_" + className + "Code";    
+                            name = "CI_" + className + codeSuffix;
                             break;
                         }
                         //we add the prefix EX_
@@ -808,7 +809,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         //we add the prefix DS_ + the suffix "Code"
                         case 9: {
                             nameType = 10;
-                            name = "DS_" + className + "Code";
+                            name = "DS_" + className + codeSuffix;
                             break;
                         }
                         //for the temporal element we remove add prefix
@@ -819,8 +820,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         }
                         //for the code list we add the "code" suffix
                         case 11: {
-                            if (name.indexOf("Code") != -1) {
-                                name += "Code";
+                            if (name.indexOf(codeSuffix) != -1) {
+                                name += codeSuffix;
                             }
                             nameType = 12;
                             break;
