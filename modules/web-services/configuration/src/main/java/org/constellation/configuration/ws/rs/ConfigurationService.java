@@ -543,13 +543,20 @@ public final class ConfigurationService extends AbstractWebService  {
         if (cswConfigurer != null) {
             cswConfigurer.destroy();
         }
-        final StyleProviderProxy spp = StyleProviderProxy.getInstance(false);
-        if (spp != null) {
-            spp.dispose();
-        }
-        final LayerProviderProxy lpp = LayerProviderProxy.getInstance(false);
-        if (lpp != null) {
-            lpp.dispose();
+        try {
+            final StyleProviderProxy spp = StyleProviderProxy.getInstance(false);
+            if (spp != null) {
+                spp.dispose();
+            }
+            final LayerProviderProxy lpp = LayerProviderProxy.getInstance(false);
+            if (lpp != null) {
+                lpp.dispose();
+            }
+        } catch (ExceptionInInitializerError ex) {
+            // Factory Registery cannot found MutableStyleFactory instance.
+            // shutdown is a bit late for looking for this factory.
+            // @TODO avoid this above block if StyleProviderProxy has never been initialized.
+            LOGGER.fine(ex.toString());
         }
     }
 }
