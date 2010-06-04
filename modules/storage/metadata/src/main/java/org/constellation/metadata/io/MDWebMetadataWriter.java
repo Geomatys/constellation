@@ -453,7 +453,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         codelistElement = null;
                     }
                 }
-                final CodeListElement cle = (CodeListElement) cl.getPropertyByName(codelistElement);
+                CodeListElement cle = (CodeListElement) cl.getPropertyByName(codelistElement);
+                if (cle == null) {
+                    cle = (CodeListElement) cl.getPropertyByShortName(codelistElement);
+                }
                 if (cle instanceof org.mdweb.model.schemas.Locale) {
                     object = cle.getShortName();
                 } else if (cle != null) {
