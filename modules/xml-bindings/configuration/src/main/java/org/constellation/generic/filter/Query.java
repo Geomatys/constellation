@@ -271,6 +271,9 @@ public class Query {
                     sb.append(block);
                 }
             }
+            if (oRblock) {
+                sb.append(')');
+            }
             
         }
         if (orderby != null) {

@@ -60,6 +60,18 @@
             <where></where>
             <orderBy></orderBy>
          </query>
+         <!-- verify that the offering exist -->
+         <query>
+            <select>
+               <col>
+                  <var>var46</var>
+                  <sql>"id"</sql>
+               </col>
+            </select>
+            <from>"sos"."observation_offerings"</from>
+            <where>"id"=:$</where>
+            <orderBy></orderBy>
+         </query>
          <!-- time bound for an offering -->
          <query>
             <select>
@@ -73,6 +85,18 @@
                </col>
             </select>
             <from>"sos"."observation_offerings"</from>
+            <where>"id"=:$</where>
+            <orderBy></orderBy>
+         </query>
+         <!-- phenomenon exist? -->
+         <query>
+            <select>
+               <col>
+                  <var>var47</var>
+                  <sql>"id"</sql>
+               </col>
+            </select>
+            <from>"observation"."phenomenons"</from>
             <where>"id"=:$</where>
             <orderBy></orderBy>
          </query>
@@ -108,7 +132,19 @@
             <where>"id"=:$</where>
             <orderBy></orderBy>
          </query>
-	 <!-- feature of interest (samplingPoint)-->
+	 <!-- feature of interest (samplingPoint) exist-->
+         <query>
+            <select>
+               <col>
+                  <var>var48</var>
+                  <sql>"id"</sql>
+               </col>
+            </select>
+            <from>"observation"."sampling_points"</from>
+            <where>"id"=:$</where>
+            <orderBy></orderBy>
+         </query>
+         <!-- feature of interest (samplingPoint)-->
          <query>
             <select>
                <col>

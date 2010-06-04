@@ -180,7 +180,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Ignore
+    @Test
     @Override
     public void GetObservationErrorTest() throws Exception {
         super.GetObservationErrorTest();
@@ -235,7 +235,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
      *
      * @throws java.lang.Exception
      */
-    @Ignore
+    @Test
     @Override
     public void GetFeatureOfInterestErrorTest() throws Exception {
         super.GetFeatureOfInterestErrorTest();

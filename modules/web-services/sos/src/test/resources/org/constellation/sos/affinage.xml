@@ -46,6 +46,6 @@
 <where group="tequalsTP"><![CDATA["sampling_time_begin"=&begin AND "sampling_time_end"=&end]]></where>
 
 -- ===== TIME EQUALS TimeInstant========
-<where group="tequalsTI"><![CDATA[("sampling_time_begin"=&position AND "sampling_time_end"=NULL) OR ("sampling_time_begin"<=&position AND "sampling_time_end">=&position)]]></where>
+<where group="tequalsTI"><![CDATA[("sampling_time_begin"=&position AND "sampling_time_end" IS NULL) OR ("sampling_time_begin"<=&position AND "sampling_time_end">=&position)]]></where>
 
 </filter:query>

@@ -152,7 +152,13 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     @Override
     public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException {
         try {
-            final Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18"), offeringName);
+            final Values values = loadData(Arrays.asList("var07", "var08", "var09", "var10", "var11", "var12", "var18", "var46"), offeringName);
+
+            final boolean exist = values.getVariable("var46") != null;
+            if (!exist) {
+                return null;
+            }
+            
             final List<String> srsName = values.getVariables("var07");
 
             // event time
@@ -249,7 +255,11 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     @Override
     public PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException {
         try {
-            final Values values = loadData(Arrays.asList("var13", "var14"), phenomenonName);
+            final Values values = loadData(Arrays.asList("var13", "var14", "var47"), phenomenonName);
+            final boolean exist = values.getVariable("var47") != null;
+            if (!exist) {
+                return null;
+            }
             return new PhenomenonEntry(phenomenonName, values.getVariable("var13"), values.getVariable("var14"));
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
@@ -259,7 +269,13 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     @Override
     public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureId) throws CstlServiceException {
         try {
-            final Values values = loadData(Arrays.asList("var19", "var20", "var21", "var22", "var23", "var24"), samplingFeatureId);
+            final Values values = loadData(Arrays.asList("var19", "var20", "var21", "var22", "var23", "var24", "var48"), samplingFeatureId);
+
+            final boolean exist = values.getVariable("var48") != null;
+            if (!exist) {
+                return null;
+            }
+
             final String name            = values.getVariable("var19");
             final String description     = values.getVariable("var20");
             final String sampledFeature  = values.getVariable("var21");
@@ -324,7 +340,15 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             final PhenomenonEntry observedProperty = getPhenomenon(values.getVariable("var27"));
             final ProcessEntry procedure = new ProcessEntry(values.getVariable("var28"));
 
-            final TimePeriodType samplingTime = new TimePeriodType(values.getVariable("var29"), values.getVariable("var30"));
+            String begin = values.getVariable("var29");
+            if (begin != null) {
+                begin = begin.replace(' ', 'T');
+            }
+            String end   = values.getVariable("var30");
+            if (end != null) {
+                end = end.replace(' ', 'T');
+            }
+            final TimePeriodType samplingTime = new TimePeriodType(begin, end);
             final AnyResultEntry anyResult = getResult(values.getVariable("var31"), resultModel);
             final DataArrayEntry dataArray = anyResult.getArray();
             final DataArrayPropertyType result = new DataArrayPropertyType(dataArray);
@@ -365,6 +389,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             for(int i = 0; i < fieldNames.size(); i++) {
                 AbstractDataComponentEntry component = null;
                 final String typeName   = type.get(i);
+                final String fieldName  = fieldNames.get(i);
                 final String definition = fieldDef.get(i);
                 final String uomCode    = uomCodes.get(i);
                 if (typeName != null) {
@@ -378,7 +403,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
                         LOGGER.severe("unexpected field type");
                     }
                 }
-                final AnyScalarPropertyType field = new AnyScalarPropertyType(dataRecordId, blockId, component);
+                final AnyScalarPropertyType field = new AnyScalarPropertyType(dataRecordId, fieldName, component);
                 fields.add(field);
             }
 

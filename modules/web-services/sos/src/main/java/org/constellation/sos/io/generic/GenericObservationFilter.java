@@ -360,7 +360,7 @@ public class GenericObservationFilter implements ObservationFilter {
 
         } catch (SQLException ex) {
             LOGGER.severe("SQLExcpetion while executing the query: " + request);
-            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
+            throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage() + '\n' + "while executing the request:" + request,
                                           NO_APPLICABLE_CODE);
         }
 
