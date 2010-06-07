@@ -267,8 +267,7 @@ public class CSWworker {
      * Build a new CSW worker with the specified configuration directory
      *
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
-     * @param marshaller A JAXB marshaller to send xml to another CSW service.
-     * @param unmarshaller  An Unmarshaller to get object from harvested resource.
+     * @param marshallerPool A JAXB marshaller pool to send xml to another CSW service used by the harvester.
      * 
      */
     public CSWworker(final String serviceID, final MarshallerPool marshallerPool, File configDir) {
@@ -329,8 +328,6 @@ public class CSWworker {
      * Build a new CSW worker with the specified configuration directory
      *
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
-     * @param marshaller A JAXB marshaller to send xml to another CSW service.
-     * @param unmarshaller  An Unmarshaller to get object from harvested resource.
      *
      */
     public CSWworker(final String serviceID, File configDir, Automatic configuration) {
@@ -365,6 +362,17 @@ public class CSWworker {
         }
     }
 
+    /**
+     * Initialize the readers and indexSearcher to the datasource for the discovery profile.
+     * If The transactionnal part is enabled, it also initialize Writer and catalog harvester.
+     *
+     * @param configuration A configuration object containing the datasource informations
+     * @param serviceID The identifier of the instance.
+     * @param configDir The direcory containing the configuration files.
+     *
+     * @throws MetadataIoException If an error occurs while querying the datasource.
+     * @throws IndexingException If an error occurs while initialiazing the indexation.
+     */
     private void init(final Automatic configuration, String serviceID, File configDir) throws MetadataIoException, IndexingException {
 
         // we assign the configuration directory
@@ -376,14 +384,14 @@ public class CSWworker {
 
         final int datasourceType = configuration.getType();
         //we initialize all the data retriever (reader/writer) and index worker
-        mdReader              = cswfactory.getMetadataReader(configuration);
-        profile               = configuration.getProfile();
+        mdReader                      = cswfactory.getMetadataReader(configuration);
+        profile                       = configuration.getProfile();
         final AbstractIndexer indexer = cswfactory.getIndexer(configuration, mdReader, serviceID);
-        indexSearcher         = cswfactory.getIndexSearcher(datasourceType, configDir, serviceID);
+        indexSearcher                 = cswfactory.getIndexSearcher(datasourceType, configDir, serviceID);
         if (profile == TRANSACTIONAL) {
-            mdWriter              = cswfactory.getMetadataWriter(configuration, indexer);
-            catalogueHarvester    = new CatalogueHarvester(marshallerPool, mdWriter);
-            harvestTaskSchreduler = new HarvestTaskSchreduler(marshallerPool, configDir, catalogueHarvester);
+            mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer);
+            catalogueHarvester        = new CatalogueHarvester(marshallerPool, mdWriter);
+            harvestTaskSchreduler     = new HarvestTaskSchreduler(marshallerPool, configDir, catalogueHarvester);
         }
     }
     
