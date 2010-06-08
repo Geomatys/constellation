@@ -113,7 +113,6 @@
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-jaxp-core</artifactId>
-      <version>${geotoolkit.version}</version>
       <scope>test</scope>
       <classifier>tests</classifier>
     </dependency>
@@ -151,7 +150,6 @@
     <dependency>
       <groupId>org.geotoolkit</groupId>
       <artifactId>geotk-epsg-javadb</artifactId>
-      <version>${geotoolkit.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
