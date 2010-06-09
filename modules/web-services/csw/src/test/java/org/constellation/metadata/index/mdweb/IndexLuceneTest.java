@@ -19,6 +19,7 @@ package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
 import java.io.File;
+import java.sql.Connection;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,14 +39,21 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
 // geotools dependencies
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.util.Util;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
+import org.geotoolkit.internal.sql.DefaultDataSource;
+import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 
 // MDWeb dependencies
 import org.geotoolkit.resources.NIOUtilities;
+import org.mdweb.io.MD_IOException;
+import org.mdweb.io.sql.v20.Writer20;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.Obligation;
 import org.mdweb.model.schemas.Path;
@@ -79,6 +87,9 @@ public class IndexLuceneTest {
     private static File configDirectory;
 
     private static final Level LOG_LEVEL = Level.FINER;
+
+    private static DefaultDataSource ds;
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
         configDirectory = new File("config-test");
@@ -87,13 +98,28 @@ public class IndexLuceneTest {
         }
         configDirectory.mkdir();
 
-        List<Form> forms     = new ArrayList<Form>();
-        List<Path> paths     = new ArrayList<Path>();
-        List<Classe> classes = new ArrayList<Classe>();
-        forms                = fillTestData(paths, classes);
+        final String url = "jdbc:derby:memory:ILTest;create=true";
+        ds               = new DefaultDataSource(url);
 
-        MDWebIndexer indexer = new MDWebIndexer(forms, classes, paths, configDirectory, LOG_LEVEL);
-        indexSearcher          = new MDWebIndexSearcher(configDirectory, "");
+        Connection con = ds.getConnection();
+
+        ScriptRunner sr = new ScriptRunner(con);
+        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-mdweb.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-base-data.sql"));
+
+        //List<Form> forms     = new ArrayList<Form>();
+        //List<Path> paths     = new ArrayList<Path>();
+        //List<Classe> classes = new ArrayList<Classe>();
+        Writer20 writer = new Writer20(ds, false);
+        fillTestData(writer);
+
+        BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
+        final Automatic configuration = new Automatic("mdweb", bdd);
+        configuration.setConfigurationDirectory(configDirectory);
+        
+        final MDWebIndexer indexer    = new MDWebIndexer(configuration, "");
+        //final MDWebIndexer indexer    = new MDWebIndexer(forms, classes, paths, configDirectory, LOG_LEVEL);
+        indexSearcher                   = new MDWebIndexSearcher(configDirectory, "");
         indexSearcher.setLogLevel(LOG_LEVEL);
     }
 
@@ -103,6 +129,7 @@ public class IndexLuceneTest {
         if (configDirectory.exists()) {
             NIOUtilities.deleteDirectory(configDirectory);
         }
+        ds.shutdown();
     }
 
     @Before
@@ -135,7 +162,7 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL,"SimpleSearch 1:" + '\n' + resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("1:catalogTest");
+        expectedResult.add("1:CATEST");
         
         assertEquals(expectedResult, result);
         
@@ -152,10 +179,10 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL,"SimpleSearch 2:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("1:catalogTest");
-        expectedResult.add("2:catalogTest");
-        expectedResult.add("3:catalogTest");
-        expectedResult.add("4:catalogTest");
+        expectedResult.add("1:CATEST");
+        expectedResult.add("2:CATEST");
+        expectedResult.add("3:CATEST");
+        expectedResult.add("4:CATEST");
         
         assertEquals(expectedResult, result);
         
@@ -172,9 +199,9 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL,"SimpleSearch 3:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:catalogTest");
-        expectedResult.add("3:catalogTest");
-        expectedResult.add("4:catalogTest");
+        expectedResult.add("2:CATEST");
+        expectedResult.add("3:CATEST");
+        expectedResult.add("4:CATEST");
         
         assertEquals(expectedResult, result);
     }
@@ -205,10 +232,10 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL,"SortedSearch 1:" + '\n' + resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("3:catalogTest");
-        expectedResult.add("2:catalogTest");
-        expectedResult.add("1:catalogTest");
-        expectedResult.add("4:catalogTest");
+        expectedResult.add("3:CATEST");
+        expectedResult.add("2:CATEST");
+        expectedResult.add("1:CATEST");
+        expectedResult.add("4:CATEST");
         
         assertEquals(expectedResult, result);
         
@@ -228,10 +255,10 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL,"SortedSearch 2:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("4:catalogTest");
-        expectedResult.add("1:catalogTest");
-        expectedResult.add("2:catalogTest");
-        expectedResult.add("3:catalogTest");
+        expectedResult.add("4:CATEST");
+        expectedResult.add("1:CATEST");
+        expectedResult.add("2:CATEST");
+        expectedResult.add("3:CATEST");
         
         assertEquals(expectedResult, result);
         
@@ -251,10 +278,10 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL,"SortedSearch 3:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("2:catalogTest");
-        expectedResult.add("3:catalogTest");
-        expectedResult.add("1:catalogTest");
-        expectedResult.add("4:catalogTest");
+        expectedResult.add("2:CATEST");
+        expectedResult.add("3:CATEST");
+        expectedResult.add("1:CATEST");
+        expectedResult.add("4:CATEST");
         
         assertEquals(expectedResult, result);
         
@@ -274,10 +301,10 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL,"SortedSearch 4:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("4:catalogTest");
-        expectedResult.add("1:catalogTest");
-        expectedResult.add("3:catalogTest");
-        expectedResult.add("2:catalogTest");
+        expectedResult.add("4:CATEST");
+        expectedResult.add("1:CATEST");
+        expectedResult.add("3:CATEST");
+        expectedResult.add("2:CATEST");
         
         assertEquals(expectedResult, result);
     }
@@ -306,9 +333,9 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL,"spatialSearch 1:" + '\n' + resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("2:catalogTest");
-        expectedResult.add("3:catalogTest");
-        expectedResult.add("4:catalogTest");
+        expectedResult.add("2:CATEST");
+        expectedResult.add("3:CATEST");
+        expectedResult.add("4:CATEST");
         
         assertEquals(expectedResult, result);
         
@@ -331,39 +358,49 @@ public class IndexLuceneTest {
         LOGGER.log(LOG_LEVEL,"spatialSearch 2:" + '\n' + resultReport);
         
         expectedResult = new ArrayList<String>();
-        expectedResult.add("1:catalogTest");
+        expectedResult.add("1:CATEST");
         
         assertEquals(expectedResult, result);
     }
 
     
-    public static List<Form> fillTestData(List<Path> paths, List<Classe> classes) {
-        List<Form> result       = new ArrayList<Form>();
+    public static void fillTestData(Writer20 writer) throws MD_IOException {
         
         //we create a new Catalog
-        RecordSet cat             = new RecordSet("catalogTest", "catalogTest");
-        
+        RecordSet cat             = new RecordSet("CATEST", "CATEST");
+        writer.writeRecordSet(cat);
+
         //then we build the classes
         Classe sLiteralClass    = new Classe(Standard.DUBLINCORE, "SimpleLiteral", "sl", "no definition", null, false, ' ');
         Property contentProp    = new Property(Standard.DUBLINCORE, "content", "ct", "no definition", sLiteralClass, PrimitiveType.STRING, 0, 1, Obligation.OPTIONNAL, 1, 'V');
         Property schemeProp     = new Property(Standard.DUBLINCORE, "scheme", "sh", "no definition", sLiteralClass, PrimitiveType.STRING, 0, 1, Obligation.OPTIONNAL, 1, 'P');
-        
+
+        writer.writeClasse(sLiteralClass);
+
         Classe boundingBoxClass = new Classe(Standard.OWS, "BoundingBox", "bbox", "no defintion", null, false, ' ');
         Property lowerProp      = new Property(Standard.OWS, "LowerCorner", "lc", "no definition", boundingBoxClass, PrimitiveType.REAL,0, 1, Obligation.OPTIONNAL, 1, ' ');
         Property upperProp      = new Property(Standard.OWS, "UpperCorner", "uc", "no definition", boundingBoxClass, PrimitiveType.REAL,0, 1, Obligation.OPTIONNAL, 1, ' ');
-        
+
+        writer.writeClasse(boundingBoxClass);
+
         Classe recordClass      = new Classe(Standard.CSW, "Record", "rec", "no definition", null, false, ' ');
         Property identifierProp = new Property(Standard.DUBLINCORE, "identifier", "id", "no definition", recordClass, sLiteralClass, 0, 1, Obligation.OPTIONNAL, 1, ' ');
         Property titleProp      = new Property(Standard.DUBLINCORE, "title", "ti", "no definition", recordClass, sLiteralClass, 0, 1, Obligation.OPTIONNAL, 2, ' ');
         Property typeProp       = new Property(Standard.DUBLINCORE, "type", "ty", "no definition", recordClass, sLiteralClass, 0, 1, Obligation.OPTIONNAL, 3, ' ');
         Property bboxProp       = new Property(Standard.OWS, "BoundingBox", "box", "no definition", recordClass, boundingBoxClass, 0, 1, Obligation.OPTIONNAL, 4, ' ');
-        
+
+        writer.writeClasse(recordClass);
+
         Classe identifiable     = new Classe(Standard.EBRIM_V3, "Identifiable", "id", "no definition", null, false, ' ');
         Classe registryObject   = new Classe(Standard.EBRIM_V2_5, "RegsitryObject", "ro", "no definition", null, false, ' ');
-        classes.add(identifiable);
-        classes.add(registryObject);
+        writer.writeClasse(identifiable);
+        writer.writeClasse(registryObject);
         
         //The paths
+        writer.writeStandard(Standard.CSW);
+        writer.writeStandard(Standard.DUBLINCORE);
+        writer.writeStandard(Standard.OWS);
+        
         Path recordPath      = new Path(Standard.CSW, recordClass);
         
         Path identifierPath  = new Path(recordPath, identifierProp);
@@ -379,21 +416,25 @@ public class IndexLuceneTest {
         Path lowerCornPath   = new Path(bboxPath, lowerProp);
         Path upperCornPath   = new Path(bboxPath, upperProp);
         
-        paths.add(recordPath);
-        paths.add(idenContentPath);
-        paths.add(identifierPath);
-        paths.add(titContentPath);
-        paths.add(titlePath);
-        paths.add(typePath);
-        paths.add(typContentPath);
-        paths.add(bboxPath);
-        paths.add(lowerCornPath);
-        paths.add(upperCornPath);
+        writer.writePath(recordPath);
+        writer.writePath(identifierPath);
+        writer.writePath(idenContentPath);
+
+        writer.writePath(titlePath);
+        writer.writePath(titContentPath);
+        
+        writer.writePath(typePath);
+        writer.writePath(typContentPath);
+        writer.writePath(bboxPath);
+        writer.writePath(lowerCornPath);
+        writer.writePath(upperCornPath);
         
         //The forms
         Date d = new Date(120);
         User inputUser = new User("admin", "adminadmin", null, d, d);
-        Form f1 = new Form(1, UUID.randomUUID(), cat, "title1", inputUser, null, null, d, d, null, false, false, Form.TYPE.NORMALFORM);
+        writer.writeUser(inputUser);
+        
+        Form f1 = new Form(1, UUID.randomUUID(), cat, "title1", inputUser, null, null, d, d, null, true, true, Form.TYPE.NORMALFORM);
         Value f1_rootValue    = new Value(recordPath, f1, 1, recordClass, null);
         Value f1_ident        = new Value(identifierPath, f1, 1, sLiteralClass, f1_rootValue);
         TextValue f1_idValue  = new TextValue(idenContentPath, f1, 1, "2345-aa453-ade456", PrimitiveType.STRING, f1_ident);
@@ -407,7 +448,7 @@ public class IndexLuceneTest {
         TextValue f1_ucxValue = new TextValue(upperCornPath, f1, 1, "50", PrimitiveType.STRING, f1_bbox);
         TextValue f1_ucyValue = new TextValue(upperCornPath, f1, 2, "15", PrimitiveType.STRING, f1_bbox);
         
-        Form f2 = new Form(2, UUID.randomUUID(), cat, "title2", inputUser, null, null, d, d, null,false, false, Form.TYPE.NORMALFORM);
+        Form f2 = new Form(2, UUID.randomUUID(), cat, "title2", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
         Value f2_rootValue    = new Value(recordPath, f2, 1, recordClass, null);
         Value f2_ident        = new Value(identifierPath, f2, 1, sLiteralClass, f2_rootValue);
         TextValue f2_idValue  = new TextValue(idenContentPath, f2, 1, "00180e67-b7cf-40a3-861d-b3a09337b195", PrimitiveType.STRING, f2_ident);
@@ -421,7 +462,7 @@ public class IndexLuceneTest {
         TextValue f2_ucxValue = new TextValue(upperCornPath, f2, 1, "-15", PrimitiveType.STRING, f2_bbox);
         TextValue f2_ucyValue = new TextValue(upperCornPath, f2, 2, "10", PrimitiveType.STRING, f2_bbox);
         
-        Form f3 = new Form(3, UUID.randomUUID(), cat, "title3", inputUser, null, null, d, d, null,false, false, Form.TYPE.NORMALFORM);
+        Form f3 = new Form(3, UUID.randomUUID(), cat, "title3", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
         Value f3_rootValue    = new Value(recordPath, f3, 1, recordClass, null);
         Value f3_ident        = new Value(identifierPath, f3, 1, sLiteralClass, f3_rootValue);
         TextValue f3_idValue  = new TextValue(idenContentPath, f3, 1, "09844e51-e5cd-52c3-737d-b3a61366d028", PrimitiveType.STRING, f3_ident);
@@ -435,7 +476,7 @@ public class IndexLuceneTest {
         TextValue f3_ucxValue = new TextValue(upperCornPath, f3, 1, "10", PrimitiveType.STRING, f3_bbox);
         TextValue f3_ucyValue = new TextValue(upperCornPath, f3, 2, "15", PrimitiveType.STRING, f3_bbox);
         
-        Form f4 = new Form(4, UUID.randomUUID(), cat, "title4", inputUser, null, null, d, d, null,false, false, Form.TYPE.NORMALFORM);
+        Form f4 = new Form(4, UUID.randomUUID(), cat, "title4", inputUser, null, null, d, d, null,true, true, Form.TYPE.NORMALFORM);
         Value f4_rootValue    = new Value(recordPath, f4, 1, recordClass, null);
         Value f4_ident        = new Value(identifierPath, f4, 1, sLiteralClass, f4_rootValue);
         TextValue f4_idValue  = new TextValue(idenContentPath, f4, 1, "urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f", PrimitiveType.STRING, f4_ident);
@@ -449,11 +490,11 @@ public class IndexLuceneTest {
         TextValue f4_ucxValue = new TextValue(upperCornPath, f4, 1, "10", PrimitiveType.STRING, f4_bbox);
         TextValue f4_ucyValue = new TextValue(upperCornPath, f4, 2, "15", PrimitiveType.STRING, f4_bbox);
         
-        result.add(f1);
-        result.add(f2);
-        result.add(f3);
-        result.add(f4);
+        writer.writeForm(f1, false, true);
+        writer.writeForm(f2, false, true);
+        writer.writeForm(f3, false, true);
+        writer.writeForm(f4, false, true);
         
-        return result;
+        
     }
 }
