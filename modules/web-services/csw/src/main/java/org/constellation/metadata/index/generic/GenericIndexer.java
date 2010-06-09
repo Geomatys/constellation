@@ -328,7 +328,6 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             }
             throw new IllegalArgumentException("unexpected metadata type: " + type);
         }
-        //doc.add(new Field("Title",   metadata.,               Field.Store.YES, Field.Index.ANALYZED));
         doc.add(new Field("id", identifier,  Field.Store.YES, Field.Index.NOT_ANALYZED));
 
         final StringBuilder anyText     = new StringBuilder();
