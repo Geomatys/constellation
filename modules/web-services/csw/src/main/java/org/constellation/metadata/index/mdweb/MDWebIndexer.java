@@ -347,19 +347,19 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
         //TODO add ANyText
         for (String term :queryableSet.keySet()) {
-            doc.add(new Field(term,           getValues(term,  form, queryableSet.get(term), -1),   Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field(term + "_sort", getValues(term,  form, queryableSet.get(term), -1),   Field.Store.YES, Field.Index.NOT_ANALYZED));
+            doc.add(new Field(term,           getValues(form, queryableSet.get(term), -1),   Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field(term + "_sort", getValues(form, queryableSet.get(term), -1),   Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
 
         // add special INSPIRE queryable
         for (String term :INSPIRE_QUERYABLE.keySet()) {
-            doc.add(new Field(term,           getValues(term,  form, INSPIRE_QUERYABLE.get(term), -1),   Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field(term + "_sort", getValues(term,  form, INSPIRE_QUERYABLE.get(term), -1),   Field.Store.YES, Field.Index.NOT_ANALYZED));
+            doc.add(new Field(term,           getValues(form, INSPIRE_QUERYABLE.get(term), -1),   Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field(term + "_sort", getValues(form, INSPIRE_QUERYABLE.get(term), -1),   Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
         
        //we add the geometry parts
         if (!alreadySpatiallyIndexed) {
-            return IndexSpatialPart(doc, form, queryableSet, -1);
+            return indexSpatialPart(doc, form, queryableSet, -1);
         }
         return false;
     }
@@ -376,7 +376,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
         final StringBuilder anyText = new StringBuilder();
 
         for (String term :queryableSet.keySet()) {
-            final String values = getValues(term,  form, queryableSet.get(term), -1);
+            final String values = getValues(form, queryableSet.get(term), -1);
             if (!values.equals("null")) {
                 anyText.append(values).append(" ");
             }
@@ -389,12 +389,23 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
 
         if (!alreadySpatiallyIndexed) {
             //we add the geometry parts
-            return IndexSpatialPart(doc, form, queryableSet, 1);
+            return indexSpatialPart(doc, form, queryableSet, 1);
         }
         return false;
     }
 
-    private boolean IndexSpatialPart(Document doc, Form form, Map<String, List<String>> queryableSet, int ordinal) throws MD_IOException {
+    /**
+     * Spatially index the form extracting the BBOX values with the specified queryable set.
+     *
+     * @param doc The current Lucene document.
+     * @param form The mdweb records to spatially index.
+     * @param queryableSet A set of queryable Term.
+     * @param ordinal
+     *
+     * @return true if the indexation succeed
+     * @throws MD_IOException
+     */
+    private boolean indexSpatialPart(Document doc, Form form, Map<String, List<String>> queryableSet, int ordinal) throws MD_IOException {
          List<String> coord = null;
          try {
             coord = getValueList(form, queryableSet.get("WestBoundLongitude"), ordinal);
@@ -451,13 +462,8 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      *
      * @return A string concataining the differents values correspounding to the specified term, coma separated.
      */
-    private String getValues(final String term, final Form form, final List<String> paths, final int ordinal) throws MD_IOException {
+    private String getValues(final Form form, final List<String> paths, final int ordinal) throws MD_IOException {
         final StringBuilder response  = new StringBuilder();
-
-        // todo remove this i don't think we need it
-        if (term.equalsIgnoreCase("Type") && form.getProfile() != null) {
-            response.append(form.getProfile().getName()).append(',');
-        }
 
         if (paths != null) {
             for (String fullPathID: paths) {
@@ -488,7 +494,6 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
     /**
      * Return a string description for the specified terms.
      *
-     * @param term An ISO queryable term defined in CSWWorker (like Title, Subject, Abstract,...)
      * @param form An MDWeb formular from whitch we extract the values correspounding to the specified term.
      * @param ordinal If we want only one value for a path we add an ordinal to select the value we want. else put -1.
      *

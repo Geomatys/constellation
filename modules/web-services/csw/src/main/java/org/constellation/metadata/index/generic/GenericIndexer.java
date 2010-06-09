@@ -313,7 +313,6 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         
         // make a new, empty document
         final Document doc = new Document();
-        CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
 
         String identifier;
         if (metadata instanceof DefaultMetadata) {
@@ -335,71 +334,78 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         final StringBuilder anyText     = new StringBuilder();
         boolean alreadySpatiallyIndexed = false;
 
+        // For an ISO 19139 object
         if (metadata instanceof DefaultMetadata) {
-            LOGGER.finer("indexing ISO 19119 MD_Metadata");
-            for (final String term : ISO_QUERYABLE.keySet()) {
-                 cs.submit(new Callable<TermValue>() {
-                    @Override
-                    public TermValue call() {
-                        return new TermValue(term, getValues(metadata, ISO_QUERYABLE.get(term)));
-                    }
-               });
-            }
+            alreadySpatiallyIndexed = indexMetadata(doc, metadata, anyText);
+        }
 
-            for (int i = 0; i < ISO_QUERYABLE.size(); i++) {
-                try {
-                    final TermValue values = cs.take().get();
-                    if (values.term != null && !values.term.equals("AnyText")) {
-                        doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
-                        doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                        if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
-                            anyText.append(values.value).append(" ");
-                        }
-                    }
-                } catch (InterruptedException ex) {
-                   LOGGER.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
-                } catch (ExecutionException ex) {
-                   LOGGER.severe("ExecutionException in parralele create document:" + '\n' + ex.getCause());
-                   LOGGER.log(Level.SEVERE, ex.getCause().getMessage(), ex.getCause());
+        // All metadata types must be compatible with dublinCore.
+        indexDublinCore(doc, metadata, anyText, alreadySpatiallyIndexed);
+
+        // we add to the index the special queryable element of the metadata reader
+        if (additionalQueryable != null) {
+            for (String term : additionalQueryable.keySet()) {
+
+                String values = getValues(metadata, additionalQueryable.get(term));
+                if (!values.equals(NULL_VALUE)) {
+                    LOGGER.finer("put " + term + " values: " + values);
+                    anyText.append(values).append(" ");
                 }
-            }
-
-            //we add the geometry parts
-            String coord = NULL_VALUE;
-            try {
-                coord = getValues(metadata, ISO_QUERYABLE.get("WestBoundLongitude"));
-                final List<Double> minxs = extractPositions(coord);
-
-                coord = getValues(metadata, ISO_QUERYABLE.get("EastBoundLongitude"));
-                final List<Double> maxxs = extractPositions(coord);
-
-                coord = getValues(metadata, ISO_QUERYABLE.get("NorthBoundLatitude"));
-                final List<Double> maxys = extractPositions(coord);
-
-                coord = getValues(metadata, ISO_QUERYABLE.get("SouthBoundLatitude"));
-                final List<Double> minys = extractPositions(coord);
-
-                if (minxs.size() == maxxs.size() && maxxs.size() == minys.size() && minys.size() == maxys.size()) {
-                    if (minxs.size() == 1) {
-                        addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
-                    } else if (minxs.size() > 0) {
-                        addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
-                    }
-                } else {
-                    LOGGER.warning(NOT_SPATIALLY_INDEXABLE + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
-                            "cause: missing coordinates.: " + coord);
+                if (term.equals("date") || term.equals("modified")) {
+                    values = values.replaceAll("-","");
                 }
-
-            } catch (NumberFormatException e) {
-                if (!coord.equals(NULL_VALUE)) {
-                    LOGGER.warning(NOT_SPATIALLY_INDEXABLE + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
-                            "cause: unable to parse double: " + coord);
-                }
+                doc.add(new Field(term, values,   Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
             }
         }
 
-         // All metadata types must be compatible with dublinCore.
-        cs = new BoundedCompletionService<TermValue>(this.pool, 5);
+        // add a default meta field to make searching all documents easy
+        doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
+
+        //we add the anyText values
+        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
+
+        return doc;
+    }
+
+
+    private boolean indexMetadata(final Document doc, final Object metadata, final StringBuilder anyText) {
+        LOGGER.finer("indexing ISO 19139 MD_Metadata");
+        final CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
+        
+        for (final String term : ISO_QUERYABLE.keySet()) {
+             cs.submit(new Callable<TermValue>() {
+                @Override
+                public TermValue call() {
+                    return new TermValue(term, getValues(metadata, ISO_QUERYABLE.get(term)));
+                }
+           });
+        }
+
+        for (int i = 0; i < ISO_QUERYABLE.size(); i++) {
+            try {
+                final TermValue values = cs.take().get();
+                if (values.term != null && !values.term.equals("AnyText")) {
+                    doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
+                    doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                    if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
+                        anyText.append(values.value).append(" ");
+                    }
+                }
+            } catch (InterruptedException ex) {
+               LOGGER.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
+            } catch (ExecutionException ex) {
+               LOGGER.severe("ExecutionException in parralele create document:" + '\n' + ex.getCause());
+               LOGGER.log(Level.SEVERE, ex.getCause().getMessage(), ex.getCause());
+            }
+        }
+
+        return indexSpatialPart(doc, metadata, ISO_QUERYABLE);
+    }
+
+    private boolean indexDublinCore(final Document doc, final Object metadata, final StringBuilder anyText, boolean alreadySpatiallyIndexed) {
+
+        final CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
         for (final String term :DUBLIN_CORE_QUERYABLE.keySet()) {
             cs.submit(new Callable<TermValue>() {
 
@@ -437,27 +443,43 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         }
 
         //we add the geometry parts
+        if (!alreadySpatiallyIndexed) {
+            return indexSpatialPart(doc, metadata, DUBLIN_CORE_QUERYABLE);
+        }
+        return false;
+    }
+
+    /**
+     * Spatially index the form extracting the BBOX values with the specified queryable set.
+     *
+     * @param doc The current Lucene document.
+     * @param metadata The object to spatially index.
+     * @param queryableSet  A set of queryable Term.
+     * 
+     * @return true if the spatial indexation succeed
+     */
+    private boolean indexSpatialPart(Document doc, Object metadata, Map<String, List<String>> queryableSet) {
         String coord = NULL_VALUE;
         try {
-            coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("WestBoundLongitude"));
+            coord = getValues(metadata, queryableSet.get("WestBoundLongitude"));
             final List<Double> minxs = extractPositions(coord);
 
-            coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("EastBoundLongitude"));
+            coord = getValues(metadata, queryableSet.get("EastBoundLongitude"));
             final List<Double> maxxs = extractPositions(coord);
 
-            coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("NorthBoundLatitude"));
+            coord = getValues(metadata, queryableSet.get("NorthBoundLatitude"));
             final List<Double> maxys = extractPositions(coord);
 
-            coord = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("SouthBoundLatitude"));
+            coord = getValues(metadata, queryableSet.get("SouthBoundLatitude"));
             final List<Double> minys = extractPositions(coord);
-
-            // String crs = getValues(metadata, DUBLIN_CORE_QUERYABLE.get("CRS"));
 
             if (minxs.size() == maxxs.size() && maxxs.size() == minys.size() && minys.size() == maxys.size()) {
                 if (minxs.size() == 1) {
                     addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
+                    return true;
                 } else if (minxs.size() > 0) {
                     addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
+                    return true;
                 }
             } else {
                 if (metadata instanceof DefaultMetadata) {
@@ -484,38 +506,14 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                 }
             }
         }
-
-        // we add to the index the special queryable element of the metadata reader
-        if (additionalQueryable != null) {
-            for (String term : additionalQueryable.keySet()) {
-
-                String values = getValues(metadata, additionalQueryable.get(term));
-                if (!values.equals(NULL_VALUE)) {
-                    LOGGER.finer("put " + term + " values: " + values);
-                    anyText.append(values).append(" ");
-                }
-                if (term.equals("date") || term.equals("modified")) {
-                    values = values.replaceAll("-","");
-                }
-                doc.add(new Field(term, values,   Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
-            }
-        }
-
-        // add a default meta field to make searching all documents easy
-        doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
-
-        //we add the anyText values
-        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
-
-        return doc;
+        return false;
     }
 
     /**
      * Extract the double coordinate in a comma separated String.
      *
-     * @param coord
-     * @return
+     * @param coord A string containing coordinate comma separated.
+     * @return A list of Double coordinates.
      */
     private List<Double> extractPositions(final String coord) {
         final StringTokenizer tokens = new StringTokenizer(coord, ",;");
