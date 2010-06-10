@@ -24,25 +24,20 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import org.apache.lucene.analysis.KeywordAnalyzer;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.constellation.util.Util;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
 
 //Junit dependencies
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.resources.NIOUtilities;
-import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -52,7 +47,7 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class KeywordAnalyzerTest {
+public class KeywordAnalyzerTest extends AbstractAnalyzerTest {
 
     protected static final FilterFactory2 FF = (FilterFactory2)
             FactoryFinder.getFilterFactory(new Hints(Hints.FILTER_FACTORY,FilterFactory2.class));
@@ -67,7 +62,7 @@ public class KeywordAnalyzerTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         NIOUtilities.deleteDirectory(configDirectory);
-        List<DefaultMetadata> object = fillTestData();
+        List<Object> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new KeywordAnalyzer(), Level.FINER);
         indexSearcher          = new GenericIndexSearcher(configDirectory, "", new KeywordAnalyzer());
         indexSearcher.setLogLevel(Level.FINER);
@@ -486,56 +481,4 @@ public class KeywordAnalyzerTest {
 
         assertEquals(expectedResult, result);
     }
-
-    public static List<DefaultMetadata> fillTestData() throws JAXBException {
-        List<DefaultMetadata> result = new ArrayList<DefaultMetadata>();
-        MarshallerPool pool          = new MarshallerPool(DefaultMetadata.class);
-        Unmarshaller unmarshaller    = pool.acquireUnmarshaller();
-
-        Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
-        if (obj instanceof DefaultMetadata) {
-            result.add((DefaultMetadata) obj);
-        } else {
-            throw new IllegalArgumentException("resource file must be MetadataImpl");
-        }
-
-        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta2.xml"));
-        if (obj instanceof DefaultMetadata) {
-            result.add((DefaultMetadata) obj);
-        } else {
-            throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
-        }
-
-        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta3.xml"));
-        if (obj instanceof DefaultMetadata) {
-            result.add((DefaultMetadata) obj);
-        } else {
-            throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
-        }
-
-        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta4.xml"));
-        if (obj instanceof DefaultMetadata) {
-            result.add((DefaultMetadata) obj);
-        } else {
-            throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
-        }
-
-        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta5.xml"));
-        if (obj instanceof DefaultMetadata) {
-            result.add((DefaultMetadata) obj);
-        } else {
-            throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
-        }
-
-        obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta6.xml"));
-        if (obj instanceof DefaultMetadata) {
-            result.add((DefaultMetadata) obj);
-        } else {
-            throw new IllegalArgumentException("resource file must be MetadataImpl:" + obj);
-        }
-        pool.release(unmarshaller);
-        
-        return result;
-    }
-
 }

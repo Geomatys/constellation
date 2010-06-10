@@ -117,20 +117,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      *
      * @param configDirectory A directory where the index can write indexation file.
      */
-    public GenericIndexer(List<? extends Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID, Analyzer analyzer) throws IndexingException {
-        super(serviceID, configDirectory, analyzer);
-        this.reader = null;
-        this.additionalQueryable = additionalQueryable;
-        if (create)
-            createIndex(toIndex);
-    }
-
-    /**
-     * Creates a new Lucene Index into the specified directory with the specified list of object to index.
-     *
-     * @param configDirectory A directory where the index can write indexation file.
-     */
-    public GenericIndexer(List<? extends Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID, Analyzer analyzer, Level logLevel) throws IndexingException {
+    public GenericIndexer(List<Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID, Analyzer analyzer, Level logLevel) throws IndexingException {
         super(serviceID, configDirectory, analyzer);
         this.logLevel            = logLevel;
         this.reader              = null;
@@ -144,7 +131,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      *
      * @param configDirectory A directory where the index can write indexation file.
      */
-    public GenericIndexer(List<? extends Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID) throws IndexingException {
+    public GenericIndexer(List<Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID) throws IndexingException {
         super(serviceID, configDirectory);
         this.reader = null;
         this.additionalQueryable = additionalQueryable;
@@ -199,7 +186,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      *
      */
     @Override
-    public void createIndex(List<? extends Object> toIndex) throws IndexingException {
+    public void createIndex(List<Object> toIndex) throws IndexingException {
         LOGGER.log(logLevel, "Creating lucene index for Generic database please wait...");
         final long time = System.currentTimeMillis();
         IndexWriter writer;
@@ -241,55 +228,6 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         }
     }
     
-    /**
-     * This method add to index of lucene a new document based on a geotoolkit Metadata object.
-     * (implements AbstractIndex.indexDocument() )
-     * 
-     * @param writer A lucene Index Writer.
-     * @param meta A geotoolkit Metadata object.
-     */
-    @Override
-    public void indexDocument(IndexWriter writer, Object meta) {
-        try {
-            //adding the document in a specific model. in this case we use a MDwebDocument.
-            writer.addDocument(createDocument(meta));
-            LOGGER.finer("Metadata: " + getIdentifier(meta) + " indexed");
-            
-        } catch (IndexingException ex) {
-            LOGGER.severe("indexingException " + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IOException ex) {
-            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-    }
-
-   /**
-     * This method add to index of lucene a new document based on a geotoolkit Metadata object.
-     * (implements AbstractIndex.indexDocument() )
-     *
-     * @param meta A geotoolkit Metadata object.
-     */
-    @Override
-    public void indexDocument(Object meta) {
-        try {
-            final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, false,IndexWriter.MaxFieldLength.UNLIMITED);
-
-            //adding the document in a specific model. in this case we use a MDwebDocument.
-            writer.addDocument(createDocument(meta));
-            LOGGER.finer("Metadata: " + getIdentifier(meta) + " indexed");
-            writer.optimize();
-            writer.close();
-
-        } catch (IndexingException ex) {
-            LOGGER.severe("IndexingException " + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IOException ex) {
-            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-    }
-
     /**
     * Makes a document for a geotoolkit Metadata Object.
     * 
@@ -496,7 +434,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param obj
      * @return
      */
-    private String getIdentifier(Object obj) {
+    @Override
+    protected String getIdentifier(Object obj) {
         final String identifier;
         if (obj instanceof DefaultMetadata) {
             identifier = ((DefaultMetadata)obj).getFileIdentifier();

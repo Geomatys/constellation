@@ -163,7 +163,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
     }
 
     @Override
-    public void createIndex(List observations) throws IndexingException {
+    public void createIndex(List<ObservationEntry> observations) throws IndexingException {
         LOGGER.info("Creating lucene index for Filesystem observations please wait...");
 
         final long time = System.currentTimeMillis();
@@ -172,66 +172,24 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
         try {
             writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
 
-            for (Object observation : observations) {
-                if (observation instanceof ObservationEntry) {
-                    final ObservationEntry ff = (ObservationEntry) observation;
-                    indexDocument(writer, ff);
-                    
-                } else {
-                    throw new IllegalArgumentException("The objects must be observation entries");
-                }
+            for (ObservationEntry observation : observations) {
+                indexDocument(writer, observation);
             }
             writer.optimize();
             writer.close();
 
         } catch (CorruptIndexException ex) {
-            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
+            LOGGER.warning(CORRUPTED_SINGLE_MSG + ex.getMessage());
             throw new IndexingException(CORRUPTED_MULTI_MSG, ex);
         } catch (LockObtainFailedException ex) {
-            LOGGER.severe(LOCK_SINGLE_MSG + ex.getMessage());
+            LOGGER.warning(LOCK_SINGLE_MSG + ex.getMessage());
             throw new IndexingException(LOCK_MULTI_MSG, ex);
         } catch (IOException ex) {
-            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
+            LOGGER.warning(IO_SINGLE_MSG + ex.getMessage());
             throw new IndexingException("SQLException while indexing documents.", ex);
         }
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                      nbObservations + " documents indexed.");
-    }
-
-    @Override
-    public void indexDocument(IndexWriter writer, ObservationEntry observation) {
-        try {
-            writer.addDocument(createDocument(observation));
-            LOGGER.finer("Observation: " + observation.getName() + " indexed");
-
-        } catch (CorruptIndexException ex) {
-            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IOException ex) {
-            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-    }
-
-    @Override
-    public void indexDocument(ObservationEntry observation) {
-        try {
-            final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, false,IndexWriter.MaxFieldLength.UNLIMITED);
-
-            //adding the document in a specific model. in this case we use a MDwebDocument.
-            writer.addDocument(createDocument(observation));
-            LOGGER.finer("Observation: " + observation.getName() + " indexed");
-
-            writer.optimize();
-            writer.close();
-
-        } catch (CorruptIndexException ex) {
-            LOGGER.severe(CORRUPTED_SINGLE_MSG + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IOException ex) {
-            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        }
     }
 
     @Override
@@ -278,6 +236,17 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
 	doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
 
         return doc;
+    }
+
+    /**
+     * Find the identifier of the metadata
+     *
+     * @param obj
+     * @return
+     */
+    @Override
+    protected String getIdentifier(ObservationEntry obj) {
+        return obj.getName();
     }
 
     @Override

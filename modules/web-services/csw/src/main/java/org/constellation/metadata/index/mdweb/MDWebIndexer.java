@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import javax.sql.DataSource;
 
 import org.apache.lucene.document.Document;
@@ -174,7 +173,7 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      * @throws java.sql.SQLException
      */
     @Override
-    public void createIndex(List<? extends Object> forms) throws IndexingException {
+    public void createIndex(List<Form> forms) throws IndexingException {
         LOGGER.log(logLevel, "Creating lucene index for MDWeb database please wait...");
 
         final long time = System.currentTimeMillis();
@@ -185,16 +184,11 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true,IndexWriter.MaxFieldLength.UNLIMITED);
 
             nbForms = forms.size();
-            for (Object form : forms) {
-                if (form instanceof Form) {
-                    final Form ff = (Form) form;
-                    if (ff.isPublished()) {
-                        indexDocument(writer, ff);
-                    } else {
-                       LOGGER.log(logLevel, "The form " + ff.getId() + "is not published we don't index it");
-                    }
+            for (Form form : forms) {
+                if (form.isPublished()) {
+                    indexDocument(writer, form);
                 } else {
-                    throw new IllegalArgumentException("The objects must be forms");
+                   LOGGER.log(logLevel, "The form " + form.getId() + "is not published we don't index it");
                 }
             }
             writer.optimize();
@@ -209,54 +203,16 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
     }
 
     /**
-     * This method add to index of lucene a new document based on Form object.
-     * (implements AbstractIndex.indexDocument() )
+     * Find the identifier of the metadata
      *
-     * @param writer A lucene Index Writer.
-     * @param object A MDweb formular.
+     * @param obj
+     * @return
      */
     @Override
-    public void indexDocument(IndexWriter writer, Form form) {
-        try {
-            writer.addDocument(createDocument(form));
-            LOGGER.finer("Form: " + form.getTitle() + " indexed");
-
-        } catch (IndexingException ex) {
-            LOGGER.severe("IndexingException " + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IOException ex) {
-            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        }
+    protected String getIdentifier(Form obj) {
+        return obj.getTitle();
     }
-
-    /**
-     * This method add to index of lucene a new document based on Form object.
-     * (implements AbstractIndex.indexDocument() )
-     * object must be a Form.
-     *
-     * @param object A MDweb formular.
-     */
-    @Override
-    public void indexDocument(Form form) {
-        try {
-            final IndexWriter writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, false,IndexWriter.MaxFieldLength.UNLIMITED);
-
-            //adding the document in a specific model. in this case we use a MDwebDocument.
-            writer.addDocument(createDocument(form));
-            LOGGER.finer("Form: " + form.getTitle() + " indexed");
-
-            writer.optimize();
-            writer.close();
-
-        } catch (IndexingException ex) {
-            LOGGER.severe("IndexingException " + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } catch (IOException ex) {
-            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-    }
+    
 
     /**
     * Makes a document for a MDWeb formular.
