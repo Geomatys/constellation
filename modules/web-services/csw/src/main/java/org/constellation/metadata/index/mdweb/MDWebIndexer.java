@@ -311,7 +311,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
         try {
             for (String term :queryableSet.keySet()) {
-                final String values = getValues(form, queryableSet.get(term), -1);
+                final String values = getValues(form, queryableSet.get(term));
                 if (!values.equals("null")) {
                     anyText.append(values).append(" ");
                 }
@@ -321,7 +321,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
             // add special INSPIRE queryable
             for (String term :INSPIRE_QUERYABLE.keySet()) {
-                final String values = getValues(form, INSPIRE_QUERYABLE.get(term), -1);
+                final String values = getValues(form, INSPIRE_QUERYABLE.get(term));
                 if (!values.equals("null")) {
                     anyText.append(values).append(" ");
                 }
@@ -331,7 +331,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
            //we add the geometry parts
             if (!alreadySpatiallyIndexed) {
-                return indexSpatialPart(doc, form, queryableSet, -1);
+                return indexSpatialPart(doc, form, queryableSet);
             }
             return false;
         } catch (MD_IOException ex) {
@@ -351,7 +351,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     protected boolean indexDublinCore(Document doc, Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) throws IndexingException {
         try {
             for (String term :queryableSet.keySet()) {
-                final String values = getValues(form, queryableSet.get(term), -1);
+                final String values = getValues(form, queryableSet.get(term));
                 if (!values.equals("null")) {
                     anyText.append(values).append(" ");
                 }
@@ -361,7 +361,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
             //we add the geometry parts
             if (!alreadySpatiallyIndexed) {
-                return indexSpatialPart(doc, form, queryableSet, 1);
+                return indexSpatialPart(doc, form, queryableSet);
             }
             return false;
         } catch (MD_IOException ex) {
@@ -369,64 +369,6 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         }
     }
 
-    /**
-     * Spatially index the form extracting the BBOX values with the specified queryable set.
-     *
-     * @param doc The current Lucene document.
-     * @param form The mdweb records to spatially index.
-     * @param queryableSet A set of queryable Term.
-     * @param ordinal
-     *
-     * @return true if the indexation succeed
-     * @throws MD_IOException
-     */
-    private boolean indexSpatialPart(Document doc, Form form, Map<String, List<String>> queryableSet, int ordinal) throws MD_IOException {
-         List<String> coord = null;
-         try {
-            coord = getValueList(form, queryableSet.get("WestBoundLongitude"), ordinal);
-            final List<Double> minxs = new ArrayList<Double>();
-            for (String minx : coord) {
-                minxs.add(Double.parseDouble(minx));
-            }
-
-            coord = getValueList(form, queryableSet.get("EastBoundLongitude"), ordinal);
-            final List<Double> maxxs = new ArrayList<Double>();
-            for (String maxx : coord) {
-                maxxs.add(Double.parseDouble(maxx));
-            }
-
-            coord = getValueList(form, queryableSet.get("NorthBoundLatitude"), ordinal);
-            final List<Double> maxys = new ArrayList<Double>();
-            for (String maxy : coord) {
-                maxys.add(Double.parseDouble(maxy));
-            }
-
-            coord = getValueList(form, queryableSet.get("SouthBoundLatitude"), ordinal);
-            final List<Double> minys = new ArrayList<Double>();
-            for (String miny : coord) {
-                minys.add(Double.parseDouble(miny));
-            }
-
-            if (minxs.size() == minys.size() && minys.size() == maxxs.size() && maxxs.size() == maxys.size()) {
-                if (minxs.size() == 1) {
-                    addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
-                    return true;
-                } else if (minxs.size() > 0) {
-                    addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
-                    return true;
-                }
-            } else {
-                LOGGER.warning("There is not the same number of coordinate: " + minxs.size() + " " + minys.size() + " " +  maxxs.size() + " " +  maxys.size());
-            }
-        } catch (NumberFormatException e) {
-            if (coord != null) {
-                LOGGER.warning("unable to spatially index form: " + form.getTitle() + '\n' +
-                               "cause:  unable to parse double: " + coord);
-            }
-        }
-        return false;
-    }
-    
     /**
      * Return a string description for the specified term.
      *
@@ -437,7 +379,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      *
      * @return A string concataining the differents values correspounding to the specified term, coma separated.
      */
-    private String getValues(final Form form, final List<String> paths, final int ordinal) throws MD_IOException {
+    private String getValues(final Form form, final List<String> paths) throws MD_IOException {
         final StringBuilder response  = new StringBuilder();
 
         if (paths != null) {
@@ -448,10 +390,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                     if (!(v instanceof TextValue)) continue;
                     
                     final TextValue tv = (TextValue) v;
-
-                    if (ordinal == -1 || ordinal == tv.getOrdinal()) {
-                        response.append(getTextValueStringDescription(tv)).append(',');
-                    }
+                    response.append(getTextValueStringDescription(tv)).append(',');
                 }
             }
         }
@@ -474,23 +413,28 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      *
      * @return A string concataining the differents values correspounding to the specified term, coma separated.
      */
-    private List<String> getValueList(final Form form, final List<String> paths, final int ordinal) throws MD_IOException {
-        final List<String> response   = new ArrayList<String>();
+    @Override
+    protected List<Double> extractPositions(final Form form, final List<String> paths) throws IndexingException {
+        final List<Double> response   = new ArrayList<Double>();
         if (paths != null) {
             for (String fullPathID: paths) {
-                final List<Value> values = getValuesFromPathID(fullPathID, form);
-                for (final Value v: values) {
-                    //only handle textvalue
-                    if (!(v instanceof TextValue)) continue;
-                    final TextValue tv = (TextValue) v;
-
-                    if (ordinal == -1 || ordinal == tv.getOrdinal()) {
-
+                try {
+                    final List<Value> values = getValuesFromPathID(fullPathID, form);
+                    for (final Value v: values) {
+                        //only handle textvalue
+                        if (!(v instanceof TextValue)) continue;
+                        final TextValue tv = (TextValue) v;
                         final String value = getTextValueStringDescription(tv);
                         if (value != null) {
-                            response.add(value);
+                            try {
+                                response.add(Double.parseDouble(value));
+                            } catch (NumberFormatException e) {
+                                LOGGER.warning("unable to spatially index form: " + form.getTitle() + "\n cause:  unable to parse double: " + value);
+                            }
                         }
                     }
+                } catch (MD_IOException ex) {
+                    throw new IndexingException("MD_IO exception while getValue from pathID", ex);
                 }
             }
         }
@@ -535,7 +479,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         Path conditionalPath     = null;
         String conditionalPathID = null;
         String conditionalValue  = null;
-
+        int ordinal              = -1;
+        
         // if the path ID contains a # we have a conditional value (codeList element) next to the searched value.
         final int separator = fullPathID.indexOf('#');
         if (separator != -1) {
@@ -547,6 +492,15 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                     + "conditionalValue : " + conditionalValue);
         } else {
             if (fullPathID.indexOf('[') != -1) {
+                String StringOrdinal = fullPathID.substring(fullPathID.indexOf('[') + 1, fullPathID.indexOf(']'));
+                try {
+                    ordinal = Integer.parseInt(StringOrdinal);
+                    // mdweb ordinal start at 1
+                    ordinal++;
+                } catch (NumberFormatException ex) {
+                    LOGGER.warning("unable to parse the ordinal:" + StringOrdinal);
+                    ordinal = -1;
+                }
                 fullPathID = fullPathID.substring(0, fullPathID.indexOf('['));
             }
             pathID = fullPathID;
@@ -559,6 +513,16 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         final List<Value> values;
         if (conditionalPath == null) {
             values = form.getValueFromPath(path);
+            if (ordinal != -1) {
+                List<Value> toRemove = new ArrayList<Value>();
+                for (Value v : values) {
+                    if (v.getOrdinal() != ordinal) {
+                        toRemove.add(v);
+                    }
+                }
+                values.removeAll(toRemove);
+            }
+
         } else {
             values = Collections.singletonList(form.getConditionalValueFromPath(path, conditionalPath, conditionalValue));
         }

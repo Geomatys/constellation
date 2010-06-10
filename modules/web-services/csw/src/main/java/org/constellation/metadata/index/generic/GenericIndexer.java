@@ -94,8 +94,6 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
 
     private static final String NULL_VALUE = "null";
 
-    private static final String NOT_SPATIALLY_INDEXABLE = "unable to spatially index metadata: ";
-
     /**
      * Creates a new Lucene Index into the specified directory with the specified generic database reader.
      * 
@@ -308,7 +306,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
 
 
     @Override
-    protected boolean indexISO19139(final Document doc, final Object metadata,final  Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) {
+    protected boolean indexISO19139(final Document doc, final Object metadata,final  Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) throws IndexingException {
         LOGGER.finer("indexing ISO 19139 MD_Metadata");
         final CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
         
@@ -347,7 +345,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     }
 
     @Override
-    protected boolean indexDublinCore(final Document doc, final Object metadata,final Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) {
+    protected boolean indexDublinCore(final Document doc, final Object metadata,final Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) throws IndexingException {
 
         final CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
         for (final String term :queryableSet.keySet()) {
@@ -394,64 +392,26 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     }
 
     /**
-     * Spatially index the form extracting the BBOX values with the specified queryable set.
-     *
-     * @param doc The current Lucene document.
-     * @param metadata The object to spatially index.
-     * @param queryableSet  A set of queryable Term.
-     * 
-     * @return true if the spatial indexation succeed
-     */
-    private boolean indexSpatialPart(Document doc, Object metadata, Map<String, List<String>> queryableSet) {
-        String coord = NULL_VALUE;
-        try {
-            coord = getValues(metadata, queryableSet.get("WestBoundLongitude"));
-            final List<Double> minxs = extractPositions(coord);
-
-            coord = getValues(metadata, queryableSet.get("EastBoundLongitude"));
-            final List<Double> maxxs = extractPositions(coord);
-
-            coord = getValues(metadata, queryableSet.get("NorthBoundLatitude"));
-            final List<Double> maxys = extractPositions(coord);
-
-            coord = getValues(metadata, queryableSet.get("SouthBoundLatitude"));
-            final List<Double> minys = extractPositions(coord);
-
-            if (minxs.size() == maxxs.size() && maxxs.size() == minys.size() && minys.size() == maxys.size()) {
-                if (minxs.size() == 1) {
-                    addBoundingBox(doc, minxs.get(0), maxxs.get(0), minys.get(0), maxys.get(0), SRID_4326);
-                    return true;
-                } else if (minxs.size() > 0) {
-                    addMultipleBoundingBox(doc, minxs, maxxs, minys, maxys, SRID_4326);
-                    return true;
-                }
-            } else {
-                LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(metadata) + '\n' +
-                        "cause: missing coordinates.: " + coord);
-            }
-
-        } catch (NumberFormatException e) {
-            if (!coord.equals(NULL_VALUE)) {
-                LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(metadata) + '\n' +
-                        "cause: unable to parse double: " + coord);
-            }
-        }
-        return false;
-    }
-
-    /**
      * Extract the double coordinate in a comma separated String.
      *
      * @param coord A string containing coordinate comma separated.
      * @return A list of Double coordinates.
      */
-    private static List<Double> extractPositions(final String coord) {
-        final StringTokenizer tokens = new StringTokenizer(coord, ",;");
+    protected List<Double> extractPositions(Object metadata, List<String> paths) {
+        final String coord            = getValues(metadata, paths);
+        final StringTokenizer tokens  = new StringTokenizer(coord, ",;");
         final List<Double> coordinate = new ArrayList<Double>(tokens.countTokens());
-        int i = 0;
-        while (tokens.hasMoreTokens()) {
-            coordinate.add(Double.parseDouble(tokens.nextToken()));
-            i++;
+        try {
+            int i = 0;
+            while (tokens.hasMoreTokens()) {
+                coordinate.add(Double.parseDouble(tokens.nextToken()));
+                i++;
+            }
+        } catch (NumberFormatException e) {
+            if (!coord.equals(NULL_VALUE)) {
+                LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(metadata) + '\n' +
+                        "cause: unable to parse double: " + coord);
+            }
         }
         return coordinate;
     }
