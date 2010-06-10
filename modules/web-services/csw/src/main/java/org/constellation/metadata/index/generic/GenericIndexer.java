@@ -50,6 +50,7 @@ import org.apache.lucene.store.SimpleFSDirectory;
 // constellation dependencies
 import org.constellation.concurrent.BoundedCompletionService;
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.index.AbstractCSWIndexer;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
@@ -62,8 +63,8 @@ import org.geotoolkit.temporal.object.DefaultInstant;
 import org.geotoolkit.temporal.object.DefaultPosition;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
+import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.resources.NIOUtilities;
 
 // geoAPI dependencies
@@ -74,7 +75,7 @@ import org.opengis.util.InternationalString;
  * A Lucene Index Handler for a generic Database.
  * @author Guilhem Legal
  */
-public class GenericIndexer extends AbstractIndexer<Object> {
+public class GenericIndexer extends AbstractCSWIndexer<Object> {
     
     /**
      * The Reader of this lucene index (generic DB mode).
@@ -251,12 +252,12 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         boolean alreadySpatiallyIndexed = false;
 
         // For an ISO 19139 object
-        if (metadata instanceof DefaultMetadata) {
-            alreadySpatiallyIndexed = indexMetadata(doc, metadata, anyText);
+        if (isISO19139(metadata)) {
+            alreadySpatiallyIndexed = indexISO19139(doc, metadata, ISO_QUERYABLE, anyText, alreadySpatiallyIndexed);
         }
 
         // All metadata types must be compatible with dublinCore.
-        indexDublinCore(doc, metadata, anyText, alreadySpatiallyIndexed);
+        indexDublinCore(doc, metadata, DUBLIN_CORE_QUERYABLE, anyText, alreadySpatiallyIndexed);
 
         // we add to the index the special queryable element of the metadata reader
         if (additionalQueryable != null) {
@@ -284,30 +285,52 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         return doc;
     }
 
+    @Override
+    protected boolean isISO19139(Object meta) {
+        return meta instanceof DefaultMetadata;
+    }
 
-    private boolean indexMetadata(final Document doc, final Object metadata, final StringBuilder anyText) {
+    @Override
+    protected boolean isDublinCore(Object meta) {
+        return meta instanceof RecordType;
+    }
+
+    @Override
+    protected boolean isEbrim25(Object meta) {
+        return meta instanceof RegistryObjectType;
+    }
+
+    @Override
+    protected boolean isEbrim30(Object meta) {
+        return meta instanceof IdentifiableType;
+    }
+
+
+
+    @Override
+    protected boolean indexISO19139(final Document doc, final Object metadata,final  Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) {
         LOGGER.finer("indexing ISO 19139 MD_Metadata");
         final CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
         
-        for (final String term : ISO_QUERYABLE.keySet()) {
+        for (final String term : queryableSet.keySet()) {
              cs.submit(new Callable<TermValue>() {
                 @Override
                 public TermValue call() {
-                    return new TermValue(term, getValues(metadata, ISO_QUERYABLE.get(term)));
+                    return new TermValue(term, getValues(metadata, queryableSet.get(term)));
                 }
            });
         }
 
-        for (int i = 0; i < ISO_QUERYABLE.size(); i++) {
+        for (int i = 0; i < queryableSet.size(); i++) {
             try {
                 final TermValue values = cs.take().get();
-                if (values.term != null && !values.term.equals("AnyText")) {
-                    doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
-                    doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                    if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
-                        anyText.append(values.value).append(" ");
-                    }
+                
+                doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
+                if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
+                    anyText.append(values.value).append(" ");
                 }
+                
             } catch (InterruptedException ex) {
                LOGGER.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
             } catch (ExecutionException ex) {
@@ -316,23 +339,28 @@ public class GenericIndexer extends AbstractIndexer<Object> {
             }
         }
 
-        return indexSpatialPart(doc, metadata, ISO_QUERYABLE);
+        //we add the geometry parts
+        if (!alreadySpatiallyIndexed) {
+            return indexSpatialPart(doc, metadata, queryableSet);
+        }
+        return false;
     }
 
-    private boolean indexDublinCore(final Document doc, final Object metadata, final StringBuilder anyText, boolean alreadySpatiallyIndexed) {
+    @Override
+    protected boolean indexDublinCore(final Document doc, final Object metadata,final Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) {
 
         final CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
-        for (final String term :DUBLIN_CORE_QUERYABLE.keySet()) {
+        for (final String term :queryableSet.keySet()) {
             cs.submit(new Callable<TermValue>() {
 
                 @Override
                 public TermValue call() {
-                    return new TermValue(term, getValues(metadata, DUBLIN_CORE_QUERYABLE.get(term)));
+                    return new TermValue(term, getValues(metadata, queryableSet.get(term)));
                 }
             });
         }
 
-        for (int i = 0; i < DUBLIN_CORE_QUERYABLE.size(); i++) {
+        for (int i = 0; i < queryableSet.size(); i++) {
             try {
                 final TermValue values = cs.take().get();
                 if (!values.term.equals("date")) {
@@ -360,7 +388,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
         //we add the geometry parts
         if (!alreadySpatiallyIndexed) {
-            return indexSpatialPart(doc, metadata, DUBLIN_CORE_QUERYABLE);
+            return indexSpatialPart(doc, metadata, queryableSet);
         }
         return false;
     }

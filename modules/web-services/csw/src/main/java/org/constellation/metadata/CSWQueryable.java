@@ -69,9 +69,9 @@ public final class CSWQueryable {
         paths.add("ISO 19115:MD_Metadata:identificationInfo:abstract");
         ISO_QUERYABLE.put("Abstract", paths);
         
-        //MANDATORY
+        /*MANDATORY
         paths = new ArrayList<String>();
-        ISO_QUERYABLE.put("AnyText", paths);
+        ISO_QUERYABLE.put("AnyText", paths);*/
         
         paths = new ArrayList<String>();
         paths.add("ISO 19115:MD_Metadata:distributionInfo:distributionFormat:name");

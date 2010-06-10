@@ -37,9 +37,9 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.metadata.index.AbstractCSWIndexer;
 
 import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.lucene.index.AbstractIndexer;
 import static org.constellation.metadata.CSWQueryable.*;
 
 // MDweb dependencies
@@ -65,12 +65,16 @@ import org.mdweb.model.storage.RecordSet.EXPOSURE;
  *
  * @author Guilhem Legal
  */
-public class MDWebIndexer extends AbstractIndexer<Form> {
+public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
     /**
      * The Reader of this lucene index (MDWeb DB mode).
      */
     private Reader mdWebReader;
+
+    private Classe identifiable;
+
+    private Classe registryObject;
 
     /**
      * Creates a new CSW indexer for a MDWeb database.
@@ -109,13 +113,21 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
             } else {
                 throw new IndexingException("unexpected database version:" + version);
             }
+            initEbrimClasses();
             if (create)
                 createIndex();
         } catch (SQLException ex) {
             throw new IndexingException("SQL Exception while creating mdweb indexer: " + ex.getMessage());
-        } 
+        } catch (MD_IOException ex) {
+            throw new IndexingException("MD_IO Exception while creating mdweb indexer(during Ebrim classes reading): " + ex.getMessage());
+        }
     }
 
+    private void initEbrimClasses() throws MD_IOException {
+        identifiable   = mdWebReader.getClasse("Identifiable", Standard.EBRIM_V3);
+        registryObject = mdWebReader.getClasse("RegistryObject", Standard.EBRIM_V2_5);
+    }
+    
     /**
      * Create a new Index from the MDweb database.
      *
@@ -224,70 +236,65 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
     protected Document createDocument(Form form) throws IndexingException {
         // make a new, empty document
         final Document doc = new Document();
-        try {
+        
+        doc.add(new Field("id",        Integer.toString(form.getId()),   Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("recordSet", form.getRecordSet().getCode() , Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("Title",     form.getTitle(),                Field.Store.YES, Field.Index.ANALYZED));
 
-            doc.add(new Field("id",        Integer.toString(form.getId()),             Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field("recordSet", form.getRecordSet().getCode() , Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field("Title",     form.getTitle(),                Field.Store.YES, Field.Index.ANALYZED));
+         if (form.getTopValue() == null) {
+            throw new IndexingException("unable to index form:" + form.getId() + " top value is null");
 
-            final Classe identifiable   = mdWebReader.getClasse("Identifiable", Standard.EBRIM_V3);
-            final Classe registryObject = mdWebReader.getClasse("RegistryObject", Standard.EBRIM_V2_5);
-            
-
-            boolean alreadySpatiallyIndexed = false;
-            
-            if (form.getTopValue() == null) {
-                LOGGER.warning("unable to index form:" + form.getId() + " top value is null");
-
-            } else if (form.getTopValue().getType() == null) {
-                LOGGER.warning("unable to index form:" + form.getId() + " top value type is null");
-
-            // For an ISO 19115 form
-            } else if (form.getTopValue().getType().getName().equals("MD_Metadata")) {
-
-                alreadySpatiallyIndexed = indexMetadata(doc, form, ISO_QUERYABLE, false);
-
-             // For an ebrim v 3.0 form
-            } else if (form.getTopValue().getType().isSubClassOf(identifiable)) {
-                LOGGER.finer("indexing Ebrim 3.0 Record");
-
-               /*  TODO
-                  for (String term :EBRIM_QUERYABLE.keySet()) {
-                    doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
-                    doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.UN_TOKENIZED));
-                }*/
-
-                 // For an ebrim v 2.5 form
-            } else if (form.getTopValue().getType().isSubClassOf(registryObject)) {
-                LOGGER.finer("indexing Ebrim 2.5 Record");
-
-                /* TODO
-                 for (String term :EBRIM_QUERYABLE.keySet()) {
-                    doc.add(new Field(term, getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.TOKENIZED));
-                    doc.add(new Field(term + "_sort", getValues(term,  form, ISO_QUERYABLE, -1),   Field.Store.YES, Field.Index.UN_TOKENIZED));
-                }*/
-
-
-            // For a csw:Record (indexing is made in next generic indexing bloc)
-            } else if (form.getTopValue().getType().getName().equals("Record")){
-                LOGGER.finer("indexing CSW Record");
-
-            } else {
-                LOGGER.warning("unknow Form classe unable to index: " + form.getTopValue().getType().getName());
-            }
-
-
-            // All form types must be compatible with dublinCore.
-            indexDublinCore(doc, form, DUBLIN_CORE_QUERYABLE, alreadySpatiallyIndexed);
-
-            // add a default meta field to make searching all documents easy
-            doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
-            
-        } catch (MD_IOException ex) {
-            throw new IndexingException(ex.getMessage());
+        } else if (form.getTopValue().getType() == null) {
+            throw new IndexingException("unable to index form:" + form.getId() + " top value type is null");
         }
+
+        final StringBuilder anyText     = new StringBuilder();
+        boolean alreadySpatiallyIndexed = false;
+
+        if (isISO19139(form)) {
+            alreadySpatiallyIndexed = indexISO19139(doc, form, ISO_QUERYABLE, anyText, false);
+        } else if (isEbrim30(form)) {
+           // TODO
+        } else if (isEbrim25(form)) {
+            // TODO
+        } else if (!isDublinCore(form)) {
+            LOGGER.warning("unknow Form classe unable to index: " + form.getTopValue().getType().getName());
+        }
+
+
+        // All form types must be compatible with dublinCore.
+        indexDublinCore(doc, form, DUBLIN_CORE_QUERYABLE, anyText, alreadySpatiallyIndexed);
+
+        // add a default meta field to make searching all documents easy
+        doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
+
+        //we add the anyText values
+        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
+
+
         return doc;
     }
+
+    @Override
+    protected boolean isISO19139(Form form) {
+       return form.getTopValue().getType().getName().equals("MD_Metadata");
+    }
+
+    @Override
+    protected boolean isDublinCore(Form form) {
+        return form.getTopValue().getType().getName().equals("Record");
+    }
+
+    @Override
+    protected boolean isEbrim25(Form form) {
+        return form.getTopValue().getType().isSubClassOf(registryObject);
+    }
+
+    @Override
+    protected boolean isEbrim30(Form form) {
+        return form.getTopValue().getType().isSubClassOf(identifiable);
+    }
+
 
     /**
      * Index a form of type MD_Metadata.
@@ -298,26 +305,38 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      * @return true is the document already contains spatial information.
      * @throws MD_IOException
      */
-    private boolean indexMetadata(Document doc, Form form, Map<String, List<String>> queryableSet, boolean alreadySpatiallyIndexed) throws MD_IOException {
+    @Override
+    protected boolean indexISO19139(final Document doc, final Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) throws IndexingException {
         LOGGER.finer("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
 
-        //TODO add ANyText
-        for (String term :queryableSet.keySet()) {
-            doc.add(new Field(term,           getValues(form, queryableSet.get(term), -1),   Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field(term + "_sort", getValues(form, queryableSet.get(term), -1),   Field.Store.YES, Field.Index.NOT_ANALYZED));
-        }
+        try {
+            for (String term :queryableSet.keySet()) {
+                final String values = getValues(form, queryableSet.get(term), -1);
+                if (!values.equals("null")) {
+                    anyText.append(values).append(" ");
+                }
+                doc.add(new Field(term,           values,   Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
+            }
 
-        // add special INSPIRE queryable
-        for (String term :INSPIRE_QUERYABLE.keySet()) {
-            doc.add(new Field(term,           getValues(form, INSPIRE_QUERYABLE.get(term), -1),   Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field(term + "_sort", getValues(form, INSPIRE_QUERYABLE.get(term), -1),   Field.Store.YES, Field.Index.NOT_ANALYZED));
+            // add special INSPIRE queryable
+            for (String term :INSPIRE_QUERYABLE.keySet()) {
+                final String values = getValues(form, INSPIRE_QUERYABLE.get(term), -1);
+                if (!values.equals("null")) {
+                    anyText.append(values).append(" ");
+                }
+                doc.add(new Field(term,           values,   Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
+            }
+
+           //we add the geometry parts
+            if (!alreadySpatiallyIndexed) {
+                return indexSpatialPart(doc, form, queryableSet, -1);
+            }
+            return false;
+        } catch (MD_IOException ex) {
+            throw new IndexingException("error while indexing ISO metadata", ex);
         }
-        
-       //we add the geometry parts
-        if (!alreadySpatiallyIndexed) {
-            return indexSpatialPart(doc, form, queryableSet, -1);
-        }
-        return false;
     }
 
     /**
@@ -328,26 +347,26 @@ public class MDWebIndexer extends AbstractIndexer<Form> {
      * @param alreadySpatiallyIndexed a flag indicating if the document already contains spatial information.
      * @throws MD_IOException
      */
-    private boolean indexDublinCore(Document doc, Form form, Map<String, List<String>> queryableSet, boolean alreadySpatiallyIndexed) throws MD_IOException {
-        final StringBuilder anyText = new StringBuilder();
-
-        for (String term :queryableSet.keySet()) {
-            final String values = getValues(form, queryableSet.get(term), -1);
-            if (!values.equals("null")) {
-                anyText.append(values).append(" ");
+    @Override
+    protected boolean indexDublinCore(Document doc, Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) throws IndexingException {
+        try {
+            for (String term :queryableSet.keySet()) {
+                final String values = getValues(form, queryableSet.get(term), -1);
+                if (!values.equals("null")) {
+                    anyText.append(values).append(" ");
+                }
+                doc.add(new Field(term,           values, Field.Store.YES, Field.Index.ANALYZED));
+                doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.NOT_ANALYZED));
             }
-            doc.add(new Field(term,           values, Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.NOT_ANALYZED));
-        }
 
-        //we add the anyText values
-        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
-
-        if (!alreadySpatiallyIndexed) {
             //we add the geometry parts
-            return indexSpatialPart(doc, form, queryableSet, 1);
+            if (!alreadySpatiallyIndexed) {
+                return indexSpatialPart(doc, form, queryableSet, 1);
+            }
+            return false;
+        } catch (MD_IOException ex) {
+            throw new IndexingException("error while indexing DublinCore metadata", ex);
         }
-        return false;
     }
 
     /**
