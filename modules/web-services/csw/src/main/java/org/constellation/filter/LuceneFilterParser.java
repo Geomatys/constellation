@@ -63,7 +63,7 @@ import static org.constellation.metadata.CSWConstants.*;
  */
 public class LuceneFilterParser extends FilterParser {
 
-    private String defaultField = "metafile:doc";
+    private final static String DEFAULT_FIELD = "metafile:doc";
 
     /**
      * Build a lucene request from the specified constraint
@@ -76,7 +76,7 @@ public class LuceneFilterParser extends FilterParser {
         //if the constraint is null we make a null filter
         if (constraint == null)  {
             final Filter nullFilter = null;
-            return new SpatialQuery(defaultField, nullFilter, SerialChainFilter.AND);
+            return new SpatialQuery(DEFAULT_FIELD, nullFilter, SerialChainFilter.AND);
         } else {
             filter = getFilterFromConstraint(constraint);
         }
@@ -151,7 +151,7 @@ public class LuceneFilterParser extends FilterParser {
                 final Filter subFilter = sq.getSpatialFilter();
                     
                 //if the sub spatial query contains both term search and spatial search we create a subQuery 
-                if ((subFilter != null && !subQuery.equals(defaultField))
+                if ((subFilter != null && !subQuery.equals(DEFAULT_FIELD))
                     || sq.getSubQueries().size() != 0 
                     || (sq.getLogicalOperator() == SerialChainFilter.NOT && sq.getSpatialFilter() == null)) {
                     subQueries.add(sq);
@@ -208,7 +208,7 @@ public class LuceneFilterParser extends FilterParser {
                 final String subQuery  = sq.getQuery();
                 final Filter subFilter = sq.getSpatialFilter();
                     
-                if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.equals(defaultField)) ||
+                if ((sq.getLogicalOperator() == SerialChainFilter.OR && subFilter != null && !subQuery.equals(DEFAULT_FIELD)) ||
                     (sq.getLogicalOperator() == SerialChainFilter.NOT)) {
                     subQueries.add(sq);
 

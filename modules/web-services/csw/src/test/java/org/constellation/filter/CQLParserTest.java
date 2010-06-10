@@ -295,6 +295,50 @@ public class CQLParserTest {
         assertEquals(spaQuery.getSubQueries().get(0).getQuery(), "Title:\"pedro\"");
         assertEquals(spaQuery.getSubQueries().get(0).getLogicalOperator(), SerialChainFilter.NOT);
 
+        /**
+         * Test 7: AND between two NOT propertyIsEqualTo
+         */
+
+        filter = FilterParser.cqlToFilter("NOT Title = 'starship trooper' AND NOT Author = 'Timothee Gustave'");
+
+        assertTrue(filter.getComparisonOps() == null);
+        assertTrue(filter.getLogicOps()      != null);
+        assertTrue(filter.getId().size()     == 0   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        spaQuery = filterParser.getLuceneQuery(filter);
+
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 2);
+        assertEquals(spaQuery.getQuery(), "metafile:doc");
+        assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.AND);
+        assertEquals(spaQuery.getSubQueries().get(0).getQuery(), "Title:\"starship trooper\"");
+        assertEquals(spaQuery.getSubQueries().get(0).getLogicalOperator(), SerialChainFilter.NOT);
+        assertEquals(spaQuery.getSubQueries().get(1).getQuery(), "Author:\"Timothee Gustave\"");
+        assertEquals(spaQuery.getSubQueries().get(1).getLogicalOperator(), SerialChainFilter.NOT);
+
+        /**
+         * Test 8: OR between two NOT propertyIsEqualTo
+         */
+
+        filter = FilterParser.cqlToFilter("NOT Title = 'starship trooper' OR NOT Author = 'Timothee Gustave'");
+
+        assertTrue(filter.getComparisonOps() == null);
+        assertTrue(filter.getLogicOps()      != null);
+        assertTrue(filter.getId().size()     == 0   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        spaQuery = filterParser.getLuceneQuery(filter);
+
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 2);
+        assertEquals(spaQuery.getQuery(), "metafile:doc");
+        assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.OR);
+        assertEquals(spaQuery.getSubQueries().get(0).getQuery(), "Title:\"starship trooper\"");
+        assertEquals(spaQuery.getSubQueries().get(0).getLogicalOperator(), SerialChainFilter.NOT);
+        assertEquals(spaQuery.getSubQueries().get(1).getQuery(), "Author:\"Timothee Gustave\"");
+        assertEquals(spaQuery.getSubQueries().get(1).getLogicalOperator(), SerialChainFilter.NOT);
+
     }
     
     /**

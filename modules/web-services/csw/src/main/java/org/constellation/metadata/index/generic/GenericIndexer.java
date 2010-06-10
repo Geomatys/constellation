@@ -253,13 +253,8 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         try {
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            if (meta instanceof DefaultMetadata) {
-                LOGGER.finer("Metadata: " + ((DefaultMetadata)meta).getFileIdentifier() + " indexed");
-            } else if (meta instanceof RecordType) {
-                LOGGER.finer("Metadata: " + ((RecordType)meta).getIdentifier() + " indexed");
-            } else {
-                LOGGER.finer("Unexpected metadata type");
-            }
+            LOGGER.finer("Metadata: " + getIdentifier(meta) + " indexed");
+            
         } catch (IndexingException ex) {
             LOGGER.severe("indexingException " + ex.getMessage());
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -282,14 +277,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
 
             //adding the document in a specific model. in this case we use a MDwebDocument.
             writer.addDocument(createDocument(meta));
-            if (meta instanceof DefaultMetadata) {
-                LOGGER.finer("Metadata: " + ((DefaultMetadata)meta).getFileIdentifier() + " indexed");
-            } else if (meta instanceof RecordType) {
-                LOGGER.finer("Metadata: " + ((RecordType)meta).getIdentifier() + " indexed");
-            } else {
-                LOGGER.finer("Unexpected metadata type");
-            }
-
+            LOGGER.finer("Metadata: " + getIdentifier(meta) + " indexed");
             writer.optimize();
             writer.close();
 
@@ -314,20 +302,11 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         // make a new, empty document
         final Document doc = new Document();
 
-        String identifier;
-        if (metadata instanceof DefaultMetadata) {
-            identifier = ((DefaultMetadata)metadata).getFileIdentifier();
-        } else if (metadata instanceof RecordType) {
-            identifier = ((RecordType)metadata).getIdentifier().getContent().get(0);
-        } else if (metadata instanceof RegistryObjectType) {
-            identifier = ((RegistryObjectType)metadata).getId();
-        } else {
-            String type = "null type";
-            if (metadata != null) {
-                type = metadata.getClass().getSimpleName();
-            }
-            throw new IllegalArgumentException("unexpected metadata type: " + type);
+        final String identifier = getIdentifier(metadata);
+        if (identifier.equals("unknow")) {
+            throw new IllegalArgumentException("unexpected metadata type.");
         }
+
         doc.add(new Field("id", identifier,  Field.Store.YES, Field.Index.NOT_ANALYZED));
 
         final StringBuilder anyText     = new StringBuilder();
@@ -481,28 +460,14 @@ public class GenericIndexer extends AbstractIndexer<Object> {
                     return true;
                 }
             } else {
-                if (metadata instanceof DefaultMetadata) {
-                    LOGGER.warning(NOT_SPATIALLY_INDEXABLE + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
+                LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(metadata) + '\n' +
                         "cause: missing coordinates.: " + coord);
-                } else if (metadata instanceof RecordType) {
-                    LOGGER.warning(NOT_SPATIALLY_INDEXABLE + ((RecordType)metadata).getIdentifier() + '\n' +
-                        "cause: missing coordinates.: " + coord);
-                } else {
-                    LOGGER.finer("Unexpected metadata type");
-                }
             }
 
         } catch (NumberFormatException e) {
             if (!coord.equals(NULL_VALUE)) {
-                if (metadata instanceof DefaultMetadata) {
-                    LOGGER.warning(NOT_SPATIALLY_INDEXABLE + ((DefaultMetadata)metadata).getFileIdentifier() + '\n' +
+                LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(metadata) + '\n' +
                         "cause: unable to parse double: " + coord);
-                } else if (metadata instanceof RecordType) {
-                    LOGGER.warning(NOT_SPATIALLY_INDEXABLE + ((RecordType)metadata).getIdentifier() + '\n' +
-                        "cause: unable to parse double: " + coord);
-                } else {
-                    LOGGER.finer("Unexpected metadata type");
-                }
             }
         }
         return false;
@@ -514,7 +479,7 @@ public class GenericIndexer extends AbstractIndexer<Object> {
      * @param coord A string containing coordinate comma separated.
      * @return A list of Double coordinates.
      */
-    private List<Double> extractPositions(final String coord) {
+    private static List<Double> extractPositions(final String coord) {
         final StringTokenizer tokens = new StringTokenizer(coord, ",;");
         final List<Double> coordinate = new ArrayList<Double>(tokens.countTokens());
         int i = 0;
@@ -524,7 +489,32 @@ public class GenericIndexer extends AbstractIndexer<Object> {
         }
         return coordinate;
     }
-    
+
+    /**
+     * Find the identifier of the metadata
+     * 
+     * @param obj
+     * @return
+     */
+    private String getIdentifier(Object obj) {
+        final String identifier;
+        if (obj instanceof DefaultMetadata) {
+            identifier = ((DefaultMetadata)obj).getFileIdentifier();
+        } else if (obj instanceof RecordType) {
+            identifier = ((RecordType)obj).getIdentifier().getContent().get(0);
+        } else if (obj instanceof RegistryObjectType) {
+            identifier = ((RegistryObjectType)obj).getId();
+        } else {
+            String type = "null type";
+            if (obj != null) {
+                type = obj.getClass().getSimpleName();
+            }
+            LOGGER.warning("unexpected metadata type: " + type);
+            identifier = "unknow";
+        }
+        return identifier;
+    }
+
     /**
      * Return a string description for the specified terms
      * 

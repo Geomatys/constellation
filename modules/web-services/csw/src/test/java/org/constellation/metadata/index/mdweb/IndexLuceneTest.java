@@ -264,6 +264,84 @@ public class IndexLuceneTest {
 
 
         assertEquals(expectedResult, result);
+
+        /**
+         * Test 6 simple search: (NOT identifier = 2345-aa453-ade456 AND NOT title = title2 )
+         */
+        resultReport = "";
+        spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.AND);
+        subQuery     = new SpatialQuery("identifier:\"2345-aa453-ade456\"", nullFilter, SerialChainFilter.NOT);
+        spatialQuery.addSubQuery(subQuery);
+        subQuery     = new SpatialQuery("Title:\"title2\"", nullFilter, SerialChainFilter.NOT);
+        spatialQuery.addSubQuery(subQuery);
+
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        LOGGER.log(LOG_LEVEL,"SimpleSearch 6:" + '\n' + resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("3:CATEST");
+        expectedResult.add("4:CATEST");
+
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 7 simple search: (NOT identifier = 2345-aa453-ade456 OR NOT title = title2 )
+         */
+        resultReport = "";
+        spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.OR);
+        subQuery     = new SpatialQuery("identifier:\"2345-aa453-ade456\"", nullFilter, SerialChainFilter.NOT);
+        spatialQuery.addSubQuery(subQuery);
+        subQuery     = new SpatialQuery("Title:\"title2\"", nullFilter, SerialChainFilter.NOT);
+        spatialQuery.addSubQuery(subQuery);
+
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        LOGGER.log(LOG_LEVEL,"SimpleSearch 7:" + '\n' + resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("2:CATEST");
+        expectedResult.add("3:CATEST");
+        expectedResult.add("4:CATEST");
+        expectedResult.add("1:CATEST");
+
+
+
+        assertEquals(expectedResult, result);
+
+        /**
+         * Test 8 simple search: (NOT identifier = 2345-aa453-ade456 OR NOT title = title1 )
+         */
+        resultReport = "";
+        spatialQuery = new SpatialQuery("metafile:doc", nullFilter, SerialChainFilter.OR);
+        subQuery     = new SpatialQuery("identifier:\"2345-aa453-ade456\"", nullFilter, SerialChainFilter.NOT);
+        spatialQuery.addSubQuery(subQuery);
+        subQuery     = new SpatialQuery("Title:\"title1\"", nullFilter, SerialChainFilter.NOT);
+        spatialQuery.addSubQuery(subQuery);
+
+        result       = indexSearcher.doSearch(spatialQuery);
+
+        for (String s: result)
+            resultReport = resultReport + s + '\n';
+
+        LOGGER.log(LOG_LEVEL,"SimpleSearch 8:" + '\n' + resultReport);
+
+        expectedResult = new ArrayList<String>();
+        expectedResult.add("2:CATEST");
+        expectedResult.add("3:CATEST");
+        expectedResult.add("4:CATEST");
+
+
+
+        assertEquals(expectedResult, result);
+
     }
     
     /**
