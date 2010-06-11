@@ -76,7 +76,10 @@ public class LuceneObservationFilter implements ObservationFilter {
             throw new CstlServiceException("IndexingException in LuceneObservationFilter constructor", ex, NO_APPLICABLE_CODE);
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void initFilterObservation(ResponseModeType requestMode, QName resultModel) {
         if (resultModel.equals(MEASUREMENT_QNAME)) {
@@ -92,6 +95,9 @@ public class LuceneObservationFilter implements ObservationFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void initFilterGetResult(Observation template, QName resultModel) {
         final ProcessEntry process = (ProcessEntry) template.getProcedure();
@@ -102,6 +108,9 @@ public class LuceneObservationFilter implements ObservationFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setProcedure(List<String> procedures, ObservationOfferingEntry off) {
         luceneRequest.append(" ( ");
@@ -126,6 +135,9 @@ public class LuceneObservationFilter implements ObservationFilter {
         luceneRequest.append(") ");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon) {
         luceneRequest.append(" AND( ");
@@ -140,6 +152,9 @@ public class LuceneObservationFilter implements ObservationFilter {
         luceneRequest.append(") ");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setFeatureOfInterest(List<String> fois) {
         luceneRequest.append(" AND (");
@@ -150,6 +165,9 @@ public class LuceneObservationFilter implements ObservationFilter {
         luceneRequest.append(") ");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTimeEquals(Object time) throws CstlServiceException {
         if (time instanceof TimePeriodType) {
@@ -181,6 +199,9 @@ public class LuceneObservationFilter implements ObservationFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTimeBefore(Object time) throws CstlServiceException {
         // for the operation before the temporal object must be an timeInstant
@@ -198,6 +219,9 @@ public class LuceneObservationFilter implements ObservationFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTimeAfter(Object time) throws CstlServiceException {
         // for the operation after the temporal object must be an timeInstant
@@ -219,6 +243,9 @@ public class LuceneObservationFilter implements ObservationFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setTimeDuring(Object time) throws CstlServiceException {
         if (time instanceof TimePeriodType) {
@@ -249,6 +276,9 @@ public class LuceneObservationFilter implements ObservationFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<ObservationResult> filterResult() throws CstlServiceException {
         List<ObservationResult> results = new ArrayList<ObservationResult>();
@@ -263,6 +293,9 @@ public class LuceneObservationFilter implements ObservationFilter {
         return results;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> filterObservation() throws CstlServiceException {
         try {
@@ -272,21 +305,33 @@ public class LuceneObservationFilter implements ObservationFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getInfos() {
         return "Constellation Lucene O&M Filter 0.6";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isBoundedObservation() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setBoundingBox(EnvelopeEntry e) throws CstlServiceException {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void refresh() throws CstlServiceException {
         try {
@@ -296,6 +341,9 @@ public class LuceneObservationFilter implements ObservationFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setLoglevel(Level logLevel) {
         if (searcher != null) {

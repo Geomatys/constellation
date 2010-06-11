@@ -203,10 +203,8 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         final StringTokenizer tokens  = new StringTokenizer(coord, ",;");
         final List<Double> coordinate = new ArrayList<Double>(tokens.countTokens());
         try {
-            int i = 0;
             while (tokens.hasMoreTokens()) {
                 coordinate.add(Double.parseDouble(tokens.nextToken()));
-                i++;
             }
         } catch (NumberFormatException e) {
             if (!coord.equals(NULL_VALUE)) {

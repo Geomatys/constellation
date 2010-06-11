@@ -65,18 +65,41 @@ public interface ObservationWriter {
      * @throws CstlServiceException
      */
     String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException;
-    
+
+    /**
+     * Update an offering after the add of a new Observation.
+     * The field updated are offering.procedure, offering.phenomenon, offering.samplingFeature
+     *
+     * @param offProc A mapping between an offering and a procedure
+     * @param offPheno A mapping between an offering and a phenomenon
+     * @param offSF A mapping between an offering and a samplingFeature
+     *
+     * @throws CstlServiceException
+     */
     void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno,
             OfferingSamplingFeatureEntry offSF) throws CstlServiceException;
-    
+
+    /**
+     * Refresh the cached offerings.
+     */
     void updateOfferings();
-    
+
+    /**
+     * Record the location of a sensor in a separated datasource if there is one (depends on the implementation).
+     *
+     * @param physicalID The pysical id of the sensor.
+     * @param position The GML position of the sensor.
+     * @throws CstlServiceException
+     */
     void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException;
 
     /**
      * Return informations about the implementation class.
      */
     String getInfos();
-    
+
+    /**
+     * Free all the resources and close datasource connections.
+     */
     void destroy();
 }

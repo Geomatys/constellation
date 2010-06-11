@@ -73,6 +73,9 @@ public class FileSensorWriter implements SensorWriter {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean writeSensor(String id, AbstractSensorML sensor) throws CstlServiceException {
         Marshaller marshaller = null;
@@ -111,6 +114,9 @@ public class FileSensorWriter implements SensorWriter {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteSensor(String id) throws CstlServiceException {
 
@@ -126,6 +132,9 @@ public class FileSensorWriter implements SensorWriter {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int replaceSensor(String id, AbstractSensorML sensor) throws CstlServiceException {
         Marshaller marshaller = null;
@@ -148,11 +157,18 @@ public class FileSensorWriter implements SensorWriter {
             }
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void startTransaction() throws CstlServiceException {
         uncommittedFiles = new ArrayList<File>();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void abortTransaction() throws CstlServiceException {
         for (File f: uncommittedFiles) {
@@ -164,11 +180,17 @@ public class FileSensorWriter implements SensorWriter {
         uncommittedFiles = new ArrayList<File>();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void endTransaction() throws CstlServiceException {
         uncommittedFiles = new ArrayList<File>();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getNewSensorId() throws CstlServiceException {
         int maxID = 0;
@@ -190,12 +212,18 @@ public class FileSensorWriter implements SensorWriter {
         return maxID + 1;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         if (uncommittedFiles != null)
             uncommittedFiles.clear();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getInfos() {
         return "Constellation Filesystem Sensor Writer 0.6";

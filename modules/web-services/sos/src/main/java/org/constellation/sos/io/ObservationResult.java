@@ -32,7 +32,7 @@ public class ObservationResult {
 
     public ObservationResult(String resultID, Timestamp beginTime, Timestamp endTime) {
         this.beginTime = beginTime;
-        this.endTime = endTime;
-        this.resultID = resultID;
+        this.endTime   = endTime;
+        this.resultID  = resultID;
     }
 }

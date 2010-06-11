@@ -19,8 +19,9 @@
 package org.constellation.configuration;
 
 /**
- *
- * @author Guilhem Legal
+ * O&M datasource different type of datasource.
+ * 
+ * @author Guilhem Legal (Geomatys)
  */
 public enum ObservationFilterType {
 

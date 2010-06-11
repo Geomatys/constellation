@@ -31,16 +31,16 @@ public interface SensorReader {
      * Return the specified sensor description from the specified ID.
      *
      * @param sensorID The identifier of the sensor.
-     * @return
+     *
+     * @return the specified sensor description from the specified ID.
      * @throws org.constellation.ws.CstlServiceException
      */
     AbstractSensorML getSensor(String sensorID) throws CstlServiceException;
 
     /**
-     * Return All sensor ID's.
+     * Return all sensor ID's.
      *
-     * @param sensorID The identifier of the sensor.
-     * @return
+     * @return All sensor ID's.
      * @throws org.constellation.ws.CstlServiceException
      */
     List<String> getSensorNames() throws CstlServiceException;

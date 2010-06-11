@@ -376,13 +376,13 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                     + "conditionalValue : " + conditionalValue);
         } else {
             if (fullPathID.indexOf('[') != -1) {
-                String StringOrdinal = fullPathID.substring(fullPathID.indexOf('[') + 1, fullPathID.indexOf(']'));
+                String stringOrdinal = fullPathID.substring(fullPathID.indexOf('[') + 1, fullPathID.indexOf(']'));
                 try {
-                    ordinal = Integer.parseInt(StringOrdinal);
+                    ordinal = Integer.parseInt(stringOrdinal);
                     // mdweb ordinal start at 1
                     ordinal++;
                 } catch (NumberFormatException ex) {
-                    LOGGER.warning("unable to parse the ordinal:" + StringOrdinal);
+                    LOGGER.warning("unable to parse the ordinal:" + stringOrdinal);
                     ordinal = -1;
                 }
                 fullPathID = fullPathID.substring(0, fullPathID.indexOf('['));

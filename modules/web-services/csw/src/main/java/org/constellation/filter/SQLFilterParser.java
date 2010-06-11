@@ -95,7 +95,7 @@ public class SQLFilterParser extends FilterParser {
         FilterType filter = null;
         //if the constraint is null we make a null filter
         if (constraint == null)  {
-            return new SQLQuery("Select identifier, catalog from Form where catalog != 'MDATA");
+            return new SQLQuery("Select \"identifier\", \"catalog\" from \"Forms\" where \"catalog\" != 'MDATA");
         } else {
             filter = getFilterFromConstraint(constraint);
         }
@@ -303,8 +303,8 @@ public class SQLFilterParser extends FilterParser {
             //we get the field
             if (pil.getPropertyName() != null) {
                 propertyName = pil.getPropertyName().getContent();
-                response.append('v').append(nbField).append(".path ='").append(transformSyntax(propertyName)).append("' AND ");
-                response.append('v').append(nbField).append("value LIKE '");
+                response.append('v').append(nbField).append(".\"path\" ='").append(transformSyntax(propertyName)).append("' AND ");
+                response.append('v').append(nbField).append("\"value\" LIKE '");
             } else {
                 throw new CstlServiceException("An operator propertyIsLike must specified the propertyName.",
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
@@ -326,7 +326,7 @@ public class SQLFilterParser extends FilterParser {
                 }
                 
                 response.append(brutValue).append("' ");
-                response.append(" AND v").append(nbField).append(".form=identifier ");
+                response.append(" AND v").append(nbField).append(".\"form\"=\"identifier\" ");
                 
             } else {
                 throw new CstlServiceException("An operator propertyIsLike must specified the literal value.",
@@ -337,9 +337,9 @@ public class SQLFilterParser extends FilterParser {
 
             //we get the field
             if (pin.getPropertyName() != null) {
-                response.append('v').append(nbField).append(".path = '").append(transformSyntax(pin.getPropertyName().getContent())).append("' AND ");
-                response.append('v').append(nbField).append(".value IS NULL ");
-                response.append(" AND v").append(nbField).append(".form=identifier ");
+                response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(pin.getPropertyName().getContent())).append("' AND ");
+                response.append('v').append(nbField).append(".\"value\" IS NULL ");
+                response.append(" AND v").append(nbField).append(".\"form\"=\"identifier\" ");
             } else {
                 throw new CstlServiceException("An operator propertyIsNull must specified the propertyName.",
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
@@ -361,14 +361,14 @@ public class SQLFilterParser extends FilterParser {
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } else {
                 if (operator.equals("PropertyIsEqualTo")) {                
-                    response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
-                    response.append('v').append(nbField).append(".value='").append(literal.getStringValue()).append("' ");
-                    response.append(" AND v").append(nbField).append(".form=identifier ");
+                    response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
+                    response.append('v').append(nbField).append(".\"value\"='").append(literal.getStringValue()).append("' ");
+                    response.append(" AND v").append(nbField).append(".\"form\"=\"identifier\" ");
                 
                 } else if (operator.equals("PropertyIsNotEqualTo")) {
                     
-                   response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
-                   response.append('v').append(nbField).append(".value != '").append(literal.getStringValue()).append("' ");
+                   response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
+                   response.append('v').append(nbField).append(".\"value\" != '").append(literal.getStringValue()).append("' ");
                    response.append(" AND v").append(nbField).append(".form=identifier ");
                 
                 } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
@@ -379,9 +379,9 @@ public class SQLFilterParser extends FilterParser {
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
-                        response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
-                        response.append('v').append(nbField).append(".value >= '").append(dateValue).append("' ");
-                        response.append(" AND v").append(nbField).append(".form=identifier ");
+                        response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
+                        response.append('v').append(nbField).append(".\"value\" >= '").append(dateValue).append("' ");
+                        response.append(" AND v").append(nbField).append(".\"form\"=\"identifier\" ");
                     } else {
                         throw new CstlServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
                                                           OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
@@ -395,9 +395,9 @@ public class SQLFilterParser extends FilterParser {
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
-                        response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
-                        response.append('v').append(nbField).append(".value > '").append(dateValue).append("' ");
-                        response.append(" AND v").append(nbField).append(".form=identifier ");
+                        response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
+                        response.append('v').append(nbField).append(".\"value\" > '").append(dateValue).append("' ");
+                        response.append(" AND v").append(nbField).append(".\"form\"=\"identifier\" ");
                     } else {
                         throw new CstlServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
                                                           OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
@@ -412,8 +412,8 @@ public class SQLFilterParser extends FilterParser {
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
-                        response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
-                        response.append('v').append(nbField).append(".value < '").append(dateValue).append("' ");
+                        response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
+                        response.append('v').append(nbField).append(".\"value\" < '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                         throw new CstlServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
@@ -428,8 +428,8 @@ public class SQLFilterParser extends FilterParser {
                         } catch( ParseException ex) {
                             throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                         }
-                        response.append('v').append(nbField).append(".path = '").append(transformSyntax(propertyName)).append("' AND ");
-                        response.append('v').append(nbField).append(".value <= '").append(dateValue).append("' ");
+                        response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
+                        response.append('v').append(nbField).append(".\"value\" <= '").append(dateValue).append("' ");
                         response.append(" AND v").append(nbField).append(".form=identifier ");
                     } else {
                          throw new CstlServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,

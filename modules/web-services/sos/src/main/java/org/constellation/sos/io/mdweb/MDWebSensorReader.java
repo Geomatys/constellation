@@ -80,10 +80,11 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
     }
 
     /**
+     * Return the specified sensor description from the specified ID.
      *
-     * @param sensorId The identifiers of the sensor.
+     * @param sensorID The identifier of the sensor.
      *
-     * @return A SensorML sensor description
+     * @return the specified sensor description from the specified ID.
      * 
      * @throws CstlServiceException If the sensor is not registred in the database,
      *                              if the specified record in the database is not a sensorML object,
@@ -127,14 +128,16 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
     }
 
     /**
-     *
-     * @return
+     * {@inheritDoc}
      */
     @Override
     public String getInfos() {
         return "Constellation MDweb Sensor Reader 0.6";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getSensorNames() throws CstlServiceException {
         try {

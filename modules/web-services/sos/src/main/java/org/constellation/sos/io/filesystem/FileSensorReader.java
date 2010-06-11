@@ -65,6 +65,9 @@ public class FileSensorReader implements SensorReader {
         } 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AbstractSensorML getSensor(final String sensorId) throws CstlServiceException {
         File sensorFile = new File(dataDirectory, sensorId + ".xml");
@@ -99,15 +102,25 @@ public class FileSensorReader implements SensorReader {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
+        // do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getInfos() {
         return "Constellation Filesystem Sensor Reader 0.6";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getSensorNames() throws CstlServiceException {
         final List<String> result = new ArrayList<String>();

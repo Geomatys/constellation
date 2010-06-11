@@ -44,11 +44,16 @@ import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 
 /**
+  * A default implementation of the CSW factory.
+ * it provide various reader / writer / filter for observations datasource and   reader / writer for SensorML datasource.
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public class DefaultSOSFactory extends AbstractSOSFactory {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
         if (type == null) {
@@ -66,6 +71,9 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObservationFilter cloneObservationFilter(ObservationFilter omFilter) throws CstlServiceException {
         if (omFilter instanceof DefaultObservationFilter) {
@@ -82,6 +90,9 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase) throws CstlServiceException {
         if (type == null) {
@@ -102,6 +113,9 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObservationWriter getObservationWriter(ObservationWriterType type, String observationTemplateIdBase, Automatic configuration) throws CstlServiceException {
         if (type == null) {
@@ -116,6 +130,9 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws MetadataIoException {
         if (type == null) {
@@ -132,6 +149,9 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SensorWriter getSensorWriter(DataSourceType type,  Automatic configuration, String sensorIdBase, Properties map) throws MetadataIoException {
         if (type == null) {

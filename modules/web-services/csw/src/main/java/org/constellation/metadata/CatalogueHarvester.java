@@ -227,7 +227,7 @@ public class CatalogueHarvester {
      * 
      * @param sourceURL The URL of the distant CSW service
      * 
-     * @return the number of inserted Record.
+     * @return An array containing: the number of inserted records, the number of updated records and the number of deleted records.
      */
     protected int[] harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, CstlServiceException, SQLException {
         
@@ -892,6 +892,14 @@ public class CatalogueHarvester {
     }
 
 
+    /**
+     * Harvest a single record and storing it into the database
+     *
+     * @param sourceURL The URL of the resource.
+     * @param resourceType The record schema of the document to harvest.
+     * 
+     * @return An array containing: the number of inserted records, the number of updated records and the number of deleted records.
+     */
     public int[] harvestSingle(String sourceURL, String resourceType) throws MalformedURLException, IOException, CstlServiceException, JAXBException {
         final int[] result = new int[3];
         result[0] = 0;

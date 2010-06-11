@@ -88,6 +88,9 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
         } 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public RecordSet getRecordSet(String recordSet) throws MD_IOException {
         RecordSet cat = mdWriter.getRecordSet("SMLC");
@@ -98,6 +101,9 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
         return cat;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean writeSensor(String id, AbstractSensorML process) throws CstlServiceException {
        
@@ -112,6 +118,9 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int replaceSensor(String sensorid, AbstractSensorML process) throws CstlServiceException {
         final boolean deleted = deleteSensor(sensorid);
@@ -125,6 +134,9 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteSensor(String sensorId) throws CstlServiceException {
         try {
@@ -152,7 +164,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     }
 
     /**
-     * This method should be called. It is used in a subProject in order to clear the database.
+     * This method shouldn't be called. It is used in a subProject in order to clear the database.
      *
      * @return
      * @throws CstlServiceException
@@ -184,11 +196,17 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String findTitle(Object obj) {
         return currentSensorID;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void startTransaction() throws CstlServiceException {
         try {
@@ -201,6 +219,9 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void abortTransaction() throws CstlServiceException {
         try {
@@ -215,6 +236,9 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void endTransaction() throws CstlServiceException {
         try {
@@ -230,7 +254,7 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
     }
 
     /**
-     * Create a new identifier for a sensor.
+     * {@inheritDoc}
      */
     @Override
     public int getNewSensorId() throws CstlServiceException {
@@ -248,7 +272,10 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
                                              NO_APPLICABLE_CODE);
         }
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         super.destroy();
@@ -259,6 +286,9 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getInfos() {
         return "Constellation MDweb Sensor Writer 0.6";

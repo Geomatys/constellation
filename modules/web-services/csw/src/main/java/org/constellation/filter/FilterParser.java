@@ -17,10 +17,8 @@
 
 package org.constellation.filter;
 
-import java.awt.geom.Line2D;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -35,12 +33,11 @@ import org.apache.lucene.search.Filter;
 // constellation dependencies
 import org.constellation.ws.CstlServiceException;
 
+import static org.constellation.metadata.CSWConstants.*;
+
 // Geotoolkit dependencies
 import org.geotoolkit.filter.text.cql2.CQL;
 import org.geotoolkit.filter.text.cql2.CQLException;
-import org.geotoolkit.geometry.GeneralDirectPosition;
-import org.geotoolkit.geometry.GeneralEnvelope;
-import org.geotoolkit.gml.xml.v311.CoordinatesType;
 import org.geotoolkit.geometry.jts.SRIDGenerator;
 import org.geotoolkit.geometry.jts.SRIDGenerator.Version;
 import org.geotoolkit.gml.xml.v311.AbstractGeometryType;
@@ -57,11 +54,13 @@ import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
-import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.csw.xml.QueryConstraint;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
+import org.geotoolkit.filter.FilterFactoryImpl;
+import org.geotoolkit.gml.GeometrytoJTS;
+import org.geotoolkit.gml.xml.v311.PolygonType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.lucene.filter.LuceneOGCFilter.*;
@@ -70,19 +69,13 @@ import static org.geotoolkit.lucene.filter.LuceneOGCFilter.*;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Geometry;
-import org.geotoolkit.filter.FilterFactoryImpl;
-import org.geotoolkit.gml.GeometrytoJTS;
-import org.geotoolkit.gml.xml.v311.PolygonType;
-
-import static org.constellation.metadata.CSWConstants.*;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public abstract class FilterParser {
 
@@ -117,152 +110,6 @@ public abstract class FilterParser {
             result = (FilterType) newFilter;
         }
         return result;
-        /*final org.opengis.filter.Filter newFilter = CQL.toFilter(cqlQuery, FF);
-        final XMLUtilities util = new XMLUtilities();
-        return util.getTransformerXMLv110().visit(newFilter);*/
-    }
-    
-    /**
-     * Transform A GML lineString into a treatable geometric object : Line2D
-     * 
-     * @param GMLlineString A GML lineString.
-     * 
-     * @return A Line2D. 
-     * @throws org.opengis.referencing.NoSuchAuthorityCodeException
-     * @throws org.opengis.referencing.FactoryException
-     */
-    public static Line2D gmlLineToline2d(LineStringType gmlLine) throws NoSuchAuthorityCodeException, FactoryException, CstlServiceException {
-        final String crsName = gmlLine.getSrsName();
-        if (crsName == null) {
-            throw new CstlServiceException("A CRS (coordinate Reference system) must be specified for the line.",
-                                          INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-        }
-       
-        final CoordinatesType coord = gmlLine.getCoordinates();
-        String s = coord.getValue();
-        double x1, x2, y1, y2;
-        
-        x1 = Double.parseDouble(s.substring(0, s.indexOf(coord.getCs())));
-        
-        s = s.substring(s.indexOf(coord.getCs()) + 1);
-        
-        y1 = Double.parseDouble(s.substring(0, s.indexOf(coord.getTs())));
-        
-        s = s.substring(s.indexOf(coord.getTs()) + 1);
-        
-        x2 = Double.parseDouble(s.substring(0, s.indexOf(coord.getCs())));
-        
-        s = s.substring(s.indexOf(coord.getCs()) + 1);
-        
-        y2 = Double.parseDouble(s);
-
-        final Line2D line = new Line2D.Double(x1, y1, x2, y2);
-        
-        // TODO CoordinateReferenceSystem crs = CRS.decode(CRSName, true);
-        
-        return line;
-    }
-    
-    /**
-     * Transform A GML envelope into a treatable geometric object : GeneralEnvelope
-     * 
-     * @param GMLenvelope A GML envelope.
-     * 
-     * @return A general Envelope. 
-     * @throws org.opengis.referencing.NoSuchAuthorityCodeException
-     * @throws org.opengis.referencing.FactoryException
-     */
-    public static GeneralEnvelope gmlEnvelopeToGeneralEnvelope(EnvelopeEntry gmlEnvelope) throws NoSuchAuthorityCodeException, FactoryException, CstlServiceException {
-        final String crsName = gmlEnvelope.getSrsName();
-        if (crsName == null) {
-            throw new CstlServiceException("An operator BBOX must specified a CRS (coordinate Reference system) for the envelope.",
-                                          INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-        }
-       
-        final List<Double> lmin = gmlEnvelope.getLowerCorner().getValue();
-        final double[] min      = new double[lmin.size()];
-        for (int i = 0; i < min.length; i++) {
-            min[i] = lmin.get(i);
-        }
-
-        final List<Double> lmax = gmlEnvelope.getUpperCorner().getValue();
-        final double[] max = new double[lmax.size()];
-        for (int i = 0; i < min.length; i++) {
-            max[i] = lmax.get(i);
-        }
-
-        final GeneralEnvelope envelopeF     = new GeneralEnvelope(min, max);
-        final CoordinateReferenceSystem crs = CRS.decode(crsName, true);
-        envelopeF.setCoordinateReferenceSystem(crs);
-        return envelopeF;
-    }
-    
-     /**
-     * Transform A GML point into a treatable geometric object : GeneralDirectPosition
-     * 
-     * @param GMLpoint The GML point to transform.
-     * 
-     * @return A GeneralDirectPosition.
-     * 
-     * @throws org.constellation.coverage.web.CstlServiceException
-     * @throws org.opengis.referencing.NoSuchAuthorityCodeException
-     * @throws org.opengis.referencing.FactoryException
-     */
-    protected GeneralDirectPosition gmlPointToGeneralDirectPosition(PointType gmlPoint) throws CstlServiceException, NoSuchAuthorityCodeException, FactoryException {
-        
-        final String crsName = gmlPoint.getSrsName();
-
-        if (crsName == null) {
-            throw new CstlServiceException("A GML point must specify Coordinate Reference System.",
-                    INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-        }
-
-        //we get the coordinate of the point (if they are present)
-        if (gmlPoint.getCoordinates() == null && gmlPoint.getPos() == null) {
-            throw new CstlServiceException("A GML point must specify coordinates or direct position.",
-                    INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-        }
-
-        final double[] coordinates = new double[2];
-        if (gmlPoint.getCoordinates() != null) {
-            final String coord = gmlPoint.getCoordinates().getValue();
-       
-            final StringTokenizer tokens = new StringTokenizer(coord, " ");
-            int index = 0;
-            while (tokens.hasMoreTokens()) {
-                final double value = parseDouble(tokens.nextToken());
-                if (index >= coordinates.length) {
-                    throw new CstlServiceException("This service support only 2D point.",
-                            INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-                }
-                coordinates[index++] = value;
-            }
-        } else if (gmlPoint.getPos().getValue() != null && gmlPoint.getPos().getValue().size() == 2){
-            coordinates[0] = gmlPoint.getPos().getValue().get(0);
-            coordinates[0] = gmlPoint.getPos().getValue().get(1);
-        } else {
-            throw new CstlServiceException("The GML point is malformed.",
-                    INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-        }
-        final GeneralDirectPosition point   = new GeneralDirectPosition(coordinates);
-        final CoordinateReferenceSystem crs = CRS.decode(crsName, true);
-        point.setCoordinateReferenceSystem(crs);
-        return point;    
-    }
-    
-    /**
-     * Parses a value as a floating point.
-     *
-     * @throws CstlServiceException if the value can't be parsed.
-     */
-    private double parseDouble(String value) throws CstlServiceException {
-        value = value.trim();
-        try {
-            return Double.parseDouble(value);
-        } catch (NumberFormatException exception) {
-            throw new CstlServiceException("The value:" + value + " is not a valid double coordinate.",
-                                         INVALID_PARAMETER_VALUE, "Coordinates");
-        }
     }
     
     public abstract Object getQuery(final QueryConstraint constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException;
@@ -352,8 +199,8 @@ public abstract class FilterParser {
      * @throws org.constellation.coverage.web.CstlServiceException
      */
     protected Filter treatSpatialOperator(final JAXBElement<? extends SpatialOpsType> jbSpatialOps) throws CstlServiceException {
-        LuceneOGCFilter spatialfilter = null;
-        final SpatialOpsType spatialOps   = jbSpatialOps.getValue();
+        LuceneOGCFilter spatialfilter   = null;
+        final SpatialOpsType spatialOps = jbSpatialOps.getValue();
 
         if (spatialOps instanceof BBOXType) {
             final BBOXType bbox       = (BBOXType) spatialOps;
@@ -452,7 +299,7 @@ public abstract class FilterParser {
             String propertyName = null;
             String operator     = jbSpatialOps.getName().getLocalPart();
             operator            = operator.toUpperCase();
-            Object gmlGeometry     = null;
+            Object gmlGeometry  = null;
 
             // the propertyName
             if (binSpatial.getPropertyName() != null && binSpatial.getPropertyName().getValue() != null) {
@@ -553,7 +400,13 @@ public abstract class FilterParser {
     }
     
 
-    protected boolean isDateField(String propertyName) {
+    /**
+     * Return true is the specified property has to be treated as a date Field.
+     *
+     * @param propertyName A property name extract from a filter.
+     * @return true is the specified property has to be treated as a date Field.
+     */
+    protected boolean isDateField(final String propertyName) {
         if (propertyName != null) {
             return propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")
                 || propertyName.equalsIgnoreCase("TempExtent_begin") || propertyName.equalsIgnoreCase("TempExtent_end");

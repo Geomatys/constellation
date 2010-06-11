@@ -40,15 +40,6 @@ import org.opengis.observation.sampling.SamplingFeature;
 public interface ObservationReader {
     
     /**
-     * Build a new Observation Reader
-     *
-     * @param observationIdBase An urn prefixing the observations id.
-     *
-    public ObservationReader(String observationIdBase) throws CstlServiceException {
-        this.observationIdBase = observationIdBase;
-    }*/
-
-    /**
      * Return the list of offering names.
      *
      * @throws org.constellation.ws.CstlServiceException

@@ -127,6 +127,9 @@ public class DefaultObservationWriter implements ObservationWriter {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String writeObservation(Observation observation) throws CstlServiceException {
         try {
@@ -145,6 +148,9 @@ public class DefaultObservationWriter implements ObservationWriter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String writeMeasurement(Measurement measurement) throws CstlServiceException {
         try {
@@ -157,6 +163,9 @@ public class DefaultObservationWriter implements ObservationWriter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String writeOffering(ObservationOfferingEntry offering) throws CstlServiceException {
         try {
@@ -170,6 +179,9 @@ public class DefaultObservationWriter implements ObservationWriter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateOffering(OfferingProcedureEntry offProc, OfferingPhenomenonEntry offPheno, OfferingSamplingFeatureEntry offSF) throws CstlServiceException {
         try {
@@ -188,11 +200,17 @@ public class DefaultObservationWriter implements ObservationWriter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateOfferings() {
         //offTable.flush();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void recordProcedureLocation(String physicalID, DirectPositionType position) throws CstlServiceException {
         if (position == null || position.getValue().size() < 2 || !isPostgres)
@@ -245,11 +263,17 @@ public class DefaultObservationWriter implements ObservationWriter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getInfos() {
         return "Constellation Postgrid O&M Writer 0.6";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         /*try {

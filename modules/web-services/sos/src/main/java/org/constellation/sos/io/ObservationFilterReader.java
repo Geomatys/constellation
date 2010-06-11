@@ -27,12 +27,38 @@ import org.opengis.observation.Observation;
  */
 public interface ObservationFilterReader extends ObservationFilter {
 
+    /**
+     * Return a list of Observation templates matching the builded filter.
+     *
+     * @return A list of Observation templates matching the builded filter.
+     * @throws CstlServiceException
+     */
     List<Observation> getObservationTemplates() throws CstlServiceException;
 
+     /**
+     * Return a list of Observation matching the builded filter.
+     *
+     * @return A list of Observation matching the builded filter.
+     * @throws CstlServiceException
+     */
     List<Observation> getObservations() throws CstlServiceException;
 
+    /**
+     * Return an encoded block of data in a string.
+     * The datas are the results of the matching observations.
+     *
+     * @return An encoded block of data in a string.
+     * @throws CstlServiceException
+     */
     String getResults() throws CstlServiceException;
 
+    /**
+     * Return an encoded block of data in a string.
+     * The datas are the results of the matching observations.
+     * The datas are usually encoded as CSV (comma separated value) format.
+     * @return
+     * @throws CstlServiceException
+     */
     String getOutOfBandResults() throws CstlServiceException;
 
 }

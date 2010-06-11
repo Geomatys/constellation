@@ -33,21 +33,84 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.factory.Factory;
 
 /**
+ * Factory used to load various implementation of observation reader/writer/filter, and sensor metadata reader/writer.
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public abstract class AbstractSOSFactory extends Factory {
 
+    /**
+     * Return an observation filter for  the specified datasource.
+     *
+     * @param type The type of the filter requested.
+     * @param observationIdBase The prefix used for the observations identifier.
+     * @param observationTemplateIdBase The prefix used for the observation templates identifier.
+     * @param map A mapping between real database ID and physysical identifiers.
+     * @param configuration A configuration object containing all the information to use the datasource.
+     *
+     * @return An observation filter for  the specified datasource.
+     * @throws CstlServiceException
+     */
     public abstract ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException;
 
+    /**
+     * Clone an observation filter.
+     *
+     * @param omFilter The observation filter to clone.
+     * 
+     * @return a clone of the specified Observation filter.
+     * @throws CstlServiceException
+     */
     public abstract ObservationFilter cloneObservationFilter(ObservationFilter omFilter) throws CstlServiceException;
-    
+
+    /**
+     * Return an Observation reader for the specified datasource.
+     * 
+     * @param type  The type of the reader requested.
+     * @param configuration A configuration object containing all the information to use the datasource.
+     * @param observationIdBase The prefix used for the observations identifier.
+     *
+     * @return An Observation reader for the specified datasource.
+     * @throws CstlServiceException
+     */
     public abstract ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase) throws CstlServiceException;
 
+    /**
+     * Return an Observation writer for the specified datasource.
+     *
+     * @param type The type of the writer requested.
+     * @param observationTemplateIdBase The prefix used for the observation templates identifier.
+     * @param configuration A configuration object containing all the information to use the datasource.
+     * 
+     * @return an Observation writer for the specified datasource.
+     * @throws CstlServiceException
+     */
     public abstract ObservationWriter getObservationWriter(ObservationWriterType type, String observationTemplateIdBase, Automatic configuration) throws CstlServiceException;
 
+    /**
+     *  Return a Sensor metadata reader for the specified datasource.
+     *
+     * @param type The type of the reader requested.
+     * @param configuration A configuration object containing all the information to use the datasource.
+     * @param sensorIdBase  The prefix used for the sensor metadatas identifier.
+     * @param map A mapping between real database ID and physysical identifiers.
+     * 
+     * @return a Sensor metadata reader for the specified datasource.
+     * @throws MetadataIoException
+     */
     public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws MetadataIoException;
 
+    /**
+     * Return a Sensor metadata writer for the specified datasource.
+     *
+     * @param type  The type of the writer requested.
+     * @param configuration A configuration object containing all the information to use the datasource.
+     * @param sensorIdBase The prefix used for the sensor metadatas identifier.
+     * @param map  A mapping between real database ID and physysical identifiers.
+     *
+     * @return a Sensor metadata writer for the specified datasource.
+     * @throws MetadataIoException
+     */
     public abstract SensorWriter getSensorWriter(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws MetadataIoException;
 
 }

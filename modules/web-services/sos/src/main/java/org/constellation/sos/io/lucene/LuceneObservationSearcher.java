@@ -62,6 +62,9 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
         super(configDir, serviceID, new WhitespaceAnalyzer());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String identifierQuery(String id) throws SearchingException {
         try {
@@ -90,6 +93,9 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getMatchingID(Document doc) throws SearchingException {
         return doc.get("id");
@@ -218,11 +224,6 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
         }
     }
 
-    /**
-     *
-     * @param d
-     * @return
-     */
     private ObservationResult getObservationResult(final Document d) {
         Timestamp begin = null;
         Timestamp end   = null;

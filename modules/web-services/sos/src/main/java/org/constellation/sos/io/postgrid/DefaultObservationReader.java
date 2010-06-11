@@ -156,6 +156,9 @@ public class DefaultObservationReader implements ObservationReader {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> getOfferingNames() throws CstlServiceException {
         try {
@@ -168,6 +171,9 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException {
         try {
@@ -184,6 +190,9 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
         try {
@@ -206,6 +215,9 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> getProcedureNames() throws CstlServiceException {
         try {
@@ -219,6 +231,9 @@ public class DefaultObservationReader implements ObservationReader {
         } 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> getPhenomenonNames() throws CstlServiceException {
         try {
@@ -237,6 +252,9 @@ public class DefaultObservationReader implements ObservationReader {
         } 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException {
         try {
@@ -264,6 +282,9 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<String> getFeatureOfInterestNames() throws CstlServiceException {
         try {
@@ -285,13 +306,11 @@ public class DefaultObservationReader implements ObservationReader {
     }
 
     /**
-     * TODO remove those duplicated catch block
-     * @param samplingFeatureName
-     * @return
-     * @throws CstlServiceException
+     * {@inheritDoc}
      */
     @Override
     public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException {
+        //TODO remove those duplicated catch block
         try {
             final SamplingPointTable pointTable = omDatabase.getTable(SamplingPointTable.class);
             return pointTable.getEntry(samplingFeatureName);
@@ -334,6 +353,9 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObservationEntry getObservation(String identifier, QName resultModel) throws CstlServiceException {
         try {
@@ -360,6 +382,9 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object getResult(String identifier, QName resultModel) throws CstlServiceException {
         try {
@@ -385,6 +410,9 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ReferenceEntry getReference(String href) throws CstlServiceException {
         try {
@@ -412,13 +440,16 @@ public class DefaultObservationReader implements ObservationReader {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
-        
+        // do nothing
     }
 
     /**
-     * Create a new identifier for an observation by searching in the O&M database.
+     * {@inheritDoc}
      */
     @Override
     public String getNewObservationId() throws CstlServiceException {
@@ -443,7 +474,7 @@ public class DefaultObservationReader implements ObservationReader {
     }
 
     /**
-     * Return the minimal value for the offering event Time
+     * {@inheritDoc}
      */
     @Override
     public List<String> getEventTime() throws CstlServiceException {
@@ -465,16 +496,25 @@ public class DefaultObservationReader implements ObservationReader {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getInfos() {
         return "Constellation Postgrid O&M Reader 0.6";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<ResponseModeType> getResponseModes() throws CstlServiceException {
         return Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getResponseFormats() throws CstlServiceException {
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");

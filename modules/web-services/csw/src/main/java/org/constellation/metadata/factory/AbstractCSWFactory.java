@@ -33,16 +33,54 @@ import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
 /**
- *
+ * Factory used to load various implementation of metadata reader/writer, and Lucene indexer/searcher.
+ * 
  * @author Guilhem Legal (Geomatys)
  */
 public abstract class AbstractCSWFactory extends Factory {
 
+    /**
+     * Return a Metadata reader for the specified datasource type.
+     *
+     * @param configuration A configuration object containing all the information to use the datasource.
+     *
+     * @return a Metadata reader for the specified datasource type.
+     * @throws MetadataIoException
+     */
     public abstract CSWMetadataReader getMetadataReader(Automatic configuration) throws MetadataIoException;
 
-    public abstract CSWMetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer index) throws MetadataIoException;
-    
+    /**
+     * Return a Metadata Writer for the specified datasource type.
+     *
+     * @param configuration A configuration object containing all the information to use the datasource.
+     * @param indexer A metadata Indexer use by the metadata writer to add new metadata to the Lucene index.
+     *
+     * @return a Metadata Writer for the specified datasource type.
+     * @throws org.constellation.metadata.io.MetadataIoException
+     */
+    public abstract CSWMetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer) throws MetadataIoException;
+
+    /**
+     * Return a Lucene indexer for the specified datasource type.
+     *
+     * @param configuration A configuration object containing all the information to use the datasource.
+     * @param reader A metadata reader to acces the datasource.
+     * @param serviceID An identifier of the service/index.
+     *
+     * @return A Lucene indexer for the specified datasource type.
+     * @throws IndexingException
+     */
     public abstract AbstractIndexer getIndexer(Automatic configuration, CSWMetadataReader reader, String serviceID) throws IndexingException;
-    
+
+    /**
+     * Return a Lucene index searcher for the specified datasource type.
+     *
+     * @param dbType The type of the datasource.
+     * @param configDir The directory containing the lucene index.
+     * @param serviceID  An identifier of the service/index.
+     *
+     * @return  a Lucene index searcher for the specified datasource type.
+     * @throws IndexingException
+     */
     public abstract AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws IndexingException;
 }

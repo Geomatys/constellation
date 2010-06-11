@@ -23,7 +23,7 @@ import org.apache.lucene.search.Filter;
 
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal (Geomatys)
  */
 public class SQLQuery {
     
@@ -58,7 +58,7 @@ public class SQLQuery {
     }
     
     public void createSelect() {
-        final StringBuilder select = new StringBuilder("SELECT distinct identifier, catalog FROM \"Forms\" ");
+        final StringBuilder select = new StringBuilder("SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\" ");
         for (int i = 1; i <= nbField; i++) {
             select.append(" , \"TextValues\" v").append(i);
         }

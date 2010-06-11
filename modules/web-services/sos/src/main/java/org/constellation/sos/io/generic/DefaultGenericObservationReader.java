@@ -80,6 +80,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         this.observationIdBase = observationIdBase;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getOfferingNames() throws CstlServiceException {
         try {
@@ -90,6 +93,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getProcedureNames() throws CstlServiceException {
         try {
@@ -100,6 +106,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getPhenomenonNames() throws CstlServiceException {
         try {
@@ -110,6 +119,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getFeatureOfInterestNames() throws CstlServiceException {
         try {
@@ -120,6 +132,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getNewObservationId() throws CstlServiceException {
         try {
@@ -139,6 +154,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getEventTime() throws CstlServiceException {
          try {
@@ -149,6 +167,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
          }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException {
         try {
@@ -234,6 +255,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
         try {
@@ -250,10 +274,11 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
     }
 
     /**
-     *  TODO return composite phenomenon
+     * {@inheritDoc}
      */
     @Override
     public PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException {
+        // TODO return composite phenomenon
         try {
             final Values values = loadData(Arrays.asList("var13", "var14", "var47"), phenomenonName);
             final boolean exist = values.getVariable("var47") != null;
@@ -266,6 +291,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureId) throws CstlServiceException {
         try {
@@ -332,6 +360,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObservationEntry getObservation(String identifier, QName resultModel) throws CstlServiceException {
         try {
@@ -364,6 +395,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AnyResultEntry getResult(String identifier, QName resutModel) throws CstlServiceException {
         try {
@@ -417,22 +451,34 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ReferenceEntry getReference(String href) throws CstlServiceException {
         //TODO
         return new ReferenceEntry(null, href);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getInfos() {
         return "Constellation Postgrid Generic O&M Reader 0.6";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<ResponseModeType> getResponseModes() throws CstlServiceException {
         return Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getResponseFormats() throws CstlServiceException {
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");

@@ -51,9 +51,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
     private static final String DEFAULT_FACTORY = " In Default CSW Factory.";
 
     /**
-     * Return a Metadata reader for the specified database type.
-     * 
-     * @throws org.constellation.metadata.io.MetadataIoException
+     * {@inheritDoc}
      */
     @Override
     public CSWMetadataReader getMetadataReader(Automatic configuration) throws MetadataIoException {
@@ -71,11 +69,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
     }
     
     /**
-     * Return a Metadata Writer for the specified database type.
-     * 
-     * @param configuration
-     * @return
-     * @throws org.constellation.metadata.io.MetadataIoException
+     * {@inheritDoc}
      */
     @Override
     public CSWMetadataWriter getMetadataWriter(Automatic configuration, AbstractIndexer indexer) throws MetadataIoException {
@@ -93,14 +87,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
     }
     
     /**
-     * Return a Lucene index for the specified database type.
-     * 
-     * @param dbType The type of the database.
-     * @param reader A metadataReader (unused for MDWeb database);
-     * @param MDConnection A connecton to the database (used only for MDWeb database).
-     * @param configDir
-     * @return
-     * @throws org.constellation.metadata.io.MetadataIoException
+     * {@inheritDoc}
      */
     @Override
     public AbstractIndexer getIndexer(Automatic configuration, CSWMetadataReader reader, String serviceID) throws IndexingException {
@@ -117,6 +104,9 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AbstractIndexSearcher getIndexSearcher(int dbType, File configDirectory, String serviceID) throws IndexingException {
         switch (dbType) {

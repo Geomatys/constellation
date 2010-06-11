@@ -98,6 +98,9 @@ public class FileObservationReader implements ObservationReader {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<String> getOfferingNames() throws CstlServiceException {
         final List<String> offeringNames = new ArrayList<String>();
@@ -111,6 +114,9 @@ public class FileObservationReader implements ObservationReader {
         return offeringNames;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObservationOfferingEntry getObservationOffering(String offeringName) throws CstlServiceException {
         final File offeringFile = new File(offeringDirectory, offeringName + FILE_EXTENSION);
@@ -134,6 +140,9 @@ public class FileObservationReader implements ObservationReader {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<ObservationOfferingEntry> getObservationOfferings() throws CstlServiceException {
         final List<ObservationOfferingEntry> offerings = new ArrayList<ObservationOfferingEntry>();
@@ -164,6 +173,9 @@ public class FileObservationReader implements ObservationReader {
         return offerings;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<String> getProcedureNames() throws CstlServiceException {
         final List<String> sensorNames = new ArrayList<String>();
@@ -177,6 +189,9 @@ public class FileObservationReader implements ObservationReader {
         return sensorNames;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<String> getPhenomenonNames() throws CstlServiceException {
         final List<String> phenomenonNames = new ArrayList<String>();
@@ -190,6 +205,9 @@ public class FileObservationReader implements ObservationReader {
         return phenomenonNames;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PhenomenonEntry getPhenomenon(String phenomenonName) throws CstlServiceException {
         final File phenomenonFile = new File(phenomenonDirectory, phenomenonName + FILE_EXTENSION);
@@ -216,6 +234,9 @@ public class FileObservationReader implements ObservationReader {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Collection<String> getFeatureOfInterestNames() throws CstlServiceException {
         final List<String> foiNames = new ArrayList<String>();
@@ -229,6 +250,9 @@ public class FileObservationReader implements ObservationReader {
         return foiNames;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public SamplingFeatureEntry getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException {
         final File samplingFeatureFile = new File(foiDirectory, samplingFeatureName + FILE_EXTENSION);
@@ -255,6 +279,9 @@ public class FileObservationReader implements ObservationReader {
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ObservationEntry getObservation(String identifier, QName resultModel) throws CstlServiceException {
         File observationFile = new File(observationDirectory, identifier + FILE_EXTENSION);
@@ -283,7 +310,10 @@ public class FileObservationReader implements ObservationReader {
         }
         throw new CstlServiceException("The file " + observationFile + " does not exist", NO_APPLICABLE_CODE);
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AnyResult getResult(String identifier, QName resutModel) throws CstlServiceException {
         final File anyResultFile = new File(observationDirectory, identifier + FILE_EXTENSION);
@@ -312,36 +342,57 @@ public class FileObservationReader implements ObservationReader {
         throw new CstlServiceException("The file " + anyResultFile + " does not exist", NO_APPLICABLE_CODE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ReferenceEntry getReference(String href) throws CstlServiceException {
         return new ReferenceEntry(null, href);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getNewObservationId() throws CstlServiceException {
         return observationIdBase + observationDirectory.list().length;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getEventTime() throws CstlServiceException {
         return Arrays.asList("undefined", "now");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getInfos() {
         return "Constellation Filesystem O&M Reader 0.6";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<ResponseModeType> getResponseModes() throws CstlServiceException {
         return Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getResponseFormats() throws CstlServiceException {
         return Arrays.asList("text/xml; subtype=\"om/1.0.0\"");

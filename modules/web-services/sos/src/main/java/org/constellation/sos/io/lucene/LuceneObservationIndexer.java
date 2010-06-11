@@ -21,7 +21,6 @@ package org.constellation.sos.io.lucene;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -65,7 +64,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
      * Creates a new SOS indexer for a FileSystem reader.
      *
      * @param configuration A configuration object containing the database informations.
-     * @param serviceID
+     * @param serviceID  The identifier, if there is one, of the index/service.
      */
     public LuceneObservationIndexer(Automatic configuration, String serviceID) throws IndexingException {
         super(serviceID, configuration.getConfigurationDirectory(), new WhitespaceAnalyzer());
@@ -95,6 +94,9 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void createIndex() throws IndexingException {
         LOGGER.info("Creating lucene index for Filesystem observations please wait...");
@@ -162,6 +164,9 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
                     "Observations indexed: " + nbObservation + ". Template indexed:" + nbTemplate + ".");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void createIndex(List<ObservationEntry> observations) throws IndexingException {
         LOGGER.info("Creating lucene index for Filesystem observations please wait...");
@@ -192,6 +197,9 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
                      nbObservations + " documents indexed.");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected Document createDocument(ObservationEntry observation) {
         // make a new, empty document
@@ -239,16 +247,16 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
     }
 
     /**
-     * Find the identifier of the metadata
-     *
-     * @param obj
-     * @return
+     * {@inheritDoc}
      */
     @Override
     protected String getIdentifier(ObservationEntry obj) {
         return obj.getName();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         // do nothing

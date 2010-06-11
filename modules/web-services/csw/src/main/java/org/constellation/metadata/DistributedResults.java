@@ -23,30 +23,34 @@ import java.util.List;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public class DistributedResults {
         
-        /**
-         * The number of records matched on all distributed servers.
-         */
-        public int nbMatched;
-        
-        /**
-         * The merged list of records.
-         */
-        public List<Object> additionalResults;
-        
-        public DistributedResults() {
-            this.nbMatched         = 0;
-            this.additionalResults = new ArrayList<Object>(); 
-        }
-        
-        public DistributedResults(int nbMatched, List<Object> additionalResults) {
-            this.nbMatched         = nbMatched;
-            this.additionalResults = additionalResults; 
-        }
-        
-        
-        
+    /**
+     * The number of records matched on all distributed servers.
+     */
+    public int nbMatched;
+
+    /**
+     * The merged list of records.
+     */
+    public List<Object> additionalResults;
+
+    /**
+     * Build an empty distributed results with 0 records matching and 0 additional results.
+     */
+    public DistributedResults() {
+        this.nbMatched         = 0;
+        this.additionalResults = new ArrayList<Object>();
     }
+
+    /**
+     * Build a distributed results with the specified number of records matching and additional results.
+     */
+    public DistributedResults(int nbMatched, List<Object> additionalResults) {
+        this.nbMatched         = nbMatched;
+        this.additionalResults = additionalResults;
+    }
+
+}

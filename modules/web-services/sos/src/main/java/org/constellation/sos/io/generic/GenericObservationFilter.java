@@ -136,7 +136,7 @@ public class GenericObservationFilter implements ObservationFilter {
     }
     
     /**
-     * Initialize the query.
+     * {@inheritDoc}
      */
     @Override
     public void initFilterObservation(ResponseModeType requestMode, QName resultModel) {
@@ -156,7 +156,7 @@ public class GenericObservationFilter implements ObservationFilter {
     }
 
     /**
-     * Initialize the query.
+     * {@inheritDoc}
      */
     @Override
     public void initFilterGetResult(Observation template, QName resultModel) {
@@ -173,11 +173,7 @@ public class GenericObservationFilter implements ObservationFilter {
     }
 
     /**
-     * Add some procedure filter to the request.
-     * if the list of procedure ID is empty it add all the offering procedure.
-     *
-     * @param procedures
-     * @param off
+     * {@inheritDoc}
      */
     @Override
     public void setProcedure(List<String> procedures, ObservationOfferingEntry off) {
@@ -204,10 +200,7 @@ public class GenericObservationFilter implements ObservationFilter {
     }
 
     /**
-     * Add some phenomenon filter to the request.
-     *
-     * @param phenomenon
-     * @param compositePhenomenon
+     * {@inheritDoc}
      */
     @Override
     public void setObservedProperties(List<String> phenomenon, List<String> compositePhenomenon) {
@@ -224,10 +217,7 @@ public class GenericObservationFilter implements ObservationFilter {
     }
 
     /**
-     * Add some sampling point filter to the request.
-     *
-     * @param phenomenon
-     * @param compositePhenomenon
+     * {@inheritDoc}
      */
     @Override
     public void setFeatureOfInterest(List<String> fois) {
@@ -239,10 +229,7 @@ public class GenericObservationFilter implements ObservationFilter {
     }
 
     /**
-     * Add a TM_Equals filter to the current request.
-     *
-     * @param time
-     * @throws org.constellation.ws.CstlServiceException
+     * {@inheritDoc}
      */
     @Override
     public void setTimeEquals(Object time) throws CstlServiceException {
@@ -272,10 +259,7 @@ public class GenericObservationFilter implements ObservationFilter {
     }
 
     /**
-     * Add a TM_Before filter to the current request.
-     *
-     * @param time
-     * @throws org.constellation.ws.CstlServiceException
+     * {@inheritDoc}
      */
     @Override
     public void setTimeBefore(Object time) throws CstlServiceException  {
@@ -295,10 +279,7 @@ public class GenericObservationFilter implements ObservationFilter {
     }
 
     /**
-     * Add a TM_After filter to the current request.
-     *
-     * @param time
-     * @throws org.constellation.ws.CstlServiceException
+     * {@inheritDoc}
      */
     @Override
     public void setTimeAfter(Object time) throws CstlServiceException {
@@ -318,10 +299,7 @@ public class GenericObservationFilter implements ObservationFilter {
     }
 
     /**
-     * Add a TM_During filter to the current request.
-     *
-     * @param time
-     * @throws org.constellation.ws.CstlServiceException
+     * {@inheritDoc}
      */
     @Override
     public void setTimeDuring(Object time) throws CstlServiceException {
@@ -341,6 +319,9 @@ public class GenericObservationFilter implements ObservationFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<ObservationResult> filterResult() throws CstlServiceException {
         final String request = currentQuery.buildSQLQuery();
@@ -366,6 +347,9 @@ public class GenericObservationFilter implements ObservationFilter {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> filterObservation() throws CstlServiceException {
         final String request = currentQuery.buildSQLQuery();
@@ -387,26 +371,41 @@ public class GenericObservationFilter implements ObservationFilter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getInfos() {
         return "Constellation Generic O&M Filter 0.6";
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isBoundedObservation() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setBoundingBox(EnvelopeEntry e) throws CstlServiceException {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void refresh() {
         // do nothing
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setLoglevel(Level logLevel) {
          //do nothing

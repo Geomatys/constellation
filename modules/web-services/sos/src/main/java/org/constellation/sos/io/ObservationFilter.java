@@ -28,18 +28,18 @@ import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.opengis.observation.Observation;
 
 /**
- *
- * @author Guilhem Legal
+ * 
+ * @author Guilhem Legal (Geomatys)
  */
 public interface ObservationFilter {
 
     /**
-     * Initialize the query.
+     * Initialize the query for a full observation request.
      */
     void initFilterObservation(ResponseModeType requestMode, QName resultModel);
 
     /**
-     * Initialize the query.
+     * Initialize the query for a restricted to the results request.
      */
     void initFilterGetResult(Observation procedure, QName resultModel);
 
@@ -139,5 +139,10 @@ public interface ObservationFilter {
      */
     boolean isBoundedObservation();
 
+    /**
+     * Set the global level for information message.
+     *
+     * @param logLevel
+     */
     void setLoglevel(Level logLevel);
 }
