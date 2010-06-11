@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.StringTokenizer;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutionException;
@@ -55,7 +54,6 @@ import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.util.ReflectionUtilities;
-import static org.constellation.metadata.CSWQueryable.*;
 
 // geotoolkit dependencies
 import org.geotoolkit.metadata.iso.DefaultMetadata;
@@ -84,29 +82,26 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
 
+    /**
+     * A map of getters to avoid to seach the same getters many times.
+     */
     private static final Map<String, Method> GETTERS = new HashMap<String, Method>();
 
-    private final Map<String, List<String>> additionalQueryable;
     /**
      * Shared Thread Pool for parralele execution
      */
     private ExecutorService pool = Executors.newFixedThreadPool(6);
 
-    private static final String NULL_VALUE = "null";
-
     /**
      * Creates a new Lucene Index into the specified directory with the specified generic database reader.
      * 
-     * @param reader A generic reader for read the metadata database.
-     * @param configDirectory A directory where the index can write indexation file. 
+     * @param reader A generic reader to request the metadata datasource.
+     * @param configuration  A configuration object containing the directory where the index can write indexation file.
+     * @param serviceID The identifier, if there is one, of the index/service.
      */
     public GenericIndexer(CSWMetadataReader reader, Automatic configuration, String serviceID) throws IndexingException {
-        super(serviceID, configuration.getConfigurationDirectory());
+        super(serviceID, configuration.getConfigurationDirectory(), reader.getAdditionalQueryablePathMap());
         this.reader = reader;
-        if (reader != null)
-            additionalQueryable = reader.getAdditionalQueryablePathMap();
-        else
-            additionalQueryable = null;
         if (create)
             createIndex();
     }
@@ -117,10 +112,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param configDirectory A directory where the index can write indexation file.
      */
     public GenericIndexer(List<Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID, Analyzer analyzer, Level logLevel) throws IndexingException {
-        super(serviceID, configDirectory, analyzer);
+        super(serviceID, configDirectory, analyzer, additionalQueryable);
         this.logLevel            = logLevel;
         this.reader              = null;
-        this.additionalQueryable = additionalQueryable;
         if (create)
             createIndex(toIndex);
     }
@@ -131,16 +125,14 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
      * @param configDirectory A directory where the index can write indexation file.
      */
     public GenericIndexer(List<Object> toIndex, Map<String, List<String>> additionalQueryable, File configDirectory, String serviceID) throws IndexingException {
-        super(serviceID, configDirectory);
+        super(serviceID, configDirectory, additionalQueryable);
         this.reader = null;
-        this.additionalQueryable = additionalQueryable;
         if (create)
             createIndex(toIndex);
     }
     
-    /** 
-     * Create a new Index from a generic database.
-     * 
+    /**
+     * {@inheritDoc}
      */
     @Override
     public void createIndex() throws IndexingException {
@@ -181,8 +173,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     }
 
     /**
-     * Create a new Index from a generic database.
-     *
+     * {@inheritDoc}
      */
     @Override
     public void createIndex(List<Object> toIndex) throws IndexingException {
@@ -226,127 +217,65 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             stopIndexing = false;
         }
     }
-    
-    /**
-    * Makes a document for a geotoolkit Metadata Object.
-    * 
-    * @param metadata.
-    * @return A Lucene document.
-    */
-    @Override
-    protected Document createDocument(final Object metadata) throws IndexingException {
-        
-        // make a new, empty document
-        final Document doc = new Document();
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void indexSpecialField(final Object metadata, final Document doc) throws IndexingException {
         final String identifier = getIdentifier(metadata);
         if (identifier.equals("unknow")) {
-            throw new IllegalArgumentException("unexpected metadata type.");
+            throw new IndexingException("unexpected metadata type.");
         }
-
         doc.add(new Field("id", identifier,  Field.Store.YES, Field.Index.NOT_ANALYZED));
-
-        final StringBuilder anyText     = new StringBuilder();
-        boolean alreadySpatiallyIndexed = false;
-
-        // For an ISO 19139 object
-        if (isISO19139(metadata)) {
-            alreadySpatiallyIndexed = indexISO19139(doc, metadata, ISO_QUERYABLE, anyText, alreadySpatiallyIndexed);
-        }
-
-        // All metadata types must be compatible with dublinCore.
-        indexDublinCore(doc, metadata, DUBLIN_CORE_QUERYABLE, anyText, alreadySpatiallyIndexed);
-
-        // we add to the index the special queryable element of the metadata reader
-        if (additionalQueryable != null) {
-            for (String term : additionalQueryable.keySet()) {
-
-                String values = getValues(metadata, additionalQueryable.get(term));
-                if (!values.equals(NULL_VALUE)) {
-                    LOGGER.finer("put " + term + " values: " + values);
-                    anyText.append(values).append(" ");
-                }
-                if (term.equals("date") || term.equals("modified")) {
-                    values = values.replaceAll("-","");
-                }
-                doc.add(new Field(term, values,   Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
-            }
-        }
-
-        // add a default meta field to make searching all documents easy
-        doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
-
-        //we add the anyText values
-        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
-
-        return doc;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String getType(Object metadata) {
+        return metadata.getClass().getSimpleName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isISO19139(Object meta) {
         return meta instanceof DefaultMetadata;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isDublinCore(Object meta) {
         return meta instanceof RecordType;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isEbrim25(Object meta) {
         return meta instanceof RegistryObjectType;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isEbrim30(Object meta) {
         return meta instanceof IdentifiableType;
     }
 
 
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected boolean indexISO19139(final Document doc, final Object metadata,final  Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) throws IndexingException {
-        LOGGER.finer("indexing ISO 19139 MD_Metadata");
-        final CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
-        
-        for (final String term : queryableSet.keySet()) {
-             cs.submit(new Callable<TermValue>() {
-                @Override
-                public TermValue call() {
-                    return new TermValue(term, getValues(metadata, queryableSet.get(term)));
-                }
-           });
-        }
-
-        for (int i = 0; i < queryableSet.size(); i++) {
-            try {
-                final TermValue values = cs.take().get();
-                
-                doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
-                if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
-                    anyText.append(values.value).append(" ");
-                }
-                
-            } catch (InterruptedException ex) {
-               LOGGER.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
-            } catch (ExecutionException ex) {
-               LOGGER.severe("ExecutionException in parralele create document:" + '\n' + ex.getCause());
-               LOGGER.log(Level.SEVERE, ex.getCause().getMessage(), ex.getCause());
-            }
-        }
-
-        //we add the geometry parts
-        if (!alreadySpatiallyIndexed) {
-            return indexSpatialPart(doc, metadata, queryableSet);
-        }
-        return false;
-    }
-
-    @Override
-    protected boolean indexDublinCore(final Document doc, final Object metadata,final Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) throws IndexingException {
-
+    protected void indexQueryableSet(final Document doc, final Object metadata,final  Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
         final CompletionService<TermValue> cs = new BoundedCompletionService<TermValue>(this.pool, 5);
         for (final String term :queryableSet.keySet()) {
             cs.submit(new Callable<TermValue>() {
@@ -360,18 +289,8 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
 
         for (int i = 0; i < queryableSet.size(); i++) {
             try {
-                final TermValue values = cs.take().get();
-                if (!values.term.equals("date")) {
-                    doc.add(new Field(values.term, values.value, Field.Store.YES, Field.Index.ANALYZED));
-                } else {
-                    // we format the date to lucene format
-                    String value = values.value;
-                    if (value.endsWith("z") || value.endsWith("Z")) {
-                        value = value.substring(0, value.length() - 1);
-                    }
-                    value = value.replace("-", "");
-                    doc.add(new Field(values.term, value, Field.Store.YES, Field.Index.ANALYZED));
-                }
+                final TermValue values = formatStringValue(cs.take().get());
+                doc.add(new Field(values.term,           values.value, Field.Store.YES, Field.Index.ANALYZED));
                 doc.add(new Field(values.term + "_sort", values.value, Field.Store.YES, Field.Index.NOT_ANALYZED));
                 if (values.value != null && !values.value.equals(NULL_VALUE) && anyText.indexOf(values.value) == -1) {
                     anyText.append(values.value).append(" ");
@@ -383,44 +302,27 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                LOGGER.severe("ExecutionException in parralele create document:" + '\n' + ex.getMessage());
             }
         }
-
-        //we add the geometry parts
-        if (!alreadySpatiallyIndexed) {
-            return indexSpatialPart(doc, metadata, queryableSet);
-        }
-        return false;
     }
 
     /**
-     * Extract the double coordinate in a comma separated String.
-     *
-     * @param coord A string containing coordinate comma separated.
-     * @return A list of Double coordinates.
-     */
-    protected List<Double> extractPositions(Object metadata, List<String> paths) {
-        final String coord            = getValues(metadata, paths);
-        final StringTokenizer tokens  = new StringTokenizer(coord, ",;");
-        final List<Double> coordinate = new ArrayList<Double>(tokens.countTokens());
-        try {
-            int i = 0;
-            while (tokens.hasMoreTokens()) {
-                coordinate.add(Double.parseDouble(tokens.nextToken()));
-                i++;
-            }
-        } catch (NumberFormatException e) {
-            if (!coord.equals(NULL_VALUE)) {
-                LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(metadata) + '\n' +
-                        "cause: unable to parse double: " + coord);
-            }
-        }
-        return coordinate;
-    }
-
-    /**
-     * Find the identifier of the metadata
-     * 
-     * @param obj
+     * Format the value part in case of a "date" term.
+     * @param values
      * @return
+     */
+    private TermValue formatStringValue(TermValue values) {
+         if (values.term.equals("date")) {
+             String value = values.value;
+             if (value.endsWith("z") || value.endsWith("Z")) {
+                 value = value.substring(0, value.length() - 1);
+             }
+             value = value.replace("-", "");
+             values.value = value;
+         }
+         return values;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     protected String getIdentifier(Object obj) {
@@ -443,14 +345,15 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     }
 
     /**
-     * Return a string description for the specified terms
-     * 
-     * @param term An ISO queryable term defined in CSWWorker (like Title, Subject, Abstract,...)
-     * @param form An getools metadata from whitch we extract the values correspounding to the specified term.
-     * 
-     * @return A string concataining the differents values correspounding to the specified term, coma separated.
+     * {@inheritDoc}
      */
-    public static String getValues(Object metadata, List<String> paths) {
+    @Override
+    protected String getValues(Object metadata, List<String> paths) {
+        return extractValues(metadata, paths);
+    }
+
+    
+    public static String extractValues(Object metadata, List<String> paths) {
         final StringBuilder response  = new StringBuilder("");
         
         if (paths != null) {
@@ -494,7 +397,8 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         }
         return response.toString();
     }
-   
+
+
     /**
      * Return a string value extract from the specified object by using the string path specified.
      * example : getValuesFromPath("ISO 19115:MD_Metadata:identificationInfo:citation:title", (MetatadataImpl) obj)

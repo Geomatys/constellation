@@ -18,28 +18,143 @@
 package org.constellation.metadata.index;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 
+import static org.constellation.metadata.CSWQueryable.*;
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A>{
+public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
 
-    protected static final String NOT_SPATIALLY_INDEXABLE = "unable to spatially index metadata: ";
-    
-    public AbstractCSWIndexer(String serviceID, File configDirectory) {
+    private static final String NOT_SPATIALLY_INDEXABLE = "unable to spatially index metadata: ";
+
+    protected static final String NULL_VALUE = "null";
+
+    private final Map<String, List<String>> additionalQueryable;
+
+    /**
+     * Build a new CSW metadata indexer.
+     *
+     * @param serviceID The identifier, if there is one, of the index/service.
+     * @param configDirectory The directory where the files of the index will be stored.
+     * @param additionalQueryable A map of additionnal queryable elements.
+     */
+    public AbstractCSWIndexer(String serviceID, File configDirectory, Map<String, List<String>> additionalQueryable) {
         super(serviceID, configDirectory);
+        if (additionalQueryable != null) {
+            this.additionalQueryable = additionalQueryable;
+        } else {
+            this.additionalQueryable = new HashMap<String, List<String>>();
+        }
     }
 
-    public AbstractCSWIndexer(String serviceID, File configDirectory, Analyzer analyzer) {
+    /**
+     * Build a new CSW metadata indexer, with the specified lucene analyzer.
+     * 
+     * @param serviceID The identifier, if there is one, of the index/service.
+     * @param configDirectory The directory where the files of the index will be stored.
+     * @param analyzer A lucene analyzer used in text values indexation (default is StandardAnalyzer).
+     * @param additionalQueryable  A map of additionnal queryable elements.
+     */
+    public AbstractCSWIndexer(String serviceID, File configDirectory, Analyzer analyzer, Map<String, List<String>> additionalQueryable) {
         super(serviceID, configDirectory, analyzer);
+        if (additionalQueryable != null) {
+            this.additionalQueryable = additionalQueryable;
+        } else {
+            this.additionalQueryable = new HashMap<String, List<String>>();
+        }
     }
+
+    /**
+    * Makes a document for a A Metadata Object.
+    *
+    * @param metadata The metadata to index.
+    * @return A Lucene document.
+    */
+    @Override
+    protected Document createDocument(final A metadata) throws IndexingException {
+        // make a new, empty document
+        final Document doc = new Document();
+
+        indexSpecialField(metadata, doc);
+
+        final StringBuilder anyText     = new StringBuilder();
+        boolean alreadySpatiallyIndexed = false;
+
+        // For an ISO 19139 object
+        if (isISO19139(metadata)) {
+            indexQueryableSet(doc, metadata, ISO_QUERYABLE, anyText);
+
+            //we add the geometry parts
+            alreadySpatiallyIndexed = indexSpatialPart(doc, metadata, ISO_QUERYABLE);
+
+        } else if (isEbrim30(metadata)) {
+           // TODO
+        } else if (isEbrim25(metadata)) {
+            // TODO
+        } else if (!isDublinCore(metadata)) {
+            LOGGER.warning("unknow Object classe unable to index: " + getType(metadata));
+        }
+
+        // All metadata types must be compatible with dublinCore.
+        indexQueryableSet(doc, metadata, DUBLIN_CORE_QUERYABLE, anyText);
+
+        //we add the geometry parts if its nor already indexed
+        if (!alreadySpatiallyIndexed) {
+            indexSpatialPart(doc, metadata, DUBLIN_CORE_QUERYABLE);
+        }
+
+        // we add to the index the special queryable elements
+        indexQueryableSet(doc, metadata, additionalQueryable, anyText);
+
+        // add a default meta field to make searching all documents easy
+        doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
+
+        //we add the anyText values
+        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
+
+        return doc;
+    }
+
+    /**
+     * Add the specifics implementation field to the document.
+     *
+     * @param metadata The metadata to index.
+     * @param doc The lucene document currently building.
+     * @throws IndexingException
+     */
+    protected abstract void indexSpecialField(final A metadata, final Document doc) throws IndexingException;
+
+    /**
+     * Return a String description of the type of the metadata.
+     *
+     * @param metadata The metadata currently indexed
+     * @return A string description (name of the class, name of the top value type, ...)
+     */
+    protected abstract String getType(final A metadata);
+
+    /**
+     * Index a set of properties contained in the queryableSet.
+     *
+     * @param doc The lucene document currently building.
+     * @param metadata The metadata to index.
+     * @param queryableSet A set of querybale properties and their relative path int the metadata.
+     * @param anyText A Stringbuilder in which are concatened all the text values.
+     * @throws IndexingException
+     */
+    protected abstract void indexQueryableSet(final Document doc, final A metadata, Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException;
 
     /**
      * Spatially index the form extracting the BBOX values with the specified queryable set.
@@ -74,18 +189,75 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A>{
         return false;
     }
 
-    protected abstract List<Double> extractPositions(A metadata, List<String> paths) throws IndexingException;
+     /**
+      * Extract the double coordinate from a metadata object using a list of paths to find the data.
+      * 
+      * @param metadata The metadata to spatially index.
+      * @param paths A list of paths where to find the information within the metadata.
+      * @return A list of Double coordinates.
+      *
+      * @throws IndexingException
+      */
+    private List<Double> extractPositions(A metadata, List<String> paths) throws IndexingException {
+        final String coord            = getValues(metadata, paths);
+        final StringTokenizer tokens  = new StringTokenizer(coord, ",;");
+        final List<Double> coordinate = new ArrayList<Double>(tokens.countTokens());
+        try {
+            int i = 0;
+            while (tokens.hasMoreTokens()) {
+                coordinate.add(Double.parseDouble(tokens.nextToken()));
+                i++;
+            }
+        } catch (NumberFormatException e) {
+            if (!coord.equals(NULL_VALUE)) {
+                LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(metadata) + '\n' +
+                        "cause: unable to parse double: " + coord);
+            }
+        }
+        return coordinate;
+    }
 
-    protected abstract boolean indexISO19139(final Document doc, final A metadata, Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) throws IndexingException;
+    /**
+     * Extract some values from a metadata object using  the list of paths.
+     * 
+     * @param meta The object to index.
+     * @param paths A list of paths where to find the information within the metadata.
+     *
+     * @return A String containing one or more informations (comma separated) find in the metadata.
+     * @throws IndexingException
+     */
+    protected abstract String getValues(final A meta, final List<String> paths) throws IndexingException;
 
-    protected abstract boolean indexDublinCore(final Document doc, final A metadata, Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) throws IndexingException;
-
+    /**
+     * Return true if the metadata object is a ISO19139 object.
+     *
+     * @param meta The object to index
+     * @return true if the metadata object is a ISO19139 object.
+     */
     protected abstract boolean isISO19139(A meta);
 
+    /**
+     * Return true if the metadata object is a DublinCore object.
+     *
+     * @param meta The object to index
+     * @return true if the metadata object is a DublinCore object.
+     */
     protected abstract boolean isDublinCore(A meta);
 
+    /**
+     * Return true if the metadata object is a Ebrim version 2.5 object.
+     *
+     * @param meta The object to index
+     * @return true if the metadata object is a Ebrim version 2.5 object.
+     */
     protected abstract boolean isEbrim25(A meta);
-    
+
+    /**
+     * Return true if the metadata object is a Ebrim version 3.0 object.
+     *
+     * @param meta The object to index
+     * @return true if the metadata object is a Ebrim version 3.0 object.
+     */
     protected abstract boolean isEbrim30(A meta);
 
 }

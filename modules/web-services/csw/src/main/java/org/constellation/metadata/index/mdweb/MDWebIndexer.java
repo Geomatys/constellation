@@ -80,10 +80,10 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      * Creates a new CSW indexer for a MDWeb database.
      *
      * @param configuration A configuration object containing the database informations.
-     * @param serviceID
+     * @param serviceID The identifier, if there is one, of the index/service.
      */
     public MDWebIndexer(Automatic configuration, String serviceID) throws IndexingException {
-        super(serviceID, configuration.getConfigurationDirectory());
+        super(serviceID, configuration.getConfigurationDirectory(), INSPIRE_QUERYABLE);
         if (configuration == null) {
             throw new IndexingException("The configuration object is null");
         }
@@ -123,15 +123,18 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         }
     }
 
+    /**
+     * Load the ebrim classes from the MDWeb database.
+     * 
+     * @throws MD_IOException
+     */
     private void initEbrimClasses() throws MD_IOException {
         identifiable   = mdWebReader.getClasse("Identifiable", Standard.EBRIM_V3);
         registryObject = mdWebReader.getClasse("RegistryObject", Standard.EBRIM_V2_5);
     }
     
     /**
-     * Create a new Index from the MDweb database.
-     *
-     * @throws java.sql.SQLException
+     * {@inheritDoc}
      */
     @Override
     public void createIndex() throws IndexingException {
@@ -180,9 +183,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     }
 
     /**
-     * Create a new Index from a list of Form object.
-     *
-     * @throws java.sql.SQLException
+     * {@inheritDoc}
      */
     @Override
     public void createIndex(List<Form> forms) throws IndexingException {
@@ -215,207 +216,91 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     }
 
     /**
-     * Find the identifier of the metadata
-     *
-     * @param obj
-     * @return
+     * {@inheritDoc}
      */
     @Override
     protected String getIdentifier(Form obj) {
         return obj.getTitle();
     }
     
-
     /**
-    * Makes a document for a MDWeb formular.
-    *
-    * @param Form An MDweb formular to index.
-    * @return A Lucene document.
-    */
+     * {@inheritDoc}
+     */
     @Override
-    protected Document createDocument(Form form) throws IndexingException {
-        // make a new, empty document
-        final Document doc = new Document();
-        
-        doc.add(new Field("id",        Integer.toString(form.getId()),   Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field("recordSet", form.getRecordSet().getCode() , Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field("Title",     form.getTitle(),                Field.Store.YES, Field.Index.ANALYZED));
+    protected void indexSpecialField(final Form metadata, final Document doc) throws IndexingException {
+        if (metadata.getTopValue() == null) {
+            throw new IndexingException("unable to index form:" + metadata.getId() + " top value is null");
 
-         if (form.getTopValue() == null) {
-            throw new IndexingException("unable to index form:" + form.getId() + " top value is null");
-
-        } else if (form.getTopValue().getType() == null) {
-            throw new IndexingException("unable to index form:" + form.getId() + " top value type is null");
+        } else if (metadata.getTopValue().getType() == null) {
+            throw new IndexingException("unable to index form:" + metadata.getId() + " top value type is null");
         }
 
-        final StringBuilder anyText     = new StringBuilder();
-        boolean alreadySpatiallyIndexed = false;
-
-        if (isISO19139(form)) {
-            alreadySpatiallyIndexed = indexISO19139(doc, form, ISO_QUERYABLE, anyText, false);
-        } else if (isEbrim30(form)) {
-           // TODO
-        } else if (isEbrim25(form)) {
-            // TODO
-        } else if (!isDublinCore(form)) {
-            LOGGER.warning("unknow Form classe unable to index: " + form.getTopValue().getType().getName());
-        }
-
-
-        // All form types must be compatible with dublinCore.
-        indexDublinCore(doc, form, DUBLIN_CORE_QUERYABLE, anyText, alreadySpatiallyIndexed);
-
-        // add a default meta field to make searching all documents easy
-        doc.add(new Field("metafile", "doc",Field.Store.YES, Field.Index.ANALYZED));
-
-        //we add the anyText values
-        doc.add(new Field("AnyText", anyText.toString(),   Field.Store.YES, Field.Index.ANALYZED));
-
-
-        return doc;
+        doc.add(new Field("id",        Integer.toString(metadata.getId()),   Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("recordSet", metadata.getRecordSet().getCode() , Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("Title",     metadata.getTitle(),                Field.Store.YES, Field.Index.ANALYZED));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isISO19139(Form form) {
        return form.getTopValue().getType().getName().equals("MD_Metadata");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isDublinCore(Form form) {
         return form.getTopValue().getType().getName().equals("Record");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isEbrim25(Form form) {
         return form.getTopValue().getType().isSubClassOf(registryObject);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected boolean isEbrim30(Form form) {
         return form.getTopValue().getType().isSubClassOf(identifiable);
     }
 
-
     /**
-     * Index a form of type MD_Metadata.
-     *
-     * @param doc The Lucene document to write on.
-     * @param form The mdweb Form.
-     *
-     * @return true is the document already contains spatial information.
-     * @throws MD_IOException
+     * {@inheritDoc}
      */
     @Override
-    protected boolean indexISO19139(final Document doc, final Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) throws IndexingException {
-        LOGGER.finer("indexing ISO 19115 MD_Metadata/FC_FeatureCatalogue");
+    protected String getType(Form f) {
+        return f.getTopValue().getType().getName();
+    }
 
-        try {
-            for (String term :queryableSet.keySet()) {
-                final String values = getValues(form, queryableSet.get(term));
-                if (!values.equals("null")) {
-                    anyText.append(values).append(" ");
-                }
-                doc.add(new Field(term,           values,   Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void indexQueryableSet(final Document doc, final Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
+        for (String term :queryableSet.keySet()) {
+            final String values = getValues(form, queryableSet.get(term));
+            if (!values.equals("null")) {
+                anyText.append(values).append(" ");
             }
-
-            // add special INSPIRE queryable
-            for (String term :INSPIRE_QUERYABLE.keySet()) {
-                final String values = getValues(form, INSPIRE_QUERYABLE.get(term));
-                if (!values.equals("null")) {
-                    anyText.append(values).append(" ");
-                }
-                doc.add(new Field(term,           values,   Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field(term + "_sort", values,   Field.Store.YES, Field.Index.NOT_ANALYZED));
-            }
-
-           //we add the geometry parts
-            if (!alreadySpatiallyIndexed) {
-                return indexSpatialPart(doc, form, queryableSet);
-            }
-            return false;
-        } catch (MD_IOException ex) {
-            throw new IndexingException("error while indexing ISO metadata", ex);
+            doc.add(new Field(term,           values, Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
     }
 
     /**
-     * Index a form of all type with the common queryable element of Dublin Core.
-     *
-     * @param doc The Lucene document to write on.
-     * @param form The mdweb Form.
-     * @param alreadySpatiallyIndexed a flag indicating if the document already contains spatial information.
-     * @throws MD_IOException
+     * {@inheritDoc}
      */
     @Override
-    protected boolean indexDublinCore(Document doc, Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText, boolean alreadySpatiallyIndexed) throws IndexingException {
-        try {
-            for (String term :queryableSet.keySet()) {
-                final String values = getValues(form, queryableSet.get(term));
-                if (!values.equals("null")) {
-                    anyText.append(values).append(" ");
-                }
-                doc.add(new Field(term,           values, Field.Store.YES, Field.Index.ANALYZED));
-                doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.NOT_ANALYZED));
-            }
-
-            //we add the geometry parts
-            if (!alreadySpatiallyIndexed) {
-                return indexSpatialPart(doc, form, queryableSet);
-            }
-            return false;
-        } catch (MD_IOException ex) {
-            throw new IndexingException("error while indexing DublinCore metadata", ex);
-        }
-    }
-
-    /**
-     * Return a string description for the specified term.
-     *
-     * @param term An ISO queryable term defined in CSWQueryable (like Title, Subject, Abstract,...)
-     * @param form An MDWeb formular from whitch we extract the values correspounding to the specified term.
-     * @param queryable A map of queryable term and their correspounding paths.
-     * @param ordinal If we want only one value for a path we add an ordinal to select the value we want. else put -1.
-     *
-     * @return A string concataining the differents values correspounding to the specified term, coma separated.
-     */
-    private String getValues(final Form form, final List<String> paths) throws MD_IOException {
+    protected String getValues(final Form form, final List<String> paths) throws IndexingException {
         final StringBuilder response  = new StringBuilder();
-
-        if (paths != null) {
-            for (String fullPathID: paths) {
-                final List<Value> values = getValuesFromPathID(fullPathID, form);
-                for (final Value v: values) {
-                    //only handle textvalue
-                    if (!(v instanceof TextValue)) continue;
-                    
-                    final TextValue tv = (TextValue) v;
-                    response.append(getTextValueStringDescription(tv)).append(',');
-                }
-            }
-        }
-
-        if (response.length() == 0) {
-            response.append("null");
-        } else {
-            // we remove the last ','
-            response.deleteCharAt(response.length()-1);
-        }
-
-        return response.toString();
-    }
-
-    /**
-     * Return a string description for the specified terms.
-     *
-     * @param form An MDWeb formular from whitch we extract the values correspounding to the specified term.
-     * @param ordinal If we want only one value for a path we add an ordinal to select the value we want. else put -1.
-     *
-     * @return A string concataining the differents values correspounding to the specified term, coma separated.
-     */
-    @Override
-    protected List<Double> extractPositions(final Form form, final List<String> paths) throws IndexingException {
-        final List<Double> response   = new ArrayList<Double>();
         if (paths != null) {
             for (String fullPathID: paths) {
                 try {
@@ -423,24 +308,23 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                     for (final Value v: values) {
                         //only handle textvalue
                         if (!(v instanceof TextValue)) continue;
+
                         final TextValue tv = (TextValue) v;
-                        final String value = getTextValueStringDescription(tv);
-                        if (value != null) {
-                            try {
-                                response.add(Double.parseDouble(value));
-                            } catch (NumberFormatException e) {
-                                LOGGER.warning("unable to spatially index form: " + form.getTitle() + "\n cause:  unable to parse double: " + value);
-                            }
-                        }
+                        response.append(getTextValueStringDescription(tv)).append(',');
                     }
                 } catch (MD_IOException ex) {
-                    throw new IndexingException("MD_IO exception while getValue from pathID", ex);
+                    throw new IndexingException("MD_IO exception while get values from path", ex);
                 }
             }
         }
-        return response;
+        if (response.length() == 0) {
+            response.append("null");
+        } else {
+            // we remove the last ','
+            response.deleteCharAt(response.length()-1);
+        }
+        return response.toString();
     }
-
 
     /**
      * Return the String description of An MDWeb textValue :
