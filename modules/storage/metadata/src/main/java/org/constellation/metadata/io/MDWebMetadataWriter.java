@@ -67,6 +67,7 @@ import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Writer20;
 import org.mdweb.io.Writer;
 import org.mdweb.io.sql.v21.Writer21;
+import org.mdweb.model.storage.FormInfo;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
 
 /**
@@ -481,21 +482,21 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             
             final TextValue textValue = new TextValue(path, form , ordinal, value, classe, parentValue);
             result.add(textValue);
-            LOGGER.finer("new TextValue: " + path.toString() + " classe:" + classe.getName() + " value=" + object + " ordinal=" + ordinal);
+            LOGGER.finer("new TextValue: " + path.getId() + " classe:" + classe.getName() + " value=" + object + " ordinal=" + ordinal);
         
         // if we have already see this object we build a Linked Value.
         } else if (linkedValue != null) {
             
             final LinkedValue value = new LinkedValue(path, form, ordinal, form, linkedValue, classe, parentValue);
             result.add(value);
-            LOGGER.finer("new LinkedValue: " + path.toString() + " classe:" + classe.getName() + " linkedValue=" + linkedValue.getIdValue() + " ordinal=" + ordinal);
+            LOGGER.finer("new LinkedValue: " + path.getId() + " classe:" + classe.getName() + " linkedValue=" + linkedValue.getIdValue() + " ordinal=" + ordinal);
         
         // else we build a Value node.
         } else {
         
             final Value value = new Value(path, form, ordinal, classe, parentValue);
             result.add(value);
-            LOGGER.finer("new Value: " + path.toString() + " classe:" + classe.getName() + " ordinal=" + ordinal);
+            LOGGER.finer("new Value: " + path.getId() + " classe:" + classe.getName() + " ordinal=" + ordinal);
             //we add this object to the listed of already write element
             alreadyWrite.put(object, value);
             
@@ -980,9 +981,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         //we parse the identifier (Form_ID:RecordSet_Code)
         try  {
             if (identifier.indexOf(':') != -1) {
-                recordSetCode    = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
-                identifier = identifier.substring(0, identifier.indexOf(':'));
-                id         = Integer.parseInt(identifier);
+                recordSetCode = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
+                identifier    = identifier.substring(0, identifier.indexOf(':'));
+                id            = Integer.parseInt(identifier);
             } else {
                 throw new NumberFormatException();
             }
@@ -990,10 +991,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
              throw new MetadataIoException("Unable to parse: " + identifier, null, "id");
         }
         try {
+            // TODO is a way more fast to know that the form exist?
             final RecordSet recordSet = mdWriter.getRecordSet(recordSetCode);
-            final Form f          = mdWriter.getForm(recordSet, id);
+            FormInfo f                = mdWriter.getFormInfo(recordSet, id);
             if (f != null) {
-                mdWriter.deleteForm(f.getId());
+                mdWriter.deleteForm(id);
             } else {
                 LOGGER.log(logLevel, "The sensor is not registered, nothing to delete");
                 return false;

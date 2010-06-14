@@ -31,7 +31,6 @@ import org.apache.lucene.search.Filter;
 
 // constellation dependencies
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.csw.xml.QueryConstraint;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.metadata.CSWConstants.*;
 
@@ -83,23 +82,9 @@ public class SQLFilterParser extends FilterParser {
     
     private boolean executeSelect;
     
-    /**
-     * Build a lucene request from the specified constraint
-     * 
-     * @param constraint a constraint expressed in CQL or FilterType
-     */
     @Override
-    public SQLQuery getQuery(final QueryConstraint constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
-        this.setVariables(variables);
-        this.setPrefixs(prefixs);
-        FilterType filter = null;
-        //if the constraint is null we make a null filter
-        if (constraint == null)  {
-            return new SQLQuery("Select \"identifier\", \"catalog\" from \"Forms\" where \"catalog\" != 'MDATA");
-        } else {
-            filter = getFilterFromConstraint(constraint);
-        }
-        return getSqlQuery(filter);
+    protected SQLQuery getNullFilter() {
+        return new SQLQuery("Select \"identifier\", \"catalog\" from \"Forms\" where \"catalog\" != 'MDATA");
     }
     
      /**
@@ -107,10 +92,12 @@ public class SQLFilterParser extends FilterParser {
      * 
      * @param filter a Filter object build directly from the XML or from a CQL request
      */
-    public SQLQuery getSqlQuery(final FilterType filter) throws CstlServiceException {
-        
-        SQLQuery response = null;
+    @Override
+    protected SQLQuery getQuery(final FilterType filter, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
+        this.variables    = variables;
+        this.prefixs      = prefixs;
         executeSelect     = true;
+        SQLQuery response = null;
         if (filter != null) { 
             // we treat logical Operators like AND, OR, ...
             if (filter.getLogicOps() != null) {
@@ -506,13 +493,5 @@ public class SQLFilterParser extends FilterParser {
             }
         } 
         return null;
-    }
-
-    public void setVariables(Map<String, QName> variables) {
-        this.variables = variables;
-    }
-
-    public void setPrefixs(Map<String, String> prefixs) {
-        this.prefixs = prefixs;
     }
 }

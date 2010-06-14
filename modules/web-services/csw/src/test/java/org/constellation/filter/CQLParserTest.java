@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 // Geotools dependencies
 
 // JUnit dependencies
+import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
@@ -80,15 +81,15 @@ public class CQLParserTest {
         /**
          * Test 1: PropertyIsLike 
          */
-        
-        FilterType filter = FilterParser.cqlToFilter("Title LIKE 'VM%'");
+        String cql = "Title LIKE 'VM%'";
+        FilterType filter = FilterParser.cqlToFilter(cql);
         
         assertNotNull(filter.getComparisonOps());
         assertNull(filter.getLogicOps());
         assertEquals(0, filter.getId().size() );
         assertNull(filter.getSpatialOps());
         
-        SpatialQuery spaQuery = filterParser.getLuceneQuery(filter);
+        SpatialQuery spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -97,8 +98,9 @@ public class CQLParserTest {
         /**
          *  Test 2: PropertyIsEquals
          */
-        
-        filter = FilterParser.cqlToFilter("Title ='VM'");
+
+        cql = "Title ='VM'";
+        filter = FilterParser.cqlToFilter(cql);
         
         
         assertNotNull(filter.getComparisonOps());
@@ -106,7 +108,7 @@ public class CQLParserTest {
         assertEquals(0, filter.getId().size() );
         assertNull(filter.getSpatialOps());
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -115,15 +117,15 @@ public class CQLParserTest {
         /**
          *  Test 3: PropertyIsNotEquals
          */
-        
-        filter =FilterParser.cqlToFilter("Title <>'VM'");
+        cql = "Title <>'VM'";
+        filter =FilterParser.cqlToFilter(cql);
         
         assertNull(filter.getComparisonOps());
         assertNotNull(filter.getLogicOps());
         assertEquals(0, filter.getId().size() );
         assertNull(filter.getSpatialOps());
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -132,15 +134,16 @@ public class CQLParserTest {
         
         /**
          * Test 4: PropertyIsNull
-         */ 
-        filter = FilterParser.cqlToFilter("Title IS NULL");
+         */
+        cql = "Title IS NULL";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertNotNull(filter.getComparisonOps());
         assertNull(filter.getLogicOps());
         assertEquals(0, filter.getId().size() );
         assertNull(filter.getSpatialOps());
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -149,14 +152,15 @@ public class CQLParserTest {
         /**
          * Test 5: PropertyIsGreaterThan
          */
-        filter = FilterParser.cqlToFilter("CreationDate AFTER 2007-06-02T00:00:00Z");
+        cql = "CreationDate AFTER 2007-06-02T00:00:00Z";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertNotNull(filter.getComparisonOps());
         assertNull(filter.getLogicOps());
         assertEquals(0, filter.getId().size() );
         assertNull(filter.getSpatialOps());
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertNull(spaQuery.getSpatialFilter());
         assertEquals(0, spaQuery.getSubQueries().size());
@@ -165,14 +169,15 @@ public class CQLParserTest {
          /**
          * Test 6: PropertyIsLessThan
          */
-        filter = FilterParser.cqlToFilter("CreationDate BEFORE 2007-06-02T00:00:00Z");
+        cql = "CreationDate BEFORE 2007-06-02T00:00:00Z";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertNotNull(filter.getComparisonOps());
         assertNull(filter.getLogicOps());
         assertEquals(0, filter.getId().size() );
         assertNull(filter.getSpatialOps());
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertNull(spaQuery.getSpatialFilter());
         assertEquals(0, spaQuery.getSubQueries().size());
@@ -190,14 +195,15 @@ public class CQLParserTest {
         /**
          * Test 1: AND between two propertyIsEqualTo 
          */
-        FilterType filter = FilterParser.cqlToFilter("Title = 'starship trooper' AND Author = 'Timothee Gustave'");
+        String cql = "Title = 'starship trooper' AND Author = 'Timothee Gustave'";
+        FilterType filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        SpatialQuery spaQuery = filterParser.getLuceneQuery(filter);
+        SpatialQuery spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -207,15 +213,15 @@ public class CQLParserTest {
         /**
          * Test 2: OR between two propertyIsEqualTo 
          */
-        
-        filter = FilterParser.cqlToFilter("Title = 'starship trooper' OR Author = 'Timothee Gustave'");
+        cql = "Title = 'starship trooper' OR Author = 'Timothee Gustave'";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -224,14 +230,15 @@ public class CQLParserTest {
         /**
          * Test 3:  OR between three propertyIsEqualTo 
          */
-        filter = FilterParser.cqlToFilter("Title = 'starship trooper' OR Author = 'Timothee Gustave' OR Id = '268'");
+        cql = "Title = 'starship trooper' OR Author = 'Timothee Gustave' OR Id = '268'";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -240,15 +247,15 @@ public class CQLParserTest {
         /**
          * Test 4: Not propertyIsEqualTo 
          */
-        
-        filter = FilterParser.cqlToFilter("NOT Title = 'starship trooper'");
+        cql = "NOT Title = 'starship trooper'";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -258,15 +265,15 @@ public class CQLParserTest {
         /**
          * Test 5: AND between two propertyIsEqualTo and OR NOT with a third propertyIsEqualsTo
          */
-
-        filter = FilterParser.cqlToFilter("(Title = 'starship trooper' AND Author = 'Timothee Gustave') OR NOT Title = 'pedro'");
+        cql = "(Title = 'starship trooper' AND Author = 'Timothee Gustave') OR NOT Title = 'pedro'";
+        filter = FilterParser.cqlToFilter(cql);
 
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 1);
@@ -278,15 +285,15 @@ public class CQLParserTest {
         /**
          * Test 6: OR between two propertyIsEqualTo and AND NOT with a third propertyIsEqualsTo
          */
-
-        filter = FilterParser.cqlToFilter("(Title = 'starship trooper' OR Author = 'Timothee Gustave') AND NOT Title = 'pedro'");
+        cql = "(Title = 'starship trooper' OR Author = 'Timothee Gustave') AND NOT Title = 'pedro'";
+        filter = FilterParser.cqlToFilter(cql);
 
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 1);
@@ -298,15 +305,15 @@ public class CQLParserTest {
         /**
          * Test 7: AND between two NOT propertyIsEqualTo
          */
-
-        filter = FilterParser.cqlToFilter("NOT Title = 'starship trooper' AND NOT Author = 'Timothee Gustave'");
+        cql = "NOT Title = 'starship trooper' AND NOT Author = 'Timothee Gustave'";
+        filter = FilterParser.cqlToFilter(cql);
 
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 2);
@@ -320,15 +327,15 @@ public class CQLParserTest {
         /**
          * Test 8: OR between two NOT propertyIsEqualTo
          */
-
-        filter = FilterParser.cqlToFilter("NOT Title = 'starship trooper' OR NOT Author = 'Timothee Gustave'");
+        cql = "NOT Title = 'starship trooper' OR NOT Author = 'Timothee Gustave'";
+        filter = FilterParser.cqlToFilter(cql);
 
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
 
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
 
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 2);
@@ -352,14 +359,15 @@ public class CQLParserTest {
         /**
          * Test 1: a simple spatial Filter Intersects 
          */
-        FilterType filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.42)) ");
+        String cql = "INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.42)) ";
+        FilterType filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        SpatialQuery spaQuery = filterParser.getLuceneQuery(filter);
+        SpatialQuery spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -373,14 +381,15 @@ public class CQLParserTest {
         /**
          * Test 2: a simple Distance Filter DWithin
          */
-        filter = FilterParser.cqlToFilter("DWITHIN(BoundingBox, POINT(12.1 28.9), 10, meters)");
+        cql = "DWITHIN(BoundingBox, POINT(12.1 28.9), 10, meters)";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -397,14 +406,15 @@ public class CQLParserTest {
         /**
          * Test 3: a simple Distance Filter Beyond
          */
-        filter = FilterParser.cqlToFilter("BEYOND(BoundingBox, POINT(12.1 28.9), 10, meters)");
+        cql = "BEYOND(BoundingBox, POINT(12.1 28.9), 10, meters)";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -420,14 +430,15 @@ public class CQLParserTest {
         /**
          * Test 4: a simple BBOX filter
          */
-        filter = FilterParser.cqlToFilter("BBOX(BoundingBox, 10,20,30,40)");
+        cql = "BBOX(BoundingBox, 10,20,30,40)";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -442,14 +453,15 @@ public class CQLParserTest {
         /**
          * Test 4: a simple Contains filter
          */
-        filter = FilterParser.cqlToFilter("CONTAINS(BoundingBox, POINT(14.05 46.46))");
+        cql = "CONTAINS(BoundingBox, POINT(14.05 46.46))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -463,14 +475,15 @@ public class CQLParserTest {
         /**
          * Test 5: a simple Contains filter
          */
-        filter = FilterParser.cqlToFilter("CONTAINS(BoundingBox, LINESTRING(1 2, 10 15))");
+        cql = "CONTAINS(BoundingBox, LINESTRING(1 2, 10 15))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -484,14 +497,15 @@ public class CQLParserTest {
         /*
          * Test 6: a simple Contains filter
          */
-        filter = FilterParser.cqlToFilter("CONTAINS(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        cql = "CONTAINS(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -505,14 +519,15 @@ public class CQLParserTest {
          /**
          * Test 7: a simple Crosses filter
          */
-        filter = FilterParser.cqlToFilter("CROSS(BoundingBox, POINT(14.05 46.46))");
+        cql = "CROSS(BoundingBox, POINT(14.05 46.46))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -526,14 +541,15 @@ public class CQLParserTest {
         /**
          * Test 8: a simple Crosses filter
          */
-        filter = FilterParser.cqlToFilter("CROSS(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        cql = "CROSS(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -547,14 +563,15 @@ public class CQLParserTest {
         /**
          * Test 9: a simple Disjoint filter
          */
-        filter = FilterParser.cqlToFilter("DISJOINT(BoundingBox, POINT(14.05 46.46))");
+        cql = "DISJOINT(BoundingBox, POINT(14.05 46.46))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -568,14 +585,15 @@ public class CQLParserTest {
         /**
          * Test 10: a simple Disjoint filter
          */
-        filter = FilterParser.cqlToFilter("DISJOINT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        cql = "DISJOINT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -589,14 +607,15 @@ public class CQLParserTest {
         /**
          * Test 11: a simple Equals filter
          */
-        filter = FilterParser.cqlToFilter("EQUAL(BoundingBox, POINT(14.05 46.46))");
+        cql = "EQUAL(BoundingBox, POINT(14.05 46.46))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -610,14 +629,15 @@ public class CQLParserTest {
         /**
          * Test 12: a simple Equals filter
          */
-        filter = FilterParser.cqlToFilter("EQUAL(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        cql = "EQUAL(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -631,14 +651,15 @@ public class CQLParserTest {
         /**
          * Test 13: a simple Overlaps filter
          */
-        filter = FilterParser.cqlToFilter("OVERLAP(BoundingBox, POINT(14.05 46.46))");
+        cql = "OVERLAP(BoundingBox, POINT(14.05 46.46))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -652,14 +673,15 @@ public class CQLParserTest {
         /**
          * Test 14: a simple Overlaps filter
          */
-        filter = FilterParser.cqlToFilter("OVERLAP(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        cql = "OVERLAP(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -673,14 +695,15 @@ public class CQLParserTest {
         /**
          * Test 15: a simple Touches filter
          */
-        filter = FilterParser.cqlToFilter("TOUCH(BoundingBox, POINT(14.05 46.46))");
+        cql = "TOUCH(BoundingBox, POINT(14.05 46.46))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -694,14 +717,15 @@ public class CQLParserTest {
         /**
          * Test 16: a simple Touches filter
          */
-        filter = FilterParser.cqlToFilter("TOUCH(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        cql = "TOUCH(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -715,14 +739,15 @@ public class CQLParserTest {
         /**
          * Test 17: a simple Within filter
          */
-        filter = FilterParser.cqlToFilter("WITHIN(BoundingBox, POINT(14.05 46.46))");
+        cql = "WITHIN(BoundingBox, POINT(14.05 46.46))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -736,14 +761,15 @@ public class CQLParserTest {
         /**
          * Test 18: a simple Within filter
          */
-        filter = FilterParser.cqlToFilter("WITHIN(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        cql = "WITHIN(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      == null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    != null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -766,14 +792,15 @@ public class CQLParserTest {
         /**
          * Test 1: two spatial Filter with AND 
          */
-        FilterType filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND OVERLAP(BoundingBox, ENVELOPE(22.07, 60.23, 11.69, 73.48))");
+        String cql = "INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND OVERLAP(BoundingBox, ENVELOPE(22.07, 60.23, 11.69, 73.48))";
+        FilterType filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        SpatialQuery spaQuery = filterParser.getLuceneQuery(filter);
+        SpatialQuery spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -789,15 +816,15 @@ public class CQLParserTest {
         /**
          * Test 2: three spatial Filter with OR 
          */
-
-        filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR CONTAINS(BoundingBox, POINT(22.07 60.23)) OR BBOX(BoundingBox, 10,20,30,40)");
+        cql = "INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR CONTAINS(BoundingBox, POINT(22.07 60.23)) OR BBOX(BoundingBox, 10,20,30,40)";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(metafile:doc)");
@@ -833,8 +860,8 @@ public class CQLParserTest {
         /**
          * Test 3: three spatial Filter F1 AND (F2 OR F3)
          */
-
-        filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND (CONTAINS(BoundingBox, POINT(22.07 60.23)) OR BBOX(BoundingBox, 10,20,30,40))");
+        cql = "INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND (CONTAINS(BoundingBox, POINT(22.07 60.23)) OR BBOX(BoundingBox, 10,20,30,40))";
+        filter = FilterParser.cqlToFilter(cql);
         
         
         assertTrue(filter.getComparisonOps() == null);
@@ -842,7 +869,7 @@ public class CQLParserTest {
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(metafile:doc)");
@@ -874,15 +901,15 @@ public class CQLParserTest {
          /**
          * Test 4: three spatial Filter (NOT F1) AND F2 AND F3
          */
-       
-        filter = FilterParser.cqlToFilter("NOT INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND CONTAINS(BoundingBox, POINT(22.07 60.23)) AND BBOX(BoundingBox, 10,20,30,40)");
+        cql = "NOT INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND CONTAINS(BoundingBox, POINT(22.07 60.23)) AND BBOX(BoundingBox, 10,20,30,40)";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
 
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -917,8 +944,8 @@ public class CQLParserTest {
         /**
          * Test 5: three spatial Filter NOT (F1 OR F2) AND F3
          */
-        
-        filter = FilterParser.cqlToFilter("NOT (INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR CONTAINS(BoundingBox, POINT(22.07 60.23))) AND BBOX(BoundingBox, 10,20,30,40)");
+        cql = "NOT (INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR CONTAINS(BoundingBox, POINT(22.07 60.23))) AND BBOX(BoundingBox, 10,20,30,40)";
+        filter = FilterParser.cqlToFilter(cql);
         
         
         assertTrue(filter.getComparisonOps() == null);
@@ -926,7 +953,7 @@ public class CQLParserTest {
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(metafile:doc)");
@@ -975,15 +1002,15 @@ public class CQLParserTest {
         /**
          * Test 1: PropertyIsLike AND INTERSECT 
          */
-        
-        FilterType filter = FilterParser.cqlToFilter("Title LIKE '%VM%' AND INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))");
+        String cql = "Title LIKE '%VM%' AND INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26))";
+        FilterType filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        SpatialQuery spaQuery = filterParser.getLuceneQuery(filter);
+        SpatialQuery spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "(Title:*VM*)");
@@ -997,15 +1024,15 @@ public class CQLParserTest {
         /**
          * Test 2: PropertyIsLike AND INTERSECT AND propertyIsEquals
          */
-        
-        filter = FilterParser.cqlToFilter("Title LIKE '%VM%' AND INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND Title = 'VM'");
+        cql = "Title LIKE '%VM%' AND INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND Title = 'VM'";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getQuery(), "(Title:\"VM\")");
@@ -1025,15 +1052,15 @@ public class CQLParserTest {
         /**
          * Test 3:  INTERSECT AND propertyIsEquals AND BBOX
          */
-        
-        filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND Title = 'VM' AND BBOX(BoundingBox, 10,20,30,40)");
+        cql =  "INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND Title = 'VM' AND BBOX(BoundingBox, 10,20,30,40)";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getSubQueries().size(), 1);
@@ -1053,7 +1080,8 @@ public class CQLParserTest {
         /**
          * Test 4: PropertyIsLike OR INTERSECT OR propertyIsEquals
          */
-        filter = FilterParser.cqlToFilter("Title LIKE '%VM%' OR INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR Title = 'VM'");
+        cql = "Title LIKE '%VM%' OR INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR Title = 'VM'";
+        filter = FilterParser.cqlToFilter(cql);
         
         
         assertTrue(filter.getComparisonOps() == null);
@@ -1061,7 +1089,7 @@ public class CQLParserTest {
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getQuery(), "(Title:\"VM\")");
@@ -1080,8 +1108,8 @@ public class CQLParserTest {
         /**
          * Test 5:  INTERSECT OR propertyIsEquals OR BBOX
          */
-        
-        filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR Title = 'VM' OR BBOX(BoundingBox, 10,20,30,40)");
+        cql = "INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) OR Title = 'VM' OR BBOX(BoundingBox, 10,20,30,40)";
+        filter = FilterParser.cqlToFilter(cql);
         
         
         assertTrue(filter.getComparisonOps() == null);
@@ -1089,7 +1117,7 @@ public class CQLParserTest {
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getSubQueries().size(), 1);
@@ -1112,15 +1140,15 @@ public class CQLParserTest {
         /**
          * Test 6:  INTERSECT AND (propertyIsEquals OR BBOX)
          */
-        
-        filter = FilterParser.cqlToFilter("INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND (Title = 'VM' OR BBOX(BoundingBox, 10,20,30,40))");
+        cql = "INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND (Title = 'VM' OR BBOX(BoundingBox, 10,20,30,40))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() != null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");
@@ -1147,15 +1175,15 @@ public class CQLParserTest {
         /**
          * Test 7:  propertyIsEquals OR (propertyIsLike AND BBOX)
          */
-        
-        filter = FilterParser.cqlToFilter("Title = 'VMAI' OR (Title LIKE 'LO?Li' AND DWITHIN(BoundingBox, POINT(12.1 28.9), 10, meters))");
+        cql = "Title = 'VMAI' OR (Title LIKE 'LO?Li' AND DWITHIN(BoundingBox, POINT(12.1 28.9), 10, meters))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getQuery(), "(Title:\"VMAI\")");
@@ -1230,15 +1258,15 @@ public class CQLParserTest {
     </And>
 </Filter>
          */
-        
-        filter = FilterParser.cqlToFilter("Title Like '%VM%' AND INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND (Title = 'PLOUF' OR BBOX(BoundingBox, 10,20,30,40)) AND (Title = 'VMAI' OR (BEYOND(BoundingBox, POINT(14.05 46.46), 10, meters) AND Title LIKE 'LO?Li'))");
+        cql = "Title Like '%VM%' AND INTERSECT(BoundingBox, ENVELOPE(14.05, 46.46, 17.24, 48.26)) AND (Title = 'PLOUF' OR BBOX(BoundingBox, 10,20,30,40)) AND (Title = 'VMAI' OR (BEYOND(BoundingBox, POINT(14.05 46.46), 10, meters) AND Title LIKE 'LO?Li'))";
+        filter = FilterParser.cqlToFilter(cql);
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getLuceneQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getQuery(), "metafile:doc");

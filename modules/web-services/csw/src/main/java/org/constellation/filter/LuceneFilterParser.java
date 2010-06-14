@@ -36,7 +36,6 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import org.apache.lucene.search.Filter;
 
 // geotoolkit dependencies
-import org.geotoolkit.csw.xml.QueryConstraint;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.ogc.xml.v110.AbstractIdType;
@@ -65,36 +64,21 @@ public class LuceneFilterParser extends FilterParser {
 
     private final static String DEFAULT_FIELD = "metafile:doc";
 
-    /**
-     * Build a lucene request from the specified constraint
-     * 
-     * @param constraint a constraint expressed in CQL or FilterType
-     */
     @Override
-    public SpatialQuery getQuery(final QueryConstraint constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
-        FilterType filter = null;
-        //if the constraint is null we make a null filter
-        if (constraint == null)  {
-            final Filter nullFilter = null;
-            return new SpatialQuery(DEFAULT_FIELD, nullFilter, SerialChainFilter.AND);
-        } else {
-            filter = getFilterFromConstraint(constraint);
-        }
-        return getLuceneQuery(filter);
+    protected SpatialQuery getNullFilter() {
+        final Filter nullFilter = null;
+        return new SpatialQuery(DEFAULT_FIELD, nullFilter, SerialChainFilter.AND);
     }
-    
     
      /**
      * Build a lucene request from the specified Filter.
      * 
      * @param filter a Filter object build directly from the XML or from a CQL request
      */
-    public SpatialQuery getLuceneQuery(final FilterType filter) throws CstlServiceException {
-        
-        SpatialQuery response   = null;
-        //for ambigous purpose
-        final Filter nullFilter = null;
-        
+    @Override
+    protected SpatialQuery getQuery(final FilterType filter, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
+
+        SpatialQuery response = null;
         if (filter != null) { 
             // we treat logical Operators like AND, OR, ...
             if (filter.getLogicOps() != null) {
@@ -102,14 +86,14 @@ public class LuceneFilterParser extends FilterParser {
             
             // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
             } else if (filter.getComparisonOps() != null) {
-                response = new SpatialQuery(treatComparisonOperator(filter.getComparisonOps()), nullFilter, SerialChainFilter.AND);
+                response = new SpatialQuery(treatComparisonOperator(filter.getComparisonOps()), null, SerialChainFilter.AND);
                 
             // we treat spatial constraint : BBOX, Beyond, Overlaps, ...    
             } else if (filter.getSpatialOps() != null) {
                 response = new SpatialQuery("", treatSpatialOperator(filter.getSpatialOps()), SerialChainFilter.AND);
                 
             } else if (filter.getId() != null) {
-                response = new SpatialQuery(treatIDOperator(filter.getId()), nullFilter, SerialChainFilter.AND);
+                response = new SpatialQuery(treatIDOperator(filter.getId()), null, SerialChainFilter.AND);
             }  
         }
         return response;

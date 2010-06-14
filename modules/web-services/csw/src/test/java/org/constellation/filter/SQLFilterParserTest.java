@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
+import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
@@ -74,12 +75,12 @@ public class SQLFilterParserTest {
     public void simpleComparisonFilterTest() throws Exception {
         Map<String, String> prefixs = new HashMap<String, String>();
         prefixs.put("rim", "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5");
-        filterParser.setPrefixs(prefixs);
+        //filterParser.setPrefixs(prefixs);
         
         Map<String, QName> variables = new HashMap<String, QName>();
         variables.put("e1", _ExtrinsicObject25_QNAME);
         variables.put("a1", _Association25_QNAME);
-        filterParser.setVariables(variables);
+        //filterParser.setVariables(variables);
         /**
          * Test 1: a simple Filter propertyIsLike 
          */
@@ -113,7 +114,7 @@ public class SQLFilterParserTest {
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        SQLQuery spaQuery = filterParser.getSqlQuery(filter);
+        SQLQuery spaQuery = filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), variables, prefixs);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
@@ -160,7 +161,7 @@ public class SQLFilterParserTest {
         assertTrue(filter.getId().size()     == 0   );
         assertTrue(filter.getSpatialOps()    == null);
         
-        spaQuery = filterParser.getSqlQuery(filter);
+        spaQuery = filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), variables, prefixs);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);

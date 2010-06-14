@@ -111,8 +111,25 @@ public abstract class FilterParser {
         }
         return result;
     }
+
+    /**
+     * Build a request from the specified constraint
+     *
+     * @param constraint a constraint expressed in CQL or FilterType
+     */
+    public Object getQuery(final QueryConstraint constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException {
+        //if the constraint is null we make a null filter
+        if (constraint == null)  {
+            return getNullFilter();
+        } else {
+            final FilterType filter = getFilterFromConstraint(constraint);
+            return getQuery(filter, variables, prefixs);
+        }
+    }
+
+    protected abstract Object getNullFilter();
     
-    public abstract Object getQuery(final QueryConstraint constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException;
+    protected abstract Object getQuery(final FilterType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException;
     
     protected abstract Object treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws CstlServiceException;
     
