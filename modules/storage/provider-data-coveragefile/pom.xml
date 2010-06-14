@@ -60,11 +60,6 @@
         <artifactId>geotk-go2-style-extension</artifactId>
     </dependency>
 
-    <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-coverageio-dimap</artifactId>
-    </dependency>
-
   </dependencies>
 
 </project>
