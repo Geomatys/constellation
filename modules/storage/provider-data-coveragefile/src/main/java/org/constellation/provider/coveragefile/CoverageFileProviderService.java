@@ -16,7 +16,6 @@
  */
 package org.constellation.provider.coveragefile;
 
-import org.geotoolkit.image.io.plugin.DimapImageReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -58,7 +57,7 @@ public class CoverageFileProviderService extends AbstractProviderService<Name,La
         Registry.setDefaultCodecPreferences();
         WorldFileImageReader.Spi.registerDefaults(null);
         WorldFileImageWriter.Spi.registerDefaults(null);
-        DimapImageReader.Spi.registerDefaults(null);
+        //DimapImageReader.Spi.registerDefaults(null);
     }
 
     public CoverageFileProviderService(){
