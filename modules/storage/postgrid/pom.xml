@@ -91,10 +91,6 @@
     </dependency>
     <dependency>
       <groupId>org.geotoolkit.pending</groupId>
-      <artifactId>geotk-coverageio-pending</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-go2</artifactId>
     </dependency>
     <dependency>

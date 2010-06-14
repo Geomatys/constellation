@@ -425,11 +425,6 @@
       </dependency>
       <dependency>
         <groupId>org.geotoolkit.pending</groupId>
-        <artifactId>geotk-coverageio-pending</artifactId>
-        <version>${geotoolkit-pending.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-spatial-lucene</artifactId>
         <version>${geotoolkit-pending.version}</version>
       </dependency>
