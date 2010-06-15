@@ -99,7 +99,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     /**
      * A map recording the binding between java Class and MDWeb classe 
      */
-    private Map<Class, Classe> classBinding;
+    private Map<String, Classe> classBinding;
     
     /**
      * A List of the already see object for the current metadata readed
@@ -159,7 +159,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                                            "cause:" + ex.getMessage());
         }
         
-        this.classBinding = new HashMap<Class, Classe>();
+        this.classBinding = new HashMap<String, Classe>();
         this.alreadyWrite = new HashMap<Object, Value>();
     }
 
@@ -177,7 +177,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             throw new MetadataIoException("MD_IOException while getting the catalog and user:" +'\n'+
                                            "cause:" + ex.getMessage());
         }
-        this.classBinding = new HashMap<Class, Classe>();
+        this.classBinding = new HashMap<String, Classe>();
         this.alreadyWrite = new HashMap<Object, Value>();
     }
 
@@ -612,7 +612,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         Classe result;
         if (object != null) {
             
-            result = classBinding.get(object.getClass());
+            result = classBinding.get(object.getClass().getName());
             if (result != null) {
                 return result;
             }
@@ -627,7 +627,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         //for the primitive type we return ISO primitive type
         result = getPrimitiveTypeFromName(className);
         if (result != null) {
-            classBinding.put(object.getClass(), result);
+            classBinding.put(object.getClass().getName(), result);
             return result;
         }
 
@@ -750,7 +750,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 result = mdWriter.getClasse(name, standard);
                 if (result != null) {
                     LOGGER.finer("class found:" + standard.getName() + ":" + name);
-                    classBinding.put(object.getClass(), result);
+                    classBinding.put(object.getClass().getName(), result);
                     return result;
                 } 
                 
@@ -911,8 +911,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         if (form != null) {
             try {
                 final long startWrite = System.currentTimeMillis();
-                final int result = mdWriter.writeForm(form, false, true);
-                writeTime  = System.currentTimeMillis() - startWrite;
+                final int result      = mdWriter.writeForm(form, false, true);
+                writeTime             = System.currentTimeMillis() - startWrite;
                 if (result == 1) {
                     LOGGER.log(logLevel, "The record have been skipped:" + form.getTitle());
                     return false;
@@ -991,7 +991,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
              throw new MetadataIoException("Unable to parse: " + identifier, null, "id");
         }
         try {
-            // TODO is a way more fast to know that the form exist?
+            // TODO is a way more fast to know that the form exist? method  isAlreadyRecordedForm(int id) writer20
             final RecordSet recordSet = mdWriter.getRecordSet(recordSetCode);
             FormInfo f                = mdWriter.getFormInfo(recordSet, id);
             if (f != null) {
