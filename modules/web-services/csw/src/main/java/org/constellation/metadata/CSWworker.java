@@ -282,7 +282,7 @@ public class CSWworker {
                 return;
             }
         }
-        LOGGER.finer("Path to config directory: " + configDir);
+        LOGGER.log(Level.FINER, "Path to config directory: {0}", configDir);
         isStarted = true;
         try {
             // we initialize the filterParsers
@@ -380,7 +380,7 @@ public class CSWworker {
 
         // we load the factory from the available classes
         final AbstractCSWFactory cswfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null,null);
-        LOGGER.finer("CSW factory loaded:" + cswfactory.getClass().getName());
+        LOGGER.log(Level.FINER, "CSW factory loaded:{0}", cswfactory.getClass().getName());
 
         final int datasourceType = configuration.getType();
         //we initialize all the data retriever (reader/writer) and index worker
@@ -444,7 +444,7 @@ public class CSWworker {
                 nbWord ++;
             }
             if (nbWord > 0) {
-                LOGGER.info(nbWord + " words put in pool.");
+                LOGGER.log(Level.INFO, "{0} words put in pool.", nbWord);
             }
         }
     }
@@ -485,7 +485,7 @@ public class CSWworker {
      */
     public Capabilities getCapabilities(final GetCapabilities requestCapabilities) throws CstlServiceException {
         isWorking();
-        LOGGER.log(logLevel, "getCapabilities request processing" + '\n');
+        LOGGER.log(logLevel, "getCapabilities request processing\n");
         final long startTime = System.currentTimeMillis();
         
         //we verify the base request attribute
@@ -570,12 +570,12 @@ public class CSWworker {
                 // we add the cascaded services (if there is some)
                 final DomainType cascadedCSW  = om.getConstraint("FederatedCatalogues");
                 if (cascadedCSW == null) {
-                    if (cascadedCSWservers != null && cascadedCSWservers.size() != 0) {
+                    if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty()) {
                         final DomainType fedCata = new DomainType("FederatedCatalogues", cascadedCSWservers);
                         om.getConstraint().add(fedCata);
                     }
                 } else {
-                    if (cascadedCSWservers != null && cascadedCSWservers.size() != 0)
+                    if (cascadedCSWservers != null && !cascadedCSWservers.isEmpty())
                         cascadedCSW.setValue(cascadedCSWservers);
                     else
                         om.removeConstraint(cascadedCSW);
@@ -679,7 +679,7 @@ public class CSWworker {
      *         an AcknowledgementType if the resultType is set to VALIDATE.
      */
     public Object getRecords(final GetRecordsRequest request) throws CstlServiceException {
-        LOGGER.log(logLevel, "GetRecords request processing" + '\n');
+        LOGGER.log(logLevel, "GetRecords request processing\n");
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         
@@ -720,7 +720,7 @@ public class CSWworker {
         if (request.getAbstractQuery() != null) {
             query = (QueryType)request.getAbstractQuery();
             typeNames =  query.getTypeNames();
-            if (typeNames == null || typeNames.size() == 0) {
+            if (typeNames == null || typeNames.isEmpty()) {
                 throw new CstlServiceException("The query must specify at least typeName.",
                                               INVALID_PARAMETER_VALUE, TYPENAMES);
             } else {
@@ -775,7 +775,7 @@ public class CSWworker {
         final List<QName> elementName = query.getElementName();
         if (setName != null) {
             set = setName.getValue();
-        } else if (elementName != null && elementName.size() != 0){
+        } else if (elementName != null && !elementName.isEmpty()){
             set = null;
         }
 
@@ -796,7 +796,7 @@ public class CSWworker {
            final SQLQuery sqlQuery = (SQLQuery) sqlFilterParser.getQuery(query.getConstraint(), variables, prefixs);
            
            // TODO sort not yet implemented
-           LOGGER.log(logLevel, "ebrim SQL query obtained:" + sqlQuery);
+           LOGGER.log(logLevel, "ebrim SQL query obtained:{0}", sqlQuery);
            try {
             // we try to execute the query
             results = mdReader.executeEbrimSQLQuery(sqlQuery.getQuery());
@@ -955,7 +955,7 @@ public class CSWworker {
      * @throws CstlServiceException
      */
     private List<String> executeLuceneQuery(final SpatialQuery query) throws CstlServiceException {
-        LOGGER.log(logLevel, "Lucene query obtained:" + query);
+        LOGGER.log(logLevel, "Lucene query obtained:{0}", query);
         try {
             return indexSearcher.doSearch(query);
         
@@ -990,7 +990,7 @@ public class CSWworker {
      * @return A GetRecordByIdResponse containing a list of records.
      */
     public GetRecordByIdResponse getRecordById(final GetRecordById request) throws CstlServiceException {
-        LOGGER.log(logLevel, "GetRecordById request processing" + '\n');
+        LOGGER.log(logLevel, "GetRecordById request processing\n");
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         
@@ -1014,7 +1014,7 @@ public class CSWworker {
             }
         }
         
-        if (request.getId().size() == 0)
+        if (request.getId().isEmpty())
             throw new CstlServiceException("You must specify at least one identifier",
                                           MISSING_PARAMETER_VALUE, "id");
         
@@ -1052,7 +1052,7 @@ public class CSWworker {
             id = executeIdentifierQuery(id);
             if (id == null) {
                 unexistingID.add(saved);
-                LOGGER.severe("unexisting id:" + saved);
+                LOGGER.log(Level.WARNING, "unexisting id:{0}", saved);
                 continue;
             }
 
@@ -1070,7 +1070,7 @@ public class CSWworker {
                         otherRecords.add(o);
                     }
                 } else {
-                    LOGGER.severe("The form " + id + " has not be read is null.");
+                    LOGGER.log(Level.WARNING, "The form {0} has not be read is null.", id);
                 }
             } catch (MetadataIoException ex) {
                 CodeList execptionCode = ex.getExceptionCode();
@@ -1122,7 +1122,7 @@ public class CSWworker {
      * @return
      */
     public DescribeRecordResponseType describeRecord(final DescribeRecord request) throws CstlServiceException{
-        LOGGER.log(logLevel, "DescribeRecords request processing" + '\n');
+        LOGGER.log(logLevel, "DescribeRecords request processing\n");
         final long startTime = System.currentTimeMillis();
         DescribeRecordResponseType response;
         Unmarshaller unmarshaller = null;
@@ -1135,7 +1135,7 @@ public class CSWworker {
         
             // we initialize the type names
             List<QName> typeNames = (List<QName>)request.getTypeName();
-            if (typeNames == null || typeNames.size() == 0) {
+            if (typeNames == null || typeNames.isEmpty()) {
                 typeNames = supportedTypeNames;
             }
             
@@ -1287,7 +1287,7 @@ public class CSWworker {
      * @return
      */
     public TransactionResponseType transaction(final Transaction request) throws CstlServiceException {
-        LOGGER.log(logLevel, "Transaction request processing" + '\n');
+        LOGGER.log(logLevel, "Transaction request processing\n");
         
         if (profile == DISCOVERY) {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
@@ -1370,10 +1370,10 @@ public class CSWworker {
                         throw new CstlServiceException("A constraint must be specified.",
                                 MISSING_PARAMETER_VALUE, "constraint");
                     }
-                    if (updateRequest.getAny() == null && updateRequest.getRecordProperty().size() == 0) {
+                    if (updateRequest.getAny() == null && updateRequest.getRecordProperty().isEmpty()) {
                         throw new CstlServiceException("The any part or a list od RecordProperty must be specified.",
                                 MISSING_PARAMETER_VALUE, "MD_Metadata");
-                    } else if (updateRequest.getAny() != null && updateRequest.getRecordProperty().size() != 0) {
+                    } else if (updateRequest.getAny() != null && !updateRequest.getRecordProperty().isEmpty()) {
                         throw new CstlServiceException("You must choose between the any part or a list of RecordProperty, you can't specify both.",
                                 MISSING_PARAMETER_VALUE, "MD_Metadata");
                     }
@@ -1444,7 +1444,7 @@ public class CSWworker {
      * @return
      */
     public HarvestResponseType harvest(final Harvest request) throws CstlServiceException {
-        LOGGER.log(logLevel, "Harvest request processing" + '\n');
+        LOGGER.log(logLevel, "Harvest request processing\n");
         if (profile == DISCOVERY) {
             throw new CstlServiceException("This method is not supported by this mode of CSW",
                                           OPERATION_NOT_SUPPORTED, "Request");
@@ -1478,7 +1478,7 @@ public class CSWworker {
                 }
 
                 //mode synchronous
-                if (request.getResponseHandler().size() == 0) {
+                if (request.getResponseHandler().isEmpty()) {
 
                     // if the resource is a simple record
                     if (mode == 0) {
@@ -1670,9 +1670,9 @@ public class CSWworker {
             handler.setFormatter(new MonolineFormatter(handler));
             LOGGER.addHandler(handler);
         } catch (IOException ex) {
-            LOGGER.severe("IO exception while trying to separate CSW Logs:" + ex.getMessage());
+            LOGGER.log(Level.SEVERE, "IO exception while trying to separate CSW Logs:{0}", ex.getMessage());
         } catch (SecurityException ex) {
-            LOGGER.severe("Security exception while trying to separate CSW Logs" + ex.getMessage());
+            LOGGER.log(Level.SEVERE, "Security exception while trying to separate CSW Logs{0}", ex.getMessage());
         }
     }
 
@@ -1704,7 +1704,7 @@ public class CSWworker {
         }
 
         if (configDir != null) {
-            LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
+            LOGGER.log(Level.INFO, "taking configuration from constellation directory: {0}", configDir.getPath());
         }
         return configDir;
     }

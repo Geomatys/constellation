@@ -31,35 +31,27 @@ import org.apache.lucene.search.Filter;
 
 // constellation dependencies
 import org.constellation.ws.CstlServiceException;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.constellation.metadata.CSWConstants.*;
 
 // Geotoolkit dependencies
-
-// MDWeb dependencies
-
 import org.geotoolkit.lucene.filter.SerialChainFilter;
-
-import org.geotoolkit.ogc.xml.v110.AbstractIdType;
-
 import org.geotoolkit.ogc.xml.v110.BinaryComparisonOpType;
 import org.geotoolkit.ogc.xml.v110.BinaryLogicOpType;
-
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
-
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsNullType;
-
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 import org.geotoolkit.temporal.object.TemporalUtilities;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+// MDWeb dependencies
 import org.mdweb.model.schemas.Standard;
 
-;
 
 /**
  * A parser for filter 1.1.0 and CQL 2.0
@@ -169,8 +161,7 @@ public class SQLFilterParser extends FilterParser {
                 final Filter subFilter = query.getSpatialFilter();
                     
                 //if the sub spatial query contains both term search and spatial search we create a subQuery 
-                if ((subFilter != null && !subQuery.isEmpty())
-                    || query.getSubQueries().size() != 0) {
+                if ((subFilter != null && !subQuery.isEmpty()) || !query.getSubQueries().isEmpty()) {
                         
                     subQueries.add(query);
                     writeOperator = false;
@@ -347,81 +338,25 @@ public class SQLFilterParser extends FilterParser {
                 throw new CstlServiceException("A binary comparison operator must be constitued of a literal and a property name.",
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } else {
+                final String literalValue = literal.getStringValue();
+
                 if (operator.equals("PropertyIsEqualTo")) {                
-                    response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
-                    response.append('v').append(nbField).append(".\"value\"='").append(literal.getStringValue()).append("' ");
-                    response.append(" AND v").append(nbField).append(".\"form\"=\"identifier\" ");
+                    addComparsionFilter(response, propertyName, literalValue, "=");
                 
                 } else if (operator.equals("PropertyIsNotEqualTo")) {
-                    
-                   response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
-                   response.append('v').append(nbField).append(".\"value\" != '").append(literal.getStringValue()).append("' ");
-                   response.append(" AND v").append(nbField).append(".form=identifier ");
+                    addComparsionFilter(response, propertyName, literalValue, "!=");
                 
                 } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
-                    if (isDateField(propertyName)) {
-                        String dateValue = literal.getStringValue();
-                        try {
-                            dateValue = TemporalUtilities.parseDate(dateValue).toString();
-                        } catch( ParseException ex) {
-                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-                        }
-                        response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
-                        response.append('v').append(nbField).append(".\"value\" >= '").append(dateValue).append("' ");
-                        response.append(" AND v").append(nbField).append(".\"form\"=\"identifier\" ");
-                    } else {
-                        throw new CstlServiceException("PropertyIsGreaterThanOrEqualTo operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
-                    }
+                    addDateComparsionFilter(response, propertyName, literalValue, ">=");
                 
                 } else if (operator.equals("PropertyIsGreaterThan")) {
-                    if (isDateField(propertyName)) {
-                        String dateValue = literal.getStringValue();
-                        try {
-                            dateValue = TemporalUtilities.parseDate(dateValue).toString();
-                        } catch( ParseException ex) {
-                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-                        }
-                        response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
-                        response.append('v').append(nbField).append(".\"value\" > '").append(dateValue).append("' ");
-                        response.append(" AND v").append(nbField).append(".\"form\"=\"identifier\" ");
-                    } else {
-                        throw new CstlServiceException("PropertyIsGreaterThan operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
-                    }
+                    addDateComparsionFilter(response, propertyName, literalValue, ">");
                 
                 } else if (operator.equals("PropertyIsLessThan") ) {
-                    if (isDateField(propertyName)) {
-                        //if we are passed by CQL we must format the date
-                        String dateValue = literal.getStringValue();
-                        try {
-                            dateValue = TemporalUtilities.parseDate(dateValue).toString();
-                        } catch( ParseException ex) {
-                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-                        }
-                        response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
-                        response.append('v').append(nbField).append(".\"value\" < '").append(dateValue).append("' ");
-                        response.append(" AND v").append(nbField).append(".form=identifier ");
-                    } else {
-                        throw new CstlServiceException("PropertyIsLessThan operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
-                    }
+                    addDateComparsionFilter(response, propertyName, literalValue, "<");
                     
                 } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
-                    if (isDateField(propertyName)) {
-                        String dateValue = literal.getStringValue();
-                        try {
-                            dateValue = TemporalUtilities.parseDate(dateValue).toString();
-                        } catch( ParseException ex) {
-                            throw new CstlServiceException(PARSE_ERROR_MSG + dateValue, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-                        }
-                        response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
-                        response.append('v').append(nbField).append(".\"value\" <= '").append(dateValue).append("' ");
-                        response.append(" AND v").append(nbField).append(".form=identifier ");
-                    } else {
-                         throw new CstlServiceException("PropertyIsLessThanOrEqualTo operator works only on Date field. " + operator,
-                                                          OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
-                    }
+                    addDateComparsionFilter(response, propertyName, literalValue, "<=");
                 } else {
                     throw new CstlServiceException("Unkwnow comparison operator: " + operator,
                                                      INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
@@ -431,15 +366,31 @@ public class SQLFilterParser extends FilterParser {
         nbField++;
         return response.toString();
     }
-    
-    private String treatIDOperator(final List<JAXBElement<? extends AbstractIdType>> jbIdsOps) {
-        //TODO
-        if (true) {
-            throw new UnsupportedOperationException("Not supported yet.");
+
+    private String extractDateValue(String literal) throws CstlServiceException {
+        try {
+            return TemporalUtilities.parseDate(literal).toString();
+        } catch (ParseException ex) {
+            throw new CstlServiceException(PARSE_ERROR_MSG + literal, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         }
-        return new StringBuilder().toString();
     }
-    
+
+    private void addComparsionFilter(StringBuilder response, String propertyName, String dateValue, String operator) {
+        response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
+        response.append('v').append(nbField).append(".\"value\" ").append(operator).append("'").append(dateValue).append("' ");
+        response.append(" AND v").append(nbField).append(".\"form\"=\"identifier\" ");
+    }
+
+    private void addDateComparsionFilter(StringBuilder response, String propertyName, String literalValue, String operator) throws CstlServiceException {
+        if (isDateField(propertyName)) {
+            final String dateValue = extractDateValue(literalValue);
+            addComparsionFilter(response, propertyName, dateValue, "<");
+        } else {
+            throw new CstlServiceException(operator + " operator works only on Date field.",
+                    OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
+        }
+    }
+
     /**
      * Format the propertyName from ebrim syntax to mdweb syntax.
      */

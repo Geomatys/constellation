@@ -72,6 +72,7 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Geometry;
+import org.geotoolkit.ogc.xml.v110.AbstractIdType;
 
 /**
  *
@@ -134,6 +135,14 @@ public abstract class FilterParser {
     protected abstract Object treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws CstlServiceException;
     
     protected abstract Object treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> jbComparisonOps) throws CstlServiceException;
+
+    protected String treatIDOperator(final List<JAXBElement<? extends AbstractIdType>> jbIdsOps) {
+        //TODO
+        if (true) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+        return "";
+    }
 
     /**
      * Extract a OCG filter from the query constraint of the received request.

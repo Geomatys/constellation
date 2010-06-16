@@ -38,7 +38,7 @@ import static org.junit.Assert.*;
 public class SQLFilterParserTest {
     
     private SQLFilterParser filterParser;
-    private Logger       logger = Logger.getLogger("org.constellation.filter");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.filter");
     private Unmarshaller filterUnmarshaller;
     private final static QName _ExtrinsicObject25_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExtrinsicObject");
     private final static QName _Association25_QNAME     = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Association");
@@ -111,14 +111,14 @@ public class SQLFilterParserTest {
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
-        assertTrue(filter.getId().size()     == 0   );
+        assertTrue(filter.getId().isEmpty());
         assertTrue(filter.getSpatialOps()    == null);
         
         SQLQuery spaQuery = (SQLQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), variables, prefixs);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 , \"TextValues\" v2 , \"TextValues\" v3 , \"TextValues\" v4 WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\"='application/octet-stream'  AND v1.\"form\"=\"identifier\"  AND v2.\"path\" = 'Ebrim v2.5:ExtrinsicObject:home' AND v2.\"value\"='http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi'  AND v2.\"form\"=\"identifier\"  AND v3.\"path\" = 'Ebrim v2.5:ExtrinsicObject:minorVersion' AND v3.\"value\"='0'  AND v3.\"form\"=\"identifier\"  AND v4.\"path\" = 'Ebrim v2.5:ExtrinsicObject:majorVersion' AND v4.\"value\"='1'  AND v4.\"form\"=\"identifier\" ");
+        assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 , \"TextValues\" v2 , \"TextValues\" v3 , \"TextValues\" v4 WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\" ='application/octet-stream'  AND v1.\"form\"=\"identifier\"  AND v2.\"path\" = 'Ebrim v2.5:ExtrinsicObject:home' AND v2.\"value\" ='http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi'  AND v2.\"form\"=\"identifier\"  AND v3.\"path\" = 'Ebrim v2.5:ExtrinsicObject:minorVersion' AND v3.\"value\" ='0'  AND v3.\"form\"=\"identifier\"  AND v4.\"path\" = 'Ebrim v2.5:ExtrinsicObject:majorVersion' AND v4.\"value\" ='1'  AND v4.\"form\"=\"identifier\" ");
         
         
         /**
@@ -158,14 +158,14 @@ public class SQLFilterParserTest {
         
         assertTrue(filter.getComparisonOps() == null);
         assertTrue(filter.getLogicOps()      != null);
-        assertTrue(filter.getId().size()     == 0   );
+        assertTrue(filter.getId().isEmpty());
         assertTrue(filter.getSpatialOps()    == null);
         
         spaQuery = (SQLQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), variables, prefixs);
         
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
-        assertEquals(spaQuery.getQuery(), "(SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v2.5:Association:status' AND v1.\"value\"='Approved'  AND v1.\"form\"=\"identifier\" ) UNION (SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 , \"TextValues\" v2 , \"TextValues\" v3 , \"TextValues\" v4 WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\"='application/octet-stream'  AND v1.\"form\"=\"identifier\"  AND v2.\"path\" = 'Ebrim v2.5:ExtrinsicObject:home' AND v2.\"value\"='http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi'  AND v2.\"form\"=\"identifier\"  AND v3.\"path\" = 'Ebrim v2.5:ExtrinsicObject:minorVersion' AND v3.\"value\"='0'  AND v3.\"form\"=\"identifier\"  AND v4.\"path\" = 'Ebrim v2.5:ExtrinsicObject:majorVersion' AND v4.\"value\"='1'  AND v4.\"form\"=\"identifier\" ) ");
+        assertEquals(spaQuery.getQuery(), "(SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v2.5:Association:status' AND v1.\"value\" ='Approved'  AND v1.\"form\"=\"identifier\" ) UNION (SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 , \"TextValues\" v2 , \"TextValues\" v3 , \"TextValues\" v4 WHERE v1.\"path\" = 'Ebrim v2.5:ExtrinsicObject:mimeType' AND v1.\"value\" ='application/octet-stream'  AND v1.\"form\"=\"identifier\"  AND v2.\"path\" = 'Ebrim v2.5:ExtrinsicObject:home' AND v2.\"value\" ='http://demo.cubewerx.com/demo/cubeserv/cubeserv.cgi'  AND v2.\"form\"=\"identifier\"  AND v3.\"path\" = 'Ebrim v2.5:ExtrinsicObject:minorVersion' AND v3.\"value\" ='0'  AND v3.\"form\"=\"identifier\"  AND v4.\"path\" = 'Ebrim v2.5:ExtrinsicObject:majorVersion' AND v4.\"value\" ='1'  AND v4.\"form\"=\"identifier\" ) ");
         
         
         
