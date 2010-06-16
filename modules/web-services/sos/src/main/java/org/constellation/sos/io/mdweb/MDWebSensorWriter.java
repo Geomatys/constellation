@@ -34,16 +34,18 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.MDWebMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
-import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
-import org.mdweb.io.MD_IOException;
-import org.mdweb.io.sql.v20.Writer20;
+
+import org.geotoolkit.sml.xml.AbstractSensorML;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // MDWeb dependencies
 import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
+import org.mdweb.io.MD_IOException;
+import org.mdweb.io.sql.AbstractReader;
+import org.mdweb.io.sql.v20.Writer20;
 
 /**
  *
@@ -81,6 +83,9 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
             this.map        = map;
              //we build the prepared Statement
             newSensorIdStmt    = smlConnection.prepareStatement("SELECT Count(*) FROM \"Storage\".\"Forms\" WHERE \"title\" LIKE '%" + sensorIdBase + "%' ");
+
+            // we enbale the fast storage mode
+            ((AbstractReader)mdWriter).setFastStorage(true);
 
         } catch (SQLException ex) {
             LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
@@ -146,8 +151,8 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
             }
             // we find the form id describing the sensor.
             final int id = ((Writer20)mdWriter).getIdFromTitleForm(dbId);
-            LOGGER.finer("describesensor id: " + dbId);
-            LOGGER.finer("describesensor mdweb id: " + id);
+            LOGGER.log(Level.FINER, "describesensor id: {0}", dbId);
+            LOGGER.log(Level.FINER, "describesensor mdweb id: {0}", id);
 
             return super.deleteMetadata(id + ":SMLC");
 
@@ -178,8 +183,8 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
             for (String title : allTitle) {
                 // we find the form id describing the sensor.
                 final int id = ((Writer20)mdWriter).getIdFromTitleForm(title);
-                LOGGER.finer("describesensor id: " + title);
-                LOGGER.finer("describesensor mdweb id: " + id);
+                LOGGER.log(Level.FINER, "describesensor id: {0}", title);
+                LOGGER.log(Level.FINER, "describesensor mdweb id: {0}", id);
 
                 super.deleteMetadata(id + ":SMLC");
             }

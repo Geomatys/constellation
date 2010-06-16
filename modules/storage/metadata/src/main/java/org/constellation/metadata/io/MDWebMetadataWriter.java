@@ -36,6 +36,7 @@ import java.util.Map;
 // JAXB dependencies
 import java.util.MissingResourceException;
 import java.util.UUID;
+import java.util.logging.Level;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 
@@ -261,14 +262,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 }
 
             } catch (IllegalAccessException ex) {
-                LOGGER.warning("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + '\n' +
-                              "cause: " + ex.getMessage());
+                LOGGER.warning("illegal access for method " + methodName + " in " + obj.getClass().getSimpleName() + "\ncause: " + ex.getMessage());
             } catch (IllegalArgumentException ex) {
-                LOGGER.warning("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +'\n' +
-                              "cause: " + ex.getMessage());
+                LOGGER.warning("illegal argument for method " + methodName + " in " + obj.getClass().getSimpleName()  +"\ncause: " + ex.getMessage());
             } catch (InvocationTargetException ex) {
-                LOGGER.warning("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +'\n' +
-                              "cause: " + ex.getMessage());
+                LOGGER.warning("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +"\ncause: " + ex.getMessage());
             }
         }
         if (title == null)
@@ -353,10 +351,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             if (rootClasse != null) {
                 alreadyWrite.clear();
                 final Path rootPath = new Path(rootClasse.getStandard(), rootClasse);
-                addValueFromObject(form, object, rootPath, null);
+                List<Value> collection = addValueFromObject(form, object, rootPath, null);
+                collection.clear();
                 return form;
             } else {
-                LOGGER.severe("unable to find the root class:" + object.getClass().getSimpleName());
+                LOGGER.log(Level.SEVERE, "unable to find the root class:{0}", object.getClass().getSimpleName());
                 return null;
             }
         } else {
@@ -450,7 +449,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         codelistElement = Util.getElementNameFromEnum(object);
                         
                     } else {
-                        LOGGER.severe (object.getClass().getName() + " is not a codelist!");
+                        LOGGER.log (Level.SEVERE, "{0} is not a codelist!", object.getClass().getName());
                         codelistElement = null;
                     }
                 }
@@ -482,23 +481,25 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             
             final TextValue textValue = new TextValue(path, form , ordinal, value, classe, parentValue);
             result.add(textValue);
-            LOGGER.finer("new TextValue: " + path.getId() + " classe:" + classe.getName() + " value=" + object + " ordinal=" + ordinal);
+            //LOGGER.finer("new TextValue: " + path.getId() + " classe:" + classe.getName() + " value=" + object + " ordinal=" + ordinal);
         
         // if we have already see this object we build a Linked Value.
         } else if (linkedValue != null) {
             
             final LinkedValue value = new LinkedValue(path, form, ordinal, form, linkedValue, classe, parentValue);
             result.add(value);
-            LOGGER.finer("new LinkedValue: " + path.getId() + " classe:" + classe.getName() + " linkedValue=" + linkedValue.getIdValue() + " ordinal=" + ordinal);
+            //LOGGER.finer("new LinkedValue: " + path.getId() + " classe:" + classe.getName() + " linkedValue=" + linkedValue.getIdValue() + " ordinal=" + ordinal);
         
         // else we build a Value node.
         } else {
         
             final Value value = new Value(path, form, ordinal, classe, parentValue);
             result.add(value);
-            LOGGER.finer("new Value: " + path.getId() + " classe:" + classe.getName() + " ordinal=" + ordinal);
+            //LOGGER.finer("new Value: " + path.getId() + " classe:" + classe.getName() + " ordinal=" + ordinal);
             //we add this object to the listed of already write element
-            alreadyWrite.put(object, value);
+            if (!isNoLink()) {
+                alreadyWrite.put(object, value);
+            }
             
             do {
                 for (Property prop: classe.getProperties()) {
@@ -571,7 +572,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 }
                 classe = classe.getSuperClass();
                 if (classe != null) {
-                    LOGGER.finer("searching in superclasse " + classe.getName());
+                    LOGGER.log(Level.FINER, "searching in superclasse {0}", classe.getName());
                 }
             } while (classe != null);
         }
@@ -619,7 +620,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             
             className   = object.getClass().getSimpleName();
             packageName = object.getClass().getPackage().getName();
-            LOGGER.finer("searche for classe " + className);
+            LOGGER.log(Level.FINER, "searche for classe {0}", className);
             
         } else {
             return null;
@@ -839,7 +840,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
         
         availableStandardLabel = availableStandardLabel.substring(0, availableStandardLabel.length() - 1);
-        LOGGER.severe("class no found: " + className + " in the following standards: " + availableStandardLabel + "\n (" + object.getClass().getName() + ')');
+        LOGGER.warning("class no found: " + className + " in the following standards: " + availableStandardLabel + "\n (" + object.getClass().getName() + ')');
         return null;
     }
     
@@ -936,6 +937,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         //need to be override by child
     }
 
+    private void logMapSize() {
+        LOGGER.info("\nclasses      :" + classBinding.size() +
+                    "\nvalues       :" + alreadyWrite.size());
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -974,7 +980,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     @Override
     public boolean deleteMetadata(String identifier) throws MetadataIoException {
-        LOGGER.log(logLevel, "metadata to delete:" + identifier);
+        LOGGER.log(logLevel, "metadata to delete:{0}", identifier);
 
         int id;
         String recordSetCode = "";
