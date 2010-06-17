@@ -382,9 +382,9 @@ public abstract class WebService {
         values = pathParameters.get(parameterName);
 
         if (values == null) {
-            for(final String key : parameters.keySet()){
-                if(key.equalsIgnoreCase(parameterName)){
-                    values = parameters.get(key);
+            for (final Entry<String,List<String>> entry : parameters.entrySet()) {
+                if (entry.getKey().equalsIgnoreCase(parameterName)) {
+                    values = entry.getValue();
                     break;
                 }
             }

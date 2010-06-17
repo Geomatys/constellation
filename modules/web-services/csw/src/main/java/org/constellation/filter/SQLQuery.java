@@ -38,7 +38,7 @@ public class SQLQuery {
     public SQLQuery(String query) {
         this.query         = query;
         this.spatialFilter = null;
-        nbField            = 0;
+        nbField            = 1;
     }
     
     public SQLQuery(Filter spatialFilter) {
@@ -88,7 +88,7 @@ public class SQLQuery {
         if (spatialFilter != null) {
             s.append("spatialFilter").append(spatialFilter).append('\n');
         }
-        if (subQueries != null && subQueries.size() != 0) {
+        if (subQueries != null && !subQueries.isEmpty()) {
             s.append("SubQueries:").append('\n');
             int i = 0;
             for (SQLQuery sq: subQueries) {

@@ -38,15 +38,11 @@ import org.apache.lucene.search.Filter;
 // geotoolkit dependencies
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.ogc.xml.v110.BinaryComparisonOpType;
 import org.geotoolkit.ogc.xml.v110.BinaryLogicOpType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
-import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
-import org.geotoolkit.ogc.xml.v110.PropertyIsNullType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 import org.geotoolkit.temporal.object.TemporalUtilities;
@@ -63,6 +59,9 @@ public class LuceneFilterParser extends FilterParser {
 
     private final static String DEFAULT_FIELD = "metafile:doc";
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SpatialQuery getNullFilter() {
         final Filter nullFilter = null;
@@ -99,11 +98,7 @@ public class LuceneFilterParser extends FilterParser {
     }
     
     /**
-     * Build a piece of lucene query with the specified Logical filter.
-     * 
-     * @param JBlogicOps
-     * @return
-     * @throws org.constellation.coverage.web.CstlServiceException
+     * {@inheritDoc}
      */
     @Override
     protected SpatialQuery treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws CstlServiceException {
@@ -213,7 +208,7 @@ public class LuceneFilterParser extends FilterParser {
         }
 
         int logicalOperand        = SerialChainFilter.valueOf(operator);
-        final Filter spatialFilter  = getSpatialFilterFromList(logicalOperand, filters, query);
+        final Filter spatialFilter  = getSpatialFilterFromList(logicalOperand, filters);
 
         // here the logical operand NOT is contained in the spatial filter
         if (query.isEmpty() && logicalOperand == SerialChainFilter.NOT) {
@@ -223,141 +218,72 @@ public class LuceneFilterParser extends FilterParser {
         response.setSubQueries(subQueries);
         return response;
     }
-    
+
     /**
-     * Build a piece of lucene query with the specified Comparison filter.
-     * 
-     * @param JBlogicOps
-     * @return
-     * @throws org.constellation.coverage.web.CstlServiceException
+     * {@inheritDoc}
      */
     @Override
-    protected String treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> jbComparisonOps) throws CstlServiceException {
-        final StringBuilder response = new StringBuilder();
-        
-        final ComparisonOpsType comparisonOps = jbComparisonOps.getValue();
-        
-        if (comparisonOps instanceof PropertyIsLikeType ) {
-            final PropertyIsLikeType pil = (PropertyIsLikeType) comparisonOps;
-            String propertyName    = "";
-            //we get the field
-            if (pil.getPropertyName() != null) {
-                propertyName = pil.getPropertyName().getContent();
-                response.append(removePrefix(propertyName)).append(':');
-            } else {
-                throw new CstlServiceException("An operator propertyIsLike must specified the propertyName.",
-                                             INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-            }
-            
-            //we get the value of the field
-            if (pil.getLiteral() != null && pil.getLiteral() != null) {
-                
-                //we format the value by replacing the specified special char by the lucene special char
-                String brutValue = pil.getLiteral();
-                brutValue = brutValue.replace(pil.getWildCard(),    "*");
-                brutValue = brutValue.replace(pil.getSingleChar(),  "?");
-                brutValue = brutValue.replace(pil.getEscapeChar(),  "\\");
-                
-                //for a date we remove the '-'
-                if (isDateField(propertyName)) {
-                        brutValue = brutValue.replaceAll("-", "");
-                        brutValue = brutValue.replace("Z", "");
-                }
-                
-                response.append(brutValue);
-                
-            } else {
-                throw new CstlServiceException("An operator propertyIsLike must specified the literal value.",
-                                              INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-            }
-        } else if (comparisonOps instanceof PropertyIsNullType) {
-             final PropertyIsNullType pin = (PropertyIsNullType) comparisonOps;
-
-            //we get the field
-            if (pin.getPropertyName() != null) {
-                response.append(removePrefix(pin.getPropertyName().getContent())).append(':').append("null");
-            } else {
-                throw new CstlServiceException("An operator propertyIsNull must specified the propertyName.",
-                                             INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-            }
-        } else if (comparisonOps instanceof PropertyIsBetweenType) {
-            
-            //TODO
-            throw new UnsupportedOperationException("Not supported yet.");
-        
-        } else if (comparisonOps instanceof BinaryComparisonOpType) {
-            
-            final BinaryComparisonOpType bc = (BinaryComparisonOpType) comparisonOps;
-            final String propertyName       = bc.getPropertyName();
-            final LiteralType literal       = bc.getLiteral();
-            final String operator           = jbComparisonOps.getName().getLocalPart();
-            
-            if (propertyName == null || literal == null) {
-                throw new CstlServiceException("A binary comparison operator must be constitued of a literal and a property name.",
-                                             INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-            } else {
-                final String literalValue = literal.getStringValue();
-                
-                if (operator.equals("PropertyIsEqualTo")) {                
-                    response.append(removePrefix(propertyName)).append(":\"").append(literalValue).append('"');
-                
-                } else if (operator.equals("PropertyIsNotEqualTo")) {
-                    
-                   response.append("metafile:doc NOT ");
-                   response.append(removePrefix(propertyName)).append(":\"").append(literalValue).append('"');
-                
-                } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
-                    if (isDateField(propertyName)) {
-                        final String dateValue = extractDateValue(literalValue);
-                        response.append(removePrefix(propertyName)).append(":[").append(dateValue).append(' ').append(" 30000101]");
-                    } else {
-                        throw new CstlServiceException(operator + " operator works only on Date field.",
-                                                      OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
-                    }
-                
-                } else if (operator.equals("PropertyIsGreaterThan")) {
-                    if (isDateField(propertyName)) {
-                        final String dateValue = extractDateValue(literalValue);
-                        response.append(removePrefix(propertyName)).append(":{").append(dateValue).append(' ').append(" 30000101}");
-                    } else {
-                        throw new CstlServiceException(operator + " operator works only on Date field.",
-                                                      OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
-                    }
-                
-                } else if (operator.equals("PropertyIsLessThan") ) {
-                    if (isDateField(propertyName)) {
-                        final String dateValue = extractDateValue(literalValue);
-                        response.append(removePrefix(propertyName)).append(":{00000101").append(' ').append(dateValue).append("}");
-                    } else {
-                        throw new CstlServiceException(operator + " operator works only on Date field.",
-                                                      OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
-                    }
-                    
-                } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
-                    if (isDateField(propertyName)) {
-                        final String dateValue = extractDateValue(literalValue);
-                        response.append(removePrefix(propertyName)).append(":[00000101").append(' ').append(dateValue).append("]");
-                    } else {
-                         throw new CstlServiceException(operator + " operator works only on Date field.",
-                                                      OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
-                    }
-                } else {
-                    throw new CstlServiceException("Unkwnow comparison operator: " + operator,
-                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-                }
-            }
+    protected void addComparsionFilter(StringBuilder response, String propertyName, String literalValue, String operator) {
+        if (operator.equals("!=")) {
+            response.append("metafile:doc NOT ");
         }
-        return response.toString();
+        if (operator.equals("LIKE") || operator.equals("IS NULL ")) {
+            response.append(removePrefix(propertyName)).append(":").append(literalValue);
+        } else {
+            response.append(removePrefix(propertyName)).append(":\"").append(literalValue).append('"');
+        }
     }
 
-     private String extractDateValue(String literal) throws CstlServiceException {
-         try {
-             return toLuceneDate(TemporalUtilities.parseDate(literal));
-         } catch (ParseException ex) {
-             throw new CstlServiceException(PARSE_ERROR_MSG + literal,
-                     INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
-         }
-     }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void addDateComparsionFilter(StringBuilder response, String propertyName, String literalValue, String operator) throws CstlServiceException {
+        if (isDateField(propertyName)) {
+            final String dateValue = extractDateValue(literalValue);
+            response.append(removePrefix(propertyName)).append(":");
+
+            String comparison;
+            if (operator.equals("<=") || operator.equals("<")) {
+                comparison = "00000101 " + dateValue;
+            } else if (operator.equals(">=") || operator.equals(">")){
+                comparison = dateValue + "  30000101";
+            } else {
+                // TODO
+                comparison = "";
+            }
+
+            if (operator.contains("=")) {
+                response.append('[').append(comparison).append(']');
+            } else {
+                response.append('{').append(comparison).append('}');
+            }
+        } else {
+            throw new CstlServiceException(operator + " operator works only on Date field.",
+                    OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String extractDateValue(String literal) throws CstlServiceException {
+        try {
+            return toLuceneDate(TemporalUtilities.parseDate(literal));
+        } catch (ParseException ex) {
+            throw new CstlServiceException(PARSE_ERROR_MSG + literal,
+                    INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected String translateSpecialChar(PropertyIsLikeType pil) {
+        return translateSpecialChar(pil, "*", "?", "\\");
+    }
 
     /**
      * Remove the prefix on propertyName.

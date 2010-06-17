@@ -1081,7 +1081,7 @@ public class CSWworker {
             }
         }
 
-        if (records.size() == 0 && otherRecords.size() == 0) {
+        if (records.isEmpty() && otherRecords.isEmpty()) {
             throwUnexistingIdentifierException(unexistingID);
         }
 

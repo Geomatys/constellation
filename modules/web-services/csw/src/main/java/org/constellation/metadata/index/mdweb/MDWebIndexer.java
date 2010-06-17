@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.logging.Level;
 import javax.sql.DataSource;
 
 import org.apache.lucene.document.Document;
@@ -154,7 +156,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                 if (r.getExposure() != EXPOSURE.INTERNAL) {
                     catToIndex.add(r);
                 } else {
-                    LOGGER.log(logLevel, "RecordSet:" + r.getCode() + " is internal we exclude it.");
+                    LOGGER.log(logLevel, "RecordSet:{0} is internal we exclude it.", r.getCode());
                 }
             }
             nbRecordSets = cats.size();
@@ -285,13 +287,13 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      */
     @Override
     protected void indexQueryableSet(final Document doc, final Form form, Map<String, List<String>> queryableSet, final StringBuilder anyText) throws IndexingException {
-        for (String term :queryableSet.keySet()) {
-            final String values = getValues(form, queryableSet.get(term));
+        for (Entry<String,List<String>> entry :queryableSet.entrySet()) {
+            final String values = getValues(form, entry.getValue());
             if (!values.equals("null")) {
                 anyText.append(values).append(" ");
             }
-            doc.add(new Field(term,           values, Field.Store.YES, Field.Index.ANALYZED));
-            doc.add(new Field(term + "_sort", values, Field.Store.YES, Field.Index.NOT_ANALYZED));
+            doc.add(new Field(entry.getKey(),           values, Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field(entry.getKey() + "_sort", values, Field.Store.YES, Field.Index.NOT_ANALYZED));
         }
     }
 
@@ -382,7 +384,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                     // mdweb ordinal start at 1
                     ordinal++;
                 } catch (NumberFormatException ex) {
-                    LOGGER.warning("unable to parse the ordinal:" + stringOrdinal);
+                    LOGGER.log(Level.WARNING, "unable to parse the ordinal:{0}", stringOrdinal);
                     ordinal = -1;
                 }
                 fullPathID = fullPathID.substring(0, fullPathID.indexOf('['));
@@ -470,7 +472,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             try {
                 code = Integer.parseInt(tv.getValue());
             } catch (NumberFormatException ex) {
-                LOGGER.warning("NumberFormat Exception while parsing a codelist code: " + tv.getValue());
+                LOGGER.log(Level.WARNING, "NumberFormat Exception while parsing a codelist code: {0}", tv.getValue());
             }
             final CodeListElement element = cl.getElementByCode(code);
 
@@ -489,7 +491,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         try {
             mdWebReader.close();
         } catch (MD_IOException ex) {
-            LOGGER.warning("MD IO Exception during destroying index while closing MDW reader:" + ex.getMessage());
+            LOGGER.log(Level.WARNING, "MD IO Exception during destroying index while closing MDW reader:{0}", ex.getMessage());
         }
     }
 }

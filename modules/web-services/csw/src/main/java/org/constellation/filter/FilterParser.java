@@ -73,6 +73,11 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 // JTS dependencies
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotoolkit.ogc.xml.v110.AbstractIdType;
+import org.geotoolkit.ogc.xml.v110.BinaryComparisonOpType;
+import org.geotoolkit.ogc.xml.v110.LiteralType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsNullType;
 
 /**
  *
@@ -128,14 +133,177 @@ public abstract class FilterParser {
         }
     }
 
+    /**
+     * Return a filter matching for all the records.
+     * 
+     * @return a filter matching for all the records.
+     */
     protected abstract Object getNullFilter();
     
     protected abstract Object getQuery(final FilterType constraint, Map<String, QName> variables, Map<String, String> prefixs) throws CstlServiceException;
-    
+
+    /**
+     * Build a piece of query with the specified logical filter.
+     *
+     * @param jbLogicOps A logical filter.
+     * @return
+     * @throws CstlServiceException
+     */
     protected abstract Object treatLogicalOperator(final JAXBElement<? extends LogicOpsType> jbLogicOps) throws CstlServiceException;
     
-    protected abstract Object treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> jbComparisonOps) throws CstlServiceException;
+    /**
+     * Build a piece of query with the specified Comparison filter.
+     *
+     * @param jbComparisonOps A comparison filter.
+     * @return
+     * @throws org.constellation.coverage.web.CstlServiceException
+     */
+    protected String treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> jbComparisonOps) throws CstlServiceException {
+        final StringBuilder response = new StringBuilder();
 
+        final ComparisonOpsType comparisonOps = jbComparisonOps.getValue();
+
+        if (comparisonOps instanceof PropertyIsLikeType ) {
+            final PropertyIsLikeType pil = (PropertyIsLikeType) comparisonOps;
+            final String propertyName;
+            //we get the field
+            if (pil.getPropertyName() != null && pil.getLiteral() != null) {
+                propertyName = pil.getPropertyName().getContent();
+            } else {
+                throw new CstlServiceException("An operator propertyIsLike must specified the propertyName and a literal value.",
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+            }
+
+            //we format the value by replacing the specified special char by the lucene special char
+            final String brutValue = translateSpecialChar(pil);
+            addComparsionFilter(response, propertyName, brutValue, "LIKE");
+
+
+        } else if (comparisonOps instanceof PropertyIsNullType) {
+             final PropertyIsNullType pin = (PropertyIsNullType) comparisonOps;
+
+            //we get the field
+            if (pin.getPropertyName() != null) {
+                addComparsionFilter(response, pin.getPropertyName().getContent(), null, "IS NULL ");
+            } else {
+                throw new CstlServiceException("An operator propertyIsNull must specified the propertyName.",
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+            }
+        } else if (comparisonOps instanceof PropertyIsBetweenType) {
+
+            //TODO
+            throw new UnsupportedOperationException("Not supported yet.");
+
+        } else if (comparisonOps instanceof BinaryComparisonOpType) {
+
+            final BinaryComparisonOpType bc = (BinaryComparisonOpType) comparisonOps;
+            final String propertyName       = bc.getPropertyName();
+            final LiteralType literal       = bc.getLiteral();
+            final String operator           = jbComparisonOps.getName().getLocalPart();
+
+            if (propertyName == null || literal == null) {
+                throw new CstlServiceException("A binary comparison operator must be constitued of a literal and a property name.",
+                                                 INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+            } else {
+                final String literalValue = literal.getStringValue();
+
+                if (operator.equals("PropertyIsEqualTo")) {
+                    addComparsionFilter(response, propertyName, literalValue, "=");
+
+                } else if (operator.equals("PropertyIsNotEqualTo")) {
+                    addComparsionFilter(response, propertyName, literalValue, "!=");
+
+                } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
+                    addDateComparsionFilter(response, propertyName, literalValue, ">=");
+
+                } else if (operator.equals("PropertyIsGreaterThan")) {
+                    addDateComparsionFilter(response, propertyName, literalValue, ">");
+
+                } else if (operator.equals("PropertyIsLessThan") ) {
+                    addDateComparsionFilter(response, propertyName, literalValue, "<");
+
+                } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
+                    addDateComparsionFilter(response, propertyName, literalValue, "<=");
+
+                } else {
+                    throw new CstlServiceException("Unkwnow comparison operator: " + operator,
+                                                     INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+                }
+            }
+        }
+        return response.toString();
+    }
+
+    /**
+     * Add to the StringBuilder a piece of query with the specified operator.
+     *
+     * @param response A stringBuilder containing the query.
+     * @param propertyName The name of the property to filter.
+     * @param literalValue The value of the filter.
+     * @param operator The comparison operator.
+     */
+    protected abstract void addComparsionFilter(StringBuilder response, String propertyName, String literalValue, String operator);
+
+    /**
+     * Add to the StringBuilder a piece of query with the specified operator fr a date property.
+     *
+     * @param response A stringBuilder containing the query.
+     * @param propertyName The name of the date property to filter.
+     * @param literalValue The value of the filter.
+     * @param operator The comparison operator.
+     * @throws CstlServiceException
+     */
+    protected abstract void addDateComparsionFilter(StringBuilder response, String propertyName, String literalValue, String operator) throws CstlServiceException;
+
+    /**
+     * Extract and format a date representation from the specified String.
+     * If the string is not a welle formed date it will raise an exception.
+     *
+     * @param literal A Date representation.
+     * @return A formatted date representation.
+     * @throws CstlServiceException if the specified string can not be parsed.
+     */
+    protected abstract String extractDateValue(String literal) throws CstlServiceException;
+
+    /**
+     * Replace The special character in a literal value for a propertyIsLike filter,
+     * with the implementation specific value.
+     *
+     * @param pil A propertyIsLike filter.
+     * @param wildchar The character replacing the filter wildChar.
+     * @param SingleChar The character replacing the filter singleChar.
+     * @param escapeChar The character replacing the filter escapeChar.
+     *
+     * @return A formatted value.
+     */
+    protected String translateSpecialChar(PropertyIsLikeType pil, String wildchar, String singleChar, String escapeChar) {
+        String brutValue = pil.getLiteral();
+        brutValue = brutValue.replace(pil.getWildCard(), wildchar);
+        brutValue = brutValue.replace(pil.getSingleChar(), singleChar);
+        brutValue = brutValue.replace(pil.getEscapeChar(), escapeChar);
+
+        //for a date we remove the '-'
+        if (isDateField(pil.getPropertyName().getContent())) {
+            brutValue = brutValue.replaceAll("-", "");
+            brutValue = brutValue.replace("Z", "");
+        }
+        return brutValue;
+    }
+
+    /**
+     *  Replace The special character in a literal value for a propertyIsLike filter.
+     *
+     * @param pil propertyIsLike filter.
+     * @return A formatted value.
+     */
+    protected abstract String translateSpecialChar(PropertyIsLikeType pil);
+
+    /**
+     * Return a piece of query for An Id filter.
+     *
+     * @param jbIdsOps an Id filter
+     * @return a piece of query.
+     */
     protected String treatIDOperator(final List<JAXBElement<? extends AbstractIdType>> jbIdsOps) {
         //TODO
         if (true) {
@@ -188,13 +356,14 @@ public abstract class FilterParser {
     }
 
     /**
-     * 
-     * @param operator
-     * @param filters
-     * @param query
-     * @return
+     * Return A single Filter Concatening the list of specified Filter.
+     *
+     * @param logicalOperand A logical operator.
+     * @param filters A List of lucene filter.
+     *
+     * @return A single Filter.
      */
-    protected Filter getSpatialFilterFromList(int logicalOperand, final List<Filter> filters, String query) {
+    protected Filter getSpatialFilterFromList(int logicalOperand, final List<Filter> filters) {
 
         Filter spatialFilter = null;
         if (filters.size() == 1) {
@@ -218,9 +387,9 @@ public abstract class FilterParser {
     }
 
     /**
-     * Build a piece of lucene query with the specified Spatial filter.
+     * Build a lucene Filter query with the specified Spatial filter.
      *
-     * @param JBlogicOps
+     * @param JBlogicOps a spatial filter.
      * @return
      * @throws org.constellation.coverage.web.CstlServiceException
      */
