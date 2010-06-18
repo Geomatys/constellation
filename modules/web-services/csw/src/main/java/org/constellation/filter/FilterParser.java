@@ -72,13 +72,19 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Geometry;
+import org.geotoolkit.ogc.xml.v110.ObjectFactory;
 import org.geotoolkit.ogc.xml.v110.AbstractIdType;
 import org.geotoolkit.ogc.xml.v110.BinaryComparisonOpType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsNullType;
-
+import org.geotoolkit.ogc.xml.v110.PropertyIsNotEqualToType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsGreaterThanOrEqualToType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsLessThanType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsGreaterThanType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsLessThanOrEqualToType;
 /**
  *
  * @author Guilhem Legal (Geomatys)
@@ -607,5 +613,46 @@ public abstract class FilterParser {
                 || propertyName.equalsIgnoreCase("TempExtent_begin") || propertyName.equalsIgnoreCase("TempExtent_end");
         }
         return false;
+    }
+
+    protected JAXBElement<? extends ComparisonOpsType> reverseComparisonOperator(JAXBElement<? extends ComparisonOpsType> jbComparisonOps) throws CstlServiceException {
+        final String operator       = jbComparisonOps.getName().getLocalPart();
+        final ComparisonOpsType c   = jbComparisonOps.getValue();
+        final ObjectFactory factory = new ObjectFactory();
+        if (c instanceof BinaryComparisonOpType) {
+            final BinaryComparisonOpType bc = (BinaryComparisonOpType) c;
+
+            if (operator.equals("PropertyIsEqualTo")) {
+                PropertyIsNotEqualToType newFilter = new PropertyIsNotEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
+                return factory.createPropertyIsNotEqualTo(newFilter);
+
+            } else if (operator.equals("PropertyIsNotEqualTo")) {
+                PropertyIsEqualToType newFilter = new PropertyIsEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
+                return factory.createPropertyIsEqualTo(newFilter);
+
+            } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
+                PropertyIsLessThanType newFilter = new  PropertyIsLessThanType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
+                return factory.createPropertyIsLessThan(newFilter);
+
+            } else if (operator.equals("PropertyIsGreaterThan")) {
+                PropertyIsLessThanOrEqualToType newFilter = new  PropertyIsLessThanOrEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
+                return factory.createPropertyIsLessThanOrEqualTo(newFilter);
+
+            } else if (operator.equals("PropertyIsLessThan")) {
+                PropertyIsGreaterThanOrEqualToType newFilter = new  PropertyIsGreaterThanOrEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
+                return factory.createPropertyIsGreaterThanOrEqualTo(newFilter);
+
+            } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
+                PropertyIsGreaterThanType newFilter = new  PropertyIsGreaterThanType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
+                return factory.createPropertyIsGreaterThan(newFilter);
+
+            } else {
+                throw new CstlServiceException("Unkwnow comparison operator: " + operator,
+                        INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+            }
+        } else {
+                throw new CstlServiceException("Unsupported combinaison NOT + " + operator,
+                        OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
+            }
     }
 }

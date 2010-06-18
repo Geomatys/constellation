@@ -73,7 +73,6 @@ import org.geotoolkit.xml.MarshallerPool;
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
-import org.opengis.observation.sampling.SamplingFeature;
 import org.opengis.observation.sampling.SamplingPoint;
 
 // JUnit dependencies

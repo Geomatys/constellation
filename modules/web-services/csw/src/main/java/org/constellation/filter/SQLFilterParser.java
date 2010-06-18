@@ -17,6 +17,7 @@
 
 package org.constellation.filter;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,9 @@ import javax.xml.namespace.QName;
 import java.text.ParseException;
 
 // Apache Lucene dependencies
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 import org.apache.lucene.search.Filter;
 
 // constellation dependencies
@@ -69,6 +73,12 @@ public class SQLFilterParser extends FilterParser {
     private int nbField;
     
     private boolean executeSelect;
+
+    private static final DateFormat dateFormatter;
+    static {
+        dateFormatter = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss");
+        dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+    }
 
     /**
      * {@inheritDoc}
@@ -218,7 +228,7 @@ public class SQLFilterParser extends FilterParser {
                         
             // we treat comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
             if (unary.getComparisonOps() != null) {
-                queryBuilder.append(treatComparisonOperator(unary.getComparisonOps()));
+                queryBuilder.append(treatComparisonOperator(reverseComparisonOperator(unary.getComparisonOps())));
                 
             // we treat spatial constraint : BBOX, Beyond, Overlaps, ...        
             } else if (unary.getSpatialOps() != null) {
@@ -292,7 +302,10 @@ public class SQLFilterParser extends FilterParser {
     @Override
     protected String extractDateValue(String literal) throws CstlServiceException {
         try {
-            return TemporalUtilities.parseDate(literal).toString();
+            synchronized (dateFormatter) {
+                final Date d = TemporalUtilities.parseDate(literal);
+                return dateFormatter.format(d);
+            }
         } catch (ParseException ex) {
             throw new CstlServiceException(PARSE_ERROR_MSG + literal, INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
         }

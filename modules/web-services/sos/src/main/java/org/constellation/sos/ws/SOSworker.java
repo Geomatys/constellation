@@ -530,7 +530,7 @@ public class SOSworker {
             // this tecnically can't happen
             LOGGER.warning("File Not Found Exception while loading the mapping file");
         }  catch (IOException e) {
-            LOGGER.warning("IO Exception while loading the mapping file:" + e.getMessage());
+            LOGGER.log(Level.WARNING, "IO Exception while loading the mapping file:{0}", e.getMessage());
         }
     }
     /**
@@ -1120,7 +1120,7 @@ public class SOSworker {
                     final Timer t = new Timer();
                     //we get the date and time for now
                     final Date d = new Date(System.currentTimeMillis() + templateValidTime);
-                    LOGGER.log(logLevel, "this template will be destroyed at:" + d.toString());
+                    LOGGER.log(logLevel, "this template will be destroyed at:{0}", d.toString());
                     t.schedule(new DestroyTemplateTask(temporaryTemplateId), d);
                     schreduledTask.add(t);
 
@@ -1290,7 +1290,7 @@ public class SOSworker {
             values = array.getValues();
             
             for (EventTime bound: eventTimes) {
-                LOGGER.finer(" Values: " + values);
+                LOGGER.log(Level.FINER, " Values: {0}", values);
                 if (bound.getTEquals() != null) {
                     if (bound.getTEquals().getRest().get(0) instanceof TimeInstantType) {
                         final TimeInstantType ti    = (TimeInstantType) bound.getTEquals().getRest().get(0);
@@ -1388,11 +1388,11 @@ public class SOSworker {
                                 break;
                             }
                         } catch (ParseException ex) {
-                            LOGGER.finer("unable to parse the value: " + samplingTimeValue);
+                            LOGGER.log(Level.FINER, "unable to parse the value: {0}", samplingTimeValue);
                         }
                     }
                     if (d == null) {
-                        LOGGER.warning("unable to parse the value: " + samplingTimeValue);
+                        LOGGER.log(Level.WARNING, "unable to parse the value: {0}", samplingTimeValue);
                         continue;
                     }
                     final Timestamp t = new Timestamp(d.getTime());
@@ -1518,7 +1518,7 @@ public class SOSworker {
         } else if (feature instanceof SamplingSurfaceType) {
             return new FeaturePropertyType(samplingFactory.createSamplingSurface((SamplingSurfaceType)feature));
         } else {
-            LOGGER.warning("unexpected feature type:" + feature);
+            LOGGER.log(Level.WARNING, "unexpected feature type:{0}", feature);
             return null;
         }
     }
@@ -1534,7 +1534,7 @@ public class SOSworker {
                 for (ReferenceEntry refStation : off.getFeatureOfInterest()) {
                     final SamplingFeature station = (SamplingFeature) omReader.getFeatureOfInterest(refStation.getHref());
                     if (station == null) {
-                        LOGGER.warning("the feature of interest is not registered:" + refStation.getHref());
+                        LOGGER.log(Level.WARNING, "the feature of interest is not registered:{0}", refStation.getHref());
                         continue;
                     }
                     if (station instanceof SamplingPointEntry) {
@@ -1545,7 +1545,7 @@ public class SOSworker {
                             LOGGER.finer(" the feature of interest " + sp.getId() + " is not in the BBOX");
                         }
                     } else {
-                        LOGGER.warning("unknow implementation:" + station.getClass().getName());
+                        LOGGER.log(Level.WARNING, "unknow implementation:{0}", station.getClass().getName());
                     }
                 }
             }
