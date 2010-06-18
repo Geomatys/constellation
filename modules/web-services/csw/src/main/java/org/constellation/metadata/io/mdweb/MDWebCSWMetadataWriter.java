@@ -103,7 +103,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      */
     @Override
     public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException {
-        LOGGER.log(logLevel, "metadataID: " + metadataID);
+        LOGGER.log(logLevel, "metadataID: {0}", metadataID);
         int id;
         String recordSetCode = "";
         Form f = null;
@@ -133,14 +133,13 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
                 final String xpath = property.getName();
                 final Object value = property.getValue();
                 final MixedPath mp = getMDWPathFromXPath(xpath);
-                LOGGER.finer("IDValue: " + mp.idValue);
+                LOGGER.log(Level.FINER, "IDValue: {0}", mp.idValue);
                 final List<Value> matchingValues = f.getValueFromNumberedPath(mp.path, mp.idValue);
 
-                if (matchingValues.size() == 0) {
+                if (matchingValues.isEmpty()) {
                     throw new MetadataIoException("There is no value matching for the xpath:" + property.getName(), INVALID_PARAMETER_VALUE);
                 }
                 for (Value v : matchingValues) {
-                    LOGGER.finer("value:" + v);
                     if (v instanceof TextValue && value instanceof String) {
                         // TODO verify more Type
                         if (v.getType().equals(PrimitiveType.DATE)) {
@@ -217,7 +216,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
 
         } else if (obj instanceof DefaultMetadata) {
             final Collection<Identification> idents = ((DefaultMetadata) obj).getIdentificationInfo();
-            if (idents.size() != 0) {
+            if (!idents.isEmpty()) {
                 final Identification ident = idents.iterator().next();
                 if (ident != null && ident.getCitation() != null && ident.getCitation().getTitle() != null) {
                     title = ident.getCitation().getTitle().toString();

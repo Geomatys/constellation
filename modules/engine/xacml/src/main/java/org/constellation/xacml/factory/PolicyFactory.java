@@ -47,7 +47,7 @@ public final class PolicyFactory {
 
     private static final Logger LOGGER = Logger.getLogger("org.constellation.xacml");
     
-    public static Class<?> constructingClass = CstlXACMLPolicy.class;
+    private static Class<?> constructingClass = CstlXACMLPolicy.class;
 
     private PolicyFactory() {}
     

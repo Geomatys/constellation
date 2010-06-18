@@ -340,14 +340,12 @@ public class SOSworker {
                 if (object instanceof SOSConfiguration) {
                     configuration = (SOSConfiguration) object;
                 } else {
-                    LOGGER.warning(notWorkingMsg                                 + '\n' +
-                            "cause: The generic configuration file is malformed" + '\n');
+                    LOGGER.warning(notWorkingMsg + "\ncause: The generic configuration file is malformed\n");
                     isStarted = false;
                     return;
                 }
             } else {
-                LOGGER.warning(notWorkingMsg                           + '\n' +
-                        "cause: The configuration file can't be found" + '\n');
+                LOGGER.warning(notWorkingMsg + "\ncause: The configuration file can't be found\n");
                 isStarted = false;
                 return;
             }
@@ -376,8 +374,7 @@ public class SOSworker {
 
             final Automatic smlConfiguration = configuration.getSMLConfiguration();
             if (smlConfiguration == null) {
-                LOGGER.warning(notWorkingMsg + '\n' +
-                        "cause: The configuration file does not contains a SML configuration");
+                LOGGER.warning(notWorkingMsg + "\ncause: The configuration file does not contains a SML configuration");
                 isStarted = false;
                 return;
             }
@@ -385,8 +382,7 @@ public class SOSworker {
 
             final Automatic omConfiguration = configuration.getOMConfiguration();
             if (omConfiguration == null) {
-                LOGGER.warning(notWorkingMsg + '\n' +
-                        "cause: The configuration file does not contains a O&M configuration");
+                LOGGER.warning(notWorkingMsg + "\ncause: The configuration file does not contains a O&M configuration");
                 isStarted = false;
                 return;
             }
@@ -472,35 +468,35 @@ public class SOSworker {
         final StringBuilder infos = new StringBuilder();
 
         if (this.profile == DISCOVERY) {
-            infos.append("Discovery profile loaded.").append('\n');
+            infos.append("Discovery profile loaded.\n");
         } else {
-            infos.append("Transactional profile loaded.").append('\n');
+            infos.append("Transactional profile loaded.\n");
         }
         if (smlReader != null) {
-            infos.append('\n').append(smlReader.getInfos() + loaded).append('\n');
+            infos.append('\n').append(smlReader.getInfos()).append(loaded).append('\n');
         } else {
             infos.append("No SensorML reader loaded.\n");
         }
         if ( profile == TRANSACTIONAL) {
             if (smlWriter != null) {
-                infos.append(smlWriter.getInfos() + loaded).append('\n');
+                infos.append(smlWriter.getInfos()).append(loaded).append('\n');
             } else {
                 infos.append("No SensorML writer loaded.\n");
             }
         }
         if (omReader != null) {
-            infos.append(omReader.getInfos() + loaded).append('\n');
+            infos.append(omReader.getInfos()).append(loaded).append('\n');
         } else {
             infos.append("No O&M reader loaded.\n");
         }
         if (omFilter != null) {
-            infos.append(omFilter.getInfos() + loaded).append('\n');
+            infos.append(omFilter.getInfos()).append(loaded).append('\n');
         } else {
             infos.append("No O&M filter loaded.\n");
         }
         if ( profile == TRANSACTIONAL) {
             if (omWriter != null) {
-                infos.append(omWriter.getInfos() + loaded).append('\n');
+                infos.append(omWriter.getInfos()).append(loaded).append('\n');
             } else {
                 infos.append("No O&M writer loaded.\n");
             }
@@ -534,7 +530,7 @@ public class SOSworker {
             // this tecnically can't happen
             LOGGER.warning("File Not Found Exception while loading the mapping file");
         }  catch (IOException e) {
-            LOGGER.severe("IO Exception while loading the mapping file:" + e.getMessage());
+            LOGGER.warning("IO Exception while loading the mapping file:" + e.getMessage());
         }
     }
     /**
@@ -545,7 +541,7 @@ public class SOSworker {
      */
     public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws CstlServiceException {
         isWorking();
-        LOGGER.log(logLevel, "getCapabilities request processing" + '\n');
+        LOGGER.log(logLevel, "getCapabilities request processing\n");
         final long start = System.currentTimeMillis();
         
         //we verify the base request attribute
@@ -702,7 +698,7 @@ public class SOSworker {
      * @param requestDescSensor A document specifying the id of the sensor that we want the description.
      */
     public AbstractSensorML describeSensor(DescribeSensor requestDescSensor) throws CstlServiceException  {
-        LOGGER.log(logLevel, "DescribeSensor request processing"  + '\n');
+        LOGGER.log(logLevel, "DescribeSensor request processing\n");
         final long start = System.currentTimeMillis();
 
         // we get the form
@@ -750,7 +746,7 @@ public class SOSworker {
      * @param requestObservation a document specifying the parameter of the request.
      */
     public Object getObservation(GetObservation requestObservation) throws CstlServiceException {
-        LOGGER.log(logLevel, "getObservation request processing"  + '\n');
+        LOGGER.log(logLevel, "getObservation request processing\n");
         final long start = System.currentTimeMillis();
         
         //we verify the base request attribute
@@ -872,7 +868,7 @@ public class SOSworker {
                 if (dbId == null) {
                     dbId = s;
                 }
-                LOGGER.log(logLevel, "process ID: " + dbId);
+                LOGGER.log(logLevel, "process ID: {0}", dbId);
                 final ReferenceEntry proc = omReader.getReference(dbId);
                 if (proc == null) {
                     throw new CstlServiceException(" this process is not registred in the table",
@@ -895,7 +891,7 @@ public class SOSworker {
         //we get the list of phenomenon
         //TODO verifier que les pheno appartiennent a l'offering
         final List<String> observedProperties = requestObservation.getObservedProperty();
-        if (observedProperties != null && observedProperties.size() != 0) {
+        if (observedProperties != null && !observedProperties.isEmpty()) {
             final List<String> singlePhenomenons    = new ArrayList<String>();
             final List<String> compositePhenomenons = new ArrayList<String>();
             for (String phenomenonName : observedProperties) {
@@ -1177,7 +1173,7 @@ public class SOSworker {
      * Web service operation
      */
     public GetResultResponse getResult(GetResult requestResult) throws CstlServiceException {
-        LOGGER.log(logLevel, "getResult request processing"  + '\n');
+        LOGGER.log(logLevel, "getResult request processing\n");
         final long start = System.currentTimeMillis();
         
         //we verify the base request attribute
@@ -1396,7 +1392,7 @@ public class SOSworker {
                         }
                     }
                     if (d == null) {
-                        LOGGER.severe("unable to parse the value: " + samplingTimeValue);
+                        LOGGER.warning("unable to parse the value: " + samplingTimeValue);
                         continue;
                     }
                     final Timestamp t = new Timestamp(d.getTime());
@@ -1439,7 +1435,7 @@ public class SOSworker {
 
     public AbstractFeatureEntry getFeatureOfInterest(GetFeatureOfInterest request) throws CstlServiceException {
         verifyBaseRequest(request);
-        LOGGER.log(logLevel, "GetFeatureOfInterest request processing"  + '\n');
+        LOGGER.log(logLevel, "GetFeatureOfInterest request processing\n");
         final long start = System.currentTimeMillis();
 
         // if there is no filter we throw an exception
@@ -1582,7 +1578,7 @@ public class SOSworker {
             throw new CstlServiceException("The operation registerSensor is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
         }
-        LOGGER.log(logLevel, "registerSensor request processing"  + '\n');
+        LOGGER.log(logLevel, "registerSensor request processing\n");
         final long start = System.currentTimeMillis();
         
         //we verify the base request attribute
@@ -1686,7 +1682,7 @@ public class SOSworker {
             throw new CstlServiceException("The operation insertObservation is not supported by the service",
                      INVALID_PARAMETER_VALUE, "request");
         }
-        LOGGER.log(logLevel, "InsertObservation request processing"  + '\n');
+        LOGGER.log(logLevel, "InsertObservation request processing\n");
         final long start = System.currentTimeMillis();
 
         //we verify the base request attribute
@@ -1771,12 +1767,12 @@ public class SOSworker {
         //In template mode  his method return a temporal Object.
         AbstractTimeGeometricPrimitiveType templateTime = null;
         
-        if (times.size() != 0) {
+        if (!times.isEmpty()) {
             
             for (EventTime time: times) {
 
                 // The operation Time Equals
-                if (time.getTEquals() != null && time.getTEquals().getRest().size() != 0) {
+                if (time.getTEquals() != null && !time.getTEquals().getRest().isEmpty()) {
                     
                     // we get the property name (not used for now)
                     //String propertyName = time.getTEquals().getPropertyName();
@@ -1794,7 +1790,7 @@ public class SOSworker {
                     }
                 
                 // The operation Time before    
-                } else if (time.getTBefore() != null && time.getTBefore().getRest().size() != 0) {
+                } else if (time.getTBefore() != null && !time.getTBefore().getRest().isEmpty()) {
 
                     // we get the property name (not used for now)
                     // String propertyName = time.getTBefore().getPropertyName();
@@ -1811,7 +1807,7 @@ public class SOSworker {
                     }
                     
                 // The operation Time after    
-                } else if (time.getTAfter() != null && time.getTAfter().getRest().size() != 0) {
+                } else if (time.getTAfter() != null && !time.getTAfter().getRest().isEmpty()) {
                     
                     // we get the property name (not used for now)
                     //String propertyName = time.getTAfter().getPropertyName();
@@ -1829,7 +1825,7 @@ public class SOSworker {
                     }
                     
                 // The time during operation    
-                } else if (time.getTDuring() != null && time.getTDuring().getRest().size() != 0) {
+                } else if (time.getTDuring() != null && !time.getTDuring().getRest().isEmpty()) {
                     
                     // we get the property name (not used for now)
                     //String propertyName = time.getTDuring().getPropertyName();
@@ -1995,7 +1991,7 @@ public class SOSworker {
      * @throws CstlServiceException If the service does not succeed to store the offering in the datasource.
      */
     private void createOffering(String offeringName, Observation template) throws CstlServiceException {
-       LOGGER.log(logLevel, "offering " + offeringName + " not present, first build");
+       LOGGER.log(logLevel, "offering {0} not present, first build", offeringName);
 
         // TODO bounded by??? station?
 
@@ -2088,11 +2084,9 @@ public class SOSworker {
             }
 
         } catch (FileNotFoundException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new CstlServiceException("The service cannot build the temporary file",
+            throw new CstlServiceException("The service cannot build the temporary file:"  + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
             throw new CstlServiceException("the service has throw an IOException:" + ex.getMessage(),
                     NO_APPLICABLE_CODE);
         }
@@ -2136,7 +2130,7 @@ public class SOSworker {
         }
 
         if (configDir != null) {
-            LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
+            LOGGER.log(Level.INFO, "taking configuration from constellation directory: {0}", configDir.getPath());
         }
         return configDir;
     }
@@ -2158,9 +2152,9 @@ public class SOSworker {
             handler.setFormatter(new MonolineFormatter(handler));
             LOGGER.addHandler(handler);
         } catch (IOException ex) {
-            LOGGER.severe("IO exception while trying to separate CSW Logs:" + ex.getMessage());
+            LOGGER.log(Level.SEVERE, "IO exception while trying to separate CSW Logs:{0}", ex.getMessage());
         } catch (SecurityException ex) {
-            LOGGER.severe("Security exception while trying to separate CSW Logs" + ex.getMessage());
+            LOGGER.log(Level.SEVERE, "Security exception while trying to separate CSW Logs{0}", ex.getMessage());
         }
     }
 
@@ -2220,7 +2214,7 @@ public class SOSworker {
         @Override
         public void run() {
             templates.remove(templateId);
-            LOGGER.log(logLevel, "template:" + templateId + " destroyed");
+            LOGGER.log(logLevel, "template:{0} destroyed", templateId);
         }
     }
 }

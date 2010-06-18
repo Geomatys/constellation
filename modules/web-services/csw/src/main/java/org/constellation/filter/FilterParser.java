@@ -176,7 +176,7 @@ public abstract class FilterParser {
 
             //we format the value by replacing the specified special char by the lucene special char
             final String brutValue = translateSpecialChar(pil);
-            addComparsionFilter(response, propertyName, brutValue, "LIKE");
+            addComparisonFilter(response, propertyName, brutValue, "LIKE");
 
 
         } else if (comparisonOps instanceof PropertyIsNullType) {
@@ -184,7 +184,7 @@ public abstract class FilterParser {
 
             //we get the field
             if (pin.getPropertyName() != null) {
-                addComparsionFilter(response, pin.getPropertyName().getContent(), null, "IS NULL ");
+                addComparisonFilter(response, pin.getPropertyName().getContent(), null, "IS NULL ");
             } else {
                 throw new CstlServiceException("An operator propertyIsNull must specified the propertyName.",
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
@@ -208,22 +208,22 @@ public abstract class FilterParser {
                 final String literalValue = literal.getStringValue();
 
                 if (operator.equals("PropertyIsEqualTo")) {
-                    addComparsionFilter(response, propertyName, literalValue, "=");
+                    addComparisonFilter(response, propertyName, literalValue, "=");
 
                 } else if (operator.equals("PropertyIsNotEqualTo")) {
-                    addComparsionFilter(response, propertyName, literalValue, "!=");
+                    addComparisonFilter(response, propertyName, literalValue, "!=");
 
                 } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
-                    addDateComparsionFilter(response, propertyName, literalValue, ">=");
+                    addDateComparisonFilter(response, propertyName, literalValue, ">=");
 
                 } else if (operator.equals("PropertyIsGreaterThan")) {
-                    addDateComparsionFilter(response, propertyName, literalValue, ">");
+                    addDateComparisonFilter(response, propertyName, literalValue, ">");
 
                 } else if (operator.equals("PropertyIsLessThan") ) {
-                    addDateComparsionFilter(response, propertyName, literalValue, "<");
+                    addDateComparisonFilter(response, propertyName, literalValue, "<");
 
                 } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
-                    addDateComparsionFilter(response, propertyName, literalValue, "<=");
+                    addDateComparisonFilter(response, propertyName, literalValue, "<=");
 
                 } else {
                     throw new CstlServiceException("Unkwnow comparison operator: " + operator,
@@ -242,7 +242,7 @@ public abstract class FilterParser {
      * @param literalValue The value of the filter.
      * @param operator The comparison operator.
      */
-    protected abstract void addComparsionFilter(StringBuilder response, String propertyName, String literalValue, String operator);
+    protected abstract void addComparisonFilter(StringBuilder response, String propertyName, String literalValue, String operator);
 
     /**
      * Add to the StringBuilder a piece of query with the specified operator fr a date property.
@@ -253,7 +253,7 @@ public abstract class FilterParser {
      * @param operator The comparison operator.
      * @throws CstlServiceException
      */
-    protected abstract void addDateComparsionFilter(StringBuilder response, String propertyName, String literalValue, String operator) throws CstlServiceException;
+    protected abstract void addDateComparisonFilter(StringBuilder response, String propertyName, String literalValue, String operator) throws CstlServiceException;
 
     /**
      * Extract and format a date representation from the specified String.

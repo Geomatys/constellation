@@ -16,12 +16,7 @@
  */
 package org.constellation.observation;
 
-import org.geotoolkit.internal.sql.table.Column;
 import org.geotoolkit.internal.sql.table.Database;
-import org.geotoolkit.internal.sql.table.Parameter;
-import org.geotoolkit.internal.sql.table.Query;
-import org.geotoolkit.internal.sql.table.QueryType;
-import static org.geotoolkit.internal.sql.table.QueryType.*;
 
 /**
  * The query to execute for a {@link MeasurementTable}.

@@ -301,7 +301,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     final Class c = Class.forName(prop.getProperty((String)className));
                     result.put((String)className, c);
                 } catch (ClassNotFoundException ex) {
-                    LOGGER.severe("error in class binding initialization for class:" + className);
+                    LOGGER.warning("error in class binding initialization for class:" + className);
                 }
             }
 
@@ -360,7 +360,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 final Form f = mdReader.getForm(recordSet, id);
                 result       = getObjectFromForm(identifier, f, mode);
             } else {
-                LOGGER.finer("getting from cache: " + identifier);
+                LOGGER.log(Level.FINER, "getting from cache: {0}", identifier);
             }
             return result;
 
@@ -418,7 +418,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         if (value.getType() != null) {
             classe = getClassFromName(value.getType(), mode);
         } else {
-            LOGGER.severe("Error null type for value:" + value.getIdValue());
+            LOGGER.log(Level.WARNING, "Error null type for value:{0}", value.getIdValue());
             return null;
         }
         

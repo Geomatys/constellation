@@ -427,7 +427,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
         
         // if its a primitive type we create a TextValue
-        if (isPrimitive(classe) || classe.getName().equals("LocalName")) {
+        if (classe.isPrimitive() || classe.getName().equals("LocalName")) {
             if (classe instanceof CodeList) {
                 final CodeList cl = (CodeList) classe;
                 String codelistElement;
@@ -577,26 +577,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             } while (classe != null);
         }
         return result;
-    }
-    
-    /**
-     * Return true if the MDWeb classe is primitive (i.e. if its a CodeList or if it has no properties).
-     * 
-     * @param classe an MDWeb classe Object
-     */
-    private boolean isPrimitive(Classe classe) {
-        if (classe != null) {
-            int nbProperties = classe.getProperties().size();
-            Classe superClass = classe.getSuperClass();
-            while (superClass != null) {
-                nbProperties = nbProperties + superClass.getProperties().size();
-                superClass = superClass.getSuperClass();
-            }
-            
-            return nbProperties == 0 || classe instanceof CodeList;
-        }
-            
-        return false;
     }
     
     /**
@@ -1033,7 +1013,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @throws org.constellation.ws.MetadataIoException
      */
     protected MixedPath getMDWPathFromXPath(String xpath) throws MD_IOException, MetadataIoException {
-        String idValue = "";
         //we remove the first '/'
         if (xpath.startsWith("/")) {
             xpath = xpath.substring(1);
@@ -1058,7 +1037,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
 
         Path p  = new Path(mainStandard, type);
-        idValue = mainStandard.getName() + ':' + type.getName() + ".*";
+        StringBuilder idValue = new StringBuilder(mainStandard.getName()).append(':').append(type.getName()).append(".*");
         while (xpath.indexOf('/') != -1) {
             //Then we get the next Property name
             String propertyName = xpath.substring(0, xpath.indexOf('/'));
@@ -1080,11 +1059,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             }
 
             LOGGER.finer("propertyName:" + propertyName + " ordinal:" + ordinal);
-            idValue = idValue + ':' + propertyName + '.';
+            idValue.append(':').append(propertyName).append('.');
             if (ordinal == -1) {
-                idValue = idValue + '*';
+                idValue.append('*');
             } else {
-                idValue = idValue + ordinal;
+                idValue.append(ordinal);
             }
             final Property property = getProperty(type, propertyName);
             p = new Path(p, property);
@@ -1107,16 +1086,16 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 throw new MetadataIoException("The xpath is malformed, unclosed bracket");
             }
         }
-        idValue = idValue + ':' + xpath + '.';
+        idValue.append(':').append(xpath).append('.');
         if (ordinal == -1) {
-            idValue = idValue + '*';
+            idValue.append('*');
         } else {
-            idValue = idValue + ordinal;
+            idValue.append(ordinal);
         }
         LOGGER.finer("last propertyName:" + xpath + " ordinal:" + ordinal);
         final Property property = getProperty(type, xpath);
         p = new Path(p, property);
-        return new MixedPath(p, idValue);
+        return new MixedPath(p, idValue.toString());
     }
 
     private Property getProperty(final Classe type, String propertyName) throws MD_IOException, MetadataIoException {

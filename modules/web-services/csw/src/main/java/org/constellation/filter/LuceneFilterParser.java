@@ -223,7 +223,7 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addComparsionFilter(StringBuilder response, String propertyName, String literalValue, String operator) {
+    protected void addComparisonFilter(StringBuilder response, String propertyName, String literalValue, String operator) {
         if (operator.equals("!=")) {
             response.append("metafile:doc NOT ");
         }
@@ -238,7 +238,7 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addDateComparsionFilter(StringBuilder response, String propertyName, String literalValue, String operator) throws CstlServiceException {
+    protected void addDateComparisonFilter(StringBuilder response, String propertyName, String literalValue, String operator) throws CstlServiceException {
         if (isDateField(propertyName)) {
             final String dateValue = extractDateValue(literalValue);
             response.append(removePrefix(propertyName)).append(":");

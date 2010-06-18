@@ -93,13 +93,11 @@ public class SQLFilterParser extends FilterParser {
             // we treat logical Operators like AND, OR, ...
             if (filter.getLogicOps() != null) {
                 response = treatLogicalOperator(filter.getLogicOps());
-                response.nbField = nbField - 1;
             
             // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
             } else if (filter.getComparisonOps() != null) {
                 nbField                          = 1;
                 response = new SQLQuery(treatComparisonOperator(filter.getComparisonOps()));
-                nbField++;
                 
             // we treat spatial constraint : BBOX, Beyond, Overlaps, ...    
             } else if (filter.getSpatialOps() != null) {
@@ -110,6 +108,7 @@ public class SQLFilterParser extends FilterParser {
             }  
         }
         if (response != null) {
+            response.nbField = nbField - 1;
             if (executeSelect)
                 response.createSelect();
         }
@@ -135,7 +134,6 @@ public class SQLFilterParser extends FilterParser {
             for (JAXBElement<? extends ComparisonOpsType> jb: binary.getComparisonOps()) {
             
                 final SQLQuery query = new SQLQuery(treatComparisonOperator((JAXBElement<? extends ComparisonOpsType>)jb));
-                nbField++;
                 if (operator.equalsIgnoreCase("OR")) {
                     query.nbField = nbField -1;
                     query.createSelect();
@@ -221,7 +219,6 @@ public class SQLFilterParser extends FilterParser {
             // we treat comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
             if (unary.getComparisonOps() != null) {
                 queryBuilder.append(treatComparisonOperator(unary.getComparisonOps()));
-                nbField++;
                 
             // we treat spatial constraint : BBOX, Beyond, Overlaps, ...        
             } else if (unary.getSpatialOps() != null) {
@@ -265,23 +262,24 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addComparsionFilter(StringBuilder response, String propertyName, String literalValue, String operator) {
+    protected void addComparisonFilter(StringBuilder response, String propertyName, String literalValue, String operator) {
         response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
         response.append('v').append(nbField).append(".\"value\" ").append(operator);
         if (!operator.equals("IS NULL ")) {
             response.append("'").append(literalValue).append("' ");
         }
         response.append(" AND v").append(nbField).append(".\"form\"=\"identifier\" ");
+        nbField++;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected void addDateComparsionFilter(StringBuilder response, String propertyName, String literalValue, String operator) throws CstlServiceException {
+    protected void addDateComparisonFilter(StringBuilder response, String propertyName, String literalValue, String operator) throws CstlServiceException {
         if (isDateField(propertyName)) {
             final String dateValue = extractDateValue(literalValue);
-            addComparsionFilter(response, propertyName, dateValue, operator);
+            addComparisonFilter(response, propertyName, dateValue, operator);
         } else {
             throw new CstlServiceException(operator + " operator works only on Date field.",
                     OPERATION_NOT_SUPPORTED, QUERY_CONSTRAINT);
