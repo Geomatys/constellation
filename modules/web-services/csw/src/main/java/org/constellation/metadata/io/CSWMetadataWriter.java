@@ -36,5 +36,10 @@ public interface CSWMetadataWriter extends MetadataWriter {
      */
     boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException;
 
+    /**
+     * Set the global level of log.
+     *
+     * @param logLevel
+     */
     void setLogLevel(Level logLevel);
 }

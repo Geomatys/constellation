@@ -298,7 +298,7 @@ public class CatalogueHarvester {
                 // if the service respond correctly    
                 } else if (harvested instanceof GetRecordsResponseType) {
                     succeed = true;
-                    LOGGER.info("Response of distant service:" + '\n' + harvested.toString());
+                    LOGGER.info("Response of distant service:\n" + harvested.toString());
                     final GetRecordsResponseType serviceResponse = (GetRecordsResponseType) harvested;
                     final SearchResultsType results              = serviceResponse.getSearchResults();
             
@@ -346,7 +346,7 @@ public class CatalogueHarvester {
                 // a correct response v2.0.0
                 } else if (harvested instanceof org.geotoolkit.csw.xml.v200.GetRecordsResponseType) {
                     succeed = true;
-                    LOGGER.info("Response of distant service:" + '\n' + harvested.toString());
+                    LOGGER.info("Response of distant service:\n" + harvested.toString());
                     final org.geotoolkit.csw.xml.v200.GetRecordsResponseType serviceResponse = (org.geotoolkit.csw.xml.v200.GetRecordsResponseType) harvested;
                     final org.geotoolkit.csw.xml.v200.SearchResultsType results              = serviceResponse.getSearchResults();
             
@@ -402,7 +402,7 @@ public class CatalogueHarvester {
                     }
                     final CstlServiceException exe = new CstlServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
                                                                       NO_APPLICABLE_CODE);
-                    LOGGER.severe("The distant service has throw a webService exception: " + '\n' + exe.toString());
+                    LOGGER.severe("The distant service has throw a webService exception: \n" + exe.toString());
                     distantException.add(exe);
                     moreResults = false;
                 
@@ -477,7 +477,7 @@ public class CatalogueHarvester {
             special      = "Special case 2";
         }
         
-        report.append("CSW ").append(distantVersion).append(" service identified: " + serviceName).append(" ").append(special).append('\n');
+        report.append("CSW ").append(distantVersion).append(" service identified: ").append(serviceName).append(" ").append(special).append('\n');
         
         //we get the Operations metadata if they are present
         final OperationsMetadata om = capa.getOperationsMetadata();
@@ -597,8 +597,7 @@ public class CatalogueHarvester {
                     }
                 }
             } else {
-                report.append("No outputSchema specified using default:"    + '\n' +
-                              '\t' + "csw:Record"                           + '\n');
+                report.append("No outputSchema specified using default:\n\tcsw:Record\n");
                 
                 //we add the default typeNames used
                 typeNamesQname.add(RECORD_QNAME);
@@ -615,7 +614,7 @@ public class CatalogueHarvester {
     }
     
     private String getBestOutputSchema(List<String> availableOutputSchema) {
-        if (availableOutputSchema.size() == 0) {
+        if (availableOutputSchema.isEmpty()) {
             //default case
             return Namespaces.CSW_202;
         
@@ -706,7 +705,7 @@ public class CatalogueHarvester {
                     xmlRequest = xmlRequest.replace("xmlns:dc=\"http://purl.org/dc/elements/1.1/\""     , "");
                     xmlRequest = xmlRequest.replace("xmlns:dc2=\"http://www.purl.org/dc/elements/1.1/\"", "");
                     xmlRequest = xmlRequest.replace("xmlns:dct2=\"http://www.purl.org/dc/terms/\""      , "");
-                    LOGGER.info("special obtained request: " + '\n' + xmlRequest);
+                    LOGGER.info("special obtained request: \n" + xmlRequest);
                 }
                 LOGGER.info("sended:" + xmlRequest);
                 wr.write(xmlRequest);
@@ -752,11 +751,9 @@ public class CatalogueHarvester {
                     harvested = ((JAXBElement) harvested).getValue();
                 }
             } catch (JAXBException ex) {
-                LOGGER.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
-                        "cause: " + ex.getMessage());
+                LOGGER.severe("The distant service does not respond correctly: unable to unmarshall response document.\ncause: " + ex.getMessage());
             }  catch (IllegalAccessError ex) {
-                LOGGER.severe("The distant service does not respond correctly: unable to unmarshall response document." + '\n' +
-                        "cause: " + ex.getMessage());
+                LOGGER.severe("The distant service does not respond correctly: unable to unmarshall response document.\ncause: " + ex.getMessage());
             } finally {
                 if (unmarshaller != null) {
                     marshallerPool.release(unmarshaller);
@@ -851,7 +848,7 @@ public class CatalogueHarvester {
 
                 if (response instanceof GetRecordsResponseType) {
                     
-                    LOGGER.info("Response of distant service:" + '\n' + response.toString());
+                    LOGGER.info("Response of distant service:\n" + response.toString());
                     final GetRecordsResponseType serviceResponse = (GetRecordsResponseType) response;
                     final SearchResultsType results = serviceResponse.getSearchResults();
 

@@ -180,8 +180,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             LOGGER.severe("SQLException while indexing document: " + ex.getMessage());
             throw new IndexingException("SQLException while indexing documents.", ex);
         }
-        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
-                "RecordSets: " + nbRecordSets + " documents indexed: " + nbForms + ".");
+        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms\nRecordSets: " +
+                nbRecordSets + " documents indexed: " + nbForms + ".");
     }
 
     /**
@@ -213,8 +213,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
         }
-        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
-                "RecordSets: " + nbRecordSets + " documents indexed: " + nbForms + ".");
+        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms\nRecordSets: " +
+                nbRecordSets + " documents indexed: " + nbForms + ".");
     }
 
     /**

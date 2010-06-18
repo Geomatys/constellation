@@ -1200,7 +1200,7 @@ public class CSWworker {
      * @return
      */
     public GetDomainResponse getDomain(final GetDomain request) throws CstlServiceException{
-        LOGGER.log(logLevel, "GetDomain request processing" + '\n');
+        LOGGER.log(logLevel, "GetDomain request processing\n");
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request);
         // we prepare the response

@@ -23,12 +23,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 
+// Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.MDWebMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.util.ReflectionUtilities;
 
+// Geotoolkit dependencies
 import org.geotoolkit.csw.xml.Record;
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.dublincore.xml.AbstractSimpleLiteral;
@@ -39,6 +41,7 @@ import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.util.Utilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
+// MDWeb meta model dependencies
 import org.mdweb.io.MD_IOException;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.PrimitiveType;
@@ -47,15 +50,17 @@ import org.mdweb.model.storage.Form;
 import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 
+// GeoAPI dependencies
 import org.opengis.metadata.identification.Identification;
 
 
 /**
- *
+ * A CSW Metadata Writer specific for MDweb data source.
+ * It allows to write, update and delete metadatas, it also keep the lucene Index of the CSW up to date.
+ * 
  * @author Guilhem Legal (Geomatys)
  */
 public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMetadataWriter {
-
 
     /**
      * An indexer lucene to add object into the index.
@@ -72,6 +77,12 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
         this.indexer = index;
     }
 
+    /**
+     * Build a MDweb CSW metadata writer with no database and no index.
+     * Used for JUnit test only.
+     * 
+     * @throws MetadataIoException
+     */
     public MDWebCSWMetadataWriter() throws MetadataIoException {
         super();
         indexer = null;
@@ -87,6 +98,9 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteMetadata(String identifier) throws MetadataIoException {
          final boolean success = super.deleteMetadata(identifier);
@@ -292,6 +306,9 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
         return title;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setLogLevel(Level logLevel) {
         super.setLogLevel(logLevel);

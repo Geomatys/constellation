@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -64,7 +65,9 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
- *
+ * A CSW Metadata reader specific for MDweb data source.
+ * It allows to read metadatas from the datasource.
+ * 
  * @author Guilhem Legal (Geomatys)
  */
 public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMetadataReader {
@@ -133,7 +136,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                         conceptMap.put(word.getLabel(), uri);
 
                     } catch (URISyntaxException ex) {
-                        LOGGER.warning("URI syntax exception for:" + word.getUriConcept());
+                        LOGGER.log(Level.WARNING, "URI syntax exception for:{0}", word.getUriConcept());
                     }
                 }
 
@@ -168,7 +171,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                         INVALID_PARAMETER_VALUE, "propertyName");
             }
 
-            if (paths.size() != 0) {
+            if (!paths.isEmpty()) {
                 try {
                     final List<String> values         = mdReader.getDomainOfValuesFromPaths(paths, true);
                     final ListOfValuesType listValues = new ListOfValuesType(values);
@@ -230,7 +233,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                     final Form f = mdReader.getForm(recordSet, id);
                     result = getObjectFromForm(identifier, f, mode);
                 } else {
-                    LOGGER.finer("getting from cache: " + identifier);
+                    LOGGER.log(Level.FINER, "getting from cache: {0}", identifier);
                 }
 
                 /*
@@ -284,7 +287,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         // then we apply the elementSet/elementName filter
 
         // for an ElementSetName mode
-        if (elementName == null || elementName.size() == 0) {
+        if (elementName == null || elementName.isEmpty()) {
 
             //if the result can't be filtered by Set filter we return it.
             if (!(result instanceof Settable)) {
@@ -412,7 +415,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         String dataType               = null;
         SimpleLiteral litType         = null;
         try {
-            if (typeValues.size() != 0) {
+            if (!typeValues.isEmpty()) {
                 final TextValue value = (TextValue)typeValues.get(0);
                 final int code        = Integer.parseInt(value.getValue());
                 final org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList)value.getType();
@@ -452,7 +455,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                     try {
                         code = Integer.parseInt(value);
                     } catch (NumberFormatException ex) {
-                        LOGGER.warning("unable to parse the codeListelement:" + value);
+                        LOGGER.log(Level.WARNING, "unable to parse the codeListelement:{0}", value);
                     }
                     final CodeListElement element = c.getElementByCode(code);
                     if (element != null) {
@@ -474,7 +477,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             }
         }
         final SimpleLiteral format;
-        if (formats.size() != 0) {
+        if (!formats.isEmpty()) {
             format = new SimpleLiteral(null, formats);
         } else {
             format = null;
@@ -568,7 +571,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
 
         // for an ElementSetName mode
-        if (elementName == null || elementName.size() == 0) {
+        if (elementName == null || elementName.isEmpty()) {
             if (type.equals(ElementSetType.BRIEF)) {
                 return new BriefRecordType(identifier, title, litType , bboxes);
             }
@@ -661,7 +664,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                 }
             }
         } catch (NumberFormatException ex) {
-            LOGGER.warning("unable to parse a double in bounding box value:" + '\n' + ex.getMessage() ) ;
+            LOGGER.warning("unable to parse a double in bounding box value:\n" + ex.getMessage()) ;
         }
 
         if (eastValue != null && westValue != null && northValue != null && southValue != null) {

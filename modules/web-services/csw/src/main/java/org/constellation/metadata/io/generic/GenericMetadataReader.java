@@ -20,6 +20,7 @@ package org.constellation.metadata.io.generic;
 // J2SE dependencies
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
@@ -57,7 +58,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      * @param identifier
      */
     protected Values loadData(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
-        LOGGER.finer("loading data for " + identifier);
+        LOGGER.log(Level.FINER, "loading data for {0}", identifier);
 
         final List<String> variables;
         
@@ -73,6 +74,9 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
         return loadData(variables, identifier);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, elementName);
@@ -107,22 +111,27 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
         }
         return result;
     }
-    
+
     /**
+     *
      * return a metadata in dublin core representation.
-     * 
-     * @param identifier
-     * @param type
-     * @param elementName
-     * @return
+     *
+     * @param identifier An unique identifier for the metadata.
+     * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
+     * @param elementName  A list of QName describing the requested fields. (implies type == null)
+     * @param values A set of variables and their associated values.
+     *
+     * @return A Dublin-core representation of the metadata.
      */
     protected abstract AbstractRecordType getDublinCore(String identifier, ElementSetType type, List<QName> elementName, Values values);
     
     /**
      * return a metadata in ISO representation.
-     * 
-     * @param identifier
-     * @return
+     *
+     * @param identifier An unique identifier for the metadata.
+     * @param values A set of variables and their associated values.
+     *
+     * @return An ISO 19139 representation of the metadata.
      */
     protected abstract DefaultMetadata getISO(String identifier, Values values);
     
@@ -164,12 +173,18 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
     public List<String> getAllIdentifiers() throws MetadataIoException {
         return getMainQueryResult();
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException {
          throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException {
         throw new UnsupportedOperationException("Not supported yet.");

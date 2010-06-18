@@ -855,406 +855,204 @@ INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemIn
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:codeSpace','codeSpace', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority','authority', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:title','title', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:alternateTitle','alternateTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:date','date', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:date:date','date', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:date:dateType','dateType', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:edition','edition', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:editionDate','editionDate', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty','citedResponsibleParty', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:presentationForm','presentationForm', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:series','series', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:series:name','name', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:series:issueIdentification','issueIdentification', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:series:page','page', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:otherCitationDetails','otherCitationDetails', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:collectiveTitle','collectiveTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:ISBN','ISBN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority:ISSN','ISSN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:referenceSystemInfo:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:citation:editionDate','editionDate', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:citation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:citation:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:citation:series:issueIdentification','issueIdentification', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:citation:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:citation:otherCitationDetails','otherCitationDetails', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:citation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:purpose','purpose', 'ISO 19115', 'MD_Identification', 'ISO 19115:MD_Metadata:identificationInfo', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:dateOfNextUpdate','dateOfNextUpdate', 'ISO 19115', 'MD_MaintenanceInformation', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:userDefinedMaintenanceFrequency','userDefinedMaintenanceFrequency', 'ISO 19115', 'MD_MaintenanceInformation', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScope','updateScope', 'ISO 19115', 'MD_MaintenanceInformation', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription','updateScopeDescription', 'ISO 19115', 'MD_MaintenanceInformation', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription:attributes','attributes', 'ISO 19115', 'MD_ScopeDescription', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription:features','features', 'ISO 19115', 'MD_ScopeDescription', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription:featureInstances','featureInstances', 'ISO 19115', 'MD_ScopeDescription', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription:attributeInstances','attributeInstances', 'ISO 19115', 'MD_ScopeDescription', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription:dataset','dataset', 'ISO 19115', 'MD_ScopeDescription', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription:other','other', 'ISO 19115', 'MD_ScopeDescription', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:updateScopeDescription', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:maintenanceNote','maintenanceNote', 'ISO 19115', 'MD_MaintenanceInformation', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceFormat:amendmentNumber','amendmentNumber', 'ISO 19115', 'MD_Format', 'ISO 19115:MD_Metadata:identificationInfo:resourceFormat', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceFormat:specification','specification', 'ISO 19115', 'MD_Format', 'ISO 19115:MD_Metadata:identificationInfo:resourceFormat', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceFormat:fileDecompressionTechnique','fileDecompressionTechnique', 'ISO 19115', 'MD_Format', 'ISO 19115:MD_Metadata:identificationInfo:resourceFormat', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:editionDate','editionDate', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation','citation', 'ISO 19115', 'FRA_Constraints', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints', 'ISO 19115 FRA 1.0');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:title','title', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:alternateTitle','alternateTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:date','date', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:date:date','date', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:date:dateType','dateType', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:edition','edition', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:editionDate','editionDate', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty','citedResponsibleParty', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:presentationForm','presentationForm', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:series','series', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:series:name','name', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:series:issueIdentification','issueIdentification', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:series:page','page', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:otherCitationDetails','otherCitationDetails', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:collectiveTitle','collectiveTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:ISBN','ISBN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation:ISSN','ISSN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:citation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:userNote','userNote', 'ISO 19115', 'MD_SecurityConstraints', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:classificationSystem','classificationSystem', 'ISO 19115', 'MD_SecurityConstraints', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceConstraints:handlingDescription','handlingDescription', 'ISO 19115', 'MD_SecurityConstraints', 'ISO 19115:MD_Metadata:identificationInfo:resourceConstraints', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:environnementDescription','environnementDescription', 'ISO 19115', 'MD_DataIdentification', 'ISO 19115:MD_Metadata:identificationInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:description','description', 'ISO 19115', 'EX_Extent', 'ISO 19115:MD_Metadata:identificationInfo:extent', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:extentTypeCode','extentTypeCode', 'ISO 19115', 'EX_GeographicExtent', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority','authority', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:title','title', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:alternateTitle','alternateTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:date','date', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:date:date','date', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:date:dateType','dateType', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:edition','edition', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:editionDate','editionDate', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty','citedResponsibleParty', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:presentationForm','presentationForm', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:series','series', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:series:name','name', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:series:issueIdentification','issueIdentification', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:series:page','page', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:otherCitationDetails','otherCitationDetails', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:collectiveTitle','collectiveTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:ISBN','ISBN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority:ISSN','ISSN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement4','geographicElement4', 'ISO 19115', 'EX_Extent', 'ISO 19115:MD_Metadata:identificationInfo:extent', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement4:extentTypeCode','extentTypeCode', 'ISO 19115', 'EX_GeographicExtent', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement4', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement4:polygon','polygon', 'ISO 19115', 'EX_BoundingPolygon', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement4', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:minimumValue','minimumValue', 'ISO 19115', 'EX_VerticalExtent', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:maximumValue','maximumValue', 'ISO 19115', 'EX_VerticalExtent', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:unitOfMeasure','unitOfMeasure', 'ISO 19115', 'EX_VerticalExtent', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS','verticalCRS', 'ISO 19115', 'EX_VerticalExtent', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:identifier','identifier', 'ISO 19115', 'VerticalCRS', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS', 'ISO 19108');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:identifier:code','code', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:identifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty','verticalCSProperty', 'ISO 19115', 'VerticalCRS', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS', 'ISO 19108');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:identifier','identifier', 'ISO 19115', 'VerticalCS', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty', 'ISO 19108');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:identifier:code','code', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:identifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis','axis', 'ISO 19115', 'VerticalCS', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty', 'ISO 19108');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis:identifier','identifier', 'ISO 19115', 'CoordinateSystemAxis', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis', 'ISO 19108');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis:identifier:code','code', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis:identifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis:identifier:codespace','codespace', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis:identifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis:axisAbbrev','axisAbbrev', 'ISO 19115', 'CoordinateSystemAxis', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis', 'ISO 19108');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis:axisDirection','axisDirection', 'ISO 19115', 'CoordinateSystemAxis', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis', 'ISO 19108');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis:uom','uom', 'ISO 19115', 'CoordinateSystemAxis', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalCSProperty:axis', 'ISO 19108');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalDatumProperty','verticalDatumProperty', 'ISO 19115', 'VerticalCRS', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS', 'ISO 19108');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalDatumProperty:identifier','identifier', 'ISO 19115', 'VerticalDatum', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalDatumProperty', 'ISO 19108');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalDatumProperty:identifier:code','code', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:identificationInfo:extent:verticalElement:verticalCRS:verticalDatumProperty:identifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:supplementalInformation','supplementalInformation', 'ISO 19115', 'MD_DataIdentification', 'ISO 19115:MD_Metadata:identificationInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributionFormat:amendmentNumber','amendmentNumber', 'ISO 19115', 'MD_Format', 'ISO 19115:MD_Metadata:distributionInfo:distributionFormat', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributionFormat:specification','specification', 'ISO 19115', 'MD_Format', 'ISO 19115:MD_Metadata:distributionInfo:distributionFormat', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributionFormat:fileDecompressionTechnique','fileDecompressionTechnique', 'ISO 19115', 'MD_Format', 'ISO 19115:MD_Metadata:distributionInfo:distributionFormat', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:onlineResource', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:onlineResource', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorContact:contactInfo:onlineResource', 'ISO 19115');
@@ -1277,533 +1075,270 @@ INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:onLine:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:onLine', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:onLine:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:onLine', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:onLine:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:onLine', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:offLine:name','name', 'ISO 19115', 'MD_Medium', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:offLine', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:offLine:density','density', 'ISO 19115', 'MD_Medium', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:offLine', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:offLine:densityUnits','densityUnits', 'ISO 19115', 'MD_Medium', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:offLine', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:offLine:volumes','volumes', 'ISO 19115', 'MD_Medium', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:offLine', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:offLine:mediumFormat','mediumFormat', 'ISO 19115', 'MD_Medium', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:offLine', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:offLine:mediumName','mediumName', 'ISO 19115', 'MD_Medium', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributorTransferOptions:offLine', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributionOrderProcess','distributionOrderProcess', 'ISO 19115', 'MD_Distributor', 'ISO 19115:MD_Metadata:distributionInfo:distributor', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributionOrderProcess:fees','fees', 'ISO 19115', 'MD_StandardOrderProcess', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributionOrderProcess', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributionOrderProcess:plannedAvailableDateTime','plannedAvailableDateTime', 'ISO 19115', 'MD_StandardOrderProcess', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributionOrderProcess', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributionOrderProcess:orderingInstructions','orderingInstructions', 'ISO 19115', 'MD_StandardOrderProcess', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributionOrderProcess', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:distributor:distributionOrderProcess:turnaround','turnaround', 'ISO 19115', 'MD_StandardOrderProcess', 'ISO 19115:MD_Metadata:distributionInfo:distributor:distributionOrderProcess', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:transferOptions:unitsOfDistribution','unitsOfDistribution', 'ISO 19115', 'MD_DigitalTransferOptions', 'ISO 19115:MD_Metadata:distributionInfo:transferOptions', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:transferOptions:onLine:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:distributionInfo:transferOptions:onLine', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:transferOptions:onLine:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:distributionInfo:transferOptions:onLine', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:distributionInfo:transferOptions:offLine:densityUnits','densityUnits', 'ISO 19115', 'MD_Medium', 'ISO 19115:MD_Metadata:distributionInfo:transferOptions:offLine', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:ellipsoidParameters','ellipsoidParameters', 'ISO 19115', 'MD_CRS', 'ISO 19115:MD_Metadata:referenceSystemInfo', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:ellipsoidParameters:semiMajorAxis','semiMajorAxis', 'ISO 19115', 'MD_EllipsoidParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:ellipsoidParameters', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:ellipsoidParameters:axisUnits','axisUnits', 'ISO 19115', 'MD_EllipsoidParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:ellipsoidParameters', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:ellipsoidParameters:denominatorOfFlatetteningRatio','denominatorOfFlatetteningRatio', 'ISO 19115', 'MD_EllipsoidParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:ellipsoidParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters','projectionParameters', 'ISO 19115', 'MD_CRS', 'ISO 19115:MD_Metadata:referenceSystemInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:zone','zone', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:standardParallel','standardParallel', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:longitudeOfCentralMeridian','longitudeOfCentralMeridian', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:latitudeOfProjectionOrigin','latitudeOfProjectionOrigin', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:0Easting','0Easting', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:0Northing','0Northing', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:0EastingNorthingUnits','0EastingNorthingUnits', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:scaleFactorAtEquator','scaleFactorAtEquator', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:heightOfProspectivePointAboveSurface','heightOfProspectivePointAboveSurface', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:longitudeOfProjectionCenter','longitudeOfProjectionCenter', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:latitudeOfProjectionCenter','latitudeOfProjectionCenter', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:scaleFactorAtCenterLine','scaleFactorAtCenterLine', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:straightVerticalLongitudeFromPole','straightVerticalLongitudeFromPole', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters:scaleFactorAtProjectionOrigin','scaleFactorAtProjectionOrigin', 'ISO 19115', 'MD_ProjectionParameters', 'ISO 19115:MD_Metadata:referenceSystemInfo:projectionParameters', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation','featureCatalogueCitation', 'ISO 19115', 'MD_FeatureCatalogueDescription', 'ISO 19115:MD_Metadata:contentInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty','citedResponsibleParty', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact','contact', 'ISO 19115', 'MD_MaintenanceInformation', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceMaintenance:contact:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource','extensionOnLineResource', 'ISO 19115', 'MD_MetadataExtensionInformation', 'ISO 19115:MD_Metadata:metadataExtensionInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extensionOnLineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:shortName','shortName', 'ISO 19115', 'MD_ExtendedElementInformation', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:domainCode','domainCode', 'ISO 19115', 'MD_ExtendedElementInformation', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:obligation','obligation', 'ISO 19115', 'MD_ExtendedElementInformation', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:condition','condition', 'ISO 19115', 'MD_ExtendedElementInformation', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:maximumOccurrence','maximumOccurrence', 'ISO 19115', 'MD_ExtendedElementInformation', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:domainValue','domainValue', 'ISO 19115', 'MD_ExtendedElementInformation', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:parentIdentity','parentIdentity', 'ISO 19115', 'MD_ExtendedElementInformation', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:rule','rule', 'ISO 19115', 'MD_ExtendedElementInformation', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:phone', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:metadataExtensionInfo:extendedElementInformation:source', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo','aggregationInfo', 'ISO 19115', 'MD_Identification', 'ISO 19115:MD_Metadata:identificationInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:associationType','associationType', 'ISO 19115', 'MD_AggregateInformation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:initiativeType','initiativeType', 'ISO 19115', 'MD_AggregateInformation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName','aggregateDataSetName', 'ISO 19115', 'MD_AggregateInformation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:title','title', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:alternateTitle','alternateTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:date','date', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:date:date','date', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:date:dateType','dateType', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:edition','edition', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:editionDate','editionDate', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty','citedResponsibleParty', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:presentationForm','presentationForm', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:series','series', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:series:name','name', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:series:issueIdentification','issueIdentification', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:series:page','page', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:otherCitationDetails','otherCitationDetails', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:collectiveTitle','collectiveTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:ISBN','ISBN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:ISSN','ISSN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName:identifier','identifier', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier','aggregateDataSetIdentifier', 'ISO 19115', 'MD_AggregateInformation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority','authority', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:identifier','identifier', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:title','title', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:alternateTitle','alternateTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:date','date', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:date:date','date', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:date:dateType','dateType', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:edition','edition', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:editionDate','editionDate', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty','citedResponsibleParty', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:presentationForm','presentationForm', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:series','series', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:series:name','name', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:series:issueIdentification','issueIdentification', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:series:page','page', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:otherCitationDetails','otherCitationDetails', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:collectiveTitle','collectiveTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:ISBN','ISBN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority:ISSN','ISSN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier:code','code', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:identificationInfo:aggregationInfo:aggregateDataSetIdentifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:series','series', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:series:name','name', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:series:issueIdentification','issueIdentification', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:series', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:codeSpace','codeSpace', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:series:page','page', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:otherCitationDetails','otherCitationDetails', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:collectiveTitle','collectiveTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:ISBN','ISBN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName:ISSN','ISSN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:ThesaurusName', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:specificUsage','specificUsage', 'ISO 19115', 'MD_Usage', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:usageDateTime','usageDateTime', 'ISO 19115', 'MD_Usage', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userDeterminedLimitations','userDeterminedLimitations', 'ISO 19115', 'MD_Usage', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo','userContactInfo', 'ISO 19115', 'MD_Usage', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:phone', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:contactInfo', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:identificationInfo:resourceSpecificUsage:userContactInfo', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:complianceCode','complianceCode', 'ISO 19115', 'MD_FeatureCatalogueDescription', 'ISO 19115:MD_Metadata:contentInfo', 'ISO 19115');
@@ -1843,165 +1378,88 @@ INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featu
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:collectiveTitle','collectiveTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:ISBN','ISBN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation:ISSN','ISSN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:contentInfo:featureCatalogueCitation', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:attributeDescription','attributeDescription', 'ISO 19115', 'MD_CoverageDescription', 'ISO 19115:MD_Metadata:contentInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:contentType','contentType', 'ISO 19115', 'MD_CoverageDescription', 'ISO 19115:MD_Metadata:contentInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension','dimension', 'ISO 19115', 'MD_CoverageDescription', 'ISO 19115:MD_Metadata:contentInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:sequenceIdentifier','sequenceIdentifier', 'ISO 19115', 'MD_RangeDimension', 'ISO 19115:MD_Metadata:contentInfo:dimension', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:sequenceIdentifier:attributeType','attributeType', 'ISO 19115', 'MemberName', 'ISO 19115:MD_Metadata:contentInfo:dimension:sequenceIdentifier', 'ISO 19103');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:sequenceIdentifier:attributeType:aName','aName', 'ISO 19115', 'GenericName', 'ISO 19115:MD_Metadata:contentInfo:dimension:sequenceIdentifier:attributeType', 'ISO 19103');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:sequenceIdentifier:aName','aName', 'ISO 19115', 'GenericName', 'ISO 19115:MD_Metadata:contentInfo:dimension:sequenceIdentifier', 'ISO 19103');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:descriptor','descriptor', 'ISO 19115', 'MD_RangeDimension', 'ISO 19115:MD_Metadata:contentInfo:dimension', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:maxValue','maxValue', 'ISO 19115', 'MD_Band', 'ISO 19115:MD_Metadata:contentInfo:dimension', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:minValue','minValue', 'ISO 19115', 'MD_Band', 'ISO 19115:MD_Metadata:contentInfo:dimension', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:units','units', 'ISO 19115', 'MD_Band', 'ISO 19115:MD_Metadata:contentInfo:dimension', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:peakResponse','peakResponse', 'ISO 19115', 'MD_Band', 'ISO 19115:MD_Metadata:contentInfo:dimension', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:bitsPerValue','bitsPerValue', 'ISO 19115', 'MD_Band', 'ISO 19115:MD_Metadata:contentInfo:dimension', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:toneGradation','toneGradation', 'ISO 19115', 'MD_Band', 'ISO 19115:MD_Metadata:contentInfo:dimension', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:scaleFactor','scaleFactor', 'ISO 19115', 'MD_Band', 'ISO 19115:MD_Metadata:contentInfo:dimension', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:contentInfo:dimension:offset','offset', 'ISO 19115', 'MD_Band', 'ISO 19115:MD_Metadata:contentInfo:dimension', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent','extent', 'ISO 19115', 'EX_Extent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:description','description', 'ISO 19115', 'DQ_Scope', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent', 'ISO 19115');
-
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2', 'geographicElement2', 'ISO 19115', 'EX_Extent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent', 'ISO 19115');
-
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2', 'geographicElement2', 'ISO 19115', 'EX_Extent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2:extentTypeCode','extentTypeCode', 'ISO 19115', 'EX_GeographicExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2', 'ISO 19115');
-
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2:westBoundLongitude', 'westBoundLongitude', 'ISO 19115', 'EX_GeographicBoundingBox', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2', 'ISO 19115');
-
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2:eastBoundLongitude', 'eastBoundLongitude', 'ISO 19115', 'EX_GeographicBoundingBox', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2', 'ISO 19115');
-
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2:northBoundLatitude', 'northBoundLatitude', 'ISO 19115', 'EX_GeographicBoundingBox', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2', 'ISO 19115');
-
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2:southBoundLatitude', 'southBoundLatitude', 'ISO 19115', 'EX_GeographicBoundingBox', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2', 'ISO 19115');
-
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3', 'geographicElement3', 'ISO 19115', 'EX_Extent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent', 'ISO 19115');
-
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2:westBoundLongitude', 'westBoundLongitude', 'ISO 19115', 'EX_GeographicBoundingBox', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2:eastBoundLongitude', 'eastBoundLongitude', 'ISO 19115', 'EX_GeographicBoundingBox', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2:northBoundLatitude', 'northBoundLatitude', 'ISO 19115', 'EX_GeographicBoundingBox', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2:southBoundLatitude', 'southBoundLatitude', 'ISO 19115', 'EX_GeographicBoundingBox', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement2', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3', 'geographicElement3', 'ISO 19115', 'EX_Extent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:extentTypeCode','extentTypeCode', 'ISO 19115', 'EX_GeographicExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier','geographicIdentifier', 'ISO 19115', 'EX_GeographicDescription', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:code','code', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority','authority', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:title','title', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:identifier','identifier', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:alternateTitle','alternateTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:date','date', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:date:date','date', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:date:dateType','dateType', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:edition','edition', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:editionDate','editionDate', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty','citedResponsibleParty', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:presentationForm','presentationForm', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:series','series', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:series:name','name', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:series:issueIdentification','issueIdentification', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:series:page','page', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:otherCitationDetails','otherCitationDetails', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:collectiveTitle','collectiveTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:ISBN','ISBN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority:ISSN','ISSN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement3:geographicIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement4','geographicElement4', 'ISO 19115', 'EX_Extent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement4:extentTypeCode','extentTypeCode', 'ISO 19115', 'EX_GeographicExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement4', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement4:polygon','polygon', 'ISO 19115', 'EX_BoundingPolygon', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:geographicElement4', 'ISO 19115');
-
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement', 'temporalElement', 'ISO 19115', 'EX_Extent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent', 'ISO 19115');
-
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'extent', 'ISO 19115', 'EX_TemporalExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent:beginPosition', 'beginPosition', 'ISO 19108', 'TimePeriod', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'ISO 19108');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent:endPosition', 'endPosition', 'ISO 19108', 'TimePeriod', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'ISO 19108');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:verticalElement:minimumValue', 'minimumValue', 'ISO 19115', 'EX_VerticalExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:verticalElement:maximumValue', 'maximumValue', 'ISO 19115', 'EX_VerticalExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:verticalElement:unitOfMeasure', 'unitOfMeasure', 'ISO 19115', 'EX_VerticalExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:verticalElement:verticalDatum', 'verticalDatum', 'ISO 19115', 'EX_VerticalExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement', 'temporalElement', 'ISO 19115', 'EX_Extent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'extent', 'ISO 19115', 'EX_TemporalExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent:beginPosition', 'beginPosition', 'ISO 19108', 'TimePeriod', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'ISO 19108');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent:endPosition', 'endPosition', 'ISO 19108', 'TimePeriod', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'ISO 19108');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:verticalElement:minimumValue', 'minimumValue', 'ISO 19115', 'EX_VerticalExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:verticalElement:maximumValue', 'maximumValue', 'ISO 19115', 'EX_VerticalExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:verticalElement:unitOfMeasure', 'unitOfMeasure', 'ISO 19115', 'EX_VerticalExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:verticalElement:verticalDatum', 'verticalDatum', 'ISO 19115', 'EX_VerticalExtent', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:extent:temporalElement:extent', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:levelDescription:attributes','attributes', 'ISO 19115', 'MD_ScopeDescription', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:levelDescription', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:levelDescription:features','features', 'ISO 19115', 'MD_ScopeDescription', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:levelDescription', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:scope:levelDescription:featureInstances','featureInstances', 'ISO 19115', 'MD_ScopeDescription', 'ISO 19115:MD_Metadata:dataQualityInfo:scope:levelDescription', 'ISO 19115');
@@ -2031,129 +1489,71 @@ INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:l
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo:onlineResource', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo:onlineResource', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:processor', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source','source', 'ISO 19115', 'LI_ProcessStep', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem','sourceReferenceSystem', 'ISO 19115', 'LI_Source', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:description','description', 'ISO 19115', 'LI_Source', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:scaleDenominator','scaleDenominator', 'ISO 19115', 'LI_Source', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:scaleDenominator:denominator','denominator', 'ISO 19115', 'MD_RepresentativeFraction', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:scaleDenominator', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier','referenceSystemIdentifier', 'ISO 19115', 'MD_ReferenceSystem', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:code','code', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:codeSpace','codeSpace', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:version','version', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority','authority', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:title','title', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:identifier','identifier', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:alternateTitle','alternateTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:date','date', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:date:date','date', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:date:dateType','dateType', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:edition','edition', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:editionDate','editionDate', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty','citedResponsibleParty', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:presentationForm','presentationForm', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:series','series', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:series:name','name', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:series:issueIdentification','issueIdentification', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:series:page','page', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:otherCitationDetails','otherCitationDetails', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:collectiveTitle','collectiveTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:ISBN','ISBN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority:ISSN','ISSN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:referenceSystemIdentifier:authority', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection','projection', 'ISO 19115', 'MD_CRS', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid','ellipsoid', 'ISO 19115', 'MD_CRS', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum','datum', 'ISO 19115', 'MD_CRS', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address:city', 'city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address:deliveryPoint', 'deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address:postalCode', 'postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address:country', 'country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource:linkage', 'linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address:city', 'city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address:deliveryPoint', 'deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address:postalCode', 'postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address:country', 'country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:address', 'ISO 19115');
+INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource:linkage', 'linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:identificationInfo:pointOfContact:contactInfo:onlineResource', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection:authority','authority', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection:code','code', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection:version','version', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection', 'ISO 19115');
@@ -2200,177 +1600,91 @@ INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:l
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection:authority:collectiveTitle','collectiveTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection:authority', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection:authority:ISBN','ISBN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection:authority', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection:authority:ISSN','ISSN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:projection:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority','authority', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:code','code', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:version','version', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:title','title', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:identifier','identifier', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:alternateTitle','alternateTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:date','date', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:date:date','date', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:date:dateType','dateType', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:edition','edition', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:editionDate','editionDate', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty','citedResponsibleParty', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:presentationForm','presentationForm', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:series','series', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:series:name','name', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:series:issueIdentification','issueIdentification', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:series', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:codeSpace','codeSpace', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:series:page','page', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:otherCitationDetails','otherCitationDetails', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:collectiveTitle','collectiveTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:ISBN','ISBN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority:ISSN','ISSN', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:ellipsoid:authority', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority','authority', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:code','code', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:version','version', 'ISO 19115', 'RS_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:title','title', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:identifier','identifier', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:alternateTitle','alternateTitle', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:date','date', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:date:date','date', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:date:dateType','dateType', 'ISO 19115', 'CI_Date', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:date', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:edition','edition', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:editionDate','editionDate', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty','citedResponsibleParty', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:individualName','individualName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:organisationName','organisationName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:positionName','positionName', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo','contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:phone','phone', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:phone:voice','voice', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:phone:facsimile','facsimile', 'ISO 19115', 'CI_Telephone', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:phone', 'ISO 19115');
-
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address','address', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address:deliveryPoint','deliveryPoint', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address:city','city', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address:administrativeArea','administrativeArea', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address:postalCode','postalCode', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address:electronicMailAddress','electronicMailAddress', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address:country','country', 'ISO 19115', 'CI_Address', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:address', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource','onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource:linkage','linkage', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource:protocol','protocol', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource:applicationProfile','applicationProfile', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource:function','function', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:onlineResource', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:hoursOfService','hoursOfService', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo:contactInstructions','contactInstructions', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:contactInfo', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty:role','role', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:citedResponsibleParty', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:presentationForm','presentationForm', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:series','series', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:series:name','name', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:series', 'ISO 19115');
-
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:series:issueIdentification','issueIdentification', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:series', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:codeSpace','codeSpace', 'ISO 19115', 'MD_Identifier', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:series:page','page', 'ISO 19115', 'CI_Series', 'ISO 19115:MD_Metadata:dataQualityInfo:lineage:processStep:source:sourceReferenceSystem:datum:authority:series', 'ISO 19115');
@@ -2650,14 +1964,9 @@ INSERT INTO "Schemas"."Properties"  VALUES ('bitsPerValue', 'bitsPerVal', 'ISO 1
 INSERT INTO "Schemas"."Properties"  VALUES ('toneGradation', 'toneGrad', 'ISO 19115', 'Tone gradation', 0, 1, 'MD_Band', 'Integer', NULL, 'O', 6, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('scaleFactor', 'sclFac', 'ISO 19115', 'Scale factor', 0, 1, 'MD_Band', 'Real', NULL, 'O', 7, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('offset', 'offset', 'ISO 19115', 'Offset', 0, 1, 'MD_Band', 'Real', NULL, 'O', 8, 'ISO 19103', 'ISO 19115', ' ');
-
---------------------------------------------------------------------------------------------
-------------------- correction adding missing properties FileDescription
 INSERT INTO "Schemas"."Properties"  VALUES ('fileName', 'bgFileName', 'ISO 19115', 'Quicklook name', 1, 1, 'MD_BrowseGraphic', 'CharacterString', NULL, 'M', 1, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('fileDescription', NULL, 'ISO 19115', NULL, 0, 1, 'MD_BrowseGraphic', 'CharacterString', NULL, 'O', 2, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('fileType', 'bgFileType', 'ISO 19115', 'File type', 0, 1, 'MD_BrowseGraphic', 'CharacterString', NULL, 'O', 3, 'ISO 19103', 'ISO 19115', ' ');
-
-
 INSERT INTO "Schemas"."Properties"  VALUES ('useLimitation', 'useLimit', 'ISO 19115', 'Limitation use of metadata', 0, 2147483647, 'MD_Constraints', 'CharacterString', NULL, 'O', 1, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('citation', 'CstCit', 'ISO 19115 FRA 1.0', 'Citation of documents or information source', 0, 2147483647, 'FRA_Constraints', 'CI_Citation', NULL, 'O', 2, 'ISO 19115', 'ISO 19115 FRA 1.0', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('attributeDescription', 'attDesc', 'ISO 19115', 'Attribute description', 1, 1, 'MD_CoverageDescription', 'RecordType', NULL, 'M', 1, 'ISO 19103', 'ISO 19115', ' ');
@@ -2686,10 +1995,6 @@ INSERT INTO "Schemas"."Properties"  VALUES ('scaleFactorAtCenterLine', 'sclFacCn
 INSERT INTO "Schemas"."Properties"  VALUES ('straightVerticalLongitudeFromPole', 'stVrLongPI', 'ISO 19115', 'Straight vertical longitude from pole', 0, 1, 'MD_ProjectionParameters', 'Real', NULL, 'O', 13, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('scaleFactorAtProjectionOrigin', 'sclFacPrOr', 'ISO 19115', 'Scale factor at projection origin', 0, 1, 'MD_ProjectionParameters', 'Real', NULL, 'O', 14, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('projectionParameters', 'projParas', 'ISO 19115', 'Projection parameters', 0, 1, 'MD_CRS', 'MD_ProjectionParameters', NULL, 'O', 6, 'ISO 19115', 'ISO 19115', ' ');
-
--------------------------------------------------------------------------------------------------------------
-------------- correction this properties belong to MD_Identification not MD_DataIdentification --------------
--------------------------------------------------------------------------------------------------------------
 INSERT INTO "Schemas"."Properties"  VALUES ('citation', 'idCitation', 'ISO 19115', 'Citation of documents or information source', 1, 1, 'MD_Identification', 'CI_Citation', NULL, 'M', 1, 'ISO 19115', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('abstract', 'idAbs', 'ISO 19115', 'Summary', 1, 1, 'MD_Identification', 'CharacterString', NULL, 'M', 2, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('purpose', 'idPurp', 'ISO 19115', 'Purpose of the resource(s)', 0, 1, 'MD_Identification', 'CharacterString', NULL, 'O', 3, 'ISO 19103', 'ISO 19115', ' ');
@@ -2703,9 +2008,6 @@ INSERT INTO "Schemas"."Properties"  VALUES ('descriptiveKeywords', 'descKeys', '
 INSERT INTO "Schemas"."Properties"  VALUES ('resourceSpecificUsage', 'idSpecUse', 'ISO 19115', 'Informations about the specific usage of the resource(s)', 0, 2147483647, 'MD_Identification', 'MD_Usage', NULL, 'O', 11, 'ISO 19115', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('resourceConstraints', 'resConst', 'ISO 19115', 'Informations about the dataset constraints', 0, 2147483647, 'MD_Identification', 'MD_Constraints', NULL, 'O', 12, 'ISO 19115', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('aggregationInfo', 'aggrInfo', 'ISO 19115', 'Informations about aggregate dataset', 0, 2147483647, 'MD_Identification', 'MD_AggregateInformation', NULL, 'O', 13, 'ISO 19115', 'ISO 19115', ' ');
--------------------------------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------------------------------
-
 INSERT INTO "Schemas"."Properties"  VALUES ('maintenanceAndUpdateFrequency', 'maintFreq', 'ISO 19115', 'Maintenance and update frequency of metadata', 1, 1, 'MD_MaintenanceInformation', NULL, 'MD_MaintenanceFrequencyCode', 'M', 1, 'ISO 19115', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('dateOfNextUpdate', 'dateNext', 'ISO 19115', 'Date of the next update of metadata', 0, 1, 'MD_MaintenanceInformation', 'Date', NULL, 'O', 2, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('userDefinedMaintenanceFrequency', 'usrDefFreq', 'ISO 19115', 'Frequency of metadata update by user', 0, 1, 'MD_MaintenanceInformation', 'TM_PeriodDuration', NULL, 'O', 3, 'MDWEB', 'ISO 19115', ' ');
@@ -2763,9 +2065,6 @@ INSERT INTO "Schemas"."Properties"  VALUES ('topicCategory', 'tpCat', 'ISO 19115
 INSERT INTO "Schemas"."Properties"  VALUES ('environmentDescription', 'envirDesc', 'ISO 19115', 'Information about the producing environment of the resource(s)', 0, 1, 'MD_DataIdentification', 'CharacterString', NULL, 'O', 19, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('extent', 'dataExt', 'ISO 19115', 'Informations about the spatial and temporal extent of the datatset', 0, 2147483647, 'MD_DataIdentification', 'EX_Extent', NULL, 'O', 20, 'ISO 19115', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('supplementalInformation', 'suppInfo', 'ISO 19115', 'Other descriptive informations about the resource(s)', 0, 1, 'MD_DataIdentification', 'CharacterString', NULL, 'O', 21, 'ISO 19103', 'ISO 19115', ' ');
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
 INSERT INTO "Schemas"."Properties"  VALUES ('relatedCitation', 'relatedCitation', 'ISO 19115 FRA 1.0', 'Citation of documents or information source', 0, 2147483647, 'FRA_DataIdentification', 'CI_Citation', NULL, 'O', 22, 'ISO 19115', 'ISO 19115 FRA 1.0', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('equivalentScale', 'equScale', 'ISO 19115', 'Equivalent scale', 0, 1, 'MD_Resolution', 'MD_RepresentativeFraction', NULL, 'C', 1, 'ISO 19115', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('distance', 'scaleDist', 'ISO 19115', 'Pixel size', 0, 1, 'MD_Resolution', 'Distance', NULL, 'C', 2, 'ISO 19103', 'ISO 19115', ' ');

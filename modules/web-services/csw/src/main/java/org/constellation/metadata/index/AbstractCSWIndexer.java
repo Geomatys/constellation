@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
@@ -105,7 +106,7 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
         } else if (isEbrim25(metadata)) {
             // TODO
         } else if (!isDublinCore(metadata)) {
-            LOGGER.warning("unknow Object classe unable to index: " + getType(metadata));
+            LOGGER.log(Level.WARNING, "unknow Object classe unable to index: {0}", getType(metadata));
         }
 
         // All metadata types must be compatible with dublinCore.
@@ -208,8 +209,8 @@ public abstract class AbstractCSWIndexer<A> extends AbstractIndexer<A> {
             }
         } catch (NumberFormatException e) {
             if (!coord.equals(NULL_VALUE)) {
-                LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(metadata) + '\n' +
-                        "cause: unable to parse double: " + coord);
+                LOGGER.warning(NOT_SPATIALLY_INDEXABLE + getIdentifier(metadata) +
+                        "\ncause: unable to parse double: " + coord);
             }
         }
         return coordinate;
