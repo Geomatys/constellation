@@ -24,18 +24,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Apache Lucene dependencies
+import java.util.logging.Level;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.FieldSelectorResult;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+
+// Geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
-
+import org.geotoolkit.lucene.index.IDFieldSelector;
 
 /**
  * A Lucene searcher for a Generic index.
@@ -44,19 +45,36 @@ import org.geotoolkit.lucene.index.AbstractIndexSearcher;
  */
 public class GenericIndexSearcher extends AbstractIndexSearcher {
 
+    /**
+     * Build a new index searcher with the index located in the specified directory.
+     * The index directory path must be :
+     * <configDir path>/<serviceID>index-<some timestamp number>
+     * 
+     * @param configDir A directory containing the lucene index directory.
+     * @param serviceID The identifier of the index/service
+     * @throws IndexingException
+     */
     public GenericIndexSearcher(File configDir, String serviceID) throws IndexingException  {
         super(configDir, serviceID);
     }
 
+    /**
+     * Build a new index searcher with the index located in the specified directory.
+     * The index directory path must be :
+     * <configDir path>/<serviceID>index-<some timestamp number>
+     *
+     * @param configDir A directory containing the lucene index directory.
+     * @param serviceID The identifier of the index/service
+     * @param analyzer A lucene analyzer.
+     *
+     * @throws IndexingException
+     */
     public GenericIndexSearcher(File configDir, String serviceID, Analyzer analyzer) throws IndexingException  {
         super(configDir, serviceID, analyzer);
     }
     
     /**
-     * In generic index we don't need to perform a lucene query for the identifier.
-     *
-     * @param id
-     * @return
+     * {@inheritDoc}
      */
     @Override
     public String identifierQuery(String id) throws SearchingException {
@@ -74,7 +92,7 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
                 results.add(searcher.doc(doc.doc, new IDFieldSelector()).get("id"));
             }
             if (results.size() > 1) {
-                LOGGER.warning("multiple record in lucene index for identifier: " + id);
+                LOGGER.log(Level.WARNING, "multiple record in lucene index for identifier: {0}", id);
             }
             if (results.size() > 0) {
                 return results.get(0);
@@ -86,28 +104,19 @@ public class GenericIndexSearcher extends AbstractIndexSearcher {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getMatchingID(Document doc) throws SearchingException {
         return doc.get("id");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         super.destroy();
-    }
-
-    private static final class IDFieldSelector implements FieldSelector {
-
-        @Override
-        public FieldSelectorResult accept(String fieldName) {
-            if (fieldName != null) {
-                if (fieldName.equals("id")) {
-                    return FieldSelectorResult.LOAD_AND_BREAK;
-                } else {
-                    return FieldSelectorResult.NO_LOAD;
-                }
-            }
-            return FieldSelectorResult.NO_LOAD;
-        }
     }
 }

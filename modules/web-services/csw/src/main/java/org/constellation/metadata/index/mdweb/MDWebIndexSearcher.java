@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Apache Lucene dependencies
+import java.util.logging.Level;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.FieldSelector;
 import org.apache.lucene.document.FieldSelectorResult;
@@ -31,28 +32,34 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+
+// Geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 
-// Constellation dependencies
-
 /**
- *
- * @author Guilhem Legal
+ * An index searcher for Lucene index connected to a MDWeb datasource.
+ * 
+ * @author Guilhem Legal (Geomatys)
  */
 public class MDWebIndexSearcher extends AbstractIndexSearcher {
 
+    /**
+     * Build a new index searcher with the index located in the specified directory.
+     * The index directory path must be :
+     * <configDir path>/<serviceID>index-<some timestamp number>
+     *
+     * @param configDir A directory containing the lucene index directory.
+     * @param serviceID The identifier of the index/service
+     * @throws IndexingException
+     */
     public MDWebIndexSearcher(File configDir, String serviceID) throws IndexingException {
         super(configDir, serviceID);
     }
 
     /**
-     * This method proceed a lucene search and returns a list of ID.
-     *
-     * @param query A simple Term query.
-     *
-     * @return      A List of id.
+     * {@inheritDoc}
      */
     @Override
     public String identifierQuery(String id) throws SearchingException {
@@ -67,7 +74,7 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
                 results.add(document.get("id") + ':' + document.get("recordSet"));
             }
             if (results.size() > 1) {
-                LOGGER.warning("multiple record in lucene index for identifier: " + id);
+                LOGGER.log(Level.WARNING, "multiple record in lucene index for identifier: {0}", id);
             }
             if (results.size() > 0) {
                 return results.get(0);
@@ -79,18 +86,33 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getMatchingID(Document doc) throws SearchingException {
         return doc.get("id") + ':' + doc.get("recordSet");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         super.destroy();
     }
 
+    /**
+     * A Lucene field selector, allowing to retrieve only the field containg the identifiers of  the document.
+     */
     private static final class IDFieldSelector implements FieldSelector {
 
+        /**
+         * Accept only the id and recordset field of a lucene document.
+         * 
+         * @param fieldName The name of the current field to load.
+         * @return FieldSelectorResult.LOAD only if the fieldName is "id" or "recordset".
+         */
         @Override
         public FieldSelectorResult accept(String fieldName) {
             if (fieldName != null) {

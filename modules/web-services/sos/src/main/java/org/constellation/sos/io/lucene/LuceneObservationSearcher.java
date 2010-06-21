@@ -22,12 +22,11 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
-// APache Lucene dependencies
+// Apache Lucene dependencies
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.FieldSelectorResult;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -45,19 +44,30 @@ import org.apache.lucene.util.Version;
 import org.constellation.sos.io.ObservationResult;
 import static org.constellation.sos.ws.Utils.*;
 
-// geotoolkit dependencies
+// Geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.lucene.index.IDFieldSelector;
 
 /**
+ *  A Lucene searcher for an index connected to an O&M Datasource.
  *
  * @author Guilhem Legal (Geomatys)
  */
 public class LuceneObservationSearcher extends AbstractIndexSearcher {
 
+    /**
+     * Build a new index searcher with the index located in the specified directory.
+     * The index directory path must be :
+     * <configDir path>/<serviceID>index-<some timestamp number>
+     *
+     * @param configDir A directory containing the lucene index directory.
+     * @param serviceID The identifier of the index/service
+     * @throws IndexingException
+     */
     public LuceneObservationSearcher(File configDir, String serviceID) throws IndexingException  {
         super(configDir, serviceID, new WhitespaceAnalyzer());
     }
@@ -75,13 +85,13 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                 LOGGER.severe("There is no document in the index");
                 maxRecords = 1;
             }
-            LOGGER.info("TermQuery: " + query.toString());
+            LOGGER.log(Level.INFO, "TermQuery: {0}", query.toString());
             final TopDocs hits = searcher.search(query, maxRecords);
             for (ScoreDoc doc : hits.scoreDocs) {
                 results.add(searcher.doc(doc.doc, new IDFieldSelector()).get("id"));
             }
             if (results.size() > 1) {
-                LOGGER.warning("multiple record in lucene index for identifier: " + id);
+                LOGGER.log(Level.WARNING, "multiple record in lucene index for identifier: {0}", id);
             }
             if (results.size() > 0) {
                 return results.get(0);
@@ -101,6 +111,13 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
         return doc.get("id");
     }
 
+    /**
+     * This method proceed a lucene search and returns a list of ObservationResult.
+     *
+     * @param spatialQuery The lucene query string with spatials filters.
+     *
+     * @return A List of Observation result..
+     */
     public List<ObservationResult> doResultSearch(SpatialQuery spatialQuery) throws SearchingException {
         final Query simpleQuery = new TermQuery(new Term("metafile", "doc"));
         try {
@@ -123,7 +140,7 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
                 parser.setAllowLeadingWildcard(true);
                 BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
             }
-            LOGGER.finer("before parse:" + spatialQuery.getQuery());
+            LOGGER.log(Level.FINER, "before parse:{0}", spatialQuery.getQuery());
             final Query query   = parser.parse(spatialQuery.getQuery());
             final Filter filter = spatialQuery.getSpatialFilter();
             final int operator  = spatialQuery.getLogicalOperator();
@@ -224,6 +241,13 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
         }
     }
 
+    /**
+     * Return an observationResult from a Lucene document.
+     *
+     * @param d A lucene document.
+     *
+     * @return an observationResult containing the id and the timepriod of the observation.
+     */
     private ObservationResult getObservationResult(final Document d) {
         Timestamp begin = null;
         Timestamp end   = null;
@@ -239,21 +263,4 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
         }
         return new ObservationResult(d.get("id"), begin, end);
     }
-
-
-    private static final class IDFieldSelector implements FieldSelector {
-
-        @Override
-        public FieldSelectorResult accept(String fieldName) {
-            if (fieldName != null) {
-                if (fieldName.equals("id")) {
-                    return FieldSelectorResult.LOAD_AND_BREAK;
-                } else {
-                    return FieldSelectorResult.NO_LOAD;
-                }
-            }
-            return FieldSelectorResult.NO_LOAD;
-        }
-    }
-
 }
