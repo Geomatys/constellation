@@ -50,7 +50,6 @@ import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
-import org.geotoolkit.lucene.index.IDFieldSelector;
 
 /**
  *  A Lucene searcher for an index connected to an O&M Datasource.
@@ -70,45 +69,6 @@ public class LuceneObservationSearcher extends AbstractIndexSearcher {
      */
     public LuceneObservationSearcher(File configDir, String serviceID) throws IndexingException  {
         super(configDir, serviceID, new WhitespaceAnalyzer());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String identifierQuery(String id) throws SearchingException {
-        try {
-            final TermQuery query = new TermQuery(new Term("id", id));
-            final List<String> results = new ArrayList<String>();
-            int maxRecords = searcher.maxDoc();
-            if (maxRecords == 0) {
-                LOGGER.severe("There is no document in the index");
-                maxRecords = 1;
-            }
-            LOGGER.log(Level.INFO, "TermQuery: {0}", query.toString());
-            final TopDocs hits = searcher.search(query, maxRecords);
-            for (ScoreDoc doc : hits.scoreDocs) {
-                results.add(searcher.doc(doc.doc, new IDFieldSelector()).get("id"));
-            }
-            if (results.size() > 1) {
-                LOGGER.log(Level.WARNING, "multiple record in lucene index for identifier: {0}", id);
-            }
-            if (results.size() > 0) {
-                return results.get(0);
-            } else {
-                return null;
-            }
-        } catch (IOException ex) {
-            throw new SearchingException("Parse Exception while performing lucene request", ex);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getMatchingID(Document doc) throws SearchingException {
-        return doc.get("id");
     }
 
     /**

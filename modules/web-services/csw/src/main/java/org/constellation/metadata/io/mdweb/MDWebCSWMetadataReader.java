@@ -211,8 +211,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         try  {
             if (identifier.indexOf(':') != -1) {
                 recordSetCode  = identifier.substring(identifier.indexOf(':') + 1, identifier.length());
-                identifier   = identifier.substring(0, identifier.indexOf(':'));
-                id           = Integer.parseInt(identifier);
+                identifier     = identifier.substring(0, identifier.indexOf(':'));
+                id             = Integer.parseInt(identifier);
             } else {
                 throw new NumberFormatException();
             }

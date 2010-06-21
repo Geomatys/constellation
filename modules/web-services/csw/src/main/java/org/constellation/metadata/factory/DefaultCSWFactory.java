@@ -23,7 +23,6 @@ import java.io.File;
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.index.generic.GenericIndexer;
-import org.constellation.metadata.index.generic.GenericIndexSearcher;
 import org.constellation.metadata.index.mdweb.MDWebIndexer;
 import org.constellation.metadata.index.mdweb.MDWebIndexSearcher;
 import org.constellation.metadata.io.CSWMetadataReader;
@@ -113,7 +112,7 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
             case MDWEB:
                 return new MDWebIndexSearcher(configDirectory, serviceID);
             case FILESYSTEM:
-                return new GenericIndexSearcher(configDirectory, serviceID);
+                return new AbstractIndexSearcher(configDirectory, serviceID);
             default:
                 throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + dbType + DEFAULT_FACTORY);
         }

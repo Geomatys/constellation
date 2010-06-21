@@ -39,6 +39,8 @@ import org.geotoolkit.lucene.filter.SpatialQuery;
 
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.resources.NIOUtilities;
+import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 //Junit dependencies
@@ -57,7 +59,7 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
 
     private Logger logger = Logger.getLogger("org.constellation.metadata");
 
-    private static GenericIndexSearcher indexSearcher;
+    private static AbstractIndexSearcher indexSearcher;
 
     private static File configDirectory = new File("StopAnalyzerTest");
 
@@ -67,7 +69,7 @@ public class StopAnalyzerTest extends AbstractAnalyzerTest {
         NIOUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StopAnalyzer(Version.LUCENE_CURRENT), Level.FINER);
-        indexSearcher          = new GenericIndexSearcher(configDirectory, "", new StopAnalyzer(Version.LUCENE_CURRENT));
+        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new StopAnalyzer(Version.LUCENE_CURRENT));
         indexSearcher.setLogLevel(Level.FINER);
     }
 

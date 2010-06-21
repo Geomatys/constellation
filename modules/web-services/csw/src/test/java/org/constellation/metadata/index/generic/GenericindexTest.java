@@ -48,6 +48,7 @@ import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 
 // GeoAPI dependencies
 import org.geotoolkit.resources.NIOUtilities;
@@ -71,7 +72,7 @@ public class GenericindexTest {
 
     private Logger logger = Logger.getLogger("org.constellation.metadata");
 
-    private static GenericIndexSearcher indexSearcher;
+    private static AbstractIndexSearcher indexSearcher;
 
     private static GenericIndexer indexer;
 
@@ -81,7 +82,7 @@ public class GenericindexTest {
         NIOUtilities.deleteDirectory(new File("GenericIndexTest"));
         List<Object> object       = fillTestData();
         indexer                    = new GenericIndexer(object, null, configDirectory, "");
-        indexSearcher               = new GenericIndexSearcher(configDirectory, "");
+        indexSearcher               = new AbstractIndexSearcher(configDirectory, "");
         indexer.setLogLevel(Level.FINER);
         indexSearcher.setLogLevel(Level.FINER);
         

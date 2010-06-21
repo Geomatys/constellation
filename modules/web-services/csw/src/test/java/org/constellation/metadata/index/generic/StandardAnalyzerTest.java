@@ -36,6 +36,7 @@ import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
+import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 
 //Junit dependencies
 import org.geotoolkit.referencing.CRS;
@@ -56,7 +57,7 @@ public class StandardAnalyzerTest extends AbstractAnalyzerTest {
 
     private Logger logger = Logger.getLogger("org.constellation.metadata");
 
-    private static GenericIndexSearcher indexSearcher;
+    private static AbstractIndexSearcher indexSearcher;
 
     private static File configDirectory = new File("StandardAnalyzerTest");
 
@@ -66,7 +67,7 @@ public class StandardAnalyzerTest extends AbstractAnalyzerTest {
         NIOUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StandardAnalyzer(Version.LUCENE_CURRENT), Level.FINER);
-        indexSearcher          = new GenericIndexSearcher(configDirectory, "", new StandardAnalyzer(Version.LUCENE_CURRENT));
+        indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new StandardAnalyzer(Version.LUCENE_CURRENT));
         indexSearcher.setLogLevel(Level.FINER);
     }
 

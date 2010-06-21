@@ -203,7 +203,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                 if (form.isPublished()) {
                     indexDocument(writer, form);
                 } else {
-                   LOGGER.log(logLevel, "The form " + form.getId() + "is not published we don't index it");
+                   LOGGER.log(logLevel, "The form {0}is not published we don''t index it", form.getId());
                 }
             }
             writer.optimize();
@@ -237,8 +237,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             throw new IndexingException("unable to index form:" + metadata.getId() + " top value type is null");
         }
 
-        doc.add(new Field("id",        Integer.toString(metadata.getId()),   Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field("recordSet", metadata.getRecordSet().getCode() , Field.Store.YES, Field.Index.ANALYZED));
+        final String identifier = Integer.toString(metadata.getId()) + ':' + metadata.getRecordSet().getCode();
+        doc.add(new Field("id",        identifier,   Field.Store.YES, Field.Index.ANALYZED));
         doc.add(new Field("Title",     metadata.getTitle(),                Field.Store.YES, Field.Index.ANALYZED));
     }
 

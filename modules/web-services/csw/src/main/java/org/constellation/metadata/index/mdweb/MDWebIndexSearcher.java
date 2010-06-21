@@ -19,23 +19,9 @@ package org.constellation.metadata.index.mdweb;
 
 // J2SE dependencies
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-// Apache Lucene dependencies
-import java.util.logging.Level;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.FieldSelector;
-import org.apache.lucene.document.FieldSelectorResult;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
 
 // Geotoolkit dependencies
 import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.lucene.SearchingException;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 
 /**
@@ -62,67 +48,7 @@ public class MDWebIndexSearcher extends AbstractIndexSearcher {
      * {@inheritDoc}
      */
     @Override
-    public String identifierQuery(String id) throws SearchingException {
-        try {
-            final TermQuery query = new TermQuery(new Term("identifier_sort", id));
-            final List<String> results = new ArrayList<String>();
-            final int maxRecords = searcher.maxDoc();
-            //LOGGER.log(logLevel, "TermQuery: " + query.toString());
-            final TopDocs hits = searcher.search(query, maxRecords);
-            for (ScoreDoc doc : hits.scoreDocs) {
-                final Document document = searcher.doc(doc.doc, new IDFieldSelector());
-                results.add(document.get("id") + ':' + document.get("recordSet"));
-            }
-            if (results.size() > 1) {
-                LOGGER.log(Level.WARNING, "multiple record in lucene index for identifier: {0}", id);
-            }
-            if (results.size() > 0) {
-                return results.get(0);
-            } else {
-                return null;
-            }
-        } catch (IOException ex) {
-            throw new SearchingException("Parse Exception while performing lucene request", ex);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getMatchingID(Document doc) throws SearchingException {
-        return doc.get("id") + ':' + doc.get("recordSet");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void destroy() {
-        super.destroy();
-    }
-
-    /**
-     * A Lucene field selector, allowing to retrieve only the field containg the identifiers of  the document.
-     */
-    private static final class IDFieldSelector implements FieldSelector {
-
-        /**
-         * Accept only the id and recordset field of a lucene document.
-         * 
-         * @param fieldName The name of the current field to load.
-         * @return FieldSelectorResult.LOAD only if the fieldName is "id" or "recordset".
-         */
-        @Override
-        public FieldSelectorResult accept(String fieldName) {
-            if (fieldName != null) {
-                if (fieldName.equals("id") || fieldName.equals("recordSet")) {
-                    return FieldSelectorResult.LOAD;
-                } else {
-                    return FieldSelectorResult.NO_LOAD;
-                }
-            }
-            return FieldSelectorResult.NO_LOAD;
-        }
+    public String getIdentifierSearchField() {
+        return "identifier_sort";
     }
 }
