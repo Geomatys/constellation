@@ -60,11 +60,11 @@ class PostGisLayerDetails extends AbstractFeatureLayerDetails {
         if(style == null && favorites.size() > 0){
             //no style provided, try to get the favorite one
             //there are some favorites styles
-            String namedStyle = favorites.get(0);
+            final String namedStyle = favorites.get(0);
             style = StyleProviderProxy.getInstance().get(namedStyle);
         }
 
-        FeatureType featureType = store.getFeatureType(groupName);
+        final FeatureType featureType = store.getFeatureType(groupName);
         if(style == null){
             //no favorites defined, create a default one
             style = RANDOM_FACTORY.createDefaultVectorStyle(featureType);

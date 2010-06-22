@@ -81,14 +81,11 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     /**
      * Creates a new CSW indexer for a MDWeb database.
      *
-     * @param configuration A configuration object containing the database informations.
+     * @param configuration A configuration object containing the database informations. Must not be null.
      * @param serviceID The identifier, if there is one, of the index/service.
      */
     public MDWebIndexer(Automatic configuration, String serviceID) throws IndexingException {
         super(serviceID, configuration.getConfigurationDirectory(), INSPIRE_QUERYABLE);
-        if (configuration == null) {
-            throw new IndexingException("The configuration object is null");
-        }
         // we get the database informations
         final BDD db = configuration.getBdd();
         if (db == null) {
@@ -378,7 +375,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
                     + "conditionalValue : " + conditionalValue);
         } else {
             if (fullPathID.indexOf('[') != -1) {
-                String stringOrdinal = fullPathID.substring(fullPathID.indexOf('[') + 1, fullPathID.indexOf(']'));
+                final String stringOrdinal = fullPathID.substring(fullPathID.indexOf('[') + 1, fullPathID.indexOf(']'));
                 try {
                     ordinal = Integer.parseInt(stringOrdinal);
                     // mdweb ordinal start at 1
@@ -400,7 +397,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         if (conditionalPath == null) {
             values = form.getValueFromPath(path);
             if (ordinal != -1) {
-                List<Value> toRemove = new ArrayList<Value>();
+                final List<Value> toRemove = new ArrayList<Value>();
                 for (Value v : values) {
                     if (v.getOrdinal() != ordinal) {
                         toRemove.add(v);

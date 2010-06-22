@@ -113,7 +113,7 @@ public abstract class FilterParser {
      * @param cqlQuery A well-formed CQL query .
      */
     public static FilterType cqlToFilter(String cqlQuery) throws CQLException, JAXBException {
-        FilterType result;
+        final FilterType result;
         final Object newFilter = CQL.toFilter(cqlQuery, new FilterFactoryImpl());
 
         if (!(newFilter instanceof FilterType)) {
@@ -623,27 +623,27 @@ public abstract class FilterParser {
             final BinaryComparisonOpType bc = (BinaryComparisonOpType) c;
 
             if (operator.equals("PropertyIsEqualTo")) {
-                PropertyIsNotEqualToType newFilter = new PropertyIsNotEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
+                final PropertyIsNotEqualToType newFilter = new PropertyIsNotEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
                 return factory.createPropertyIsNotEqualTo(newFilter);
 
             } else if (operator.equals("PropertyIsNotEqualTo")) {
-                PropertyIsEqualToType newFilter = new PropertyIsEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
+                final PropertyIsEqualToType newFilter = new PropertyIsEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
                 return factory.createPropertyIsEqualTo(newFilter);
 
             } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
-                PropertyIsLessThanType newFilter = new  PropertyIsLessThanType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
+                final PropertyIsLessThanType newFilter = new  PropertyIsLessThanType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
                 return factory.createPropertyIsLessThan(newFilter);
 
             } else if (operator.equals("PropertyIsGreaterThan")) {
-                PropertyIsLessThanOrEqualToType newFilter = new  PropertyIsLessThanOrEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
+                final PropertyIsLessThanOrEqualToType newFilter = new  PropertyIsLessThanOrEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
                 return factory.createPropertyIsLessThanOrEqualTo(newFilter);
 
             } else if (operator.equals("PropertyIsLessThan")) {
-                PropertyIsGreaterThanOrEqualToType newFilter = new  PropertyIsGreaterThanOrEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
+                final PropertyIsGreaterThanOrEqualToType newFilter = new  PropertyIsGreaterThanOrEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
                 return factory.createPropertyIsGreaterThanOrEqualTo(newFilter);
 
             } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
-                PropertyIsGreaterThanType newFilter = new  PropertyIsGreaterThanType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
+                final PropertyIsGreaterThanType newFilter = new  PropertyIsGreaterThanType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
                 return factory.createPropertyIsGreaterThan(newFilter);
 
             } else {

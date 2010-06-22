@@ -80,7 +80,7 @@ public class SLDProviderService extends AbstractProviderService<String,MutableSt
     @Override
     protected void loadProvider(ProviderSource ps) {
         try {
-            SLDProvider provider = new SLDProvider(ps);
+            final SLDProvider provider = new SLDProvider(ps);
             PROVIDERS.add(provider);
             LOGGER.log(Level.INFO, "[PROVIDER]> SLD provider created : " + provider.getSource().parameters.get(KEY_FOLDER_PATH));
         } catch (Exception ex) {

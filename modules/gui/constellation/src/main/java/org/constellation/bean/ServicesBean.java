@@ -95,14 +95,14 @@ import org.opengis.feature.type.Name;
  * @author Guilhem Legal
  * @author Medhi Sidhoum
  */
-public class ServicesBean {
+public final class ServicesBean {
 
     private static final String WCS = "WCS";
     private static final String WMS = "WMS";
     private static final String SOS = "SOS";
     private static final String CSW = "CSW";
 
-
+    private static final String FILLFORM = "fillForm";
     /**
      * The service Identification title
      */
@@ -110,7 +110,7 @@ public class ServicesBean {
     /**
      * The service Identification description
      */
-    private String _abstract;
+    private String abstractDescription;
     /**
      * The  service Identification List of keywords 
      */
@@ -223,7 +223,6 @@ public class ServicesBean {
     private UserData userData;
     
     /**
-     *  A logger (debugging purpose)
      * The uploaded File.
      */
     private UploadedFile uploadedFile;
@@ -267,7 +266,7 @@ public class ServicesBean {
         //we fill the default value of Service Identification
         final AbstractServiceIdentification si = cap.getServiceIdentification();
         this.title = si.getFirstTitle();
-        this._abstract = si.getFirstAbstract();
+        this.abstractDescription = si.getFirstAbstract();
         if (si.getKeywords().size() > 0) {
             this.keywords = keywordsToSelectItem(si.getKeywords().get(0));
         }
@@ -321,7 +320,7 @@ public class ServicesBean {
         //we fill the default value of Service Identification
         final Service s         = cap.getService();
         this.title              = s.getTitle();
-        this._abstract          = s.getAbstract();
+        this.abstractDescription          = s.getAbstract();
         final KeywordList klist = s.getKeywordList();
         if (klist != null) {
             this.keywords = keywordsToSelectItem(klist);
@@ -491,7 +490,7 @@ public class ServicesBean {
         }
 
         return new ServiceIdentification(new LanguageStringType(title),
-                new LanguageStringType(_abstract),
+                new LanguageStringType(abstractDescription),
                 new KeywordsType(listKey, null),
                 new CodeType(serviceType),
                 listVers,
@@ -515,7 +514,7 @@ public class ServicesBean {
         }
 
         return new org.geotoolkit.ows.xml.v100.ServiceIdentification(title,
-                _abstract,
+                abstractDescription,
                 new org.geotoolkit.ows.xml.v100.KeywordsType(listKey, null),
                 new org.geotoolkit.ows.xml.v100.CodeType(serviceType),
                 listVers,
@@ -554,7 +553,7 @@ public class ServicesBean {
         return new ServiceType(links,
                 title,
                 title,
-                _abstract,
+                abstractDescription,
                 new Keywords(listKey),
                 resp,
                 new CodeListType(fees),
@@ -582,7 +581,7 @@ public class ServicesBean {
         final ContactInformation ci = new ContactInformation(cpp, positionName,
                 ca, phoneVoice, phoneFacsimile, electronicAddress);
 
-        final Service service130 = new Service(title, title, _abstract,
+        final Service service130 = new Service(title, title, abstractDescription,
                 keywordList,
                 new OnlineResource(providerSite),
                 ci, fees, accessConstraints, getLayerLimit(),
@@ -603,7 +602,7 @@ public class ServicesBean {
                 ca111, phoneVoice, phoneFacsimile, electronicAddress);
 
         final org.geotoolkit.wms.xml.v111.Service service111 = new org.geotoolkit.wms.xml.v111.Service(
-                title, title, _abstract,
+                title, title, abstractDescription,
                 keywordList111,
                 new org.geotoolkit.wms.xml.v111.OnlineResource(providerSite),
                 ci111, fees, accessConstraints);
@@ -680,7 +679,7 @@ public class ServicesBean {
                 final OutputStream out = new FileOutputStream(f);
                 marshaller.marshal(capabilities[i],out);
                 out.close();
-                LOGGER.info("store " + f.getAbsolutePath());
+                LOGGER.log(Level.INFO, "store {0}", f.getAbsolutePath());
                 i++;
             }
             marshallerPool.release(marshaller);
@@ -733,7 +732,7 @@ public class ServicesBean {
                         marshaller.marshal(userData.getWMSCapabilities()[0], (OutputStream) new FileOutputStream(file));
               
                     } else {
-                        LOGGER.severe("WMS capabilities file version 1.3.0 not found at :" + path + ". unable to load WMS Data");
+                        LOGGER.log(Level.WARNING, "WMS capabilities file version 1.3.0 not found at :{0}. unable to load WMS Data", path);
                     }
         
                     // the we add to the list of object to update the other sub version
@@ -744,7 +743,7 @@ public class ServicesBean {
                         marshaller.marshal(userData.getWMSCapabilities()[1], (OutputStream) new FileOutputStream(file));
               
                     } else {
-                        LOGGER.severe("WMS capabilities file version 1.1.1 not found at :" + path + ". unable to load WMS Data");
+                        LOGGER.log(Level.WARNING, "WMS capabilities file version 1.1.1 not found at :{0}. unable to load WMS Data", path);
                     }
                 } else {
                     // TODO afficher fichier non valide
@@ -765,7 +764,7 @@ public class ServicesBean {
                         marshaller.marshal(userData.getWCSCapabilities()[0], (OutputStream) new FileOutputStream(file));
               
                     } else {
-                        LOGGER.severe("WCS capabilities file version 1.1.1 not found at :" + path + ". unable to load WCS Data");
+                        LOGGER.log(Level.WARNING, "WCS capabilities file version 1.1.1 not found at :{0}. unable to load WCS Data", path);
                     }
         
                     // the we add to the list of object to update the other sub version
@@ -776,7 +775,7 @@ public class ServicesBean {
                         marshaller.marshal(userData.getWCSCapabilities()[1], (OutputStream) new FileOutputStream(file));
               
                     } else {
-                        LOGGER.severe("WCS capabilities file version 1.0.0 not found at :" + path + ". unable to load WCS Data");
+                        LOGGER.log(Level.WARNING, "WCS capabilities file version 1.0.0 not found at :{0}. unable to load WCS Data", path);
                     }
                 } else {
                     // TODO afficher fichier non valide
@@ -797,7 +796,7 @@ public class ServicesBean {
                         marshaller.marshal(userData.getCSWCapabilities()[0], (OutputStream) new FileOutputStream(file));
               
                     } else {
-                        LOGGER.severe("CSW capabilities file version 2.0.2 not found at :" + path + ". unable to load CSW Data");
+                        LOGGER.log(Level.WARNING, "CSW capabilities file version 2.0.2 not found at :{0}. unable to load CSW Data", path);
                     }
                     
                 } else {
@@ -819,7 +818,7 @@ public class ServicesBean {
                         marshaller.marshal(userData.getSOSCapabilities()[0], (OutputStream) new FileOutputStream(file));
               
                     } else {
-                        LOGGER.severe("SOS capabilities file version 1.0.0 not found at :" + path + ". unable to load SOS Data");
+                        LOGGER.log(Level.WARNING, "SOS capabilities file version 1.0.0 not found at :{0}. unable to load SOS Data", path);
                     }
                     
                 } else {
@@ -848,7 +847,7 @@ public class ServicesBean {
             marshallerPool.release(marshaller);
             
         } catch (JAXBException ex) {
-            Logger.getLogger(ServicesBean.class.getName()).log(Level.SEVERE, null, ex);
+           LOGGER.log(Level.SEVERE, null, ex);
             //TODO afficher quelquechose si le fichier n'est pas valide
         }
     }
@@ -881,7 +880,7 @@ public class ServicesBean {
             fillFormFromWMS((WMSCapabilities) capabilities[0]);
 
         } else {
-            LOGGER.severe("WMS capabilities file version 1.3.0 not found at :" + path);
+            LOGGER.log(Level.WARNING, "WMS capabilities file version 1.3.0 not found at :{0}", path);
         }
 
         // the we add to the list of object to update the other sub version
@@ -892,11 +891,11 @@ public class ServicesBean {
             capabilities[1] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[1]));
 
         } else {
-            LOGGER.severe("WMS capabilities file version 1.1.1 not found at :" + path);
+            LOGGER.log(Level.WARNING, "WMS capabilities file version 1.1.1 not found at :{0}", path);
         }
         marshallerPool.release(unmarshaller);
         
-        return "fillForm";
+        return FILLFORM;
 
     }
 
@@ -916,7 +915,7 @@ public class ServicesBean {
             fillFormFromOWS((Capabilities) capabilities[0]);
 
         } else {
-            LOGGER.severe("WCS capabilities file version 1.1.1 not found at :" + path);
+            LOGGER.log(Level.WARNING, "WCS capabilities file version 1.1.1 not found at :{0}", path);
         }
 
         // the we add to the list of object to update the other sub version
@@ -927,11 +926,11 @@ public class ServicesBean {
             capabilities[1] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[1]));
             
         } else {
-            LOGGER.severe("WCS capabilities file version 1.0.0 not found at :" + path);
+            LOGGER.log(Level.WARNING, "WCS capabilities file version 1.0.0 not found at :{0}", path);
         }
         marshallerPool.release(unmarshaller);
 
-        return "fillForm";
+        return FILLFORM;
 
     }
 
@@ -951,10 +950,10 @@ public class ServicesBean {
             marshallerPool.release(unmarshaller);
 
         } else {
-            LOGGER.severe("SOS capabilities file version 1.0.0 not found at :" + path);
+            LOGGER.log(Level.WARNING, "SOS capabilities file version 1.0.0 not found at :{0}", path);
         }
 
-        return "fillForm";
+        return FILLFORM;
     }
 
     public String setCSWMode() throws FileNotFoundException, JAXBException {
@@ -973,10 +972,10 @@ public class ServicesBean {
             marshallerPool.release(unmarshaller);
 
         } else {
-            LOGGER.severe("CSW capabilities file version 2.0.2 not found at :" + path);
+            LOGGER.log(Level.WARNING, "CSW capabilities file version 2.0.2 not found at :{0}", path);
         }
 
-        return "fillForm";
+        return FILLFORM;
     }
 
     /**
@@ -995,7 +994,7 @@ public class ServicesBean {
         } else if (webServiceMode.equals(CSW)) {
             setCSWMode();
         }
-        return "fillForm";
+        return FILLFORM;
     }
 
     /**
@@ -1083,7 +1082,7 @@ public class ServicesBean {
                     FacesMessage.SEVERITY_FATAL,
                     x.getClass().getName(), x.getMessage());
             FacesContext.getCurrentInstance().addMessage(null, message);
-            LOGGER.severe("Exception in proccesSubmitFile " + x.getMessage());
+            LOGGER.log(Level.WARNING, "Exception in proccesSubmitFile {0}", x.getMessage());
             return null;
         } finally {
             if (inputStream != null) inputStream.close();
@@ -1136,11 +1135,11 @@ public class ServicesBean {
     }
 
     public String getAbstract() {
-        return _abstract;
+        return abstractDescription;
     }
 
     public void setAbstract(String abstractt) {
-        this._abstract = abstractt;
+        this.abstractDescription = abstractt;
     }
 
     public List<SelectItem> getKeywords() {

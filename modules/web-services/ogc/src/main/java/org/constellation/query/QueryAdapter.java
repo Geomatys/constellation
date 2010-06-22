@@ -89,7 +89,7 @@ public final class QueryAdapter {
 
         MutableStyledLayerDescriptor sld = null;
 
-        XMLUtilities sldUtilities = new XMLUtilities();
+        final XMLUtilities sldUtilities = new XMLUtilities();
 
         //try sld v1.1
         try {

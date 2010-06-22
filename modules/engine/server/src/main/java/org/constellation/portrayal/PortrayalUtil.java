@@ -104,7 +104,7 @@ public final class PortrayalUtil {
             final List<String> styleNames,
             final MutableStyledLayerDescriptor sld) {
 
-        List<Object> styles = new ArrayList<Object>();
+        final List<Object> styles = new ArrayList<Object>();
 
         for (int i = 0; i < layerRefs.size(); i++) {
 

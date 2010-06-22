@@ -850,7 +850,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             className = "ReferenceSystemMetadata";
         }
 
-        List<String> packagesName = getPackageFromStandard(standardName, className, mode);
+        final List<String> packagesName = getPackageFromStandard(standardName, className, mode);
 
         for (String packageName : packagesName) {
             

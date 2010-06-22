@@ -351,7 +351,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             if (rootClasse != null) {
                 alreadyWrite.clear();
                 final Path rootPath = new Path(rootClasse.getStandard(), rootClasse);
-                List<Value> collection = addValueFromObject(form, object, rootPath, null);
+                final List<Value> collection = addValueFromObject(form, object, rootPath, null);
                 collection.clear();
                 return form;
             } else {
@@ -466,8 +466,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     for (Property p: classe.getProperties()) {
                         values.append(p.getName()).append('\n');
                     }
-                    LOGGER.warning("unable to find a codeListElement named " + codelistElement + " in the codelist " + classe.getName() + '\n' +
-                                  "allowed values are: " + '\n' +  values);
+                    LOGGER.warning("unable to find a codeListElement named " + codelistElement + " in the codelist " + classe.getName() + 
+                            "\nallowed values are:\n" +  values);
                 }
             }
             String value;
@@ -564,8 +564,8 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             LOGGER.severe("The class is not accessible");
                             return result;
                         } catch (java.lang.reflect.InvocationTargetException e) {
-                            LOGGER.severe("Exception throw in the invokated getter: " + getter.toGenericString() + '\n' +
-                                          "Cause: " + e.getMessage());
+                            LOGGER.severe("Exception throw in the invokated getter: " + getter.toGenericString() +
+                                          "\nCause: " + e.getMessage());
                             return result;
                         }   
                     }
@@ -979,7 +979,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         try {
             // TODO is a way more fast to know that the form exist? method  isAlreadyRecordedForm(int id) writer20
             final RecordSet recordSet = mdWriter.getRecordSet(recordSetCode);
-            FormInfo f                = mdWriter.getFormInfo(recordSet, id);
+            final FormInfo f          = mdWriter.getFormInfo(recordSet, id);
             if (f != null) {
                 mdWriter.deleteForm(id);
             } else {
@@ -1037,7 +1037,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
 
         Path p  = new Path(mainStandard, type);
-        StringBuilder idValue = new StringBuilder(mainStandard.getName()).append(':').append(type.getName()).append(".*");
+        final StringBuilder idValue = new StringBuilder(mainStandard.getName()).append(':').append(type.getName()).append(".*");
         while (xpath.indexOf('/') != -1) {
             //Then we get the next Property name
             String propertyName = xpath.substring(0, xpath.indexOf('/'));

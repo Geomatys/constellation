@@ -79,7 +79,7 @@ public class PostGisProviderService extends AbstractProviderService<Name,LayerDe
     @Override
     protected void loadProvider(ProviderSource ps) {
         try {
-            PostGisProvider provider = new PostGisProvider(ps);
+            final PostGisProvider provider = new PostGisProvider(ps);
             PROVIDERS.add(provider);
             LOGGER.log(Level.INFO, "[PROVIDER]> postgis provider created : "
                     + provider.getSource().parameters.get(KEY_HOST) + " > "

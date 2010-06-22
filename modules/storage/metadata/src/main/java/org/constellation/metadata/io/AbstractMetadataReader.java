@@ -44,12 +44,12 @@ public abstract class AbstractMetadataReader implements MetadataReader {
     /**
      * A flag indicating if the cache mecanism is enabled or not.
      */
-    private boolean isCacheEnabled;
+    private boolean cacheEnabled;
 
     /**
      * A flag indicating if the multi thread mecanism is enabled or not.
      */
-    private boolean isThreadEnabled;
+    private boolean threadEnabled;
     
     /**
      * A map containing the metadata already extract from the database.
@@ -68,8 +68,8 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * @param isThreadEnabled A flag indicating if the multi thread mecanism is enabled or not.
      */
     public AbstractMetadataReader(boolean isCacheEnabled, boolean isThreadEnabled) {
-        this.isCacheEnabled  = isCacheEnabled;
-        this.isThreadEnabled = isThreadEnabled;
+        this.cacheEnabled  = isCacheEnabled;
+        this.threadEnabled = isThreadEnabled;
     }
     
     /**
@@ -110,7 +110,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      */
     @Override
     public void removeFromCache(String identifier) {
-        if (isCacheEnabled)
+        if (cacheEnabled)
             metadatas.remove(identifier);
     }
 
@@ -138,7 +138,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      */
     @Override
     public boolean isCacheEnabled() {
-        return isCacheEnabled;
+        return cacheEnabled;
     }
 
     /**
@@ -146,7 +146,7 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      */
     @Override
     public boolean isThreadEnabled() {
-        return isThreadEnabled;
+        return threadEnabled;
     }
 
     /**
@@ -160,13 +160,13 @@ public abstract class AbstractMetadataReader implements MetadataReader {
      * @param isCacheEnabled the isCacheEnabled to set
      */
     public void setIsCacheEnabled(boolean isCacheEnabled) {
-        this.isCacheEnabled = isCacheEnabled;
+        this.cacheEnabled = isCacheEnabled;
     }
 
     /**
      * @param isThreadEnabled the isThreadEnabled to set
      */
     public void setIsThreadEnabled(boolean isThreadEnabled) {
-        this.isThreadEnabled = isThreadEnabled;
+        this.threadEnabled = isThreadEnabled;
     }
 }

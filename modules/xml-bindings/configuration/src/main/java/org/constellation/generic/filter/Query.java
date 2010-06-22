@@ -176,7 +176,7 @@ public class Query {
      * Gets all the value of the where property for the specified group name.
      */
     public List<Where> getAllWhere(String group) {
-        List<Where> result = new ArrayList<Where>();
+        final List<Where> result = new ArrayList<Where>();
         for (Where s: getWhere()) {
             if (group != null && group.equals(s.getGroup())) {
                 result.add(s);

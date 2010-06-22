@@ -21,6 +21,7 @@ package org.constellation.sos.io.lucene;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -63,14 +64,11 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
     /**
      * Creates a new SOS indexer for a FileSystem reader.
      *
-     * @param configuration A configuration object containing the database informations.
+     * @param configuration A configuration object containing the database informations.Must not be null.
      * @param serviceID  The identifier, if there is one, of the index/service.
      */
     public LuceneObservationIndexer(Automatic configuration, String serviceID) throws IndexingException {
         super(serviceID, configuration.getConfigurationDirectory(), new WhitespaceAnalyzer());
-        if (configuration == null) {
-            throw new IndexingException("The configuration object is null");
-        }
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
             observationDirectory = new File(dataDirectory, "observations");
@@ -160,8 +158,8 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
             if (unmarshaller != null) marshallerPool.release(unmarshaller);
         }
 
-        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
-                    "Observations indexed: " + nbObservation + ". Template indexed:" + nbTemplate + ".");
+        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms\nObservations indexed: "
+                + nbObservation + ". Template indexed:" + nbTemplate + ".");
     }
 
     /**
@@ -193,7 +191,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
             LOGGER.warning(IO_SINGLE_MSG + ex.getMessage());
             throw new IndexingException("SQLException while indexing documents.", ex);
         }
-        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms\n" +
                      nbObservations + " documents indexed.");
     }
 
@@ -230,7 +228,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
                 doc.add(new Field("sampling_time_end",    "NULL", Field.Store.YES, Field.Index.ANALYZED));
                 
             } else if (time != null) {
-                LOGGER.severe("unrecognized sampling time type:" + time);
+                LOGGER.log(Level.WARNING, "unrecognized sampling time type:{0}", time);
             }
         } catch(CstlServiceException ex) {
             LOGGER.severe("error while indexing sampling time.");

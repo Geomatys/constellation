@@ -135,7 +135,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
         final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
         for (String layerName : layerNames) {
-            LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName,
+            final LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName,
                     serviceDef.specification.name());
 
             if (null == layerRef) {
@@ -160,7 +160,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
     private LayerDetails getLayerRef(ServiceDef serviceDef, String layerName) throws RegisterException {
 
-        LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName,
+        final LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName,
                 serviceDef.specification.name());
 
         if (null == layerRef) {

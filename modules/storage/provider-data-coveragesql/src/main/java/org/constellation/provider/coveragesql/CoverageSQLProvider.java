@@ -117,7 +117,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
 
         }else{
             server = properties.getProperty(KEY_SERVER);
-            String portTxt = properties.getProperty(KEY_PORT);
+            final String portTxt = properties.getProperty(KEY_PORT);
             if(server == null || server.trim().isEmpty()){
                 server = "localhost";
             }

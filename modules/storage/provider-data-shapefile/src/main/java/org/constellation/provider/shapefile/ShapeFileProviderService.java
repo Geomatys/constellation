@@ -79,7 +79,7 @@ public class ShapeFileProviderService extends AbstractProviderService<Name,Layer
     @Override
     protected void loadProvider(ProviderSource ps) {
         try {
-            ShapeFileProvider provider = new ShapeFileProvider(ps);
+            final ShapeFileProvider provider = new ShapeFileProvider(ps);
             PROVIDERS.add(provider);
             LOGGER.log(Level.INFO, "[PROVIDER]> shapefile provider created : " + provider.getSource().parameters.get(KEY_FOLDER_PATH));
         } catch (Exception ex) {

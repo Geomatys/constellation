@@ -140,7 +140,7 @@ public class SLDProvider extends AbstractStyleProvider{
 
         MutableStyle value = cache.peek(key);
         if (value == null) {
-            Cache.Handler<MutableStyle> handler = cache.lock(key);
+            final Cache.Handler<MutableStyle> handler = cache.lock(key);
             try {
                 value = handler.peek();
                 if (value == null) {
