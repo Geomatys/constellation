@@ -57,22 +57,81 @@ public interface WFSWorker extends Worker {
      */
     WFSCapabilitiesType getCapabilities(final GetCapabilitiesType getCapab) throws CstlServiceException;
 
+    /**
+     * describe the structure of any feature type it can service.
+     *
+     * @param model A desribeFeatureType request contains typenames.
+     *
+     * @return A marshallable object representing a xsd.
+     * @throws CstlServiceException
+     */
     Schema describeFeatureType(final DescribeFeatureTypeType model) throws CstlServiceException;
 
+    /**
+     * Allows retrieval of features from a web feature service.
+     * 
+     * @param request e request containg typeNames, comparison filter, spatial filter, etc.
+     * @return features instances.
+     * @throws CstlServiceException
+     */
     Object getFeature(final GetFeatureType request) throws CstlServiceException;
 
+    /**
+     * Allows retrieval of features and elements by ID from a web feature service.
+     *
+     * @param grbi a getGMLObject request containing IDs.
+     * 
+     * @return A GML representation of a fature instance or element.
+     * @throws CstlServiceException
+     */
     AbstractGMLEntry getGMLObject(GetGmlObjectType grbi) throws CstlServiceException;
 
+    /**
+     * lock request on one or more instancesof a feature type for the duration of a transaction
+     *
+     * @param gr a lockFeature request identifying which feature are to lock.
+     *
+     * @return An acknowledgement
+     * @throws CstlServiceException
+     */
     LockFeatureResponseType lockFeature(LockFeatureType gr) throws CstlServiceException;
 
+    /**
+     * Allow to insert, update, or remove feature instances.
+     *
+     * @param t A request containing feature to insert and filters identifying which feature have to be update/delete
+     * @return
+     * @throws CstlServiceException
+     */
     TransactionResponseType transaction(TransactionType t) throws CstlServiceException;
 
+    /**
+     * Return the current outputFormat.
+     *
+     * @return the current outputFormat.
+     */
     String getOutputFormat();
 
+    /**
+     * Return a map with namespace - xsd location.
+     * this map is added to the XML output.
+     *
+     * @return a map with namespace - xsd location.
+     */
     Map<String, String> getSchemaLocations();
 
+    /**
+     * Add mapping between prefix and namespace,
+     * used for transaction request where the feature are extracted by JAXP.
+     *
+     * @param namespaceMapping a map of prefix - namespace.
+     */
     void setprefixMapping(Map<String, String> namespaceMapping);
 
+    /**
+     * Return all the feature type that the service support.
+     * @return all the feature type that the service support.
+     */
     List<FeatureType> getFeatureTypes();
 
 }

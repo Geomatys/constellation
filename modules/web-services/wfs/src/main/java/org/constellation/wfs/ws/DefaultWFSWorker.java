@@ -123,6 +123,9 @@ import org.w3c.dom.NodeList;
  */
 public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
+    /**
+     * Base known CRS.
+     */
     private final List<String> standardCRS = new ArrayList<String>();
 
     /**
@@ -130,10 +133,19 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      */
     private ServiceDef actingVersion = ServiceDef.WFS_1_1_0;
 
+    /**
+     * Current map with namespace - xsd location. << ISSUE multiThread
+     */
     private Map<String, String> schemaLocations;
 
+    /**
+     * Current mapping between prefix and namespace << ISSUE multiThread
+     */
     private Map<String, String> namespaceMapping;
 
+    /**
+     * Current outputFormat requested (default value is text/xml) << ISSUE multiThread
+     */
     private String outputFormat = "text/xml";
 
     public DefaultWFSWorker(final MarshallerPool marshallerPool) {
@@ -206,8 +218,8 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     try {
                         type  = getFeatureTypeFromLayer(fld);
                     } catch (DataStoreException ex) {
-                        LOGGER.severe("error while getting featureType for:" + fld.getGroupName() + '\n' +
-                                      "cause:" + ex.getMessage());
+                        LOGGER.severe("error while getting featureType for:" + fld.getGroupName() + 
+                                "\ncause:" + ex.getMessage());
                         continue;
                     }
                     final FeatureTypeType ftt;
@@ -313,7 +325,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 try {
                     types.add(getFeatureTypeFromLayer((FeatureLayerDetails)layer));
                 } catch (DataStoreException ex) {
-                    LOGGER.severe("error while getting featureType for:" + layer.getName());
+                    LOGGER.log(Level.WARNING, "error while getting featureType for:{0}", layer.getName());
                 }
             }
         } else {
@@ -334,7 +346,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 try {
                     types.add(getFeatureTypeFromLayer((FeatureLayerDetails)layer));
                 } catch (DataStoreException ex) {
-                    LOGGER.severe("error while getting featureType for:" + layer.getName());
+                    LOGGER.log(Level.WARNING, "error while getting featureType for:{0}", layer.getName());
                 }
             }
         }
@@ -352,10 +364,10 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
     }
 
     /**
-     * Extract a FatureType from a FeatureLayerDetails
+     * Extract a FeatureType from a FeatureLayerDetails
      * 
-     * @param fld
-     * @return
+     * @param fld A feature layer object.
+     * @return A Feature type.
      */
     private FeatureType getFeatureTypeFromLayer(FeatureLayerDetails fld) throws DataStoreException {
         return fld.getStore().getFeatureType(fld.getGroupName());
@@ -387,7 +399,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         final List<FeatureCollection> collections = new ArrayList<FeatureCollection>();
         schemaLocations                           = new HashMap<String, String>();
 
-        if (request.getQuery() == null || request.getQuery().size() == 0) {
+        if (request.getQuery() == null || request.getQuery().isEmpty()) {
             throw new CstlServiceException("You must specify a query!", MISSING_PARAMETER_VALUE);
         }
         
@@ -567,7 +579,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      */
     @Override
     public TransactionResponseType transaction(TransactionType request) throws CstlServiceException {
-        LOGGER.log(logLevel, "Transaction request processing" + '\n');
+        LOGGER.log(logLevel, "Transaction request processing\n");
         final long startTime = System.currentTimeMillis();
         verifyBaseRequest(request, true, false);
 
@@ -779,6 +791,13 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         return response;
     }
 
+    /**
+     * Extract the a XML string from a W3C Element.
+     *
+     * @param node An W3c Xml Element.
+     *
+     * @return a string containing the xml representation.
+     */
     private  String getXMLFromElementNSImpl(ElementNSImpl elt) {
         final StringBuilder s = new StringBuilder();
         s.append('<').append(elt.getLocalName()).append('>');
@@ -789,13 +808,20 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         return s.toString();
     }
 
+    /**
+     * Extract the a XML string from a W3C node.
+     *
+     * @param node An W3c Xml node.
+     *
+     * @return a string builder containing the xml.
+     */
     private  StringBuilder getXMLFromNode(Node node) {
         final StringBuilder temp = new StringBuilder();
         if (!node.getNodeName().equals("#text")){
-            temp.append("<" + node.getNodeName());
+            temp.append("<").append(node.getNodeName());
             final NamedNodeMap attrs = node.getAttributes();
             for(int i=0;i<attrs.getLength();i++){
-                temp.append(" "+attrs.item(i).getNodeName()+"=\""+attrs.item(i).getTextContent()+"\" ");
+                temp.append(" ").append(attrs.item(i).getNodeName()).append("=\"").append(attrs.item(i).getTextContent()).append("\" ");
             }
             temp.append(">");
         }
@@ -808,7 +834,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         else{
             temp.append(node.getTextContent());
         }
-        if (!node.getNodeName().equals("#text")) temp.append("</" + node.getNodeName() + ">");
+        if (!node.getNodeName().equals("#text")) temp.append("</").append(node.getNodeName()).append(">");
         return temp;
     }
 
@@ -825,7 +851,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      * unmarshalled by JAXB.
      *
      * @param jaxbFilter an OGC JAXB filter.
-     * @return
+     * @return An OGC filter
      * @throws CstlServiceException
      */
     private Filter extractJAXBFilter(FilterType jaxbFilter, Filter defaultFilter) throws CstlServiceException {
@@ -973,11 +999,18 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
          }
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public Map<String, String> getSchemaLocations() {
         return schemaLocations;
     }
 
+
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public List<FeatureType> getFeatureTypes() {
         final List<FeatureType> types       = new ArrayList<FeatureType>();
@@ -997,6 +1030,9 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         return types;
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void setprefixMapping(Map<String, String> namespaceMapping) {
        this.namespaceMapping = namespaceMapping;
