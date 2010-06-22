@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 
 // JAXB dependencies
+import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -58,6 +59,8 @@ import org.opengis.util.InternationalString;
 
 
 /**
+ * A csw Metadata Writer. This writer does not require a database.
+ * The csw records are stored XML file in a directory .
  *
  * @author Guilhem Legal (Geomatys)
  */
@@ -78,9 +81,11 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     private static final String IN_CLASS_MSG = " in the class:";
      
     /**
-     * 
-     * @param index
-     * @param marshaller
+     * Build a new File metadata writer, with the specified indexer.
+     *
+     * @param index A lucene indexer.
+     * @param configuration An object containing all the datasource informations (in this case the data directory).
+     *
      * @throws java.sql.SQLException
      */
     public FileMetadataWriter(Automatic configuration, AbstractIndexer index) throws MetadataIoException {
@@ -193,6 +198,9 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         return identifier;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean storeMetadata(Object obj) throws MetadataIoException {
         File f = null;
@@ -217,21 +225,33 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         super.destroy();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteSupported() {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean updateSupported() {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean deleteMetadata(String metadataID) throws MetadataIoException {
         final File metadataFile = new File (dataDirectory,  metadataID + ".xml");
@@ -248,6 +268,9 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean replaceMetadata(String metadataID, Object any) throws MetadataIoException {
         final boolean succeed = deleteMetadata(metadataID);
@@ -256,6 +279,9 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         return storeMetadata(any);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean updateMetadata(String metadataID, List<RecordPropertyType> properties) throws MetadataIoException {
         final Object metadata = getObjectFromFile(metadataID);
@@ -282,7 +308,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                 } else {
                     throw new MetadataIoException("This metadata type is not allowed:" + typeName + "\n Allowed ones are: MD_Metadata or Record", INVALID_PARAMETER_VALUE);
                 }
-                LOGGER.finer("update type:" + type);
+                LOGGER.log(Level.FINER, "update type:{0}", type);
                 
                 // we verify that the metadata to update has the same type that the Xpath type
                 if (!metadata.getClass().equals(type)) {
@@ -369,6 +395,14 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         return false;
     }
 
+    /**
+     * Return an ordinal if there is one in the propertyName specified else return -1.
+     * example : name[1] return  1
+     *           name    return -1
+     * @param propertyName A property name extract from an Xpath
+     * @return an ordinal if there is one, -1 else.
+     * @throws MetadataIoException
+     */
     private int extractOrdinal(String propertyName) throws MetadataIoException {
         int ordinal = -1;
 
@@ -389,17 +423,18 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     }
     
     /**
-     * Update an object by calling the setter of the specified property with the specified value
+     * Update an object by calling the setter of the specified property with the specified value.
      * 
-     * @param parent
-     * @param propertyName
-     * @param value
+     * @param parent The parent object on witch call the setters.
+     * @param propertyName The name of the property to update on the parent (can contain an ordinal).
+     * @param value The new value to update.
+     * 
      * @throws org.constellation.ws.MetadataIoException
      */
     private void updateObjects(Object parent, String propertyName, Object value) throws MetadataIoException {
 
         Class parameterType = value.getClass();
-        LOGGER.finer("parameter type:" + parameterType);
+        LOGGER.log(Level.FINER, "parameter type:{0}", parameterType);
 
         final String fullPropertyName = propertyName;
         final int ordinal             = extractOrdinal(propertyName);
@@ -433,6 +468,17 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         }
     }
 
+    /**
+     * Update a single  object by calling the setter of the specified property with the specified value.
+     *
+     * @param propertyName  The name of the property to update on the parent (can't contain an ordinal).
+     * @param parent The parent object on witch call the setters.
+     * @param value The new value to update.
+     * @param parameterType The class of the parameter
+     * @param ordinal The ordinal of the value in a collection.
+     *
+     * @throws MetadataIoException
+     */
     private void updateObject(String propertyName, Object parent, Object value, Class parameterType, int ordinal) throws MetadataIoException {
         Method setter = ReflectionUtilities.getSetterFromName(propertyName, parameterType, parent.getClass());
 
@@ -528,6 +574,15 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         }
     }
 
+    /**
+     * Try to set a collection of String or International string on a parent object.
+     *
+     * @param method A setter.
+     * @param object An object to set.
+     * @param parameter A string value to add to object.
+     *
+     * @throws MetadataIoException
+     */
     public static Object invokeMethodStrColl(final Method method, final Object object, final String parameter) throws MetadataIoException {
         final String baseMessage = "Unable to invoke the method " + method + ": ";
         Object result = null;

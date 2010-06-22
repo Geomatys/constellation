@@ -23,7 +23,8 @@ import java.util.logging.Level;
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 
 /**
- *
+ * An interface adding the method update to the metadataWriter interface for CSW.
+ * 
  * @author Guilhem Legal (Geomatys)
  */
 public interface CSWMetadataWriter extends MetadataWriter {

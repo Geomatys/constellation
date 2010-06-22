@@ -82,5 +82,9 @@ public interface CSWMetadataReader extends MetadataReader {
      */
     abstract List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException;
 
+    /**
+     * Set the global level of log for information message.
+     * @param logLevel
+     */
     void setLogLevel(Level logLevel);
 }

@@ -91,6 +91,8 @@ import static org.geotoolkit.csw.xml.TypeNames.*;
  */
 public class FileMetadataReader extends AbstractMetadataReader implements CSWMetadataReader {
 
+    private static final String METAFILE_MSG = "The metadata file : ";
+    
     /**
      * A date formatter used to display the Date object for dublin core translation.
      */
@@ -100,7 +102,6 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         //FORMATTER.setTimeZone(TimeZone.getTimeZone("GMT+0"));
     }
 
-    private static final String METAFILE_MSG = "The metadata file : ";
     /**
      * The directory containing the data XML files.
      */
@@ -139,20 +140,16 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object getMetadata(String identifier, int mode, List<QName> elementName) throws MetadataIoException {
         return getMetadata(identifier, mode, ElementSetType.FULL, elementName);
     }
 
-    /**
-     * Return a metadata object from the specified identifier.
-     * 
-     * @param identifier The metadata identifier.
-     * @param mode An output schema mode: EBRIM, ISO_19115 and DUBLINCORE supported.
-     * @param type An ElementSetType: FULL, SUMMARY and BRIEF. (implies elementName == null)
-     * @param elementName A list of QName describing the requested fields. (implies type == null)
-     * 
-     * @return A marshallable metadata object.
+     /**
+     * {@inheritDoc}
      */
     @Override
     public Object getMetadata(String identifier, int mode, ElementSetType type, List<QName> elementName) throws MetadataIoException {
@@ -169,8 +166,8 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * Unmarshall The file designed by the path dataDirectory/identifier.xml
      * If the file is not present or if it is impossible to unmarshall it it return an exception.
      *
-     * @param identifier
-     * @return
+     * @param identifier the metadata identifier
+     * @return A unmarshalled metadata object.
      * @throws org.constellation.ws.MetadataIoException
      */
     private Object getObjectFromFile(String identifier) throws MetadataIoException {
@@ -203,10 +200,11 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     /**
      * Apply the elementSet (Brief, Summary or full) or the custom elementSetName on the specified record.
      * 
-     * @param record
-     * @param type
-     * @param elementName
-     * @return
+     * @param record A dublinCore record.
+     * @param type The ElementSetType to apply ont this record.
+     * @param elementName A list of QName correspunding to the requested attribute. this parameter is ignored if type is not null.
+     *
+     * @return A record object.
      * @throws MetadataIoException If the type and the element name are null.
      */
     private AbstractRecordType applyElementSet(RecordType record, ElementSetType type, List<QName> elementName) throws MetadataIoException {
@@ -250,7 +248,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                         LOGGER.warning("illegal argument exception while invoking the method for attribute" + localPart + " in the classe RecordType");
                     }
                 } else {
-                    LOGGER.severe("An elementName was null.");
+                    LOGGER.warning("An elementName was null.");
                 }
             }
             return customRecord;
@@ -368,7 +366,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                     formats.add(new SimpleLiteral(f.getName().toString()));
                 }
             }
-            if (formats.size() == 0) {
+            if (formats.isEmpty()) {
                 formats = null;
             }
             if (elementName != null && elementName.contains(_Format_QNAME)) {
@@ -410,7 +408,8 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
 
                 }
             }
-            if (creator.size() == 0) creator = null;
+            if (creator.isEmpty()) creator = null;
+            
             if (elementName != null && elementName.contains(_Creator_QNAME)) {
                 customRecord.setCreator(creator);
             }
@@ -450,6 +449,9 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException {
         final List<DomainValues> responseList = new ArrayList<DomainValues>();
@@ -467,7 +469,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                         INVALID_PARAMETER_VALUE, "propertyName");
             }
 
-            if (paths.size() != 0) {
+            if (!paths.isEmpty()) {
 
                 final List<String> values         = getAllValuesFromPaths(paths);
                 final ListOfValuesType listValues = new ListOfValuesType(values);
@@ -483,6 +485,13 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return responseList;
     }
 
+    /**
+     * Return all the String values correspounding to the specified list of papth through the metadata.
+     * 
+     * @param paths
+     * @return
+     * @throws MetadataIoException
+     */
     private List<String> getAllValuesFromPaths(List<String> paths) throws MetadataIoException {
         final List<String> result = new ArrayList<String>();
         Unmarshaller unmarshaller = null;
@@ -511,16 +520,25 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return StringUtilities.sortStringList(result);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void destroy() {
         
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException {
         throw new MetadataIoException("Ebrim query are not supported int the FILESYSTEM mode.", OPERATION_NOT_SUPPORTED);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<? extends Object> getAllEntries() throws MetadataIoException {
         final List<Object> results = new ArrayList<Object>();
@@ -553,6 +571,9 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return results;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
         final List<String> results = new ArrayList<String>();
@@ -567,6 +588,9 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return results;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<Integer> getSupportedDataTypes() {
         return Arrays.asList(ISO_19115, DUBLINCORE);
@@ -580,11 +604,17 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         return new ArrayList<QName>();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, List<String>> getAdditionalQueryablePathMap() {
         return new HashMap<String, List<String>>();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Map<String, URI> getConceptMap() {
         return new HashMap<String, URI>();
