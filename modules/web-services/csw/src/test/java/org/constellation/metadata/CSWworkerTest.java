@@ -110,7 +110,7 @@ import static org.junit.Assert.*;
 @Ignore
 public class CSWworkerTest {
 
-    protected CSWworker worker;
+    protected static CSWworker worker;
 
     protected static MarshallerPool pool;
 
@@ -243,7 +243,7 @@ public class CSWworkerTest {
         GetRecordByIdResponseType result = (GetRecordByIdResponseType) worker.getRecordById(request);
 
         assertTrue(result != null);
-        assertTrue(result.getAbstractRecord().size() == 0);
+        assertTrue(result.getAbstractRecord().isEmpty());
         assertTrue(result.getAny().size() == 1);
         Object obj = result.getAny().get(0);
         assertTrue(obj instanceof DefaultMetadata);
@@ -263,7 +263,7 @@ public class CSWworkerTest {
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 1);
-        assertTrue(result.getAny().size() == 0);
+        assertTrue(result.getAny().isEmpty());
 
         obj = result.getAbstractRecord().get(0);
         assertTrue(obj instanceof BriefRecordType);
@@ -283,7 +283,7 @@ public class CSWworkerTest {
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 1);
-        assertTrue(result.getAny().size() == 0);
+        assertTrue(result.getAny().isEmpty());
 
         obj = result.getAbstractRecord().get(0);
         assertTrue(obj instanceof SummaryRecordType);
@@ -304,7 +304,7 @@ public class CSWworkerTest {
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 1);
-        assertTrue(result.getAny().size() == 0);
+        assertTrue(result.getAny().isEmpty());
 
         obj = result.getAbstractRecord().get(0);
         assertTrue(obj instanceof RecordType);
@@ -325,7 +325,7 @@ public class CSWworkerTest {
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 2);
-        assertTrue(result.getAny().size() == 0);
+        assertTrue(result.getAny().isEmpty());
 
         obj = result.getAbstractRecord().get(0);
         assertTrue(obj instanceof RecordType);
@@ -413,7 +413,7 @@ public class CSWworkerTest {
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 1);
-        assertTrue(result.getAny().size() == 0);
+        assertTrue(result.getAny().isEmpty());
 
         obj = result.getAbstractRecord().get(0);
         assertTrue(obj instanceof SummaryRecordType);
@@ -434,7 +434,7 @@ public class CSWworkerTest {
 
         assertTrue(result != null);
         assertTrue(result.getAbstractRecord().size() == 1);
-        assertTrue(result.getAny().size() == 0);
+        assertTrue(result.getAny().isEmpty());
 
         obj = result.getAbstractRecord().get(0);
         assertTrue(obj instanceof SummaryRecordType);
@@ -471,8 +471,8 @@ public class CSWworkerTest {
 
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
-        assertTrue(result.getSearchResults().getAbstractRecord().size() == 0);
-        assertTrue(result.getSearchResults().getAny().size() == 0);
+        assertTrue(result.getSearchResults().getAbstractRecord().isEmpty());
+        assertTrue(result.getSearchResults().getAny().isEmpty());
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 0);
@@ -494,7 +494,7 @@ public class CSWworkerTest {
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
         assertTrue(result.getSearchResults().getAbstractRecord().size() == 2);
-        assertTrue(result.getSearchResults().getAny().size() == 0);
+        assertTrue(result.getSearchResults().getAny().isEmpty());
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.FULL));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
@@ -556,7 +556,7 @@ public class CSWworkerTest {
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
         assertTrue(result.getSearchResults().getAbstractRecord().size() == 2);
-        assertTrue(result.getSearchResults().getAny().size() == 0);
+        assertTrue(result.getSearchResults().getAny().isEmpty());
         assertTrue(result.getSearchResults().getElementSet().equals(ElementSetType.BRIEF));
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
@@ -611,7 +611,7 @@ public class CSWworkerTest {
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
         assertTrue(result.getSearchResults().getAbstractRecord().size() == 2);
-        assertTrue(result.getSearchResults().getAny().size() == 0);
+        assertTrue(result.getSearchResults().getAny().isEmpty());
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
@@ -664,7 +664,7 @@ public class CSWworkerTest {
         assertTrue(result.getSearchResults() != null);
         //assertTrue(result.getSearchResults().getRecordSchema().equals("http://www.opengis.net/cat/csw/2.0.2"));
         assertTrue(result.getSearchResults().getAbstractRecord().size() == 2);
-        assertTrue(result.getSearchResults().getAny().size() == 0);
+        assertTrue(result.getSearchResults().getAny().isEmpty());
         assertTrue(result.getSearchResults().getNumberOfRecordsMatched() == 2);
         assertTrue(result.getSearchResults().getNumberOfRecordsReturned() == 2);
         assertTrue(result.getSearchResults().getNextRecord() == 0);
@@ -1107,7 +1107,7 @@ public class CSWworkerTest {
         GetRecordByIdResponseType GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
-        assertTrue(GRresult.getAbstractRecord().size() == 0);
+        assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
         assertTrue(obj instanceof DefaultMetadata);
@@ -1169,7 +1169,7 @@ public class CSWworkerTest {
         GetRecordByIdResponseType GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
-        assertTrue(GRresult.getAbstractRecord().size() == 0);
+        assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
         assertTrue(obj instanceof DefaultMetadata);
@@ -1196,7 +1196,7 @@ public class CSWworkerTest {
 
         assertTrue(GRresult != null);
         assertTrue(GRresult.getAbstractRecord().size() == 1);
-        assertTrue(GRresult.getAny().size() == 0);
+        assertTrue(GRresult.getAny().isEmpty());
         obj = GRresult.getAbstractRecord().get(0);
         assertTrue(obj instanceof RecordType);
 
@@ -1249,7 +1249,7 @@ public class CSWworkerTest {
         GetRecordByIdResponseType GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
-        assertTrue(GRresult.getAbstractRecord().size() == 0);
+        assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         Object obj = GRresult.getAny().get(0);
         assertTrue(obj instanceof DefaultMetadata);
@@ -1391,7 +1391,7 @@ public class CSWworkerTest {
         assertTrue(response != null);
         assertTrue(response.getSearchResults() != null);
         assertTrue(response.getSearchResults().getAny() != null);
-        assertTrue(response.getSearchResults().getAny().size() == 0);
+        assertTrue(response.getSearchResults().getAny().isEmpty());
 
         results = new ArrayList<String>();
         for (Object objRec : response.getSearchResults().getAny()) {
@@ -1901,7 +1901,7 @@ public class CSWworkerTest {
         GRresult = (GetRecordByIdResponseType) worker.getRecordById(requestGRBI);
 
         assertTrue(GRresult != null);
-        assertTrue(GRresult.getAbstractRecord().size() == 0);
+        assertTrue(GRresult.getAbstractRecord().isEmpty());
         assertTrue(GRresult.getAny().size() == 1);
         obj = GRresult.getAny().get(0);
         assertTrue(obj instanceof DefaultMetadata);

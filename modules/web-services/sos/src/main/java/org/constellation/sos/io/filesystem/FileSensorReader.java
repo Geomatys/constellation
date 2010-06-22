@@ -96,7 +96,7 @@ public class FileSensorReader implements SensorReader {
                 }
             }
         } else {
-            LOGGER.info("the file: " + sensorFile.getPath() + " does not exist");
+            LOGGER.log(Level.INFO, "the file: {0} does not exist", sensorFile.getPath());
             throw new CstlServiceException("this sensor is not registered in the database:" + sensorId,
                         INVALID_PARAMETER_VALUE, "procedure");
         }

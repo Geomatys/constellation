@@ -117,6 +117,28 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         }
         pool.release(marshaller);
         init();
+        worker = new SOSworker(configDir);
+        worker.setSkeletonCapabilities(capabilities);
+        worker.setServiceURL(URL);
+        worker.setLogLevel(Level.FINER);
+    }
+
+
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        if (worker != null) {
+            worker.destroy();
+        }
+        NIOUtilities.deleteDirectory(new File("SOSWorkerTest"));
+    }
+
+    @Before
+    public void setUp() throws Exception {
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        
     }
 
     public static void writeCommonDataFile(File dataDirectory, String resourceName, String identifier) throws IOException {
@@ -150,30 +172,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         in.close();
         fw.close();
     }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-        NIOUtilities.deleteDirectory(new File("SOSWorkerTest"));
-    }
-
-    @Before
-    public void setUp() throws Exception {
-
-        File configDir = new File("SOSWorkerTest");
-        worker = new SOSworker(configDir);
-        worker.setSkeletonCapabilities(capabilities);
-        worker.setServiceURL(URL);
-        worker.setLogLevel(Level.FINER);
-        
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        if (worker != null) {
-            worker.destroy();
-        }
-    }
-
+    
     /**
      * Tests the getcapabilities method
      *

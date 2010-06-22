@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 
 // JAXB dependencies
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -127,7 +128,7 @@ public class FileObservationWriter implements ObservationWriter {
                     throw new CstlServiceException("unable to create an observation file.", NO_APPLICABLE_CODE);
                 }
             } else {
-                LOGGER.warning("we overwrite the file:" + observationFile.getPath());
+                LOGGER.log(Level.WARNING, "we overwrite the file:{0}", observationFile.getPath());
             }
             
             marshaller.marshal(observation, observationFile);

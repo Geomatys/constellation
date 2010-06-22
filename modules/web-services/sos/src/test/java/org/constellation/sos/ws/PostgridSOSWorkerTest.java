@@ -112,11 +112,18 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         }
         pool.release(marshaller);
         init();
+        worker = new SOSworker(configDir);
+        System.out.println("capabilities>>>>>>>>>>>>>>>>" + capabilities);
+        worker.setSkeletonCapabilities(capabilities);
+        worker.setServiceURL(URL);
+        worker.setLogLevel(Level.FINER);
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-
+        if (worker != null) {
+            worker.destroy();
+        }
         NIOUtilities.deleteDirectory(new File("SOSWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
@@ -138,18 +145,10 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
     @Before
     public void setUp() throws Exception {
-        File configDir = new File("SOSWorkerTest");
-        worker = new SOSworker(configDir);
-        worker.setSkeletonCapabilities(capabilities);
-        worker.setServiceURL(URL);
-        worker.setLogLevel(Level.FINER);
     }
 
     @After
     public void tearDown() throws Exception {
-        if (worker != null) {
-            worker.destroy();
-        }
     }
 
 

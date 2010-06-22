@@ -64,7 +64,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
 
 
 
-        File configDir = new File("GPGSOSWorkerTest");
+        final File configDir = new File("GPGSOSWorkerTest");
         if (configDir.exists()) {
             NIOUtilities.deleteDirectory(configDir);
         }
@@ -104,10 +104,17 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
         }
         pool.release(marshaller);
         init();
+        worker = new SOSworker(configDir);
+        worker.setSkeletonCapabilities(capabilities);
+        worker.setServiceURL(URL);
+        worker.setLogLevel(Level.FINER);
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        if (worker != null) {
+            worker.destroy();
+        }
 
         NIOUtilities.deleteDirectory(new File("GPGSOSWorkerTest"));
         File derbyLog = new File("derby.log");
@@ -127,18 +134,10 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
 
     @Before
     public void setUp() throws Exception {
-        File configDir = new File("GPGSOSWorkerTest");
-        worker = new SOSworker(configDir);
-        worker.setSkeletonCapabilities(capabilities);
-        worker.setServiceURL(URL);
-        worker.setLogLevel(Level.FINER);
     }
 
     @After
     public void tearDown() throws Exception {
-        if (worker != null) {
-            worker.destroy();
-        }
     }
 
 

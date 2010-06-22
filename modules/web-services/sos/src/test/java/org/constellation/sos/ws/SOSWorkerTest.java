@@ -87,7 +87,7 @@ import static org.junit.Assert.*;
 @Ignore
 public class SOSWorkerTest {
 
-    protected SOSworker worker;
+    protected static SOSworker worker;
 
     protected static MarshallerPool marshallerPool;
 
@@ -161,6 +161,7 @@ public class SOSWorkerTest {
             assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
         }
 
+        worker.setSkeletonCapabilities(capabilities);
         assertTrue(exLaunched);
     }
     

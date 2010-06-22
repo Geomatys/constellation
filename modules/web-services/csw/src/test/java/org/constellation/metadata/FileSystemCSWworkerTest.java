@@ -77,6 +77,10 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
         pool.release(u);
 
+        worker = new CSWworker("", pool, configDir);
+        worker.setSkeletonCapabilities(skeletonCapabilities);
+        worker.setLogLevel(Level.FINER);
+
     }
 
     @AfterClass
@@ -85,6 +89,9 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
     }
 
     public static void deleteTemporaryFile() {
+        if (worker != null) {
+            worker.destroy();
+        }
         File configDirectory = new File("CSWWorkerTest");
         if (configDirectory.exists()) {
             File dataDirectory = new File(configDirectory, "data");
@@ -109,17 +116,10 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
 
     @Before
     public void setUp() throws Exception {
-        File configDir = new File("CSWWorkerTest");
-        worker = new CSWworker("", pool, configDir);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
-        worker.setLogLevel(Level.FINER);
     }
 
     @After
     public void tearDown() throws Exception {
-        if (worker != null) {
-            worker.destroy();
-        }
     }
 
     /**

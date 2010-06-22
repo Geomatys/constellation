@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -89,7 +90,7 @@ public class FileSensorWriter implements SensorWriter {
                     throw new CstlServiceException("the service was unable to create a new file:" + currentFile.getName(), NO_APPLICABLE_CODE);
                 }
             } else {
-                LOGGER.warning("we overwrite the file: " + currentFile.getPath());
+                LOGGER.log(Level.WARNING, "we overwrite the file: {0}", currentFile.getPath());
             }
             marshaller.marshal(sensor, currentFile);
         } catch (JAXBException ex) {
@@ -174,7 +175,7 @@ public class FileSensorWriter implements SensorWriter {
         for (File f: uncommittedFiles) {
             final boolean delete = f.delete();
             if (!delete) {
-                LOGGER.severe("unable to delete the file:" + f.getName());
+                LOGGER.log(Level.WARNING, "unable to delete the file:{0}", f.getName());
             }
         }
         uncommittedFiles = new ArrayList<File>();

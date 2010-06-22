@@ -162,7 +162,7 @@ public class FileObservationReader implements ObservationReader {
                     if (msg == null && ex.getCause() != null) {
                         msg = ex.getCause().getMessage();
                     }
-                    LOGGER.severe("Unable to unmarshall The file " + offeringFile + " cause:" + msg);
+                    LOGGER.warning("Unable to unmarshall The file " + offeringFile + " cause:" + msg);
                 } finally {
                     if (unmarshaller != null) {
                         marshallerPool.release(unmarshaller);
