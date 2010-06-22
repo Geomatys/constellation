@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
@@ -88,10 +89,23 @@ public class SOSWorkerTest {
 
     protected SOSworker worker;
 
-    protected MarshallerPool marshallerPool;
+    protected static MarshallerPool marshallerPool;
+
+    protected static Capabilities capabilities;
 
     protected static final String URL = "http://pulsar.geomatys.fr/SOServer/SOService";
 
+    protected static void init() throws JAXBException {
+        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:"
+                                       + "org.geotoolkit.observation.xml.v100:"
+                                       + "org.geotoolkit.sml.xml.v100:"
+                                       + "org.geotoolkit.sampling.xml.v100:"
+                                       + "org.geotoolkit.swe.xml.v101");
+        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        capabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
+        marshallerPool.release(unmarshaller);
+    }
+    
     /**
      * Tests the getcapabilities method
      *

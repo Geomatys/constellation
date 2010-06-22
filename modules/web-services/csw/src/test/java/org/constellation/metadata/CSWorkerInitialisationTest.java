@@ -50,11 +50,11 @@ import static org.junit.Assert.*;
  */
 public class CSWorkerInitialisationTest {
 
-    private MarshallerPool pool;
+    private static MarshallerPool pool;
 
     private static File configurationDirectory = new File("CSWorkerInitialisationTest");
 
-    private Capabilities skeletonCapabilities;
+    private static Capabilities skeletonCapabilities;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -62,6 +62,11 @@ public class CSWorkerInitialisationTest {
         if (!configurationDirectory.exists()) {
             configurationDirectory.mkdir();
         }
+        pool = new MarshallerPool(CSWClassesContext.getAllClasses());
+        Unmarshaller u = pool.acquireUnmarshaller();
+
+        skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
+        pool.release(u);
     }
 
     @AfterClass
@@ -102,13 +107,6 @@ public class CSWorkerInitialisationTest {
     @Before
     public void setUp() throws Exception {
         emptyConfigurationDirectory();
-
-        pool = new MarshallerPool(CSWClassesContext.getAllClasses());
-        Unmarshaller u = pool.acquireUnmarshaller();
-        
-        skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
-        pool.release(u);
-
     }
 
     @After

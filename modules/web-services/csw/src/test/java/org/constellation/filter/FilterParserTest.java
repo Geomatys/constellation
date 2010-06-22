@@ -48,11 +48,11 @@ public class FilterParserTest {
     
     private LuceneFilterParser filterParser;
     private final static Logger LOGGER = Logger.getLogger("org.constellation.filter");
-    private Unmarshaller filterUnmarshaller;
-    private MarshallerPool pool;
+    private static MarshallerPool pool;
    
     @BeforeClass
     public static void setUpClass() throws Exception {
+        pool = new MarshallerPool("org.geotoolkit.ogc.xml.v110:org.geotoolkit.gml.xml.v311");
     }
 
     @AfterClass
@@ -62,15 +62,11 @@ public class FilterParserTest {
     @Before
     public void setUp() throws Exception {
         filterParser = new LuceneFilterParser();
-        pool = new MarshallerPool("org.geotoolkit.ogc.xml.v110:org.geotoolkit.gml.xml.v311");
-        filterUnmarshaller = pool.acquireUnmarshaller();
     }
 
     @After
     public void tearDown() throws Exception {
-        if (filterUnmarshaller != null) {
-            pool.release(filterUnmarshaller);
-        }
+        
     }
     
     /**
@@ -80,7 +76,9 @@ public class FilterParserTest {
      */
     @Test
     public void simpleComparisonFilterTest() throws Exception {
-        
+
+        Unmarshaller filterUnmarshaller = pool.acquireUnmarshaller();
+
         /**
          * Test 1: a simple Filter propertyIsLike 
          */
@@ -290,7 +288,7 @@ public class FilterParserTest {
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "CreationDate:[00000101 20070602]");
         
-        
+        pool.release(filterUnmarshaller);
         
     }
     
@@ -301,7 +299,8 @@ public class FilterParserTest {
      */
     @Test
     public void simpleLogicalFilterTest() throws Exception {
-        
+
+        Unmarshaller filterUnmarshaller = pool.acquireUnmarshaller();
         /**
          * Test 1: a simple Filter AND between two propertyIsEqualTo 
          */
@@ -429,6 +428,8 @@ public class FilterParserTest {
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "Title:\"starship trooper\"");
         assertEquals(spaQuery.getLogicalOperator(), SerialChainFilter.NOT);
+
+        pool.release(filterUnmarshaller);
     }
     
     
@@ -439,6 +440,8 @@ public class FilterParserTest {
      */
     @Test
     public void simpleSpatialFilterTest() throws Exception {
+
+        Unmarshaller filterUnmarshaller = pool.acquireUnmarshaller();
         
         /**
          * Test 1: a simple spatial Filter Intersects 
@@ -544,7 +547,8 @@ public class FilterParserTest {
         spatialFilter = (LuceneOGCFilter) spaQuery.getSpatialFilter();
                 
         assertTrue(spatialFilter.getOGCFilter() instanceof Intersects);
-        
+
+        pool.release(filterUnmarshaller);
     }
     
     /**
@@ -554,7 +558,8 @@ public class FilterParserTest {
      */
     @Test
     public void multipleSpatialFilterTest() throws Exception {
-        
+
+        Unmarshaller filterUnmarshaller = pool.acquireUnmarshaller();
         /**
          * Test 1: two spatial Filter with AND 
          */
@@ -888,7 +893,8 @@ public class FilterParserTest {
         
         f2 = (LuceneOGCFilter) chainFilter.getChain().get(1);
         assertTrue(f2.getOGCFilter() instanceof BBOX);
-        
+
+        pool.release(filterUnmarshaller);
     }
 
     /**
@@ -899,6 +905,8 @@ public class FilterParserTest {
     @Test
     public void multipleMixedFilterTest() throws Exception {
 
+        Unmarshaller filterUnmarshaller = pool.acquireUnmarshaller();
+        
         /**
          * Test 1: PropertyIsLike AND INTERSECT 
          */
@@ -1505,7 +1513,7 @@ public class FilterParserTest {
         
         assertTrue (spaFilter.getOGCFilter() instanceof  DWithin);
         
-        
+        pool.release(filterUnmarshaller);
     }
     
 

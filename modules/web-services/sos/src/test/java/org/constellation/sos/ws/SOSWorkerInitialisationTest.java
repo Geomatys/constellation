@@ -24,7 +24,6 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.generic.database.ObjectFactory;
 import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
 import org.constellation.util.Util;

@@ -39,13 +39,13 @@ public class SQLFilterParserTest {
     
     private SQLFilterParser filterParser;
     private static final Logger LOGGER = Logger.getLogger("org.constellation.filter");
-    private Unmarshaller filterUnmarshaller;
     private final static QName _ExtrinsicObject25_QNAME = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "ExtrinsicObject");
     private final static QName _Association25_QNAME     = new QName("urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5", "Association");
-    private MarshallerPool pool;
+    private static MarshallerPool pool;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        pool = new MarshallerPool("org.geotoolkit.ogc.xml.v110:org.geotoolkit.gml.xml.v311");
     }
 
     @AfterClass
@@ -55,15 +55,10 @@ public class SQLFilterParserTest {
     @Before
     public void setUp() throws Exception {
         filterParser = new SQLFilterParser();
-        pool = new MarshallerPool("org.geotoolkit.ogc.xml.v110:org.geotoolkit.gml.xml.v311");
-        filterUnmarshaller = pool.acquireUnmarshaller();
     }
 
     @After
     public void tearDown() throws Exception {
-        if (filterUnmarshaller != null) {
-            pool.release(filterUnmarshaller);
-        }
     }
 
     /**
@@ -73,6 +68,9 @@ public class SQLFilterParserTest {
      */
     @Test
     public void simpleComparisonFilterTest() throws Exception {
+
+        Unmarshaller filterUnmarshaller = pool.acquireUnmarshaller();
+        
         Map<String, String> prefixs = new HashMap<String, String>();
         prefixs.put("rim", "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5");
         prefixs.put("wrs", "http://www.opengis.net/cat/wrs");
@@ -159,7 +157,7 @@ public class SQLFilterParserTest {
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Web Registry Service v1.0:ExtrinsicObject:mimeType' AND v1.\"value\" LIKE'%application%'  AND v1.\"form\"=\"identifier\" ");
 
-
+        pool.release(filterUnmarshaller);
     }
 
     /**
@@ -169,6 +167,9 @@ public class SQLFilterParserTest {
      */
     @Test
     public void multipleComparisonFilterTest() throws Exception {
+       
+        Unmarshaller filterUnmarshaller = pool.acquireUnmarshaller();
+        
         Map<String, String> prefixs = new HashMap<String, String>();
         prefixs.put("rim", "urn:oasis:names:tc:ebxml-regrep:rim:xsd:2.5");
         prefixs.put("rim3", "urn:oasis:names:tc:ebxml-regrep:xsd:rim:3.0");
@@ -350,6 +351,7 @@ public class SQLFilterParserTest {
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "SELECT distinct \"identifier\", \"catalog\" FROM \"Forms\"  , \"TextValues\" v1 WHERE v1.\"path\" = 'Ebrim v3.0:date' AND v1.\"value\" >'2007-06-02 00:00:00'  AND v1.\"form\"=\"identifier\" ");
 
+        pool.release(filterUnmarshaller);
     }
 
 }

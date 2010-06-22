@@ -21,7 +21,6 @@ package org.constellation.metadata.io;
 import java.sql.Connection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;

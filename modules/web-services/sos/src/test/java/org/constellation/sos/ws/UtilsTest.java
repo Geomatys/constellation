@@ -23,18 +23,14 @@ import java.util.List;
 import java.util.logging.Logger;
 
 // Junit dependencies
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.gml.xml.v311.AbstractFeatureEntry;
-import org.geotoolkit.gml.xml.v311.BoundingShapeEntry;
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
-import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
@@ -44,7 +40,6 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.opengis.observation.Observation;
 import static org.junit.Assert.*;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -55,13 +50,18 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  */
 public class UtilsTest {
 
-    private Logger logger = Logger.getLogger("org.constellation.sos.ws");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.ws");
 
-    private MarshallerPool marshallerPool;
+    private static MarshallerPool marshallerPool;
 
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:"
+                                       + "org.geotoolkit.observation.xml.v100:"
+                                       + "org.geotoolkit.sml.xml.v100:"
+                                       + "org.geotoolkit.sampling.xml.v100:"
+                                       + "org.geotoolkit.swe.xml.v101");
     }
 
     @AfterClass
@@ -76,11 +76,6 @@ public class UtilsTest {
     @After
     public void tearDown() throws Exception {
 
-    }
-
-    public UtilsTest() throws JAXBException {
-        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100:org.geotoolkit.sml.xml.v100:org.geotoolkit.sampling.xml.v100:org.geotoolkit.swe.xml.v101");
-        
     }
 
     /**

@@ -28,13 +28,11 @@ import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
 import org.constellation.generic.filter.Query;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.resources.NIOUtilities;
-import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.xml.MarshallerPool;
 
 import org.junit.*;
@@ -105,6 +103,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
 
         }
         pool.release(marshaller);
+        init();
     }
 
     @AfterClass
@@ -128,17 +127,11 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
 
     @Before
     public void setUp() throws Exception {
-
-        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100:org.geotoolkit.sml.xml.v100:org.geotoolkit.sampling.xml.v100:org.geotoolkit.swe.xml.v101");
-
         File configDir = new File("GPGSOSWorkerTest");
         worker = new SOSworker(configDir);
-        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-        Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
-        worker.setSkeletonCapabilities(stcapa);
+        worker.setSkeletonCapabilities(capabilities);
         worker.setServiceURL(URL);
         worker.setLogLevel(Level.FINER);
-        marshallerPool.release(unmarshaller);
     }
 
     @After

@@ -116,6 +116,8 @@ public class CSWworkerTest {
 
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
 
+    protected static Capabilities skeletonCapabilities;
+    
     /**
      * Tests the getcapabilities method
      *

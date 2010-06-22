@@ -72,13 +72,13 @@ public class SosIOTest {
 
     private SOSworker genericWorker;
 
-    private MarshallerPool marshallerPool;
+    private static MarshallerPool marshallerPool;
 
-    private Marshaller marshaller;
     private final boolean configFilesExist;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+         marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.ows.xml.v110");
     }
 
     @AfterClass
@@ -87,19 +87,16 @@ public class SosIOTest {
 
     @Before
     public void setUp() throws Exception {
-        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.ows.xml.v110");
-        marshaller = marshallerPool.acquireMarshaller();
+       
     }
 
     @After
     public void tearDown() throws Exception {
-        if (marshaller != null) {
-            marshallerPool.release(marshaller);
-        }
+        
     }
 
     public SosIOTest() throws Exception {
-        File capabilitiesFile = new File("sosDefaultConfig/sos_configuration/SOSCapabilities1.0.0.xml");
+        final File capabilitiesFile = new File("sosDefaultConfig/sos_configuration/SOSCapabilities1.0.0.xml");
         Capabilities staticCapabilities = null;
         if (capabilitiesFile.exists()) {
             Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
@@ -140,6 +137,8 @@ public class SosIOTest {
     public void GetCapabilitiesTest() throws Exception {
         if (configFilesExist) {
             
+            Marshaller marshaller = marshallerPool.acquireMarshaller();
+
             GetCapabilities request = new GetCapabilities("1.0.0", MimeType.APP_XML);
             Capabilities expResult  = defaultWorker.getCapabilities(request);
             Capabilities result     = genericWorker.getCapabilities(request);
@@ -170,7 +169,8 @@ public class SosIOTest {
             assertEquals(expResult.getServiceIdentification(), result.getServiceIdentification());
             assertEquals(expResult.getServiceProvider(), result.getServiceProvider());
             assertEquals(expResult, result);
-        
+            marshallerPool.release(marshaller);
+            
         } else {
             logger.info("configuration files missing skipping test");
         }

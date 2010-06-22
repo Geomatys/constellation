@@ -90,6 +90,9 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         pool.release(unmarshaller);
         pool = new AnchorPool(Arrays.asList(CSWClassesContext.getAllClasses()));
 
+        Unmarshaller u = pool.acquireUnmarshaller();
+        skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
+        pool.release(u);
     }
 
     @AfterClass
@@ -104,15 +107,11 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
 
     @Before
     public void setUp() throws Exception {
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-
+        
         File configDir = new File("CSWWorkerTest");
         worker = new CSWworker("", pool, configDir);
-        Capabilities stcapa = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
-        worker.setSkeletonCapabilities(stcapa);
+        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
-
-        pool.release(unmarshaller);
     }
 
     @After

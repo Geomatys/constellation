@@ -73,7 +73,7 @@ public class MdwebIndexTest {
 
     private static DefaultDataSource ds;
     
-    private Logger logger = Logger.getLogger("org.constellation.metadata");
+    private static final Logger logger = Logger.getLogger("org.constellation.metadata");
 
     private static AbstractIndexSearcher indexSearcher;
 
@@ -147,7 +147,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SimpleSearch 1:" + '\n' + resultReport);
+        logger.finer("SimpleSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("2:CSWCat");
@@ -166,7 +166,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SimpleSearch 2:" + '\n' + resultReport);
+        logger.finer("SimpleSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("5:CSWCat");
@@ -189,7 +189,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("simpleSearch 3:" + '\n' + resultReport);
+        logger.finer("simpleSearch 3:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("2:CSWCat");
@@ -216,7 +216,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 1:" + '\n' + resultReport);
+        logger.finer("wildCharSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("3:CSWCat");
@@ -234,7 +234,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 2:" + '\n' + resultReport);
+        logger.finer("wildCharSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("2:CSWCat");
@@ -252,7 +252,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wilCharSearch 3:" + '\n' + resultReport);
+        logger.finer("wilCharSearch 3:\n" + resultReport);
 
         assertTrue(result.contains("4:CSWCat"));
         assertTrue(result.contains("6:CSWCat"));
@@ -269,7 +269,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("wildCharSearch 4:" + '\n' + resultReport);
+        logger.finer("wildCharSearch 4:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("2:CSWCat");
@@ -298,7 +298,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("DateSearch 1:" + '\n' + resultReport);
+        logger.finer("DateSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("5:CSWCat");
@@ -318,7 +318,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("DateSearch 2:" + '\n' + resultReport);
+        logger.finer("DateSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("5:CSWCat");
@@ -336,7 +336,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("DateSearch 3:" + '\n' + resultReport);
+        logger.finer("DateSearch 3:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("6:CSWCat");
@@ -370,7 +370,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 1:" + '\n' + resultReport);
+        logger.finer("SortedSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("5:CSWCat");
@@ -395,7 +395,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 2:" + '\n' + resultReport);
+        logger.finer("SortedSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("7:CSWCat");
@@ -421,7 +421,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 3:" + '\n' + resultReport);
+        logger.finer("SortedSearch 3:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("7:CSWCat");
@@ -447,7 +447,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("SortedSearch 4:" + '\n' + resultReport);
+        logger.finer("SortedSearch 4:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("2:CSWCat");
@@ -488,7 +488,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("spatialSearch 1:" + '\n' + resultReport);
+        logger.finer("spatialSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("5:CSWCat");
@@ -515,7 +515,7 @@ public class MdwebIndexTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        logger.finer("spatialSearch 2:" + '\n' + resultReport);
+        logger.finer("spatialSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("3:CSWCat");
@@ -542,7 +542,7 @@ public class MdwebIndexTest {
         String identifier = "39727_22_19750113062500";
         String result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 1:" + '\n' + result);
+        logger.finer("identifier query 1:\n" + result);
 
         String expectedResult = "4:CSWCat";
 
@@ -555,7 +555,7 @@ public class MdwebIndexTest {
         identifier = "CTDF02";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 2:" + '\n' + result);
+        logger.finer("identifier query 2:\n" + result);
 
         expectedResult = "8:CSWCat";
 
@@ -568,7 +568,7 @@ public class MdwebIndexTest {
         identifier = "urn:uuid:1ef30a8b-876d-4828-9246-c37ab4510bbd";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 3:" + '\n' + result);
+        logger.finer("identifier query 3:\n" + result);
 
         expectedResult = "7:CSWCat";
 
@@ -594,7 +594,7 @@ public class MdwebIndexTest {
         String identifier = "39727_22_19750113062500";
         String result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 1:" + '\n' + result);
+        logger.finer("identifier query 1:\n" + result);
 
         String expectedResult = "4:CSWCat";
 
@@ -607,7 +607,7 @@ public class MdwebIndexTest {
         identifier = "CTDF02";
         result = indexSearcher.identifierQuery(identifier);
 
-        logger.finer("identifier query 2:" + '\n' + result);
+        logger.finer("identifier query 2:\n" + result);
 
         expectedResult = null;
 

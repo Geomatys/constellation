@@ -8,7 +8,6 @@ package org.constellation.sos.factory;
 import java.util.Properties;
 import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
-import org.constellation.configuration.ObservationWriterType;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.sos.io.ObservationFilter;
@@ -29,11 +28,11 @@ public class SOSFactoryTest {
 
     private static FactoryRegistry factory = new FactoryRegistry(AbstractSOSFactory.class);
 
-    private AbstractSOSFactory sosFactory;
+    private static AbstractSOSFactory sosFactory;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-
+        sosFactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
     }
 
     @AfterClass
@@ -42,7 +41,6 @@ public class SOSFactoryTest {
 
     @Before
     public void setUp() throws Exception {
-         sosFactory = factory.getServiceProvider(AbstractSOSFactory.class, null, null, null);
     }
 
     @After
