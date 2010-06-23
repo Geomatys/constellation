@@ -271,9 +271,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         this.gmlPackage         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311");
 
         this.opengisPackage     = FileUtilities.searchSubPackage("org.opengis.metadata", "org.opengis.referencing", "org.opengis.temporal",
-                                                        "org.opengis.service", "org.opengis.feature.catalog");
+                                                               "org.opengis.service", "org.opengis.feature.catalog");
         this.cswPackage         = FileUtilities.searchSubPackage("org.geotoolkit.csw.xml.v202", "org.geotoolkit.dublincore.xml.v2.elements", "org.geotoolkit.ows.xml.v100",
-                                                        "org.geotoolkit.ogc.xml");
+                                                               "org.geotoolkit.ogc.xml");
         this.ebrimV3Package     = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v300", "org.geotoolkit.wrs.xml.v100");
         this.ebrimV25Package    = FileUtilities.searchSubPackage("org.geotoolkit.ebrim.xml.v250", "org.geotoolkit.wrs.xml.v090");
         this.natureSDIPackage   = FileUtilities.searchSubPackage("org.geotoolkit.naturesdi");
@@ -865,7 +865,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 packageName = "org.geotoolkit.metadata.fra";
             else if (className.equals("ReferenceSystemMetadata"))
                 packageName = "org.geotoolkit.internal.jaxb.metadata";
-            
+            else if (className.equals("Anchor"))
+                packageName = "org.geotoolkit.internal.jaxb.text";
             String name  = className;
             int nameType = 0;
             while (nameType < 10) {

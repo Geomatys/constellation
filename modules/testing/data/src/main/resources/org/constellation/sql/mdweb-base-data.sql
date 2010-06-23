@@ -43,3 +43,13 @@ INSERT INTO "Schemas"."Properties"  VALUES ('endPosition', NULL, 'ISO 19108', NU
 
 INSERT INTO "Schemas"."Classes"  VALUES ('TimeInstant', 'TimeInstant', 'ISO 19108', 'TimeInstant', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('position', NULL, 'ISO 19108', NULL, 1, 1, 'TimeInstant', 'Date', NULL, 'M', 0, 'ISO 19103', 'ISO 19108', ' ');
+
+INSERT INTO "Schemas"."Classes"  VALUES ('Anchor', 'Anchor', 'ISO 19103', NULL, 0, NULL, NULL, ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('href',    NULL, 'ISO 19103', NULL, 0, 1, 'Anchor', 'URI', NULL, 'O', 0, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('role',    NULL, 'ISO 19103', NULL, 0, 1, 'Anchor', 'URI', NULL, 'O', 1, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('arcrole', NULL, 'ISO 19103', NULL, 0, 1, 'Anchor', 'URI', NULL, 'O', 2, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('show',    NULL, 'ISO 19103', NULL, 0, 1, 'Anchor', 'CharacterString', NULL, 'O', 3, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('title',   NULL, 'ISO 19103', NULL, 0, 1, 'Anchor', 'CharacterString', NULL, 'O', 4, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('actuate', NULL, 'ISO 19103', NULL, 0, 1, 'Anchor', 'CharacterString', NULL, 'O', 5, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('type',    NULL, 'ISO 19103', NULL, 0, 1, 'Anchor', 'CharacterString', NULL, 'O', 6, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('value',   NULL, 'ISO 19103', NULL, 0, 1, 'Anchor', 'CharacterString', NULL, 'O', 7, 'ISO 19103', 'ISO 19103', ' ');

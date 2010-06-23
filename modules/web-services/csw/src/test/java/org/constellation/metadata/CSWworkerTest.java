@@ -95,6 +95,7 @@ import org.opengis.metadata.citation.Role;
 
 // JUnit dependencies
 import org.junit.Ignore;
+import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.extent.Extent;
 import org.opengis.metadata.extent.GeographicExtent;
 import org.opengis.metadata.extent.VerticalExtent;
@@ -1928,6 +1929,32 @@ public class CSWworkerTest {
         assertEquals(expResult.getAcquisitionInformation(), result.getAcquisitionInformation());
         assertEquals(expResult.getApplicationSchemaInfo(), result.getApplicationSchemaInfo());
         assertEquals(expResult.getCharacterSet(), result.getCharacterSet());
+        assertEquals(expResult.getContacts().size(), result.getContacts().size());
+        if (expResult.getContacts().size() > 0) {
+            ResponsibleParty expResp = expResult.getContacts().iterator().next();
+            ResponsibleParty resResp = result.getContacts().iterator().next();
+            
+            assertEquals(expResp.getIndividualName(), resResp.getIndividualName());
+            assertEquals(expResp.getOrganisationName(), resResp.getOrganisationName());
+            assertEquals(expResp.getPositionName(), resResp.getPositionName());
+            assertEquals(expResp.getRole(), resResp.getRole());
+            if (expResp.getContactInfo() != null) {
+                assertEquals(expResp.getContactInfo().getHoursOfService(), resResp.getContactInfo().getHoursOfService());
+                assertEquals(expResp.getContactInfo().getContactInstructions(), resResp.getContactInfo().getContactInstructions());
+                assertEquals(expResp.getContactInfo().getPhone(), resResp.getContactInfo().getPhone());
+                assertEquals(expResp.getContactInfo().getOnlineResource(), resResp.getContactInfo().getOnlineResource());
+                if (expResp.getContactInfo().getAddress() != null) {
+                    assertEquals(expResp.getContactInfo().getAddress().getAdministrativeArea(), resResp.getContactInfo().getAddress().getAdministrativeArea());
+                    assertEquals(expResp.getContactInfo().getAddress().getCity(), resResp.getContactInfo().getAddress().getCity());
+                    assertEquals(expResp.getContactInfo().getAddress().getCountry(), resResp.getContactInfo().getAddress().getCountry());
+                    assertEquals(expResp.getContactInfo().getAddress().getDeliveryPoints(), resResp.getContactInfo().getAddress().getDeliveryPoints());
+                    assertEquals(expResp.getContactInfo().getAddress().getElectronicMailAddresses(), resResp.getContactInfo().getAddress().getElectronicMailAddresses());
+                    assertEquals(expResp.getContactInfo().getAddress().getPostalCode(), resResp.getContactInfo().getAddress().getPostalCode());
+                }
+                assertEquals(expResp.getContactInfo().getAddress(), resResp.getContactInfo().getAddress());
+            }
+            assertEquals(expResp.getContactInfo(), resResp.getContactInfo());
+        }
         assertEquals(expResult.getContacts(), result.getContacts());
         assertEquals(expResult.getContentInfo(), result.getContentInfo());
         assertEquals(expResult.getDataQualityInfo().size(), result.getDataQualityInfo().size());

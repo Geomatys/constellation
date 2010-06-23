@@ -85,6 +85,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
         isoMap.put("date",        "ISO 19115:MD_Metadata:dateStamp");
         isoMap.put("subject",     "ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword");
         isoMap.put("subject2",    "ISO 19115:MD_Metadata:identificationInfo:topicCategory");
+        isoMap.put("subject3",    "ISO 19115:MD_Metadata:identificationInfo:descriptiveKeywords:keyword:value");
         isoMap.put("format",      "ISO 19115:MD_Metadata:identificationInfo:resourceFormat:name");
         isoMap.put("abstract",    "ISO 19115:MD_Metadata:identificationInfo:abstract");
         isoMap.put("boundingBox", "ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement2");
@@ -141,7 +142,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                 }
 
             } catch (SQLException ex) {
-                LOGGER.warning("SQLException while initializing the Thesaurus reader: " + thesaurusDB.getConnectURL());
+                LOGGER.log(Level.WARNING, "SQLException while initializing the Thesaurus reader: {0}", thesaurusDB.getConnectURL());
             }
         }
     }
@@ -433,7 +434,8 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
 
 
         // we get the keywords
-        final List<Value> keywordsValues  = form.getValueFromPath(pathMap.get("subject"));
+        final List<Value> keywordsValues  = form.getValueFromPath(pathMap.get("subject3"));
+        keywordsValues.addAll(form.getValueFromPath(pathMap.get("subject")));
         final List<SimpleLiteral> keywords = new ArrayList<SimpleLiteral>();
         for (Value v: keywordsValues) {
             if (v instanceof TextValue) {
@@ -441,7 +443,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             }
         }
 
-        // we get the keywords
+        // we get the topic category
         final List<Value> topicCategoriesValues  = form.getValueFromPath(pathMap.get("subject2"));
         for (Value v: topicCategoriesValues) {
             if (v instanceof TextValue) {
