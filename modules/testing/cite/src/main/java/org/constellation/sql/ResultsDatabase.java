@@ -87,6 +87,8 @@ public final class ResultsDatabase {
      */
     private static final String SELECT_TESTS_FAILED =
             "SELECT date,id,directory FROM \"Results\" WHERE date=? AND passed=FALSE;";
+    private static final String SELECT_TESTS_PASSED =
+            "SELECT date,id,directory FROM \"Results\" WHERE date=? AND passed=TRUE;";
     private static final String SELECT_PREVIOUS_SUITE =
             "SELECT date FROM \"Suites\" WHERE date < ? AND service=? AND version=? ORDER BY date DESC;";
 
@@ -141,30 +143,67 @@ public final class ResultsDatabase {
     {
         // Contains all tests that have failed for the current session.
         final List<Result> currentTestsFailed  = getTestsFailed(date);
+        final List<Result> currentTestsPassed  = getTestsPassed(date);
+        final int nbCurrentTest                = currentTestsFailed.size()  + currentTestsPassed.size();
 
         final Date previousSuite = getPreviousSuiteDate(date, service, version);
         // Contains all tests that have failed for the previous session.
         final List<Result> previousTestsFailed;
+        // Contains all tests that have Passed for the previous session.
+        final List<Result> previousTestsPassed;
 
         // Will contain the tests that have passed for the last session, but not for the current one.
         final List<Result> problematicTests = new ArrayList<Result>();
         // Will contain the tests that have passed for the current session, but not for the last one.
         final List<Result> newlyPassedTests = new ArrayList<Result>();
+        // Will contain the tests that have been activated for the current session.
+        final List<Result> newlyActivatedTests = new ArrayList<Result>();
+        // Will contain the tests that have been deactivated for the current session.
+        final List<Result> disapearTests = new ArrayList<Result>();
+
+        final boolean missingTest;
         if (previousSuite != null) {
             previousTestsFailed = getTestsFailed(previousSuite);
+            previousTestsPassed = getTestsPassed(previousSuite);
             for (Result currentTest : currentTestsFailed) {
+                // add to the problematic list if a test fail and was passed in the last session
                 if (!isTestPresentInList(currentTest, previousTestsFailed)) {
-                    problematicTests.add(currentTest);
+                    if (isTestPresentInList(currentTest, previousTestsPassed)) {
+                        problematicTests.add(currentTest);
+                    } else {
+                        newlyActivatedTests.add(currentTest);
+                    }
                 }
             }
-            for (Result previousTest : previousTestsFailed) {
-                if (!isTestPresentInList(previousTest, currentTestsFailed)) {
-                    newlyPassedTests.add(previousTest);
+            for (Result currentTest : currentTestsPassed) {
+                // add to the newlyPassed list if a test pass and was failed in the last session
+                if (!isTestPresentInList(currentTest, previousTestsPassed)) {
+                    if (isTestPresentInList(currentTest, previousTestsFailed)) {
+                        newlyPassedTests.add(currentTest);
+                    } else {
+                        newlyActivatedTests.add(currentTest);
+                    }
                 }
             }
+            int nbPreviousTest =nbPreviousTest = previousTestsFailed.size() + previousTestsPassed.size();
+            missingTest = nbCurrentTest < nbPreviousTest;
+            
+            //if some test have been deactivated we list them
+            if (missingTest) {
+                previousTestsPassed.addAll(previousTestsFailed);
+                for (Result previousTest: previousTestsPassed) {
+                    if (!isTestPresentInList(previousTest, currentTestsFailed) && !isTestPresentInList(previousTest, currentTestsPassed)) {
+                        disapearTests.add(previousTest);
+                    }
+                }
+            }
+
+        } else {
+            missingTest = false;
         }
-        displayComparisonResults(problematicTests, newlyPassedTests, date, previousSuite, service, version);
-        return problematicTests.isEmpty();
+
+        displayComparisonResults(problematicTests, newlyPassedTests, newlyActivatedTests, disapearTests, date, previousSuite, service, version);
+        return problematicTests.isEmpty() && !missingTest;
     }
 
     /**
@@ -298,9 +337,11 @@ public final class ResultsDatabase {
      * @param version          The service version.
      */
     private void displayComparisonResults(final List<Result> problematicTests,
-                                           final List<Result> newlyPassedTests,
-                                           final Date date, final Date previous,
-                                           final String service, final String version)
+                                          final List<Result> newlyPassedTests,
+                                          final List<Result> newlyActivatedTests,
+                                          final List<Result> deActivatedTests,
+                                          final Date date, final Date previous,
+                                          final String service, final String version)
     {
         final char endOfLine = '\n';
         final char tab       = '\t';
@@ -347,10 +388,31 @@ public final class ResultsDatabase {
                 sb.append(tab).append(tab).append(tab).append("==> Directory: ").append(res.getDirectory())
                   .append(endOfLine);
             }
-            if (x364) sb.append(X364.RESET.sequence());
-            LOGGER.info(sb.toString());
-            return;
         }
+
+        if (!newlyActivatedTests.isEmpty()) {
+            if (x364) sb.append(X364.FOREGROUND_GREEN.sequence());
+            sb.append(tab).append("New tests have been activated in the current session.").append(endOfLine);
+            for (Result res : newlyActivatedTests) {
+                sb.append(tab).append(tab).append("Id: ").append(res.getId());
+                sb.append(" Result:").append(res.isPassed()).append(endOfLine);
+            }
+            if (x364) sb.append(X364.FOREGROUND_DEFAULT.sequence());
+        }
+
+        if (!deActivatedTests.isEmpty()) {
+            if (x364) sb.append(X364.FOREGROUND_RED.sequence());
+            if (x364) sb.append(X364.BOLD.sequence());
+            sb.append(tab).append("/!\\ Some tests have been deactivated in the current session! ! You should reactivate them to restore the build /!\\")
+                    .append(endOfLine);
+            for (Result res : deActivatedTests) {
+                sb.append(tab).append(tab).append("Id: ").append(res.getId()).append(endOfLine);
+                sb.append(tab).append(tab).append(tab).append("==> Directory: ").append(res.getDirectory());
+                sb.append("previous Result:").append(res.isPassed()).append(endOfLine);
+            }
+            if (x364) sb.append(X364.FOREGROUND_DEFAULT.sequence());
+        }
+
         if (x364) sb.append(X364.RESET.sequence());
         LOGGER.info(sb.toString());
     }
@@ -403,6 +465,29 @@ public final class ResultsDatabase {
         ensureConnectionOpened();
 
         final PreparedStatement psCurrent = connection.prepareStatement(SELECT_TESTS_FAILED);
+        psCurrent.setTimestamp(1, new Timestamp(date.getTime()));
+
+        final List<Result> results = new ArrayList<Result>();
+        final ResultSet rs = psCurrent.executeQuery();
+        while (rs.next()) {
+            results.add(new Result(rs.getTimestamp(1), rs.getString(2), rs.getString(3), false));
+        }
+        rs.close();
+
+        return results;
+    }
+
+    /**
+     * Returns a list of {@link Result} that have passed for the session at the date specified.
+     * This list can be empty, but never {@code null}.
+     *
+     * @param date The date of the session.
+     * @throws SQLException
+     */
+    private List<Result> getTestsPassed(final Date date) throws SQLException {
+        ensureConnectionOpened();
+
+        final PreparedStatement psCurrent = connection.prepareStatement(SELECT_TESTS_PASSED);
         psCurrent.setTimestamp(1, new Timestamp(date.getTime()));
 
         final List<Result> results = new ArrayList<Result>();
