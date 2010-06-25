@@ -625,7 +625,13 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         featureCollection = (FeatureCollection) featureObject;
                         typeName = ((FeatureCollection)featureCollection).getFeatureType().getName();
                     } else {
-                        throw new CstlServiceException("Unexpected Object to insert");
+                        final String featureType;
+                        if (featureObject == null) {
+                            featureType = "null";
+                        } else {
+                            featureType = featureObject.getClass().getName();
+                        }
+                        throw new CstlServiceException("Unexpected Object to insert:" + featureType);
                     }
                     
                     final FeatureLayerDetails layer = (FeatureLayerDetails) namedProxy.get(typeName, ServiceDef.Specification.WFS.name());
