@@ -73,6 +73,11 @@
     the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
+    <dependency>
+      <groupId>greenpepper-open</groupId>
+      <artifactId>greenpepper-core</artifactId>
+      <version>2.7</version>
+    </dependency>
     <!-- Apache maven plugin -->
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -169,6 +174,40 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>greenpepper</groupId>
+        <artifactId>greenpepper-maven-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+          <fixtureSourceDirectory>src/fixture/java</fixtureSourceDirectory>
+          <fixtureOutputDirectory>target/fixture-test-classes</fixtureOutputDirectory>
+          <specsDirectory>src/specs</specsDirectory>
+          <reportsDirectory>target/greenpepper-reports</reportsDirectory>
+          <repositories>
+            <repository>
+              <type>com.greenpepper.runner.repository.GreenPepperRepository</type>
+              <root>
+                <![CDATA[http://dev.geomatys.com/confluence/rpc/xmlrpc?handler=greenpepper1&sut=Maven&includeStyle=true]]>
+              </root>
+              <name>Constellation-greenpepper</name>
+              <suites>
+                <suite>Geomatys-kbConstellation</suite>
+              </suites>
+            </repository>
+          </repositories>
+        </configuration>
+        <executions>
+          <execution>
+            <id>greenpepper</id>
+            <goals>
+              <goal>compile</goal>
+              <goal>fixture-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <dependencies>
@@ -465,6 +504,23 @@
       </build>
     </profile>
   </profiles>
+
+
+  <repositories>
+      <repository>
+      <id>GreenPepper</id>
+      <name>GreenPepper</name>
+      <url>http://www.greenpeppersoftware.com/nexus/content/groups/public</url>
+      </repository>
+   </repositories> 
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>GreenPepper</id>
+      <name>GreenPepper</name>
+      <url>http://www.greenpeppersoftware.com/nexus/content/groups/public</url>
+    </pluginRepository>
+  </pluginRepositories>
 
 
 </project>

@@ -50,7 +50,7 @@ import org.geotoolkit.util.logging.Logging;
  *
  * @since 0.4
  */
-public final class ResultsDatabase {
+public class ResultsDatabase {
     
     private static final Logger LOGGER = Logging.getLogger("org.constellation.sql");
     /**
@@ -101,7 +101,7 @@ public final class ResultsDatabase {
     /**
      * The connection to the database of Cite Tests results.
      */
-    private final Connection connection;
+    protected final Connection connection;
 
     /**
      * List of existing services, already checked from the database as present.
