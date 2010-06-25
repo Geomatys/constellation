@@ -288,7 +288,7 @@
                             <gmd:date>
                                 <gmd:CI_Date>
                                     <gmd:date>
-                                        <gco:DateTime>2008-11-26T00:00:00+01:00</gco:DateTime>
+                                        <gco:DateTime>2008-11-26T00:00:00+02:00</gco:DateTime>
                                     </gmd:date>
                                     <gmd:dateType>
                                         <gmd:CI_DateTypeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#revision" codeListValue="revision"/>

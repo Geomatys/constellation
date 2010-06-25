@@ -185,7 +185,7 @@ public final class ResultsDatabase {
                     }
                 }
             }
-            int nbPreviousTest =nbPreviousTest = previousTestsFailed.size() + previousTestsPassed.size();
+            int nbPreviousTest = previousTestsFailed.size() + previousTestsPassed.size();
             missingTest = nbCurrentTest < nbPreviousTest;
             
             //if some test have been deactivated we list them
@@ -493,7 +493,7 @@ public final class ResultsDatabase {
         final List<Result> results = new ArrayList<Result>();
         final ResultSet rs = psCurrent.executeQuery();
         while (rs.next()) {
-            results.add(new Result(rs.getTimestamp(1), rs.getString(2), rs.getString(3), false));
+            results.add(new Result(rs.getTimestamp(1), rs.getString(2), rs.getString(3), true));
         }
         rs.close();
 

@@ -18,6 +18,7 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
+import org.opengis.metadata.citation.Citation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -2000,6 +2001,7 @@ public class CSWworkerTest {
                         assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers().iterator().next());
                     }
                     assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName().getIdentifiers());
+                    citationEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName());
                     assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getThesaurusName(), idResult.getDescriptiveKeywords().iterator().next().getThesaurusName());
                     assertEquals(idExpResult.getDescriptiveKeywords().iterator().next().getType(), idResult.getDescriptiveKeywords().iterator().next().getType());
                     assertEquals(idExpResult.getDescriptiveKeywords().iterator().next(), idResult.getDescriptiveKeywords().iterator().next());
@@ -2031,19 +2033,23 @@ public class CSWworkerTest {
                     while (expVIt.hasNext() && resVIt.hasNext()) {
                         VerticalExtent expVEx = expVIt.next();
                         VerticalExtent resVEx = resVIt.next();
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getDimension(), resVEx.getVerticalCRS().getCoordinateSystem().getDimension());
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit());
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection());
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation());
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning());
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers());
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass());
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName());
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0));
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getName(), resVEx.getVerticalCRS().getCoordinateSystem().getName());
-                        assertEquals(expVEx.getVerticalCRS().getCoordinateSystem(), resVEx.getVerticalCRS().getCoordinateSystem());
-                        assertEquals(expVEx.getVerticalCRS().getDatum(), resVEx.getVerticalCRS().getDatum());
-                        assertEquals(expVEx.getVerticalCRS(), resVEx.getVerticalCRS());
+                        if (expVEx != null && resVEx != null) {
+                            if (expVEx.getVerticalCRS() != null && resVEx.getVerticalCRS() != null) {
+                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getDimension(), resVEx.getVerticalCRS().getCoordinateSystem().getDimension());
+                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getUnit());
+                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getDirection());
+                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getAbbreviation());
+                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getRangeMeaning());
+                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getIdentifiers());
+                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName().getClass());
+                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName(), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0).getName());
+                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getAxis(0), resVEx.getVerticalCRS().getCoordinateSystem().getAxis(0));
+                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem().getName(), resVEx.getVerticalCRS().getCoordinateSystem().getName());
+                                assertEquals(expVEx.getVerticalCRS().getCoordinateSystem(), resVEx.getVerticalCRS().getCoordinateSystem());
+                                assertEquals(expVEx.getVerticalCRS().getDatum(), resVEx.getVerticalCRS().getDatum());
+                                assertEquals(expVEx.getVerticalCRS(), resVEx.getVerticalCRS());
+                            }
+                        }
                         assertEquals(expVEx, resVEx);
                     }
                     assertEquals(expEx.getTemporalElements(),   resEx.getTemporalElements());
@@ -2095,5 +2101,23 @@ public class CSWworkerTest {
         assertEquals(expResult.getReferenceSystemInfo(), result.getReferenceSystemInfo());
         assertEquals(expResult.getSpatialRepresentationInfo(), result.getSpatialRepresentationInfo());
         assertEquals(expResult, result);
+    }
+
+    public static void citationEquals(Citation expectedCitation, Citation resultCitation) {
+        if (expectedCitation != null && resultCitation != null) {
+            assertEquals(expectedCitation.getAlternateTitles(), resultCitation.getAlternateTitles());
+            assertEquals(expectedCitation.getCitedResponsibleParties(), resultCitation.getCitedResponsibleParties());
+            assertEquals(expectedCitation.getCollectiveTitle(), resultCitation.getCollectiveTitle());
+            assertEquals(expectedCitation.getDates(), resultCitation.getDates());
+            assertEquals(expectedCitation.getEdition(), resultCitation.getEdition());
+            assertEquals(expectedCitation.getEditionDate(), resultCitation.getEditionDate());
+            assertEquals(expectedCitation.getISBN(), resultCitation.getISBN());
+            assertEquals(expectedCitation.getISSN(), resultCitation.getISSN());
+            assertEquals(expectedCitation.getIdentifiers(), resultCitation.getIdentifiers());
+            assertEquals(expectedCitation.getOtherCitationDetails(), resultCitation.getOtherCitationDetails());
+            assertEquals(expectedCitation.getPresentationForms(), resultCitation.getPresentationForms());
+            assertEquals(expectedCitation.getSeries(), resultCitation.getSeries());
+            assertEquals(expectedCitation.getTitle(), resultCitation.getTitle());
+        }
     }
 }
