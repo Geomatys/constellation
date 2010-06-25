@@ -20,7 +20,7 @@ import com.greenpepper.interpreter.flow.scenario.Check;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
+import java.util.Date;
 
 
 /**
@@ -48,15 +48,15 @@ public final class CiteTestsFixture extends ResultsDatabase {
      */
     @Check("Vérifier que la dernière session pour le service (\\w+) en version (\\d.\\d.\\d) n'a pas régressé")
     public boolean compareLastResults(final String service, final String version)
-                                  throws SQLException, ParseException
+                                  throws SQLException
     {
         final PreparedStatement ps = connection.prepareStatement(SELECT_LAST_DATE);
         ps.setString(1, service);
         ps.setString(2, version);
         final ResultSet rs = ps.executeQuery();
-        final String date;
+        final Date date;
         if (rs.next()) {
-            date = rs.getString(1);
+            date = rs.getTimestamp(1);
         } else {
             rs.close();
             ps.close();
@@ -64,6 +64,6 @@ public final class CiteTestsFixture extends ResultsDatabase {
         }
         rs.close();
         ps.close();
-        return compareResults(DATE_FORMAT.parse(date), service, version);
+        return compareResults(date, service, version);
     }
 }
