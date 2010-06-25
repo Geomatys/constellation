@@ -58,8 +58,12 @@ public final class CiteTestsFixture extends ResultsDatabase {
         if (rs.next()) {
             date = rs.getString(1);
         } else {
+            rs.close();
+            ps.close();
             throw new SQLException("The requested session does not contain values");
         }
+        rs.close();
+        ps.close();
         return compareResults(DATE_FORMAT.parse(date), service, version);
     }
 }
