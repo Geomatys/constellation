@@ -17,6 +17,8 @@
  */
 package org.constellation.map.ws.rs;
 
+import java.util.ArrayList;
+import org.opengis.feature.type.Name;
 import com.sun.jersey.spi.resource.Singleton;
 
 //J2SE dependencies
@@ -65,6 +67,7 @@ import org.constellation.ws.rs.GridWebService;
 //GeotoolKit dependencies
 import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
+import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
@@ -304,7 +307,7 @@ public class WMSService extends GridWebService {
                 final ExceptionFilterWriter swException = new ExceptionFilterWriter(sw);
                 try {
                     swException.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
-                    swException.write("<!DOCTYPE ServiceExceptionReport SYSTEM \"http://schemas.opengis.net/wms/1.1.0/exception_1_1_0.dtd\">\n");
+                    swException.write("<!DOCTYPE ServiceExceptionReport SYSTEM \"http://schemas.opengis.net/wms/1.1.1/exception_1_1_1.dtd\">\n");
                 } catch (IOException io) {
                     throw new JAXBException(io);
                 }
@@ -404,6 +407,8 @@ public class WMSService extends GridWebService {
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
         final List<String> queryLayers = StringUtilities.toStringList(strQueryLayers);
         final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, null);
+        final List<Name> namedQueryableLayers = parseNamespaceLayerList(queryLayers);
+
         final int x, y;
         try {
             x = RequestsUtilities.toInt(strX);
@@ -423,7 +428,38 @@ public class WMSService extends GridWebService {
         } else {
             featureCount = RequestsUtilities.toInt(strFeatureCount);
         }
-        return new GetFeatureInfo(getMap, x, y, queryableLayers, infoFormat, featureCount);
+        return new GetFeatureInfo(getMap, x, y, namedQueryableLayers, infoFormat, featureCount);
+    }
+
+    /**
+     * Return a List of named Layer (namespace : name) from a string list.
+     *
+     * @param layerNames
+     * @return
+     */
+    private List<Name> parseNamespaceLayerList(List<String> layerNames) {
+        final List<Name> result = new ArrayList<Name>();
+        for (String layerName : layerNames) {
+            result.add(parseName(layerName));
+        }
+        return result;
+    }
+
+    /**
+     * Parse a String to ionstanciate a named Layer (namespace : name).
+     * @param layerName
+     * @return
+     */
+    private Name parseName(String layerName) {
+        final Name name;
+        if (layerName != null && layerName.indexOf(':') != -1) {
+            final String namespace = layerName.substring(0, layerName.indexOf(':'));
+            final String localPart = layerName.substring(layerName.indexOf(':') + 1);
+            name = new DefaultName(namespace, localPart);
+        } else {
+            name = new DefaultName(layerName);
+        }
+        return name;
     }
 
     /**
@@ -434,7 +470,7 @@ public class WMSService extends GridWebService {
      * @throws CstlServiceException
      */
     private GetLegendGraphic adaptGetLegendGraphic() throws CstlServiceException {
-        final String strLayer  = getParameter(KEY_LAYER,  true );
+        final Name strLayer  = parseName(getParameter(KEY_LAYER,  true));
         final String strFormat = getParameter(KEY_FORMAT, true );
         final String strWidth  = getParameter(KEY_WIDTH,  false);
         final String strHeight = getParameter(KEY_HEIGHT, false);
@@ -538,6 +574,7 @@ public class WMSService extends GridWebService {
             throw new CstlServiceException(i, INVALID_FORMAT, KEY_FORMAT.toLowerCase());
         }
         final List<String> layers  = StringUtilities.toStringList(strLayers);
+        final List<Name> namedLayers  = parseNamespaceLayerList(layers);
         final List<String> styles = StringUtilities.toStringList(strStyles);
         MutableStyledLayerDescriptor sld = null;
         final Double elevation;
@@ -607,7 +644,7 @@ public class WMSService extends GridWebService {
         }
 
         // Builds the request.
-        return new GetMap(env, new Version(version), format, layers, styles, sld, elevation,
+        return new GetMap(env, new Version(version), format, namedLayers, styles, sld, elevation,
                     date, size, background, transparent, azimuth, strExceptions, getParameters());
     }
 

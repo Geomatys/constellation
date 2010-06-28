@@ -52,9 +52,9 @@ public abstract class AbstractLayerProvider implements LayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails getByIdentifier(String key) {
+    public LayerDetails getByIdentifier(Name key) {
         for(final Name n : getKeys()){
-            if(n.getLocalPart().equals(key)){
+            if(n.equals(key)){
                 return get(n);
             }
         }
@@ -65,9 +65,9 @@ public abstract class AbstractLayerProvider implements LayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public LayerDetails getByIdentifier(String key, String service) {
+    public LayerDetails getByIdentifier(Name key, String service) {
         for(final Name n : getKeys(service)){
-            if(n.getLocalPart().equals(key)){
+            if(n.equals(key)){
                 return get(n);
             }
         }
@@ -78,7 +78,7 @@ public abstract class AbstractLayerProvider implements LayerProvider{
      * {@inheritDoc }
      */
     @Override
-    public ElevationModel getElevationModel(String name) {
+    public ElevationModel getElevationModel(Name name) {
         return null;
     }
 

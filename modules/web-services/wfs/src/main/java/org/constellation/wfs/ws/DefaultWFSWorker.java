@@ -246,7 +246,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                         }
                         ftt = new FeatureTypeType(
                                 Utils.getQnameFromName(layerName),
-                                fld.getName(),
+                                fld.getName().getLocalPart(),
                                 defaultCRS,
                                 standardCRS,
                                 UnmodifiableArrayList.wrap(new WGS84BoundingBoxType[]{toBBox(fld.getStore(), fld.getGroupName())}));

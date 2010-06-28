@@ -17,6 +17,7 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
+import org.opengis.feature.type.Name;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -154,7 +155,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             final LayerDescriptionType outputLayer = new LayerDescriptionType(or, t);
             layerDescriptions.add(outputLayer);
         }
-        return new DescribeLayerResponseType("1.1.0", layerDescriptions);
+        return new DescribeLayerResponseType("1.1.1", layerDescriptions);
     }
 
     /**
@@ -324,9 +325,15 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
 
             // LegendUrl generation
             //TODO: Use a StringBuilder or two
-            final String layerName = layer.getName();
+            final Name fullLayerName = layer.getName();
+            final String layerName;
+            if (fullLayerName.getNamespaceURI() != null) {
+                layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
+            } else {
+                layerName = fullLayerName.getLocalPart();
+            }
             final String beginLegendUrl = url + "wms?REQUEST=GetLegendGraphic&" +
-                                                    "VERSION=1.1.0&" +
+                                                    "VERSION=1.1.1&" +
                                                     "FORMAT=";
             final String legendUrlGif = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;
             final String legendUrlPng = beginLegendUrl + MimeType.IMAGE_PNG + "&LAYER=" + layerName;
@@ -349,7 +356,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
 
                 final List<String> stylesName = layer.getFavoriteStyles();
                 final List<org.geotoolkit.wms.xml.v111.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v111.Style>();
-                if (stylesName != null && stylesName.size() != 0) {
+                if (stylesName != null && !stylesName.isEmpty()) {
                     // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
                     for (String styleName : stylesName) {
                         final MutableStyle ms = StyleProviderProxy.getInstance().get(styleName);
@@ -410,7 +417,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
 
                 final List<String> stylesName = layer.getFavoriteStyles();
                 final List<org.geotoolkit.wms.xml.v130.Style> styles = new ArrayList<org.geotoolkit.wms.xml.v130.Style>();
-                if (stylesName != null && stylesName.size() != 0) {
+                if (stylesName != null && !stylesName.isEmpty()) {
                     // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
                     for (String styleName : stylesName) {
                         final MutableStyle ms = StyleProviderProxy.getInstance().get(styleName);
@@ -532,7 +539,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
     	//
         // 1. SCENE
         //       -- get the List of layer references
-        final List<String> layerNames = getFI.getQueryLayers();
+        final List<Name> layerNames = getFI.getQueryLayers();
         final List<LayerDetails> layerRefs = getLayerReferences(layerNames, getFI.getVersion().toString());
 
         for (LayerDetails layer : layerRefs) {
@@ -699,7 +706,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
 
         // 1. SCENE
         //       -- get the List of layer references
-        final List<String> layerNames = getMap.getLayers();
+        final List<Name> layerNames = getMap.getLayers();
         final List<LayerDetails> layerRefs;
         try{
             layerRefs = getLayerReferences(layerNames, getMap.getVersion().toString());
@@ -807,7 +814,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
 
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
-    private static List<LayerDetails> getLayerReferences(final List<String> layerNames, final String version)
+    private static List<LayerDetails> getLayerReferences(final List<Name> layerNames, final String version)
             throws CstlServiceException {
         List<LayerDetails> layerRefs;
         try { // WE catch the exception from either service version
@@ -827,7 +834,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
 
     //TODO: handle the null value in the exception.
     //TODO: harmonize with the method getLayerReference().
-    public static LayerDetails getLayerReference(final String layerName, final String version)
+    public static LayerDetails getLayerReference(final Name layerName, final String version)
             throws CstlServiceException {
 
         LayerDetails layerRef;
@@ -848,14 +855,14 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
 
 
 
-    private static MutableStyle extractStyle(final String layerName, final StyledLayerDescriptor sld){
+    private static MutableStyle extractStyle(final Name layerName, final StyledLayerDescriptor sld){
         if(sld == null){
             throw new NullPointerException("SLD should not be null");
         }
 
         for(final Layer layer : sld.layers()){
 
-            if(layer instanceof MutableNamedLayer && layerName.equals(layer.getName()) ){
+            if(layer instanceof MutableNamedLayer && layerName.getLocalPart().equals(layer.getName()) ){
                 //we can only extract style from a NamedLayer that has the same name
                 final MutableNamedLayer mnl = (MutableNamedLayer) layer;
 

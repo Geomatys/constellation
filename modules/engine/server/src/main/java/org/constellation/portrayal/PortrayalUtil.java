@@ -34,6 +34,7 @@ import org.geotoolkit.sld.MutableNamedLayer;
 import org.geotoolkit.sld.MutableNamedStyle;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.style.MutableStyle;
+import org.opengis.feature.type.Name;
 
 /**
  * Utility methods for the Portrayal system.
@@ -127,7 +128,7 @@ public final class PortrayalUtil {
         return styles;
     }
 
-    private static Object extractStyle(final String layerName,
+    private static Object extractStyle(final Name layerName,
             final MutableStyledLayerDescriptor sld) {
 
         if (sld == null) {
@@ -136,7 +137,7 @@ public final class PortrayalUtil {
 
         for (final MutableLayer layer : sld.layers()) {
 
-            if (layer instanceof MutableNamedLayer && layerName.equals(layer.getName())) {
+            if (layer instanceof MutableNamedLayer && layerName.getLocalPart().equals(layer.getName())) {
                 //we can only extract style from a NamedLayer that has the same name
                 final MutableNamedLayer mnl = (MutableNamedLayer) layer;
 

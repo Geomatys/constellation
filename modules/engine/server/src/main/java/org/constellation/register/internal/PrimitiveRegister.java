@@ -78,7 +78,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
     @Override
     public List<LayerDetails> getLayerReferences(ServiceDef serviceDef,
-            List<String> layerNames) throws RegisterException {
+            List<Name> layerNames) throws RegisterException {
 
         if (isServiceAllowed("read all files", serviceDef)) {
             return getLayerRefs(serviceDef, layerNames);
@@ -90,7 +90,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
     }
 
     @Override
-    public LayerDetails getLayerReference(ServiceDef serviceDef, String layerName) throws RegisterException {
+    public LayerDetails getLayerReference(ServiceDef serviceDef, Name layerName) throws RegisterException {
 
         if (isServiceAllowed("read all files", serviceDef)) {
             return getLayerRef(serviceDef, layerName);
@@ -131,10 +131,10 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
 
     }
 
-    private List<LayerDetails> getLayerRefs(ServiceDef serviceDef, List<String> layerNames) throws RegisterException {
+    private List<LayerDetails> getLayerRefs(ServiceDef serviceDef, List<Name> layerNames) throws RegisterException {
 
         final List<LayerDetails> layerRefs = new ArrayList<LayerDetails>();
-        for (String layerName : layerNames) {
+        for (Name layerName : layerNames) {
             final LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName,
                     serviceDef.specification.name());
 
@@ -158,7 +158,7 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
         return layerRefs;
     }
 
-    private LayerDetails getLayerRef(ServiceDef serviceDef, String layerName) throws RegisterException {
+    private LayerDetails getLayerRef(ServiceDef serviceDef, Name layerName) throws RegisterException {
 
         final LayerDetails layerRef = LayerProviderProxy.getInstance().getByIdentifier(layerName,
                 serviceDef.specification.name());

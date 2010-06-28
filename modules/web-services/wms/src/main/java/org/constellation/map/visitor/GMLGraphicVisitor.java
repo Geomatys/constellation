@@ -42,6 +42,7 @@ import org.geotoolkit.metadata.iso.citation.Citations;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.MeasurementRange;
+import org.opengis.feature.type.Name;
 
 import org.opengis.geometry.Envelope;
 import org.opengis.referencing.FactoryException;
@@ -99,7 +100,9 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
             return;
         }
 
-        final String layerName = coverage.getCoverageLayer().getCoverageName().getLocalPart();
+        final Name fullLayerName = coverage.getCoverageLayer().getCoverageName();
+        final String layerName = fullLayerName.getLocalPart();
+
         List<String> strs = values.get(layerName);
         if (strs == null) {
             strs = new ArrayList<String>();
@@ -123,7 +126,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         builder.append("\t<").append(layerNameCorrected).append("_layer").append(endMark)
                .append("\t\t<").append(layerNameCorrected).append("_feature").append(endMark);
 
-        final LayerDetails layerPostgrid = dp.getByIdentifier(layerName);
+        final LayerDetails layerPostgrid = dp.getByIdentifier(fullLayerName);
         final Envelope objEnv = gfi.getEnvelope();
         final Date time = gfi.getTime();
         final Double elevation = gfi.getElevation();

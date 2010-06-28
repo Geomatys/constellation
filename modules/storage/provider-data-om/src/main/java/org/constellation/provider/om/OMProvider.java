@@ -123,7 +123,7 @@ public class OMProvider extends AbstractLayerProvider {
             final StringBuilder sb = new StringBuilder("Could not connect to O&M : \n");
             for(final Map.Entry<String,Serializable> entry : params.entrySet()){
                 if (entry.getKey().equals(KEY_PASSWD)) {
-                    sb.append(entry.getKey()).append(" : *******" + entry.getValue() +"*").append('\n');
+                    sb.append(entry.getKey()).append(" : *******").append(entry.getValue()).append("*").append('\n');
                 } else {
                     sb.append(entry.getKey()).append(" : ").append(entry.getValue()).append('\n');
                 }
@@ -210,7 +210,7 @@ public class OMProvider extends AbstractLayerProvider {
             elevationStartField = null;
             elevationEndField   = null;
         }
-        return new OMLayerDetails(key.getLocalPart(), store, key, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
+        return new OMLayerDetails(key, store, key, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
         
     }
 
@@ -289,9 +289,9 @@ public class OMProvider extends AbstractLayerProvider {
 
         final StringBuilder builder = new StringBuilder("DATA PROVIDER : O&M ");
         for (final OMProvider dp : dps){
-            builder.append("\n["+ dp.source.parameters.get(KEY_DATABASE)+"=");
+            builder.append("\n[").append(dp.source.parameters.get(KEY_DATABASE)).append("=");
             for(final Name layer : dp.getKeys()){
-                builder.append(layer + ",");
+                builder.append(layer).append( ",");
             }
             builder.append("]");
         }

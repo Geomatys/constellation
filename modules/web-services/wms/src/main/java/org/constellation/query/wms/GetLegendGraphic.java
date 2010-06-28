@@ -21,6 +21,7 @@ import org.constellation.query.QueryRequest;
 import org.constellation.ws.MimeType;
 
 import org.geotoolkit.lang.Immutable;
+import org.opengis.feature.type.Name;
 
 
 /**
@@ -35,7 +36,7 @@ public final class GetLegendGraphic extends WMSQuery {
     /**
      * Layer to consider.
      */
-    private final String layer;
+    private final Name layer;
 
     /**
      * Format of the legend file returned.
@@ -56,7 +57,7 @@ public final class GetLegendGraphic extends WMSQuery {
      * Builds a {@code GetLegendGraphic} request, using the layer and mime-type specified
      * and width and height for the image.
      */
-    public GetLegendGraphic(final String layer, final String format,
+    public GetLegendGraphic(final Name layer, final String format,
                             final Integer width, final Integer height)
     {
         super(ServiceDef.WMS_1_1_1_SLD.version,null);
@@ -69,7 +70,7 @@ public final class GetLegendGraphic extends WMSQuery {
     /**
      * Returns the layer to consider for this request.
      */
-    public String getLayer() {
+    public Name getLayer() {
         return layer;
     }
 

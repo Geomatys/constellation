@@ -44,11 +44,11 @@ import org.opengis.feature.type.Name;
  */
 class ShapeFileLayerDetails extends AbstractFeatureLayerDetails {
 
-    ShapeFileLayerDetails(String name, DataStore store, Name groupName, List<String> favorites){
+    ShapeFileLayerDetails(Name name, DataStore store, Name groupName, List<String> favorites){
         this(name,store, groupName,favorites,null,null,null,null);
     }
     
-    ShapeFileLayerDetails(String name, DataStore store, Name groupName, List<String> favorites,
+    ShapeFileLayerDetails(Name name, DataStore store, Name groupName, List<String> favorites,
         String dateStart, String dateEnd, String elevationStart, String elevationEnd)
     {
         super(name,store,groupName,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
@@ -76,7 +76,7 @@ class ShapeFileLayerDetails extends AbstractFeatureLayerDetails {
         layer.setElevationRange(elevationStartField, elevationEndField);
         layer.setTemporalRange(dateStartField, dateEndField);
 
-        layer.setName(getName());
+        layer.setName(getName().getLocalPart());
 
         return layer;
     }

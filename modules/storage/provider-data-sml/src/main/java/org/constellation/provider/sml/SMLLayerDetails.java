@@ -44,11 +44,11 @@ import org.opengis.feature.type.Name;
  */
 class SMLLayerDetails extends AbstractFeatureLayerDetails {
 
-    SMLLayerDetails(String name, DataStore store, Name groupName, List<String> favorites){
+    SMLLayerDetails(Name name, DataStore store, Name groupName, List<String> favorites){
         this(name,store,groupName,favorites,null,null,null,null);
     }
     
-    SMLLayerDetails(String name, DataStore store, Name groupName, List<String> favorites,
+    SMLLayerDetails(Name name, DataStore store, Name groupName, List<String> favorites,
         String dateStart, String dateEnd, String elevationStart, String elevationEnd)
     {
         super(name,store,groupName,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
@@ -75,7 +75,7 @@ class SMLLayerDetails extends AbstractFeatureLayerDetails {
         layer.setElevationRange(elevationStartField, elevationEndField);
         layer.setTemporalRange(dateStartField, dateEndField);
 
-        layer.setName(getName());
+        layer.setName(getName().getLocalPart());
 
         return layer;
     }

@@ -125,7 +125,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
                 port = Integer.parseInt(portTxt);
             }catch(Exception nf){
                 //catch numberformat and nullpointer
-                LOGGER.log(Level.WARNING,"Port value for coverage-sql is not valid : "+ portTxt);
+                LOGGER.log(Level.WARNING, "Port value for coverage-sql is not valid : {0}", portTxt);
                 port = 5432;
             }
             dbName = properties.getProperty(KEY_DATABASE);
@@ -200,10 +200,10 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
             final String name = key.getLocalPart();
             final ProviderLayer layer = source.getLayer(name);
             if (layer == null) {
-                return new CoverageSQLLayerDetails(reader,null,null,name);
+                return new CoverageSQLLayerDetails(reader,null,null,key);
 
             } else {
-                return new CoverageSQLLayerDetails(reader,layer.styles,null,name);
+                return new CoverageSQLLayerDetails(reader,layer.styles,null,key);
             }
         }
 
@@ -285,7 +285,7 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     }
 
     @Override
-    public ElevationModel getElevationModel(String name) {
+    public ElevationModel getElevationModel(Name name) {
 
 //        final ProviderLayer layer = source.getLayer(name);
 //        if(layer != null && layer.isElevationModel){

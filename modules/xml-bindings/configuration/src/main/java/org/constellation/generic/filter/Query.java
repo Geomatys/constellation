@@ -390,4 +390,19 @@ public class Query {
         }
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 37 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 37 * hash + (this.option != null ? this.option.hashCode() : 0);
+        hash = 37 * hash + (this.parameters != null ? this.parameters.hashCode() : 0);
+        hash = 37 * hash + (this.statique != null ? this.statique.hashCode() : 0);
+        hash = 37 * hash + (this.select != null ? this.select.hashCode() : 0);
+        hash = 37 * hash + (this.from != null ? this.from.hashCode() : 0);
+        hash = 37 * hash + (this.where != null ? this.where.hashCode() : 0);
+        hash = 37 * hash + (this.orderby != null ? this.orderby.hashCode() : 0);
+        hash = 37 * hash + (this.groupby != null ? this.groupby.hashCode() : 0);
+        return hash;
+    }
 }

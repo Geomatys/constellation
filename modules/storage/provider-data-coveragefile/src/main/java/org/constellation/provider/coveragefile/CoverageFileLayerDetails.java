@@ -51,6 +51,7 @@ import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
+import org.opengis.feature.type.Name;
 
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -76,8 +77,8 @@ class CoverageFileLayerDetails implements CoverageLayerDetails {
      */
     private final List<String> favorites;
 
-    private final String name;
-    private final String elevationModel;
+    private final Name name;
+    private final Name elevationModel;
 
 
     /**
@@ -88,7 +89,7 @@ class CoverageFileLayerDetails implements CoverageLayerDetails {
      * @param layer The layer to consider in the database.
      */
     CoverageFileLayerDetails(final GridCoverageReader reader, final List<String> favorites,
-            final String elevationModel, final String name) {
+            final Name elevationModel, final Name name) {
         this.reader = reader;
         this.name = name;
 
@@ -135,7 +136,7 @@ class CoverageFileLayerDetails implements CoverageLayerDetails {
             style = RANDOM_FACTORY.createRasterStyle();
         }
 
-        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, style, getName());
+        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, style, getName().getLocalPart());
 
         //search if we need an elevationmodel for style
         search_loop:
@@ -164,7 +165,7 @@ class CoverageFileLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public String getName() {
+    public Name getName() {
         return name;
     }
 

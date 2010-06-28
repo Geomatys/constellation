@@ -44,11 +44,11 @@ import org.opengis.feature.type.Name;
  */
 class PostGisLayerDetails extends AbstractFeatureLayerDetails {
 
-    PostGisLayerDetails(String name, DataStore store, Name groupName, List<String> favorites){
+    PostGisLayerDetails(Name name, DataStore store, Name groupName, List<String> favorites){
         this(name,store, groupName,favorites,null,null,null,null);
     }
     
-    PostGisLayerDetails(String name, DataStore store, Name groupName, List<String> favorites,
+    PostGisLayerDetails(Name name, DataStore store, Name groupName, List<String> favorites,
             String dateStart, String dateEnd, String elevationStart, String elevationEnd){
         super(name,store, groupName,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
     }
@@ -75,7 +75,7 @@ class PostGisLayerDetails extends AbstractFeatureLayerDetails {
         layer.setElevationRange(elevationStartField, elevationEndField);
         layer.setTemporalRange(dateStartField, dateEndField);
 
-        layer.setName(getName());
+        layer.setName(getName().getLocalPart());
         
         return layer;
     }

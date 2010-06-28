@@ -86,18 +86,18 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     protected final DataStore store;
     protected final Name groupName;
     protected final List<String> favorites;
-    protected final String name;
+    protected final Name name;
     protected final PropertyName dateStartField;
     protected final PropertyName dateEndField;
     protected final PropertyName elevationStartField;
     protected final PropertyName elevationEndField;
 
-    protected AbstractFeatureLayerDetails(String name, DataStore store, Name groupName, List<String> favorites){
+    protected AbstractFeatureLayerDetails(Name name, DataStore store, Name groupName, List<String> favorites){
         this(name,store, groupName,favorites,null,null,null,null);
         
     }
     
-    protected AbstractFeatureLayerDetails(String name, DataStore store, Name groupName, List<String> favorites,
+    protected AbstractFeatureLayerDetails(Name name, DataStore store, Name groupName, List<String> favorites,
             String dateStart, String dateEnd, String elevationStart, String elevationEnd){
         
         if(store == null){
@@ -154,7 +154,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
      * {@inheritDoc}
      */
     @Override
-    public String getName() {
+    public Name getName() {
         return name;
     }
 

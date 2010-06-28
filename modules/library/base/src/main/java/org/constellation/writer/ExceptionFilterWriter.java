@@ -48,7 +48,7 @@ public final class ExceptionFilterWriter extends AbstractFilterWriter {
     protected String filterLine(final StringBuilder buffer) {
         String line = buffer.toString();
         if (line.trim().startsWith("<ServiceExceptionReport")) {
-            line = "<ServiceExceptionReport version=\"1.1.0\">";
+            line = "<ServiceExceptionReport version=\"1.1.1\">";
         }
         return line;
     }

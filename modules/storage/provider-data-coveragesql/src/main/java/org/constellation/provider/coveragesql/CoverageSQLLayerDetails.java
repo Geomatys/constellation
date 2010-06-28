@@ -57,6 +57,7 @@ import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.logging.Logging;
+import org.opengis.feature.type.Name;
 
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
@@ -85,8 +86,8 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      * Favorites styles associated with this layer.
      */
     private final List<String> favorites;
-    private final String elevationModel;
-    private final String name;
+    private final Name elevationModel;
+    private final Name name;
 
     /**
      * Stores information about a {@linkplain Layer layer} in a {@code PostGRID}
@@ -98,7 +99,7 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      * @param name           The name of the layer.
      */
     CoverageSQLLayerDetails(final LayerCoverageReader reader, final List<String> favorites, 
-            final String elevationModel, final String name) {
+            final Name elevationModel, final Name name) {
 
         this.reader = reader;
         this.name = name;
@@ -146,7 +147,7 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
                         //a dim range is define, it replace any given style.
                         final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
                         style = STYLE_FACTORY.style(symbol);
-                        return MapBuilder.createCoverageLayer(reader, style, getName());
+                        return MapBuilder.createCoverageLayer(reader, style, getName().getLocalPart());
                     }
                 }
             }
@@ -165,7 +166,7 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
             style = RANDOM_FACTORY.createRasterStyle();
         }
 
-        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, style, getName());
+        final CoverageMapLayer mapLayer = MapBuilder.createCoverageLayer(reader, style, getName().getLocalPart());
 
         //search if we need an elevationmodel for style
         search_loop:
@@ -194,7 +195,7 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
      * {@inheritDoc}
      */
     @Override
-    public String getName() {
+    public Name getName() {
         return name;
     }
 

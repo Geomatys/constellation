@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.constellation.ServiceDef;
 import org.constellation.provider.LayerDetails;
+import org.opengis.feature.type.Name;
 
 /**
  * This interface does *not* aim to be a general abstraction of the register but 
@@ -42,9 +43,9 @@ public interface PrimitiveRegisterIF {
 
 	List<LayerDetails> getAllLayerReferences(ServiceDef serviceDef) throws RegisterException ;
 	
-	List<LayerDetails> getLayerReferences(ServiceDef serviceDef, List<String> layerNames) throws RegisterException ;
+	List<LayerDetails> getLayerReferences(ServiceDef serviceDef, List<Name> layerNames) throws RegisterException ;
 	
-	LayerDetails getLayerReference(ServiceDef serviceDef, String layerName) throws RegisterException ;
+	LayerDetails getLayerReference(ServiceDef serviceDef, Name layerName) throws RegisterException ;
 	
 
 }

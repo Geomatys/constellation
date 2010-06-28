@@ -196,7 +196,7 @@ public class SMLProvider extends AbstractLayerProvider {
             elevationStartField = null;
             elevationEndField   = null;
         }
-        return new SMLLayerDetails(key.getLocalPart(), store, key, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
+        return new SMLLayerDetails(key, store, key, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
         
     }
 
@@ -275,9 +275,9 @@ public class SMLProvider extends AbstractLayerProvider {
 
         final StringBuilder builder = new StringBuilder("DATA PROVIDER : SensorML ");
         for (final SMLProvider dp : dps){
-            builder.append("\n["+ dp.source.parameters.get(KEY_DATABASE)+"=");
+            builder.append("\n[").append(dp.source.parameters.get(KEY_DATABASE)).append("=");
             for(final Name layer : dp.getKeys()){
-                builder.append(layer + ",");
+                builder.append(layer).append(",");
             }
             builder.append("]");
         }

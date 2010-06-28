@@ -135,7 +135,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
     }
 
     @Override
-    public ElevationModel getElevationModel(String name) {
+    public ElevationModel getElevationModel(Name name) {
 
         for(LayerProviderService service : SERVICES){
             for(LayerProvider provider : service.getProviders()){

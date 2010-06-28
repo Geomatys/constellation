@@ -36,6 +36,7 @@ import org.geotoolkit.map.FeatureMapLayer;
 
 import org.opengis.feature.Feature;
 import org.opengis.feature.Property;
+import org.opengis.feature.type.Name;
 import org.opengis.feature.type.PropertyDescriptor;
 
 
@@ -61,7 +62,7 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
     public HTMLGraphicVisitor(final GetFeatureInfo gfi) {
         super(gfi);
 
-        for (String key : gfi.getQueryLayers()) {
+        for (Name key : gfi.getQueryLayers()) {
             final LayerDetails layerDetails;
             try {
                 layerDetails = DefaultWMSWorker.getLayerReference(key, gfi.getVersion().toString());
@@ -70,9 +71,9 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
                 throw new AssertionError(ex);
             }
             if (layerDetails.getType().equals(TYPE.COVERAGE)) {
-                coverages.put(key, new ArrayList<String>());
+                coverages.put(key.getLocalPart(), new ArrayList<String>());
             } else {
-                features.put(key, new ArrayList<Feature>());
+                features.put(key.getLocalPart(), new ArrayList<Feature>());
             }
         }
     }

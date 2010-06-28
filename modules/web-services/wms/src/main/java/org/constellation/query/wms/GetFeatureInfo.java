@@ -28,6 +28,7 @@ import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
+import org.opengis.feature.type.Name;
 
 import org.opengis.geometry.Envelope;
 
@@ -56,7 +57,7 @@ public final class GetFeatureInfo extends GetMap {
     /**
      * Layers to request.
      */
-    private final UnmodifiableArrayList<String> queryLayers;
+    private final UnmodifiableArrayList<Name> queryLayers;
 
     /**
      * Format of the returned information.
@@ -69,30 +70,30 @@ public final class GetFeatureInfo extends GetMap {
     private final Integer featureCount;
 
     public GetFeatureInfo(final GetMap getMap, final int x, final int y,
-                          final List<String> queryLayers, final String infoFormat,
+                          final List<Name> queryLayers, final String infoFormat,
                           final Integer featureCount)
     {
         super(getMap);
         this.x = x;     
         this.y = y;
-        this.queryLayers = UnmodifiableArrayList.wrap(queryLayers.toArray(new String[queryLayers.size()]));
+        this.queryLayers = UnmodifiableArrayList.wrap(queryLayers.toArray(new Name[queryLayers.size()]));
         this.infoFormat  = infoFormat;
         this.featureCount = featureCount;
     }
 
     public GetFeatureInfo(final Envelope envelope, final Version version,
-                  final String format, final List<String> layers, final List<String> styles,
+                  final String format, final List<Name> layers, final List<String> styles,
                   final MutableStyledLayerDescriptor sld, final Double elevation, final Date date,
                   final Dimension size, final Color background,
                   final Boolean transparent, final String exceptions, final int x, final int y,
-                  final List<String> queryLayers, final String infoFormat, final Integer featureCount,
+                  final List<Name> queryLayers, final String infoFormat, final Integer featureCount,
                   final MultivaluedMap<String,String> parameters)
     {
         super(envelope, version, format, layers, styles, sld, elevation, date, size,
                 background, transparent, 0,exceptions, parameters);
         this.x = x;     
         this.y = y;
-        this.queryLayers = UnmodifiableArrayList.wrap(queryLayers.toArray(new String[queryLayers.size()]));
+        this.queryLayers = UnmodifiableArrayList.wrap(queryLayers.toArray(new Name[queryLayers.size()]));
         this.infoFormat  = infoFormat;
         this.featureCount = featureCount;
     }
@@ -122,7 +123,7 @@ public final class GetFeatureInfo extends GetMap {
     /**
      * Returns an immutable list of layers to request.
      */
-    public List<String> getQueryLayers() {
+    public List<Name> getQueryLayers() {
         return queryLayers;
     }
 

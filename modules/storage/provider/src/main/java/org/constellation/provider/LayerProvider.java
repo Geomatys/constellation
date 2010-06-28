@@ -28,6 +28,6 @@ import org.opengis.feature.type.Name;
  */
 public interface LayerProvider extends Provider<Name,LayerDetails>{
 
-    ElevationModel getElevationModel(String name);
+    ElevationModel getElevationModel(Name name);
 
 }

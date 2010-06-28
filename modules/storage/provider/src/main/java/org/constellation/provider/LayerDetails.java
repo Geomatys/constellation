@@ -35,6 +35,7 @@ import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.style.MutableStyleFactory;
+import org.opengis.feature.type.Name;
 
 import org.opengis.filter.FilterFactory2;
 import org.opengis.geometry.Envelope;
@@ -135,7 +136,7 @@ public interface LayerDetails {
     /**
      * @see Layer#getName
      */
-    String getName();
+    Name getName();
 
     /**
      * @see Layer#getSampleValueRanges

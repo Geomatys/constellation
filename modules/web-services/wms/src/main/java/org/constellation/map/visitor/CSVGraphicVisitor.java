@@ -25,6 +25,7 @@ import org.constellation.query.wms.GetFeatureInfo;
 
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
+import org.opengis.feature.type.Name;
 
 
 /**
@@ -39,8 +40,8 @@ public final class CSVGraphicVisitor extends TextGraphicVisitor {
     public CSVGraphicVisitor(final GetFeatureInfo gfi) {
         super(gfi);
 
-        for (String key : gfi.getQueryLayers()) {
-            values.put(key, new ArrayList<String>());
+        for (Name key : gfi.getQueryLayers()) {
+            values.put(key.getLocalPart(), new ArrayList<String>());
         }
     }
 

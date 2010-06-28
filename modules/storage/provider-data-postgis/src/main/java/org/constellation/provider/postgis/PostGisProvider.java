@@ -186,11 +186,11 @@ public class PostGisProvider extends AbstractLayerProvider{
         }
         final ProviderLayer layer = source.getLayer(key.getLocalPart());
         if (layer == null) {
-            return new PostGisLayerDetails(key.getLocalPart(), store, key, null, null, null, null, null);
+            return new PostGisLayerDetails(key, store, key, null, null, null, null, null);
 
         } else {
             final List<String> styles = layer.styles;
-            return new PostGisLayerDetails(key.getLocalPart(), store, key, styles,
+            return new PostGisLayerDetails(key, store, key, styles,
                     layer.dateStartField, layer.dateEndField,
                     layer.elevationStartField, layer.elevationEndField);
         }
@@ -302,7 +302,7 @@ public class PostGisProvider extends AbstractLayerProvider{
     }
 
     @Override
-    public ElevationModel getElevationModel(String name) {
+    public ElevationModel getElevationModel(Name name) {
         return null;
     }
 

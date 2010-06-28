@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.util.Collections;
 
 // Constellation dependencies
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.data.CoverageSQLTestCase;
 import org.constellation.provider.LayerProviderProxy;
@@ -92,6 +93,7 @@ public final class GrizzlyServer {
         CoverageSQLTestCase.init();
 
         // Defines a PostGrid data provider
+        /*
         final ProviderSource sourcePostGrid = new ProviderSource();
         sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
         sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_DRIVER,   "org.postgresql.Driver");
@@ -114,7 +116,7 @@ public final class GrizzlyServer {
                 }
                 break;
             }
-        }
+        }*/
 
         // Extracts the zip data into a temporary folder
         final File outputDir = initDataDirectory();
@@ -141,15 +143,17 @@ public final class GrizzlyServer {
 
         // Defines a ShapeFile data provider
         final ProviderSource sourceShape = new ProviderSource();
-        sourceShape.loadAll = true;
+        sourceShape.loadAll = false;
         sourceShape.parameters.put(ShapeFileProvider.KEY_FOLDER_PATH, outputDir.getAbsolutePath() +
                 "/org/constellation/ws/embedded/wms111/shapefiles");
+        sourceShape.parameters.put(ShapeFileProvider.KEY_NAMESPACE, "cite");
+        
         sourceShape.layers.add(new ProviderLayer("BasicPolygons", Collections.singletonList("cite_style_BasicPolygons"),
                                null, null, null, null, false, null));
         sourceShape.layers.add(new ProviderLayer("Bridges", Collections.singletonList("cite_style_Bridges"),
                                null, null, null, null, false, null));
-        sourceShape.layers.add(new ProviderLayer("BuildingCenters", Collections.singletonList("cite_style_BuildingCenters"),
-                               null, null, null, null, false, null));
+        /*sourceShape.layers.add(new ProviderLayer("BuildingCenters", Collections.singletonList("cite_style_BuildingCenters"),
+                               null, null, null, null, false, null));*/
         sourceShape.layers.add(new ProviderLayer("Buildings", Collections.singletonList("cite_style_Buildings"),
                                null, null, null, null, false, null));
         sourceShape.layers.add(new ProviderLayer("DividedRoutes", Collections.singletonList("cite_style_DividedRoutes"),
@@ -168,6 +172,7 @@ public final class GrizzlyServer {
                                null, null, null, null, false, null));
         sourceShape.layers.add(new ProviderLayer("Streams", Collections.singletonList("cite_style_Streams"),
                                null, null, null, null, false, null));
+
 
 
         final ProviderConfig configShape = new ProviderConfig();
@@ -196,7 +201,7 @@ public final class GrizzlyServer {
         final ProviderConfig configPostGis = new ProviderConfig();
         configPostGis.sources.add(sourcePostGis);
         sourcePostGis.loadAll = true;
-
+        sourcePostGis.services.add("WFS");
         for (LayerProviderService service : LayerProviderProxy.getInstance().getServices()) {
             // Here we should have the postgis data provider defined previously
             if (service instanceof PostGisProviderService) {
@@ -257,10 +262,10 @@ public final class GrizzlyServer {
         if (outputDir != null && outputDir.exists()) {
             if (outputDir.canWrite()) {
                 if (!NIOUtilities.deleteDirectory(outputDir)) {
-                    LOGGER.info("Unable to delete folder "+ outputDir.getAbsolutePath());
+                    LOGGER.log(Level.INFO, "Unable to delete folder {0}", outputDir.getAbsolutePath());
                 }
             } else {
-                LOGGER.info("No write permission for "+ outputDir.getAbsolutePath());
+                LOGGER.log(Level.INFO, "No write permission for {0}", outputDir.getAbsolutePath());
             }
         }
         File f = new File("derby.log");

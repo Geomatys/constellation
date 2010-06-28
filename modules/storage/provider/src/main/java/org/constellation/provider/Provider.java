@@ -65,7 +65,7 @@ public interface Provider<K,V> {
      * the String key to it's own key class.
      * @return V object if it is in the dataprovider, or null if not.
      */
-    V getByIdentifier(String key);
+    V getByIdentifier(K key);
 
     /**
      * Get the data related to the given key, accessible by the given service.
@@ -73,7 +73,7 @@ public interface Provider<K,V> {
      * be able to transform the String key to it's own key class.
      * @return V object if it is in the dataprovider, or null if not.
      */
-    V getByIdentifier(String key, String service);
+    V getByIdentifier(K key, String service);
 
     /**
      * Get the data related to the given key.

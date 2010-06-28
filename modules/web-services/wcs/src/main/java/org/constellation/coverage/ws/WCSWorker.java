@@ -17,6 +17,8 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
+import org.geotoolkit.feature.DefaultName;
+import org.opengis.feature.type.Name;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -225,7 +227,13 @@ public final class WCSWorker extends AbstractWorker {
                         LAYER_NOT_DEFINED, KEY_COVERAGE.toLowerCase());
             }
             final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
-            final String coverageName = coverageRef.getName();
+            final Name fullCoverageName = coverageRef.getName();
+            final String coverageName;
+            if (fullCoverageName.getNamespaceURI() != null) {
+                coverageName = fullCoverageName.getNamespaceURI() + ':' + fullCoverageName.getLocalPart();
+            } else {
+                coverageName = fullCoverageName.getLocalPart();
+            }
             if (!coverageRef.isQueryable(ServiceDef.Query.WCS_ALL)) {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
                         coverageName + "\".", LAYER_NOT_QUERYABLE, KEY_COVERAGE.toLowerCase());
@@ -363,7 +371,13 @@ public final class WCSWorker extends AbstractWorker {
                         LAYER_NOT_DEFINED, KEY_IDENTIFIER.toLowerCase());
             }
             final CoverageLayerDetails coverageRef = (CoverageLayerDetails) layerRef;
-            final String coverageName = coverageRef.getName();
+            final Name fullCoverageName = coverageRef.getName();
+            final String coverageName;
+            if (fullCoverageName.getNamespaceURI() != null) {
+                coverageName = fullCoverageName.getNamespaceURI() + ':' + fullCoverageName.getLocalPart();
+            } else {
+                coverageName = fullCoverageName.getLocalPart();
+            }
             if (!coverageRef.isQueryable(ServiceDef.Query.WCS_ALL)) {
                 throw new CstlServiceException("You are not allowed to request the layer \"" +
                         coverageName + "\".", INVALID_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
@@ -594,8 +608,8 @@ public final class WCSWorker extends AbstractWorker {
                     continue;
                 }
                 final CoverageOfferingBriefType co = new CoverageOfferingBriefType();
-                co.addRest(wcs100Factory.createName(layer.getName()));
-                co.addRest(wcs100Factory.createLabel(layer.getName()));
+                co.addRest(wcs100Factory.createName(layer.getName().getLocalPart()));
+                co.addRest(wcs100Factory.createLabel(layer.getName().getLocalPart()));
 
                 final GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
                 if (inputGeoBox == null) {
@@ -734,7 +748,7 @@ public final class WCSWorker extends AbstractWorker {
                 }
                 final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
                 final List<LanguageStringType> title = new ArrayList<LanguageStringType>();
-                title.add(new LanguageStringType(coverageLayer.getName()));
+                title.add(new LanguageStringType(coverageLayer.getName().getLocalPart()));
                 final List<LanguageStringType> remark = new ArrayList<LanguageStringType>();
                 remark.add(new LanguageStringType(StringUtilities.cleanSpecialCharacter(coverageLayer.getRemarks())));
 
@@ -753,7 +767,7 @@ public final class WCSWorker extends AbstractWorker {
                         inputGeoBox.getEastBoundLongitude(),
                         inputGeoBox.getNorthBoundLatitude());
                 cs.addRest(owsFactory.createWGS84BoundingBox(outputBBox));
-                cs.addRest(wcs111Factory.createIdentifier(coverageLayer.getName()));
+                cs.addRest(wcs111Factory.createIdentifier(coverageLayer.getName().getLocalPart()));
                 summary.add(cs);
             }
 
@@ -1038,13 +1052,21 @@ public final class WCSWorker extends AbstractWorker {
     {
 
     	LayerDetails layerRef;
+        final Name namedLayerName;
+        if (layerName != null && layerName.indexOf(':') != -1) {
+            final String namespace = layerName.substring(0, layerName.indexOf(':'));
+            final String localPart = layerName.substring(layerName.indexOf(':') + 1);
+            namedLayerName = new DefaultName(namespace, localPart);
+        } else {
+            namedLayerName = new DefaultName(layerName);
+        }
     	try { // WE catch the exception from either service version
         	if ( version.equals("1.0.0") ){
-        		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_0_0, layerName);
+        		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_0_0, namedLayerName);
         	} else if ( version.equals("1.1.1") ) {
-        		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_1_1, layerName);
+        		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_1_1, namedLayerName);
         	} else if ( version.equals("1.1.2") ) {
-        		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_1_2, layerName);
+        		layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WCS_1_1_2, namedLayerName);
         	} else {
         		throw new CstlServiceException("WCS acting according to no known version.",
                         VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());

@@ -138,10 +138,10 @@ public class CoverageFileProvider extends AbstractLayerProvider{
             final String name = key.getLocalPart();
             final ProviderLayer layer = source.getLayer(name);
             if (layer == null) {
-                return new CoverageFileLayerDetails(reader,null,null,name);
+                return new CoverageFileLayerDetails(reader,null,null, key);
 
             } else {
-                return new CoverageFileLayerDetails(reader,layer.styles,null,name);
+                return new CoverageFileLayerDetails(reader,layer.styles,null,key);
             }
         }
 
@@ -233,9 +233,9 @@ public class CoverageFileProvider extends AbstractLayerProvider{
     }
 
     @Override
-    public ElevationModel getElevationModel(String name) {
+    public ElevationModel getElevationModel(Name name) {
 
-        final ProviderLayer layer = source.getLayer(name);
+        final ProviderLayer layer = source.getLayer(name.getLocalPart());
         if(layer != null && layer.isElevationModel){
             final CoverageFileLayerDetails pgld = (CoverageFileLayerDetails) getByIdentifier(name);
             if(pgld != null){
