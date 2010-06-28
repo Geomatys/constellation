@@ -154,7 +154,14 @@ public class WMSService extends GridWebService {
 
             //Handle user's requests.
             if (GETMAP.equalsIgnoreCase(request)) {
-                final String versionSt = getParameter(KEY_VERSION, true);
+                String versionSt = getParameter(KEY_VERSION, false);
+                if (versionSt == null) {
+                    versionSt = getParameter(KEY_WMTVER, false);
+                }
+                if (versionSt == null) {
+                    throw new CstlServiceException("The parameter version must be specified",
+                        MISSING_PARAMETER_VALUE, "version");
+                }
                 isVersionSupported(versionSt);
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final GetMap requestMap = adaptGetMap(versionSt, true, queryContext);
@@ -163,7 +170,14 @@ public class WMSService extends GridWebService {
                 return Response.ok(map, requestMap.getFormat()).build();
             }
             if (GETFEATUREINFO.equalsIgnoreCase(request)) {
-                final String versionSt = getParameter(KEY_VERSION, true);
+                String versionSt = getParameter(KEY_VERSION, false);
+                if (versionSt == null) {
+                    versionSt = getParameter(KEY_WMTVER, false);
+                }
+                if (versionSt == null) {
+                    throw new CstlServiceException("The parameter version must be specified",
+                        MISSING_PARAMETER_VALUE, "version");
+                }
                 isVersionSupported(versionSt);
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo(versionSt, queryContext);
@@ -227,7 +241,14 @@ public class WMSService extends GridWebService {
                 return Response.ok(legend, requestLegend.getFormat()).build();
             }
             if (DESCRIBELAYER.equalsIgnoreCase(request)) {
-                final String versionSt = getParameter(KEY_VERSION, true);
+                String versionSt = getParameter(KEY_VERSION, false);
+                if (versionSt == null) {
+                    versionSt = getParameter(KEY_WMTVER, false);
+                }
+                if (versionSt == null) {
+                    throw new CstlServiceException("The parameter version must be specified",
+                        MISSING_PARAMETER_VALUE, "version");
+                }
                 isVersionSupported(versionSt);
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final DescribeLayer describeLayer = adaptDescribeLayer(versionSt);
