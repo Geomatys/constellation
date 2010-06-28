@@ -17,10 +17,12 @@
 package org.constellation.sql;
 
 import com.greenpepper.interpreter.flow.scenario.Check;
+import com.greenpepper.interpreter.flow.scenario.Display;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -47,9 +49,43 @@ public final class CiteTestsFixture extends ResultsDatabase {
      * @throws SQLException
      */
     @Check("Vérifier que la dernière session pour le service (\\w+) en version (\\d.\\d.\\d) n'a pas régressé")
-    public boolean compareLastResults(final String service, final String version)
-                                  throws SQLException
-    {
+    public boolean compareLastResults(final String service, final String version) throws SQLException {
+        final Date date = getLastDateForSession(service, version);
+        return compareResults(date, service, version);
+    }
+
+    /**
+     * Display the failing tests.
+     *
+     * @param service The service name.
+     * @param version The service version.
+     * @return
+     * @throws SQLException
+     */
+    @Display("Tests en échec pour le service (\\w+) en version (\\d.\\d.\\d)")
+    public String displayErrors(final String service, final String version) throws SQLException {
+        final Date date = getLastDateForSession(service, version);
+        final List<Result> failings = getTestsFailed(date);
+        if (failings.isEmpty()) {
+            return "";
+        }
+        final StringBuilder builder = new StringBuilder("Tests fail: | ");
+        for (Result failing : failings) {
+            builder.append(failing.toString()).append(" | \\\\ ");
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Return the date of the nearest session of tests stored in the database, for the given service
+     * and version.
+     *
+     * @param service The service name.
+     * @param version The service version.
+     * @return
+     * @throws SQLException
+     */
+    private Date getLastDateForSession(final String service, final String version) throws SQLException {
         final PreparedStatement ps = connection.prepareStatement(SELECT_LAST_DATE);
         ps.setString(1, service);
         ps.setString(2, version);
@@ -64,6 +100,6 @@ public final class CiteTestsFixture extends ResultsDatabase {
         }
         rs.close();
         ps.close();
-        return compareResults(date, service, version);
+        return date;
     }
 }

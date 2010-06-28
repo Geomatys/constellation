@@ -461,7 +461,7 @@ public class ResultsDatabase {
      * @param date The date of the session.
      * @throws SQLException
      */
-    private List<Result> getTestsFailed(final Date date) throws SQLException {
+    protected List<Result> getTestsFailed(final Date date) throws SQLException {
         ensureConnectionOpened();
 
         final PreparedStatement psCurrent = connection.prepareStatement(SELECT_TESTS_FAILED);
