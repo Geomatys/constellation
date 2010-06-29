@@ -516,6 +516,13 @@ public class WMSService extends GridWebService {
         }
     }
 
+    private boolean isV111orUnder(String version) {
+        return version.equals(ServiceDef.WMS_1_0_0.version.toString())     ||
+               version.equals(ServiceDef.WMS_1_0_0_SLD.version.toString()) ||
+               version.equals(ServiceDef.WMS_1_1_1.version.toString())     ||
+               version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString());
+    }
+
     /**
      * Converts a GetMap request composed of string values, to a container of real
      * java objects.
@@ -565,11 +572,7 @@ public class WMSService extends GridWebService {
         final CoordinateReferenceSystem crs;
         boolean forceLongitudeFirst = false;
         try {
-            if (version.equals(ServiceDef.WMS_1_0_0.version.toString())     ||
-                version.equals(ServiceDef.WMS_1_0_0_SLD.version.toString()) ||
-                version.equals(ServiceDef.WMS_1_1_1.version.toString())     ||
-                version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()))
-            {
+            if (isV111orUnder(version)) {
                 /*
                  * If we are in version older than WMS 1.3.0, then the bounding box is
                  * expressed with the longitude in first, even if the CRS has the latitude as
@@ -580,7 +583,11 @@ public class WMSService extends GridWebService {
             }
             crs = CRS.decode(strCRS, forceLongitudeFirst);
         } catch (FactoryException ex) {
-            throw new CstlServiceException(ex, org.constellation.ws.ExceptionCode.INVALID_SRS);
+            if (isV111orUnder(version)) {
+                throw new CstlServiceException(ex, org.constellation.ws.ExceptionCode.INVALID_SRS);
+            } else {
+                throw new CstlServiceException(ex, INVALID_CRS);
+            }
         }
         final Envelope env;
         try {
