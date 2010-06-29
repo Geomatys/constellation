@@ -153,7 +153,7 @@ public class WMSService extends GridWebService {
             logParameters();
 
             //Handle user's requests.
-            if (GETMAP.equalsIgnoreCase(request)) {
+            if (GETMAP.equalsIgnoreCase(request) || MAP.equalsIgnoreCase(request)) {
                 String versionSt = getParameter(KEY_VERSION, false);
                 if (versionSt == null) {
                     versionSt = getParameter(KEY_WMTVER, false);
@@ -428,7 +428,7 @@ public class WMSService extends GridWebService {
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
         final List<String> queryLayers = StringUtilities.toStringList(strQueryLayers);
         final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, null);
-        final List<Name> namedQueryableLayers = parseNamespaceLayerList(queryLayers);
+        final List<Name> namedQueryableLayers = parseNamespaceLayerList(queryableLayers);
 
         final int x, y;
         try {
@@ -445,7 +445,7 @@ public class WMSService extends GridWebService {
         }
         final Integer featureCount;
         if (strFeatureCount == null || strFeatureCount.isEmpty()) {
-            featureCount = null;
+            featureCount = 1;
         } else {
             featureCount = RequestsUtilities.toInt(strFeatureCount);
         }
@@ -473,9 +473,9 @@ public class WMSService extends GridWebService {
      */
     private Name parseName(String layerName) {
         final Name name;
-        if (layerName != null && layerName.indexOf(':') != -1) {
-            final String namespace = layerName.substring(0, layerName.indexOf(':'));
-            final String localPart = layerName.substring(layerName.indexOf(':') + 1);
+        if (layerName != null && layerName.lastIndexOf(':') != -1) {
+            final String namespace = layerName.substring(0, layerName.lastIndexOf(':'));
+            final String localPart = layerName.substring(layerName.lastIndexOf(':') + 1);
             name = new DefaultName(namespace, localPart);
         } else {
             name = new DefaultName(layerName);
@@ -580,7 +580,7 @@ public class WMSService extends GridWebService {
             }
             crs = CRS.decode(strCRS, forceLongitudeFirst);
         } catch (FactoryException ex) {
-            throw new CstlServiceException(ex, INVALID_CRS);
+            throw new CstlServiceException(ex, org.constellation.ws.ExceptionCode.INVALID_SRS);
         }
         final Envelope env;
         try {

@@ -41,6 +41,7 @@ public abstract class WMSQuery implements Query {
      * Request parameters.
      */
     public static final String GETMAP           = "GetMap";
+    public static final String MAP              = "Map";
     public static final String GETFEATUREINFO   = "GetFeatureInfo";
     public static final String GETCAPABILITIES  = "GetCapabilities";
     public static final String DESCRIBELAYER    = "DescribeLayer";

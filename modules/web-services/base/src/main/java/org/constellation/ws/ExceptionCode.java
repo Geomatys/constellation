@@ -103,6 +103,12 @@ public final class ExceptionCode extends CodeList<ExceptionCode> {
     public static final ExceptionCode INVALID_CRS = new ExceptionCode("INVALID_CRS");
 
     /**
+     * Invalid CRS.
+     * Used by WMS 1.1.1
+     */
+    public static final ExceptionCode INVALID_SRS = new ExceptionCode("InvalidSRS");
+
+    /**
      * Layer not defined.
      * Used by WMS.
      */
