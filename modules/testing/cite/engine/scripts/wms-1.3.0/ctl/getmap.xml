@@ -3313,10 +3313,10 @@
 
          <xsl:if test="not($size='')">            
             <xsl:variable name="layer-list">
-                <xsl:value-of select="functions:encode($layer-name)"/>
+                <xsl:value-of select="$layer-name"/>
                <xsl:for-each select="2 to $size">
                   <xsl:text>,</xsl:text>
-                  <xsl:value-of select="functions:encode($layer-name)"/>
+                  <xsl:value-of select="$layer-name"/>
                </xsl:for-each>
             </xsl:variable>
                

@@ -209,7 +209,7 @@ public final class WCSWorker extends AbstractWorker {
             final org.geotoolkit.wcs.xml.v100.DescribeCoverageType request)
                             throws JAXBException, CstlServiceException
     {
-        if (request.getCoverage().size() == 0) {
+        if (request.getCoverage().isEmpty()) {
             throw new CstlServiceException("The parameter COVERAGE must be specified.",
                     MISSING_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
         }
@@ -353,7 +353,7 @@ public final class WCSWorker extends AbstractWorker {
             final org.geotoolkit.wcs.xml.v111.DescribeCoverageType request)
                             throws JAXBException, CstlServiceException
     {
-        if (request.getIdentifier().size() == 0) {
+        if (request.getIdentifier().isEmpty()) {
             throw new CstlServiceException("The parameter IDENTIFIER must be specified",
                     MISSING_PARAMETER_VALUE, KEY_IDENTIFIER.toLowerCase());
         }
@@ -507,7 +507,7 @@ public final class WCSWorker extends AbstractWorker {
             // if the user have specified one format accepted (only one for now != spec)
             final AcceptFormatsType formats =
                     ((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType)request).getAcceptFormats();
-            if (formats == null || formats.getOutputFormat().size() == 0) {
+            if (formats == null || formats.getOutputFormat().isEmpty()) {
                 format = MimeType.TEXT_XML;
             } else {
                 format = formats.getOutputFormat().get(0);
@@ -608,8 +608,16 @@ public final class WCSWorker extends AbstractWorker {
                     continue;
                 }
                 final CoverageOfferingBriefType co = new CoverageOfferingBriefType();
-                co.addRest(wcs100Factory.createName(layer.getName().getLocalPart()));
-                co.addRest(wcs100Factory.createLabel(layer.getName().getLocalPart()));
+                final Name fullLayerName = layer.getName();
+                final String layerName;
+                if (fullLayerName.getNamespaceURI() != null) {
+                    layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
+                } else {
+                    layerName = fullLayerName.getLocalPart();
+                }
+
+                co.addRest(wcs100Factory.createName(layerName));
+                co.addRest(wcs100Factory.createLabel(layerName));
 
                 final GeographicBoundingBox inputGeoBox = layer.getGeographicBoundingBox();
                 if (inputGeoBox == null) {
@@ -1053,9 +1061,9 @@ public final class WCSWorker extends AbstractWorker {
 
     	LayerDetails layerRef;
         final Name namedLayerName;
-        if (layerName != null && layerName.indexOf(':') != -1) {
-            final String namespace = layerName.substring(0, layerName.indexOf(':'));
-            final String localPart = layerName.substring(layerName.indexOf(':') + 1);
+        if (layerName != null && layerName.lastIndexOf(':') != -1) {
+            final String namespace = layerName.substring(0, layerName.lastIndexOf(':'));
+            final String localPart = layerName.substring(layerName.lastIndexOf(':') + 1);
             namedLayerName = new DefaultName(namespace, localPart);
         } else {
             namedLayerName = new DefaultName(layerName);

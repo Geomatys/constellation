@@ -93,7 +93,6 @@ public final class GrizzlyServer {
         CoverageSQLTestCase.init();
 
         // Defines a PostGrid data provider
-        /*
         final ProviderSource sourcePostGrid = new ProviderSource();
         sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_DATABASE, "jdbc:postgresql://db.geomatys.com/coverages-test");
         sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_DRIVER,   "org.postgresql.Driver");
@@ -104,6 +103,7 @@ public final class GrizzlyServer {
         sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
         sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
         sourcePostGrid.loadAll = true;
+        sourcePostGrid.services.add("WCS");
         final ProviderConfig configPostGrid = new ProviderConfig();
         configPostGrid.sources.add(sourcePostGrid);
 
@@ -116,7 +116,7 @@ public final class GrizzlyServer {
                 }
                 break;
             }
-        }*/
+        }
 
         // Extracts the zip data into a temporary folder
         final File outputDir = initDataDirectory();
