@@ -17,6 +17,7 @@
 package org.constellation.sql;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,11 +30,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Geotoolkit dependencies
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.io.X364;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
 
 
@@ -74,6 +77,7 @@ public class ResultsDatabase {
     private static final String INSERT_RESULT  = "INSERT INTO \"Results\" VALUES (?,?,?,?);";
     private static final String INSERT_SERVICE = "INSERT INTO \"Services\" VALUES (?,?);";
     private static final String INSERT_SUITE   = "INSERT INTO \"Suites\" VALUES (?,?,?,?);";
+    private static final String INSERT_DESCRIPTION = "INSERT INTO \"TestsDescriptions\" VALUES (?,?);";
 
     /**
      * Count requests.
@@ -91,7 +95,7 @@ public class ResultsDatabase {
     private static final String SELECT_TESTS_PASSED =
             "SELECT date,id,directory FROM \"Results\" WHERE date=? AND passed=TRUE;";
     private static final String SELECT_TESTS_DESC =
-            "SELECT description, assertion FROM \"TestsDescriptions\" WHERE id=?;";
+            "SELECT assertion FROM \"TestsDescriptions\" WHERE id=?;";
 
     private static final String SELECT_PREVIOUS_SUITE =
             "SELECT date FROM \"Suites\" WHERE lastsuccess='TRUE' AND service=? AND version=?";
@@ -487,10 +491,33 @@ public class ResultsDatabase {
         return dateResult;
     }
 
-    public String[] extractDescription(final String id, final String directory) {
-        File f = new File("target/logs/" + directory + "/log.xml");
-        //System.out.println("<<<<<<<<<<<<<<<<<<<<< file exist? " + f.exists());
-        return null;
+    /**
+     * Esxtract a description of the test from a file.
+     *
+     * @param id The identifier of the test
+     * @param directory The directory where to find the log file.
+     * @return An assertion.
+     */
+    public String extractDescription(final String id, final String directory) {
+        final File f = new File("target/logs/" + directory + "/log.xml");
+        String assertion = null;
+        if (f.exists()) {
+            try {
+                final String xml = FileUtilities.getStringFromFile(f);
+                if (xml.indexOf("<assertion>") != -1) {
+                    assertion =  xml.substring(xml.indexOf("<assertion>") + 11, xml.indexOf("</assertion>"));
+                    final PreparedStatement ps = connection.prepareStatement(INSERT_DESCRIPTION);
+                    ps.setString(1, id);
+                    ps.setString(2, assertion);
+                    ps.executeUpdate();
+                }
+            } catch (SQLException ex) {
+                LOGGER.log(Level.SEVERE, "Error while inserting new assertion for test:" + id,  ex);
+            } catch (IOException ex) {
+                LOGGER.log(Level.WARNING, "Error while reading log file for test:" + id, ex);
+            }
+        }
+        return assertion;
     }
 
     /**
@@ -515,17 +542,13 @@ public class ResultsDatabase {
             final PreparedStatement psDesc = connection.prepareStatement(SELECT_TESTS_DESC);
             psDesc.setString(1, id);
             final ResultSet rs2 = psDesc.executeQuery();
-            final String description;
             final String assertion;
             if (rs2.next()) {
-                description = rs2.getString(1);
-                assertion   = rs2.getString(1);
+                assertion = rs2.getString(1);
             } else {
-                String[] descAssert = extractDescription(id, directory);
-                description = null;
-                assertion = null;
+                assertion = extractDescription(id, directory);
             }
-            results.add(new Result(rs.getTimestamp(1), id, directory, false, description, assertion));
+            results.add(new Result(rs.getTimestamp(1), id, directory, false, assertion));
             rs2.close();
         }
         rs.close();
@@ -555,17 +578,13 @@ public class ResultsDatabase {
             final PreparedStatement psDesc = connection.prepareStatement(SELECT_TESTS_DESC);
             psDesc.setString(1, id);
             final ResultSet rs2 = psDesc.executeQuery();
-            final String description;
             final String assertion;
             if (rs2.next()) {
-                description = rs2.getString(1);
-                assertion   = rs2.getString(1);
+                assertion = rs2.getString(1);
             } else {
-                String[] descAssert = extractDescription(id, directory);
-                description = null;
-                assertion = null;
+                assertion = extractDescription(id, directory);
             } 
-            results.add(new Result(rs.getTimestamp(1), id, directory, true, description, assertion));
+            results.add(new Result(rs.getTimestamp(1), id, directory, true, assertion));
             rs2.close();
         }
         rs.close();

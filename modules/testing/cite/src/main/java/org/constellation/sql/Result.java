@@ -44,11 +44,6 @@ public final class Result {
     private final String directory;
 
     /**
-     * A String description of the test.
-     */
-    private final String description;
-
-    /**
      * The assertion tested.
      */
     private final String assertion;
@@ -59,13 +54,12 @@ public final class Result {
     private final boolean passed;
 
     public Result(final Date date, final String id, final String directory, final boolean passed,
-            final String description, final String assertion) {
+            final String assertion) {
         this.date        = date;
         this.id          = id;
         this.directory   = directory;
         this.passed      = passed;
         this.assertion   = assertion;
-        this.description = description;
     }
 
     /**
@@ -94,13 +88,6 @@ public final class Result {
      */
     public boolean isPassed() {
         return passed;
-    }
-
-    /**
-     * @return the description
-     */
-    public String getDescription() {
-        return description;
     }
 
     /**
