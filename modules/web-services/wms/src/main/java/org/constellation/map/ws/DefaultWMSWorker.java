@@ -483,11 +483,11 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             final AbstractHTTP http = dcp.getHTTP();
             final AbstractProtocol getMethod = http.getGet();
             if (getMethod != null) {
-                getMethod.getOnlineResource().setHref(url + "wms?SERVICE=WMS&");
+                getMethod.getOnlineResource().setHref(url + "wms?");
             }
             final AbstractProtocol postMethod = http.getPost();
             if (postMethod != null) {
-                postMethod.getOnlineResource().setHref(url + "wms?SERVICE=WMS&");
+                postMethod.getOnlineResource().setHref(url + "wms?");
             }
         }
     }

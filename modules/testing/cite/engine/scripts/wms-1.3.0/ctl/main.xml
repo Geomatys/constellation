@@ -158,12 +158,6 @@
       <ctl:param name="recommended"/>
       <ctl:assertion>The implementation under test complies with the WMS 1.3.0 specification.</ctl:assertion>
       <ctl:code>
-         <ctl:values>
-            <ctl:value key="updatesequence">auto</ctl:value>
-            <ctl:value key="basic">basic</ctl:value>
-            <ctl:value key="queryable">queryable</ctl:value>
-	    <ctl:value key="recommended">recommended</ctl:value>
-         </ctl:values>
          <xsl:variable name="capabilities">
             <ctl:request>
                <ctl:url>http://localhost:9090/wms</ctl:url>
@@ -174,6 +168,11 @@
             </ctl:request>
          </xsl:variable>
 
+         <xsl:variable name="queryable">queryable</xsl:variable>
+         <xsl:variable name="basic">basic</xsl:variable>
+         <xsl:variable name="updatesequence">auto</xsl:variable>
+         <!--xsl:variable name="recommended">recommended</xsl:variable-->
+         
          <xsl:variable name="high-updatesequence">
             <xsl:choose>
                <xsl:when test="$updatesequence = 'auto'">
