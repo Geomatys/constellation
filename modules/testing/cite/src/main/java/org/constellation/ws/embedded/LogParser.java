@@ -18,7 +18,6 @@ package org.constellation.ws.embedded;
 
 import java.util.Date;
 import org.constellation.sql.Result;
-import org.constellation.sql.TestsDescription;
 
 
 /**
@@ -60,6 +59,6 @@ public final class LogParser {
         if (serviceAndVersion.contains("/")) {
             serviceAndVersion = serviceAndVersion.substring(0, serviceAndVersion.indexOf('/'));
         }
-        return new Result(date, new TestsDescription(lineSplitted[1]), directory, passed);
+        return new Result(date, lineSplitted[1], directory, passed, null, null);
     }
 }

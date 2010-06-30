@@ -16,6 +16,7 @@
  */
 package org.constellation.sql;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -89,6 +90,9 @@ public class ResultsDatabase {
             "SELECT date,id,directory FROM \"Results\" WHERE date=? AND passed=FALSE;";
     private static final String SELECT_TESTS_PASSED =
             "SELECT date,id,directory FROM \"Results\" WHERE date=? AND passed=TRUE;";
+    private static final String SELECT_TESTS_DESC =
+            "SELECT description, assertion FROM \"TestsDescriptions\" WHERE id=?;";
+
     private static final String SELECT_PREVIOUS_SUITE =
             "SELECT date FROM \"Suites\" WHERE lastsuccess='TRUE' AND service=? AND version=?";
 
@@ -240,7 +244,7 @@ public class ResultsDatabase {
      * @return
      * @throws SQLException if an error occurs in the insert request.
      */
-    public int insertResult(final String service, final String version, final TestsDescription id,
+    public int insertResult(final String service, final String version, final String id,
                             final String directory, final boolean passed, final Date date) throws SQLException
     {
         ensureConnectionOpened();
@@ -255,14 +259,13 @@ public class ResultsDatabase {
         // If already defined, we use the id name concatenated with the index number,
         // and we increment the count of this id into the hashmap.
         final String finalId;
-        final String tempId = id.getId();
-        final Integer numberId = ids.get(tempId);
+        final Integer numberId = ids.get(id);
         if (numberId == null) {
-            ids.put(tempId, 0);
-            finalId = tempId;
+            ids.put(id, 0);
+            finalId = id;
         } else {
-            ids.put(tempId, numberId + 1);
-            finalId = tempId + (numberId + 1);
+            ids.put(id, numberId + 1);
+            finalId = id + (numberId + 1);
         }
 
         final PreparedStatement ps = connection.prepareStatement(INSERT_RESULT);
@@ -484,6 +487,12 @@ public class ResultsDatabase {
         return dateResult;
     }
 
+    public String[] extractDescription(final String id, final String directory) {
+        File f = new File("target/logs/" + directory + "/log.xml");
+        //System.out.println("<<<<<<<<<<<<<<<<<<<<< file exist? " + f.exists());
+        return null;
+    }
+
     /**
      * Returns a list of {@link Result} that have failed for the session at the date specified.
      * This list can be empty, but never {@code null}.
@@ -500,7 +509,24 @@ public class ResultsDatabase {
         final List<Result> results = new ArrayList<Result>();
         final ResultSet rs = psCurrent.executeQuery();
         while (rs.next()) {
-            results.add(new Result(rs.getTimestamp(1), new TestsDescription(rs.getString(2)), rs.getString(3), false));
+            final String id        = rs.getString(2);
+            final String directory = rs.getString(3);
+            
+            final PreparedStatement psDesc = connection.prepareStatement(SELECT_TESTS_DESC);
+            psDesc.setString(1, id);
+            final ResultSet rs2 = psDesc.executeQuery();
+            final String description;
+            final String assertion;
+            if (rs2.next()) {
+                description = rs2.getString(1);
+                assertion   = rs2.getString(1);
+            } else {
+                String[] descAssert = extractDescription(id, directory);
+                description = null;
+                assertion = null;
+            }
+            results.add(new Result(rs.getTimestamp(1), id, directory, false, description, assertion));
+            rs2.close();
         }
         rs.close();
 
@@ -523,7 +549,24 @@ public class ResultsDatabase {
         final List<Result> results = new ArrayList<Result>();
         final ResultSet rs = psCurrent.executeQuery();
         while (rs.next()) {
-            results.add(new Result(rs.getTimestamp(1), new TestsDescription(rs.getString(2)), rs.getString(3), true));
+            final String id        = rs.getString(2);
+            final String directory = rs.getString(3);
+
+            final PreparedStatement psDesc = connection.prepareStatement(SELECT_TESTS_DESC);
+            psDesc.setString(1, id);
+            final ResultSet rs2 = psDesc.executeQuery();
+            final String description;
+            final String assertion;
+            if (rs2.next()) {
+                description = rs2.getString(1);
+                assertion   = rs2.getString(1);
+            } else {
+                String[] descAssert = extractDescription(id, directory);
+                description = null;
+                assertion = null;
+            } 
+            results.add(new Result(rs.getTimestamp(1), id, directory, true, description, assertion));
+            rs2.close();
         }
         rs.close();
 

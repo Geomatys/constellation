@@ -36,7 +36,7 @@ public final class Result {
     /**
      * The identifier of the test.
      */
-    private final TestsDescription id;
+    private final String id;
 
     /**
      * The directory where logs are stored.
@@ -44,15 +44,28 @@ public final class Result {
     private final String directory;
 
     /**
+     * A String description of the test.
+     */
+    private final String description;
+
+    /**
+     * The assertion tested.
+     */
+    private final String assertion;
+
+    /**
      * Defined whether the test has passed or not.
      */
     private final boolean passed;
 
-    public Result(final Date date, final TestsDescription id, final String directory, final boolean passed) {
-        this.date = date;
-        this.id = id;
-        this.directory = directory;
-        this.passed = passed;
+    public Result(final Date date, final String id, final String directory, final boolean passed,
+            final String description, final String assertion) {
+        this.date        = date;
+        this.id          = id;
+        this.directory   = directory;
+        this.passed      = passed;
+        this.assertion   = assertion;
+        this.description = description;
     }
 
     /**
@@ -65,7 +78,7 @@ public final class Result {
     /**
      * Returns the identifier of the test.
      */
-    public TestsDescription getId() {
+    public String getId() {
         return id;
     }
 
@@ -81,6 +94,20 @@ public final class Result {
      */
     public boolean isPassed() {
         return passed;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @return the assertion
+     */
+    public String getAssertion() {
+        return assertion;
     }
 
     @Override
