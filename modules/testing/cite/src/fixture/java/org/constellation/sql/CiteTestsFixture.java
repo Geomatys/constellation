@@ -18,6 +18,7 @@ package org.constellation.sql;
 
 import com.greenpepper.interpreter.flow.scenario.Check;
 import com.greenpepper.interpreter.flow.scenario.Display;
+import com.greenpepper.interpreter.flow.scenario.Given;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -97,8 +98,8 @@ public final class CiteTestsFixture extends ResultsDatabase {
      *         if the test is valid, {@code Failed} if the test fails.
      * @throws SQLException
      */
-    @Display("Test (\\w+) pour le service (\\w+) en version (\\d.\\d.\\d)")
-    public String getResultsForTest(final String id, final String service, final String version)
+    @Check("Test (\\S+) pour le service (\\w+) en version (\\d.\\d.\\d)")
+    public boolean getResultsForTest(final String id, final String service, final String version)
                                                                              throws SQLException
     {
         final Date date = getLastDateForSession(service, version);
@@ -108,12 +109,12 @@ public final class CiteTestsFixture extends ResultsDatabase {
         }
         final Result res = getTest(date, id);
         if (res == null) {
-            return "Disappear";
+            return false;
         }
         if (res.isPassed()) {
-            return "Passed";
+            return true;
         }
-        return "Failed";
+        return false;
     }
 
     /**

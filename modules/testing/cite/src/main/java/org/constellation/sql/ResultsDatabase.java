@@ -99,7 +99,8 @@ public class ResultsDatabase {
     private static final String SELECT_PREVIOUS_SUITE =
             "SELECT date FROM \"Suites\" WHERE lastsuccess='TRUE' AND service=? AND version=?;";
     private static final String SELECT_TEST_RESULT_FROM_ID =
-            "SELECT * FROM \"Results\" WHERE date=? AND id=?;";
+            "SELECT date,r.id,directory,passed,assertion FROM \"Results\" r, \"TestsDescriptions\" t "
+            + "WHERE date=? and r.id=? and r.id=t.id;";
 
     /**
      * Delete requests.
