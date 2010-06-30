@@ -4288,10 +4288,10 @@ longitude</td>
                <param name="LaYeRs">
                   <xsl:value-of select="$VAR_BASIC_POLYGONS"/>
                </param>
-               <example:StringLength/>
+               <!--example:StringLength/-->
             </request>
          </xsl:variable>
-         <xsl:variable name="expression">string(/length)</xsl:variable>
+         <xsl:variable name="expression">string-length(/)</xsl:variable>
          <xsl:variable name="VAR_SIZE_1">
             <xsl:for-each select="$request1">
                <xsl:value-of select="saxon:evaluate($expression)"/>
@@ -4329,11 +4329,11 @@ longitude</td>
                <param name="InFo_fOrMaT">
                   <xsl:value-of select="$VAR_GET_FEATURE_INFO_FORMAT"/>
                </param>
-               <example:StringLength/>
+               <!--example:StringLength/-->
             </request>
          </xsl:variable>
          <xsl:for-each select="$request2">
-            <xsl:variable name="expression">not(/length &gt; <xsl:value-of select="$VAR_SIZE_1"/>)</xsl:variable>
+            <xsl:variable name="expression">not(string-length(/) &gt; <xsl:value-of select="$VAR_SIZE_1"/>)</xsl:variable>
             <xsl:if test="saxon:evaluate($expression)">
                <fail/>
             </xsl:if>
@@ -4489,10 +4489,10 @@ longitude</td>
                   <xsl:value-of select="$VAR_WMS_VERSION"/>
                </param>
                <param name="SrS">EPSG:4326</param>
-               <example:StringLength/>
+               <!--example:StringLength/-->
             </request>
          </xsl:variable>
-         <xsl:variable name="expression">string(/length)</xsl:variable>
+         <xsl:variable name="expression">string-length(/msGMLOutput)</xsl:variable>
          <xsl:variable name="VAR_SIZE_1">
             <xsl:for-each select="$request1">
                <xsl:value-of select="saxon:evaluate($expression)"/>
@@ -4530,11 +4530,11 @@ longitude</td>
                </param>
                <param name="StYlEs"/>
                <param name="X">50</param>
-               <example:StringLength/>
+               <!--example:StringLength/-->
             </request>
          </xsl:variable>
          <xsl:for-each select="$request2">
-            <xsl:variable name="expression">not(/length &gt; <xsl:value-of select="$VAR_SIZE_1"/>)</xsl:variable>
+            <xsl:variable name="expression">not(string-length(/msGMLOutput/*) &gt; <xsl:value-of select="$VAR_SIZE_1"/>)</xsl:variable>
             <xsl:if test="saxon:evaluate($expression)">
                <fail/>
             </xsl:if>

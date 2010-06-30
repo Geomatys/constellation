@@ -424,12 +424,14 @@ public class WMSService extends GridWebService {
         final String strX    = getParameter(version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_I_V111 : KEY_I_V130, true);
         final String strY    = getParameter(version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()) ? KEY_J_V111 : KEY_J_V130, true);
         final String strQueryLayers = getParameter(KEY_QUERY_LAYERS, true);
-        final String infoFormat  = getParameter(KEY_INFO_FORMAT, true);
+              String infoFormat  = getParameter(KEY_INFO_FORMAT, false);
         final String strFeatureCount = getParameter(KEY_FEATURE_COUNT, false);
         final List<String> queryLayers = StringUtilities.toStringList(strQueryLayers);
         final List<String> queryableLayers = QueryAdapter.areQueryableLayers(queryLayers, null);
         final List<Name> namedQueryableLayers = parseNamespaceLayerList(queryableLayers);
-
+        if (infoFormat == null) {
+            infoFormat = MimeType.TEXT_XML;
+        }
         final int x, y;
         try {
             x = RequestsUtilities.toInt(strX);
