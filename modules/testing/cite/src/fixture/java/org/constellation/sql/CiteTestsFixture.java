@@ -69,10 +69,11 @@ public final class CiteTestsFixture extends ResultsDatabase {
         if (failings.isEmpty()) {
             return "";
         }
-        final StringBuilder builder = new StringBuilder("Tests fail: | ");
+        final StringBuilder builder = new StringBuilder("{greenpepper-info}\n");
         for (Result failing : failings) {
-            builder.append(failing.toString()).append(" | \\\\ ");
+            builder.append("* ").append(failing.toString()).append('\n');
         }
+        builder.append("{greenpepper-info}");
         return builder.toString();
     }
 

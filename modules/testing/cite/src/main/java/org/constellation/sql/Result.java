@@ -36,7 +36,7 @@ public final class Result {
     /**
      * The identifier of the test.
      */
-    private final String id;
+    private final TestsDescription id;
 
     /**
      * The directory where logs are stored.
@@ -48,7 +48,7 @@ public final class Result {
      */
     private final boolean passed;
 
-    public Result(final Date date, final String id, final String directory, final boolean passed) {
+    public Result(final Date date, final TestsDescription id, final String directory, final boolean passed) {
         this.date = date;
         this.id = id;
         this.directory = directory;
@@ -65,7 +65,7 @@ public final class Result {
     /**
      * Returns the identifier of the test.
      */
-    public String getId() {
+    public TestsDescription getId() {
         return id;
     }
 

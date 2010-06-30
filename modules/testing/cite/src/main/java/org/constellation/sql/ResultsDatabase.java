@@ -240,7 +240,7 @@ public class ResultsDatabase {
      * @return
      * @throws SQLException if an error occurs in the insert request.
      */
-    public int insertResult(final String service, final String version, final String id,
+    public int insertResult(final String service, final String version, final TestsDescription id,
                             final String directory, final boolean passed, final Date date) throws SQLException
     {
         ensureConnectionOpened();
@@ -255,13 +255,14 @@ public class ResultsDatabase {
         // If already defined, we use the id name concatenated with the index number,
         // and we increment the count of this id into the hashmap.
         final String finalId;
-        final Integer numberId = ids.get(id);
+        final String tempId = id.getId();
+        final Integer numberId = ids.get(tempId);
         if (numberId == null) {
-            ids.put(id, 0);
-            finalId = id;
+            ids.put(tempId, 0);
+            finalId = tempId;
         } else {
-            ids.put(id, numberId + 1);
-            finalId = id + (numberId + 1);
+            ids.put(tempId, numberId + 1);
+            finalId = tempId + (numberId + 1);
         }
 
         final PreparedStatement ps = connection.prepareStatement(INSERT_RESULT);
@@ -499,7 +500,7 @@ public class ResultsDatabase {
         final List<Result> results = new ArrayList<Result>();
         final ResultSet rs = psCurrent.executeQuery();
         while (rs.next()) {
-            results.add(new Result(rs.getTimestamp(1), rs.getString(2), rs.getString(3), false));
+            results.add(new Result(rs.getTimestamp(1), new TestsDescription(rs.getString(2)), rs.getString(3), false));
         }
         rs.close();
 
@@ -522,7 +523,7 @@ public class ResultsDatabase {
         final List<Result> results = new ArrayList<Result>();
         final ResultSet rs = psCurrent.executeQuery();
         while (rs.next()) {
-            results.add(new Result(rs.getTimestamp(1), rs.getString(2), rs.getString(3), true));
+            results.add(new Result(rs.getTimestamp(1), new TestsDescription(rs.getString(2)), rs.getString(3), true));
         }
         rs.close();
 
