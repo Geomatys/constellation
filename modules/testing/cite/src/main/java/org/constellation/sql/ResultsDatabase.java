@@ -61,7 +61,7 @@ public class ResultsDatabase {
     /**
      * Database connection parameters.
      */
-    private static final String DB_NAME  = "cite_results";
+    private static final String DB_NAME  = "cite_resultsV2";
     private static final String PROTOCOL = "jdbc:postgresql";
     private static final String HOST     = "db.geomatys.com";
     private static final String USER     = "cite";
@@ -72,7 +72,7 @@ public class ResultsDatabase {
      */
     private static final String INSERT_RESULT  = "INSERT INTO \"Results\" VALUES (?,?,?,?);";
     private static final String INSERT_SERVICE = "INSERT INTO \"Services\" VALUES (?,?);";
-    private static final String INSERT_SUITE   = "INSERT INTO \"Suites\" VALUES (?,?,?);";
+    private static final String INSERT_SUITE   = "INSERT INTO \"Suites\" VALUES (?,?,?,?);";
 
     /**
      * Count requests.
@@ -90,13 +90,19 @@ public class ResultsDatabase {
     private static final String SELECT_TESTS_PASSED =
             "SELECT date,id,directory FROM \"Results\" WHERE date=? AND passed=TRUE;";
     private static final String SELECT_PREVIOUS_SUITE =
-            "SELECT date FROM \"Suites\" WHERE date < ? AND service=? AND version=? ORDER BY date DESC;";
+            "SELECT date FROM \"Suites\" WHERE lastsuccess='TRUE' AND service=? AND version=?";
 
     /**
      * Delete requests.
      */
-    private static final String DELETE_SUITE = "DELETE FROM \"Suites\" "+
-                                                        "WHERE date=?;";
+    private static final String DELETE_SUITE = "DELETE FROM \"Suites\" WHERE date=?;";
+
+    /**
+     * Update requests.
+     */
+    private static final String UPDATE_SUITE_SUCCESS = "UPDATE \"Suites\"  set lastsuccess='TRUE' WHERE date=?;";
+
+    private static final String UPDATE_SUITE_REPLACED = "UPDATE \"Suites\"  set lastsuccess='FALSE' WHERE service=? and version =?;";
 
     /**
      * The connection to the database of Cite Tests results.
@@ -146,7 +152,7 @@ public class ResultsDatabase {
         final List<Result> currentTestsPassed  = getTestsPassed(date);
         final int nbCurrentTest                = currentTestsFailed.size()  + currentTestsPassed.size();
 
-        final Date previousSuite = getPreviousSuiteDate(date, service, version);
+        final Date previousSuite = getPreviousSuiteDate(service, version);
         // Contains all tests that have failed for the previous session.
         final List<Result> previousTestsFailed;
         // Contains all tests that have Passed for the previous session.
@@ -276,10 +282,35 @@ public class ResultsDatabase {
      * @param date The date of the suite to delete.
      * @throws SQLException if an error occurs in the delete request.
      */
+    @Deprecated
     public void deleteSuite(final Date date) throws SQLException {
         ensureConnectionOpened();
 
         final PreparedStatement ps = connection.prepareStatement(DELETE_SUITE);
+        ps.setTimestamp(1, new Timestamp(date.getTime()));
+        ps.execute();
+
+        ps.close();
+    }
+
+    /**
+     * Set the flag lastsuccess of the previous suite to false, and set the flag of the last suite
+     * identified by the specified date to true.
+     *
+     * @param date The date of the suite to update.
+     * @param service The service name.
+     * @param version The service version.
+     * @throws SQLException if an error occurs in the update request.
+     */
+    public void setSuiteLastSuccess(final Date date, final String service, final String version) throws SQLException {
+        ensureConnectionOpened();
+
+        PreparedStatement ps = connection.prepareStatement(UPDATE_SUITE_REPLACED);
+        ps.setString(1, service);
+        ps.setString(2, version);
+        ps.execute();
+
+        ps = connection.prepareStatement(UPDATE_SUITE_SUCCESS);
         ps.setTimestamp(1, new Timestamp(date.getTime()));
         ps.execute();
 
@@ -433,20 +464,18 @@ public class ResultsDatabase {
      * Returns the date of the previous session of tests, or {@code null} if there is no other
      * test suite in the database.
      *
-     * @param date The date of the current session.
      * @param service The service name.
      * @param version The service version.
      * @throws SQLException
      */
-    private Date getPreviousSuiteDate(final Date date, final String service, final String version)
+    private Date getPreviousSuiteDate(final String service, final String version)
                                       throws SQLException
     {
         ensureConnectionOpened();
 
         final PreparedStatement ps = connection.prepareStatement(SELECT_PREVIOUS_SUITE);
-        ps.setTimestamp(1, new Timestamp(date.getTime()));
-        ps.setString(2, service);
-        ps.setString(3, version);
+        ps.setString(1, service);
+        ps.setString(2, version);
         final ResultSet rs = ps.executeQuery();
         final Date dateResult = (rs.next()) ? rs.getTimestamp(1) : null;
         rs.close();
@@ -535,6 +564,7 @@ public class ResultsDatabase {
         ps.setTimestamp(1, new Timestamp(date.getTime()));
         ps.setString(2, service);
         ps.setString(3, version);
+        ps.setBoolean(4, false);
         ps.execute();
         ps.close();
 

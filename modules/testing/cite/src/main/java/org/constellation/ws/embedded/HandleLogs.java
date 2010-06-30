@@ -24,6 +24,8 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -41,6 +43,8 @@ import org.constellation.sql.ResultsDatabase;
  * @see GrizzlyServer
  */
 public final class HandleLogs {
+
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.ws.embedded");
     /**
      * Prevents instanciation.
      */
@@ -79,7 +83,7 @@ public final class HandleLogs {
         } catch (SQLException e) {
             // May be normal if we killed the process. Prints only
             // a summary of the exception, not the full stack trace.
-            System.err.println(e);
+            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
         } finally {
             try {
                 resDB.close();
@@ -107,7 +111,7 @@ public final class HandleLogs {
         } catch (SQLException ex) {
             // May be normal if we killed the process. Prints only
             // a summary of the exception, not the full stack trace.
-            System.err.println(ex);
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
             return true;
         } finally {
             try {
@@ -124,6 +128,7 @@ public final class HandleLogs {
      *
      * @param date The date of the session that will be deleted.
      */
+    @Deprecated
     private static void deleteSessionWithNewFailures(final Date date) {
         ResultsDatabase resDB = null;
         try {
@@ -132,7 +137,32 @@ public final class HandleLogs {
         } catch (SQLException ex) {
             // May be normal if we killed the process. Prints only
             // a summary of the exception, not the full stack trace.
-            System.err.println(ex);
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+        } finally {
+            try {
+                resDB.close();
+            } catch (SQLException ex) {
+                System.err.println(ex);
+            }
+        }
+    }
+
+    /**
+     * Update the last session by tagging it as the last succeed suite.
+     *
+     * @param date the date of the current session which have succeed
+     * @param service The service name.
+     * @param version The service version.
+     */
+    private static void updateSessionSuite(final Date date, final String service, final String version) {
+        ResultsDatabase resDB = null;
+        try {
+            resDB = new ResultsDatabase();
+            resDB.setSuiteLastSuccess(date, service, version);
+        } catch (SQLException ex) {
+            // May be normal if we killed the process. Prints only
+            // a summary of the exception, not the full stack trace.
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         } finally {
             try {
                 resDB.close();
@@ -196,8 +226,10 @@ public final class HandleLogs {
                  * We do not want the next tests session to be compared to that one, this way
                  * it is compulsory to correct newly-failing tests to fix the build.
                  */
-                deleteSessionWithNewFailures(currentSessionDate);
+                //deleteSessionWithNewFailures(currentSessionDate);
                 successResults = false;
+            } else {
+                updateSessionSuite(currentSessionDate, service, version);
             }
         }
 
