@@ -51,6 +51,10 @@ public final class CiteTestsFixture extends ResultsDatabase {
     @Check("Vérifier que la dernière session pour le service (\\w+) en version (\\d.\\d.\\d) n'a pas régressé")
     public boolean compareLastResults(final String service, final String version) throws SQLException {
         final Date date = getLastDateForSession(service, version);
+        if (date == null) {
+            throw new SQLException("There is no session in the database for "+ service +
+                    " version "+ version);
+        }
         return compareResults(date, service, version);
     }
 
@@ -65,16 +69,51 @@ public final class CiteTestsFixture extends ResultsDatabase {
     @Display("Tests en échec pour le service (\\w+) en version (\\d.\\d.\\d)")
     public String displayErrors(final String service, final String version) throws SQLException {
         final Date date = getLastDateForSession(service, version);
+        if (date == null) {
+            throw new SQLException("There is no session in the database for "+ service +
+                    " version "+ version);
+        }
         final List<Result> failings = getTestsFailed(date);
         if (failings.isEmpty()) {
             return "";
         }
-        final StringBuilder builder = new StringBuilder("{greenpepper-info}\n");
+        final StringBuilder builder = new StringBuilder("{li}");
         for (Result failing : failings) {
-            builder.append("* ").append(failing.toString()).append('\n');
+            builder.append(failing.toString()).append('\n')
+                   .append("=> Assertion: ").append(failing.getAssertion())
+                   .append('\n');
         }
-        builder.append("{greenpepper-info}");
+        builder.append("{li}");
         return builder.toString();
+    }
+
+    /**
+     * Display the result for the specified test.
+     *
+     * @param id The test id.
+     * @param service The service name.
+     * @param version The service version.
+     * @return {@code Disappear} if a test has disappeared between two sessions, {@code Passed}
+     *         if the test is valid, {@code Failed} if the test fails.
+     * @throws SQLException
+     */
+    @Display("Test (\\w+) pour le service (\\w+) en version (\\d.\\d.\\d)")
+    public String getResultsForTest(final String id, final String service, final String version)
+                                                                             throws SQLException
+    {
+        final Date date = getLastDateForSession(service, version);
+        if (date == null) {
+            throw new SQLException("There is no session in the database for "+ service +
+                    " version "+ version);
+        }
+        final Result res = getTest(date, id);
+        if (res == null) {
+            return "Disappear";
+        }
+        if (res.isPassed()) {
+            return "Passed";
+        }
+        return "Failed";
     }
 
     /**

@@ -96,9 +96,10 @@ public class ResultsDatabase {
             "SELECT date,id,directory FROM \"Results\" WHERE date=? AND passed=TRUE;";
     private static final String SELECT_TESTS_DESC =
             "SELECT assertion FROM \"TestsDescriptions\" WHERE id=?;";
-
     private static final String SELECT_PREVIOUS_SUITE =
-            "SELECT date FROM \"Suites\" WHERE lastsuccess='TRUE' AND service=? AND version=?";
+            "SELECT date FROM \"Suites\" WHERE lastsuccess='TRUE' AND service=? AND version=?;";
+    private static final String SELECT_TEST_RESULT_FROM_ID =
+            "SELECT * FROM \"Results\" WHERE date=? AND id=?;";
 
     /**
      * Delete requests.
@@ -590,6 +591,32 @@ public class ResultsDatabase {
         rs.close();
 
         return results;
+    }
+
+    /**
+     * Returns the test for the given id and date.
+     *
+     * @param date The date of the session.
+     * @param id The test id.
+     * @return The {@linkplain Result results} for this test, or {@code null} if the test is
+     *         not found in the database.
+     * @throws SQLException
+     */
+    protected Result getTest(final Date date, final String id) throws SQLException {
+        ensureConnectionOpened();
+
+        final PreparedStatement psCurrent = connection.prepareStatement(SELECT_TEST_RESULT_FROM_ID);
+        psCurrent.setTimestamp(1, new Timestamp(date.getTime()));
+        psCurrent.setString(2, id);
+
+        Result result = null;
+        final ResultSet rs = psCurrent.executeQuery();
+        if (rs.next()) {
+            result = new Result(rs.getDate(1), rs.getString(2), rs.getString(3),
+                                rs.getBoolean(4), rs.getString(5));
+        }
+        rs.close();
+        return result;
     }
 
     /**
