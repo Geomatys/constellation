@@ -196,6 +196,9 @@ public class WCSService extends GridWebService {
 
                 if (desccov == null) {
                     desccov = adaptKvpDescribeCoverageRequest();
+                } else if (desccov.getVersion() == null) {
+                    throw new CstlServiceException("The parameter version must be specified",
+                        MISSING_PARAMETER_VALUE, "version");
                 }
                 serviceDef = getVersionFromNumber(desccov.getVersion().toString());
                 final DescribeCoverageResponse describeResponse = worker.describeCoverage(desccov);
@@ -213,6 +216,12 @@ public class WCSService extends GridWebService {
 
                 if (getcov == null) {
                     getcov = adaptKvpGetCoverageRequest();
+                } else if (getcov.getVersion() == null) {
+                    throw new CstlServiceException("The parameter version must be specified",
+                        MISSING_PARAMETER_VALUE, "version");
+                } else if (getcov.getFormat() == null) {
+                    throw new CstlServiceException("The parameter format must be specified",
+                        MISSING_PARAMETER_VALUE, "format");
                 }
                 serviceDef = getVersionFromNumber(getcov.getVersion().toString());
                 String format = getcov.getFormat();
@@ -561,8 +570,7 @@ public class WCSService extends GridWebService {
         }
 
         //interpolation method
-        final org.geotoolkit.wcs.xml.v100.InterpolationMethod interpolation =
-                org.geotoolkit.wcs.xml.v100.InterpolationMethod.fromValue(getParameter(KEY_INTERPOLATION, false));
+        final String interpolation = getParameter(KEY_INTERPOLATION, false);
 
         //output
         final List<Double> resolutions;

@@ -260,6 +260,7 @@ offering. Enter the grid resolutions below.</p>
          <xsl:variable name="VAR_WCS_COVERAGE_1_RESX">10</xsl:variable>
          <xsl:variable name="VAR_WCS_COVERAGE_1_RESY">10</xsl:variable>
          <xsl:variable name="VAR_WCS_FORMAT_1_HEADER">image/png</xsl:variable>
+         <xsl:variable name="xml">xml</xsl:variable>
          <xsl:variable name="parser">
             <xsl:choose>
                <xsl:when test="$schemas = 'original'">
@@ -1451,7 +1452,8 @@ offering. Enter the grid resolutions below.</p>
                         <ctl:with-param name="type">KVP</ctl:with-param>
                      </ctl:call-test>
                   </xsl:if>
-                  <xsl:if test="$post and $xml and $supporttime">
+                  <!-- ce test est desactivé car il est probablement buggé (pas de RESX RESY)-->
+                  <!--xsl:if test="$post and $xml and $supporttime">
                      <ctl:call-test name="wcs1-0-0:getcoverage_operations-getcoverage_request-time-post-xml-1">
                         <ctl:with-param name="VAR_WCS_VERSION" select="$VAR_WCS_VERSION"/>
                         <ctl:with-param name="VAR_WCS_COVERAGE_1" select="$VAR_WCS_COVERAGE_1"/>
@@ -1461,7 +1463,7 @@ offering. Enter the grid resolutions below.</p>
                         <ctl:with-param name="VAR_WCS_GET_COVERAGE_HTTP_POST_URL"
                                         select="$VAR_WCS_GET_COVERAGE_HTTP_POST_URL"/>
                      </ctl:call-test>
-                  </xsl:if>
+                  </xsl:if-->
                   <xsl:if test="$post and $xml and $supporttime">
                      <ctl:call-test name="wcs1-0-0:getcoverage_operations-getcoverage_request-time-post-xml-2">
                         <ctl:with-param name="VAR_WCS_VERSION" select="$VAR_WCS_VERSION"/>
@@ -3720,7 +3722,7 @@ offering. Enter the grid resolutions below.</p>
                </ctl:url>
                <ctl:method>post</ctl:method>
                <ctl:header name="Content-type">text/xml</ctl:header>
-               <ctl:body><![CDATA[<GetCoverage xmlns="http://www.opengis.net/wcs" xmlns:gml="http://www.opengis.net/gml"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/getCoverage.xsd" version="]]><xsl:value-of select="$VAR_WCS_VERSION"/><![CDATA[" service="WCS" ><sourceCoverage>]]><xsl:value-of select="$VAR_WCS_COVERAGE_1"/><![CDATA[</sourceCoverage><domainSubset><spatialSubset><gml:Envelope srsName="]]><xsl:value-of select="$VAR_WCS_COVERAGE_1_CRS"/><![CDATA[">			
+               <ctl:body><![CDATA[<GetCoverage xmlns="http://www.opengis.net/wcs" xmlns:gml="http://www.opengis.net/gml"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/getCoverage.xsd" version="]]><xsl:value-of select="$VAR_WCS_VERSION"/><![CDATA[" service="WCS" ><sourceCoverage>]]><xsl:value-of select="$VAR_WCS_COVERAGE_1"/><![CDATA[</sourceCoverage><domainSubset><spatialSubset><gml:Envelope srsName="]]><xsl:value-of select="$VAR_WCS_COVERAGE_1_CRS"/><![CDATA[">
 	</gml:Envelope>	<gml:Grid dimension="2"><gml:limits><gml:GridEnvelope><gml:low>0 0 </gml:low><gml:high>]]><xsl:value-of select="$VAR_WCS_COVERAGE_1_WIDTH"/><![CDATA[
                   ]]><xsl:value-of select="' '"/><![CDATA[
                   ]]><xsl:value-of select="$VAR_WCS_COVERAGE_1_HEIGHT"/><![CDATA[ </gml:high></gml:GridEnvelope></gml:limits><gml:axisName>width</gml:axisName><gml:axisName>height</gml:axisName></gml:Grid></spatialSubset></domainSubset>
@@ -8959,7 +8961,7 @@ offering. Enter the grid resolutions below.</p>
                <ctl:method>post</ctl:method>
                <ctl:header name="Content-type">text/xml</ctl:header>
                <ctl:body><![CDATA[<GetCoverage xmlns="http://www.opengis.net/wcs" xmlns:gml="http://www.opengis.net/gml"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/getCoverage.xsd" version="]]><xsl:value-of select="$VAR_WCS_VERSION"/><![CDATA[" service="WCS" ><sourceCoverage>]]><xsl:value-of select="$VAR_WCS_COVERAGE_1"/><![CDATA[</sourceCoverage><domainSubset><temporalSubset>
-	<gml:timePosition>]]><xsl:value-of select="$VAR_WCS_COVERAGE_1_TIME"/><![CDATA[</timePosition>
+	<gml:timePosition>]]><xsl:value-of select="$VAR_WCS_COVERAGE_1_TIME"/><![CDATA[</gml:timePosition>
 </temporalSubset></domainSubset>
 <output><format>]]><xsl:value-of select="$VAR_WCS_FORMAT_1"/><![CDATA[</format></output></GetCoverage>]]></ctl:body>
                <parsers:HeadersParser/>
@@ -9031,7 +9033,7 @@ offering. Enter the grid resolutions below.</p>
                <ctl:method>post</ctl:method>
                <ctl:header name="Content-type">text/xml</ctl:header>
                <ctl:body><![CDATA[  <GetCoverage xmlns="http://www.opengis.net/wcs" xmlns:gml="http://www.opengis.net/gml"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wcs http://schemas.opengis.net/wcs/1.0.0/getCoverage.xsd" version="]]><xsl:value-of select="$VAR_WCS_VERSION"/><![CDATA[" service="WCS" ><sourceCoverage>]]><xsl:value-of select="$VAR_WCS_COVERAGE_1"/><![CDATA[</sourceCoverage><domainSubset><temporalSubset>
-	<gml:timePosition>WCS_TIME_INVALID</timePosition>
+	<gml:timePosition>WCS_TIME_INVALID</gml:timePosition>
 </temporalSubset></domainSubset>
 <output><format>]]><xsl:value-of select="$VAR_WCS_FORMAT_1"/><![CDATA[</format></output></GetCoverage>]]></ctl:body>
             </ctl:request>

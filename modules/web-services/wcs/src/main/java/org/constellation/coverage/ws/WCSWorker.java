@@ -17,8 +17,7 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
-import org.geotoolkit.feature.DefaultName;
-import org.opengis.feature.type.Name;
+import org.geotoolkit.wcs.xml.v111.InterpolationMethodType;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -91,6 +90,7 @@ import org.geotoolkit.wcs.xml.v100.DCPTypeType;
 import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Get;
 import org.geotoolkit.wcs.xml.v100.DCPTypeType.HTTP.Post;
 import org.geotoolkit.wcs.xml.v100.DomainSetType;
+import org.geotoolkit.wcs.xml.v100.GetCoverageType;
 import org.geotoolkit.wcs.xml.v100.Keywords;
 import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
 import org.geotoolkit.wcs.xml.v100.RangeSet;
@@ -108,13 +108,16 @@ import org.geotoolkit.wcs.xml.v111.CoverageDescriptions;
 import org.geotoolkit.wcs.xml.v111.CoverageDomainType;
 import org.geotoolkit.wcs.xml.v111.CoverageSummaryType;
 import org.geotoolkit.wcs.xml.v111.FieldType;
-import org.geotoolkit.wcs.xml.v111.InterpolationMethodType;
 import org.geotoolkit.wcs.xml.v111.InterpolationMethods;
 import org.geotoolkit.wcs.xml.v111.RangeType;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.wcs.xml.v100.InterpolationMethod;
+import org.geotoolkit.feature.DefaultName;
+
 
 // GeoAPI dependencies
 import org.opengis.geometry.Envelope;
+import org.opengis.feature.type.Name;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -146,10 +149,25 @@ public final class WCSWorker extends AbstractWorker {
      */
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
-    /*
-     * Set to true for CITE tests.
+    /**
+     * A list of supported interpolation
      */
-    private static final boolean CITE_TESTING = false;
+    private final static List<org.geotoolkit.wcs.xml.v100.InterpolationMethod> SUPPORTED_INTERPOLATIONS_V100 = new ArrayList<org.geotoolkit.wcs.xml.v100.InterpolationMethod>();
+    static {
+            SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BILINEAR);
+            SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BICUBIC);
+            SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR);
+    }
+
+    /**
+     * A list of supported interpolation
+     */
+    private final static List<org.geotoolkit.wcs.xml.v111.InterpolationMethod> SUPPORTED_INTERPOLATIONS_V111 = new ArrayList<org.geotoolkit.wcs.xml.v111.InterpolationMethod>();
+    static {
+            SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.BILINEAR);
+            SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.BICUBIC);
+            SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR);
+    }
 
     /**
      * Initializes the marshaller pool for the WCS.
@@ -321,13 +339,8 @@ public final class WCSWorker extends AbstractWorker {
             final SupportedFormatsType supForm = new SupportedFormatsType(nativeFormat, supportedFormats);
 
             //supported interpolations
-            final List<org.geotoolkit.wcs.xml.v100.InterpolationMethod> interpolations =
-                    new ArrayList<org.geotoolkit.wcs.xml.v100.InterpolationMethod>();
-            interpolations.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BILINEAR);
-            interpolations.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BICUBIC);
-            interpolations.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR);
             final SupportedInterpolationsType supInt = new SupportedInterpolationsType(
-                    org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR, interpolations);
+                    org.geotoolkit.wcs.xml.v100.InterpolationMethod.NEAREST_NEIGHBOR, SUPPORTED_INTERPOLATIONS_V100);
 
             //we build the coverage offering for this layer/coverage
             final CoverageOfferingType coverageOffering = new CoverageOfferingType(null, coverageName,
@@ -443,14 +456,11 @@ public final class WCSWorker extends AbstractWorker {
 
             //supported interpolations
             final List<InterpolationMethodType> intList = new ArrayList<InterpolationMethodType>();
-            intList.add(new InterpolationMethodType(
-                    org.geotoolkit.wcs.xml.v111.InterpolationMethod.BILINEAR.value(), null));
-            intList.add(new InterpolationMethodType(
-                    org.geotoolkit.wcs.xml.v111.InterpolationMethod.BICUBIC.value(), null));
-            intList.add(new InterpolationMethodType(
-                    org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value(), null));
-            final InterpolationMethods interpolations = new InterpolationMethods(
-                    intList, org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
+            for (org.geotoolkit.wcs.xml.v111.InterpolationMethod inte : SUPPORTED_INTERPOLATIONS_V111) {
+                intList.add(new InterpolationMethodType(inte.value(), null));
+            }
+            final InterpolationMethods interpolations = new InterpolationMethods(intList
+                    , org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR.value());
             final RangeType range = new RangeType(new FieldType(StringUtilities.cleanSpecialCharacter(coverageRef.getThematic()),
                     null, new org.geotoolkit.ows.xml.v110.CodeType("0.0"), interpolations));
 
@@ -779,16 +789,6 @@ public final class WCSWorker extends AbstractWorker {
                 summary.add(cs);
             }
 
-            /**
-             * FOR CITE TEST we put the first data mars because of ifremer overlapping data
-             * TODO delete when overlapping problem is solved
-             */
-            if (CITE_TESTING) {
-                final CoverageSummaryType temp = summary.get(10);
-                summary.remove(10);
-                summary.add(0, temp);
-            }
-
             contents = new Contents(summary, null, null, null);
         } catch (DataStoreException exception) {
             throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
@@ -833,6 +833,17 @@ public final class WCSWorker extends AbstractWorker {
         if (!layerRef.isQueryable(ServiceDef.Query.WCS_ALL) || layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +
                     layerRef.getName() + "\".", INVALID_PARAMETER_VALUE, KEY_COVERAGE.toLowerCase());
+        }
+
+        // we verify the interpolation method even if we don't use it
+        if (request instanceof GetCoverageType) {
+            String interpolationSt = ((GetCoverageType)request).getInterpolationMethod();
+            if (interpolationSt != null) {
+                InterpolationMethod interpolation = InterpolationMethod.fromValue(interpolationSt);
+                if (interpolation == null || !SUPPORTED_INTERPOLATIONS_V100.contains(interpolation)) {
+                    throw new CstlServiceException("Unsupported interpolation: " + interpolationSt, INVALID_PARAMETER_VALUE, KEY_INTERPOLATION.toLowerCase());
+                }
+            }
         }
 
         Envelope envelope;
@@ -889,6 +900,10 @@ public final class WCSWorker extends AbstractWorker {
             } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE, KEY_BBOX.toLowerCase());
             }
+        } else if (date == null) {
+
+            throw new CstlServiceException("One of Time or Envelope has to be specified", MISSING_PARAMETER_VALUE);
+
         } else {
             // We take the envelope from the data provider. That envelope can be a little bit imprecise.
             try {

@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletContext;
 
@@ -325,7 +326,7 @@ public abstract class WebService {
                 } else {
                     type = request.getClass().getName();
                 }
-                LOGGER.finer("request type:" + type);
+                LOGGER.log(Level.FINER, "request type:{0}", type);
             }
             return treatIncomingRequest(request);
         } else {
