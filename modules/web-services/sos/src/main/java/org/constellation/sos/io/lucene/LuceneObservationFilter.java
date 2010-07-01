@@ -281,16 +281,14 @@ public class LuceneObservationFilter implements ObservationFilter {
      */
     @Override
     public List<ObservationResult> filterResult() throws CstlServiceException {
-        List<ObservationResult> results = new ArrayList<ObservationResult>();
         try {
             final SpatialQuery query = new SpatialQuery(luceneRequest.toString());
             final SortField sf       = new SortField("sampling_time_begin", SortField.STRING, false);
             query.setSort(new Sort(sf));
-            results = searcher.doResultSearch(query);
+            return searcher.doResultSearch(query);
         } catch(SearchingException ex) {
             throw new CstlServiceException("Search exception while filtering the observation", ex, NO_APPLICABLE_CODE);
         }
-        return results;
     }
 
     /**

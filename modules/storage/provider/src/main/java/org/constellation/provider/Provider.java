@@ -27,7 +27,7 @@ import java.util.Set;
  */
 public interface Provider<K,V> {
 
-    public final String JNDI_GROUP = "Data Provider Properties";
+    final String JNDI_GROUP = "Data Provider Properties";
     
     /**
      * @return the Key class

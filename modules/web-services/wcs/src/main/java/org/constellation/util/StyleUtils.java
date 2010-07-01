@@ -76,7 +76,7 @@ public final class StyleUtils {
         final LinkedHashMap<Expression,List<Symbolizer>> newThredholds = new LinkedHashMap<Expression, List<Symbolizer>>();
         final List<Double[]> visibles = toRanges(categories);
 
-        double from = Double.NaN;
+        double from;
         double to = Double.NaN;
         List<Symbolizer> symbols = null;
         for(final Entry<Expression,List<Symbolizer>> entry : oldThredholds.entrySet()){

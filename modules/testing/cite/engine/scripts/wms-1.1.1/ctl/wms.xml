@@ -275,7 +275,7 @@ longitude</td>
          <xsl:variable name="queryable_profile">queryable_profile</xsl:variable>
          <xsl:variable name="recommended">recommended</xsl:variable>
          <xsl:variable name="testgml"></xsl:variable>
-         <xsl:variable name="free"></xsl:variable>
+         <xsl:variable name="free">free</xsl:variable>
          <xsl:variable name="loosebboxconstraints"></xsl:variable>
          <xsl:variable name="strictbboxconstraints"></xsl:variable>
          <xsl:variable name="eitherbboxconstraint">eitherbboxconstraint</xsl:variable>

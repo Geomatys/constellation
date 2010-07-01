@@ -29,6 +29,6 @@ import org.opengis.feature.type.Name;
 public interface LayerProviderService extends ProviderService<Name,LayerDetails>{
 
     @Override
-    public Collection<? extends LayerProvider> getProviders();
+    Collection<? extends LayerProvider> getProviders();
 
 }

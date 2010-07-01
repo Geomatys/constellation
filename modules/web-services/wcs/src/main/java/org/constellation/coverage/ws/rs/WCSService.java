@@ -32,7 +32,6 @@ import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -105,7 +104,7 @@ public class WCSService extends GridWebService {
     /**
      * Build a new instance of the webService and initialize the JAXB marshaller.
      *
-     * @throws JAXBException if the initialization of the {@link JAXBContext} fails.
+     * @throws JAXBException if the initialization of the XML context fails.
      */
     public WCSService() throws JAXBException {
         super(ServiceDef.WCS_1_1_1, ServiceDef.WCS_1_0_0);

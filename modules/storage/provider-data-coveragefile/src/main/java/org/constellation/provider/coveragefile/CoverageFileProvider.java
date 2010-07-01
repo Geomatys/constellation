@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageReader;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
@@ -36,7 +35,6 @@ import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.io.ImageCoverageReader;
 import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.util.collection.Cache;
@@ -213,8 +211,8 @@ public class CoverageFileProvider extends AbstractLayerProvider{
      */
     private void test(final File candidate){
         if (candidate.isFile()){
-            try {
-                final ImageReader reader = XImageIO.getReaderBySuffix(candidate, Boolean.TRUE, Boolean.TRUE);
+            /*try {
+                final ImageReader reader = XImageIO.getReaderBySuffix(candidate, Boolean.TRUE, Boolean.TRUE);*/
 
                 final String fullName = candidate.getName();
                 final int idx = fullName.lastIndexOf('.');
@@ -227,8 +225,8 @@ public class CoverageFileProvider extends AbstractLayerProvider{
                     index.put(new DefaultName(nmsp,name), candidate);
                 }
 
-            } catch (IOException ex) {
-            }
+            /*} catch (IOException ex) {
+            }*/
         }
     }
 

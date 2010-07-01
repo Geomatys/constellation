@@ -153,5 +153,5 @@ public interface LayerDetails {
     /**
      * Returns the type of provider for a {@linkplain Layer layer}.
      */
-    abstract TYPE getType();
+    TYPE getType();
 }

@@ -72,7 +72,7 @@ public class SurveyProcedureTable extends SingletonTable<SurveyProcedureEntry>{
      */
     @Override
     protected SurveyProcedureEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
-         final SurveyProcedureQuery localQuery = (SurveyProcedureQuery) super.query;
+         //final SurveyProcedureQuery localQuery = (SurveyProcedureQuery) super.query;
          return null;/* new SurveyProcedureEntry(results.getString(indexOf(query.name   )),
                                          results.getString(indexOf(query.operator)),
                                          results.getString(indexOf(query.elevationAccuracy)),

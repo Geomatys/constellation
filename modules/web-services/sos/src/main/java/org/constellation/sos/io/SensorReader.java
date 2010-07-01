@@ -53,5 +53,5 @@ public interface SensorReader {
     /**
      * Destroy and free the resource used by the reader.
      */
-    abstract void destroy();
+    void destroy();
 }

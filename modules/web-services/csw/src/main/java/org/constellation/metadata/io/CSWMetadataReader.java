@@ -71,7 +71,7 @@ public interface CSWMetadataReader extends MetadataReader {
     /**
      * Return the list of Additional queryable element.
      */
-    abstract Map<String, URI> getConceptMap();
+    Map<String, URI> getConceptMap();
 
     /**
      * Execute a SQL query and return the result as a List of identifier;
@@ -80,7 +80,7 @@ public interface CSWMetadataReader extends MetadataReader {
      * @return
      * @throws MetadataIoException
      */
-    abstract List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException;
+    List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException;
 
     /**
      * Set the global level of log for information message.

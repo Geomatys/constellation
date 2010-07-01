@@ -42,17 +42,17 @@ public interface MetadataReader {
     /**
      * Return all the entries from the database
      */
-    abstract List<? extends Object> getAllEntries() throws MetadataIoException;
+    List<? extends Object> getAllEntries() throws MetadataIoException;
 
      /**
      * Return all the entries identifiers from the database
      */
-    abstract List<String> getAllIdentifiers() throws MetadataIoException;
+    List<String> getAllIdentifiers() throws MetadataIoException;
     
     /**
      * Destroy all the resource used by this reader.
      */
-    abstract void destroy();
+    void destroy();
 
     /**
      * Remove a metadata from the cache.

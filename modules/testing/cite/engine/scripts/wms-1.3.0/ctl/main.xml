@@ -172,7 +172,9 @@
          <xsl:variable name="basic">basic</xsl:variable>
          <xsl:variable name="updatesequence">auto</xsl:variable>
          <!--xsl:variable name="recommended">recommended</xsl:variable-->
-         
+         <!--xsl:variable name="vector_elevation">vector_elevation</xsl:variable-->
+         <!--xsl:variable name="raster_elevation">raster_elevation</xsl:variable-->
+
          <xsl:variable name="high-updatesequence">
             <xsl:choose>
                <xsl:when test="$updatesequence = 'auto'">
