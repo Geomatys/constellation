@@ -30,6 +30,7 @@ import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // JAXB dependencies
@@ -170,7 +171,7 @@ public class CatalogueHarvester {
          * we build the first filter : < dublinCore:Title IS LIKE '*' >
          */ 
         final List<QName> typeNames = new ArrayList<QName>();
-        PropertyNameType pname      = new PropertyNameType("dc:Title");
+        PropertyNameType pname      = new PropertyNameType("dc:title");
         PropertyIsLikeType pil      = new PropertyIsLikeType(pname, "something?", "*", "?", "\\");
         NotType n                   = new NotType(pil);
         final FilterType filter1    = new FilterType(n);
@@ -571,10 +572,17 @@ public class CatalogueHarvester {
             final List<QName>  typeNamesQname = new ArrayList<QName>();
             if (typeNameDomain != null) {
                 final List<String> typeNames  = typeNameDomain.getValue();
-                
+
+                boolean defaultTypeName = false;
                 final String defaultValue = typeNameDomain.getDefaultValue();
-                if (defaultValue != null && !defaultValue.isEmpty())
+                if (defaultValue != null && !defaultValue.isEmpty()) {
                     typeNames.add(defaultValue);
+                    String prefix             = defaultValue.substring(0, defaultValue.indexOf(':'));
+                    String localPart          = defaultValue.substring(defaultValue.indexOf(':') + 1, defaultValue.length());
+                    final String namespaceURI = getNamespaceURIFromprefix(prefix, distantVersion);
+                    typeNamesQname.add(new QName(namespaceURI, localPart, prefix));
+                    defaultTypeName = true;
+                }
                 
                 report.append("TypeNames supported:").append('\n');
                 for (String osc: typeNames) {
@@ -585,15 +593,16 @@ public class CatalogueHarvester {
                     }
                     
                     report.append('\t').append("- ").append(osc).append('\n');
-                    String prefix, localPart;
-                    
-                    if (osc.indexOf(':') != -1) {
-                        prefix    = osc.substring(0, osc.indexOf(':'));
-                        localPart = osc.substring(osc.indexOf(':') + 1, osc.length());
-                        final String namespaceURI = getNamespaceURIFromprefix(prefix, distantVersion);
-                        typeNamesQname.add(new QName(namespaceURI, localPart, prefix));
-                    } else {
-                        LOGGER.severe("NO ':' in Typenames => unexpected!!!");
+                    if (defaultTypeName) {
+                        String prefix, localPart;
+                        if (osc.indexOf(':') != -1) {
+                            prefix    = osc.substring(0, osc.indexOf(':'));
+                            localPart = osc.substring(osc.indexOf(':') + 1, osc.length());
+                            final String namespaceURI = getNamespaceURIFromprefix(prefix, distantVersion);
+                            typeNamesQname.add(new QName(namespaceURI, localPart, prefix));
+                        } else {
+                            LOGGER.severe("NO ':' in Typenames => unexpected!!!");
+                        }
                     }
                 }
             } else {
@@ -705,9 +714,9 @@ public class CatalogueHarvester {
                     xmlRequest = xmlRequest.replace("xmlns:dc=\"http://purl.org/dc/elements/1.1/\""     , "");
                     xmlRequest = xmlRequest.replace("xmlns:dc2=\"http://www.purl.org/dc/elements/1.1/\"", "");
                     xmlRequest = xmlRequest.replace("xmlns:dct2=\"http://www.purl.org/dc/terms/\""      , "");
-                    LOGGER.info("special obtained request: \n" + xmlRequest);
+                    LOGGER.log(Level.INFO, "special obtained request: \n{0}", xmlRequest);
                 }
-                LOGGER.info("sended:" + xmlRequest);
+                LOGGER.log(Level.INFO, "sended:{0}", xmlRequest);
                 wr.write(xmlRequest);
                 wr.flush();
             }
@@ -751,9 +760,9 @@ public class CatalogueHarvester {
                     harvested = ((JAXBElement) harvested).getValue();
                 }
             } catch (JAXBException ex) {
-                LOGGER.severe("The distant service does not respond correctly: unable to unmarshall response document.\ncause: " + ex.getMessage());
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
             }  catch (IllegalAccessError ex) {
-                LOGGER.severe("The distant service does not respond correctly: unable to unmarshall response document.\ncause: " + ex.getMessage());
+                LOGGER.log(Level.WARNING, "The distant service does not respond correctly: unable to unmarshall response document.\ncause: {0}", ex.getMessage());
             } finally {
                 if (unmarshaller != null) {
                     marshallerPool.release(unmarshaller);
@@ -848,7 +857,7 @@ public class CatalogueHarvester {
 
                 if (response instanceof GetRecordsResponseType) {
                     
-                    LOGGER.info("Response of distant service:\n" + response.toString());
+                    LOGGER.log(Level.INFO, "Response of distant service:\n{0}", response.toString());
                     final GetRecordsResponseType serviceResponse = (GetRecordsResponseType) response;
                     final SearchResultsType results = serviceResponse.getSearchResults();
 
@@ -881,7 +890,7 @@ public class CatalogueHarvester {
             } catch (CstlServiceException ex) {
                 LOGGER.severe(ex.getMessage());
             } catch (IOException ex) {
-                LOGGER.info("IO exeception while distibuting the request: " + ex.getMessage());
+                LOGGER.log(Level.INFO, "IO exeception while distibuting the request: {0}", ex.getMessage());
             }
         }
         

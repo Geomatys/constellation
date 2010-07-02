@@ -835,7 +835,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     private Classe getPrimitiveTypeFromName(String className) throws MD_IOException {
         
-        if (className.equals("String") || className.equals("SimpleInternationalString") || className.equals("BaseUnit")) {
+        if (className.equals("String") || className.equals("SimpleInternationalString") || className.equals("DefaultInternationalString") || className.equals("BaseUnit")) {
             return mdWriter.getClasse("CharacterString", Standard.ISO_19103);
         } else if (className.equalsIgnoreCase("Date")) {
             return mdWriter.getClasse(className, Standard.ISO_19103);
@@ -898,7 +898,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 final int result      = mdWriter.writeForm(form, false, true);
                 writeTime             = System.currentTimeMillis() - startWrite;
                 if (result == 1) {
-                    LOGGER.log(logLevel, "The record have been skipped:" + form.getTitle());
+                    LOGGER.log(logLevel, "The record have been skipped:{0}", form.getTitle());
                     return false;
                 }
 
