@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 // constellation dependecies
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
@@ -292,13 +293,13 @@ public abstract class GenericReader  {
                     staticValues.addToValue(var, staticValue);
                 } else {
                     unboundedVariable.add(var);
-                    LOGGER.warning("no statement found for variable: " + var);
+                    LOGGER.log(Level.WARNING, "no statement found for variable: {0}", var);
                 }
                 
             }
         }
         // if there is only static parameters
-        if (subStmts.size() == 0) {
+        if (subStmts.isEmpty()) {
             return staticValues;
         }
         final Values values;
@@ -401,7 +402,7 @@ public abstract class GenericReader  {
                     final int id = Integer.parseInt(parameter);
                     stmt.setInt(i, id);
                 } catch(NumberFormatException ex) {
-                    LOGGER.severe("unable to parse the int parameter:" + parameter);
+                    LOGGER.log(Level.SEVERE, "unable to parse the int parameter:{0}", parameter);
                 }
             } else  {
                 stmt.setString(i, parameter);
@@ -485,7 +486,7 @@ public abstract class GenericReader  {
                isReconnecting  = false;
 
             } catch(SQLException ex) {
-                LOGGER.severe("SQLException while restarting the connection:" + ex);
+                LOGGER.log(Level.WARNING, "SQLException while restarting the connection.", ex);
                 isReconnecting = false;
             }
         }
@@ -507,6 +508,7 @@ public abstract class GenericReader  {
                 stmt.close();
             }
             statements.clear();
+            connection.close();
 
         } catch (SQLException ex) {
             LOGGER.severe("SQLException while destroying Generic metadata reader");

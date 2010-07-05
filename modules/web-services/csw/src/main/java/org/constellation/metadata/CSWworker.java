@@ -277,7 +277,7 @@ public class CSWworker {
         if (configDir == null) {
             configDir    = getConfigDirectory();
             if (configDir == null) {
-                LOGGER.warning(notWorkingMsg + "\nCause: The configuration directory has not been found");
+                LOGGER.log(Level.WARNING, "{0}\nCause: The configuration directory has not been found", notWorkingMsg);
                 isStarted = false;
                 return;
             }
@@ -290,7 +290,7 @@ public class CSWworker {
             final Unmarshaller configUnmarshaller = jb.createUnmarshaller();
             final File configFile                 = new File(configDir, serviceID + "config.xml");
             if (!configFile.exists()) {
-                 LOGGER.warning(notWorkingMsg + "\nCause: The configuration file has not been found");
+                 LOGGER.log(Level.WARNING, "{0}\nCause: The configuration file has not been found", notWorkingMsg);
                  isStarted = false;
             } else {
                 final Automatic configuration = (Automatic) configUnmarshaller.unmarshal(configFile);
@@ -318,8 +318,8 @@ public class CSWworker {
             LOGGER.warning(notWorkingMsg + "\nCause:" + e.getMessage());
             isStarted = false;
         } catch (IllegalArgumentException e) {
-            LOGGER.warning(notWorkingMsg + "\nCause: IllegalArgumentException: " + e.getMessage());
-            LOGGER.log(Level.FINER, null, e);
+            LOGGER.warning(notWorkingMsg + "\nCause: IllegalArgumentException: " + e.getLocalizedMessage());
+            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
             isStarted = false;
         }
     }
@@ -356,8 +356,8 @@ public class CSWworker {
             LOGGER.warning(notWorkingMsg + "\nCause:" + e.getMessage());
             isStarted = false;
         } catch (IllegalArgumentException e) {
-            LOGGER.warning(notWorkingMsg + "\nCause: IllegalArgumentException: " + e.getMessage());
-            LOGGER.log(Level.FINER, null, e);
+            LOGGER.warning(notWorkingMsg + "\nCause: IllegalArgumentException: " + e.getLocalizedMessage());
+            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
             isStarted = false;
         }
     }
@@ -392,6 +392,8 @@ public class CSWworker {
             mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer);
             catalogueHarvester        = new CatalogueHarvester(marshallerPool, mdWriter);
             harvestTaskSchreduler     = new HarvestTaskSchreduler(marshallerPool, configDir, catalogueHarvester);
+        } else {
+            indexer.destroy();
         }
     }
     

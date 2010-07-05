@@ -514,7 +514,7 @@ public class CSWService extends OGCWebService {
         final Map<String, String> namespaces = extractNamespace(namespace);
         
         //if there is not namespace specified, using the default namespace
-        if (namespaces.size() == 0) {
+        if (namespaces.isEmpty()) {
             namespaces.put("csw", Namespaces.CSW_202);
             namespaces.put("gmd", Namespaces.GMD);
         }
@@ -755,7 +755,7 @@ public class CSWService extends OGCWebService {
         
         //if there is not namespace specified, using the default namespace
         // TODO add gmd...
-        if (namespaces.size() == 0) {
+        if (namespaces.isEmpty()) {
             namespaces.put("csw", Namespaces.CSW_202);
             namespaces.put("gmd", Namespaces.GMD);
         }
@@ -855,5 +855,6 @@ public class CSWService extends OGCWebService {
         for (final CSWworker worker : workers.values()) {
             worker.destroy();
         }
+        workers.clear();
     }
 }

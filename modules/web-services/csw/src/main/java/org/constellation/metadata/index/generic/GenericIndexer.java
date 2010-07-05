@@ -147,7 +147,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             // TODO getting the objects list and index avery item in the IndexWriter.
             final List<String> ids = reader.getAllIdentifiers();
             nbEntries = ids.size();
-            LOGGER.info( nbEntries + " metadata to index (light memory mode)");
+            LOGGER.log( Level.INFO, "{0} metadata to index (light memory mode)", nbEntries);
             for (String id : ids) {
                 if (!stopIndexing && !indexationToStop.contains(serviceID)) {
                     final Object entry = reader.getMetadata(id, AbstractMetadataReader.ISO_19115, null);
@@ -199,8 +199,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             writer.close();
 
         } catch (IOException ex) {
-            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            LOGGER.log(Level.WARNING, IO_SINGLE_MSG, ex);
         }
         LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
                 " documents indexed: " + nbEntries);
@@ -213,7 +212,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         if (indexationToStop.contains(serviceID)) {
             indexationToStop.remove(serviceID);
         }
-        if (indexationToStop.size() == 0) {
+        if (indexationToStop.isEmpty()) {
             stopIndexing = false;
         }
     }
@@ -297,9 +296,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                 }
 
             } catch (InterruptedException ex) {
-               LOGGER.severe("InterruptedException in parralele create document:" + '\n' + ex.getMessage());
+               LOGGER.log(Level.WARNING, "InterruptedException in parralele create document:\n{0}", ex.getMessage());
             } catch (ExecutionException ex) {
-               LOGGER.severe("ExecutionException in parralele create document:" + '\n' + ex.getMessage());
+               LOGGER.log(Level.WARNING, "ExecutionException in parralele create document:\n{0}", ex.getMessage());
             }
         }
     }
@@ -338,7 +337,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             if (obj != null) {
                 type = obj.getClass().getSimpleName();
             }
-            LOGGER.warning("unexpected metadata type: " + type);
+            LOGGER.log(Level.WARNING, "unexpected metadata type: {0}", type);
             identifier = "unknow";
         }
         return identifier;
@@ -624,7 +623,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             try {
                 ordinal = Integer.parseInt(tmp);
             } catch (NumberFormatException ex) {
-                LOGGER.severe("Unable to parse the ordinal " + tmp);
+                LOGGER.log(Level.WARNING, "Unable to parse the ordinal {0}", tmp);
             }
         }
         if (object != null) {
@@ -665,8 +664,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
 
     @Override
     public void destroy() {
-        if (reader != null)
-            reader.destroy();
+        LOGGER.info("shutting down generic indexer");
         pool.shutdown();
     }
 
