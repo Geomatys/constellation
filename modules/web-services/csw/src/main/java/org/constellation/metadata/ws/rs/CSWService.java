@@ -18,6 +18,8 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
+import java.io.IOException;
+import org.apache.xml.serialize.XMLSerializer;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,6 +101,8 @@ public class CSWService extends OGCWebService {
     protected Map<String, CSWworker> workers;
 
     private final String serviceID;
+
+    private final XMLSerializer serializer;
     
     /**
      * Build a new Restfull CSW service.
@@ -125,6 +129,7 @@ public class CSWService extends OGCWebService {
         if (setClassesContext()) {
             this.workers = workers;
         }
+        this.serializer = getXMLSerializer();
     }
 
     /**
@@ -139,9 +144,9 @@ public class CSWService extends OGCWebService {
             this.workers = new HashMap<String, CSWworker>();
             workers.put(serviceID, worker);
         }
-
-        
+         this.serializer = getXMLSerializer();
     }
+
 
     private boolean setClassesContext() {
         try {
@@ -160,6 +165,15 @@ public class CSWService extends OGCWebService {
         return false;
     }
 
+    /**
+     * This method has to be overriden by child classes.
+     * 
+     * @return
+     */
+    protected XMLSerializer getXMLSerializer() {
+        return null;
+    }
+
      /**
      * Treat the incomming request and call the right function.
      * 
@@ -167,7 +181,7 @@ public class CSWService extends OGCWebService {
      *        this object contain the request. Else for a GET or a POST kvp
      *        request this param is {@code null}
      * 
-     * @return an image or xml response.
+     * @return an xml response.
      * @throw JAXBException
      */
     @Override
@@ -176,6 +190,17 @@ public class CSWService extends OGCWebService {
         return treatIncomingRequest(objectRequest, worker);
     }
 
+    /**
+     * Treat the incomming request and call the right function.
+     *
+     * @param objectRequest if the server receive a POST request in XML,
+     *        this object contain the request. Else for a GET or a POST kvp
+     *        request this param is {@code null}
+     * @param The worker to call.
+      * 
+     * @return an xml response.
+     * @throw JAXBException
+     */
     protected Response treatIncomingRequest(Object objectRequest, CSWworker worker) throws JAXBException {
         Catching.Marshaller marshaller    = null;
         ServiceDef serviceDef           = null;
@@ -233,7 +258,13 @@ public class CSWService extends OGCWebService {
                     }
                     serviceDef = getVersionFromNumber(gr.getVersion());
                     final StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.getRecords(gr), sw);
+                    if (serializer != null) {
+                        // marshal using the Apache XMLSerializer
+                        serializer.setOutputCharStream(sw);
+                        marshaller.marshal(worker.getRecords(gr), serializer.asContentHandler());
+                    } else {
+                        marshaller.marshal(worker.getRecords(gr), sw);
+                    }
 
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
 
@@ -252,7 +283,14 @@ public class CSWService extends OGCWebService {
                     }
                     serviceDef = getVersionFromNumber(grbi.getVersion());
                     final StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.getRecordById(grbi), sw);
+
+                    if (serializer != null) {
+                        // marshal using the Apache XMLSerializer
+                        serializer.setOutputCharStream(sw);
+                        marshaller.marshal(worker.getRecordById(grbi), serializer.asContentHandler());
+                    } else {
+                        marshaller.marshal(worker.getRecordById(grbi), sw);
+                    }
 
                     return Response.ok(sw.toString(), worker.getOutputFormat()).build();
 
@@ -348,6 +386,9 @@ public class CSWService extends OGCWebService {
 
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, serviceDef);
+
+        } catch (IOException ex) {
+            return processExceptionResponse(new CstlServiceException("IO exception while using  the XML serializer:" + ex.getLocalizedMessage()), serviceDef);
 
         } finally {
             if (marshaller != null) {

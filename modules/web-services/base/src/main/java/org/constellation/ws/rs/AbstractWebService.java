@@ -96,8 +96,8 @@ public abstract class AbstractWebService extends WebService {
      * @throws JAXBException
      */
     protected synchronized void setXMLContext(final String packagesName, final String rootNamespace, final String schemaLocation, final String exceptionSchemaLocation) throws JAXBException {
-        LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + '\n' +
-                    " packages: " + packagesName);
+        LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() +
+                "\n packages: " + packagesName);
         this.exceptionSchemaLocation = exceptionSchemaLocation;
         this.schemaLocation = schemaLocation;
         try{

@@ -90,9 +90,13 @@
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-temporal</artifactId>
     </dependency>
-<dependency>
+    <dependency>
       <groupId>org.geotoolkit.pending</groupId>
       <artifactId>geotk-clients-core</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
     </dependency>
   </dependencies>
 
