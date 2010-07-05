@@ -52,7 +52,6 @@ public class CstlXMLSerializer extends XMLSerializer {
         } else {
             currentPath = currentPath + '/' + namespaceURI + ':' + localName;
         }
-        System.out.println("path:" + currentPath);
         boolean preserveSpace;
         ElementState state;
         String name;
