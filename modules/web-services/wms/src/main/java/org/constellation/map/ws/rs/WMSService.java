@@ -80,7 +80,7 @@ import org.geotoolkit.xml.MarshallerPool;
 
 //Geoapi dependencies
 import org.opengis.geometry.Envelope;
-import org.opengis.referencing.FactoryException;
+import org.opengis.util.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;

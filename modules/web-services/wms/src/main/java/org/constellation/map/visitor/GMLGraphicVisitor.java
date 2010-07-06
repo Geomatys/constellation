@@ -45,7 +45,7 @@ import org.geotoolkit.util.MeasurementRange;
 import org.opengis.feature.type.Name;
 
 import org.opengis.geometry.Envelope;
-import org.opengis.referencing.FactoryException;
+import org.opengis.util.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 

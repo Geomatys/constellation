@@ -67,7 +67,7 @@ import static org.geotoolkit.lucene.filter.LuceneOGCFilter.*;
 
 // GeoAPI dependencies
 import org.opengis.filter.FilterFactory2;
-import org.opengis.referencing.FactoryException;
+import org.opengis.util.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 // JTS dependencies

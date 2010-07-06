@@ -32,7 +32,7 @@ import javax.measure.quantity.Duration;
 import javax.measure.converter.UnitConverter;
 
 import org.opengis.util.CodeList;
-import org.opengis.referencing.FactoryException;
+import org.opengis.util.FactoryException;
 import org.opengis.referencing.cs.AxisDirection;
 import org.opengis.metadata.spatial.PixelOrientation;
 import org.geotoolkit.metadata.iso.spatial.PixelTranslation;

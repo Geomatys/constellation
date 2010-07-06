@@ -119,7 +119,7 @@ import org.geotoolkit.feature.DefaultName;
 import org.opengis.geometry.Envelope;
 import org.opengis.feature.type.Name;
 import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.opengis.referencing.FactoryException;
+import org.opengis.util.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.cs.CoordinateSystemAxis;
 import org.opengis.referencing.operation.TransformException;

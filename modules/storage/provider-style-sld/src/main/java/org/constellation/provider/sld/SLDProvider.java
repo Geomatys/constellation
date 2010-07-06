@@ -44,7 +44,7 @@ import org.geotoolkit.style.MutableFeatureTypeStyle;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.collection.Cache;
 import org.geotoolkit.style.MutableStyleFactory;
-import org.opengis.referencing.FactoryException;
+import org.opengis.util.FactoryException;
 
 /**
  * Style provider. index and cache MutableStyle whithin the given folder.
