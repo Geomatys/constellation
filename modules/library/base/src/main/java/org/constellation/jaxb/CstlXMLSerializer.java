@@ -56,13 +56,12 @@ public class CstlXMLSerializer extends XMLSerializer {
         ElementState state;
         String name;
         String value;
-        boolean addNSAttr = false;
 
         LOGGER.finer("==>startElement(" + namespaceURI + "," + localName + "," + rawName + ")");
 
         try {
             if (_printer == null) {
-                String msg = DOMMessageFormatter.formatMessage(DOMMessageFormatter.SERIALIZER_DOMAIN, "NoWriterSupplied", null);
+                final String msg = DOMMessageFormatter.formatMessage(DOMMessageFormatter.SERIALIZER_DOMAIN, "NoWriterSupplied", null);
                 throw new IllegalStateException(msg);
             }
 
@@ -105,12 +104,11 @@ public class CstlXMLSerializer extends XMLSerializer {
             // This only happens in endElement().
             if (rawName == null || rawName.length() == 0) {
                 if (localName == null) {
-                    String msg = DOMMessageFormatter.formatMessage(DOMMessageFormatter.SERIALIZER_DOMAIN, "NoName", null);
+                    final String msg = DOMMessageFormatter.formatMessage(DOMMessageFormatter.SERIALIZER_DOMAIN, "NoName", null);
                     throw new SAXException(msg);
                 }
                 if (namespaceURI != null && !namespaceURI.equals("")) {
-                    String prefix;
-                    prefix = getPrefix(namespaceURI);
+                    String prefix = getPrefix(namespaceURI);
                     if (prefix != null && prefix.length() > 0) {
                         rawName = prefix + ":" + localName;
                     } else {
@@ -119,7 +117,6 @@ public class CstlXMLSerializer extends XMLSerializer {
                 } else {
                     rawName = localName;
                 }
-                addNSAttr = true;
             }
 
             _printer.printText('<');
@@ -208,8 +205,8 @@ public class CstlXMLSerializer extends XMLSerializer {
 
 
 
-    /** Retrieve and remove the namespaces declarations from the list of attributes.
-     *
+    /**
+     * Retrieve and remove the namespaces declarations from the list of attributes.
      */
     private Attributes extractNamespaces(Attributes attrs) throws SAXException {
         AttributesImpl attrsOnly;

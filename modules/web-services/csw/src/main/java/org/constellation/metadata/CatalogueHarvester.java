@@ -276,7 +276,7 @@ public class CatalogueHarvester {
         
         //we request all the records for the best outputSchema supported
         
-            LOGGER.info("harvesting with outputSchema: " + bestDistantOuputSchema);
+            LOGGER.log(Level.INFO, "harvesting with outputSchema: {0}", bestDistantOuputSchema);
             startPosition    = 1;
             
             if (!specialCase1)
@@ -299,7 +299,7 @@ public class CatalogueHarvester {
                 // if the service respond correctly    
                 } else if (harvested instanceof GetRecordsResponseType) {
                     succeed = true;
-                    LOGGER.info("Response of distant service:\n" + harvested.toString());
+                    LOGGER.log(Level.INFO, "Response of distant service:\n{0}", harvested.toString());
                     final GetRecordsResponseType serviceResponse = (GetRecordsResponseType) harvested;
                     final SearchResultsType results              = serviceResponse.getSearchResults();
             
@@ -323,7 +323,7 @@ public class CatalogueHarvester {
                         if (otherRecord instanceof JAXBElement)
                             otherRecord = ((JAXBElement)otherRecord).getValue();
                         
-                        LOGGER.info("other Record Type: " + otherRecord.getClass().getSimpleName());
+                        LOGGER.log(Level.INFO, "other Record Type: {0}", otherRecord.getClass().getSimpleName());
                         
                         //Temporary ugly patch TODO handle update in CSW
                         try {
@@ -340,14 +340,14 @@ public class CatalogueHarvester {
                     moreResults = results.getNumberOfRecordsReturned() != 0;
                     if (moreResults) {
                         startPosition = startPosition + results.getAbstractRecord().size() + results.getAny().size();
-                        LOGGER.info("startPosition=" + startPosition);
+                        LOGGER.log(Level.INFO, "startPosition={0}", startPosition);
                         getRecordRequest.setStartPosition(startPosition);
                     } 
                     
                 // a correct response v2.0.0
                 } else if (harvested instanceof org.geotoolkit.csw.xml.v200.GetRecordsResponseType) {
                     succeed = true;
-                    LOGGER.info("Response of distant service:\n" + harvested.toString());
+                    LOGGER.log(Level.INFO, "Response of distant service:\n{0}", harvested.toString());
                     final org.geotoolkit.csw.xml.v200.GetRecordsResponseType serviceResponse = (org.geotoolkit.csw.xml.v200.GetRecordsResponseType) harvested;
                     final org.geotoolkit.csw.xml.v200.SearchResultsType results              = serviceResponse.getSearchResults();
             
@@ -386,7 +386,7 @@ public class CatalogueHarvester {
                     moreResults = (results.getAbstractRecord().size() + results.getAny().size()) != 0;
                     if (moreResults) {
                         startPosition = startPosition +  results.getAbstractRecord().size() + results.getAny().size();
-                        LOGGER.info("startPosition=" + startPosition);
+                        LOGGER.log(Level.INFO, "startPosition={0}", startPosition);
                         getRecordRequest.setStartPosition(startPosition);
                     }
                      
@@ -403,7 +403,7 @@ public class CatalogueHarvester {
                     }
                     final CstlServiceException exe = new CstlServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
                                                                       NO_APPLICABLE_CODE);
-                    LOGGER.severe("The distant service has throw a webService exception: \n" + exe.toString());
+                    LOGGER.log(Level.WARNING, "The distant service has throw a webService exception: \n{0}", exe.toString());
                     distantException.add(exe);
                     moreResults = false;
                 
@@ -577,8 +577,8 @@ public class CatalogueHarvester {
                 final String defaultValue = typeNameDomain.getDefaultValue();
                 if (defaultValue != null && !defaultValue.isEmpty()) {
                     typeNames.add(defaultValue);
-                    String prefix             = defaultValue.substring(0, defaultValue.indexOf(':'));
-                    String localPart          = defaultValue.substring(defaultValue.indexOf(':') + 1, defaultValue.length());
+                    final String prefix       = defaultValue.substring(0, defaultValue.indexOf(':'));
+                    final String localPart    = defaultValue.substring(defaultValue.indexOf(':') + 1, defaultValue.length());
                     final String namespaceURI = getNamespaceURIFromprefix(prefix, distantVersion);
                     typeNamesQname.add(new QName(namespaceURI, localPart, prefix));
                     defaultTypeName = true;
@@ -886,9 +886,9 @@ public class CatalogueHarvester {
                 }
 
             } catch (MalformedURLException ex) {
-                LOGGER.severe(serverURL + " is a malformed URL. unable to request that service");
+                LOGGER.log(Level.WARNING, "{0} is a malformed URL. unable to request that service", serverURL);
             } catch (CstlServiceException ex) {
-                LOGGER.severe(ex.getMessage());
+                LOGGER.warning(ex.getMessage());
             } catch (IOException ex) {
                 LOGGER.log(Level.INFO, "IO exeception while distibuting the request: {0}", ex.getMessage());
             }
@@ -939,7 +939,7 @@ public class CatalogueHarvester {
                             INVALID_PARAMETER_VALUE, "Source");
                 }
 
-                LOGGER.info("Object Type of the harvested Resource: " + harvested.getClass().getName());
+                LOGGER.log(Level.INFO, "Object Type of the harvested Resource: {0}", harvested.getClass().getName());
 
                 // ugly patch TODO handle update in mdweb
                 try {

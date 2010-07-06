@@ -263,7 +263,6 @@ public final class WCSWorker extends AbstractWorker {
             } catch (DataStoreException ex) {
                 throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE);
             }
-            final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
             final LonLatEnvelopeType llenvelope;
             if (inputGeoBox != null) {
                 final SortedSet<Number> elevations;
@@ -272,20 +271,7 @@ public final class WCSWorker extends AbstractWorker {
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                 }
-                final List<Double> pos1 = new ArrayList<Double>();
-                pos1.add(inputGeoBox.getWestBoundLongitude());
-                pos1.add(inputGeoBox.getSouthBoundLatitude());
-                final List<Double> pos2 = new ArrayList<Double>();
-                pos2.add(inputGeoBox.getEastBoundLongitude());
-                pos2.add(inputGeoBox.getNorthBoundLatitude());
-                if (elevations != null && elevations.size() >= 2) {
-                    pos1.add(elevations.first().doubleValue());
-                    pos2.add(elevations.last().doubleValue());
-                }
-                final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
-                pos.add(new DirectPositionType(pos1));
-                pos.add(new DirectPositionType(pos2));
-                llenvelope = new LonLatEnvelopeType(pos, srsName);
+                llenvelope = createEnvelope("urn:ogc:def:crs:OGC:1.3:CRS84", inputGeoBox, elevations);
             } else {
                 throw new CstlServiceException("The geographic bbox for the layer is null !",
                         NO_APPLICABLE_CODE);
@@ -352,6 +338,23 @@ public final class WCSWorker extends AbstractWorker {
         return new CoverageDescription(coverageOfferings, ServiceDef.WCS_1_0_0.version.toString());
     }
 
+    private LonLatEnvelopeType createEnvelope(String srsName, GeographicBoundingBox inputGeoBox, SortedSet<Number> elevations) {
+         final List<Double> pos1 = new ArrayList<Double>();
+        pos1.add(inputGeoBox.getWestBoundLongitude());
+        pos1.add(inputGeoBox.getSouthBoundLatitude());
+        final List<Double> pos2 = new ArrayList<Double>();
+        pos2.add(inputGeoBox.getEastBoundLongitude());
+        pos2.add(inputGeoBox.getNorthBoundLatitude());
+        if (elevations != null && elevations.size() >= 2) {
+            pos1.add(elevations.first().doubleValue());
+            pos2.add(elevations.last().doubleValue());
+        }
+        final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
+        pos.add(new DirectPositionType(pos1));
+        pos.add(new DirectPositionType(pos2));
+        return new LonLatEnvelopeType(pos, srsName);
+    }
+    
     /**
      * Returns the description of the coverage requested in version 1.1.1 of WCS standard.
      *
@@ -635,24 +638,9 @@ public final class WCSWorker extends AbstractWorker {
                     // in the capabilities response.
                     continue;
                 }
-                final String srsName = "urn:ogc:def:crs:OGC:1.3:CRS84";
+                
+                final LonLatEnvelopeType outputBBox = createEnvelope("urn:ogc:def:crs:OGC:1.3:CRS84", inputGeoBox, layer.getAvailableElevations());
 
-                final SortedSet<Number> elevations = layer.getAvailableElevations();
-                final List<Double> pos1 = new ArrayList<Double>();
-                pos1.add(inputGeoBox.getWestBoundLongitude());
-                pos1.add(inputGeoBox.getSouthBoundLatitude());
-                final List<Double> pos2 = new ArrayList<Double>();
-                pos2.add(inputGeoBox.getEastBoundLongitude());
-                pos2.add(inputGeoBox.getNorthBoundLatitude());
-
-                if (elevations != null && elevations.size() >= 2) {
-                    pos1.add(elevations.first().doubleValue());
-                    pos2.add(elevations.last().doubleValue());
-                }
-                final List<DirectPositionType> pos = new ArrayList<DirectPositionType>();
-                pos.add(new DirectPositionType(pos1));
-                pos.add(new DirectPositionType(pos2));
-                final LonLatEnvelopeType outputBBox = new LonLatEnvelopeType(pos, srsName);
                 final SortedSet<Date> dates = layer.getAvailableTimes();
                 if (dates != null && dates.size() >= 2) {
                     /*
@@ -837,9 +825,9 @@ public final class WCSWorker extends AbstractWorker {
 
         // we verify the interpolation method even if we don't use it
         if (request instanceof GetCoverageType) {
-            String interpolationSt = ((GetCoverageType)request).getInterpolationMethod();
+            final String interpolationSt = ((GetCoverageType)request).getInterpolationMethod();
             if (interpolationSt != null) {
-                InterpolationMethod interpolation = InterpolationMethod.fromValue(interpolationSt);
+                final InterpolationMethod interpolation = InterpolationMethod.fromValue(interpolationSt);
                 if (interpolation == null || !SUPPORTED_INTERPOLATIONS_V100.contains(interpolation)) {
                     throw new CstlServiceException("Unsupported interpolation: " + interpolationSt, INVALID_PARAMETER_VALUE, KEY_INTERPOLATION.toLowerCase());
                 }
