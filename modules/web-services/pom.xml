@@ -94,6 +94,12 @@
       </modules>
     </profile>
     <profile>
+      <id>wmts</id>
+      <modules>
+        <module>wmts</module>
+      </modules>
+    </profile>
+    <profile>
       <id>wcs</id>
       <modules>
         <module>wcs</module>

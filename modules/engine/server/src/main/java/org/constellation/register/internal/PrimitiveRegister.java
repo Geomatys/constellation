@@ -57,7 +57,8 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
         //  this should be extended to handle user permissions
         if (serviceDef == ServiceDef.WMS_1_1_1     || serviceDef == ServiceDef.WMS_1_3_0     ||
             serviceDef == ServiceDef.WMS_1_1_1_SLD || serviceDef == ServiceDef.WMS_1_3_0_SLD ||
-            serviceDef == ServiceDef.WCS_1_0_0     || serviceDef == ServiceDef.WCS_1_1_1) {
+            serviceDef == ServiceDef.WCS_1_0_0     || serviceDef == ServiceDef.WCS_1_1_1     ||
+            serviceDef == ServiceDef.WMTS_1_0_0) {
 
             return true;
         }
@@ -115,18 +116,6 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
             layerRefs.add(layerRef);
         }
 
-        /* TODO merge this two part in one
-        final Set<Name> completelayerNames = NamedLayerProviderProxy.getInstance().getKeys();
-        for (Name layerName : completelayerNames) {
-            final LayerDetails layerRef = NamedLayerProviderProxy.getInstance().get(layerName);
-
-            if (null == layerRef) {
-                throw new RegisterException("Unknown layer " + layerName);
-            }
-
-            layerRefs.add(layerRef);
-        }*/
-
         return layerRefs;
 
     }
@@ -139,19 +128,8 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
                     serviceDef.specification.name());
 
             if (null == layerRef) {
-
-                /*// we try with named Layer
-                final Set<Name> completelayerNames = NamedLayerProviderProxy.getInstance().getKeys();
-                for (Name completelayerName : completelayerNames) {
-                    if (completelayerName.getLocalPart().equals(layerName)) {
-                        layerRef = NamedLayerProviderProxy.getInstance().get(completelayerName);
-                    }
-                }*/
-                if (null == layerRef) {
-                    throw new RegisterException("Unknown layer " + layerName);
-                }
+                throw new RegisterException("Unknown layer " + layerName);
             }
-
             layerRefs.add(layerRef);
         }
 
@@ -164,18 +142,8 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
                 serviceDef.specification.name());
 
         if (null == layerRef) {
-
-           /* final Set<Name> completelayerNames = NamedLayerProviderProxy.getInstance().getKeys();
-            for (Name completelayerName : completelayerNames) {
-                if (completelayerName.getLocalPart().equals(layerName)) {
-                    layerRef = NamedLayerProviderProxy.getInstance().get(completelayerName);
-                    return layerRef;
-                }
-            }*/
-            // we try with named layer
             throw new RegisterException("Unknown layer " + layerName);
         }
-
         return layerRef;
     }
 }

@@ -63,7 +63,7 @@ public class WMTSService {
      * Creates a WMTS SOAP service.
      */
     public WMTSService() {
-        worker = new WMTSWorker();
+        worker = new WMTSWorker(null);
     }
 
     /**

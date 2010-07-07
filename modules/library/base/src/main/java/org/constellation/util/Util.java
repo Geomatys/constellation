@@ -33,6 +33,8 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.geotoolkit.feature.DefaultName;
+import org.opengis.feature.type.Name;
 
 /**
  * Utility methods of general use.
@@ -142,5 +144,22 @@ public final class Util {
     public static InputStream getResourceAsStream(final String url) {
         final ClassLoader cl = getContextClassLoader();
         return cl.getResourceAsStream(url);
+    }
+
+    /**
+     * Parse a String to ionstanciate a named Layer (namespace : name).
+     * @param layerName
+     * @return
+     */
+    public static Name parseLayerName(String layerName) {
+        final Name name;
+        if (layerName != null && layerName.lastIndexOf(':') != -1) {
+            final String namespace = layerName.substring(0, layerName.lastIndexOf(':'));
+            final String localPart = layerName.substring(layerName.lastIndexOf(':') + 1);
+            name = new DefaultName(namespace, localPart);
+        } else {
+            name = new DefaultName(layerName);
+        }
+        return name;
     }
 }

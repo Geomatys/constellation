@@ -236,40 +236,44 @@ public abstract class OGCWebService extends AbstractWebService {
             p.put("update", "false");
         }
 
-       //we recup the capabilities file and unmarshall it
-       
-       //we look if we have already put it in cache
-       Object response = capabilities.get(fileName);
-       final boolean update  = p.getProperty("update").equals("true");
+        //we recup the capabilities file and unmarshall it
 
-       if (response == null || update) {
-           if (update) {
-               LOGGER.info("updating metadata");
-           }
+        //we look if we have already put it in cache
+        Object response = capabilities.get(fileName);
+        final boolean update = p.getProperty("update").equals("true");
 
-           final File f = getFile(fileName);
-           Unmarshaller unmarshaller = null;
-           try {
-               unmarshaller = getMarshallerPool().acquireUnmarshaller();
-               if (f == null || !f.exists()) {
-                   final InputStream in = getClass().getResourceAsStream(fileName);
-                   response = unmarshaller.unmarshal(in);
-                   in.close();
-               } else {
-                   response = unmarshaller.unmarshal(f);
-               }
-           } catch (IOException ex) {
-               LOGGER.info("Unable to close the skeleton capabilities input stream.");
-           } finally {
-               if (unmarshaller != null) {
-                   getMarshallerPool().release(unmarshaller);
-               }
-           }
-           if (response != null) {
-               capabilities.put(fileName, response);
-               lastUpdateTime = System.currentTimeMillis();
-               p.put("update", "false");
-           }
+        if (response == null || update) {
+            if (update) {
+                LOGGER.info("updating metadata");
+            }
+
+            final File f = getFile(fileName);
+            Unmarshaller unmarshaller = null;
+            try {
+                unmarshaller = getMarshallerPool().acquireUnmarshaller();
+                if (f == null || !f.exists()) {
+                    final InputStream in = getClass().getResourceAsStream(fileName);
+                    if (in != null) {
+                        response = unmarshaller.unmarshal(in);
+                        in.close();
+                    } else {
+                        LOGGER.warning("Unable to find the skeleton capabilities file in the resource.");
+                    }
+                } else {
+                    response = unmarshaller.unmarshal(f);
+                }
+            } catch (IOException ex) {
+                LOGGER.warning("Unable to close the skeleton capabilities input stream.");
+            } finally {
+                if (unmarshaller != null) {
+                    getMarshallerPool().release(unmarshaller);
+                }
+            }
+            if (response != null) {
+                capabilities.put(fileName, response);
+                lastUpdateTime = System.currentTimeMillis();
+                p.put("update", "false");
+            }
 
            // if the flag file is present we store the properties
            if (changeFile != null && changeFile.exists()) {

@@ -17,6 +17,7 @@
  */
 package org.constellation.map.ws.rs;
 
+import org.constellation.util.Util;
 import java.util.ArrayList;
 import org.opengis.feature.type.Name;
 import com.sun.jersey.spi.resource.Singleton;
@@ -463,26 +464,9 @@ public class WMSService extends GridWebService {
     private List<Name> parseNamespaceLayerList(List<String> layerNames) {
         final List<Name> result = new ArrayList<Name>();
         for (String layerName : layerNames) {
-            result.add(parseName(layerName));
+            result.add(Util.parseLayerName(layerName));
         }
         return result;
-    }
-
-    /**
-     * Parse a String to ionstanciate a named Layer (namespace : name).
-     * @param layerName
-     * @return
-     */
-    private Name parseName(String layerName) {
-        final Name name;
-        if (layerName != null && layerName.lastIndexOf(':') != -1) {
-            final String namespace = layerName.substring(0, layerName.lastIndexOf(':'));
-            final String localPart = layerName.substring(layerName.lastIndexOf(':') + 1);
-            name = new DefaultName(namespace, localPart);
-        } else {
-            name = new DefaultName(layerName);
-        }
-        return name;
     }
 
     /**
@@ -493,7 +477,7 @@ public class WMSService extends GridWebService {
      * @throws CstlServiceException
      */
     private GetLegendGraphic adaptGetLegendGraphic() throws CstlServiceException {
-        final Name strLayer  = parseName(getParameter(KEY_LAYER,  true));
+        final Name strLayer  = Util.parseLayerName(getParameter(KEY_LAYER,  true));
         final String strFormat = getParameter(KEY_FORMAT, true );
         final String strWidth  = getParameter(KEY_WIDTH,  false);
         final String strHeight = getParameter(KEY_HEIGHT, false);

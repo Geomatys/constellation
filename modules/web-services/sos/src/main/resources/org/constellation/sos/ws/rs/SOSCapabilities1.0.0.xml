@@ -14,19 +14,18 @@
 	</ows:ServiceIdentification>
 	<ows:ServiceProvider>
 		<ows:ProviderName>Geomatys</ows:ProviderName>
-		<ows:ProviderSite xlink:href="http://www.brgm.fr/"/>
+		<ows:ProviderSite xlink:href="http://www.geomatys.fr/"/>
 		<ows:ServiceContact>
-			<ows:IndividualName>????</ows:IndividualName>
-			<ows:PositionName>????</ows:PositionName>
+			<ows:IndividualName>Vincent Heurteaux</ows:IndividualName>
+			<ows:PositionName>PDG</ows:PositionName>
 			<ows:ContactInfo>
 				<ows:Phone>
-					<ows:Voice>??-??-??-??-??</ows:Voice>
-					<ows:Facsimile>??-??-??-??-??</ows:Facsimile>
+					<ows:Voice>04 67 54 87 30</ows:Voice>
 				</ows:Phone>
 				<ows:Address>
 					<ows:DeliveryPoint>Geomatys</ows:DeliveryPoint>
 					<ows:City>Arles</ows:City>
-					<ows:PostalCode>????</ows:PostalCode>
+					<ows:PostalCode>13200</ows:PostalCode>
 					<ows:Country>FRANCE</ows:Country>
 				</ows:Address>
 			</ows:ContactInfo>

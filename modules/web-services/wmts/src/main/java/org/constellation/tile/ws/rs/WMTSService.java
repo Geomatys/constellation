@@ -16,6 +16,7 @@
  */
 package org.constellation.tile.ws.rs;
 
+import org.geotoolkit.wmts.xml.v100.Capabilities;
 import com.sun.jersey.spi.resource.Singleton;
 import java.io.StringWriter;
 import java.math.BigInteger;
@@ -82,12 +83,12 @@ public class WMTSService extends GridWebService {
                           "org.geotoolkit.ows.xml.v110:"  +
                           "org.geotoolkit.gml.xml.v311",
                           "http://www.opengis.net/wmts");
-            worker = new WMTSWorker();
+            worker = new WMTSWorker(getMarshallerPool());
 
         } catch (JAXBException ex){
-            LOGGER.severe("The WMTS service is not running."       + '\n' +
-                          " cause  : Error creating XML context." + '\n' +
-                          " error  : " + ex.getMessage()          + '\n' +
+            LOGGER.severe("The WMTS service is not running.\n"      +
+                          " cause  : Error creating XML context.\n" +
+                          " error  : " + ex.getMessage()     + '\n' +
                           " details: " + ex.toString());
         }
     }
@@ -123,7 +124,8 @@ public class WMTSService extends GridWebService {
             if (objectRequest == null) {
                 request = getParameter(KEY_REQUEST, true);
             }
-
+            worker.setServiceURL(getServiceURL());
+            
             if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 GetCapabilities gc = (GetCapabilities) objectRequest;
 
@@ -135,6 +137,8 @@ public class WMTSService extends GridWebService {
                     gc = createNewGetCapabilitiesRequest();
                 }
                 serviceDef = getVersionFromNumber(gc.getVersion().toString());
+                worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
+                
                 final StringWriter sw = new StringWriter();
                 marshaller.marshal(worker.getCapabilities(gc), sw);
 
@@ -256,8 +260,8 @@ public class WMTSService extends GridWebService {
     private GetFeatureInfo createNewGetFeatureInfoRequest() throws CstlServiceException {
         final GetFeatureInfo gfi = new GetFeatureInfo();
         gfi.setGetTile(createNewGetTileRequest());
-        gfi.setI(new BigInteger(getParameter("I", true)));
-        gfi.setJ(new BigInteger(getParameter("J", true)));
+        gfi.setI(new Integer(getParameter("I", true)));
+        gfi.setJ(new Integer(getParameter("J", true)));
         gfi.setInfoFormat(getParameter("infoformat", true));
         gfi.setService(getParameter(KEY_SERVICE, true));
         gfi.setVersion(getParameter(KEY_VERSION, true));
@@ -277,8 +281,8 @@ public class WMTSService extends GridWebService {
         getTile.setLayer(getParameter("layer", true));
         getTile.setService(getParameter(KEY_SERVICE, true));
         getTile.setVersion(getParameter(KEY_VERSION, true));
-        getTile.setTileCol(new BigInteger(getParameter("TileCol", true)));
-        getTile.setTileRow(new BigInteger(getParameter("TileRow", true)));
+        getTile.setTileCol(new Integer(getParameter("TileCol", true)));
+        getTile.setTileRow(new Integer(getParameter("TileRow", true)));
         getTile.setTileMatrix(getParameter("TileMatrix", true));
         getTile.setTileMatrixSet(getParameter("TileMatrixSet", true));
         // Optionnal parameters
@@ -315,12 +319,12 @@ public class WMTSService extends GridWebService {
             throw new CstlServiceException("The parameter TILECOL must be specified",
                         MISSING_PARAMETER_VALUE);
         }
-        getTile.setTileCol(new BigInteger(tileCol));
+        getTile.setTileCol(new Integer(tileCol));
         if (tileRow == null) {
             throw new CstlServiceException("The parameter TILEROW must be specified",
                         MISSING_PARAMETER_VALUE);
         }
-        getTile.setTileRow(new BigInteger(tileRow));
+        getTile.setTileRow(new Integer(tileRow));
         if (tileMatrix == null) {
             throw new CstlServiceException("The parameter TILEMATRIX must be specified",
                         MISSING_PARAMETER_VALUE);

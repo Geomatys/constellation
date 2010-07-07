@@ -29,6 +29,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -612,7 +613,7 @@ public class CatalogueHarvester {
                 typeNamesQname.add(RECORD_QNAME);
             }
             //we update the request
-            request.setTypeNames(typeNamesQname);
+            request.setTypeNames(Arrays.asList(RECORD_QNAME));
             
         } else {
             report.append("No GetRecords operation find").append('\n');

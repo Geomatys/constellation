@@ -16,15 +16,84 @@
  */
 package org.constellation.tile.ws;
 
+import org.constellation.tile.visitor.GMLGraphicVisitor;
+import org.constellation.tile.visitor.HTMLGraphicVisitor;
+import org.constellation.tile.visitor.CSVGraphicVisitor;
+import org.constellation.tile.visitor.TextGraphicVisitor;
+import java.awt.Rectangle;
+import org.geotoolkit.geometry.jts.JTSEnvelope2D;
+import org.geotoolkit.display2d.service.VisitDef;
+import org.geotoolkit.display2d.service.ViewDef;
+import org.opengis.referencing.operation.TransformException;
+import org.opengis.geometry.Envelope;
+import org.geotoolkit.display2d.service.CanvasDef;
+import org.geotoolkit.map.MapContext;
+import org.constellation.portrayal.PortrayalUtil;
+import org.geotoolkit.display2d.service.SceneDef;
+import org.geotoolkit.display2d.GO2Utilities;
+import java.util.HashMap;
+import java.util.Map;
+import org.constellation.util.Util;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.Color;
+import java.awt.BasicStroke;
+import org.geotoolkit.display2d.ext.DefaultBackgroundTemplate;
+import org.geotoolkit.display2d.ext.legend.LegendTemplate;
+import org.geotoolkit.display2d.ext.legend.DefaultLegendTemplate;
+import org.geotoolkit.ows.xml.v110.CodeType;
+import java.math.BigInteger;
+import org.geotoolkit.ows.xml.v110.OnlineResourceType;
+import org.constellation.provider.CoverageLayerDetails;
+import org.constellation.provider.StyleProviderProxy;
+import org.geotoolkit.style.MutableStyle;
+import org.geotoolkit.wmts.xml.v100.Style;
+import org.geotoolkit.wmts.xml.v100.LegendURL;
+import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.ows.xml.v110.BoundingBoxType;
+import org.opengis.feature.type.Name;
+import org.geotoolkit.util.MeasurementRange;
+import javax.measure.unit.Unit;
+import java.util.Iterator;
+import org.constellation.util.PeriodUtilities;
+import java.util.TimeZone;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.util.logging.Level;
+import java.util.Date;
+import java.util.SortedSet;
+import org.geotoolkit.wmts.xml.v100.Dimension;
+import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.geotoolkit.wmts.xml.v100.LayerType;
+import java.util.ArrayList;
+import org.constellation.register.RegisterException;
+import org.constellation.Cstl;
+import org.constellation.ServiceDef;
+import org.constellation.provider.LayerDetails;
+import org.geotoolkit.ows.xml.v110.SectionsType;
+import org.geotoolkit.wmts.xml.v100.ContentsType;
+import org.geotoolkit.ows.xml.v110.OperationsMetadata;
+import org.geotoolkit.ows.xml.v110.ServiceProvider;
+import org.geotoolkit.ows.xml.v110.ServiceIdentification;
+import org.constellation.ws.MimeType;
+import java.util.Arrays;
+import java.util.List;
+import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
+import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import java.awt.image.BufferedImage;
-import java.util.logging.Logger;
+import org.constellation.ws.AbstractWorker;
+import org.geotoolkit.storage.DataStoreException;
 
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.rs.OGCWebService;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 import org.geotoolkit.wmts.xml.v100.GetTile;
+import org.geotoolkit.wmts.xml.v100.Themes;
+import org.geotoolkit.xml.MarshallerPool;
 
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * Working part of the WMTS service.
@@ -36,17 +105,51 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public class WMTSWorker extends AbstractWMTSWorker {
+public class WMTSWorker extends AbstractWorker implements AbstractWMTSWorker {
 
     /**
-     * The default logger.
+     * The current MIME type of return
      */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.tile.ws");
+    private String outputFormat;
+
+    /**
+     * The service url.
+     */
+    private String serviceURL;
+    
+    /**
+     * A capabilities object containing the static part of the document.
+     */
+    private Capabilities skeletonCapabilities;
+    
+    /**
+     * A list of supported MIME type
+     */
+    private static final List<String> ACCEPTED_OUTPUT_FORMATS;
+    static {
+        ACCEPTED_OUTPUT_FORMATS = Arrays.asList(MimeType.TEXT_XML,
+                                                MimeType.APP_XML,
+                                                MimeType.TEXT_PLAIN);
+    }
+
+    private static final LegendTemplate LEGEND_TEMPLATE = new DefaultLegendTemplate(
+                    new DefaultBackgroundTemplate(
+                        new BasicStroke(1),
+                        Color.LIGHT_GRAY,
+                        Color.WHITE,
+                        new Insets(4, 4, 4, 4),
+                        10),
+                        5,
+                        new java.awt.Dimension(30, 24),
+                        new Font("Arial", Font.PLAIN, 10),
+                        false,
+                        new Font("Arial", Font.BOLD, 12));
 
     /**
      * Instanciates the working class for a SOAP client, that do request on a SOAP PEP service.
      */
-    public WMTSWorker() {
+    public WMTSWorker(final MarshallerPool marshallerPool) {
+        super(marshallerPool);
         LOGGER.info("WMTS Service started");
     }
 
@@ -54,26 +157,503 @@ public class WMTSWorker extends AbstractWMTSWorker {
      * {@inheritDoc}
      */
     @Override
-    public Capabilities getCapabilities(GetCapabilities gc) throws CstlServiceException {
-        // TODO: implements GetCapabilities
-        throw new UnsupportedOperationException();
+    public Capabilities getCapabilities(GetCapabilities requestCapabilities) throws CstlServiceException {
+        LOGGER.log(logLevel, "getCapabilities request processing\n");
+        final long start = System.currentTimeMillis();
+
+        //we verify the base request attribute
+        if (requestCapabilities.getService() != null) {
+            if (!requestCapabilities.getService().equals("WMTS")) {
+                throw new CstlServiceException("service must be \"WMTS\"!",
+                                                 INVALID_PARAMETER_VALUE, "service");
+            }
+        } else {
+            throw new CstlServiceException("Service must be specified!",
+                                             MISSING_PARAMETER_VALUE, "service");
+        }
+        final AcceptVersionsType versions = requestCapabilities.getAcceptVersions();
+        if (versions != null) {
+            if (!versions.getVersion().contains("1.0.0")){
+                 throw new CstlServiceException("version available : 1.0.0",
+                                             VERSION_NEGOTIATION_FAILED, "acceptVersion");
+            }
+        }
+        final AcceptFormatsType formats = requestCapabilities.getAcceptFormats();
+        if (formats != null && formats.getOutputFormat().size() > 0 ) {
+            boolean found = false;
+            for (String form: formats.getOutputFormat()) {
+                if (ACCEPTED_OUTPUT_FORMATS.contains(form)) {
+                    outputFormat = form;
+                    found = true;
+                }
+            }
+            if (!found) {
+                throw new CstlServiceException("accepted format : text/xml, application/xml",
+                                                 INVALID_PARAMETER_VALUE, "acceptFormats");
+            }
+
+        } else {
+            this.outputFormat = MimeType.APP_XML;
+        }
+
+        //we prepare the response document
+        Capabilities c           = null;
+        ServiceIdentification si = null;
+        ServiceProvider       sp = null;
+        OperationsMetadata    om = null;
+        ContentsType        cont = null;
+        Themes            themes = null;
+
+        SectionsType sections = requestCapabilities.getSections();
+        if (sections == null) {
+            sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
+        }
+
+        if (skeletonCapabilities == null) {
+            throw new CstlServiceException("the service was unable to find the metadata for capabilities operation", NO_APPLICABLE_CODE);
+        }
+
+        //we enter the information for service identification.
+        if (sections.containsSection("ServiceIdentification") || sections.containsSection("All")) {
+
+            si = skeletonCapabilities.getServiceIdentification();
+        }
+
+        //we enter the information for service provider.
+        if (sections.containsSection("ServiceProvider") || sections.containsSection("All")) {
+
+            sp = skeletonCapabilities.getServiceProvider();
+        }
+
+        //we enter the operation Metadata
+        if (sections.containsSection("OperationsMetadata") || sections.containsSection("All")) {
+
+           om = skeletonCapabilities.getOperationsMetadata();
+
+           //we update the URL
+           OGCWebService.updateOWSURL(om.getOperation(), serviceURL, "WMTS");
+
+        }
+
+        if (sections.containsSection("Contents") || sections.containsSection("All")) {
+            
+            final List<LayerDetails> layerRefs = getAllLayerReferences();
+            //Build the list of layers
+            final List<LayerType> layers = new ArrayList<LayerType>();
+
+            for (LayerDetails layer : layerRefs){
+            if (!layer.isQueryable(ServiceDef.Query.WMTS_ALL)) {
+                continue;
+            }
+            /*
+             *  TODO
+             * code = CRS.lookupEpsgCode(inputLayer.getCoverageReference().getCoordinateReferenceSystem(), false);
+             */
+            final GeographicBoundingBox inputGeoBox;
+            try {
+                inputGeoBox = layer.getGeographicBoundingBox();
+            } catch (DataStoreException exception) {
+                throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
+            }
+
+            if (inputGeoBox == null) {
+                // The layer does not contain geometric information, we do not want this layer
+                // in the capabilities response.
+                continue;
+            }
+
+            // List of elevations, times and dim_range values.
+            final List<Dimension> dimensions = new ArrayList<Dimension>();
+
+            //the available date
+            String defaut = null;
+            Dimension dim;
+            SortedSet<Date> dates = null;
+            try {
+                dates = layer.getAvailableTimes();
+            } catch (DataStoreException ex) {
+                LOGGER.log(Level.INFO, "Error retrieving dates values for the layer :"+ layer.getName(), ex);
+                dates = null;
+            }
+            if (dates != null && !(dates.isEmpty())) {
+                final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                final PeriodUtilities periodFormatter = new PeriodUtilities(df);
+                defaut = df.format(dates.last());
+                dim = new Dimension("time", "ISO8601", defaut);
+                    
+                dim.setValue(periodFormatter.getDatesRespresentation(dates));
+                dimensions.add(dim);
+            }
+
+            //the available elevation
+            defaut = null;
+            SortedSet<Number> elevations = null;
+            try {
+                elevations = layer.getAvailableElevations();
+            } catch (DataStoreException ex) {
+                LOGGER.log(Level.INFO, "Error retrieving elevation values for the layer :"+ layer.getName(), ex);
+                elevations = null;
+            }
+            if (elevations != null && !(elevations.isEmpty())) {
+                defaut = elevations.first().toString();
+                dim = new Dimension("elevation", "EPSG:5030", defaut);
+                final StringBuilder elevs = new StringBuilder();
+                for (final Iterator<Number> it = elevations.iterator(); it.hasNext();) {
+                    final Number n = it.next();
+                    elevs.append(n.toString());
+                    if (it.hasNext()) {
+                        elevs.append(',');
+                    }
+                }
+                dim.setValue(elevs.toString());
+                dimensions.add(dim);
+            }
+
+            //the dimension range
+            defaut = null;
+            final MeasurementRange<?>[] ranges = layer.getSampleValueRanges();
+            /* If the layer has only one sample dimension, then we can apply the dim_range
+             * parameter. Otherwise it can be a multiple sample dimensions layer, and we
+             * don't apply the dim_range.
+             */
+            if (ranges != null && ranges.length == 1 && ranges[0] != null) {
+                final MeasurementRange<?> firstRange = ranges[0];
+                final double minRange = firstRange.getMinimum();
+                final double maxRange = firstRange.getMaximum();
+                defaut = minRange + "," + maxRange;
+                final Unit<?> u = firstRange.getUnits();
+                final String unit = (u != null) ? u.toString() : null;
+                dim = new Dimension("dim_range", unit, defaut, minRange + "," + maxRange);
+                dimensions.add(dim);
+            }
+
+            // LegendUrl generation
+            //TODO: Use a StringBuilder or two
+            final Name fullLayerName = layer.getName();
+            final String layerName;
+            if (fullLayerName.getNamespaceURI() != null) {
+                layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
+            } else {
+                layerName = fullLayerName.getLocalPart();
+            }
+            String url = null;
+            final String beginLegendUrl = url + "wms?REQUEST=GetLegendGraphic&" +
+                                                    "VERSION=1.1.1&" +
+                                                    "FORMAT=";
+            final String legendUrlGif = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;
+            final String legendUrlPng = beginLegendUrl + MimeType.IMAGE_PNG + "&LAYER=" + layerName;
+            final LayerType outputLayer;
+            
+                /*
+                 * TODO
+                 * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
+                 */
+                final BoundingBoxType outputBBox =
+                    new BoundingBoxType("EPSG:4326", inputGeoBox.getWestBoundLongitude(),
+                            inputGeoBox.getSouthBoundLatitude(), inputGeoBox.getEastBoundLongitude(),
+                            inputGeoBox.getNorthBoundLatitude());
+
+                // we build The Style part
+                OnlineResourceType or = new OnlineResourceType(legendUrlPng);
+                
+                final List<String> stylesName = layer.getFavoriteStyles();
+                final List<Style> styles = new ArrayList<Style>();
+                if (stylesName != null && !stylesName.isEmpty()) {
+                    // For each styles defined for the layer, get the dimension of the getLegendGraphic response.
+                    for (String styleName : stylesName) {
+                        final MutableStyle ms = StyleProviderProxy.getInstance().get(styleName);
+                        final java.awt.Dimension dimLegend;
+                        try {
+                            dimLegend = layer.getPreferredLegendSize(LEGEND_TEMPLATE, ms);
+                        } catch (PortrayalException ex) {
+                            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+                        }
+                        final LegendURL legendURL1 = new LegendURL(MimeType.IMAGE_PNG, or,
+                                BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height), 0.0, 0.0);
+
+                        or = new OnlineResourceType(legendUrlGif);
+                        final LegendURL legendURL2 = new LegendURL(MimeType.IMAGE_GIF, or,
+                                BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height), 0.0, 0.0);
+
+                        final Style style = new Style(new CodeType(styleName), Arrays.asList(legendURL1, legendURL2));
+                        styles.add(style);
+                    }
+                }
+
+                if (layer instanceof CoverageLayerDetails) {
+                    final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
+                    // TODO ?
+                    final String abstractt =  coverageLayer.getRemarks();
+                    // StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic()),
+
+                    outputLayer = new LayerType(layerName, abstractt, outputBBox, styles, dimensions);
+                } else {
+                    continue;
+                }
+
+                layers.add(outputLayer);
+            }
+            
+        
+            cont = new ContentsType();
+            cont.setLayers(layers);
+            
+        }
+        
+        if (sections.containsSection("Themes") || sections.containsSection("All")) {
+            // TODO
+            
+            themes = new Themes();
+        }
+
+        c = new Capabilities(si, sp, om, "1.0.0", null, cont, themes);
+
+        LOGGER.log(logLevel, "getCapabilities processed in " + (System.currentTimeMillis() - start) + "ms.\n");
+        return c;
+
+        
+    }
+
+    //TODO: handle the null value in the exception.
+    //TODO: harmonize with the method getLayerReference().
+    private static List<LayerDetails> getAllLayerReferences() throws CstlServiceException {
+
+        List<LayerDetails> layerRefs;
+        try { // WE catch the exception from either service version
+            layerRefs = Cstl.getRegister().getAllLayerReferences(ServiceDef.WMTS_1_0_0);
+
+        } catch (RegisterException regex) {
+            throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
+        }
+        return layerRefs;
+    }
+
+    //TODO: handle the null value in the exception.
+    //TODO: harmonize with the method getLayerReference().
+    public static LayerDetails getLayerReference(Name name) throws CstlServiceException {
+
+        LayerDetails layerRef;
+        try { // WE catch the exception from either service version
+            layerRef = Cstl.getRegister().getLayerReference(ServiceDef.WMTS_1_0_0, name);
+
+        } catch (RegisterException regex) {
+            throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
+        }
+        return layerRef;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public String getFeatureInfo(GetFeatureInfo gf) throws CstlServiceException {
-        // TODO: implements GetFeatureInfo
-        throw new UnsupportedOperationException();
+    public String getFeatureInfo(GetFeatureInfo request) throws CstlServiceException {
+        //
+    	// Note this is almost the same logic as in getMap
+    	//
+        // 1. SCENE
+        //       -- get the List of layer references
+        GetTile getTile = request.getGetTile();
+
+        final Name layerName = Util.parseLayerName(getTile.getLayer());
+        final LayerDetails layerRef = getLayerReference(layerName);
+
+        
+        if (!layerRef.isQueryable(ServiceDef.Query.WMS_GETINFO)) {
+            throw new CstlServiceException("You are not allowed to request the layer \""+
+                    layerRef.getName() +"\".", LAYER_NOT_QUERYABLE, "");
+        }
+        
+        //       -- build an equivalent style List
+        final String styleName = getTile.getStyle();
+
+        final MutableStyle style        = getStyle(layerRef, styleName);
+        //       -- create the rendering parameter Map
+        final Double elevation                 = null;// request.getElevation();
+        final Date time                        = null;// request.getTime();
+        final Map<String, Object> params       = new HashMap<String, Object>();
+        /*params.put(WMSQuery.KEY_ELEVATION, elevation);
+        params.put(WMSQuery.KEY_TIME, time);*/
+        final SceneDef sdef = new SceneDef();
+
+        try {
+            final MapContext context = PortrayalUtil.createContext(layerRef, style, params);
+            sdef.setContext(context);
+        } catch (PortrayalException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
+
+        // 2. VIEW
+        final JTSEnvelope2D refEnv             = null;//new JTSEnvelope2D(request.getEnvelope());
+        final double azimuth                   = 0;//request.getAzimuth();
+        final ViewDef vdef = new ViewDef(refEnv,azimuth);
+
+
+        // 3. CANVAS
+        final java.awt.Dimension canvasDimension = null;//request.getSize();
+        final Color background = null;
+        final CanvasDef cdef = new CanvasDef(canvasDimension,background);
+
+        // 4. SHAPE
+        //     a
+        final int pixelTolerance = 3;
+        final int i = request.getI();
+        final int j = request.getJ();
+        if (i < 0 || i > canvasDimension.width) {
+            throw new CstlServiceException("The requested point has an invalid X coordinate.", INVALID_POINT);
+        }
+        if (j < 0 || j > canvasDimension.height) {
+            throw new CstlServiceException("The requested point has an invalid Y coordinate.", INVALID_POINT);
+        }
+        final Rectangle selectionArea = new Rectangle( request.getI()-pixelTolerance,
+        		                               request.getJ()-pixelTolerance,
+        		                               pixelTolerance*2,
+        		                               pixelTolerance*2);
+
+        // 5. VISITOR
+        String infoFormat = request.getInfoFormat();
+        if (infoFormat == null) {
+            //Should not happen since the info format parameter is mandatory for the GetFeatureInfo request.
+            infoFormat = MimeType.TEXT_PLAIN;
+        }
+        final TextGraphicVisitor visitor;
+        if (infoFormat.equalsIgnoreCase(MimeType.TEXT_PLAIN)) {
+            // TEXT / PLAIN
+            visitor = new CSVGraphicVisitor(request);
+        } else if (infoFormat.equalsIgnoreCase(MimeType.TEXT_HTML)) {
+            // TEXT / HTML
+            visitor = new HTMLGraphicVisitor(request);
+        } else if (infoFormat.equalsIgnoreCase(MimeType.APP_GML) || infoFormat.equalsIgnoreCase(MimeType.TEXT_XML) ||
+                   infoFormat.equalsIgnoreCase(MimeType.APP_XML) || infoFormat.equalsIgnoreCase("xml") ||
+                   infoFormat.equalsIgnoreCase("gml"))
+        {
+            // GML
+            visitor = new GMLGraphicVisitor(request);
+        } else {
+            throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
+                    "You have to choose between: "+ MimeType.TEXT_PLAIN +", "+ MimeType.TEXT_HTML +", "+ MimeType.APP_GML +", "+ "gml" +
+                    ", "+ MimeType.APP_XML +", "+ "xml"+", "+ MimeType.TEXT_XML,
+                    INVALID_FORMAT, "infoFormat");
+        }
+
+        final VisitDef visitDef = new VisitDef();
+        visitDef.setArea(selectionArea);
+        visitDef.setVisitor(visitor);
+
+
+        // We now build the response, according to the format chosen.
+        try {
+        	Cstl.getPortrayalService().visit(sdef,vdef,cdef,visitDef);
+        } catch (PortrayalException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
+
+        return visitor.getResult();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public BufferedImage getTile(GetTile gt) throws CstlServiceException {
-        // TODO: implements GetTile
-        throw new UnsupportedOperationException();
+    public BufferedImage getTile(GetTile request) throws CstlServiceException {
+        
+        // 1. SCENE
+        //       -- get the layer reference
+        final Name layerName = Util.parseLayerName(request.getLayer());
+        LayerDetails layerRef;
+        try{
+            layerRef = getLayerReference(layerName);
+        } catch (CstlServiceException ex) {
+            throw new CstlServiceException(ex, LAYER_NOT_DEFINED, "layer");
+        }
+      
+        if (!layerRef.isQueryable(ServiceDef.Query.WMS_ALL)) {
+            throw new CstlServiceException("You are not allowed to request the layer \""+
+                    layerRef.getName() +"\".", LAYER_NOT_QUERYABLE, "layer");
+        }
+        
+        //       -- build an equivalent style List
+        //TODO: clean up the SLD vs. style logic
+        final String styleName    = request.getStyle();
+        final MutableStyle style  = getStyle(layerRef, styleName);
+
+        //       -- create the rendering parameter Map
+        final Map<String, Object> params       = new HashMap<String, Object>();
+        //params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
+        final SceneDef sdef = new SceneDef();
+        //sdef.extensions().add(WMSMapDecoration.getExtension());
+
+        try {
+            final MapContext context = PortrayalUtil.createContext(layerRef, style, params);
+            sdef.setContext(context);
+        } catch (PortrayalException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
+        
+
+        // 2. VIEW
+        final Double elevation =  null; // TODO request.getElevation();
+        final Date time        = null; // TODO request.getTime();
+        Envelope refEnv        = null; //request.getEnvelope();
+        try {
+            refEnv = GO2Utilities.combine(
+                    refEnv, new Date[]{time, time}, new Double[]{elevation, elevation});
+        } catch (TransformException ex) {
+            throw new CstlServiceException(ex);
+        }
+
+
+        final double azimuth = 0.0; //request.getAzimuth();
+        final ViewDef vdef = new ViewDef(refEnv,azimuth);
+
+
+        // 3. CANVAS
+        final java.awt.Dimension canvasDimension = null;// request.getSize();
+        final Color background = null;
+        final CanvasDef cdef = new CanvasDef(canvasDimension,background);
+
+        // 4. IMAGE
+        BufferedImage image;
+        try {
+            image = Cstl.getPortrayalService().portray(sdef, vdef, cdef);
+        } catch (PortrayalException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
+
+        return image;
+    }
+
+    /**
+     * Set the capabilities document.
+     *
+     * @param skeletonCapabilities An OWS 1.0.0 capabilities object.
+     */
+    @Override
+    public void setSkeletonCapabilities(final Capabilities skeletonCapabilities) {
+        this.skeletonCapabilities = skeletonCapabilities;
+    }
+
+    /**
+     * Set the current service URL
+     */
+    @Override
+    public void setServiceURL(final String serviceURL){
+        this.serviceURL = serviceURL;
+    }
+
+    private static MutableStyle getStyle(final LayerDetails layerRef, final String styleName) throws CstlServiceException {
+        final MutableStyle style;
+        if (styleName != null) {
+            //try to grab the style if provided
+            //a style has been given for this layer, try to use it
+            style = StyleProviderProxy.getInstance().get(styleName);
+            if (style == null) {
+                throw new CstlServiceException("Style provided not found.", STYLE_NOT_DEFINED);
+            }
+        } else {
+            //no defined styles, use the favorite one, let the layer get it himself.
+            style = null;
+        }
+        return style;
     }
 }

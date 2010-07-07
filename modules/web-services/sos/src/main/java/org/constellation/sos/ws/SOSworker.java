@@ -446,16 +446,16 @@ public class SOSworker {
                     msg = "no message";
                 }
             }
-            LOGGER.warning(notWorkingMsg + '\n' + "cause: JAXBException:" + msg);
+            LOGGER.warning(notWorkingMsg + "\ncause: JAXBException:" + msg);
             isStarted = false;
         } catch (FactoryNotFoundException ex) {
-            LOGGER.warning(notWorkingMsg + '\n' + "cause: Unable to find a SOS Factory");
+            LOGGER.warning(notWorkingMsg + "\ncause: Unable to find a SOS Factory");
             isStarted = false;
         } catch (MetadataIoException ex) {
-            LOGGER.warning(notWorkingMsg + '\n' + "cause: MetadataIOException wile initializing the sensor reader/writer:\n" + ex.getMessage());
+            LOGGER.warning(notWorkingMsg + "\ncause: MetadataIOException wile initializing the sensor reader/writer:\n" + ex.getMessage());
             isStarted = false;
         } catch (CstlServiceException ex) {
-            LOGGER.warning(notWorkingMsg + '\n' + "cause:" + ex.getMessage());
+            LOGGER.warning(notWorkingMsg + "\ncause:" + ex.getMessage());
             isStarted = false;
         }
     }
