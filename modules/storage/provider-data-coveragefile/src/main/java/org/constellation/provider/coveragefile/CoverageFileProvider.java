@@ -221,6 +221,8 @@ public class CoverageFileProvider extends AbstractLayerProvider{
                     String nmsp = source.parameters.get(KEY_NAMESPACE);
                     if (nmsp == null) {
                         nmsp = DEFAULT_NAMESPACE;
+                    } else if (nmsp.equals("no namespace")) {
+                        nmsp = null;
                     }
                     index.put(new DefaultName(nmsp,name), candidate);
                 }
