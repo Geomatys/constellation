@@ -137,17 +137,19 @@ class CoverageSQLLayerDetails implements CoverageLayerDetails {
 
 
         // DIM_RANGE extra parameter ///////////////////////////////////////////
-        final Map<String,?> extras = (Map<String, ?>) params.get(KEY_EXTRA_PARAMETERS);
-        if(extras != null){
-            for(String key : extras.keySet()){
-                if(key.equalsIgnoreCase("dim_range")){
-                    final String strDimRange = ((List)extras.get(key)).get(0).toString();
-                    final MeasurementRange dimRange = toMeasurementRange(strDimRange);
-                    if(dimRange != null){
-                        //a dim range is define, it replace any given style.
-                        final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
-                        style = STYLE_FACTORY.style(symbol);
-                        return MapBuilder.createCoverageLayer(reader, style, getName().getLocalPart());
+        if (params != null) {
+            final Map<String,?> extras = (Map<String, ?>) params.get(KEY_EXTRA_PARAMETERS);
+            if(extras != null){
+                for(String key : extras.keySet()){
+                    if(key.equalsIgnoreCase("dim_range")){
+                        final String strDimRange = ((List)extras.get(key)).get(0).toString();
+                        final MeasurementRange dimRange = toMeasurementRange(strDimRange);
+                        if(dimRange != null){
+                            //a dim range is define, it replace any given style.
+                            final DimRangeSymbolizer symbol = new DimRangeSymbolizer(dimRange);
+                            style = STYLE_FACTORY.style(symbol);
+                            return MapBuilder.createCoverageLayer(reader, style, getName().getLocalPart());
+                        }
                     }
                 }
             }
