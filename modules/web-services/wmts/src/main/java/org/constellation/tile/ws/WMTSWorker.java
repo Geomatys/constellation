@@ -35,9 +35,10 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
  * @version $Id$
  * 
  * @author Cédric Briançon (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
-public interface AbstractWMTSWorker {
+public interface WMTSWorker {
 
     /**
      * Returns an unmarshalled {@linkplain Capabilities get capabilities} object.

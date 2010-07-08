@@ -16,6 +16,7 @@
  */
 package org.constellation.tile.ws.rs;
 
+import org.constellation.tile.ws.WMTSWorker;
 import org.constellation.tile.ws.DefaultWMTSWorker;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import com.sun.jersey.spi.resource.Singleton;
@@ -34,7 +35,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import org.constellation.ServiceDef;
-import org.constellation.tile.ws.AbstractWMTSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
@@ -68,7 +68,7 @@ public class WMTSService extends GridWebService {
     /**
      * A worker to use in order to do WMTS operations.
      */
-    protected AbstractWMTSWorker worker;
+    protected WMTSWorker worker;
 
     private static final String NOT_WORKING = "The WMTS service is not running";
     /**

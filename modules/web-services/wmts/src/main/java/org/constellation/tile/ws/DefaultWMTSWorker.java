@@ -106,7 +106,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
-public class DefaultWMTSWorker extends AbstractWorker implements AbstractWMTSWorker {
+public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
 
     /**
      * The current MIME type of return
