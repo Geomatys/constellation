@@ -17,6 +17,7 @@
 package org.constellation.tile.ws.soap;
 
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -125,7 +126,7 @@ public class WMTSService {
         LOGGER.info("received SOAP getTile request");
         try {
             final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-            final BufferedImage buffered = worker.getTile(requestTile);
+            final RenderedImage buffered = worker.getTile(requestTile);
             final String mimeType = ImageIOUtilities.fileExtensionToMimeType(requestTile.getFormat());
             ImageIOUtilities.writeImage(buffered, mimeType, byteOut);
             final BinaryPayload binaryPayLoad = new BinaryPayload();

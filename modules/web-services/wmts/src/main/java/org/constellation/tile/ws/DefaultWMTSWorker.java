@@ -16,6 +16,13 @@
  */
 package org.constellation.tile.ws;
 
+import java.awt.image.RenderedImage;
+import java.io.IOException;
+import org.geotoolkit.coverage.grid.GridCoverage2D;
+import org.opengis.coverage.Coverage;
+import java.text.ParseException;
+import org.constellation.util.TimeParser;
+import org.geotoolkit.wmts.xml.v100.DimensionNameValue;
 import org.constellation.tile.visitor.GMLGraphicVisitor;
 import org.constellation.tile.visitor.HTMLGraphicVisitor;
 import org.constellation.tile.visitor.CSVGraphicVisitor;
@@ -24,13 +31,10 @@ import java.awt.Rectangle;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.display2d.service.ViewDef;
-import org.opengis.referencing.operation.TransformException;
-import org.opengis.geometry.Envelope;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.map.MapContext;
 import org.constellation.portrayal.PortrayalUtil;
 import org.geotoolkit.display2d.service.SceneDef;
-import org.geotoolkit.display2d.GO2Utilities;
 import java.util.HashMap;
 import java.util.Map;
 import org.constellation.util.Util;
@@ -80,7 +84,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
-import java.awt.image.BufferedImage;
 import org.constellation.ws.AbstractWorker;
 import org.geotoolkit.storage.DataStoreException;
 
@@ -416,8 +419,6 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         
     }
 
-    //TODO: handle the null value in the exception.
-    //TODO: harmonize with the method getLayerReference().
     private static List<LayerDetails> getAllLayerReferences() throws CstlServiceException {
 
         List<LayerDetails> layerRefs;
@@ -430,8 +431,6 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         return layerRefs;
     }
 
-    //TODO: handle the null value in the exception.
-    //TODO: harmonize with the method getLayerReference().
     public static LayerDetails getLayerReference(Name name) throws CstlServiceException {
 
         LayerDetails layerRef;
@@ -449,32 +448,42 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
      */
     @Override
     public String getFeatureInfo(GetFeatureInfo request) throws CstlServiceException {
-        //
-    	// Note this is almost the same logic as in getMap
-    	//
-        // 1. SCENE
+       // 1. SCENE
         //       -- get the List of layer references
-        GetTile getTile = request.getGetTile();
+        final GetTile getTile = request.getGetTile();
 
-        final Name layerName = Util.parseLayerName(getTile.getLayer());
+        final Name layerName        = Util.parseLayerName(getTile.getLayer());
         final LayerDetails layerRef = getLayerReference(layerName);
 
-        
-        if (!layerRef.isQueryable(ServiceDef.Query.WMS_GETINFO)) {
-            throw new CstlServiceException("You are not allowed to request the layer \""+
-                    layerRef.getName() +"\".", LAYER_NOT_QUERYABLE, "");
-        }
-        
+        Coverage c = null;
+
         //       -- build an equivalent style List
         final String styleName = getTile.getStyle();
 
-        final MutableStyle style        = getStyle(layerRef, styleName);
+        final MutableStyle style        = getStyle(styleName);
         //       -- create the rendering parameter Map
-        final Double elevation                 = null;// request.getElevation();
-        final Date time                        = null;// request.getTime();
+        Double elevation =  null;
+        Date time        = null;
+        List<DimensionNameValue> dimensions = getTile.getDimensionNameValue();
+        for (DimensionNameValue dimension : dimensions) {
+            if (dimension.getName().equalsIgnoreCase("elevation")) {
+                try {
+                    elevation = Double.parseDouble(dimension.getValue());
+                } catch (NumberFormatException ex) {
+                    throw new CstlServiceException("Unable to perse the elevation value", INVALID_PARAMETER_VALUE, "elevation");
+                }
+            }
+            if (dimension.getName().equalsIgnoreCase("time")) {
+                try {
+                    time = TimeParser.toDate(dimension.getValue());
+                } catch (ParseException ex) {
+                    throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, "time");
+                }
+            }
+        }
         final Map<String, Object> params       = new HashMap<String, Object>();
-        /*params.put(WMSQuery.KEY_ELEVATION, elevation);
-        params.put(WMSQuery.KEY_TIME, time);*/
+        params.put("ELEVATION", elevation);
+        params.put("TIME", time);
         final SceneDef sdef = new SceneDef();
 
         try {
@@ -485,7 +494,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         }
 
         // 2. VIEW
-        final JTSEnvelope2D refEnv             = null;//new JTSEnvelope2D(request.getEnvelope());
+        final JTSEnvelope2D refEnv             = new JTSEnvelope2D(c.getEnvelope());
         final double azimuth                   = 0;//request.getAzimuth();
         final ViewDef vdef = new ViewDef(refEnv,azimuth);
 
@@ -556,7 +565,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
      * {@inheritDoc}
      */
     @Override
-    public BufferedImage getTile(GetTile request) throws CstlServiceException {
+    public RenderedImage getTile(GetTile request) throws CstlServiceException {
         
         // 1. SCENE
         //       -- get the layer reference
@@ -567,59 +576,45 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         } catch (CstlServiceException ex) {
             throw new CstlServiceException(ex, LAYER_NOT_DEFINED, "layer");
         }
-      
-        if (!layerRef.isQueryable(ServiceDef.Query.WMS_ALL)) {
-            throw new CstlServiceException("You are not allowed to request the layer \""+
-                    layerRef.getName() +"\".", LAYER_NOT_QUERYABLE, "layer");
-        }
-        
-        //       -- build an equivalent style List
-        //TODO: clean up the SLD vs. style logic
-        final String styleName    = request.getStyle();
-        final MutableStyle style  = getStyle(layerRef, styleName);
-
-        //       -- create the rendering parameter Map
-        final Map<String, Object> params       = new HashMap<String, Object>();
-        //params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
-        final SceneDef sdef = new SceneDef();
-        //sdef.extensions().add(WMSMapDecoration.getExtension());
-
-        try {
-            final MapContext context = PortrayalUtil.createContext(layerRef, style, params);
-            sdef.setContext(context);
-        } catch (PortrayalException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-        }
-        
 
         // 2. VIEW
-        final Double elevation =  null; // TODO request.getElevation();
-        final Date time        = null; // TODO request.getTime();
-        Envelope refEnv        = null; //request.getEnvelope();
-        try {
-            refEnv = GO2Utilities.combine(
-                    refEnv, new Date[]{time, time}, new Double[]{elevation, elevation});
-        } catch (TransformException ex) {
-            throw new CstlServiceException(ex);
+        Double elevation =  null;
+        Date time        = null;
+        List<DimensionNameValue> dimensions = request.getDimensionNameValue();
+        for (DimensionNameValue dimension : dimensions) {
+            if (dimension.getName().equalsIgnoreCase("elevation")) {
+                try {
+                    elevation = Double.parseDouble(dimension.getValue());
+                } catch (NumberFormatException ex) {
+                    throw new CstlServiceException("Unable to perse the elevation value", INVALID_PARAMETER_VALUE, "elevation");
+                }
+            }
+            if (dimension.getName().equalsIgnoreCase("time")) {
+                try {
+                    time = TimeParser.toDate(dimension.getValue());
+                } catch (ParseException ex) {
+                    throw new CstlServiceException(ex, INVALID_PARAMETER_VALUE, "time");
+                }
+            }
         }
 
+        GridCoverage2D c = null;
+        try {
+            c = layerRef.getCoverage(null, null, elevation, time);
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        } catch (DataStoreException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
 
-        final double azimuth = 0.0; //request.getAzimuth();
-        final ViewDef vdef = new ViewDef(refEnv,azimuth);
-
-
-        // 3. CANVAS
-        final java.awt.Dimension canvasDimension = null;// request.getSize();
-        final Color background = null;
-        final CanvasDef cdef = new CanvasDef(canvasDimension,background);
+        // 3 STYLE
+        final String styleName    = request.getStyle();
+        final MutableStyle style  = getStyle(styleName);
 
         // 4. IMAGE
-        BufferedImage image;
-        try {
-            image = Cstl.getPortrayalService().portray(sdef, vdef, cdef);
-        } catch (PortrayalException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-        }
+        RenderedImage image;
+        image = c.getRenderedImage();
+        
 
         return image;
     }
@@ -642,7 +637,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         this.serviceURL = serviceURL;
     }
 
-    private static MutableStyle getStyle(final LayerDetails layerRef, final String styleName) throws CstlServiceException {
+    private static MutableStyle getStyle(final String styleName) throws CstlServiceException {
         final MutableStyle style;
         if (styleName != null) {
             //try to grab the style if provided
