@@ -25,7 +25,7 @@ import javax.jws.WebParam;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 import org.constellation.tile.ws.AbstractWMTSWorker;
-import org.constellation.tile.ws.WMTSWorker;
+import org.constellation.tile.ws.DefaultWMTSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.ExceptionCode;
 import org.geotoolkit.util.ImageIOUtilities;
@@ -63,7 +63,7 @@ public class WMTSService {
      * Creates a WMTS SOAP service.
      */
     public WMTSService() {
-        worker = new WMTSWorker(null);
+        worker = new DefaultWMTSWorker(null);
     }
 
     /**

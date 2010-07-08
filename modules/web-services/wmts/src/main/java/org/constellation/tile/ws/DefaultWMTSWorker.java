@@ -103,9 +103,10 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  * @version $Id$
  *
  * @author Cédric Briançon (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
-public class WMTSWorker extends AbstractWorker implements AbstractWMTSWorker {
+public class DefaultWMTSWorker extends AbstractWorker implements AbstractWMTSWorker {
 
     /**
      * The current MIME type of return
@@ -134,7 +135,7 @@ public class WMTSWorker extends AbstractWorker implements AbstractWMTSWorker {
 
     private static final LegendTemplate LEGEND_TEMPLATE = new DefaultLegendTemplate(
                     new DefaultBackgroundTemplate(
-                        new BasicStroke(1),
+                        new BasicStroke(1), 
                         Color.LIGHT_GRAY,
                         Color.WHITE,
                         new Insets(4, 4, 4, 4),
@@ -148,7 +149,7 @@ public class WMTSWorker extends AbstractWorker implements AbstractWMTSWorker {
     /**
      * Instanciates the working class for a SOAP client, that do request on a SOAP PEP service.
      */
-    public WMTSWorker(final MarshallerPool marshallerPool) {
+    public DefaultWMTSWorker(final MarshallerPool marshallerPool) {
         super(marshallerPool);
         LOGGER.info("WMTS Service started");
     }

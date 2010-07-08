@@ -26,7 +26,7 @@ import javax.measure.unit.Unit;
 
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerDetails.TYPE;
-import org.constellation.tile.ws.WMTSWorker;
+import org.constellation.tile.ws.DefaultWMTSWorker;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
@@ -66,7 +66,7 @@ public final class HTMLGraphicVisitor extends TextGraphicVisitor {
         final Name key = Util.parseLayerName(gfi.getGetTile().getLayer());
         final LayerDetails layerDetails;
         try {
-            layerDetails = WMTSWorker.getLayerReference(key);
+            layerDetails = DefaultWMTSWorker.getLayerReference(key);
         } catch (CstlServiceException ex) {
             // Should not occur since it has already been gotten previously.
             throw new AssertionError(ex);

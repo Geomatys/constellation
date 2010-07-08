@@ -16,10 +16,10 @@
  */
 package org.constellation.tile.ws.rs;
 
+import org.constellation.tile.ws.DefaultWMTSWorker;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import com.sun.jersey.spi.resource.Singleton;
 import java.io.StringWriter;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -35,7 +35,6 @@ import javax.xml.bind.Marshaller;
 
 import org.constellation.ServiceDef;
 import org.constellation.tile.ws.AbstractWMTSWorker;
-import org.constellation.tile.ws.WMTSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
@@ -83,7 +82,7 @@ public class WMTSService extends GridWebService {
                           "org.geotoolkit.ows.xml.v110:"  +
                           "org.geotoolkit.gml.xml.v311",
                           "http://www.opengis.net/wmts");
-            worker = new WMTSWorker(getMarshallerPool());
+            worker = new DefaultWMTSWorker(getMarshallerPool());
 
         } catch (JAXBException ex){
             LOGGER.severe("The WMTS service is not running.\n"      +
