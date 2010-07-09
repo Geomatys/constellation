@@ -392,6 +392,8 @@ public final class ReflectionUtilities {
                 return null;
             else
                 propertyName = "ending";
+        } else if (propertyName.equals("recordType") && rootClass.getSimpleName().equals("DefaultRecordType")) {
+            return null;
         } else if (propertyName.equals("dataSetURI")) {
             propertyName = "dataSetUri";
         } else if (propertyName.equals("nameOfMeasure")) {
@@ -428,12 +430,12 @@ public final class ReflectionUtilities {
             propertyName = "date";
         }
 
-        String methodName        = "get" + StringUtilities.firstToUpper(propertyName);
+        final String methodName  = "get" + StringUtilities.firstToUpper(propertyName);
         final String methodName2 = "is" + StringUtilities.firstToUpper(propertyName);
         final String methodName3 = propertyName;
         int occurenceType = 0;
 
-        while (occurenceType < 6) {
+        while (occurenceType < 7) {
 
             try {
                 Method getter = null;
@@ -452,10 +454,11 @@ public final class ReflectionUtilities {
                         break;
                     }
                     case 3: {
+                        String temp = methodName;
                         if (methodName.endsWith("y")) {
-                            methodName = methodName.substring(0, methodName.length() - 1) + 'i';
+                            temp = methodName.substring(0, methodName.length() - 1) + 'i';
                         }
-                        getter = rootClass.getMethod(methodName + "es");
+                        getter = rootClass.getMethod(temp + "es");
                         break;
                     }
                     case 4: {
@@ -464,6 +467,14 @@ public final class ReflectionUtilities {
                     }
                     case 5: {
                         getter = rootClass.getMethod(methodName3);
+                        break;
+                    }
+                    case 6: {
+                        String temp = methodName2;
+                        if (methodName2.endsWith("Availability")) {
+                            temp = methodName2.substring(0, methodName2.length() - 12) + "Available";
+                        }
+                        getter = rootClass.getMethod(temp);
                         break;
                     }
                     default: break;

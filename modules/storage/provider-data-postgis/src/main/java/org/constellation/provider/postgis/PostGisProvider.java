@@ -43,6 +43,7 @@ import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.DataStoreFinder;
 import org.geotoolkit.data.postgis.PostgisNGDataStoreFactory;
+import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.storage.DataStoreException;
 
@@ -230,9 +231,15 @@ public class PostGisProvider extends AbstractLayerProvider{
 
     private void visit() {
         try {
+            String namespace = source.parameters.get(KEY_NAMESPACE);
+
             for (final Name name : store.getNames()) {
                 if (source.loadAll || source.containsLayer(name.getLocalPart())) {
-                    index.add(name);
+                    if (DEFAULT_NAMESPACE.equals(name.getNamespaceURI()) && "no namespace".equals(namespace)) {
+                        index.add(new DefaultName(name.getLocalPart()));
+                    } else {
+                        index.add(name);
+                    }
                 }
             }
         } catch (DataStoreException ex) {
