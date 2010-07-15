@@ -102,7 +102,13 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
     @AfterClass
     public static void tearDownClass() throws Exception {
         if (worker != null) {
-            worker.destroy();
+            try {
+                worker.destroy();
+            } catch (NullPointerException ex) {
+                // Temporary catch of this exception, that comes from a class in mdweb package.
+                // @TODO: fix it interface mdweb.
+                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+            }
         }
         NIOUtilities.deleteDirectory(dbDirectory);
         NIOUtilities.deleteDirectory(new File("CSWWorkerTest"));
