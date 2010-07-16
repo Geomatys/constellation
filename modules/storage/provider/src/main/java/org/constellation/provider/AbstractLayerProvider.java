@@ -67,7 +67,8 @@ public abstract class AbstractLayerProvider implements LayerProvider{
     @Override
     public LayerDetails getByIdentifier(Name key, String service) {
         for(final Name n : getKeys(service)){
-            if(n.equals(key)){
+            if( (key.getNamespaceURI() == null && key.getLocalPart().equals(n.getLocalPart()))
+                || key.equals(n) ){
                 return get(n);
             }
         }
