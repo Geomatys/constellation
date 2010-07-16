@@ -267,7 +267,7 @@
       <artifactId>jsf-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet.jsp.jstl</groupId>
+      <groupId>jstl</groupId>
       <artifactId>jstl</artifactId>
     </dependency>
     <dependency>
