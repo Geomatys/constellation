@@ -16,6 +16,7 @@
  */
 package org.constellation.tile.ws;
 
+import java.io.File;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -395,16 +396,17 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
                 /**
                  * Hard coded part
                  */
-                final TileMatrixSet outputMatrixSet = new TileMatrixSet(DefaultTileExample.tileMatrixSetIdentifier, DefaultTileExample.supportedCRS);
-                outputMatrixSet.setTileMatrix(DefaultTileExample.getTileMatrix());
+                final TileMatrixSet outputMatrixSet = DefaultTileExample.getTileMatrixSet(layerName);
+                if (outputMatrixSet != null) {
+                    outputLayer.getTileMatrixSet().add(layerName);
+                    tileSets.add(outputMatrixSet);
+                }
                 layers.add(outputLayer);
-                tileSets.add(outputMatrixSet);
             }
-            
         
             cont = new ContentsType();
             cont.setLayers(layers);
-            
+            cont.setTileMatrixSet(tileSets);
             
         }
         
@@ -570,7 +572,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
     @Override
     public RenderedImage getTile(GetTile request) throws CstlServiceException {
         
-        //get the layer reference
+        //1 LAYER
         final Name layerName = Util.parseLayerName(request.getLayer());
         LayerDetails layerRef;
         try{
@@ -579,7 +581,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
             throw new CstlServiceException(ex, LAYER_NOT_DEFINED, "layer");
         }
 
-        // 2. VIEW
+        // 2. PARAMETERS NOT USED FOR NOW
         Double elevation =  null;
         Date time        = null;
         List<DimensionNameValue> dimensions = request.getDimensionNameValue();
@@ -600,22 +602,22 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
             }
         }
 
-        GridCoverage2D c = null;
+        /*GridCoverage2D c = null;
         try {
             c = layerRef.getCoverage(null, null, elevation, time);
         } catch (IOException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
         } catch (DataStoreException ex) {
             LOGGER.log(Level.SEVERE, null, ex);
-        }
+        }*/
 
-        // 3 STYLE
+        // 3 STYLE NOT USED FOR NOW
         final String styleName    = request.getStyle();
         final MutableStyle style  = getStyle(styleName);
 
         // 4. IMAGE
-        RenderedImage image;
-        image = c.getRenderedImage();
+        RenderedImage image = null;
+        File f = new File("whatever");
         
 
         return image;
