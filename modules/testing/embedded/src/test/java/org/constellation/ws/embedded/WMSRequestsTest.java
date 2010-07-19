@@ -19,7 +19,6 @@ package org.constellation.ws.embedded;
 // J2SE dependencies
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -197,7 +196,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         assertTrue(obj instanceof WMT_MS_Capabilities);
 
         final WMT_MS_Capabilities responseCaps = (WMT_MS_Capabilities)obj;
-        final Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST);
+        final Layer layer = (Layer) responseCaps.getLayerFromName(LAYER_TEST.getLocalPart());
 
         assertNotNull(layer);
         assertEquals("EPSG:4326", layer.getSRS().get(0));

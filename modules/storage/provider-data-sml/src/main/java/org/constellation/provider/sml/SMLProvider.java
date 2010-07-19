@@ -196,7 +196,7 @@ public class SMLProvider extends AbstractLayerProvider {
             elevationStartField = null;
             elevationEndField   = null;
         }
-        return new SMLLayerDetails(key, store, key, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
+        return new SMLLayerDetails(key, store, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
         
     }
 

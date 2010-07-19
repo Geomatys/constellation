@@ -187,11 +187,11 @@ public class PostGisProvider extends AbstractLayerProvider{
         }
         final ProviderLayer layer = source.getLayer(key.getLocalPart());
         if (layer == null) {
-            return new PostGisLayerDetails(key, store, key, null, null, null, null, null);
+            return new PostGisLayerDetails(key, store, null, null, null, null, null);
 
         } else {
             final List<String> styles = layer.styles;
-            return new PostGisLayerDetails(key, store, key, styles,
+            return new PostGisLayerDetails(key, store, styles,
                     layer.dateStartField, layer.dateEndField,
                     layer.elevationStartField, layer.elevationEndField);
         }

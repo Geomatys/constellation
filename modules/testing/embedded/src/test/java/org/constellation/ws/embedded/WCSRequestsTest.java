@@ -18,7 +18,6 @@ package org.constellation.ws.embedded;
 
 // J2SE dependencies
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -226,7 +225,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         boolean layerTestFound = false;
         for (CoverageOfferingBriefType coverage : coverages) {
             for (JAXBElement<String> elem : coverage.getRest()) {
-                if (elem.getValue().equals(LAYER_TEST)) {
+                if (elem.getValue().equals(LAYER_TEST.getLocalPart())) {
                     layerTestFound = true;
                     final LonLatEnvelopeType env = coverage.getLonLatEnvelope();
                     assertTrue(env.getPos().get(0).getValue().get(0) == -180d);
@@ -277,7 +276,7 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
         assertNotNull(responseDesc);
         final List<CoverageOfferingType> coverageOffs = responseDesc.getCoverageOffering();
         assertFalse (coverageOffs.isEmpty());
-        assertEquals(LAYER_TEST, coverageOffs.get(0).getRest().get(1).getValue());
+        assertEquals(LAYER_TEST.getLocalPart(), coverageOffs.get(0).getRest().get(1).getValue());
         // TODO: add more tests on returned XML doc
     }
 

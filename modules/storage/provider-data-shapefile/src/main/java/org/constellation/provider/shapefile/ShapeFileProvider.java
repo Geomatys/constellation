@@ -141,7 +141,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
      * @todo Should use {@code cache.getOrCreate(...)} for concurrent access.
      */
     @Override
-    public LayerDetails get(final Name key) {
+    public LayerDetails get(Name key) {
         DataStore store = cache.get(key);
 
         if (store == null) {
@@ -154,17 +154,22 @@ public class ShapeFileProvider extends AbstractLayerProvider {
                     //cache the datastore
                     cache.put(key, store);
                 }
+                try {
+                    key = store.getNames().iterator().next();
+                } catch (DataStoreException ex) {
+                    Logger.getLogger(ShapeFileProvider.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
 
         if (store != null) {
             final ProviderLayer layer = source.getLayer(key.getLocalPart());
             if (layer == null) {
-                return new ShapeFileLayerDetails(key, store, key, null, null, null, null, null);
+                return new ShapeFileLayerDetails(key, store, null, null, null, null, null);
                 
             } else {
                 final List<String> styles = layer.styles;
-                return new ShapeFileLayerDetails(key, store, key, styles,
+                return new ShapeFileLayerDetails(key, store, styles,
                         layer.dateStartField, layer.dateEndField,
                         layer.elevationStartField, layer.elevationEndField);
             }

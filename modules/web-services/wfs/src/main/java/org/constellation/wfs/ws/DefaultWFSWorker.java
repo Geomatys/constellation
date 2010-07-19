@@ -218,7 +218,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     try {
                         type  = getFeatureTypeFromLayer(fld);
                     } catch (DataStoreException ex) {
-                        LOGGER.severe("error while getting featureType for:" + fld.getGroupName() + 
+                        LOGGER.severe("error while getting featureType for:" + fld.getName() + 
                                 "\ncause:" + ex.getMessage());
                         continue;
                     }
@@ -249,7 +249,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                                 fld.getName().getLocalPart(),
                                 defaultCRS,
                                 standardCRS,
-                                UnmodifiableArrayList.wrap(new WGS84BoundingBoxType[]{toBBox(fld.getStore(), fld.getGroupName())}));
+                                UnmodifiableArrayList.wrap(new WGS84BoundingBoxType[]{toBBox(fld.getStore(), fld.getName())}));
                         types.add(ftt);
                     } catch (FactoryException ex) {
                         Logging.unexpectedException(LOGGER, ex);
@@ -370,7 +370,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      * @return A Feature type.
      */
     private FeatureType getFeatureTypeFromLayer(FeatureLayerDetails fld) throws DataStoreException {
-        return fld.getStore().getFeatureType(fld.getGroupName());
+        return fld.getStore().getFeatureType(fld.getName());
     }
 
 
@@ -680,11 +680,11 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     verifyFilterProperty(ft, filter);
 
                     // we extract the number of feature deleted
-                    final QueryBuilder queryBuilder = new QueryBuilder(layer.getGroupName());
+                    final QueryBuilder queryBuilder = new QueryBuilder(layer.getName());
                     queryBuilder.setFilter(filter);
                     totalDeleted = totalDeleted + (int) layer.getStore().getCount(queryBuilder.buildQuery());
 
-                    layer.getStore().removeFeatures(layer.getGroupName(), filter);
+                    layer.getStore().removeFeatures(layer.getName(), filter);
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
                 } catch (ClassCastException ex) {
@@ -721,7 +721,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                 try {
                     final FeatureType ft = getFeatureTypeFromLayer(layer);
                     if (ft == null) {
-                        throw new CstlServiceException("Unable to find the featuretype:" + layer.getGroupName());
+                        throw new CstlServiceException("Unable to find the featuretype:" + layer.getName());
                     }
 
                     final Map<PropertyDescriptor,Object> values = new HashMap<PropertyDescriptor, Object>();
@@ -764,11 +764,11 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
                     verifyFilterProperty(ft, filter);
 
                     // we extract the number of feature update
-                    final QueryBuilder queryBuilder = new QueryBuilder(layer.getGroupName());
+                    final QueryBuilder queryBuilder = new QueryBuilder(layer.getName());
                     queryBuilder.setFilter(filter);
                     totalUpdated = totalUpdated + (int) layer.getStore().getCount(queryBuilder.buildQuery());
 
-                    layer.getStore().updateFeatures(layer.getGroupName(), filter, values);
+                    layer.getStore().updateFeatures(layer.getName(), filter, values);
                 } catch (DataStoreException ex) {
                     throw new CstlServiceException(ex);
                 }

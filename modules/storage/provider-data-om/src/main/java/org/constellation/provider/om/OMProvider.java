@@ -210,7 +210,7 @@ public class OMProvider extends AbstractLayerProvider {
             elevationStartField = null;
             elevationEndField   = null;
         }
-        return new OMLayerDetails(key, store, key, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
+        return new OMLayerDetails(key, store, styles, dateStartField, dateEndField, elevationStartField, elevationEndField);
         
     }
 

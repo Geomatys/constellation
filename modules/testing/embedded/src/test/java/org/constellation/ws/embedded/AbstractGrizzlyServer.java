@@ -17,6 +17,7 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
+import org.geotoolkit.feature.DefaultName;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
@@ -80,7 +81,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
     /**
      * The layer to test.
      */
-    protected static final String LAYER_TEST = "SST_tests";
+    protected static final DefaultName LAYER_TEST = new DefaultName("SST_tests");
 
     private static DefaultDataSource ds;
     
@@ -114,6 +115,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
         source.parameters.put(CoverageSQLProvider.KEY_ROOT_DIRECTORY, rootDir);
         source.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
         source.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
+        source.parameters.put(CoverageSQLProvider.KEY_NAMESPACE, "no namespace");
         source.loadAll = true;
 
         final ProviderConfig config = new ProviderConfig();

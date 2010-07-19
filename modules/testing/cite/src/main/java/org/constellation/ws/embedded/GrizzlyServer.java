@@ -102,6 +102,7 @@ public final class GrizzlyServer {
         sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_ROOT_DIRECTORY, rootDir);
         sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_USER,     "test");
         sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_SCHEMA,   "coverages");
+        sourcePostGrid.parameters.put(CoverageSQLProvider.KEY_NAMESPACE, "no namespace");
         sourcePostGrid.loadAll = true;
         sourcePostGrid.services.add("WCS");
         final ProviderConfig configPostGrid = new ProviderConfig();

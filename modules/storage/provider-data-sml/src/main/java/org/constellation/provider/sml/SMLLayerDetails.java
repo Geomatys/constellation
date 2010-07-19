@@ -44,14 +44,14 @@ import org.opengis.feature.type.Name;
  */
 class SMLLayerDetails extends AbstractFeatureLayerDetails {
 
-    SMLLayerDetails(Name name, DataStore store, Name groupName, List<String> favorites){
-        this(name,store,groupName,favorites,null,null,null,null);
+    SMLLayerDetails(Name name, DataStore store, List<String> favorites){
+        this(name,store,favorites,null,null,null,null);
     }
     
-    SMLLayerDetails(Name name, DataStore store, Name groupName, List<String> favorites,
+    SMLLayerDetails(Name name, DataStore store, List<String> favorites,
         String dateStart, String dateEnd, String elevationStart, String elevationEnd)
     {
-        super(name,store,groupName,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
+        super(name,store,favorites,dateStart,dateEnd,elevationStart,elevationEnd);
     }
     
     @Override
@@ -64,13 +64,13 @@ class SMLLayerDetails extends AbstractFeatureLayerDetails {
             final String namedStyle = favorites.get(0);
             style = StyleProviderProxy.getInstance().get(namedStyle);
         }
-        final FeatureType featureType = store.getFeatureType(groupName);
+        final FeatureType featureType = store.getFeatureType(name);
         if(style == null){
             //no favorites defined, create a default one
             style = RANDOM_FACTORY.createDefaultVectorStyle(featureType);
         }
 
-        layer = MapBuilder.createFeatureLayer(store.createSession(false).getFeatureCollection(QueryBuilder.all(groupName)), style);
+        layer = MapBuilder.createFeatureLayer(store.createSession(false).getFeatureCollection(QueryBuilder.all(name)), style);
 
         layer.setElevationRange(elevationStartField, elevationEndField);
         layer.setTemporalRange(dateStartField, dateEndField);

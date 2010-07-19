@@ -84,7 +84,6 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     protected static final int MARGIN = 4;
 
     protected final DataStore store;
-    protected final Name groupName;
     protected final List<String> favorites;
     protected final Name name;
     protected final PropertyName dateStartField;
@@ -92,21 +91,28 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     protected final PropertyName elevationStartField;
     protected final PropertyName elevationEndField;
 
-    protected AbstractFeatureLayerDetails(Name name, DataStore store, Name groupName, List<String> favorites){
-        this(name,store, groupName,favorites,null,null,null,null);
+    protected AbstractFeatureLayerDetails(Name name, DataStore store, List<String> favorites){
+        this(name,store,favorites,null,null,null,null);
         
     }
     
-    protected AbstractFeatureLayerDetails(Name name, DataStore store, Name groupName, List<String> favorites,
+    protected AbstractFeatureLayerDetails(Name name, DataStore store, List<String> favorites,
             String dateStart, String dateEnd, String elevationStart, String elevationEnd){
         
         if(store == null){
             throw new NullPointerException("FeatureSource can not be null.");
         }
-        
+        try {
+            if (!store.getNames().contains(name)) {
+                throw new IllegalArgumentException("Provided name " + name + " is not in the datastore known names");
+            }
+        } catch (DataStoreException ex) {
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
+        }
+
+
         this.name = name;
         this.store = store;
-        this.groupName = groupName;
 
         if(favorites == null){
             this.favorites = Collections.emptyList();
@@ -158,13 +164,6 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
         return name;
     }
 
-    @Override
-    public Name getGroupName() {
-        return groupName;
-    }
-
-
-
     /**
      * {@inheritDoc}
      */
@@ -188,7 +187,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
         //TODO handle this correctly
         try{
-            final Envelope env = store.getEnvelope(QueryBuilder.all(groupName));
+            final Envelope env = store.getEnvelope(QueryBuilder.all(name));
 
             Envelope renv = null;
             if(env.getCoordinateReferenceSystem().equals(DefaultGeographicCRS.WGS84)){
@@ -217,7 +216,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
         if(dateStartField != null){
             try{
                 final AttributeDescriptor desc = (AttributeDescriptor) 
-                        dateStartField.evaluate((SimpleFeatureType)store.getFeatureType(groupName));
+                        dateStartField.evaluate((SimpleFeatureType)store.getFeatureType(name));
 
                 if(desc == null){
                     LOGGER.log(Level.WARNING , "Invalide field : "+ dateStartField + " Doesnt exists in layer :" + name);
@@ -231,7 +230,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
                 }
 
                 final QueryBuilder builder = new QueryBuilder();
-                builder.setTypeName(groupName);
+                builder.setTypeName(name);
                 builder.setProperties(new String[]{dateStartField.getPropertyName()});
                 final Query query = builder.buildQuery();
 
@@ -268,7 +267,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
 
             try {
                 final AttributeDescriptor desc = (AttributeDescriptor)
-                        elevationStartField.evaluate((SimpleFeatureType)store.getFeatureType(groupName));
+                        elevationStartField.evaluate((SimpleFeatureType)store.getFeatureType(name));
                 if(desc == null){
                     LOGGER.log(Level.WARNING , "Invalide field : "+ elevationStartField + " Doesnt exists in layer :" + name);
                     return elevations;
@@ -281,7 +280,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
                 }
 
                 final QueryBuilder builder = new QueryBuilder();
-                builder.setTypeName(groupName);
+                builder.setTypeName(name);
                 builder.setProperties(new String[]{elevationStartField.getPropertyName()});
                 final Query query = builder.buildQuery();
 
@@ -317,7 +316,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
 
     private MutableStyle createDefaultStyle(){
         try {
-            return StyleProviderProxy.STYLE_RANDOM_FACTORY.createDefaultVectorStyle(store.getFeatureType(groupName));
+            return StyleProviderProxy.STYLE_RANDOM_FACTORY.createDefaultVectorStyle(store.getFeatureType(name));
         } catch (DataStoreException ex) {
             return StyleProviderProxy.STYLE_RANDOM_FACTORY.createPolygonStyle();
         }
