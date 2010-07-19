@@ -157,7 +157,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
                 try {
                     key = store.getNames().iterator().next();
                 } catch (DataStoreException ex) {
-                    Logger.getLogger(ShapeFileProvider.class.getName()).log(Level.SEVERE, null, ex);
+                    LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
                 }
             }
         }
