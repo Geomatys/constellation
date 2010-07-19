@@ -817,6 +817,11 @@ public final class WCSWorker extends AbstractWorker {
                     KEY_TIME.toLowerCase());
         }
 
+        final String coverageName = request.getCoverage();
+        if (coverageName == null) {
+            throw new CstlServiceException("You must specify the parameter: COVERAGE" , INVALID_PARAMETER_VALUE,
+                    KEY_COVERAGE.toLowerCase());
+        }
         final LayerDetails layerRef = getLayerReference(request.getCoverage(), inputVersion);
         if (!layerRef.isQueryable(ServiceDef.Query.WCS_ALL) || layerRef.getType().equals(LayerDetails.TYPE.FEATURE)) {
             throw new CstlServiceException("You are not allowed to request the layer \"" +

@@ -94,6 +94,7 @@ import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 import org.geotoolkit.wmts.xml.v100.GetTile;
 import org.geotoolkit.wmts.xml.v100.Themes;
+import org.geotoolkit.wmts.xml.v100.TileMatrixSet;
 import org.geotoolkit.xml.MarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -242,112 +243,116 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         if (sections.containsSection("Contents") || sections.containsSection("All")) {
             
             final List<LayerDetails> layerRefs = getAllLayerReferences();
-            //Build the list of layers
+            
+            // Build the list of layers
             final List<LayerType> layers = new ArrayList<LayerType>();
-
+            // and the list of matrix set
+            final List<TileMatrixSet> tileSets = new ArrayList<TileMatrixSet>();
+            
             for (LayerDetails layer : layerRefs){
-            if (!layer.isQueryable(ServiceDef.Query.WMTS_ALL)) {
-                continue;
-            }
-            /*
-             *  TODO
-             * code = CRS.lookupEpsgCode(inputLayer.getCoverageReference().getCoordinateReferenceSystem(), false);
-             */
-            final GeographicBoundingBox inputGeoBox;
-            try {
-                inputGeoBox = layer.getGeographicBoundingBox();
-            } catch (DataStoreException exception) {
-                throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
-            }
-
-            if (inputGeoBox == null) {
-                // The layer does not contain geometric information, we do not want this layer
-                // in the capabilities response.
-                continue;
-            }
-
-            // List of elevations, times and dim_range values.
-            final List<Dimension> dimensions = new ArrayList<Dimension>();
-
-            //the available date
-            String defaut = null;
-            Dimension dim;
-            SortedSet<Date> dates = null;
-            try {
-                dates = layer.getAvailableTimes();
-            } catch (DataStoreException ex) {
-                LOGGER.log(Level.INFO, "Error retrieving dates values for the layer :"+ layer.getName(), ex);
-                dates = null;
-            }
-            if (dates != null && !(dates.isEmpty())) {
-                final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                df.setTimeZone(TimeZone.getTimeZone("UTC"));
-                final PeriodUtilities periodFormatter = new PeriodUtilities(df);
-                defaut = df.format(dates.last());
-                dim = new Dimension("time", "ISO8601", defaut);
-                    
-                dim.setValue(periodFormatter.getDatesRespresentation(dates));
-                dimensions.add(dim);
-            }
-
-            //the available elevation
-            defaut = null;
-            SortedSet<Number> elevations = null;
-            try {
-                elevations = layer.getAvailableElevations();
-            } catch (DataStoreException ex) {
-                LOGGER.log(Level.INFO, "Error retrieving elevation values for the layer :"+ layer.getName(), ex);
-                elevations = null;
-            }
-            if (elevations != null && !(elevations.isEmpty())) {
-                defaut = elevations.first().toString();
-                dim = new Dimension("elevation", "EPSG:5030", defaut);
-                final StringBuilder elevs = new StringBuilder();
-                for (final Iterator<Number> it = elevations.iterator(); it.hasNext();) {
-                    final Number n = it.next();
-                    elevs.append(n.toString());
-                    if (it.hasNext()) {
-                        elevs.append(',');
-                    }
+                if (!layer.isQueryable(ServiceDef.Query.WMTS_ALL) || !(layer instanceof CoverageLayerDetails)) {
+                    continue;
                 }
-                dim.setValue(elevs.toString());
-                dimensions.add(dim);
-            }
+                final CoverageLayerDetails coverageLayer = (CoverageLayerDetails) layer;
 
-            //the dimension range
-            defaut = null;
-            final MeasurementRange<?>[] ranges = layer.getSampleValueRanges();
-            /* If the layer has only one sample dimension, then we can apply the dim_range
-             * parameter. Otherwise it can be a multiple sample dimensions layer, and we
-             * don't apply the dim_range.
-             */
-            if (ranges != null && ranges.length == 1 && ranges[0] != null) {
-                final MeasurementRange<?> firstRange = ranges[0];
-                final double minRange = firstRange.getMinimum();
-                final double maxRange = firstRange.getMaximum();
-                defaut = minRange + "," + maxRange;
-                final Unit<?> u = firstRange.getUnits();
-                final String unit = (u != null) ? u.toString() : null;
-                dim = new Dimension("dim_range", unit, defaut, minRange + "," + maxRange);
-                dimensions.add(dim);
-            }
+                /*
+                 *  TODO
+                 * code = CRS.lookupEpsgCode(inputLayer.getCoverageReference().getCoordinateReferenceSystem(), false);
+                 */
+                final GeographicBoundingBox inputGeoBox;
+                try {
+                    inputGeoBox = layer.getGeographicBoundingBox();
+                } catch (DataStoreException exception) {
+                    throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
+                }
 
-            // LegendUrl generation
-            //TODO: Use a StringBuilder or two
-            final Name fullLayerName = layer.getName();
-            final String layerName;
-            if (fullLayerName.getNamespaceURI() != null) {
-                layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
-            } else {
-                layerName = fullLayerName.getLocalPart();
-            }
-            String url = null;
-            final String beginLegendUrl = url + "wms?REQUEST=GetLegendGraphic&" +
-                                                    "VERSION=1.1.1&" +
-                                                    "FORMAT=";
-            final String legendUrlGif = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;
-            final String legendUrlPng = beginLegendUrl + MimeType.IMAGE_PNG + "&LAYER=" + layerName;
-            final LayerType outputLayer;
+                if (inputGeoBox == null) {
+                    // The layer does not contain geometric information, we do not want this layer
+                    // in the capabilities response.
+                    continue;
+                }
+
+                // List of elevations, times and dim_range values.
+                final List<Dimension> dimensions = new ArrayList<Dimension>();
+
+                //the available date
+                String defaut = null;
+                Dimension dim;
+                SortedSet<Date> dates = null;
+                try {
+                    dates = layer.getAvailableTimes();
+                } catch (DataStoreException ex) {
+                    LOGGER.log(Level.INFO, "Error retrieving dates values for the layer :"+ layer.getName(), ex);
+                    dates = null;
+                }
+                if (dates != null && !(dates.isEmpty())) {
+                    final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    df.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    final PeriodUtilities periodFormatter = new PeriodUtilities(df);
+                    defaut = df.format(dates.last());
+                    dim = new Dimension("time", "ISO8601", defaut);
+
+                    dim.setValue(periodFormatter.getDatesRespresentation(dates));
+                    dimensions.add(dim);
+                }
+
+                //the available elevation
+                defaut = null;
+                SortedSet<Number> elevations = null;
+                try {
+                    elevations = layer.getAvailableElevations();
+                } catch (DataStoreException ex) {
+                    LOGGER.log(Level.INFO, "Error retrieving elevation values for the layer :"+ layer.getName(), ex);
+                    elevations = null;
+                }
+                if (elevations != null && !(elevations.isEmpty())) {
+                    defaut = elevations.first().toString();
+                    dim = new Dimension("elevation", "EPSG:5030", defaut);
+                    final StringBuilder elevs = new StringBuilder();
+                    for (final Iterator<Number> it = elevations.iterator(); it.hasNext();) {
+                        final Number n = it.next();
+                        elevs.append(n.toString());
+                        if (it.hasNext()) {
+                            elevs.append(',');
+                        }
+                    }
+                    dim.setValue(elevs.toString());
+                    dimensions.add(dim);
+                }
+
+                //the dimension range
+                defaut = null;
+                final MeasurementRange<?>[] ranges = layer.getSampleValueRanges();
+                /* If the layer has only one sample dimension, then we can apply the dim_range
+                 * parameter. Otherwise it can be a multiple sample dimensions layer, and we
+                 * don't apply the dim_range.
+                 */
+                if (ranges != null && ranges.length == 1 && ranges[0] != null) {
+                    final MeasurementRange<?> firstRange = ranges[0];
+                    final double minRange = firstRange.getMinimum();
+                    final double maxRange = firstRange.getMaximum();
+                    defaut = minRange + "," + maxRange;
+                    final Unit<?> u = firstRange.getUnits();
+                    final String unit = (u != null) ? u.toString() : null;
+                    dim = new Dimension("dim_range", unit, defaut, minRange + "," + maxRange);
+                    dimensions.add(dim);
+                }
+
+                // LegendUrl generation
+                //TODO: Use a StringBuilder or two
+                final Name fullLayerName = layer.getName();
+                final String layerName;
+                if (fullLayerName.getNamespaceURI() != null) {
+                    layerName = fullLayerName.getNamespaceURI() + ':' + fullLayerName.getLocalPart();
+                } else {
+                    layerName = fullLayerName.getLocalPart();
+                }
+                String url = null;
+                final String beginLegendUrl = url + "wms?REQUEST=GetLegendGraphic&" +
+                                                        "VERSION=1.1.1&" +
+                                                        "FORMAT=";
+                final String legendUrlGif = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;
+                final String legendUrlPng = beginLegendUrl + MimeType.IMAGE_PNG + "&LAYER=" + layerName;
             
                 /*
                  * TODO
@@ -385,23 +390,21 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
                     }
                 }
 
-                if (layer instanceof CoverageLayerDetails) {
-                    final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
-                    // TODO ?
-                    final String abstractt =  coverageLayer.getRemarks();
-                    // StringUtilities.cleanSpecialCharacter(coverageLayer.getThematic()),
+                final LayerType outputLayer = new LayerType(layerName, coverageLayer.getRemarks(), outputBBox, styles, dimensions);
 
-                    outputLayer = new LayerType(layerName, abstractt, outputBBox, styles, dimensions);
-                } else {
-                    continue;
-                }
-
+                /**
+                 * Hard coded part
+                 */
+                final TileMatrixSet outputMatrixSet = new TileMatrixSet(DefaultTileExample.tileMatrixSetIdentifier, DefaultTileExample.supportedCRS);
+                outputMatrixSet.setTileMatrix(DefaultTileExample.getTileMatrix());
                 layers.add(outputLayer);
+                tileSets.add(outputMatrixSet);
             }
             
         
             cont = new ContentsType();
             cont.setLayers(layers);
+            
             
         }
         
@@ -448,7 +451,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
      */
     @Override
     public String getFeatureInfo(GetFeatureInfo request) throws CstlServiceException {
-       // 1. SCENE
+       
         //       -- get the List of layer references
         final GetTile getTile = request.getGetTile();
 
@@ -457,7 +460,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
 
         Coverage c = null;
 
-        //       -- build an equivalent style List
+        // build an equivalent style List
         final String styleName = getTile.getStyle();
 
         final MutableStyle style        = getStyle(styleName);
@@ -567,8 +570,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
     @Override
     public RenderedImage getTile(GetTile request) throws CstlServiceException {
         
-        // 1. SCENE
-        //       -- get the layer reference
+        //get the layer reference
         final Name layerName = Util.parseLayerName(request.getLayer());
         LayerDetails layerRef;
         try{
