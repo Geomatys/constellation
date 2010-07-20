@@ -17,6 +17,7 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
+import org.geotoolkit.feature.DefaultName;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -312,7 +313,8 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         assertFalse(layerDescs.isEmpty());
         final List<TypeNameType> typeNames = layerDescs.get(0).getTypeName();
         assertFalse(typeNames.isEmpty());
-        assertEquals(LAYER_TEST, typeNames.get(0).getCoverageName());
+        final DefaultName name = new DefaultName(typeNames.get(0).getCoverageName());
+        assertEquals(LAYER_TEST, name);
     }
 
     /**
