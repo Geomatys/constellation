@@ -46,6 +46,7 @@ public interface PrimitiveRegisterIF {
 	List<LayerDetails> getLayerReferences(ServiceDef serviceDef, List<Name> layerNames) throws RegisterException ;
 	
 	LayerDetails getLayerReference(ServiceDef serviceDef, Name layerName) throws RegisterException ;
-	
+
+        List<String> getRootDirectory() throws RegisterException;
 
 }

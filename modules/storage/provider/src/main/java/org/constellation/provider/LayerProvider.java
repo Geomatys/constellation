@@ -16,6 +16,7 @@
  */
 package org.constellation.provider;
 
+import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.map.ElevationModel;
 import org.opengis.feature.type.Name;
 
@@ -30,4 +31,5 @@ public interface LayerProvider extends Provider<Name,LayerDetails>{
 
     ElevationModel getElevationModel(Name name);
 
+    ProviderSource getSource();
 }

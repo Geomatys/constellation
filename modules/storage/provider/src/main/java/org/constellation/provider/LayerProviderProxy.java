@@ -25,6 +25,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.constellation.provider.configuration.ConfigDirectory;
+import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.util.FileUtilities;
 import org.opengis.feature.type.Name;

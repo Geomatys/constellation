@@ -17,12 +17,15 @@
 package org.constellation.register.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import org.constellation.ServiceDef;
 import org.constellation.provider.LayerDetails;
+import org.constellation.provider.LayerProvider;
 import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.LayerProviderService;
 import org.constellation.register.PrimitiveRegisterIF;
 import org.constellation.register.RegisterException;
 import org.opengis.feature.type.Name;
@@ -145,5 +148,21 @@ public final class PrimitiveRegister implements PrimitiveRegisterIF {
             throw new RegisterException("Unknown layer " + layerName);
         }
         return layerRef;
+    }
+
+    @Override
+    public List<String> getRootDirectory() throws RegisterException {
+
+        final List<String> rootDirectories = new ArrayList<String>();
+        final Collection<LayerProviderService> services = LayerProviderProxy.getInstance().getServices();
+        for (LayerProviderService service : services) {
+            for (LayerProvider p : service.getProviders()) {
+                final String s = p.getSource().parameters.get("rootDirectory");
+                if (s != null) {
+                   rootDirectories.add(s);
+                }
+            }
+        }
+        return rootDirectories;
     }
 }

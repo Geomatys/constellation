@@ -135,7 +135,8 @@ public class OMProvider extends AbstractLayerProvider {
 
     }
 
-    protected ProviderSource getSource(){
+    @Override
+    public ProviderSource getSource(){
         return source;
     }
 

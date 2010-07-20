@@ -19,6 +19,7 @@ package org.constellation.tile.ws.soap;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 import javax.jws.WebMethod;
@@ -126,17 +127,18 @@ public class WMTSService {
         LOGGER.info("received SOAP getTile request");
         try {
             final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            /*
             final RenderedImage buffered = worker.getTile(requestTile);
             final String mimeType = ImageIOUtilities.fileExtensionToMimeType(requestTile.getFormat());
-            ImageIOUtilities.writeImage(buffered, mimeType, byteOut);
+            ImageIOUtilities.writeImage(buffered, mimeType, byteOut);*/
             final BinaryPayload binaryPayLoad = new BinaryPayload();
             binaryPayLoad.setPayloadContent(byteOut.toByteArray());
             binaryPayLoad.setFormat(requestTile.getFormat());
             byteOut.close();
             return binaryPayLoad;
-        } catch (CstlServiceException ex) {
+        /*} catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
-                                           requestTile.getVersion());
+                                           requestTile.getVersion());*/
         } catch (IOException ex) {
             throw new SOAPServiceException(ex.getMessage(), ExceptionCode.NO_APPLICABLE_CODE.name(), null);
         }

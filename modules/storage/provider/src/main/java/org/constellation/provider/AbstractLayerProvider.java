@@ -18,6 +18,7 @@
 package org.constellation.provider;
 
 import java.util.Collection;
+import org.constellation.provider.configuration.ProviderSource;
 
 import org.geotoolkit.map.ElevationModel;
 import org.opengis.feature.type.Name;
@@ -94,5 +95,10 @@ public abstract class AbstractLayerProvider implements LayerProvider{
             }
         }
         return null;
+    }
+
+    @Override
+    public ProviderSource getSource() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 
 //Constellation dependencies
 import java.awt.image.RenderedImage;
+import java.io.File;
 
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
@@ -63,7 +64,7 @@ public interface WMTSWorker {
      * @param getTile The {@linkplain GetTile get tile} request done on this service.
      * @throws CstlServiceException
      */
-    RenderedImage getTile(final GetTile getTile) throws CstlServiceException;
+    File getTile(final GetTile getTile) throws CstlServiceException;
 
     public void setServiceURL(String serviceURL);
 

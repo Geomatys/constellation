@@ -103,7 +103,8 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         visit(folder);
     }
 
-    protected ProviderSource getSource(){
+    @Override
+    public ProviderSource getSource(){
         return source;
     }
 

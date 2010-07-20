@@ -146,7 +146,8 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     }
 
 
-    protected ProviderSource getSource(){
+    @Override
+    public ProviderSource getSource(){
         return source;
     }
 

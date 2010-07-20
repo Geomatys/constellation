@@ -16,6 +16,7 @@
  */
 package org.constellation.tile.ws;
 
+import org.geotoolkit.wmts.xml.v100.TileMatrix;
 import java.io.File;
 import java.awt.image.RenderedImage;
 import java.io.IOException;
@@ -436,6 +437,19 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         return layerRefs;
     }
 
+    private static List<String> getRootDirectories() throws CstlServiceException {
+
+        List<String> rootDirectories;
+        try { // WE catch the exception from either service version
+            rootDirectories = Cstl.getRegister().getRootDirectory();;
+
+        } catch (RegisterException regex) {
+            throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
+        }
+        return rootDirectories;
+    }
+
+
     public static LayerDetails getLayerReference(Name name) throws CstlServiceException {
 
         LayerDetails layerRef;
@@ -570,7 +584,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
      * {@inheritDoc}
      */
     @Override
-    public RenderedImage getTile(GetTile request) throws CstlServiceException {
+    public File getTile(GetTile request) throws CstlServiceException {
         
         //1 LAYER
         final Name layerName = Util.parseLayerName(request.getLayer());
@@ -615,12 +629,107 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         final String styleName    = request.getStyle();
         final MutableStyle style  = getStyle(styleName);
 
-        // 4. IMAGE
-        RenderedImage image = null;
-        File f = new File("whatever");
-        
 
-        return image;
+        // 4. IMAGE
+        final String matrixSetName    = request.getTileMatrixSet();
+        final String level            = request.getTileMatrix();
+        final TileMatrixSet matrixSet = DefaultTileExample.getTileMatrixSet(matrixSetName);
+        final TileMatrix matrix       = matrixSet.getTileMatrixByName(level);
+
+        final String col              = getLettersFromInt(request.getTileCol(), matrix.getMatrixWidth()); // letter
+        final String line             = getNumbersFromInt(request.getTileRow(), matrix.getMatrixHeight()); // number
+        final List<String> rootDir    = getRootDirectories();
+        final String fileName         = rootDir.get(0) + DefaultTileExample.getPathForMatrixSet(matrixSetName) + level + '_' + col + line + ".png";
+
+
+        final File f = new File(fileName);
+        if (f.exists()) {
+            System.out.println("OKKKK:" + f.getPath());
+        } else {
+            System.out.println("not exist:" + f.getPath());
+        }
+
+        return f;
+    }
+
+    protected static String getNumbersFromInt(Integer i, int max) {
+        if (i != null) {
+            final int nbChar;
+            if (max < 10) {
+                nbChar = 1;
+            } else if (9 < max && max < 100 ){
+                nbChar = 2;
+            } else if (99 < max && max < 1000 ){
+                nbChar = 3;
+            } else {
+                nbChar = 4;
+            }
+            String result = i + "";
+            while (result.length() < nbChar) {
+                result = "0" + result;
+            }
+            return result;
+        }
+        return null;
+    }
+
+    protected static String getLettersFromInt(Integer i, int max) {
+        if (i != null) {
+            final int nbChar;
+            if (max < 26) {
+                nbChar = 1;
+            } else if (25 < max && max < 676 ){
+                nbChar = 2;
+            } else {
+                nbChar = 3;
+            }
+            String result = "";
+            while (i >= 26) {
+                int temp = i / 26;
+                i = i - (26 * temp);
+                result += getLetterFromInt(temp);
+            }
+            result += getLetterFromInt(i);
+
+            while (result.length() < nbChar) {
+                result = "A" + result;
+            }
+            return result;
+        }
+        return null;
+    }
+
+    private static String getLetterFromInt(Integer i) {
+        switch(i) {
+            case 0:  return "A";
+            case 1:  return "B";
+            case 2:  return "C";
+            case 3:  return "D";
+            case 4:  return "E";
+            case 5:  return "F";
+            case 6:  return "G";
+            case 7:  return "H";
+            case 8:  return "I";
+            case 9:  return "J";
+            case 10: return "K";
+            case 11: return "L";
+            case 12: return "M";
+            case 13: return "N";
+            case 14: return "O";
+            case 15: return "P";
+            case 16: return "Q";
+            case 17: return "R";
+            case 18: return "S";
+            case 19: return "T";
+            case 20: return "U";
+            case 21: return "V";
+            case 22: return "W";
+            case 23: return "X";
+            case 24: return "Y";
+            case 25: return "Z";
+            default:
+                throw new IllegalArgumentException("i must be -1 < i < 26 => i=" + i);
+        }
     }
 
     /**

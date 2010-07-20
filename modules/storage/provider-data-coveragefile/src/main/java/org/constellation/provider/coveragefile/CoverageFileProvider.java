@@ -78,7 +78,8 @@ public class CoverageFileProvider extends AbstractLayerProvider{
         visit(folder);
     }
 
-    protected ProviderSource getSource(){
+    @Override
+    public ProviderSource getSource(){
         return source;
     }
 
