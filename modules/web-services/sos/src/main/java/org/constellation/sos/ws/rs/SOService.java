@@ -219,6 +219,7 @@ public class SOService extends OGCWebService {
 
              if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
+                worker.cacheCapabilities();
                 GetCapabilities gc = (GetCapabilities)objectRequest;
                 /*
                  * if the parameters have been send by GET or POST kvp,

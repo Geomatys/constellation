@@ -193,11 +193,12 @@ public class GenericConfigurationXMLBindingTest {
         "            <connectURL>http://somehost/blablabla</connectURL>"           + '\n' +
         "            <user>bobby</user>"                                           + '\n' +
         "            <password>juanito</password>"                                 + '\n' +
-        "        </bdd>"                                                            + '\n' +
+        "        </bdd>"                                                           + '\n' +
         "    </ns2:extensions>"                                                    + '\n' +
         "    <ns2:maxObservationByRequest>0</ns2:maxObservationByRequest>"         + '\n' +
         "    <ns2:debugMode>false</ns2:debugMode>"                                 + '\n' +
         "    <ns2:verifySynchronization>false</ns2:verifySynchronization>"         + '\n' +
+        "    <ns2:keepCapabilities>false</ns2:keepCapabilities>"                   + '\n' +
         "</ns2:SOSConfiguration>" + '\n';
 
         assertEquals(expResult, result);

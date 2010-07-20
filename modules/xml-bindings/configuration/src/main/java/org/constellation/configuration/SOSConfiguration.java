@@ -71,6 +71,8 @@ public class SOSConfiguration {
 
     private boolean verifySynchronization;
 
+    private boolean keepCapabilities = false;
+
     public SOSConfiguration() {
         
     }
@@ -315,6 +317,20 @@ public class SOSConfiguration {
      */
     public void setExtensions(List<Automatic> extensions) {
         this.extensions = extensions;
+    }
+
+    /**
+     * @return the keepCapabilities
+     */
+    public boolean isKeepCapabilities() {
+        return keepCapabilities;
+    }
+
+    /**
+     * @param keepCapabilities the keepCapabilities to set
+     */
+    public void setKeepCapabilities(boolean keepCapabilities) {
+        this.keepCapabilities = keepCapabilities;
     }
 
 }

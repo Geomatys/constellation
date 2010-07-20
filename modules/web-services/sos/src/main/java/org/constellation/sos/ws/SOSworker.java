@@ -313,6 +313,16 @@ public class SOSworker {
     private boolean verifySynchronization;
 
     /**
+     * A flag indicating if we have to store in cache the capabilities document.
+     */
+    private boolean keepCapabilities;
+
+    /**
+     * if the flag keepCapabilities is set to true, this attribute will be fill with the reponse of a getCapabilities.
+     */
+    private static Capabilities cachedCapabilities;
+
+    /**
      * The log level off al the informations log.
      */
     private Level logLevel = Level.INFO;
@@ -352,10 +362,11 @@ public class SOSworker {
 
             if (configuration.getLogFolder() != null) {
                 initLogger("", configuration.getLogFolder());
-                LOGGER.info("Redirecting the log to: " + configuration.getLogFolder());
+                LOGGER.log(Level.INFO, "Redirecting the log to: {0}", configuration.getLogFolder());
             }
-            this.profile = configuration.getProfile();
+            this.profile               = configuration.getProfile();
             this.verifySynchronization = configuration.isVerifySynchronization();
+            this.keepCapabilities      = configuration.isKeepCapabilities();
 
             // the file who record the map between phisycal ID and DB ID.
             loadMapping(configurationDirectory);
@@ -430,7 +441,7 @@ public class SOSworker {
             //we initialize the variables depending on the Reader capabilities
             this.acceptedResponseMode   = omReader.getResponseModes();
             this.acceptedResponseFormat = omReader.getResponseFormats();
-            
+
             // we log some implementation informations
             logInfos();
 
@@ -505,6 +516,16 @@ public class SOSworker {
         LOGGER.info(infos.toString());
     }
 
+    public void cacheCapabilities() throws CstlServiceException {
+        //we fill the cachedCapabilities if we have to
+        if (keepCapabilities && cachedCapabilities == null) {
+            LOGGER.info("adding capabilities document in cache");
+            keepCapabilities = false;
+            cachedCapabilities = getCapabilities(new GetCapabilities("1.0.0", "text/xml"));
+            keepCapabilities = true;
+        }
+    }
+    
     /**
      *
      * @param configDir
@@ -579,7 +600,7 @@ public class SOSworker {
             this.outputFormat = MimeType.APP_XML;
         }
         
-        //we prepare the response document
+        //we prepare the different parts response document
         Capabilities c           = null; 
         ServiceIdentification si = null;
         ServiceProvider       sp = null;
@@ -595,93 +616,105 @@ public class SOSworker {
         if (skeletonCapabilities == null) {
             throw new CstlServiceException("the service was unable to find the metadata for capabilities operation", NO_APPLICABLE_CODE);
         }
+        final Capabilities localCapabilities;
+        if (keepCapabilities) {
+            localCapabilities = cachedCapabilities;
+        } else {
+            localCapabilities = skeletonCapabilities;
+        }
 
         //we enter the information for service identification.
         if (sections.containsSection("ServiceIdentification") || sections.containsSection(ALL)) {
 
-            si = skeletonCapabilities.getServiceIdentification();
+            si = localCapabilities.getServiceIdentification();
         }
 
         //we enter the information for service provider.
         if (sections.containsSection("ServiceProvider") || sections.containsSection(ALL)) {
 
-            sp = skeletonCapabilities.getServiceProvider();
+            sp = localCapabilities.getServiceProvider();
         }
 
         //we enter the operation Metadata
         if (sections.containsSection("OperationsMetadata") || sections.containsSection(ALL)) {
 
-           om = skeletonCapabilities.getOperationsMetadata();
+           om = localCapabilities.getOperationsMetadata();
 
-           //we remove the operation not supported in this profile (transactional/discovery)
-           if (profile == DISCOVERY) {
-               om.removeOperation("InsertObservation");
-               om.removeOperation("RegisterSensor");
-           }
+           if (!keepCapabilities) {
 
-
-           //we update the URL
-           OGCWebService.updateOWSURL(om.getOperation(), serviceURL, SOS);
+               //we remove the operation not supported in this profile (transactional/discovery)
+               if (profile == DISCOVERY) {
+                   om.removeOperation("InsertObservation");
+                   om.removeOperation("RegisterSensor");
+               }
 
 
-           //we update the parameter in operation metadata.
-           final Operation go = om.getOperation("GetObservation");
+               //we update the URL
+               OGCWebService.updateOWSURL(om.getOperation(), serviceURL, SOS);
 
-           // the list of offering names
-           go.updateParameter(OFFERING, omReader.getOfferingNames());
 
-           // the event time range
-           final List<String> eventTime = omReader.getEventTime();
-           if (eventTime != null && eventTime.size() == 1) {
-               final RangeType range = new RangeType(eventTime.get(0), "now");
-               go.updateParameter(EVENT_TIME, range);
-           } else if (eventTime != null && eventTime.size() == 2) {
-               final RangeType range = new RangeType(eventTime.get(0), eventTime.get(1));
-               go.updateParameter(EVENT_TIME, range);
-           }
+               //we update the parameter in operation metadata.
+               final Operation go = om.getOperation("GetObservation");
 
-           //the process list
-           final Collection<String> procNames = omReader.getProcedureNames();
-           go.updateParameter(PROCEDURE, procNames);
+               // the list of offering names
+               go.updateParameter(OFFERING, omReader.getOfferingNames());
 
-           //the phenomenon list
-           go.updateParameter("observedProperty", omReader.getPhenomenonNames());
+               // the event time range
+               final List<String> eventTime = omReader.getEventTime();
+               if (eventTime != null && eventTime.size() == 1) {
+                   final RangeType range = new RangeType(eventTime.get(0), "now");
+                   go.updateParameter(EVENT_TIME, range);
+               } else if (eventTime != null && eventTime.size() == 2) {
+                   final RangeType range = new RangeType(eventTime.get(0), eventTime.get(1));
+                   go.updateParameter(EVENT_TIME, range);
+               }
 
-           //the feature of interest list
-           go.updateParameter("featureOfInterest", omReader.getFeatureOfInterestNames());
+               //the process list
+               final Collection<String> procNames = omReader.getProcedureNames();
+               go.updateParameter(PROCEDURE, procNames);
 
-           // the different responseMode available
-           final List<String> arm = new ArrayList<String>();
-           for (ResponseModeType rm: acceptedResponseMode) {
-               arm.add(rm.value());
-           }
-           go.updateParameter(RESPONSE_MODE, arm);
+               //the phenomenon list
+               go.updateParameter("observedProperty", omReader.getPhenomenonNames());
 
-           // the different responseFormat available
-           go.updateParameter("responseFormat", acceptedResponseFormat);
+               //the feature of interest list
+               go.updateParameter("featureOfInterest", omReader.getFeatureOfInterestNames());
 
-           /**
-            * Because sometimes there is some sensor that are queryable in DescribeSensor but not in GetObservation
-            */
-           final Operation ds = om.getOperation("DescribeSensor");
-           if (smlReader != null) {
-               ds.updateParameter(PROCEDURE, smlReader.getSensorNames());
-           } else {
-               ds.updateParameter(PROCEDURE, procNames);
-           }
+               // the different responseMode available
+               final List<String> arm = new ArrayList<String>();
+               for (ResponseModeType rm: acceptedResponseMode) {
+                   arm.add(rm.value());
+               }
+               go.updateParameter(RESPONSE_MODE, arm);
 
+               // the different responseFormat available
+               go.updateParameter("responseFormat", acceptedResponseFormat);
+
+               /**
+                * Because sometimes there is some sensor that are queryable in DescribeSensor but not in GetObservation
+                */
+               final Operation ds = om.getOperation("DescribeSensor");
+               if (smlReader != null) {
+                   ds.updateParameter(PROCEDURE, smlReader.getSensorNames());
+               } else {
+                   ds.updateParameter(PROCEDURE, procNames);
+               }
+            }
         }
 
         //we enter the information filter capablities.
         if (sections.containsSection("Filter_Capabilities") || sections.containsSection(ALL)) {
 
-            fc = skeletonCapabilities.getFilterCapabilities();
+            fc = localCapabilities.getFilterCapabilities();
         }
 
         if (sections.containsSection("Contents") || sections.containsSection(ALL)) {
-            // we add the list of observation ofeerings 
-            final ObservationOfferingList ool = new ObservationOfferingList(omReader.getObservationOfferings());
-            cont = new Contents(ool);
+            if (keepCapabilities) {
+                cont = cachedCapabilities.getContents();
+            } else {
+                // we add the list of observation ofeerings
+                final ObservationOfferingList ool = new ObservationOfferingList(omReader.getObservationOfferings());
+                cont = new Contents(ool);
+            }
         }
         c = new Capabilities(si, sp, om, VERSION, null, fc, cont);
 
@@ -1165,7 +1198,7 @@ public class SOSworker {
             // we look if the station if contained in the BBOX
             return stationX < maxx && stationX > minx && stationY < maxy && stationY > miny;
         }
-        LOGGER.warning(" the feature of interest " + sp.getId() + " does not have proper position");
+        LOGGER.log(Level.WARNING, " the feature of interest {0} does not have proper position", sp.getId());
         return false;
     }
     
@@ -1376,7 +1409,6 @@ public class SOSworker {
                 int i = 1;
                 while (tokenizer.hasMoreTokens()) {
                     final String block = tokenizer.nextToken();
-                    LOGGER.finer(i + " eme block =" + block);
                     i++;
                     String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
                     samplingTimeValue = samplingTimeValue.replace('T', ' ');
@@ -1401,28 +1433,24 @@ public class SOSworker {
                     if (boundBegin != null && boundEnd != null) {
                         if (t.after(boundBegin) && t.before(boundEnd)) {
                             values += block + encoding.getBlockSeparator();
-                            LOGGER.finer("TD matching");
                         }
                         
                     //time after case    
                     } else if (boundBegin != null && boundEnd == null) {
                         if (t.after(boundBegin)) {
                             values += block + encoding.getBlockSeparator();
-                            LOGGER.finer("TA matching");
                         }
                     
                     //time before case    
                     } else if (boundBegin == null && boundEnd != null) {
                         if (t.before(boundEnd)) {
                             values += block + encoding.getBlockSeparator();
-                            LOGGER.finer("TB matching");
                         }
                         
                     //time equals case    
                     } else if (boundEquals != null) {
                         if (t.equals(boundEquals)) {
                             values += block + encoding.getBlockSeparator();
-                            LOGGER.finer("TE matching");
                         }
                     }
                 }
@@ -1439,7 +1467,7 @@ public class SOSworker {
         final long start = System.currentTimeMillis();
 
         // if there is no filter we throw an exception
-        if (request.getEventTime().size() ==  0 && request.getFeatureOfInterestId().size() == 0 && request.getLocation() == null) {
+        if (request.getEventTime().isEmpty() && request.getFeatureOfInterestId().isEmpty() && request.getLocation() == null) {
             throw new CstlServiceException("You must choose a filter parameter: eventTime, featureId or location", MISSING_PARAMETER_VALUE);
         }
 
@@ -1542,7 +1570,7 @@ public class SOSworker {
                         if (samplingPointMatchEnvelope(sp, e)) {
                             matchingFeatureOfInterest.add(sp);
                         } else {
-                            LOGGER.finer(" the feature of interest " + sp.getId() + " is not in the BBOX");
+                            LOGGER.log(Level.FINER, " the feature of interest {0} is not in the BBOX", sp.getId());
                         }
                     } else {
                         LOGGER.log(Level.WARNING, "unknow implementation:{0}", station.getClass().getName());
@@ -1706,7 +1734,7 @@ public class SOSworker {
             obs.setProcedure(proc);
             obs.setName(omReader.getNewObservationId());
             LOGGER.finer("samplingTime received: " + obs.getSamplingTime());
-            LOGGER.finer("template received:" + '\n' + obs.toString());
+            LOGGER.finer("template received:\n"    + obs.toString());
         } else {
             throw new CstlServiceException("The observation template must be specified",
                                              MISSING_PARAMETER_VALUE, OBSERVATION_TEMPLATE);

@@ -113,7 +113,6 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         pool.release(marshaller);
         init();
         worker = new SOSworker(configDir);
-        System.out.println("capabilities>>>>>>>>>>>>>>>>" + capabilities);
         worker.setSkeletonCapabilities(capabilities);
         worker.setServiceURL(URL);
         worker.setLogLevel(Level.FINER);
