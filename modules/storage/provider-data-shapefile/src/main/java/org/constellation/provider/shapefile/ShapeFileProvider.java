@@ -262,7 +262,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
         final Map<String,Serializable> params = new HashMap<String,Serializable>();
         try {
             params.put("url", f.toURI().toURL());
-            params.put("namespace", namespace);
+            params.put(KEY_NAMESPACE, namespace);
             return DataStoreFinder.getDataStore(params);
        } catch (DataStoreException ex) {
             LOGGER.log(Level.WARNING, null, ex);

@@ -23,6 +23,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -66,6 +67,7 @@ import org.geotoolkit.display2d.ext.text.DefaultTextTemplate;
 import org.geotoolkit.display2d.ext.text.GraphicTextJ2D;
 import org.geotoolkit.display2d.ext.text.TextTemplate;
 import org.geotoolkit.display2d.service.PortrayalExtension;
+import org.geotoolkit.factory.Hints;
 import org.geotoolkit.lang.ThreadSafe;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.Converters;
@@ -143,6 +145,7 @@ public final class WMSMapDecoration {
      * Decoration extension for map queries.
      */
     private static PortrayalExtension extension = null;
+    private static Hints hints = null;
 
     /**
      * The default legend template.
@@ -197,6 +200,11 @@ public final class WMSMapDecoration {
         return extension;
     }
 
+    public static synchronized Hints getHints() {
+        getExtension();
+        return hints;
+    }
+
     public static PortrayalExtension read(File configFile)
             throws ParserConfigurationException, SAXException, IOException{
 
@@ -207,8 +215,41 @@ public final class WMSMapDecoration {
         final DocumentBuilderFactory fabrique = DocumentBuilderFactory.newInstance();
         final DocumentBuilder constructeur = fabrique.newDocumentBuilder();
         final Document document = constructeur.parse(configFile);
-        final NodeList nodes = document.getElementsByTagName(TAG_DECORATION);
 
+        hints = new Hints();
+        final Map<String,String> params = parseParameters(document.getDocumentElement());
+        for (String key : params.keySet()) {
+            if ("antialiasing".equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                if ("true".equalsIgnoreCase(value)) {
+                    hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                } else {
+                    hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+                }
+            }
+            if ("interpolation".equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                if ("bilinear".equalsIgnoreCase(value)) {
+                    hints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                } else if ("bicubic".equalsIgnoreCase(value)) {
+                    hints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+                } else {
+                    hints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                }
+            }
+            if ("rendering".equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                if ("quality".equalsIgnoreCase(value)) {
+                    hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                } else if ("speed".equalsIgnoreCase(value)) {
+                    hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
+                } else {
+                    hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT);
+                }
+            }
+        }
+
+        final NodeList nodes = document.getElementsByTagName(TAG_DECORATION);
         final DecorationExtension ext = new DecorationExtension();
 
         final int n = nodes.getLength();

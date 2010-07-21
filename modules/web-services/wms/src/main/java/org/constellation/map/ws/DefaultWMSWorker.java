@@ -735,6 +735,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         params.put(WMSQuery.KEY_EXTRA_PARAMETERS, getMap.getParameters());
         final SceneDef sdef = new SceneDef();
         sdef.extensions().add(WMSMapDecoration.getExtension());
+        sdef.getHints().putAll(WMSMapDecoration.getHints());
 
         try {
             final MapContext context = PortrayalUtil.createContext(layerRefs, styles, params);
