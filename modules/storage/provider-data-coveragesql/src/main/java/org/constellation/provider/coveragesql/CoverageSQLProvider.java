@@ -200,11 +200,12 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
         if (reader != null) {
             final String name = key.getLocalPart();
             final ProviderLayer layer = source.getLayer(name);
+            final Name em = (layer.elevationModel == null) ? null : DefaultName.valueOf(layer.elevationModel);
             if (layer == null) {
-                return new CoverageSQLLayerDetails(reader,null,null,key);
+                return new CoverageSQLLayerDetails(reader,null,em,key);
 
             } else {
-                return new CoverageSQLLayerDetails(reader,layer.styles,null,key);
+                return new CoverageSQLLayerDetails(reader,layer.styles,em,key);
             }
         }
 

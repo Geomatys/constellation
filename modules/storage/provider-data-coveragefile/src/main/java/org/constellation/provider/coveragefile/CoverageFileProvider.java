@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageReader;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
@@ -35,6 +36,7 @@ import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.io.ImageCoverageReader;
 import org.geotoolkit.feature.DefaultName;
+import org.geotoolkit.image.io.XImageIO;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.util.collection.Cache;
@@ -55,8 +57,45 @@ public class CoverageFileProvider extends AbstractLayerProvider{
 
     private static final Logger LOGGER = Logging.getLogger(CoverageFileProvider.class);
 
-    private final Map<Name,File> index = new HashMap<Name,File>();
-    private final Map<Name,GridCoverageReader> cache = new Cache<Name, GridCoverageReader>(10, 10, true);
+    private final Map<Name,File> index = new HashMap<Name,File>(){
+
+        @Override
+        public File get(Object key) {
+            if(key instanceof Name && ((Name)key).isGlobal()){
+                String nmsp = source.parameters.get(KEY_NAMESPACE);
+                if (nmsp == null) {
+                    nmsp = DEFAULT_NAMESPACE;
+                } else if (nmsp.equals("no namespace")) {
+                    nmsp = null;
+                }
+
+                key = new DefaultName(nmsp, ((Name)key).getLocalPart());
+            }
+
+            return super.get(key);
+        }
+
+    };
+
+    private final Map<Name,GridCoverageReader> cache = new Cache<Name, GridCoverageReader>(10, 10, true){
+
+        @Override
+        public GridCoverageReader get(Object key) {
+            if(key instanceof Name && ((Name)key).isGlobal()){
+                String nmsp = source.parameters.get(KEY_NAMESPACE);
+                if (nmsp == null) {
+                    nmsp = DEFAULT_NAMESPACE;
+                } else if (nmsp.equals("no namespace")) {
+                    nmsp = null;
+                }
+
+                key = new DefaultName(nmsp, ((Name)key).getLocalPart());
+            }
+
+            return super.get(key);
+        }
+
+    };
 
     private final ProviderSource source;
     private final File folder;
@@ -136,11 +175,12 @@ public class CoverageFileProvider extends AbstractLayerProvider{
         if (reader != null) {
             final String name = key.getLocalPart();
             final ProviderLayer layer = source.getLayer(name);
+            final Name em = (layer.elevationModel == null) ? null : DefaultName.valueOf(layer.elevationModel);
             if (layer == null) {
-                return new CoverageFileLayerDetails(reader,null,null, key);
+                return new CoverageFileLayerDetails(reader,null,em, key);
 
             } else {
-                return new CoverageFileLayerDetails(reader,layer.styles,null,key);
+                return new CoverageFileLayerDetails(reader,layer.styles,em,key);
             }
         }
 
@@ -212,8 +252,10 @@ public class CoverageFileProvider extends AbstractLayerProvider{
      */
     private void test(final File candidate){
         if (candidate.isFile()){
-            /*try {
-                final ImageReader reader = XImageIO.getReaderBySuffix(candidate, Boolean.TRUE, Boolean.TRUE);*/
+            try {
+                //don't comment this block, This raise an error if no reader for the file can be found
+                //this way we are sure that the file is an image.
+                final ImageReader reader = XImageIO.getReaderBySuffix(candidate, Boolean.TRUE, Boolean.TRUE);
 
                 final String fullName = candidate.getName();
                 final int idx = fullName.lastIndexOf('.');
@@ -228,8 +270,8 @@ public class CoverageFileProvider extends AbstractLayerProvider{
                     index.put(new DefaultName(nmsp,name), candidate);
                 }
 
-            /*} catch (IOException ex) {
-            }*/
+            } catch (IOException ex) {
+            }
         }
     }
 
