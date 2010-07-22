@@ -38,6 +38,7 @@ import org.geotoolkit.feature.DefaultName;
 
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.jdbc.WrappedDataSource;
+import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.util.logging.Logging;
 
 import org.opengis.feature.type.Name;
@@ -291,13 +292,13 @@ public class CoverageSQLProvider extends AbstractLayerProvider{
     @Override
     public ElevationModel getElevationModel(Name name) {
 
-//        final ProviderLayer layer = source.getLayer(name);
-//        if(layer != null && layer.isElevationModel){
-//            final CoverageSQLLayerDetails pgld = (CoverageSQLLayerDetails) getByIdentifier(name);
-//            if(pgld != null){
-//                return MapBuilder.createElevationModel(pgld.getReader());
-//            }
-//        }
+        final ProviderLayer layer = source.getLayer(name.getLocalPart());
+        if(layer != null && layer.isElevationModel){
+            final CoverageSQLLayerDetails pgld = (CoverageSQLLayerDetails) getByIdentifier(name);
+            if(pgld != null){
+                return MapBuilder.createElevationModel(pgld.getReader());
+            }
+        }
         
         return null;
     }
