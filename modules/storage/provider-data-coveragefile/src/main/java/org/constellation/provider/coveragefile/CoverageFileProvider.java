@@ -175,7 +175,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
         if (reader != null) {
             final String name = key.getLocalPart();
             final ProviderLayer layer = source.getLayer(name);
-            final Name em = (layer.elevationModel == null) ? null : DefaultName.valueOf(layer.elevationModel);
+            final Name em = (layer == null || layer.elevationModel == null) ? null : DefaultName.valueOf(layer.elevationModel);
             if (layer == null) {
                 return new CoverageFileLayerDetails(reader,null,em, key);
 
