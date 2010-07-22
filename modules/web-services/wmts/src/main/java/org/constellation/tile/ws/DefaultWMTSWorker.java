@@ -18,9 +18,6 @@ package org.constellation.tile.ws;
 
 import org.geotoolkit.wmts.xml.v100.TileMatrix;
 import java.io.File;
-import java.awt.image.RenderedImage;
-import java.io.IOException;
-import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.opengis.coverage.Coverage;
 import java.text.ParseException;
 import org.constellation.util.TimeParser;
@@ -586,7 +583,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
     @Override
     public File getTile(GetTile request) throws CstlServiceException {
         
-        //1 LAYER
+        //1 LAYER NOT USED FOR NOW
         final Name layerName = Util.parseLayerName(request.getLayer());
         LayerDetails layerRef;
         try{
@@ -604,7 +601,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
                 try {
                     elevation = Double.parseDouble(dimension.getValue());
                 } catch (NumberFormatException ex) {
-                    throw new CstlServiceException("Unable to perse the elevation value", INVALID_PARAMETER_VALUE, "elevation");
+                    throw new CstlServiceException("Unable to parse the elevation value", INVALID_PARAMETER_VALUE, "elevation");
                 }
             }
             if (dimension.getName().equalsIgnoreCase("time")) {
@@ -616,37 +613,52 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
             }
         }
 
-        /*GridCoverage2D c = null;
-        try {
-            c = layerRef.getCoverage(null, null, elevation, time);
-        } catch (IOException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        } catch (DataStoreException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
-        }*/
-
         // 3 STYLE NOT USED FOR NOW
         final String styleName    = request.getStyle();
         final MutableStyle style  = getStyle(styleName);
 
 
-        // 4. IMAGE
+        // 4. We get the parameters
+        final int columnIndex         = request.getTileCol();
+        final int rowIndex            = request.getTileRow();
         final String matrixSetName    = request.getTileMatrixSet();
         final String level            = request.getTileMatrix();
+        
+        
+        // 5. we verify the parameters
+        if (columnIndex < 0 || rowIndex < 0) {
+            throw new CstlServiceException("TileCol and TileRow must be > 0", INVALID_PARAMETER_VALUE);
+        }
+
         final TileMatrixSet matrixSet = DefaultTileExample.getTileMatrixSet(matrixSetName);
+        if (matrixSet == null) {
+            throw new CstlServiceException("Undefined matrixSet:" + matrixSetName + " for layer:" + layerName, INVALID_PARAMETER_VALUE, "tilematrixset");
+        }
         final TileMatrix matrix       = matrixSet.getTileMatrixByName(level);
 
-        final String col              = getLettersFromInt(request.getTileCol(), matrix.getMatrixWidth()); // letter
-        final String line             = getNumbersFromInt(request.getTileRow(), matrix.getMatrixHeight()); // number
+        if (matrix == null) {
+            throw new CstlServiceException("Undefined matrix:" + level + " for matrixSet:" + matrixSetName, INVALID_PARAMETER_VALUE, "tilematrix");
+        }
+        if (columnIndex >= matrix.getMatrixWidth()) {
+            throw new CstlServiceException("TileCol out of band" + columnIndex + " > " +  matrix.getMatrixWidth(), INVALID_PARAMETER_VALUE, "tilecol");
+        }
+        if (rowIndex >= matrix.getMatrixHeight()) {
+            throw new CstlServiceException("TileRow out of band" + rowIndex + " > " +  matrix.getMatrixHeight(), INVALID_PARAMETER_VALUE, "tilerow");
+        }
+
+        // we transform the parameters to get the correct tile file
+        final String col              = getLettersFromInt(columnIndex, matrix.getMatrixWidth()); // letter
+        final String line             = getNumbersFromInt(rowIndex, matrix.getMatrixHeight()); // number
         final List<String> rootDir    = getRootDirectories();
         final String fileName         = rootDir.get(0) + DefaultTileExample.getPathForMatrixSet(matrixSetName) + level + '_' + col + line + ".png";
 
 
         final File f = new File(fileName);
         if (f.exists()) {
-            System.out.println("OKKKK:" + f.getPath());
+            LOGGER.info("OKKKK:" + f.getPath());
         } else {
-            System.out.println("not exist:" + f.getPath());
+            LOGGER.info("not exist:" + f.getPath());
+            throw new CstlServiceException("The correspounding file has not been found", NO_APPLICABLE_CODE);
         }
 
         return f;
@@ -654,10 +666,11 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
 
     protected static String getNumbersFromInt(Integer i, int max) {
         if (i != null) {
+            i = i + 1;
             final int nbChar;
-            if (max < 10) {
+            if (max < 9) {
                 nbChar = 1;
-            } else if (9 < max && max < 100 ){
+            } else if (8 < max && max < 100 ){
                 nbChar = 2;
             } else if (99 < max && max < 1000 ){
                 nbChar = 3;
@@ -752,7 +765,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
 
     private static MutableStyle getStyle(final String styleName) throws CstlServiceException {
         final MutableStyle style;
-        if (styleName != null) {
+        if (styleName != null && !styleName.isEmpty()) {
             //try to grab the style if provided
             //a style has been given for this layer, try to use it
             style = StyleProviderProxy.getInstance().get(styleName);

@@ -390,7 +390,7 @@ public class CSWworker {
         indexSearcher                 = cswfactory.getIndexSearcher(datasourceType, configDir, serviceID);
         if (profile == TRANSACTIONAL) {
             mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer);
-            catalogueHarvester        = new DefaultCatalogueHarvester(marshallerPool, mdWriter);//new IGNHarvester(marshallerPool, mdWriter);
+            catalogueHarvester        = new DefaultCatalogueHarvester(marshallerPool, mdWriter);//new ByIDHarvester(marshallerPool, mdWriter);
             harvestTaskSchreduler     = new HarvestTaskSchreduler(marshallerPool, configDir, catalogueHarvester);
         } else {
             indexer.destroy();
