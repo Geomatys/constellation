@@ -390,7 +390,11 @@ public class CSWworker {
         indexSearcher                 = cswfactory.getIndexSearcher(datasourceType, configDir, serviceID);
         if (profile == TRANSACTIONAL) {
             mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer);
-            catalogueHarvester        = new DefaultCatalogueHarvester(marshallerPool, mdWriter);//new ByIDHarvester(marshallerPool, mdWriter);
+            if (configuration.getByIdHarvester() != null && configuration.getByIdHarvester().equalsIgnoreCase("true")) {
+                catalogueHarvester    = new ByIDHarvester(marshallerPool, mdWriter, configuration.getIdentifierDirectory());
+            } else {
+                catalogueHarvester    = new DefaultCatalogueHarvester(marshallerPool, mdWriter);//
+            }
             harvestTaskSchreduler     = new HarvestTaskSchreduler(marshallerPool, configDir, catalogueHarvester);
         } else {
             indexer.destroy();

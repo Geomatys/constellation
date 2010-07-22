@@ -110,8 +110,16 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
     protected static final String UNKNOW_TITLE = "unknow title";
 
+    /**
+     * A flag indicating that we don't want to write predefined values.
+     */
     private boolean noLink = false;
-    
+
+    /**
+     * A flag indicating that we don't want to add the metadata to the index.
+     */
+    private boolean noIndexation = false;
+
     /**
      * Build a new metadata writer.
      * 
@@ -151,6 +159,11 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
            
             mdRecordSet = getRecordSet(configuration.getDefaultRecordSet());
             defaultUser = mdWriter.getUser("admin");
+
+            if (configuration.getNoIndexation() != null && configuration.getNoIndexation().equalsIgnoreCase("true")) {
+                noIndexation = true;
+                LOGGER.info("indexation is de-activated for Transactionnal part");
+            }
 
         } catch (MD_IOException ex) {
             throw new MetadataIoException("MD_IOException while initializing the MDWeb writer:" +'\n'+
@@ -914,7 +927,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final long time = System.currentTimeMillis() - start;
 
             LOGGER.log(logLevel, "inserted new Form: " + form.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " + writeTime + ")");
-            indexDocument(form);
+            if (!noIndexation) {
+                indexDocument(form);
+            }
             return true;
 
         }

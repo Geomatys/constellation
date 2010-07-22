@@ -54,31 +54,96 @@ public class Automatic {
     @XmlTransient
     public static final int SERV       = 8;
 
+    /**
+     * The database connection informations.
+     */
     private BDD bdd;
 
+    /**
+     * A List of thesaurus database connection informations.
+     */
     private List<BDD> thesaurus;
 
+    /**
+     * The directory whe is stored the configuration file.
+     * must be set by java, not in the xml file because it is transient.
+     */
     @XmlTransient
     private File configurationDirectory;
-    
+
+    /**
+     * The specific type of implementation.
+     * could be one of the static flag declared up there.
+     * DEFAULT, CSR, MDWEB, FILESYSTEM, PRODLINE, ....
+     */
     @XmlAttribute
     private String format;
 
+    /**
+     * A name to the object.
+     * could be used in a case of multiple automatic in the same file.
+     */
     @XmlAttribute
     private String name;
 
+    /**
+     * The profile of the service (Discovery or transactional).
+     */
     private String profile;
 
+    /**
+     * Enable the paralele execution.
+     */
     private String enableThread;
-    
+
+    /**
+     * Enable the cache of metadata
+     * (caution in case of large amount of data)
+     */
     private String enableCache;
 
+    /**
+     * Allow to store the mapping between MDWeb classes and GEOTK classes
+     * in a properties file at the shutdown of the reader.
+     */
     private String storeMapping;
 
+    /**
+     * Allow to disable the indexation part in of the metadataReader,
+     * In the operation Harvest and transaction.
+     */
+    private String noIndexation;
+
+    /**
+     * In the case of a fileSystem implementation,
+     * this attribute contains the path of the directory containing the data.
+     */
     private String dataDirectory;
 
+    /**
+     * In the case of a MDWeb implementation,
+     * this flag allow to send all the metadata in the specified RecordSet.
+     */
     private String defaultRecordSet;
 
+    /**
+     * In the case of a CSW configuration,
+     * you can use this flag to substitute the Default catalogue harvester,
+     * by a ByIdHarvester.
+     */
+    private String byIdHarvester;
+
+    /**
+     * In the case of CSW with a ByIdHarvester,
+     * you must set this parameter to indicate
+     * to the harvester where to find the file containing the identifiers.
+     */
+    private String identifierDirectory;
+
+    /**
+     * In the case of a generic Implementation,
+     * this object contains all the sql queries used to retrieve and build metadata.
+     */
     private Queries queries;
 
     public Automatic() {
@@ -150,21 +215,21 @@ public class Automatic {
     }
 
     public int getType() {
-        if ("cdi".equals(format))
+        if ("cdi".equalsIgnoreCase(format))
             return CDI;
-        else if ("csr".equals(format))
+        else if ("csr".equalsIgnoreCase(format))
             return CSR;
-        else if ("edmed".equals(format))
+        else if ("edmed".equalsIgnoreCase(format))
             return EDMED;
-        else if ("mdweb".equals(format))
+        else if ("mdweb".equalsIgnoreCase(format))
             return MDWEB;
-        else if ("filesystem".equals(format))
+        else if ("filesystem".equalsIgnoreCase(format))
             return FILESYSTEM;
-        else if ("serv".equals(format))
+        else if ("serv".equalsIgnoreCase(format))
             return SERV;
-        else if ("prodline".equals(format))
+        else if ("prodline".equalsIgnoreCase(format))
             return PRODLINE;
-        else if ("prodspec".equals(format))
+        else if ("prodspec".equalsIgnoreCase(format))
             return PRODSPEC;
         else
             return DEFAULT;
@@ -254,6 +319,20 @@ public class Automatic {
     }
 
     /**
+     * @return the noIndexation
+     */
+    public String getNoIndexation() {
+        return noIndexation;
+    }
+
+    /**
+     * @param noIndexation the noIndexation to set
+     */
+    public void setNoIndexation(String noIndexation) {
+        this.noIndexation = noIndexation;
+    }
+
+    /**
      * @return the defaultRecordSet
      */
     public String getDefaultRecordSet() {
@@ -265,6 +344,34 @@ public class Automatic {
      */
     public void setDefaultRecordSet(String defaultRecordSet) {
         this.defaultRecordSet = defaultRecordSet;
+    }
+
+     /**
+     * @return the byIdHarvester
+     */
+    public String getByIdHarvester() {
+        return byIdHarvester;
+    }
+
+    /**
+     * @param byIdHarvester the byIdHarvester to set
+     */
+    public void setByIdHarvester(String byIdHarvester) {
+        this.byIdHarvester = byIdHarvester;
+    }
+
+    /**
+     * @return the identifierDirectory
+     */
+    public String getIdentifierDirectory() {
+        return identifierDirectory;
+    }
+
+    /**
+     * @param identifierDirectory the identifierDirectory to set
+     */
+    public void setIdentifierDirectory(String identifierDirectory) {
+        this.identifierDirectory = identifierDirectory;
     }
 
     @Override
@@ -303,8 +410,14 @@ public class Automatic {
         if (storeMapping != null) {
             s.append("storeMapping:").append(storeMapping).append('\n');
         }
-        if (queries != null) {
-            s.append("queries: ").append(queries).append('\n');
+        if (noIndexation != null) {
+            s.append("noIndexation:").append(noIndexation).append('\n');
+        }
+        if (byIdHarvester != null) {
+            s.append("byIdHarvester:").append(byIdHarvester).append('\n');
+        }
+        if (identifierDirectory != null) {
+            s.append("identifierDirectory: ").append(identifierDirectory).append('\n');
         }
         return s.toString();
     }
@@ -330,6 +443,9 @@ public class Automatic {
                    Utilities.equals(this.profile,          that.profile)          &&
                    Utilities.equals(this.storeMapping,     that.storeMapping)     &&
                    Utilities.equals(this.thesaurus,        that.thesaurus)        &&
+                   Utilities.equals(this.noIndexation,     that.noIndexation)     &&
+                   Utilities.equals(this.byIdHarvester,    that.byIdHarvester)     &&
+                   Utilities.equals(this.noIndexation,     that.noIndexation)     &&
                    Utilities.equals(this.queries,          that.queries);
         }
         return false;
@@ -349,6 +465,7 @@ public class Automatic {
         hash = 37 * hash + (this.storeMapping != null ? this.storeMapping.hashCode() : 0);
         hash = 37 * hash + (this.dataDirectory != null ? this.dataDirectory.hashCode() : 0);
         hash = 37 * hash + (this.defaultRecordSet != null ? this.defaultRecordSet.hashCode() : 0);
+        hash = 37 * hash + (this.noIndexation != null ? this.noIndexation.hashCode() : 0);
         return hash;
     }
 
