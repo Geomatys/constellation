@@ -177,6 +177,12 @@
 
   <profiles>
     <profile>
+      <id>wmswcs</id>
+      <properties>
+        <constellation.services.packages>${constellation.config};${constellation.map};${constellation.coverage};${constellation.provider}</constellation.services.packages>
+      </properties>
+    </profile>
+    <profile>
       <id>wms</id>
       <properties>
         <constellation.services.packages>${constellation.config};${constellation.map};${constellation.provider}</constellation.services.packages>

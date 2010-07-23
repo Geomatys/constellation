@@ -117,6 +117,14 @@
     	<module>generic</module>
       </modules>
     </profile>
+    <profile>
+      <id>sos</id>
+      <modules>
+        <module>metadata</module>
+    	<module>generic</module>
+        <module>observation</module>
+      </modules>
+    </profile>
   </profiles>
 
   <!-- =========================================================== -->
