@@ -190,7 +190,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
             final Envelope env = store.getEnvelope(QueryBuilder.all(name));
 
             Envelope renv = null;
-            if(env.getCoordinateReferenceSystem().equals(DefaultGeographicCRS.WGS84)){
+            if(!CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), DefaultGeographicCRS.WGS84)){
                 renv = CRS.transform(env, DefaultGeographicCRS.WGS84);
             }
 
