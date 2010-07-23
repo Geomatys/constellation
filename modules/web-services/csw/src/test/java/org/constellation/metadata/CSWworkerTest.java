@@ -710,7 +710,7 @@ public class CSWworkerTest {
 
         /*
          *  TEST 7 : getRecords with RESULTS - DC mode (Custom) - CQL text: CreationDate BETWEEN 2009-01-10 AND 2009-01-30
-         */
+         
 
         typeNames        = Arrays.asList(RECORD_QNAME);
         cust             = new ArrayList<QName>();
@@ -774,6 +774,8 @@ public class CSWworkerTest {
         assertEquals(expCustomResult3, customResult3);
         assertEquals(expCustomResult4, customResult4);
 
+         
+         */
         pool.release(unmarshaller);
     }
 
