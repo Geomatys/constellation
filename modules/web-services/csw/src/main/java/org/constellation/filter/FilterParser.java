@@ -61,17 +61,7 @@ import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.filter.FilterFactoryImpl;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.v311.PolygonType;
-
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.geotoolkit.lucene.filter.LuceneOGCFilter.*;
-
-// GeoAPI dependencies
-import org.opengis.filter.FilterFactory2;
-import org.opengis.util.FactoryException;
-import org.opengis.referencing.NoSuchAuthorityCodeException;
-
-// JTS dependencies
-import com.vividsolutions.jts.geom.Geometry;
+import org.geotoolkit.ogc.xml.v110.LowerBoundaryType;
 import org.geotoolkit.ogc.xml.v110.ObjectFactory;
 import org.geotoolkit.ogc.xml.v110.AbstractIdType;
 import org.geotoolkit.ogc.xml.v110.BinaryComparisonOpType;
@@ -85,6 +75,19 @@ import org.geotoolkit.ogc.xml.v110.PropertyIsGreaterThanOrEqualToType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLessThanType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsGreaterThanType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLessThanOrEqualToType;
+import org.geotoolkit.ogc.xml.v110.UpperBoundaryType;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import static org.geotoolkit.lucene.filter.LuceneOGCFilter.*;
+
+// GeoAPI dependencies
+import org.opengis.filter.FilterFactory2;
+import org.opengis.util.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+
+// JTS dependencies
+import com.vividsolutions.jts.geom.Geometry;
+
 /**
  *
  * @author Guilhem Legal (Geomatys)
@@ -122,6 +125,15 @@ public abstract class FilterParser {
             result = (FilterType) newFilter;
         }
         return result;
+    }
+
+    /**
+     * Build a CQL query with the specified Filter.
+     *
+     * @param filter A well-formed Filter .
+     */
+    public static String filterToCql(FilterType filter) throws CQLException, JAXBException {
+        return CQL.toCQL(filter);
     }
 
     /**
@@ -196,9 +208,19 @@ public abstract class FilterParser {
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
         } else if (comparisonOps instanceof PropertyIsBetweenType) {
-
-            //TODO
-            throw new UnsupportedOperationException("Not supported yet.");
+            final PropertyIsBetweenType pib = (PropertyIsBetweenType) comparisonOps;
+            final String propertyName       = pib.getPropertyName();
+            final LowerBoundaryType low     = pib.getLowerBoundary();
+            final LiteralType lowLit        = low.getLiteral();
+            final UpperBoundaryType upp     = pib.getUpperBoundary();
+            final LiteralType uppLit        = upp.getLiteral();
+            if (propertyName == null || lowLit == null || uppLit == null) {
+                throw new CstlServiceException("A PropertyIsBetween operator must be constitued of a lower boundary containing a literal, "
+                                             + "an upper boundary containing a literal and a property name.", INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
+            } else {
+                addDateComparisonFilter(response, propertyName, lowLit.getStringValue(), ">=");
+                addDateComparisonFilter(response, propertyName, uppLit.getStringValue(), "<=");
+            }
 
         } else if (comparisonOps instanceof BinaryComparisonOpType) {
 
@@ -615,6 +637,17 @@ public abstract class FilterParser {
         return false;
     }
 
+    /**
+     * In the case of a NOT operator containing a comparison operator, the easyest way is to
+     * reverse the comparison operator.
+     * example: NOT PropertyIsLessOrEqualsThan => PropertyIsGreaterThan
+     *          NOT PropertyIsLessThan         => PropertyIsGreaterOrEqualsThan
+     *
+     * @param jbComparisonOps The comparison operator to reverse.
+     * @return The reversed comparison Operator
+     * 
+     * @throws CstlServiceException
+     */
     protected JAXBElement<? extends ComparisonOpsType> reverseComparisonOperator(JAXBElement<? extends ComparisonOpsType> jbComparisonOps) throws CstlServiceException {
         final String operator       = jbComparisonOps.getName().getLocalPart();
         final ComparisonOpsType c   = jbComparisonOps.getValue();

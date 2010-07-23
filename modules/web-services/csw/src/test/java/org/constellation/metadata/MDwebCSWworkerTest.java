@@ -143,6 +143,17 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
     }
 
     /**
+     * Tests the getcapabilities method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void getRecordByIdErrorTest() throws Exception {
+        super.getRecordByIdErrorTest();
+    }
+
+    /**
      * Tests the getRecords method
      *
      * @throws java.lang.Exception
@@ -151,6 +162,17 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
     @Override
     public void getRecordsTest() throws Exception {
         super.getRecordsTest();
+    }
+
+    /**
+     * Tests the getRecords method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void getRecordsErrorTest() throws Exception {
+        super.getRecordsErrorTest();
     }
 
     /**

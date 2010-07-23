@@ -18,6 +18,8 @@
 package org.constellation.filter;
 
 // J2SE dependencies
+import org.geotoolkit.ogc.xml.v110.UpperBoundaryType;
+import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
 import java.io.StringReader;
 import java.util.logging.Logger;
 
@@ -31,6 +33,11 @@ import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.ogc.xml.v110.FilterType;
+import org.geotoolkit.ogc.xml.v110.LiteralType;
+import org.geotoolkit.ogc.xml.v110.LowerBoundaryType;
+import org.geotoolkit.ogc.xml.v110.ObjectFactory;
+import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
+import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import org.opengis.filter.spatial.BBOX;
@@ -287,11 +294,73 @@ public class FilterParserTest {
         assertTrue(spaQuery.getSpatialFilter() == null);
         assertEquals(spaQuery.getSubQueries().size(), 0);
         assertEquals(spaQuery.getQuery(), "CreationDate:[00000101 20070602]");
+
+        
+        /**
+         * Test 9: a simple Filter PropertyIsBetween
+         */
+        XMLrequest ="<ogc:Filter xmlns:ogc=\"http://www.opengis.net/ogc\" xmlns:apiso=\"http://www.opengis.net/cat/csw/apiso/1.0\">" +
+	            "    <ogc:PropertyIsBetween>"                                     +
+                    "        <ogc:PropertyName>apiso:CreationDate</ogc:PropertyName>" +
+                    "        <ogc:LowerBoundary>"                                     +
+                    "           <ogc:Literal>2007-06-02</ogc:Literal>"                +
+                    "        </ogc:LowerBoundary>"                                    +
+                    "        <ogc:UpperBoundary>"                                     +
+                    "           <ogc:Literal>2007-06-04</ogc:Literal>"                +
+                    "       </ogc:UpperBoundary>"                                     +
+                    "    </ogc:PropertyIsBetween>"                                    +
+                    "</ogc:Filter>";
+
+        reader = new StringReader(XMLrequest);
+
+        element =  (JAXBElement) filterUnmarshaller.unmarshal(reader);
+        filter = (FilterType) element.getValue();
+
+        assertTrue(filter.getComparisonOps() != null);
+        assertTrue(filter.getLogicOps()      == null);
+        assertTrue(filter.getId().isEmpty()   );
+        assertTrue(filter.getSpatialOps()    == null);
+
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(filter, "1.1.0"), null, null);
+
+        assertTrue(spaQuery.getSpatialFilter() == null);
+        assertEquals(spaQuery.getSubQueries().size(), 0);
+        assertEquals(spaQuery.getQuery(), "CreationDate:[20070602  30000101]CreationDate:[00000101 20070604]");
         
         pool.release(filterUnmarshaller);
         
     }
-    
+
+    /**
+     * Test simple logical filter (unary and binary).
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void FiltertoCQLTest() throws Exception {
+
+        ObjectFactory factory = new ObjectFactory();
+        final PropertyNameType propertyName = new PropertyNameType("ATTR1");
+        final LowerBoundaryType low = new LowerBoundaryType();
+        final LiteralType lowLit = new LiteralType("10");
+        low.setExpression(factory.createLiteral(lowLit));
+        final UpperBoundaryType upp = new UpperBoundaryType();
+        final LiteralType uppLit = new LiteralType("20");
+        upp.setExpression(factory.createLiteral(uppLit));
+        final PropertyIsBetweenType pib = new PropertyIsBetweenType(factory.createPropertyName(propertyName), low, upp);
+        FilterType filter = new FilterType(pib);
+        String result = FilterParser.filterToCql(filter);
+        String expResult = "";
+        assertEquals(expResult, result);
+
+        final LiteralType lit = new LiteralType("10");
+        final PropertyIsEqualToType pe = new PropertyIsEqualToType(lit, propertyName, Boolean.TRUE);
+        filter = new FilterType(pe);
+        result = FilterParser.filterToCql(filter);
+        expResult = "";
+        assertEquals(expResult, result);
+    }
+
     /**
      * Test simple logical filter (unary and binary). 
      * 

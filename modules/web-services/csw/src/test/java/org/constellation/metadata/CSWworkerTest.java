@@ -343,71 +343,7 @@ public class CSWworkerTest {
         assertEquals(expRecordResult2, recordResult2);
 
         /*
-         *  TEST 6 : getRecordById with no identifier (waiting an exception).
-         */
-        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", null);
-        boolean exLaunched = false;
-        try {
-            worker.getRecordById(request);
-        } catch (CstlServiceException ex) {
-            exLaunched = true;
-            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), "id");
-        }
-
-        assertTrue(exLaunched);
-
-        /*
-         *  TEST 7 : getRecordById with an unvalid identifier (waiting an exception).
-         */
-        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2",Arrays.asList("whatever"));
-        exLaunched = false;
-        try {
-            worker.getRecordById(request);
-        } catch (CstlServiceException ex) {
-            exLaunched = true;
-            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), "id");
-        }
-
-        assertTrue(exLaunched);
-
-        /*
-         *  TEST 8 : getRecordById with an unvalid outputSchema (waiting an exception).
-         */
-        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                MimeType.APPLICATION_XML, "http://www.opengis.net/whatever",Arrays.asList("42292_5p_19900609195600"));
-        exLaunched = false;
-        try {
-            worker.getRecordById(request);
-        } catch (CstlServiceException ex) {
-            exLaunched = true;
-            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), "outputSchema");
-        }
-
-        assertTrue(exLaunched);
-
-        /*
-         *  TEST 9 : getRecordById with an unvalid outputFormat (waiting an exception).
-         */
-        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
-                "ping/pong", "http://www.opengis.net/cat/csw/2.0.2",Arrays.asList("42292_5p_19900609195600"));
-        exLaunched = false;
-        try {
-            worker.getRecordById(request);
-        } catch (CstlServiceException ex) {
-            exLaunched = true;
-            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
-            assertEquals(ex.getLocator(), "outputFormat");
-        }
-
-        assertTrue(exLaunched);
-
-        /*
-         *  TEST 11 : getRecordById with the first metadata with no outputSchema.
+         *  TEST 6 : getRecordById with the first metadata with no outputSchema.
          */
         request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.SUMMARY),
                 MimeType.APPLICATION_XML, null, Arrays.asList("42292_5p_19900609195600"));
@@ -428,7 +364,7 @@ public class CSWworkerTest {
         assertEquals(expSumResult1, sumResult);
 
         /*
-         *  TEST 12 : getRecordById with the first metadata with no outputSchema and no ElementSetName.
+         *  TEST 7 : getRecordById with the first metadata with no outputSchema and no ElementSetName.
          */
         request = new GetRecordByIdType("CSW", "2.0.2", null,
                 MimeType.APPLICATION_XML, null, Arrays.asList("42292_5p_19900609195600"));
@@ -449,6 +385,73 @@ public class CSWworkerTest {
         assertEquals(expSumResult1, sumResult);
 
         pool.release(unmarshaller);
+    }
+
+    public void getRecordByIdErrorTest() throws Exception {
+
+        /*
+         *  TEST 1 : getRecordById with no identifier (waiting an exception).
+         */
+         GetRecordByIdType request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", null);
+        boolean exLaunched = false;
+        try {
+            worker.getRecordById(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), MISSING_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "id");
+        }
+
+        assertTrue(exLaunched);
+
+        /*
+         *  TEST 2 : getRecordById with an unvalid identifier (waiting an exception).
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2",Arrays.asList("whatever"));
+        exLaunched = false;
+        try {
+            worker.getRecordById(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "id");
+        }
+
+        assertTrue(exLaunched);
+
+        /*
+         *  TEST 3 : getRecordById with an unvalid outputSchema (waiting an exception).
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                MimeType.APPLICATION_XML, "http://www.opengis.net/whatever",Arrays.asList("42292_5p_19900609195600"));
+        exLaunched = false;
+        try {
+            worker.getRecordById(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "outputSchema");
+        }
+
+        assertTrue(exLaunched);
+
+        /*
+         *  TEST 4 : getRecordById with an unvalid outputFormat (waiting an exception).
+         */
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                "ping/pong", "http://www.opengis.net/cat/csw/2.0.2",Arrays.asList("42292_5p_19900609195600"));
+        exLaunched = false;
+        try {
+            worker.getRecordById(request);
+        } catch (CstlServiceException ex) {
+            exLaunched = true;
+            assertEquals(ex.getExceptionCode(), INVALID_PARAMETER_VALUE);
+            assertEquals(ex.getLocator(), "outputFormat");
+        }
+
+        assertTrue(exLaunched);
     }
 
     /**
@@ -706,13 +709,85 @@ public class CSWworkerTest {
         assertEquals(expCustomResult2, customResult2);
 
         /*
-         * Test 7 : getRecord with bad outputFormat
+         *  TEST 7 : getRecords with RESULTS - DC mode (Custom) - CQL text: CreationDate BETWEEN 2009-01-10 AND 2009-01-30
          */
+
         typeNames        = Arrays.asList(RECORD_QNAME);
+        cust             = new ArrayList<QName>();
+        cust.add(_Modified_QNAME);
+        cust.add(_Identifier_QNAME);
+        cust.add(_BoundingBox_QNAME);
         sortBy           = null;
-        constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
-        query            = new QueryType(typeNames, elementSetName, sortBy, constraint);
-        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "something", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+        constraint       = new QueryConstraintType("Modified BETWEEN '2009-01-10' AND '2009-01-30'", "1.0.0");
+        query            = new QueryType(typeNames, cust, sortBy, constraint);
+        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+
+        result = (GetRecordsResponseType) worker.getRecords(request);
+
+        assertTrue(result.getSearchResults() != null);
+        assertEquals(4, result.getSearchResults().getAbstractRecord().size());
+        assertTrue(result.getSearchResults().getAny().isEmpty());
+        assertEquals(4, result.getSearchResults().getNumberOfRecordsMatched());
+        assertEquals(4, result.getSearchResults().getNumberOfRecordsReturned());
+        assertTrue(result.getSearchResults().getNextRecord() == 0);
+
+        RecordType customResult3 = null;
+        RecordType customResult4 = null;
+
+        for (JAXBElement ob : result.getSearchResults().getAbstractRecord()) {
+            obj = ((JAXBElement) ob).getValue();
+            assertTrue(obj instanceof RecordType);
+            RecordType r = (RecordType)obj;
+            if (r.getIdentifier().getContent().get(0).equals("42292_5p_19900609195600")) {
+                customResult1 = r;
+            } else if (r.getIdentifier().getContent().get(0).equals("42292_9s_19900610041000")){
+                customResult2 = r;
+            } else if (r.getIdentifier().getContent().get(0).equals("40510_145_19930221211500")){
+                customResult3 = r;
+            } else {
+                customResult4 = r;
+            }
+        }
+        
+        expCustomResult1 =  new RecordType();
+        expCustomResult1.setIdentifier(new SimpleLiteral("42292_5p_19900609195600"));
+        expCustomResult1.setModified(new SimpleLiteral("2009-01-01T06:00:00+01:00"));
+        expCustomResult1.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.1667, 36.6, 1.1667, 36.6));
+        
+        expCustomResult2 =  new RecordType();
+        expCustomResult2.setIdentifier(new SimpleLiteral("42292_9s_19900610041000"));
+        expCustomResult2.setModified(new SimpleLiteral("2009-01-26T12:00:00+01:00"));
+        expCustomResult2.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.3667, 36.6, 1.3667, 36.6));
+        
+        RecordType expCustomResult3 =  new RecordType();
+        expCustomResult3.setIdentifier(new SimpleLiteral("40510_145_19930221211500"));
+        expCustomResult3.setModified(new SimpleLiteral("2009-01-26T12:22:52+01:00"));
+        expCustomResult3.setBoundingBox(new BoundingBoxType("EPSG:4326", 156.0, 0, 156.0, 0));
+
+        RecordType expCustomResult4 =  new RecordType();
+        expCustomResult4.setIdentifier(new SimpleLiteral("39727_22_19750113062500"));
+        expCustomResult4.setModified(new SimpleLiteral("2009-01-26T12:21:45+01:00"));
+        expCustomResult4.setBoundingBox(new BoundingBoxType("EPSG:4326", -4.967, -6.95, -4.967, -6.95));
+
+        assertEquals(expCustomResult1, customResult1);
+        assertEquals(expCustomResult2, customResult2);
+        assertEquals(expCustomResult3, customResult3);
+        assertEquals(expCustomResult4, customResult4);
+
+        pool.release(unmarshaller);
+    }
+
+    public void getRecordsErrorTest() throws Exception {
+        
+        /*
+         * Test 1 : getRecord with bad outputFormat
+         */
+        ElementSetNameType elementSetName = new ElementSetNameType(ElementSetType.FULL);
+        List<QName> typeNames           = Arrays.asList(RECORD_QNAME);
+        SortByType sortBy               = null;
+        QueryConstraintType constraint  = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
+        QueryType query                 = new QueryType(typeNames, elementSetName, sortBy, constraint);
+        GetRecordsType request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, "something", "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
 
         boolean exLaunched = false;
         try {
@@ -725,7 +800,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
         /*
-         * Test 8 : getRecord with no typeNames
+         * Test 2 : getRecord with no typeNames
          */
         sortBy           = null;
         constraint       = new QueryConstraintType("Title LIKE '90008411%'", "1.0.0");
@@ -743,7 +818,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
         /*
-         * Test 9 : getRecord with bad typeNames
+         * Test 3 : getRecord with bad typeNames
          */
         typeNames        = Arrays.asList(new QName("http://www.badnamespace.com", "something"));
         sortBy           = null;
@@ -762,7 +837,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
          /*
-         * Test 10 : getRecord with bad outputSchema
+         * Test 4 : getRecord with bad outputSchema
          */
         typeNames        = Arrays.asList(RECORD_QNAME);
         sortBy           = null;
@@ -781,7 +856,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
          /*
-         * Test 11 : getRecord with no query
+         * Test 5 : getRecord with no query
          */
         request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, null, null);
 
@@ -796,7 +871,7 @@ public class CSWworkerTest {
         assertTrue(exLaunched);
 
         /*
-         * Test 12 : getRecord with bad start position
+         * Test 7 : getRecord with bad start position
          */
         typeNames        = Arrays.asList(RECORD_QNAME);
         sortBy           = null;
@@ -812,9 +887,6 @@ public class CSWworkerTest {
             assertEquals(ex.getLocator(), "startPosition");
         }
         assertTrue(exLaunched);
-
-
-        pool.release(unmarshaller);
     }
 
     /**

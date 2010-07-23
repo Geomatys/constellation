@@ -182,6 +182,23 @@ public class CQLParserTest {
         assertNull(spaQuery.getSpatialFilter());
         assertEquals(0, spaQuery.getSubQueries().size());
         assertEquals("CreationDate:{00000101 20070602}", spaQuery.getQuery());
+
+        /**
+         * Test 6: PropertyIsBetween
+         */
+        cql = "CreationDate BETWEEN '2007-06-02T00:00:00Z' AND '2007-06-04T00:00:00Z'";
+        filter = FilterParser.cqlToFilter(cql);
+
+        assertNotNull(filter.getComparisonOps());
+        assertNull(filter.getLogicOps());
+        assertEquals(0, filter.getId().size() );
+        assertNull(filter.getSpatialOps());
+
+        spaQuery = (SpatialQuery) filterParser.getQuery(new QueryConstraintType(cql, "1.1.0"), null, null);
+
+        assertNull(spaQuery.getSpatialFilter());
+        assertEquals(0, spaQuery.getSubQueries().size());
+        assertEquals("CreationDate:[20070602  30000101]CreationDate:[00000101 20070604]", spaQuery.getQuery());
     }
     
     /**

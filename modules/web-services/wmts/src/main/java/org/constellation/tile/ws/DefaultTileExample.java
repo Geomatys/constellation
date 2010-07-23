@@ -13,7 +13,7 @@ import org.geotoolkit.wmts.xml.v100.TileMatrixSet;
  */
 public class DefaultTileExample {
 
-    public final static TileMatrixSet BLUEMARBLE;
+    /*public final static TileMatrixSet BLUEMARBLE;
     static {
         BLUEMARBLE = new TileMatrixSet(new CodeType("BlueMarble"), "urn:ogc:def:crs:OGC:1.3:CRS84");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
@@ -30,6 +30,23 @@ public class DefaultTileExample {
         tm.add(createTileMatrix("L03",  60,  30, 480, 480, 0.0125,              -180, 90));
         tm.add(createTileMatrix("L02",  90,  45, 480, 480, 0.00833333333333333, -180, 90));
         tm.add(createTileMatrix("L01",  180, 90, 480, 480, 0.00416666666666667, -180, 90));
+        BLUEMARBLE.setTileMatrix(tm);
+    }*/
+
+    public final static TileMatrixSet BLUEMARBLE;
+    static {
+        BLUEMARBLE = new TileMatrixSet(new CodeType("BlueMarble"), "urn:ogc:def:crs:OGC:1.3:CRS84");
+        final List<TileMatrix> tm = new ArrayList<TileMatrix>();
+        tm.add(createTileMatrix("L10",  1,   1,   480, 480, 0.125,               -180, 90));
+        tm.add(createTileMatrix("L09",  2,   2,   480, 480, 0.075,               -180, 90));
+        tm.add(createTileMatrix("L08",  4,   4,   480, 480, 0.0625,              -180, 90));
+        tm.add(createTileMatrix("L07",  8,   8,   480, 480, 0.0416666666666667,  -180, 90));
+        tm.add(createTileMatrix("L06",  16,  16,  480, 480, 0.0375,              -180, 90));
+        tm.add(createTileMatrix("L05",  32,  32,  480, 480, 0.025,               -180, 90));
+        tm.add(createTileMatrix("L04",  64,  64,  480, 480, 0.0208333333333333,  -180, 90));
+        tm.add(createTileMatrix("L03",  128, 128, 480, 480, 0.0125,              -180, 90));
+        tm.add(createTileMatrix("L02",  256, 256, 480, 480, 0.00833333333333333, -180, 90));
+        tm.add(createTileMatrix("L01",  512, 512, 480, 480, 0.00416666666666667, -180, 90));
         BLUEMARBLE.setTileMatrix(tm);
     }
 

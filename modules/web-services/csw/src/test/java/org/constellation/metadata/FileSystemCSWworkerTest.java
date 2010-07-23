@@ -145,6 +145,17 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
     }
 
     /**
+     * Tests the getcapabilities method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void getRecordByIdErrorTest() throws Exception {
+        super.getRecordByIdErrorTest();
+    }
+    
+    /**
      * Tests the getRecords method
      *
      * @throws java.lang.Exception
@@ -155,6 +166,17 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         super.getRecordsTest();
     }
 
+    /**
+     * Tests the getRecords method
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    @Override
+    public void getRecordsErrorTest() throws Exception {
+        super.getRecordsErrorTest();
+    }
+    
     /**
      * Tests the getDomain method
      *
