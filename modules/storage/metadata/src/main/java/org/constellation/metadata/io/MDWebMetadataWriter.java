@@ -19,6 +19,7 @@
 package org.constellation.metadata.io;
 
 // J2SE dependencies
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
@@ -37,6 +38,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.UUID;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 
@@ -584,7 +586,39 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             LOGGER.severe("Exception throw in the invokated getter: " + getter.toGenericString() +
                                           "\nCause: " + e.getMessage());
                             return result;
-                        }   
+                        }
+                    // we get directly the field
+                    } else if (!propName.equals("unitOfMeasure") && !propName.equals("verticalDatum")) {
+                        final Class valueClass = object.getClass();
+                        try {
+                            Field field = valueClass.getDeclaredField(propName);
+                            field.setAccessible(true);
+                            final Object propertyValue;
+                            if (field != null) {
+                                propertyValue = field.get(object);
+                            } else {
+                                propertyValue = null;
+                            }
+                            if (propertyValue != null) {
+                                final Path childPath = new Path(path, prop);
+
+                                //if the path is not already in the database we write it
+                                if (mdWriter.getPath(childPath.getId()) == null) {
+                                    mdWriter.writePath(childPath);
+                                }
+                                result.addAll(addValueFromObject(form, propertyValue, childPath, value));
+                            }
+                            
+                        } catch (NoSuchFieldException ex) {
+                            LOGGER.log(Level.WARNING, "no such Field:" + propName + " in class:" + valueClass.getName());
+                            return result;
+                        } catch (SecurityException ex) {
+                            LOGGER.log(Level.WARNING, null, ex);
+                            return result;
+                        } catch (IllegalAccessException ex) {
+                            LOGGER.log(Level.WARNING, null, ex);
+                            return result;
+                        }
                     }
                 }
                 classe = classe.getSuperClass();

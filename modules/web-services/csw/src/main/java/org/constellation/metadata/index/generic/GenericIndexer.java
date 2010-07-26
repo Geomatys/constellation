@@ -642,6 +642,8 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                 if (getter != null) {
                     GETTERS.put(object.getClass().getName() + ':' + attributeName, getter);
                     result = ReflectionUtilities.invokeMethod(object, getter);
+                } else {
+                    LOGGER.finer("No getter have been found for attribute " + attributeName + " in the class " + object.getClass().getName());
                 }
             }
         }

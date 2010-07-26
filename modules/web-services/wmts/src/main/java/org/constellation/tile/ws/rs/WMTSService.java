@@ -259,8 +259,8 @@ public class WMTSService extends GridWebService {
     private GetFeatureInfo createNewGetFeatureInfoRequest() throws CstlServiceException {
         final GetFeatureInfo gfi = new GetFeatureInfo();
         gfi.setGetTile(createNewGetTileRequest());
-        gfi.setI(new Integer(getParameter("I", true)));
-        gfi.setJ(new Integer(getParameter("J", true)));
+        gfi.setI(Integer.valueOf(getParameter("I", true)));
+        gfi.setJ(Integer.valueOf(getParameter("J", true)));
         gfi.setInfoFormat(getParameter("infoformat", true));
         gfi.setService(getParameter(KEY_SERVICE, true));
         gfi.setVersion(getParameter(KEY_VERSION, true));
@@ -280,8 +280,8 @@ public class WMTSService extends GridWebService {
         getTile.setLayer(getParameter("layer", true));
         getTile.setService(getParameter(KEY_SERVICE, true));
         getTile.setVersion(getParameter(KEY_VERSION, true));
-        getTile.setTileCol(new Integer(getParameter("TileCol", true)));
-        getTile.setTileRow(new Integer(getParameter("TileRow", true)));
+        getTile.setTileCol(Integer.valueOf(getParameter("TileCol", true)));
+        getTile.setTileRow(Integer.valueOf(getParameter("TileRow", true)));
         getTile.setTileMatrix(getParameter("TileMatrix", true));
         getTile.setTileMatrixSet(getParameter("TileMatrixSet", true));
         // Optionnal parameters
@@ -318,12 +318,12 @@ public class WMTSService extends GridWebService {
             throw new CstlServiceException("The parameter TILECOL must be specified",
                         MISSING_PARAMETER_VALUE);
         }
-        getTile.setTileCol(new Integer(tileCol));
+        getTile.setTileCol(Integer.valueOf(tileCol));
         if (tileRow == null) {
             throw new CstlServiceException("The parameter TILEROW must be specified",
                         MISSING_PARAMETER_VALUE);
         }
-        getTile.setTileRow(new Integer(tileRow));
+        getTile.setTileRow(Integer.valueOf(tileRow));
         if (tileMatrix == null) {
             throw new CstlServiceException("The parameter TILEMATRIX must be specified",
                         MISSING_PARAMETER_VALUE);

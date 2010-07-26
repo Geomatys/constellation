@@ -1406,10 +1406,8 @@ public class SOSworker {
         if (abstractEncoding instanceof TextBlock) {
                 final TextBlock encoding        = (TextBlock) abstractEncoding;
                 final StringTokenizer tokenizer = new StringTokenizer(brutValues, encoding.getBlockSeparator());
-                int i = 1;
                 while (tokenizer.hasMoreTokens()) {
                     final String block = tokenizer.nextToken();
-                    i++;
                     String samplingTimeValue = block.substring(0, block.indexOf(encoding.getTokenSeparator()));
                     samplingTimeValue = samplingTimeValue.replace('T', ' ');
                     Date d = null;
@@ -1733,8 +1731,8 @@ public class SOSworker {
         if (obs != null) {
             obs.setProcedure(proc);
             obs.setName(omReader.getNewObservationId());
-            LOGGER.finer("samplingTime received: " + obs.getSamplingTime());
-            LOGGER.finer("template received:\n"    + obs.toString());
+            LOGGER.log(Level.FINER, "samplingTime received: {0}", obs.getSamplingTime());
+            LOGGER.log(Level.FINER, "template received:\n{0}", obs.toString());
         } else {
             throw new CstlServiceException("The observation template must be specified",
                                              MISSING_PARAMETER_VALUE, OBSERVATION_TEMPLATE);

@@ -13,6 +13,8 @@ import org.geotoolkit.wmts.xml.v100.TileMatrixSet;
  */
 public class DefaultTileExample {
 
+    private DefaultTileExample() {}
+    
     /*public final static TileMatrixSet BLUEMARBLE;
     static {
         BLUEMARBLE = new TileMatrixSet(new CodeType("BlueMarble"), "urn:ogc:def:crs:OGC:1.3:CRS84");
