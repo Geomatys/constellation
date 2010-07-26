@@ -91,7 +91,7 @@ public class ByIDHarvester implements CatalogueHarvester {
             identifierDirectoryPath = identifierDirectory;
             File f = new File(identifierDirectoryPath);
             if (f.exists() && f.isDirectory()) {
-                LOGGER.info("Getting identifier file from :" + f.getPath());
+                LOGGER.log(Level.INFO, "Getting identifier file from :{0}", f.getPath());
             } else {
                 throw new MetadataIoException("The identifierDirectory does not exist or is not a directory:" + f.getPath());
             }
@@ -243,8 +243,6 @@ public class ByIDHarvester implements CatalogueHarvester {
                                                  NO_APPLICABLE_CODE);
                 }
             }
-
-
 
             if (!succeed && distantException.size() > 0) {
                 throw distantException.get(0);

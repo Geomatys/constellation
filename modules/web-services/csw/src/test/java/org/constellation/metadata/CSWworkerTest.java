@@ -710,7 +710,7 @@ public class CSWworkerTest {
 
         /*
          *  TEST 7 : getRecords with RESULTS - DC mode (Custom) - CQL text: CreationDate BETWEEN 2009-01-10 AND 2009-01-30
-         
+         */
 
         typeNames        = Arrays.asList(RECORD_QNAME);
         cust             = new ArrayList<QName>();
@@ -720,7 +720,7 @@ public class CSWworkerTest {
         sortBy           = null;
         constraint       = new QueryConstraintType("Modified BETWEEN '2009-01-10' AND '2009-01-30'", "1.0.0");
         query            = new QueryType(typeNames, cust, sortBy, constraint);
-        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 5, query, null);
+        request          = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, MimeType.APPLICATION_XML, "http://www.opengis.net/cat/csw/2.0.2", 1, 20, query, null);
 
         result = (GetRecordsResponseType) worker.getRecords(request);
 
@@ -731,28 +731,27 @@ public class CSWworkerTest {
         assertEquals(4, result.getSearchResults().getNumberOfRecordsReturned());
         assertTrue(result.getSearchResults().getNextRecord() == 0);
 
+        customResult2            = null;
         RecordType customResult3 = null;
         RecordType customResult4 = null;
+        RecordType customResult5 = null;
 
         for (JAXBElement ob : result.getSearchResults().getAbstractRecord()) {
             obj = ((JAXBElement) ob).getValue();
             assertTrue(obj instanceof RecordType);
             RecordType r = (RecordType)obj;
-            if (r.getIdentifier().getContent().get(0).equals("42292_5p_19900609195600")) {
-                customResult1 = r;
-            } else if (r.getIdentifier().getContent().get(0).equals("42292_9s_19900610041000")){
+            if (r.getIdentifier().getContent().get(0).equals("42292_9s_19900610041000")){
                 customResult2 = r;
             } else if (r.getIdentifier().getContent().get(0).equals("40510_145_19930221211500")){
                 customResult3 = r;
-            } else {
+            } else if (r.getIdentifier().getContent().get(0).equals("39727_22_19750113062500")) {
                 customResult4 = r;
+            } else if (r.getIdentifier().getContent().get(0).equals("11325_158_19640418141800")) {
+                customResult5 = r;
+            } else {
+                fail("unexpected metadata:" + r.getIdentifier().getContent().get(0));
             }
         }
-        
-        expCustomResult1 =  new RecordType();
-        expCustomResult1.setIdentifier(new SimpleLiteral("42292_5p_19900609195600"));
-        expCustomResult1.setModified(new SimpleLiteral("2009-01-01T06:00:00+01:00"));
-        expCustomResult1.setBoundingBox(new BoundingBoxType("EPSG:4326", 1.1667, 36.6, 1.1667, 36.6));
         
         expCustomResult2 =  new RecordType();
         expCustomResult2.setIdentifier(new SimpleLiteral("42292_9s_19900610041000"));
@@ -769,13 +768,18 @@ public class CSWworkerTest {
         expCustomResult4.setModified(new SimpleLiteral("2009-01-26T12:21:45+01:00"));
         expCustomResult4.setBoundingBox(new BoundingBoxType("EPSG:4326", -4.967, -6.95, -4.967, -6.95));
 
+        RecordType expCustomResult5 =  new RecordType();
+        expCustomResult5.setIdentifier(new SimpleLiteral("11325_158_19640418141800"));
+        expCustomResult5.setModified(new SimpleLiteral("2009-01-26T12:22:24+01:00"));
+        expCustomResult5.setBoundingBox(new BoundingBoxType("EPSG:4326", 9.2667, 3.55, 9.2667, 3.55));
+
         assertEquals(expCustomResult1, customResult1);
         assertEquals(expCustomResult2, customResult2);
         assertEquals(expCustomResult3, customResult3);
         assertEquals(expCustomResult4, customResult4);
+        assertEquals(expCustomResult5, customResult5);
 
          
-         */
         pool.release(unmarshaller);
     }
 
