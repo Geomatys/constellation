@@ -238,7 +238,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
              *  TODO
              * code = CRS.lookupEpsgCode(inputLayer.getCoverageReference().getCoordinateReferenceSystem(), false);
              */
-            final GeographicBoundingBox inputGeoBox;
+            GeographicBoundingBox inputGeoBox;
             try {
                 inputGeoBox = layer.getGeographicBoundingBox();
             } catch (DataStoreException exception) {
@@ -251,6 +251,27 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                 continue;
             }
 
+            // We ensure that the data envelope is not empty. It can occurs with vector data, on a single point.
+            final double width = inputGeoBox.getEastBoundLongitude() - inputGeoBox.getWestBoundLongitude();
+            final double height = inputGeoBox.getNorthBoundLatitude() - inputGeoBox.getSouthBoundLatitude();
+            if (width == 0 && height == 0) {
+                final double diffWidth = Math.nextUp(inputGeoBox.getEastBoundLongitude()) - inputGeoBox.getEastBoundLongitude();
+                final double diffHeight = Math.nextUp(inputGeoBox.getNorthBoundLatitude()) - inputGeoBox.getNorthBoundLatitude();
+                inputGeoBox = new LatLonBoundingBox(inputGeoBox.getWestBoundLongitude() - diffWidth,
+                                                    inputGeoBox.getSouthBoundLatitude() - diffHeight,
+                                                    Math.nextUp(inputGeoBox.getEastBoundLongitude()),
+                                                    Math.nextUp(inputGeoBox.getNorthBoundLatitude()));
+            }
+            if (width == 0) {
+                final double diffWidth = Math.nextUp(inputGeoBox.getEastBoundLongitude()) - inputGeoBox.getEastBoundLongitude();
+                inputGeoBox = new LatLonBoundingBox(inputGeoBox.getWestBoundLongitude() - diffWidth, inputGeoBox.getSouthBoundLatitude(),
+                        Math.nextUp(inputGeoBox.getEastBoundLongitude()), inputGeoBox.getNorthBoundLatitude());
+            }
+            if (height == 0) {
+                final double diffHeight = Math.nextUp(inputGeoBox.getNorthBoundLatitude()) - inputGeoBox.getNorthBoundLatitude();
+                inputGeoBox = new LatLonBoundingBox(inputGeoBox.getWestBoundLongitude(), inputGeoBox.getSouthBoundLatitude() - diffHeight,
+                        inputGeoBox.getEastBoundLongitude(), Math.nextUp(inputGeoBox.getNorthBoundLatitude()));
+            }
             // List of elevations, times and dim_range values.
             final List<AbstractDimension> dimensions = new ArrayList<AbstractDimension>();
 

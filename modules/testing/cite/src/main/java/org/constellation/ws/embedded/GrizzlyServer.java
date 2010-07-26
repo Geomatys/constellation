@@ -44,6 +44,7 @@ import org.constellation.provider.sld.SLDProvider;
 import org.constellation.provider.sld.SLDProviderService;
 import org.geotoolkit.internal.io.IOUtilities;
 import org.geotoolkit.resources.NIOUtilities;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
 
 
@@ -235,22 +236,28 @@ public final class GrizzlyServer {
      */
     private static File initDataDirectory() throws IOException {
         String styleResource = GrizzlyServer.class.getResource("wms111/styles").getFile();
-        styleResource = styleResource.substring(0, styleResource.indexOf('!'));
+        if (styleResource.contains("!")) {
+            styleResource = styleResource.substring(0, styleResource.indexOf('!'));
+        }
         if (styleResource.startsWith("file:")) {
             styleResource = styleResource.substring(5);
         }
-        final File styleJar = new File(styleResource);
-        if (styleJar == null || !styleJar.exists()) {
-            throw new IOException("Unable to find the style folder: "+ styleJar);
+        File styles = new File(styleResource);
+        if (styles == null || !styles.exists()) {
+            throw new IOException("Unable to find the style folder: "+ styles);
         }
-        final InputStream in = new FileInputStream(styleJar);
         final File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        final File outputDir = new File(tmpDir, "Constellation");
+        File outputDir = new File(tmpDir, "Constellation");
         if (!outputDir.exists()) {
             outputDir.mkdir();
         }
-        IOUtilities.unzip(in, outputDir);
-        in.close();
+        if (styles.isDirectory()) {
+            FileUtilities.copy(styles, outputDir);
+        } else {
+            final InputStream in = new FileInputStream(styles);
+            IOUtilities.unzip(in, outputDir);
+            in.close();
+        }
         return outputDir;
     }
 
