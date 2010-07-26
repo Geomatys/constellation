@@ -43,11 +43,14 @@ import org.geotoolkit.ogc.xml.v110.BinaryLogicOpType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
-import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 import org.geotoolkit.temporal.object.TemporalUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+// GeoAPI dependencies
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.expression.PropertyName;
 
 // MDWeb dependencies
 import org.mdweb.model.schemas.Standard;
@@ -107,7 +110,7 @@ public class SQLFilterParser extends FilterParser {
             // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
             } else if (filter.getComparisonOps() != null) {
                 nbField                          = 1;
-                response = new SQLQuery(treatComparisonOperator(filter.getComparisonOps()));
+                response = new SQLQuery(treatComparisonOperator(filter.getComparisonOps().getValue()));
                 
             // we treat spatial constraint : BBOX, Beyond, Overlaps, ...    
             } else if (filter.getSpatialOps() != null) {
@@ -143,7 +146,7 @@ public class SQLFilterParser extends FilterParser {
             // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...   
             for (JAXBElement<? extends ComparisonOpsType> jb: binary.getComparisonOps()) {
             
-                final SQLQuery query = new SQLQuery(treatComparisonOperator((JAXBElement<? extends ComparisonOpsType>)jb));
+                final SQLQuery query = new SQLQuery(treatComparisonOperator(jb.getValue()));
                 if (operator.equalsIgnoreCase("OR")) {
                     query.nbField = nbField -1;
                     query.createSelect();
@@ -228,7 +231,7 @@ public class SQLFilterParser extends FilterParser {
                         
             // we treat comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
             if (unary.getComparisonOps() != null) {
-                queryBuilder.append(treatComparisonOperator(reverseComparisonOperator(unary.getComparisonOps())));
+                queryBuilder.append(treatComparisonOperator(reverseComparisonOperator(unary.getComparisonOps().getValue())));
                 
             // we treat spatial constraint : BBOX, Beyond, Overlaps, ...        
             } else if (unary.getSpatialOps() != null) {
@@ -272,8 +275,8 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addComparisonFilter(StringBuilder response, String propertyName, String literalValue, String operator) {
-        response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName)).append("' AND ");
+    protected void addComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) {
+        response.append('v').append(nbField).append(".\"path\" = '").append(transformSyntax(propertyName.getPropertyName())).append("' AND ");
         response.append('v').append(nbField).append(".\"value\" ").append(operator);
         if (!operator.equals("IS NULL ")) {
             response.append("'").append(literalValue).append("' ");
@@ -286,7 +289,7 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addDateComparisonFilter(StringBuilder response, String propertyName, String literalValue, String operator) throws CstlServiceException {
+    protected void addDateComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) throws CstlServiceException {
         if (isDateField(propertyName)) {
             final String dateValue = extractDateValue(literalValue);
             addComparisonFilter(response, propertyName, dateValue, operator);
@@ -315,7 +318,7 @@ public class SQLFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected String translateSpecialChar(PropertyIsLikeType pil) {
+    protected String translateSpecialChar(PropertyIsLike pil) {
         return translateSpecialChar(pil, "%", "%", "\\");
     }
     

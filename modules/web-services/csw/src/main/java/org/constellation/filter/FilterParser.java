@@ -62,13 +62,11 @@ import org.geotoolkit.filter.FilterFactoryImpl;
 import org.geotoolkit.gml.GeometrytoJTS;
 import org.geotoolkit.gml.xml.v311.PolygonType;
 import org.geotoolkit.ogc.xml.v110.LowerBoundaryType;
-import org.geotoolkit.ogc.xml.v110.ObjectFactory;
 import org.geotoolkit.ogc.xml.v110.AbstractIdType;
 import org.geotoolkit.ogc.xml.v110.BinaryComparisonOpType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsBetweenType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
-import org.geotoolkit.ogc.xml.v110.PropertyIsNullType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsNotEqualToType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsEqualToType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsGreaterThanOrEqualToType;
@@ -82,11 +80,23 @@ import static org.geotoolkit.lucene.filter.LuceneOGCFilter.*;
 
 // GeoAPI dependencies
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.BinaryComparisonOperator;
+import org.opengis.filter.PropertyIsNull;
+import org.opengis.filter.expression.Literal;
+import org.opengis.filter.expression.PropertyName;
 import org.opengis.util.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 // JTS dependencies
 import com.vividsolutions.jts.geom.Geometry;
+import org.opengis.filter.PropertyIsEqualTo;
+import org.opengis.filter.PropertyIsGreaterThan;
+import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
+import org.opengis.filter.PropertyIsLessThan;
+import org.opengis.filter.PropertyIsLessThanOrEqualTo;
+import org.opengis.filter.PropertyIsNotEqualTo;
+
 
 /**
  *
@@ -176,17 +186,15 @@ public abstract class FilterParser {
      * @return
      * @throws org.constellation.coverage.web.CstlServiceException
      */
-    protected String treatComparisonOperator(final JAXBElement<? extends ComparisonOpsType> jbComparisonOps) throws CstlServiceException {
+    protected String treatComparisonOperator(ComparisonOpsType comparisonOps) throws CstlServiceException {
         final StringBuilder response = new StringBuilder();
 
-        final ComparisonOpsType comparisonOps = jbComparisonOps.getValue();
-
-        if (comparisonOps instanceof PropertyIsLikeType ) {
+        if (comparisonOps instanceof PropertyIsLike ) {
             final PropertyIsLikeType pil = (PropertyIsLikeType) comparisonOps;
-            final String propertyName;
+            final PropertyName propertyName;
             //we get the field
             if (pil.getPropertyName() != null && pil.getLiteral() != null) {
-                propertyName = pil.getPropertyName().getContent();
+                propertyName = (PropertyName) pil.getExpression();
             } else {
                 throw new CstlServiceException("An operator propertyIsLike must specified the propertyName and a literal value.",
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
@@ -197,19 +205,19 @@ public abstract class FilterParser {
             addComparisonFilter(response, propertyName, brutValue, "LIKE");
 
 
-        } else if (comparisonOps instanceof PropertyIsNullType) {
-             final PropertyIsNullType pin = (PropertyIsNullType) comparisonOps;
+        } else if (comparisonOps instanceof PropertyIsNull) {
+             final PropertyIsNull pin = (PropertyIsNull) comparisonOps;
 
             //we get the field
-            if (pin.getPropertyName() != null) {
-                addComparisonFilter(response, pin.getPropertyName().getContent(), null, "IS NULL ");
+            if (pin.getExpression() != null) {
+                addComparisonFilter(response, (PropertyName) pin.getExpression(), null, "IS NULL ");
             } else {
                 throw new CstlServiceException("An operator propertyIsNull must specified the propertyName.",
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             }
         } else if (comparisonOps instanceof PropertyIsBetweenType) {
             final PropertyIsBetweenType pib = (PropertyIsBetweenType) comparisonOps;
-            final String propertyName       = pib.getPropertyName();
+            final PropertyName propertyName = (PropertyName) pib.getExpression();
             final LowerBoundaryType low     = pib.getLowerBoundary();
             final LiteralType lowLit        = low.getLiteral();
             final UpperBoundaryType upp     = pib.getUpperBoundary();
@@ -222,38 +230,43 @@ public abstract class FilterParser {
                 addDateComparisonFilter(response, propertyName, uppLit.getStringValue(), "<=");
             }
 
-        } else if (comparisonOps instanceof BinaryComparisonOpType) {
+        } else if (comparisonOps instanceof BinaryComparisonOperator) {
 
-            final BinaryComparisonOpType bc = (BinaryComparisonOpType) comparisonOps;
-            final String propertyName       = bc.getPropertyName();
-            final LiteralType literal       = bc.getLiteral();
-            final String operator           = jbComparisonOps.getName().getLocalPart();
+            final BinaryComparisonOperator bc = (BinaryComparisonOperator) comparisonOps;
+            final PropertyName propertyName   = (PropertyName) bc.getExpression1();
+            final Literal literal             = (Literal) bc.getExpression2();
 
             if (propertyName == null || literal == null) {
                 throw new CstlServiceException("A binary comparison operator must be constitued of a literal and a property name.",
                                                  INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
             } else {
-                final String literalValue = literal.getStringValue();
+                final String literalValue = (String) literal.getValue();
 
-                if (operator.equals("PropertyIsEqualTo")) {
+                if (bc instanceof PropertyIsEqualTo) {
                     addComparisonFilter(response, propertyName, literalValue, "=");
 
-                } else if (operator.equals("PropertyIsNotEqualTo")) {
+                } else if (bc instanceof PropertyIsNotEqualTo) {
                     addComparisonFilter(response, propertyName, literalValue, "!=");
 
-                } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
+                } else if (bc instanceof PropertyIsGreaterThanOrEqualTo) {
                     addDateComparisonFilter(response, propertyName, literalValue, ">=");
 
-                } else if (operator.equals("PropertyIsGreaterThan")) {
+                } else if (bc instanceof PropertyIsGreaterThan) {
                     addDateComparisonFilter(response, propertyName, literalValue, ">");
 
-                } else if (operator.equals("PropertyIsLessThan") ) {
+                } else if (bc instanceof  PropertyIsLessThan) {
                     addDateComparisonFilter(response, propertyName, literalValue, "<");
 
-                } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
+                } else if (bc instanceof PropertyIsLessThanOrEqualTo) {
                     addDateComparisonFilter(response, propertyName, literalValue, "<=");
 
                 } else {
+                    final String operator;
+                    if (bc != null) {
+                        operator = bc.getClass().getSimpleName();
+                    } else {
+                        operator = "null";
+                    }
                     throw new CstlServiceException("Unkwnow comparison operator: " + operator,
                                                      INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                 }
@@ -270,7 +283,7 @@ public abstract class FilterParser {
      * @param literalValue The value of the filter.
      * @param operator The comparison operator.
      */
-    protected abstract void addComparisonFilter(StringBuilder response, String propertyName, String literalValue, String operator);
+    protected abstract void addComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator);
 
     /**
      * Add to the StringBuilder a piece of query with the specified operator fr a date property.
@@ -281,7 +294,7 @@ public abstract class FilterParser {
      * @param operator The comparison operator.
      * @throws CstlServiceException
      */
-    protected abstract void addDateComparisonFilter(StringBuilder response, String propertyName, String literalValue, String operator) throws CstlServiceException;
+    protected abstract void addDateComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) throws CstlServiceException;
 
     /**
      * Extract and format a date representation from the specified String.
@@ -304,14 +317,14 @@ public abstract class FilterParser {
      *
      * @return A formatted value.
      */
-    protected String translateSpecialChar(PropertyIsLikeType pil, String wildchar, String singleChar, String escapeChar) {
+    protected String translateSpecialChar(PropertyIsLike pil, String wildchar, String singleChar, String escapeChar) {
         String brutValue = pil.getLiteral();
         brutValue = brutValue.replace(pil.getWildCard(), wildchar);
         brutValue = brutValue.replace(pil.getSingleChar(), singleChar);
-        brutValue = brutValue.replace(pil.getEscapeChar(), escapeChar);
+        brutValue = brutValue.replace(pil.getEscape(), escapeChar);
 
         //for a date we remove the '-'
-        if (isDateField(pil.getPropertyName().getContent())) {
+        if (isDateField((PropertyName) pil.getExpression())) {
             brutValue = brutValue.replaceAll("-", "");
             brutValue = brutValue.replace("Z", "");
         }
@@ -324,7 +337,7 @@ public abstract class FilterParser {
      * @param pil propertyIsLike filter.
      * @return A formatted value.
      */
-    protected abstract String translateSpecialChar(PropertyIsLikeType pil);
+    protected abstract String translateSpecialChar(PropertyIsLike pil);
 
     /**
      * Return a piece of query for An Id filter.
@@ -629,8 +642,9 @@ public abstract class FilterParser {
      * @param propertyName A property name extract from a filter.
      * @return true is the specified property has to be treated as a date Field.
      */
-    protected boolean isDateField(final String propertyName) {
-        if (propertyName != null) {
+    protected boolean isDateField(final PropertyName pName) {
+        if (pName != null && pName.getPropertyName() != null) {
+            String propertyName = pName.getPropertyName();
             return propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")
                 || propertyName.equalsIgnoreCase("TempExtent_begin") || propertyName.equalsIgnoreCase("TempExtent_end");
         }
@@ -643,41 +657,38 @@ public abstract class FilterParser {
      * example: NOT PropertyIsLessOrEqualsThan => PropertyIsGreaterThan
      *          NOT PropertyIsLessThan         => PropertyIsGreaterOrEqualsThan
      *
-     * @param jbComparisonOps The comparison operator to reverse.
+     * @param c The comparison operator to reverse.
      * @return The reversed comparison Operator
      * 
      * @throws CstlServiceException
      */
-    protected JAXBElement<? extends ComparisonOpsType> reverseComparisonOperator(JAXBElement<? extends ComparisonOpsType> jbComparisonOps) throws CstlServiceException {
-        final String operator       = jbComparisonOps.getName().getLocalPart();
-        final ComparisonOpsType c   = jbComparisonOps.getValue();
-        final ObjectFactory factory = new ObjectFactory();
+    protected ComparisonOpsType reverseComparisonOperator(ComparisonOpsType c) throws CstlServiceException {
+        String operator;
+        if (c != null) {
+            operator = c.getClass().getSimpleName();
+        } else {
+            operator = "null";
+        }
         if (c instanceof BinaryComparisonOpType) {
             final BinaryComparisonOpType bc = (BinaryComparisonOpType) c;
 
-            if (operator.equals("PropertyIsEqualTo")) {
-                final PropertyIsNotEqualToType newFilter = new PropertyIsNotEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
-                return factory.createPropertyIsNotEqualTo(newFilter);
+            if (c instanceof PropertyIsEqualTo) {
+                return new PropertyIsNotEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
 
-            } else if (operator.equals("PropertyIsNotEqualTo")) {
-                final PropertyIsEqualToType newFilter = new PropertyIsEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
-                return factory.createPropertyIsEqualTo(newFilter);
+            } else if (c instanceof  PropertyIsNotEqualTo) {
+                return new PropertyIsEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
 
-            } else if (operator.equals("PropertyIsGreaterThanOrEqualTo")) {
-                final PropertyIsLessThanType newFilter = new  PropertyIsLessThanType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
-                return factory.createPropertyIsLessThan(newFilter);
+            } else if (c instanceof PropertyIsGreaterThanOrEqualTo) {
+                return new PropertyIsLessThanType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
 
-            } else if (operator.equals("PropertyIsGreaterThan")) {
-                final PropertyIsLessThanOrEqualToType newFilter = new  PropertyIsLessThanOrEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
-                return factory.createPropertyIsLessThanOrEqualTo(newFilter);
+            } else if (c instanceof PropertyIsGreaterThan) {
+                return new PropertyIsLessThanOrEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
 
-            } else if (operator.equals("PropertyIsLessThan")) {
-                final PropertyIsGreaterThanOrEqualToType newFilter = new  PropertyIsGreaterThanOrEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
-                return factory.createPropertyIsGreaterThanOrEqualTo(newFilter);
+            } else if (c instanceof PropertyIsLessThan) {
+                return new PropertyIsGreaterThanOrEqualToType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
 
-            } else if (operator.equals("PropertyIsLessThanOrEqualTo")) {
-                final PropertyIsGreaterThanType newFilter = new  PropertyIsGreaterThanType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
-                return factory.createPropertyIsGreaterThan(newFilter);
+            } else if (c instanceof PropertyIsLessThanOrEqualTo) {
+                return new  PropertyIsGreaterThanType(bc.getLiteral(), new PropertyNameType(bc.getPropertyName()), Boolean.TRUE);
 
             } else {
                 throw new CstlServiceException("Unkwnow comparison operator: " + operator,

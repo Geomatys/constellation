@@ -41,11 +41,11 @@ public class DefaultTileExample {
         tm.add(createTileMatrix("L09",  2,   2,   480, 480, 0.075,               -180, 90));
         tm.add(createTileMatrix("L08",  4,   4,   480, 480, 0.0625,              -180, 90));
         tm.add(createTileMatrix("L07",  8,   8,   480, 480, 0.0416666666666667,  -180, 90));
-        tm.add(createTileMatrix("L06",  16,  16,  480, 480, 0.0375,              -180, 90));
-        tm.add(createTileMatrix("L05",  32,  32,  480, 480, 0.025,               -180, 90));
-        tm.add(createTileMatrix("L04",  64,  64,  480, 480, 0.0208333333333333,  -180, 90));
-        tm.add(createTileMatrix("L03",  128, 128, 480, 480, 0.0125,              -180, 90));
-        tm.add(createTileMatrix("L02",  256, 256, 480, 480, 0.00833333333333333, -180, 90));
+        tm.add(createTileMatrix("L06",  16,  6,  480, 480, 0.0375,              -180, 90));
+        tm.add(createTileMatrix("L05",  21,  32,  480, 480, 0.025,               -180, 90));
+        tm.add(createTileMatrix("L04",  64,  43,  480, 480, 0.0208333333333333,  -180, 90));
+        tm.add(createTileMatrix("L03",  128, 43, 480, 480, 0.0125,              -180, 90));
+        tm.add(createTileMatrix("L02",  256, 85, 480, 480, 0.00833333333333333, -180, 90));
         tm.add(createTileMatrix("L01",  512, 512, 480, 480, 0.00416666666666667, -180, 90));
         BLUEMARBLE.setTileMatrix(tm);
     }
@@ -145,7 +145,7 @@ public class DefaultTileExample {
         }  else if ("OrthoThau".equals(name)) {
             return "/France/OrthoLittoral/Thau/";
         } else if ("BlueMarble".equals(name)) {
-            return "/Monde/BlueMarble/S480/";
+            return "/home/guilhem/mosaique/ouput/";
         } else if ("UNESCO".equals(name)) {
             return "/Monde/UNESCO/";
         }

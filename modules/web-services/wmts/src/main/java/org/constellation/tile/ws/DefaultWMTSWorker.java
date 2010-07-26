@@ -650,8 +650,8 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         final String col              = getLettersFromInt(columnIndex, matrix.getMatrixWidth()); // letter
         final String line             = getNumbersFromInt(rowIndex, matrix.getMatrixHeight()); // number
         final List<String> rootDir    = getRootDirectories();
-        final String fileName         = rootDir.get(0) + DefaultTileExample.getPathForMatrixSet(matrixSetName) + level + '_' + col + line + ".png";
-
+        //final String fileName         = rootDir.get(0) + DefaultTileExample.getPathForMatrixSet(matrixSetName) + level + '_' + col + line + ".png";
+        final String fileName         = DefaultTileExample.getPathForMatrixSet(matrixSetName) + level + '_' + col + line + ".png";
 
         final File f = new File(fileName);
         if (f.exists()) {

@@ -35,6 +35,10 @@ import static org.constellation.metadata.CSWConstants.*;
 // Lucene dependencies
 import org.apache.lucene.search.Filter;
 
+// GeoAPI dependencies
+import org.opengis.filter.PropertyIsLike;
+import org.opengis.filter.expression.PropertyName;
+
 // geotoolkit dependencies
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
@@ -42,7 +46,6 @@ import org.geotoolkit.ogc.xml.v110.BinaryLogicOpType;
 import org.geotoolkit.ogc.xml.v110.ComparisonOpsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LogicOpsType;
-import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
 import org.geotoolkit.ogc.xml.v110.SpatialOpsType;
 import org.geotoolkit.ogc.xml.v110.UnaryLogicOpType;
 import org.geotoolkit.temporal.object.TemporalUtilities;
@@ -84,7 +87,7 @@ public class LuceneFilterParser extends FilterParser {
             
             // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
             } else if (filter.getComparisonOps() != null) {
-                response = new SpatialQuery(treatComparisonOperator(filter.getComparisonOps()), null, SerialChainFilter.AND);
+                response = new SpatialQuery(treatComparisonOperator(filter.getComparisonOps().getValue()), null, SerialChainFilter.AND);
                 
             // we treat spatial constraint : BBOX, Beyond, Overlaps, ...    
             } else if (filter.getSpatialOps() != null) {
@@ -115,7 +118,7 @@ public class LuceneFilterParser extends FilterParser {
             // we treat directly comparison operator: PropertyIsLike, IsNull, IsBetween, ...   
             for (JAXBElement<? extends ComparisonOpsType> jb: binary.getComparisonOps()) {
             
-                queryBuilder.append(treatComparisonOperator((JAXBElement<? extends ComparisonOpsType>)jb));
+                queryBuilder.append(treatComparisonOperator(jb.getValue()));
                 queryBuilder.append(" ").append(operator.toUpperCase()).append(" ");
             }
             
@@ -172,7 +175,7 @@ public class LuceneFilterParser extends FilterParser {
                         
             // we treat comparison operator: PropertyIsLike, IsNull, IsBetween, ...    
             if (unary.getComparisonOps() != null) {
-                queryBuilder.append(treatComparisonOperator(unary.getComparisonOps()));
+                queryBuilder.append(treatComparisonOperator(unary.getComparisonOps().getValue()));
                 
             // we treat spatial constraint : BBOX, Beyond, Overlaps, ...        
             } else if (unary.getSpatialOps() != null) {
@@ -223,14 +226,14 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addComparisonFilter(StringBuilder response, String propertyName, String literalValue, String operator) {
+    protected void addComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) {
         if (operator.equals("!=")) {
             response.append("metafile:doc NOT ");
         }
         if (operator.equals("LIKE") || operator.equals("IS NULL ")) {
-            response.append(removePrefix(propertyName)).append(":").append(literalValue);
+            response.append(removePrefix(propertyName.getPropertyName())).append(":").append(literalValue);
         } else {
-            response.append(removePrefix(propertyName)).append(":\"").append(literalValue).append('"');
+            response.append(removePrefix(propertyName.getPropertyName())).append(":\"").append(literalValue).append('"');
         }
     }
 
@@ -238,10 +241,10 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected void addDateComparisonFilter(StringBuilder response, String propertyName, String literalValue, String operator) throws CstlServiceException {
+    protected void addDateComparisonFilter(StringBuilder response, PropertyName propertyName, String literalValue, String operator) throws CstlServiceException {
         if (isDateField(propertyName)) {
             final String dateValue = extractDateValue(literalValue);
-            response.append(removePrefix(propertyName)).append(":");
+            response.append(removePrefix(propertyName.getPropertyName())).append(":");
 
             String comparison;
             if (operator.equals("<=") || operator.equals("<")) {
@@ -281,7 +284,7 @@ public class LuceneFilterParser extends FilterParser {
      * {@inheritDoc}
      */
     @Override
-    protected String translateSpecialChar(PropertyIsLikeType pil) {
+    protected String translateSpecialChar(PropertyIsLike pil) {
         return translateSpecialChar(pil, "*", "?", "\\");
     }
 
