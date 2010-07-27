@@ -185,17 +185,14 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
      */
     @Override
     public GeographicBoundingBox getGeographicBoundingBox() throws DataStoreException {
-        //TODO handle this correctly
         try{
-            final Envelope env = store.getEnvelope(QueryBuilder.all(name));
-
-            Envelope renv = null;
+            Envelope env = store.getEnvelope(QueryBuilder.all(name));
             if(!CRS.equalsIgnoreMetadata(env.getCoordinateReferenceSystem(), DefaultGeographicCRS.WGS84)){
-                renv = CRS.transform(env, DefaultGeographicCRS.WGS84);
+                env = CRS.transform(env, DefaultGeographicCRS.WGS84);
             }
 
-            if(renv != null){
-                return new DefaultGeographicBoundingBox(renv);
+            if(env != null){
+                return new DefaultGeographicBoundingBox(env);
             }
 
         }catch(Exception e){
