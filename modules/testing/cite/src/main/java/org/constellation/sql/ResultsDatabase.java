@@ -451,6 +451,7 @@ public class ResultsDatabase {
                 sb.append(tab).append(tab).append(tab).append("==> Directory: ").append(res.getDirectory())
                   .append(endOfLine);
             }
+            if (x364) sb.append(X364.FOREGROUND_DEFAULT.sequence());
         }
 
         if (!newlyActivatedTests.isEmpty()) {
