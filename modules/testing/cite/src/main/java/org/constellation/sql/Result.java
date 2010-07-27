@@ -53,13 +53,19 @@ public final class Result {
      */
     private final boolean passed;
 
-    public Result(final Date date, final String id, final String directory, final boolean passed,
+    /**
+     * Defined whether the test has passed or not.
+     */
+    private boolean groupNode;
+
+    public Result(final Date date, final String id, final String directory, final boolean passed, final boolean groupNode,
             final String assertion) {
         this.date        = date;
         this.id          = id;
         this.directory   = directory;
         this.passed      = passed;
         this.assertion   = assertion;
+        this.groupNode   = groupNode;
     }
 
     /**
@@ -97,9 +103,23 @@ public final class Result {
         return assertion;
     }
 
+    /**
+     * @return the groupNode
+     */
+    public boolean isGroupNode() {
+        return groupNode;
+    }
+
+    /**
+     * @param groupNode the groupNode to set
+     */
+    public void setGroupNode(boolean groupNode) {
+        this.groupNode = groupNode;
+    }
+
     @Override
     public String toString() {
-        return "Result["+ ResultsDatabase.DATE_FORMAT.format(date) +","+ id +","+ directory +","+ passed +"]";
+        return "Result["+ ResultsDatabase.DATE_FORMAT.format(date) +","+ id +","+ directory +","+ passed +","+groupNode+"]";
     }
 
     @Override

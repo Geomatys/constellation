@@ -59,6 +59,6 @@ public final class LogParser {
         if (serviceAndVersion.contains("/")) {
             serviceAndVersion = serviceAndVersion.substring(0, serviceAndVersion.indexOf('/'));
         }
-        return new Result(date, lineSplitted[1], directory, passed, null);
+        return new Result(date, lineSplitted[1], directory, passed, false, null);
     }
 }

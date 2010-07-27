@@ -74,7 +74,7 @@ public class ResultsDatabase {
     /**
      * Insertion requests.
      */
-    private static final String INSERT_RESULT  = "INSERT INTO \"Results\" VALUES (?,?,?,?);";
+    private static final String INSERT_RESULT  = "INSERT INTO \"Results\" VALUES (?,?,?,?,?);";
     private static final String INSERT_SERVICE = "INSERT INTO \"Services\" VALUES (?,?);";
     private static final String INSERT_SUITE   = "INSERT INTO \"Suites\" VALUES (?,?,?,?);";
     private static final String INSERT_DESCRIPTION = "INSERT INTO \"TestsDescriptions\" VALUES (?,?);";
@@ -91,15 +91,15 @@ public class ResultsDatabase {
      * Select requests.
      */
     private static final String SELECT_TESTS_FAILED =
-            "SELECT date,id,directory FROM \"Results\" WHERE date=? AND passed=FALSE;";
+            "SELECT date,id,directory,groupnode FROM \"Results\" WHERE date=? AND passed=FALSE;";
     private static final String SELECT_TESTS_PASSED =
-            "SELECT date,id,directory FROM \"Results\" WHERE date=? AND passed=TRUE;";
+            "SELECT date,id,directory,groupnode FROM \"Results\" WHERE date=? AND passed=TRUE;";
     private static final String SELECT_TESTS_DESC =
             "SELECT assertion FROM \"TestsDescriptions\" WHERE id=?;";
     private static final String SELECT_PREVIOUS_SUITE =
             "SELECT date FROM \"Suites\" WHERE lastsuccess='TRUE' AND service=? AND version=?;";
     private static final String SELECT_TEST_RESULT_FROM_ID =
-            "SELECT date,r.id,directory,passed,assertion FROM \"Results\" r, \"TestsDescriptions\" t "
+            "SELECT date,r.id,directory,passed,assertion,groupnode FROM \"Results\" r, \"TestsDescriptions\" t "
             + "WHERE date=? and r.id=? and r.id=t.id;";
 
     /**
@@ -170,6 +170,8 @@ public class ResultsDatabase {
 
         // Will contain the tests that have passed for the last session, but not for the current one.
         final List<Result> problematicTests = new ArrayList<Result>();
+        // Will contain the groupNode tests that have passed for the last session, but not for the current one (not problematic).
+        final List<Result> problematicGroupNodeTests = new ArrayList<Result>();
         // Will contain the tests that have passed for the current session, but not for the last one.
         final List<Result> newlyPassedTests = new ArrayList<Result>();
         // Will contain the tests that have been activated for the current session.
@@ -185,7 +187,11 @@ public class ResultsDatabase {
                 // add to the problematic list if a test fail and was passed in the last session
                 if (!isTestPresentInList(currentTest, previousTestsFailed)) {
                     if (isTestPresentInList(currentTest, previousTestsPassed)) {
-                        problematicTests.add(currentTest);
+                        if (currentTest.isGroupNode()) {
+                            problematicGroupNodeTests.add(currentTest);
+                        } else {
+                            problematicTests.add(currentTest);
+                        }
                     } else {
                         newlyActivatedTests.add(currentTest);
                     }
@@ -218,7 +224,7 @@ public class ResultsDatabase {
             missingTest = false;
         }
 
-        displayComparisonResults(problematicTests, newlyPassedTests, newlyActivatedTests, disapearTests, date, previousSuite, service, version);
+        displayComparisonResults(problematicTests, problematicGroupNodeTests, newlyPassedTests, newlyActivatedTests, disapearTests, date, previousSuite, service, version);
         return problematicTests.isEmpty() && !missingTest;
     }
 
@@ -235,7 +241,7 @@ public class ResultsDatabase {
                             throws SQLException
     {
         return insertResult(service, version, result.getId(), result.getDirectory(),
-                            result.isPassed(), result.getDate());
+                            result.isPassed(), result.isGroupNode(), result.getDate());
     }
 
     /**
@@ -251,7 +257,7 @@ public class ResultsDatabase {
      * @throws SQLException if an error occurs in the insert request.
      */
     public int insertResult(final String service, final String version, final String id,
-                            final String directory, final boolean passed, final Date date) throws SQLException
+                            final String directory, final boolean passed, final boolean groupNode, final Date date) throws SQLException
     {
         ensureConnectionOpened();
 
@@ -279,6 +285,7 @@ public class ResultsDatabase {
         ps.setString(2, finalId);
         ps.setBoolean(3, passed);
         ps.setString(4, directory);
+        ps.setBoolean(5, groupNode);
 
         final int result = ps.executeUpdate();
         ps.close();
@@ -368,16 +375,20 @@ public class ResultsDatabase {
     /**
      * Display the results for the current session, compared to the last one.
      *
-     * @param problematicTests List of problematic tests, that no more passed.
-     * @param newlyPassedTests List of tests that are corrected in the current session.
-     * @param date             The date of the suite of tests.
-     * @param previous         The date of the previous suite of tests. Note that if it is
-     *                         {@code null}, we can't compare the current session with
-     *                         another one.
-     * @param service          The service name.
-     * @param version          The service version.
+     * @param problematicTests      List of problematic tests, that no more passed.
+     * @param problematicGroupTests List of problematic tests, that no more passed.
+     * @param newlyPassedTests    List of tests that are corrected in the current session.
+     * @param newlyActivatedTests List of tests that appears in the current session.
+     * @param deActivatedTests    List of tests that disapears in the current session.
+     * @param date                The date of the suite of tests.
+     * @param previous            The date of the previous suite of tests. Note that if it is
+     *                            {@code null}, we can't compare the current session with
+     *                            another one.
+     * @param service             The service name.
+     * @param version             The service version.
      */
     private void displayComparisonResults(final List<Result> problematicTests,
+                                          final List<Result> problematicGroupTests,
                                           final List<Result> newlyPassedTests,
                                           final List<Result> newlyActivatedTests,
                                           final List<Result> deActivatedTests,
@@ -425,6 +436,17 @@ public class ResultsDatabase {
             sb.append(tab).append("/!\\ Some tests are now failing ! You should fix them to restore the build /!\\")
               .append(endOfLine);
             for (Result res : problematicTests) {
+                sb.append(tab).append(tab).append("Id: ").append(res.getId()).append(endOfLine);
+                sb.append(tab).append(tab).append(tab).append("==> Directory: ").append(res.getDirectory())
+                  .append(endOfLine);
+            }
+        }
+
+        if (!problematicGroupTests.isEmpty()) {
+            if (x364) sb.append(X364.FOREGROUND_RED.sequence());
+            sb.append(tab).append("Some Group tests are now failing because of new activated test failling (not an error)")
+              .append(endOfLine);
+            for (Result res : problematicGroupTests) {
                 sb.append(tab).append(tab).append("Id: ").append(res.getId()).append(endOfLine);
                 sb.append(tab).append(tab).append(tab).append("==> Directory: ").append(res.getDirectory())
                   .append(endOfLine);
@@ -538,9 +560,10 @@ public class ResultsDatabase {
         final List<Result> results = new ArrayList<Result>();
         final ResultSet rs = psCurrent.executeQuery();
         while (rs.next()) {
-            final String id        = rs.getString(2);
-            final String directory = rs.getString(3);
-            
+            final String id           = rs.getString(2);
+            final String directory    = rs.getString(3);
+            final boolean isGroupNode = rs.getBoolean(4);
+
             final PreparedStatement psDesc = connection.prepareStatement(SELECT_TESTS_DESC);
             psDesc.setString(1, id);
             final ResultSet rs2 = psDesc.executeQuery();
@@ -550,7 +573,8 @@ public class ResultsDatabase {
             } else {
                 assertion = extractDescription(id, directory);
             }
-            results.add(new Result(rs.getTimestamp(1), id, directory, false, assertion));
+
+            results.add(new Result(rs.getTimestamp(1), id, directory, false, isGroupNode, assertion));
             rs2.close();
         }
         rs.close();
@@ -574,8 +598,9 @@ public class ResultsDatabase {
         final List<Result> results = new ArrayList<Result>();
         final ResultSet rs = psCurrent.executeQuery();
         while (rs.next()) {
-            final String id        = rs.getString(2);
-            final String directory = rs.getString(3);
+            final String id           = rs.getString(2);
+            final String directory    = rs.getString(3);
+            final boolean isGroupNode = rs.getBoolean(4);
 
             final PreparedStatement psDesc = connection.prepareStatement(SELECT_TESTS_DESC);
             psDesc.setString(1, id);
@@ -586,7 +611,7 @@ public class ResultsDatabase {
             } else {
                 assertion = extractDescription(id, directory);
             } 
-            results.add(new Result(rs.getTimestamp(1), id, directory, true, assertion));
+            results.add(new Result(rs.getTimestamp(1), id, directory, true, isGroupNode, assertion));
             rs2.close();
         }
         rs.close();
@@ -614,7 +639,7 @@ public class ResultsDatabase {
         final ResultSet rs = psCurrent.executeQuery();
         if (rs.next()) {
             result = new Result(rs.getDate(1), rs.getString(2), rs.getString(3),
-                                rs.getBoolean(4), rs.getString(5));
+                                rs.getBoolean(4), rs.getBoolean(5), rs.getString(6));
         }
         rs.close();
         return result;

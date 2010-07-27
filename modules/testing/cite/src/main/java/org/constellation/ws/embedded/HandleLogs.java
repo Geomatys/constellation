@@ -21,8 +21,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,15 +68,27 @@ public final class HandleLogs {
             final LogParser logParser = new LogParser(date);
             final BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String line;
-            resDB = new ResultsDatabase();
+            Result precedentResult = null;
+            final List<Result> results = new ArrayList<Result>();
             while ((line = br.readLine()) != null) {
                 if (line.trim().startsWith("Error")) {
                     throw new IllegalArgumentException("Error the session does not exist.");
                 }
                 final Result result = logParser.toResult(line);
-                resDB.insertResult(result, service, version);
+                if (precedentResult == null) {
+                    result.setGroupNode(true);
+                } else if (isChildOf(precedentResult, result)) {
+                    precedentResult.setGroupNode(true);
+                }
+                precedentResult = result;
+                results.add(result);
             }
             br.close();
+
+            resDB = new ResultsDatabase();
+            for (Result result : results) {
+                resDB.insertResult(result, service, version);
+            }
             resDB.close();
         } catch (IOException e) {
             // May be normal if we killed the process. Prints only
@@ -91,6 +105,21 @@ public final class HandleLogs {
                 System.err.println(ex);
             }
         }
+    }
+
+    /**
+     * return true if the result is a child of the specified precedent result.
+     * A result id considered as a child if his directory contains the precedent directory.
+     * 
+     * @param oldResult The precedent result.
+     * @param result The current result.
+     *
+     * @return True if the directory of the current result contain the directory of the precedent result.
+     */
+    private static boolean isChildOf(Result oldResult, Result result) {
+        final String oldDirectory   = oldResult.getDirectory();
+        final String childDirectory = result.getDirectory();
+        return childDirectory.startsWith(oldDirectory);
     }
 
     /**
