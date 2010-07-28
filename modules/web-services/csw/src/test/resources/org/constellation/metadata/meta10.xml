@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gmd:MD_Metadata xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gml="http://www.opengis.net/gml" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gsr="http://www.isotc211.org/2005/gsr" xmlns:gss="http://www.isotc211.org/2005/gss" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink" uuid="IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959">
+    <gmd:fileIdentifier>
+        <gco:CharacterString>IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959.xml</gco:CharacterString>
+    </gmd:fileIdentifier>
+    <gmd:language>
+        <!--gmd:LanguageCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#LanguageCode" codeListValue="fre">fre</gmd:LanguageCode-->
+        <gco:CharacterString>fre</gco:CharacterString>
+    </gmd:language>
+    <gmd:characterSet>
+        <gmd:MD_CharacterSetCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
+    </gmd:characterSet>
+    <gmd:hierarchyLevel>
+        <gmd:MD_ScopeCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</gmd:MD_ScopeCode>
+    </gmd:hierarchyLevel>
+    <gmd:hierarchyLevelName>
+        <gco:CharacterString>Cliché</gco:CharacterString>
+    </gmd:hierarchyLevelName>
+    <gmd:contact>
+        <gmd:CI_ResponsibleParty>
+            <gmd:organisationName>
+                <gco:CharacterString>IGN-F</gco:CharacterString>
+            </gmd:organisationName>
+            <gmd:positionName>
+                <gco:CharacterString>responsable de marché</gco:CharacterString>
+            </gmd:positionName>
+            <gmd:contactInfo>
+                <gmd:CI_Contact>
+                    <gmd:address>
+                        <gmd:CI_Address>
+                            <gmd:deliveryPoint>
+                                <gco:CharacterString>Institut Géographique National - Service Clients</gco:CharacterString>
+                            </gmd:deliveryPoint>
+                            <gmd:deliveryPoint>
+                                <gco:CharacterString>73 avenue de Paris</gco:CharacterString>
+                            </gmd:deliveryPoint>
+                            <gmd:city>
+                                <gco:CharacterString>Saint Mandé</gco:CharacterString>
+                            </gmd:city>
+                            <gmd:postalCode>
+                                <gco:CharacterString>94165 Cedex</gco:CharacterString>
+                            </gmd:postalCode>
+                            <gmd:country>
+                                <gco:CharacterString>FRA</gco:CharacterString>
+                            </gmd:country>
+                            <gmd:electronicMailAddress>
+                                <gco:CharacterString>sav-bd@ign.fr</gco:CharacterString>
+                            </gmd:electronicMailAddress>
+                        </gmd:CI_Address>
+                    </gmd:address>
+                </gmd:CI_Contact>
+            </gmd:contactInfo>
+            <gmd:role>
+                <gmd:CI_RoleCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#CI_RoleCode" codeListValue="distributor">distributor</gmd:CI_RoleCode>
+            </gmd:role>
+        </gmd:CI_ResponsibleParty>
+    </gmd:contact>
+    <gmd:dateStamp>
+        <gco:Date>2008-07-07T00:00:00.000+02:00</gco:Date>
+    </gmd:dateStamp>
+    <gmd:metadataStandardName>
+        <gco:CharacterString>ISO 19115</gco:CharacterString>
+    </gmd:metadataStandardName>
+    <gmd:metadataStandardVersion>
+        <gco:CharacterString>2005/PDAM 1</gco:CharacterString>
+    </gmd:metadataStandardVersion>
+    <!--gmd:locale>
+        <gmd:PT_Locale id="locale-eng">
+            <gmd:languageCode>
+                <gmd:LanguageCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#LanguageCode" codeListValue="eng">eng</gmd:LanguageCode>
+            </gmd:languageCode>
+            <gmd:country>
+                <gmd:Country codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#Country" codeListValue="GB">GB</gmd:Country>
+            </gmd:country>
+            <gmd:characterEncoding>
+                <gmd:MD_CharacterSetCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#MD_CharacterSetCode" codeListValue="8859part15">8859part15</gmd:MD_CharacterSetCode>
+            </gmd:characterEncoding>
+        </gmd:PT_Locale>
+    </gmd:locale-->
+    <gmd:referenceSystemInfo>
+        <gmd:MD_ReferenceSystem id="IGNF_PVA_1-0.xml.referenceSystemInfo.LAMBE">
+            <gmd:referenceSystemIdentifier>
+                <gmd:RS_Identifier>
+                    <gmd:code>
+                        <!--gmx:Anchor xlink:href="http://librairies.ign.fr/geoportail/resources/RIG.xml#LAMBE">NTF Lambert II étendu</gmx:Anchor-->
+                        <gco:CharacterString>NTF Lambert II étendu</gco:CharacterString>
+                    </gmd:code>
+                    <gmd:codeSpace>
+                        <gco:CharacterString>urn:ogc:def:crs:IGNF:1.1</gco:CharacterString>
+                    </gmd:codeSpace>
+                </gmd:RS_Identifier>
+            </gmd:referenceSystemIdentifier>
+        </gmd:MD_ReferenceSystem>
+    </gmd:referenceSystemInfo>
+    <gmd:identificationInfo>
+        <gmd:MD_DataIdentification>
+            <gmd:citation>
+                <gmd:CI_Citation>
+                    <gmd:title>
+                        <gco:CharacterString>8959</gco:CharacterString>
+                    </gmd:title>
+                    <gmd:date>
+                        <gmd:CI_Date>
+                            <gmd:date>
+                                <gco:Date>1968</gco:Date>
+                            </gmd:date>
+                            <gmd:dateType>
+                                <gmd:CI_DateTypeCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#CI_DateTypeCode" codeListValue="creation">creation</gmd:CI_DateTypeCode>
+                            </gmd:dateType>
+                        </gmd:CI_Date>
+                    </gmd:date>
+                    <gmd:edition>
+                        <gco:CharacterString>1.0</gco:CharacterString>
+                    </gmd:edition>
+                    <gmd:identifier>
+                        <gmd:MD_Identifier id="IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959.identifier">
+                            <gmd:code>
+                                <gco:CharacterString>IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959</gco:CharacterString>
+                            </gmd:code>
+                        </gmd:MD_Identifier>
+                    </gmd:identifier>
+                    <gmd:series>
+                        <gmd:CI_Series>
+                            <gmd:name>
+                                <gco:CharacterString>IGNF_PVA_1-0.xml</gco:CharacterString>
+                            </gmd:name>
+                            <gmd:issueIdentification>
+                                <gco:CharacterString>Produit</gco:CharacterString>
+                            </gmd:issueIdentification>
+                        </gmd:CI_Series>
+                    </gmd:series>
+                </gmd:CI_Citation>
+            </gmd:citation>
+            <gmd:abstract>
+                <gco:CharacterString>Cliché d'une prise de vue aérienne.</gco:CharacterString>
+            </gmd:abstract>
+            <gmd:pointOfContact>
+                <gmd:CI_ResponsibleParty>
+                    <gmd:organisationName>
+                        <gco:CharacterString>Institut Géographique National - France (IGN-F)</gco:CharacterString>
+                    </gmd:organisationName>
+                    <gmd:positionName>
+                        <gco:CharacterString>dépot légal</gco:CharacterString>
+                    </gmd:positionName>
+                    <gmd:role>
+                        <gmd:CI_RoleCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#CI_RoleCode" codeListValue="custodian">custodian</gmd:CI_RoleCode>
+                    </gmd:role>
+                </gmd:CI_ResponsibleParty>
+            </gmd:pointOfContact>
+            <gmd:descriptiveKeywords>
+                <gmd:MD_Keywords id="IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959.descriptiveKeywords.INSPIRE">
+                    <gmd:keyword>
+                        <gco:CharacterString>photographie aérienne</gco:CharacterString>
+                    </gmd:keyword>
+                    <gmd:type>
+                        <gmd:MD_KeywordTypeCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#MD_KeywordTypeCode" codeListValue="theme">theme</gmd:MD_KeywordTypeCode>
+                    </gmd:type>
+                    <gmd:thesaurusName>
+                        <gmd:CI_Citation>
+                            <gmd:title xsi:type="gmd:PT_FreeText_PropertyType">
+                                <gco:CharacterString>Thésaurus GEMET</gco:CharacterString>
+                                <gmd:PT_FreeText>
+                                    <gmd:textGroup>
+                                        <gmd:LocalisedCharacterString locale="#locale-eng">GEMET Thesaurus</gmd:LocalisedCharacterString>
+                                    </gmd:textGroup>
+                                </gmd:PT_FreeText>
+                            </gmd:title>
+                        </gmd:CI_Citation>
+                    </gmd:thesaurusName>
+                </gmd:MD_Keywords>
+            </gmd:descriptiveKeywords>
+            <gmd:resourceSpecificUsage>
+                <gmd:MD_Usage id="IGNF_PVA_1-0.xml.resourceSpecificUsage_1">
+                    <gmd:specificUsage>
+                        <gco:CharacterString>Echelles d'affichage</gco:CharacterString>
+                    </gmd:specificUsage>
+                    <gmd:userDeterminedLimitations>
+                        <gco:CharacterString>Dépend de l'échelle ou de la résolution de la prise de vue.</gco:CharacterString>
+                    </gmd:userDeterminedLimitations>
+                    <gmd:userContactInfo>
+                        <gmd:CI_ResponsibleParty>
+                            <gmd:organisationName>
+                                <gco:CharacterString>IGN-F</gco:CharacterString>
+                            </gmd:organisationName>
+                            <gmd:positionName>
+                                <gco:CharacterString>dépot légal</gco:CharacterString>
+                            </gmd:positionName>
+                        </gmd:CI_ResponsibleParty>
+                    </gmd:userContactInfo>
+                </gmd:MD_Usage>
+            </gmd:resourceSpecificUsage>
+            <gmd:resourceConstraints>
+                <gmd:MD_SecurityConstraints>
+                    <gmd:useLimitation>
+                        <gco:CharacterString>Présence de zones sensibles</gco:CharacterString>
+                    </gmd:useLimitation>
+                    <gmd:classification>
+                        <gmd:MD_ClassificationCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#MD_ClassificationCode" codeListValue="restricted">restricted</gmd:MD_ClassificationCode>
+                    </gmd:classification>
+                </gmd:MD_SecurityConstraints>
+            </gmd:resourceConstraints>
+            <gmd:language>
+                <gco:CharacterString>fre</gco:CharacterString>
+            </gmd:language>
+            <gmd:characterSet>
+                <gmd:MD_CharacterSetCode codeList="http://librairies.ign.fr/geoportail/resources/Codelists.xml#MD_CharacterSetCode" codeListValue="utf8">utf8</gmd:MD_CharacterSetCode>
+            </gmd:characterSet>
+            <gmd:topicCategory>
+                <gmd:MD_TopicCategoryCode>imageryBaseMapsEarthCover</gmd:MD_TopicCategoryCode>
+            </gmd:topicCategory>
+            <gmd:extent>
+                <gmd:EX_Extent>
+                    <gmd:description>
+                        <gco:CharacterString>C0620-0111_CDP_5569_8959</gco:CharacterString>
+                    </gmd:description>
+                    <gmd:geographicElement>
+                        <gmd:EX_BoundingPolygon>
+                            <gmd:polygon>
+                                <gml:MultiSurface gml:id="polygon.IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959" srsName="http://librairies.ign.fr/geoportail/resources/RIG.xml#xpointer(//*[@gml:id='LAMBE'])">
+                                    <gml:surfaceMember>
+                                        <gml:Surface gml:id="s.IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959.1">
+                                            <gml:patches>
+                                                <gml:PolygonPatch>
+                                                    <gml:exterior>
+                                                        <gml:Ring>
+                                                            <gml:curveMember>
+                                                                <gml:Curve gml:id="c.IGNF_PVA_1-0__1968__C0620-0111_CDP_5569_8959.0">
+                                                                    <gml:segments>
+                                                                        <gml:LineStringSegment>
+                                                                            <gml:posList>135510 2338590 135430 2337870 135370 2337150 134650 2337230 133930 2337300 134000 2338020 134070 2338740 134790 2338670 135510 2338590</gml:posList>
+                                                                        </gml:LineStringSegment>
+                                                                    </gml:segments>
+                                                                </gml:Curve>
+                                                            </gml:curveMember>
+                                                        </gml:Ring>
+                                                    </gml:exterior>
+                                                </gml:PolygonPatch>
+                                            </gml:patches>
+                                        </gml:Surface>
+                                    </gml:surfaceMember>
+                                </gml:MultiSurface>
+                            </gmd:polygon>
+                        </gmd:EX_BoundingPolygon>
+                    </gmd:geographicElement>
+                </gmd:EX_Extent>
+            </gmd:extent>
+            <gmd:supplementalInformation>
+                <gco:CharacterString>Format des clichés : 180x180 (mm x mm)</gco:CharacterString>
+            </gmd:supplementalInformation>
+        </gmd:MD_DataIdentification>
+    </gmd:identificationInfo>
+</gmd:MD_Metadata>

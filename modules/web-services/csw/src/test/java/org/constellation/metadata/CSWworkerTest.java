@@ -78,6 +78,7 @@ import org.geotoolkit.csw.xml.v202.TransactionType;
 import org.geotoolkit.csw.xml.v202.UpdateType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
 import org.geotoolkit.metadata.iso.identification.DefaultDataIdentification;
+import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
@@ -2094,7 +2095,7 @@ public class CSWworkerTest {
                 while (expIt.hasNext() && resIt.hasNext()) {
                     Extent expEx = expIt.next();
                     Extent resEx = resIt.next();
-                    
+                    assertEquals(expEx.getGeographicElements().size(), resEx.getGeographicElements().size());
                     Iterator<? extends GeographicExtent> expGeExIt = expEx.getGeographicElements().iterator();
                     Iterator<? extends GeographicExtent> resGeExIt = resEx.getGeographicElements().iterator();
                     while (expGeExIt.hasNext() && resGeExIt.hasNext()) {
@@ -2195,6 +2196,12 @@ public class CSWworkerTest {
             assertEquals(expectedCitation.getOtherCitationDetails(), resultCitation.getOtherCitationDetails());
             assertEquals(expectedCitation.getPresentationForms(), resultCitation.getPresentationForms());
             assertEquals(expectedCitation.getSeries(), resultCitation.getSeries());
+            if (expectedCitation.getTitle() instanceof DefaultInternationalString) {
+                DefaultInternationalString expTitle = (DefaultInternationalString) expectedCitation.getTitle();
+                DefaultInternationalString resTitle = (DefaultInternationalString) resultCitation.getTitle();
+                assertEquals(expTitle.getLocales(), resTitle.getLocales());
+                assertEquals(expTitle, resTitle);
+            }
             assertEquals(expectedCitation.getTitle(), resultCitation.getTitle());
         }
     }

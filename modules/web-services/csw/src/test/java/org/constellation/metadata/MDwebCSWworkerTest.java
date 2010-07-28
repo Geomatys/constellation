@@ -72,6 +72,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-base-data.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-data.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19119-data.sql"));
+            sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19108-data.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/sql/DC-schema.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/sql/ebrim-schema.sql"));

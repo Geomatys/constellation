@@ -183,8 +183,8 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
                     statement.statement.setNull(indexOf(query.sampledFeature), java.sql.Types.VARCHAR);
                 }
 
-                if( station.getShape() != null && station.getShape().getAbstractCurve() != null && station.getShape().getAbstractCurve().getValue() != null) {
-                    final LineStringType lineString = (LineStringType) station.getShape().getAbstractCurve().getValue();
+                if( station.getShape() != null && station.getShape().getAbstractCurve() != null && station.getShape().getAbstractCurve() != null) {
+                    final LineStringType lineString = (LineStringType) station.getShape().getAbstractCurve();
 
                     statement.statement.setString(indexOf(query.curveIdentifier), lineString.getId());
                     statement.statement.setString(indexOf(query.srsName), lineString.getSrsName());

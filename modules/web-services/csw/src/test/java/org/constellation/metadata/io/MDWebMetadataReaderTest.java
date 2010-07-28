@@ -74,6 +74,7 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-base-data.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-data.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19119-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19108-data.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/DC-schema.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/ebrim-schema.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
@@ -148,6 +149,26 @@ public class MDWebMetadataReaderTest {
         Object result = reader.getMetadata("16:CSWCat", AbstractMetadataReader.ISO_19115, null);
 
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta-fra1.xml"));
+
+        assertTrue(result instanceof DefaultMetadata);
+        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+
+
+        pool.release(unmarshaller);
+    }
+
+     /**
+     * Tests the getMetadata method for ISO 19119 data
+     *
+     * @throws java.lang.Exception
+     */
+    @Ignore
+    public void getMetadataISOGMLTest() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object result = reader.getMetadata("17:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta10.xml"));
 
         assertTrue(result instanceof DefaultMetadata);
         CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);

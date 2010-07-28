@@ -182,11 +182,11 @@ CREATE TABLE "Schemas"."Obligations" (
 
 
 CREATE TABLE "Schemas"."Paths" (
-    "id" character varying(200) NOT NULL,
+    "id" character varying(600) NOT NULL,
     "name" character varying(50) NOT NULL,
     "standard" character varying(50) NOT NULL,
     "owner" character varying(50) NOT NULL,
-    "parent" character varying(200),
+    "parent" character varying(600),
     "owner_Standard" character varying(50) NOT NULL
 );
 
@@ -206,22 +206,11 @@ CREATE TABLE "Storage"."Catalogs" (
 
 CREATE TABLE "Storage"."Values" (
     "form" integer NOT NULL,
-    "path" character varying(200) NOT NULL,
+    "path" character varying(600) NOT NULL,
     "ordinal" integer NOT NULL,
     "type" character varying(50),
     "typeStandard" character varying(50),
-    "id_value" character varying(200) NOT NULL
-);
-
-
-CREATE TABLE "Storage"."DateValues" (
-    "form" integer NOT NULL,
-    "path" character varying(150) NOT NULL,
-    "ordinal" integer NOT NULL,
-    "type" character varying(50),
-    "typeStandard" character varying(50),
-    "id_value" character varying(200) NOT NULL,
-    "value" date
+    "id_value" character varying(600) NOT NULL
 );
 
 
@@ -264,7 +253,7 @@ CREATE TABLE "Storage"."InputLevelCompletions" (
 
 CREATE TABLE "Storage"."LinkedValues" (
     "form" integer NOT NULL,
-    "path" character varying(150) NOT NULL,
+    "path" character varying(600) NOT NULL,
     "ordinal" integer NOT NULL,
     "type" character varying(50),
     "typeStandard" character varying(50),
@@ -281,11 +270,11 @@ CREATE TABLE "Storage"."PredefinedValues" (
 
 CREATE TABLE "Storage"."TextValues" (
     "form" integer NOT NULL,
-    "path" character varying(200) NOT NULL,
+    "path" character varying(600) NOT NULL,
     "ordinal" integer NOT NULL,
     "type" character varying(50),
     "typeStandard" character varying(50),
-    "id_value" character varying(200) NOT NULL,
+    "id_value" character varying(600) NOT NULL,
     "value" character varying(500)
 );
 
@@ -373,8 +362,6 @@ ALTER TABLE  "Schemas"."Paths" ADD CONSTRAINT unique_paths UNIQUE ("name", "stan
 
 ALTER TABLE  "Storage"."Catalogs" ADD CONSTRAINT "Catalogs_pkey" PRIMARY KEY ("code");
 
-ALTER TABLE  "Storage"."DateValues" ADD CONSTRAINT "DateValues_pkey" PRIMARY KEY ("form", "ordinal", "path");
-
 ALTER TABLE  "Storage"."Forms" ADD CONSTRAINT "Forms_pkey" PRIMARY KEY ("identifier");
 
 ALTER TABLE  "Storage"."ImportForms" ADD CONSTRAINT "ImportForms_pkey" PRIMARY KEY ("form");
@@ -422,8 +409,6 @@ ALTER TABLE  "Schemas"."Properties"  ADD CONSTRAINT "Properties_fk2" FOREIGN KEY
 ALTER TABLE  "Schemas"."Properties" ADD CONSTRAINT "Properties_fk3" FOREIGN KEY ("obligation") REFERENCES "Schemas"."Obligations"("code");
 
 ALTER TABLE  "Schemas"."Properties" ADD CONSTRAINT "Properties_fk4" FOREIGN KEY ("owner", "owner_standard") REFERENCES "Schemas"."Classes"( "name", "standard");
-
-ALTER TABLE  "Storage"."DateValues"  ADD CONSTRAINT "DateValues_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
 ALTER TABLE  "Storage"."FormHierarchies" ADD CONSTRAINT "FormHierarchies_fk" FOREIGN KEY ("parent") REFERENCES "Storage"."Forms"("identifier");
 

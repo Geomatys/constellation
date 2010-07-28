@@ -66,7 +66,9 @@ import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.io.wkt.UnformattableObjectException;
 import org.geotoolkit.naming.DefaultLocalName;
 import org.geotoolkit.naming.DefaultNameFactory;
+import org.geotoolkit.resources.Locales;
 import org.geotoolkit.temporal.object.TemporalUtilities;
+import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
@@ -548,8 +550,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 String namespaceURI = null;
 
                 //We search the children of the QName
-                for (Value childValue : form.getValues()) {
-                    if (childValue.getParent() != null && childValue.getParent().equals(value) && childValue instanceof TextValue) {
+                for (Value childValue : value.getChildren()) {
+                    if (childValue instanceof TextValue) {
                         if (childValue.getPath().getName().equals("localPart"))
                             localPart = ((TextValue)childValue).getValue();
                         else  if (childValue.getPath().getName().equals("namespaceURI"))
@@ -563,7 +565,52 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     LOGGER.severe("The QName is mal-formed");
                     return null;
                 }
+
+            /**
+             * Again another special case PT_FreeText has a special construction.
+             */
+            } else if (className.equals("DefaultInternationalString")) {
+
+                String ptvalue = null;
+                Map<Locale, String> map = new HashMap<Locale, String>();
+                //We search the children of the value
+                for (Value childValue : value.getChildren()) {
+                    if (childValue instanceof TextValue) {
+                        ptvalue = ((TextValue)childValue).getValue();
+                    } else {
+                        if (childValue.getType() != null && childValue.getType().getName().equals("LocalisedCharacterString")) {
+                            String lvalue = null;
+                            String locale = null;
+                            for (Value subchildValue : childValue.getChildren()) {
+                                if (subchildValue instanceof TextValue && subchildValue.getPath().getName().equals("value")) {
+                                    lvalue = ((TextValue) subchildValue).getValue();
+                                } else if (subchildValue instanceof TextValue && subchildValue.getPath().getName().equals("locale")) {
+                                    locale = ((TextValue) subchildValue).getValue();
+                                }
+                            }
+                            if (lvalue != null && locale != null) {
+                                if (locale.startsWith("#locale-")) {
+                                    locale = locale.substring(locale.indexOf('-') + 1);
+                                    Locale loc = Locales.parse(locale);
+                                    map.put(loc, lvalue);
+                                } else {
+                                    LOGGER.warning("Malformed values: child of LocalisedCharacterString `\"locale\"does not starts with '#locale-'");
+                                }
+                            } else {
+                                LOGGER.warning("Malformed values: child of LocalisedCharacterString does not contains a value and a locale");
+                            }
+                        } else {
+                            LOGGER.warning("Malformed values: Child of PT_FreeText is not a LocalisedCharacterString");
+                        }
+                    }
+                }
+                DefaultInternationalString resultIS = new DefaultInternationalString(ptvalue);
+                for (Entry<Locale, String> entry : map.entrySet()) {
+                    resultIS.add(entry.getKey(), entry.getValue());
+                }
+                return resultIS;
             }
+
             /**
              * normal case
              * we get the empty constructor
@@ -746,6 +793,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             return String.class;
         } else if (className.equalsIgnoreCase("Date")) {
             return Date.class;
+        } else if (className.equalsIgnoreCase("PT_FreeText")) {
+            return DefaultInternationalString.class;
         } else if (className.equalsIgnoreCase("Decimal") || className.equalsIgnoreCase("Double")) {
             return Double.class;
         } else if (className.equalsIgnoreCase("Real")) {
@@ -807,6 +856,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else {
             if (!className.contains("Code") && !className.equals("DCPList") && !className.equals("SV_CouplingType") && !className.equals("AxisDirection")) {
                 packagesName = geotoolkitPackage;
+                packagesName.addAll(gmlPackage);
             } else {
                 packagesName = opengisPackage;
             }

@@ -31,6 +31,11 @@ INSERT INTO "Schemas"."Classes"  VALUES ('Decimal', NULL, 'ISO 19103', NULL, 0, 
 INSERT INTO "Schemas"."Classes"  VALUES ('Distance', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('Real', NULL, 'ISO 19103', NULL, 0, NULL, NULL, ' ');
 
+INSERT INTO "Schemas"."Classes"  VALUES ('LocalisedCharacterString',NULL,'ISO 19103',NULL,0,NULL,NULL, ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('value',  NULL, 'ISO 19103', NULL, 1, 1, 'LocalisedCharacterString', 'CharacterString', NULL, 'M', 0, 'ISO 19103', 'ISO 19103', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('locale', NULL, 'ISO 19103', NULL, 0, 1, 'LocalisedCharacterString', 'CharacterString', NULL, 'O', 1, 'ISO 19103', 'ISO 19103', ' ');
+
+
 INSERT INTO "Schemas"."CodeLists"  VALUES ('TimeIndeterminateValue', null, 'ISO 19108', NULL, 0, 'CodeList', NULL, ' ');
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('after', NULL, 'ISO 19108', NULL, 0, 1, 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 1);
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('before', NULL, 'ISO 19108', NULL, 0, 1, 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'TimeIndeterminateValue', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 2);

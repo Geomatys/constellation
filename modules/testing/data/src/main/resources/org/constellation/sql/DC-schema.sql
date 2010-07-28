@@ -70,23 +70,7 @@ INSERT INTO "Schemas"."Properties"  VALUES ('spatial', NULL, 'DublinCore-terms',
  *-------------------------------------------------*/
  INSERT INTO "Schemas"."Classes"  VALUES('SpatialOps',NULL,'OGC Filter',NULL,1,NULL,NULL, ' ');
 
-/*-------------------------------------------------*
- *--------------  Classe AbstractGML --------------*
- *-------------------------------------------------*/
- INSERT INTO "Schemas"."Classes"  VALUES('AbstractGML',NULL,'ISO 19108',NULL,0,NULL,NULL, ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('description', NULL, 'ISO 19108', NULL, 0, 1,'AbstractGML','CharacterString', NULL, 'O',0 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('name', NULL, 'ISO 19108', NULL, 0, 1,'AbstractGML','CharacterString', NULL, 'O',1 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('id', NULL, 'ISO 19108', NULL, 0, 1,'AbstractGML','CharacterString', NULL, 'O',2 , 'ISO 19103','ISO 19108', ' ');
 
-
-/*-------------------------------------------------*
- *--------------  Classe AbstractGeometry ---------*
- *-------------------------------------------------*/
- INSERT INTO "Schemas"."Classes"  VALUES('AbstractGeometry',NULL,'ISO 19108',NULL,0,'AbstractGML','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('srsDimension', NULL, 'ISO 19108', NULL, 0, 1,'AbstractGeometry','Integer', NULL, 'O',0 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('srsName', NULL, 'ISO 19108', NULL, 0, 1,'AbstractGeometry','CharacterString', NULL, 'O',1 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('axisLabels', NULL, 'ISO 19108', NULL, 0, 2147483647,'AbstractGeometry','CharacterString', NULL, 'O',2 , 'ISO 19103','ISO 19108', ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('uomLabels', NULL, 'ISO 19108', NULL, 0, 2147483647,'AbstractGeometry','CharacterString', NULL, 'O',3 , 'ISO 19103','ISO 19108', ' ');
 
 
 /*-------------------------------------------------*
