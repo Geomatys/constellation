@@ -793,7 +793,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         // 3. CANVAS
         final Dimension canvasDimension        = getMap.getSize();
         final Color background;
-        if (getMap.getTransparent()) {
+        if (getMap.getTransparent() && !MimeType.IMAGE_JPEG.equalsIgnoreCase(getMap.getFormat())) {
             background = null;
         } else {
             final Color color = getMap.getBackground();

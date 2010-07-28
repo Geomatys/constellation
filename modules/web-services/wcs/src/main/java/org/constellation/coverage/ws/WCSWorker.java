@@ -17,6 +17,7 @@
 package org.constellation.coverage.ws;
 
 // J2SE dependencies
+import java.awt.Color;
 import org.geotoolkit.wcs.xml.v111.InterpolationMethodType;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -1013,7 +1014,11 @@ public final class WCSWorker extends AbstractWorker {
             final ViewDef vdef = new ViewDef(refEnvel, azimuth);
 
             // CANVAS
-            final CanvasDef cdef = new CanvasDef(size, null);
+            Color background = null;
+            if (MimeType.IMAGE_JPEG.equalsIgnoreCase(format)) {
+                background = Color.WHITE;
+            }
+            final CanvasDef cdef = new CanvasDef(size, background);
 
             // IMAGE
             final BufferedImage img;
