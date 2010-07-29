@@ -17,6 +17,7 @@
  */
 package org.constellation.ws.rs;
 
+import java.util.logging.Level;
 import javax.imageio.ImageIO;
 import org.constellation.ServiceDef;
 import org.geotoolkit.image.jai.Registry;
@@ -32,11 +33,16 @@ import org.geotoolkit.internal.io.Installation;
  * @since 0.5
  */
 public abstract class GridWebService extends OGCWebService {
-
     static {
         Installation.allowSystemPreferences = false;
         ImageIO.scanForPlugins();
         Registry.setDefaultCodecPreferences();
+        try {
+            Class.forName("javax.media.jai.JAI");
+        } catch (ClassNotFoundException ex) {
+            LOGGER.log(Level.SEVERE, "JAI librairies are not in the classpath. Please install it.\n "
+                    + ex.getLocalizedMessage(), ex);
+        }
     }
 
     public GridWebService(final ServiceDef... supportedVersions) {
