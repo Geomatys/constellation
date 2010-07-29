@@ -39,6 +39,7 @@ import java.util.MissingResourceException;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.lang.model.type.PrimitiveType;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 
@@ -50,6 +51,7 @@ import org.constellation.util.Util;
 
 // Geotoolkit dependencies
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicDescription;
+import org.geotoolkit.util.DefaultInternationalString;
 import org.geotoolkit.util.StringUtilities;
 
 // MDWeb dependencies
@@ -395,7 +397,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         } 
         if (object == null) {
             return result;
-        }             
+        }          
+        
+        //if the object is a JAXBElement we desencapsulate it
         if (object instanceof JAXBElement) {
             final JAXBElement jb = (JAXBElement) object;
             object = jb.getValue();
@@ -413,10 +417,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 
             }
             return result;
-            
-        //if the object is a JAXBElement we desencapsulate it    
         } else {
-            
             classe = getClasseFromObject(object);
         }
         
@@ -441,8 +442,42 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             linkedValue = alreadyWrite.get(object);
         }
         
+        //Special case for PT_FreeText
+        if (classe.getName().equals("PT_FreeText")) {
+            final DefaultInternationalString dis = (DefaultInternationalString) object;
+
+            // 1. the root Value PT_FreeText
+            final Value rootValue = new Value(path, form, ordinal, classe, parentValue);
+            result.add(rootValue);
+
+            // 2. The default value
+            final String defaultValue = dis.toString(null);
+            final Path defaultValuePath = new Path(path, classe.getPropertyByName("value"));
+            final TextValue textValue = new TextValue(defaultValuePath, form , ordinal, defaultValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), rootValue);
+            result.add(textValue);
+
+            // 3. the localised values
+            final Classe localisedString = mdWriter.getClasse("LocalisedCharacterString", Standard.ISO_19103);
+            for (Locale locale : dis.getLocales())  {
+                if (locale == null) continue;
+                
+                final Path valuePath = new Path(path, classe.getPropertyByName("textGroup"));
+                final Value value = new Value(valuePath, form, ordinal, localisedString, rootValue);
+                result.add(value);
+
+                final String localisedValue = dis.toString(locale);
+                final Path locValuePath = new Path(valuePath, localisedString.getPropertyByName("value"));
+                final TextValue locValValue = new TextValue(locValuePath, form , ordinal, localisedValue, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value);
+                result.add(locValValue);
+
+                final Path localePath = new Path(valuePath, localisedString.getPropertyByName("locale"));
+                final String localeDesc = "#locale-" + locale.getISO3Language();
+                final TextValue localeValue = new TextValue(localePath, form , ordinal, localeDesc, mdWriter.getClasse("CharacterString", Standard.ISO_19103), value);
+                result.add(localeValue);
+            }
+
         // if its a primitive type we create a TextValue
-        if (classe.isPrimitive() || classe.getName().equals("LocalName")) {
+        } else if (classe.isPrimitive() || classe.getName().equals("LocalName")) {
             if (classe instanceof CodeList) {
                 final CodeList cl = (CodeList) classe;
                 String codelistElement;
@@ -887,8 +922,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      */
     private Classe getPrimitiveTypeFromName(String className) throws MD_IOException {
         
-        if (className.equals("String") || className.equals("SimpleInternationalString") || className.equals("DefaultInternationalString") || className.equals("BaseUnit")) {
+        if (className.equals("String") || className.equals("SimpleInternationalString") || className.equals("BaseUnit")) {
             return mdWriter.getClasse("CharacterString", Standard.ISO_19103);
+        } else if (className.equals("DefaultInternationalString")) {
+            return mdWriter.getClasse("PT_FreeText", Standard.ISO_19115);
         } else if (className.equalsIgnoreCase("Date")) {
             return mdWriter.getClasse(className, Standard.ISO_19103);
         } else if (className.equalsIgnoreCase("URI")) {
@@ -938,7 +975,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             
         } catch (IllegalArgumentException e) {
              throw new MetadataIoException("This kind of resource cannot be parsed by the service: " + obj.getClass().getSimpleName() +'\n' +
-                                           "cause: " + e.getMessage());
+                                           "cause: " + e.getMessage(), e, null);
         } catch (MD_IOException e) {
              throw new MetadataIoException("The service has throw an SQLException while writing the metadata: " + e.getMessage());
         }
@@ -960,7 +997,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             
             final long time = System.currentTimeMillis() - start;
 
-            LOGGER.log(logLevel, "inserted new Form: " + form.getTitle() + " in " + time + " ms (transformation: " + transTime + " DB write: " + writeTime + ")");
+            LOGGER.log(logLevel, "inserted new Form: " + form.getTitle() + "( ID:" + form.getId() + " in " + time + " ms (transformation: " + transTime + " DB write: " + writeTime + ")");
             if (!noIndexation) {
                 indexDocument(form);
             }

@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.io;
 
+import org.geotoolkit.metadata.iso.DefaultMetadata;
 import java.sql.Connection;
 import java.util.Iterator;
 import java.util.List;
@@ -25,6 +26,7 @@ import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.AnchorPool;
+import org.constellation.metadata.CSWworkerTest;
 import org.constellation.util.Util;
 import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
 import org.geotoolkit.internal.sql.DefaultDataSource;
@@ -79,10 +81,11 @@ public class MDWebMetadataWriterTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/DC-schema.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/ebrim-schema.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data.sql"));
-
+        //sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data.sql"));
+        //sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-5.sql"));
+        
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-schema_v2.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
+        //sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
 
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
@@ -120,17 +123,17 @@ public class MDWebMetadataWriterTest {
     public void writeMetadataComponentSMLTest() throws Exception {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component2.xml"));
+        SensorML absExpResult = (SensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component2.xml"));
 
         writer.storeMetadata(absExpResult);
 
-        Object absResult = reader.getMetadata("14:SMLC", AbstractMetadataReader.SENSORML,  null);
+        Object absResult = reader.getMetadata("2:CSWCat", AbstractMetadataReader.SENSORML,  null);
 
         assertTrue(absResult != null);
         assertTrue(absResult instanceof SensorML);
         assertTrue(absExpResult instanceof SensorML);
         SensorML result = (SensorML) absResult;
-        SensorML expResult = (SensorML) absExpResult;
+        SensorML expResult =  (SensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component2.xml"));
 
         assertEquals(expResult.getCapabilities(), result.getCapabilities());
         assertEquals(expResult.getCharacteristics(), result.getCharacteristics());
@@ -227,6 +230,7 @@ public class MDWebMetadataWriterTest {
 
         pool.release(unmarshaller);
     }
+    
     /**
      * Tests the storeMetadata method for SML data
      *
@@ -239,13 +243,13 @@ public class MDWebMetadataWriterTest {
 
         writer.storeMetadata(absExpResult);
 
-        AbstractSensorML absResult = (AbstractSensorML) reader.getMetadata("15:SMLC", AbstractMetadataReader.SENSORML, null);
+        AbstractSensorML absResult = (AbstractSensorML) reader.getMetadata("3:CSWCat", AbstractMetadataReader.SENSORML, null);
 
         assertTrue(absResult != null);
         assertTrue(absResult instanceof SensorML);
         assertTrue(absExpResult instanceof SensorML);
         SensorML result = (SensorML) absResult;
-        SensorML expResult = (SensorML) absExpResult;
+        SensorML expResult = (SensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
 
 
         assertEquals(expResult.getCapabilities(), result.getCapabilities());
@@ -388,7 +392,7 @@ public class MDWebMetadataWriterTest {
 
         absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system2.xml"));
 
-        absResult = (AbstractSensorML) reader.getMetadata("16:SMLC", AbstractMetadataReader.SENSORML, null);
+        absResult = (AbstractSensorML) reader.getMetadata("4:CSWCat", AbstractMetadataReader.SENSORML, null);
 
         assertTrue(absResult != null);
         assertTrue(absResult instanceof SensorML);
@@ -542,4 +546,27 @@ public class MDWebMetadataWriterTest {
         pool.release(unmarshaller);
     }
 
+    /**
+     * Tests the storeMetadata method for SML data
+     *
+     * @throws java.lang.Exception
+     */
+    @Ignore
+    public void writeMetadataGMLTest() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta10.xml"));
+
+        writer.storeMetadata(absExpResult);
+
+
+        Object absResult = reader.getMetadata("5:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        DefaultMetadata result = (DefaultMetadata) absResult;
+        DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta10.xml"));
+
+        CSWworkerTest.metadataEquals(expResult,result);
+    }
 }

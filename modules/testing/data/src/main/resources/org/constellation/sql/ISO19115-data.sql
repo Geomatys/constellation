@@ -111,7 +111,6 @@ INSERT INTO "Schemas"."Classes"  VALUES ('MD_Georeferenceable', 'Georef', 'ISO 1
 INSERT INTO "Schemas"."Classes"  VALUES ('MD_ImageDescription', 'ImgDesc', 'ISO 19115', 'MD_ImageDescription', 0, 'MD_CoverageDescription', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('MD_Metadata', 'metadata', 'ISO 19115', 'MD_Metadata', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('PT_Locale', 'PT_Locale', 'ISO 19115', 'Class PT_Locale', 0, NULL, NULL, ' ');
-INSERT INTO "Schemas"."Classes"  VALUES ('PT_FreeText', 'PT_FreeText', 'ISO 19115', 'Class PT_FreeText', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('MD_MetadataExtensionInformation', 'MdExtInfo', 'ISO 19115', 'MD_MetadataExtensionInformation', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('MD_PortrayalCatalogueReference', 'PortCatRef', 'ISO 19115', 'MD_PortrayalCatalogueReference', 0, NULL, NULL, ' ');
 INSERT INTO "Schemas"."Classes"  VALUES ('obliqueLineAzimuthParameter', 'obLnAziPars', 'ISO 19115', 'Oblique line azimut parameter', 0, 'MD_ProjectionParameters', 'ISO 19115', ' ');
@@ -132,6 +131,9 @@ INSERT INTO "Schemas"."CodeLists"  VALUES ('AxisDirection', 'Axisdir', 'ISO 1910
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('UP', NULL, 'ISO 19108', NULL, 0, 1, 'AxisDirection', 'AxisDirection', 'AxisDirection', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 1);
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('DOWN', NULL, 'ISO 19108', NULL, 0, 1, 'AxisDirection', 'AxisDirection', 'AxisDirection', 'C', 0, 'ISO 19108', 'ISO 19108', ' ', 2);
 
+INSERT INTO "Schemas"."Classes"  VALUES ('PT_FreeText', 'PT_FreeText', 'ISO 19115', 'Class PT_FreeText', 0, NULL, NULL, ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('value', null, 'ISO 19115', null, 0, 1, 'PT_FreeText', 'CharacterString', NULL, 'O', 1, 'ISO 19103', 'ISO 19115', ' ');
+INSERT INTO "Schemas"."Properties"  VALUES ('textGroup', null, 'ISO 19115', null, 1, 1, 'PT_FreeText', 'LocalisedCharacterString', NULL, 'O', 2, 'ISO 19103', 'ISO 19115', ' ');
 
 INSERT INTO "Schemas"."CodeLists"  VALUES ('MeasureType', 'MeasType', 'ISO 19103', NULL, 0, 'CodeList', NULL, ' ');
 INSERT INTO "Schemas"."CodeListElements"  VALUES ('angle', NULL, 'ISO 19103', NULL, 0, 1, 'MeasureType', 'MeasureType', 'MeasureType', 'C', 0, 'ISO 19103', 'ISO 19103', ' ', 1);
@@ -2203,7 +2205,6 @@ INSERT INTO "Schemas"."Properties"  VALUES ('azimuthAngle', 'aziAngle', 'ISO 191
 INSERT INTO "Schemas"."Properties"  VALUES ('azimuthMeasurePointLongitude', 'aziPtLong', 'ISO 19115', 'Azimuth measure point longitude', 1, 1, 'MD_ObliqueLineAzimuth', 'Real', NULL, 'M', 2, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('obliqueLineLatitude', 'obLineLat', 'ISO 19115', 'Oblique line latitude', 1, 1, 'MD_ObliqueLinePoint', 'Real', NULL, 'M', 1, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('obliqueLineLongitude', 'obLineLong', 'ISO 19115', 'Oblique line longitude', 1, 1, 'MD_ObliqueLinePoint', 'Real', NULL, 'M', 2, 'ISO 19103', 'ISO 19115', ' ');
-INSERT INTO "Schemas"."Properties"  VALUES ('useLimitation', 'useLimit', 'ISO 19115', 'Limitation use of metadata', 0, 1, 'MD_SecurityConstraints', 'CharacterString', NULL, 'O', 1, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('classification', 'class', 'ISO 19115', 'Handling restrictions of the metadata', 1, 1, 'MD_SecurityConstraints', NULL, 'MD_ClassificationCode', 'M', 2, 'ISO 19115', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('userNote', 'userNote', 'ISO 19115', 'Explanation of the application of the constraints', 0, 1, 'MD_SecurityConstraints', 'CharacterString', NULL, 'O', 3, 'ISO 19103', 'ISO 19115', ' ');
 INSERT INTO "Schemas"."Properties"  VALUES ('classificationSystem', 'classSys', 'ISO 19115', 'Name of the classification of restrictions', 0, 1, 'MD_SecurityConstraints', 'CharacterString', NULL, 'O', 4, 'ISO 19103', 'ISO 19115', ' ');

@@ -18,6 +18,7 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
+import org.opengis.metadata.constraint.Constraints;
 import org.opengis.metadata.citation.Citation;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2142,7 +2143,10 @@ public class CSWworkerTest {
                 assertEquals(idExpResult.getPurpose(), idResult.getPurpose());
                 assertEquals(idExpResult.getResourceConstraints().size(), idResult.getResourceConstraints().size());
                 if (idExpResult.getResourceConstraints().size() > 0) {
-                    assertEquals(idExpResult.getResourceConstraints().iterator().next(), idResult.getResourceConstraints().iterator().next());
+                    Constraints expConst = idExpResult.getResourceConstraints().iterator().next();
+                    Constraints resConst = idResult.getResourceConstraints().iterator().next();
+                    assertEquals(expConst.getUseLimitations(), resConst.getUseLimitations());
+                    assertEquals(expConst, resConst);
                 }
                 assertEquals(idExpResult.getResourceConstraints(), idResult.getResourceConstraints());
                 assertEquals(idExpResult.getResourceFormats(), idResult.getResourceFormats());
@@ -2197,6 +2201,7 @@ public class CSWworkerTest {
             assertEquals(expectedCitation.getPresentationForms(), resultCitation.getPresentationForms());
             assertEquals(expectedCitation.getSeries(), resultCitation.getSeries());
             if (expectedCitation.getTitle() instanceof DefaultInternationalString) {
+                assertTrue("result citation title:" + resultCitation.getTitle() , resultCitation.getTitle() instanceof DefaultInternationalString);
                 DefaultInternationalString expTitle = (DefaultInternationalString) expectedCitation.getTitle();
                 DefaultInternationalString resTitle = (DefaultInternationalString) resultCitation.getTitle();
                 assertEquals(expTitle.getLocales(), resTitle.getLocales());

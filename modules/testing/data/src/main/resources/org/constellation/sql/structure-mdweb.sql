@@ -402,46 +402,46 @@ ALTER TABLE  "Schemas"."Paths" ADD CONSTRAINT "Paths_fk1" FOREIGN KEY ("parent")
 
 ALTER TABLE  "Schemas"."Paths"  ADD CONSTRAINT "Paths_fk2" FOREIGN KEY ("owner", "owner_Standard") REFERENCES "Schemas"."Classes"("name", "standard");
 
-ALTER TABLE  "Schemas"."Properties"  ADD CONSTRAINT "Properties_fk1" FOREIGN KEY ("type", "type_standard") REFERENCES "Schemas"."Classes"("name", "standard");
+ALTER TABLE  "Schemas"."Properties"  ADD CONSTRAINT "Properties_Typefk" FOREIGN KEY ("type", "type_standard") REFERENCES "Schemas"."Classes"("name", "standard");
 
-ALTER TABLE  "Schemas"."Properties"  ADD CONSTRAINT "Properties_fk2" FOREIGN KEY ("codelist", "type_standard") REFERENCES "Schemas"."CodeLists"("name", "standard");
+ALTER TABLE  "Schemas"."Properties"  ADD CONSTRAINT "Properties_CodeListfk" FOREIGN KEY ("codelist", "type_standard") REFERENCES "Schemas"."CodeLists"("name", "standard");
 
-ALTER TABLE  "Schemas"."Properties" ADD CONSTRAINT "Properties_fk3" FOREIGN KEY ("obligation") REFERENCES "Schemas"."Obligations"("code");
+ALTER TABLE  "Schemas"."Properties" ADD CONSTRAINT "Properties_Obligation3" FOREIGN KEY ("obligation") REFERENCES "Schemas"."Obligations"("code");
 
-ALTER TABLE  "Schemas"."Properties" ADD CONSTRAINT "Properties_fk4" FOREIGN KEY ("owner", "owner_standard") REFERENCES "Schemas"."Classes"( "name", "standard");
+ALTER TABLE  "Schemas"."Properties" ADD CONSTRAINT "Properties_Ownerfk" FOREIGN KEY ("owner", "owner_standard") REFERENCES "Schemas"."Classes"( "name", "standard");
 
 ALTER TABLE  "Storage"."FormHierarchies" ADD CONSTRAINT "FormHierarchies_fk" FOREIGN KEY ("parent") REFERENCES "Storage"."Forms"("identifier");
 
 ALTER TABLE  "Storage"."FormHierarchies"  ADD CONSTRAINT "FormHierarchies_fk1" FOREIGN KEY ("child") REFERENCES "Storage"."Forms"("identifier");
 
-ALTER TABLE  "Storage"."Forms" ADD CONSTRAINT "Forms_fk1" FOREIGN KEY ("catalog") REFERENCES "Storage"."Catalogs"("code");
+ALTER TABLE  "Storage"."Forms" ADD CONSTRAINT "Forms_Catalogfk" FOREIGN KEY ("catalog") REFERENCES "Storage"."Catalogs"("code");
 
-ALTER TABLE  "Storage"."Forms" ADD CONSTRAINT "Forms_fk2" FOREIGN KEY ("inputLogin") REFERENCES "Users"."Users"("login");
+ALTER TABLE  "Storage"."Forms" ADD CONSTRAINT "Forms_InputUserfk" FOREIGN KEY ("inputLogin") REFERENCES "Users"."Users"("login");
 
-ALTER TABLE  "Storage"."Forms"  ADD CONSTRAINT "Forms_fk3" FOREIGN KEY ("validationLogin") REFERENCES "Users"."Users"("login");
+ALTER TABLE  "Storage"."Forms"  ADD CONSTRAINT "Forms_ValidUserfk" FOREIGN KEY ("validationLogin") REFERENCES "Users"."Users"("login");
 
-ALTER TABLE  "Storage"."ImportForms" ADD CONSTRAINT "ImportForms_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
+ALTER TABLE  "Storage"."ImportForms" ADD CONSTRAINT "ImportForms_Formfk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
 ALTER TABLE  "Storage"."InputLevelCompletions" ADD CONSTRAINT "InputLevelCompletions_fk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
-ALTER TABLE  "Storage"."LinkedValues" ADD CONSTRAINT "LinkedValues_fk" FOREIGN KEY ("linkedForm") REFERENCES "Storage"."Forms"("identifier");
+ALTER TABLE  "Storage"."LinkedValues" ADD CONSTRAINT "LinkedValues_LinkedFormfk" FOREIGN KEY ("linkedForm") REFERENCES "Storage"."Forms"("identifier");
 
-ALTER TABLE  "Storage"."LinkedValues" ADD CONSTRAINT "LinkedValues_fk1" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
+ALTER TABLE  "Storage"."LinkedValues" ADD CONSTRAINT "LinkedValues_Formfk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
-ALTER TABLE  "Storage"."PredefinedValues" ADD CONSTRAINT "PredefinedValues_fk" FOREIGN KEY ("linkedForm") REFERENCES "Storage"."Forms"("identifier");
+ALTER TABLE  "Storage"."PredefinedValues" ADD CONSTRAINT "PredefinedValues_linkedFormfk" FOREIGN KEY ("linkedForm") REFERENCES "Storage"."Forms"("identifier");
 
-ALTER TABLE  "Storage"."TextValues" ADD CONSTRAINT "TextValues_fk1" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
+ALTER TABLE  "Storage"."TextValues" ADD CONSTRAINT "TextValues_Formfk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
-ALTER TABLE  "Storage"."TextValues" ADD CONSTRAINT "TextValues_fk2" FOREIGN KEY ("path") REFERENCES "Schemas"."Paths"("id");
+ALTER TABLE  "Storage"."TextValues" ADD CONSTRAINT "TextValues_Pathfk" FOREIGN KEY ("path") REFERENCES "Schemas"."Paths"("id");
 
 --ALTER TABLE  "Storage"."TextValues" ADD CONSTRAINT "TextValues_fk3" FOREIGN KEY ("type", "typeStandard") REFERENCES "Schemas"."Classes"("name", "standard")
 
-ALTER TABLE  "Storage"."Values" ADD CONSTRAINT "Values_fk1" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
+ALTER TABLE  "Storage"."Values" ADD CONSTRAINT "Values_Formfk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
 
-ALTER TABLE  "Storage"."Values" ADD CONSTRAINT "Values_fk2"  FOREIGN KEY ("path") REFERENCES "Schemas"."Paths"("id");
+ALTER TABLE  "Storage"."Values" ADD CONSTRAINT "Values_Pathfk"  FOREIGN KEY ("path") REFERENCES "Schemas"."Paths"("id");
 
 --ALTER TABLE  "Storage"."Values" ADD CONSTRAINT "Values_fk3" FOREIGN KEY ("type", "typeStandard") REFERENCES "Schemas"."Classes"("name", "standard")
 
-ALTER TABLE  "Users"."UserGroups" ADD CONSTRAINT "UserGroups_fk" FOREIGN KEY ("role") REFERENCES "Users"."Roles"("name");
+ALTER TABLE  "Users"."UserGroups" ADD CONSTRAINT "UserGroups_Rolefk" FOREIGN KEY ("role") REFERENCES "Users"."Roles"("name");
 
-ALTER TABLE  "Users"."Users" ADD CONSTRAINT "Users_fk1" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
+ALTER TABLE  "Users"."Users" ADD CONSTRAINT "Users_Formfk" FOREIGN KEY ("form") REFERENCES "Storage"."Forms"("identifier");
