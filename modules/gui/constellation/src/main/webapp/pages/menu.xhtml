@@ -1,0 +1,13 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:a4j="http://richfaces.org/a4j">
+
+	<h:panelGroup style="width:9%;background-color:#f5f5f5;left:0px;position:absolute;top:20px;bottom:0px;padding-left:1%;" rendered="#{navigationBean.authenticated}">
+	     <h:commandLink value="Services" action="#{navigationBean.goToServices}" /><br />
+	     <h:commandLink value="Configuration" action="#{navigationBean.goToUserConfiguration}" /><br />
+	     <h:commandLink value="Autre" />
+	</h:panelGroup>
+    
+</ui:composition>

@@ -3,6 +3,16 @@
 
     <display-name>constellation</display-name>
 
+    <welcome-file-list>
+        <welcome-file>index.jsf</welcome-file>
+    </welcome-file-list>
+    <login-config>
+        <auth-method>BASIC</auth-method>
+    </login-config>
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+    
     <!-- REST Servlet for constellation web service -->
     <servlet>
         <servlet-name>ServletAdaptor</servlet-name>
@@ -32,7 +42,7 @@
     
     <!-- SOAP servlet for constellation web service for Tomcat  --> 
     
-	<!-- to enable the SOS service SOAP (in tomcat) uncomment the following servlet -->
+    <!-- to enable the SOS service SOAP (in tomcat) uncomment the following servlet -->
     <!--listener>
         <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
     </listener>
@@ -79,54 +89,101 @@
 
     <!-- Servlet for constellation JSF interface -->
 
-    <!-- a4j -->
-    <filter>
-        <display-name>Ajax4jsf Filter</display-name>
-        <filter-name>ajax4jsf</filter-name>
-        <filter-class>org.ajax4jsf.Filter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>ajax4jsf</filter-name>
+    <!-- Mandatory -->
+    <context-param>
+        <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+        <param-value>server</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.compressViewState</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.verifyObjects</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.validateXml</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <servlet>
         <servlet-name>Faces Servlet</servlet-name>
-        <dispatcher>REQUEST</dispatcher>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-    </filter-mapping>
-
-    <!-- filters for tomahawk and sandbox -->
-    <filter>
-        <filter-name>MyFacesExtensionsFilter</filter-name>
-        <filter-class>org.apache.myfaces.webapp.filter.ExtensionsFilter</filter-class>
-        <init-param>
-            <param-name>maxFileSize</param-name>
-            <param-value>20m</param-value>
-        </init-param>
-    </filter>
-    
-    <!-- extension mapping for adding <script/>, <link/>, and other resource tags to JSF-pages  -->
-    <filter-mapping>
-        <filter-name>MyFacesExtensionsFilter</filter-name>
-        <!-- servlet-name must match the name of your javax.faces.webapp.FacesServlet entry -->
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
-    </filter-mapping>
+        <url-pattern>*.jsf</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>/faces/*</url-pattern>
+    </servlet-mapping>
+    <context-param>
+        <param-name>javax.faces.CONFIG_FILES</param-name>
+        <param-value>/WEB-INF/faces-config*</param-value>
+    </context-param>
     
-    <!-- extension mapping for serving page-independent resources (javascript, stylesheets, images, etc.)  -->
-    <filter-mapping>
-        <filter-name>MyFacesExtensionsFilter</filter-name>
-        <url-pattern>/faces/myFacesExtensionResource/*</url-pattern>
-    </filter-mapping>
+     <!-- Mandatory -->
+    <context-param>
+        <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+        <param-value>.xhtml</param-value>
+    </context-param>
+    
+     <!--Mandatory in servlet environment-->
+    <context-param>
+        <param-name>org.ajax4jsf.VIEW_HANDLERS</param-name>
+        <param-value>com.sun.facelets.FaceletViewHandler</param-value>
+    </context-param>
+    
+     <!-- Mandatory -->
 
-    <!--
-        Here we declare a "UserDatabase" realm in order to use the one already present in
-        a Tomcat application server (which already controls the logging to the manager page).
-        For Glassfish, the administrator has to define a new realm named "UserDatabase"
-        and to add a user in the group "administrator" (as defined in the sun-web.xml file).
-    -->
-    <!-- Authentication via a pop-up -->
-    <login-config>
-        <auth-method>BASIC</auth-method>
-        <realm-name>UserDatabase</realm-name>
-    </login-config>
+    <servlet>
+        <servlet-name>Mapfaces Resource Servlet</servlet-name>
+        <servlet-class>org.mapfaces.servlet.ResourceServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Mapfaces Resource Servlet</servlet-name>
+        <url-pattern>/mfRes/*</url-pattern>
+    </servlet-mapping>
+
+
+
+<!-- RICHFACES see: http://docs.jboss.org/richfaces/latest_3_3_X/en/devguide/html_single/-->
+
+    <!-- Mandatory -->
+    <context-param>
+        <param-name>org.ajax4jsf.RESOURCE_URI_PREFIX</param-name>
+        <param-value>rfRes</param-value>
+    </context-param>
+    
+    <context-param>
+        <param-name>org.richfaces.LoadStyleStrategy</param-name>
+        <param-value>NONE</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.richfaces.LoadScriptStrategy</param-name>
+        <param-value>DEFAULT</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.ajax4jsf.COMPRESS_SCRIPT</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    
+    <filter>
+      <display-name>Ajax4jsf Filter</display-name>
+      <filter-name>ajax4jsf</filter-name>
+      <filter-class>org.ajax4jsf.Filter</filter-class>
+   </filter>
+   <filter-mapping>
+      <filter-name>ajax4jsf</filter-name>
+      <servlet-name>Faces Servlet</servlet-name>
+      <dispatcher>FORWARD</dispatcher>
+      <dispatcher>REQUEST</dispatcher>
+      <dispatcher>INCLUDE</dispatcher>
+   </filter-mapping>
+    
 
     <!--
         Security role name.
@@ -152,22 +209,5 @@
             <role-name>cstladmin</role-name>
         </auth-constraint>
     </security-constraint>
-
-    <!-- Faces Servlet -->
-    <servlet>
-        <servlet-name>Faces Servlet</servlet-name>
-        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Faces Servlet</servlet-name>
-        <url-pattern>*.jsf</url-pattern>
-    </servlet-mapping>
-    <session-config>
-        <session-timeout>-1</session-timeout>
-    </session-config>
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
 
 </web-app>

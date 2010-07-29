@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:a4j="http://richfaces.org/a4j">
+    
+    <f:view>
+        <html>
+            <head>
+                <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+                <title>Constellation</title>
+                <link rel="stylesheet" type="text/css" href="resources/css/style.css"/>
+                <link rel="stylesheet" type="text/css" href="resources/css/login.css"/>
+            </head>
+            <body>
+                <h:form id="form">
+                    <div style="height:20px;position:absolute;width:100%;background-color:#f5f5f5;">
+                        <h:commandLink value="Logout" action="#{navigationBean.logout}" style="float:right;margin-right:15px;" rendered="#{navigationBean.authenticated}" />
+                        <h:outputText value="Not authenticated" style="float:right;margin-right:15px;" rendered="#{!navigationBean.authenticated}" />
+                    </div>
+                    <ui:include id="menu" src="pages/menu.xhtml" />
+                    <ui:include id="include" src="#{navigationBean.currentHref}"/>
+               </h:form>
+            </body>
+        </html>
+    </f:view>
+</ui:composition>

@@ -1,0 +1,38 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:mfb="http://mapfaces.org/taglib-base">
+                
+    <div style="top:30px;left:11%;width:88%;position:absolute;">
+        <center>
+            <div class="content">
+                <h3>Web Services configuration and maintenance for Constellation</h3>
+                <br/>
+                <a4j:commandLink id="restart-id" action="#{configurationBean.restartServices}" value="Restart the services" />
+            </div>
+            <div class="content" style="height:280px;">
+	            <h:panelGrid id="providers_panel" columns="2" width="100%" columnClasses="colclasse">
+					<a4j:commandButton style="float:left;" action="#{servicesBean.reloadLayerProviders}" value="Reload data providers"></a4j:commandButton>
+					<a4j:commandButton style="float:right;" reRender="stylePane" action="#{servicesBean.reloadStyleProviders}" value="Reload styles providers"></a4j:commandButton>
+					
+					<h:panelGroup id="layerPane" styleClass="list" style="left:30px;">
+			            <a4j:repeat value="#{servicesBean.layerProviders}" rendered="#{servicesBean.layerProviderError != 'LAYERPROVIDERERROR'}" var="x">
+			                <h:outputText value="#{x}"/><br/>
+			            </a4j:repeat>
+			            <h:outputText style="color:red;" value="An error occure while trying to load the layer providers." rendered="#{servicesBean.layerProviderError == 'LAYERPROVIDERERROR'}" />
+			        </h:panelGroup>
+			        
+			        <h:panelGroup id="stylePane" styleClass="list" style="right:30px;">
+			            <a4j:repeat value="#{servicesBean.styleProviders}" rendered="#{servicesBean.styleProviderError != 'STYLEPROVIDERERROR'}" var="x">
+			                <h:outputText value="#{x}"/><br/>
+			            </a4j:repeat>
+			            <h:outputText style="color:red;" value="An error occure while trying to load the style providers." rendered="#{servicesBean.styleProviderError == 'STYLEPROVIDERERROR'}" />
+			        </h:panelGroup>
+			    </h:panelGrid>
+			</div>
+		</center>
+	</div>
+    
+</ui:composition>

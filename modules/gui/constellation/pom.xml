@@ -262,41 +262,34 @@
       <artifactId>geotk-coverageio-netcdf</artifactId>
     </dependency>
 
+    <!-- mapfaces -->
     <dependency>
-      <groupId>javax.faces</groupId>
-      <artifactId>jsf-api</artifactId>
+        <groupId>org.mapfaces</groupId>
+       <artifactId>mapfaces-core</artifactId>
+       <version>0.41-SNAPSHOT</version>
     </dependency>
+
+    <!-- FACELET -->
     <dependency>
-      <groupId>jstl</groupId>
-      <artifactId>jstl</artifactId>
+        <groupId>com.sun.facelets</groupId>
+        <artifactId>jsf-facelets</artifactId>
+        <version>1.1.15.B1</version>
     </dependency>
+
+    <!-- JSTL -->
+    <dependency>
+        <groupId>jstl</groupId>
+        <artifactId>jstl</artifactId>
+        <version>1.2</version>
+    </dependency>
+    
     <dependency>
       <groupId>javax.servlet.jsp</groupId>
       <artifactId>jsp-api</artifactId>
-      <scope>provided</scope>   <!-- Uncomment if Tomcat already has jsp / servlet APIs in <TOMCAT_HOME>/lib -->
+      <version>2.1</version>
+      <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>javax.faces</groupId>
-      <artifactId>jsf-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.myfaces.tomahawk</groupId>
-      <artifactId>tomahawk</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>batik</groupId>
-          <artifactId>batik-awt-util</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>jstl</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.myfaces.tomahawk</groupId>
-      <artifactId>tomahawk-sandbox</artifactId>
-    </dependency>
+    
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
@@ -304,24 +297,12 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <!--scope>provided</scope-->   <!-- Uncomment if Tomcat already has jsp / servlet APIs in <TOMCAT_HOME>/lib -->
+      <version>2.5</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>poi</groupId>
       <artifactId>poi</artifactId>
-    </dependency>
-
-    <!-- ajax4jsf -->
-    <dependency>
-      <groupId>org.ajax4jsf</groupId>
-      <artifactId>ajax4jsf</artifactId>
-      <version>1.1.2-GEOMATYS</version>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.servlet</groupId>
-          <artifactId>jstl</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
   </dependencies>

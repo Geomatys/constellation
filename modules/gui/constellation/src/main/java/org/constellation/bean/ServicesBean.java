@@ -28,25 +28,36 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// JSF dependencies
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.faces.validator.ValidatorException;
 import javax.servlet.ServletContext;
-
-// JAXB dependencies
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-// Constellation dependencies
+import org.constellation.provider.LayerProviderProxy;
+import org.constellation.provider.StyleProviderProxy;
+import org.constellation.util.UserData;
+import org.geotoolkit.gml.xml.v311.CodeListType;
+import org.geotoolkit.ows.xml.AbstractAddress;
+import org.geotoolkit.ows.xml.AbstractCapabilitiesBase;
+import org.geotoolkit.ows.xml.AbstractContact;
+import org.geotoolkit.ows.xml.AbstractKeywords;
+import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
+import org.geotoolkit.ows.xml.AbstractServiceIdentification;
+import org.geotoolkit.ows.xml.AbstractServiceProvider;
+import org.geotoolkit.ows.xml.AbstractTelephone;
 import org.geotoolkit.ows.xml.v110.AddressType;
 import org.geotoolkit.ows.xml.v110.CapabilitiesBaseType;
 import org.geotoolkit.ows.xml.v110.CodeType;
@@ -64,8 +75,8 @@ import org.geotoolkit.wcs.xml.v100.ResponsiblePartyType;
 import org.geotoolkit.wcs.xml.v100.ServiceType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
 import org.geotoolkit.wcs.xml.v111.Capabilities;
-import org.constellation.util.UserData;
 import org.geotoolkit.wms.xml.AbstractService;
+import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
 import org.geotoolkit.wms.xml.v130.ContactAddress;
 import org.geotoolkit.wms.xml.v130.ContactInformation;
 import org.geotoolkit.wms.xml.v130.ContactPersonPrimary;
@@ -73,20 +84,7 @@ import org.geotoolkit.wms.xml.v130.Keyword;
 import org.geotoolkit.wms.xml.v130.KeywordList;
 import org.geotoolkit.wms.xml.v130.OnlineResource;
 import org.geotoolkit.wms.xml.v130.Service;
-import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
 import org.geotoolkit.wms.xml.v130.WMSCapabilities;
-import org.apache.myfaces.custom.fileupload.UploadedFile;
-import org.constellation.provider.LayerProviderProxy;
-import org.constellation.provider.StyleProviderProxy;
-import org.geotoolkit.gml.xml.v311.CodeListType;
-import org.geotoolkit.ows.xml.AbstractAddress;
-import org.geotoolkit.ows.xml.AbstractCapabilitiesBase;
-import org.geotoolkit.ows.xml.AbstractContact;
-import org.geotoolkit.ows.xml.AbstractKeywords;
-import org.geotoolkit.ows.xml.AbstractResponsiblePartySubset;
-import org.geotoolkit.ows.xml.AbstractServiceIdentification;
-import org.geotoolkit.ows.xml.AbstractServiceProvider;
-import org.geotoolkit.ows.xml.AbstractTelephone;
 import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.feature.type.Name;
 
@@ -225,11 +223,20 @@ public final class ServicesBean {
     /**
      * The uploaded File.
      */
-    private UploadedFile uploadedFile;
+  //  private UploadedFile uploadedFile;
     
     private String urlPreference = "";
     
     private boolean existPrefrence = false;
+    
+    private SERVICESERROR layerProviderError;
+    private SERVICESERROR styleProviderError;
+    
+    private static enum SERVICESERROR {
+    	LAYERPROVIDERERROR,
+    	STYLEPROVIDERERROR,
+    	NOERROR
+    }
     
     /**
      * Debugging purpose
@@ -1066,7 +1073,7 @@ public final class ServicesBean {
         FileWriter writer        = null;
         try {
            
-            inputStream                = uploadedFile.getInputStream();
+         //   inputStream                = uploadedFile.getInputStream();
             infile                     = new InputStreamReader(inputStream);
             final BufferedReader inbuf = new BufferedReader(infile);
             writer                     = new FileWriter(f);
@@ -1106,10 +1113,10 @@ public final class ServicesBean {
      * @throws java.io.IOException
      */
     public void upload() throws IOException {
-        final FacesContext facesContext = FacesContext.getCurrentInstance();
+        /* final FacesContext facesContext = FacesContext.getCurrentInstance();
         facesContext.getExternalContext().getApplicationMap().put("fileupload_bytes", uploadedFile.getBytes());
         facesContext.getExternalContext().getApplicationMap().put("fileupload_type", uploadedFile.getContentType());
-        facesContext.getExternalContext().getApplicationMap().put("fileupload_name", uploadedFile.getName());
+        facesContext.getExternalContext().getApplicationMap().put("fileupload_name", uploadedFile.getName()); */
     }
 
     /**
@@ -1339,14 +1346,14 @@ public final class ServicesBean {
     public void setWebServices(List webServices) {
         this.webServices = webServices;
     }
-
+/*
     public UploadedFile getUploadedFile() {
         return uploadedFile;
     }
 
     public void setUploadedFile(UploadedFile uploadedFile) {
         this.uploadedFile = uploadedFile;
-    }
+    } */
 
     public String getUrlPreference() {
         return urlPreference;
@@ -1372,22 +1379,52 @@ public final class ServicesBean {
         StyleProviderProxy.getInstance().reload();
     }
 
-    public List<String> getLayerProviders(){
-        final List<String> names = new ArrayList<String>();
-        for(Name n : LayerProviderProxy.getInstance().getKeys()){
-            if (n.getNamespaceURI() != null) {
-                names.add("{"+ n.getNamespaceURI() + "}" + n.getLocalPart());
-            } else {
-                names.add("{}" + n.getLocalPart());
-            }
+    public List<String> getLayerProviders() {
+    	final List<String> names = new ArrayList<String>();
+        try {
+	        for(Name n : LayerProviderProxy.getInstance().getKeys()){
+	            if (n.getNamespaceURI() != null) {
+	                names.add("{"+ n.getNamespaceURI() + "}" + n.getLocalPart());
+	            } else {
+	                names.add("{}" + n.getLocalPart());
+	            }
+	        }
+	        Collections.sort(names);
+	        layerProviderError = SERVICESERROR.NOERROR;
+        } catch (IllegalStateException ex) {
+        	LOGGER.log(Level.SEVERE, "An error occurs while trying to load the layer providers.");
+        	layerProviderError = SERVICESERROR.LAYERPROVIDERERROR;
         }
         return names;
     }
 
     public List<String> getStyleProviders(){
         final List<String> names = new ArrayList<String>();
-        names.addAll(StyleProviderProxy.getInstance().getKeys());
+        try {
+	        names.addAll(StyleProviderProxy.getInstance().getKeys());
+	        Collections.sort(names);
+	        styleProviderError = SERVICESERROR.NOERROR;
+        } catch (IllegalStateException ex) {
+        	LOGGER.log(Level.SEVERE, "An error occurs while trying to load the style providers.");
+        	styleProviderError = SERVICESERROR.STYLEPROVIDERERROR;
+        }
         return names;
     }
 
+	public void setLayerProviderError(SERVICESERROR layerProviderError) {
+		this.layerProviderError = layerProviderError;
+	}
+
+	public SERVICESERROR getLayerProviderError() {
+		return layerProviderError;
+	}
+
+	public void setStyleProviderError(SERVICESERROR styleProviderError) {
+		this.styleProviderError = styleProviderError;
+	}
+
+	public SERVICESERROR getStyleProviderError() {
+		return styleProviderError;
+	}
+    
 }
