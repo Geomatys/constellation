@@ -136,7 +136,7 @@
           The sun-web.xml is not used.
     -->
     <security-role>
-        <role-name>admin</role-name>
+        <role-name>cstladmin</role-name>
     </security-role>
 
     <!-- Secured all GET and POST requests done on the configuration webservice -->
@@ -149,7 +149,7 @@
         </web-resource-collection>
         <auth-constraint>
             <description>User must be logged in as an administrator to use this service.</description>
-            <role-name>admin</role-name>
+            <role-name>cstladmin</role-name>
         </auth-constraint>
     </security-constraint>
 

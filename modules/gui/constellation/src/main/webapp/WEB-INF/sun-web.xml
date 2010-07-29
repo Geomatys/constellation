@@ -3,7 +3,7 @@
 <sun-web-app error-url="">
   <context-root>/constellation</context-root>
   <security-role-mapping>
-    <role-name>admin</role-name>
+    <role-name>cstladmin</role-name>
     <group-name>administrator</group-name>
   </security-role-mapping>
 </sun-web-app>
