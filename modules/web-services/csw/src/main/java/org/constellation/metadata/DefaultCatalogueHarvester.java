@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
@@ -86,13 +85,8 @@ import static org.constellation.metadata.CSWConstants.*;
  *
  * @author Guilhem Legal
  */
-public class DefaultCatalogueHarvester implements CatalogueHarvester {
+public class DefaultCatalogueHarvester extends CatalogueHarvester {
 
-    /**
-     * use for debugging purpose
-     */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
-    
     /**
      * A getRecords request used to request another csw (2.0.2).
      */
@@ -111,12 +105,23 @@ public class DefaultCatalogueHarvester implements CatalogueHarvester {
     /**
      * A getCapabilities request used request another csw(2.0.2)
      */
-    private GetCapabilitiesType getCapabilitiesRequestv202;
+    private static final GetCapabilitiesType getCapabilitiesRequestv202;
     
     /**
      * A getCapabilities request used request another csw(2.0.0)
      */
-    private org.geotoolkit.csw.xml.v200.GetCapabilitiesType getCapabilitiesRequestv200;
+    private static final org.geotoolkit.csw.xml.v200.GetCapabilitiesType getCapabilitiesRequestv200;
+
+    static {
+        //we build the base request to get the capabilities of anoter CSW service (2.0.2)
+        final AcceptVersionsType versions = new AcceptVersionsType(CSW_202_VERSION, "2.0.0");
+        final SectionsType sections       = new SectionsType("All");
+        final AcceptFormatsType formats   = new AcceptFormatsType(MimeType.TEXT_XML, MimeType.APPLICATION_XML);
+        getCapabilitiesRequestv202            = new GetCapabilitiesType(versions, sections, formats, null, CSW);
+
+        //we build the base request to get the capabilities of anoter CSW service (2.0.0)
+        getCapabilitiesRequestv200            = new org.geotoolkit.csw.xml.v200.GetCapabilitiesType(versions, sections, formats, null, CSW);
+    }
     
     /**
      * A global variable used during the harvest of a distant CSW.
@@ -135,11 +140,6 @@ public class DefaultCatalogueHarvester implements CatalogueHarvester {
     private static final QName DATASET_QNAME = new QName(Namespaces.GMD, "Dataset");
     
     /**
-     * A Marshaller / unMarshaller pool to send request to another CSW services / to get object from harvested resource.
-     */
-    private final MarshallerPool marshallerPool;
-    
-    /**
      * A flag indicating that we are harvesting a CSW special case 1
      */
     private boolean specialCase1 = false;
@@ -150,16 +150,10 @@ public class DefaultCatalogueHarvester implements CatalogueHarvester {
     private boolean specialCase2 = false;
     
     /**
-     * A writer for the database
-     */
-    private final MetadataWriter metadataWriter;
-    
-    /**
      * Build a new catalogue harvester with the write part.
      */
-    public DefaultCatalogueHarvester(MarshallerPool marshallerPool, MetadataWriter metadataWriter) {
-        this.marshallerPool    = marshallerPool;
-        this.metadataWriter = metadataWriter;
+    public DefaultCatalogueHarvester(MarshallerPool marshallerPool, MetadataWriter metadataWriter) throws MetadataIoException {
+       super(marshallerPool, metadataWriter);
         initializeRequest();
     }
     
@@ -212,15 +206,6 @@ public class DefaultCatalogueHarvester implements CatalogueHarvester {
                                                                    constraint2); 
         fullGetRecordsRequestv200Special1 = new org.geotoolkit.csw.xml.v200.GetRecordsType(CSW, "2.0.0", ResultType.RESULTS, null, MimeType.APPLICATION_XML, null, 1, 20, query2, null);
         
-        
-        //we build the base request to get the capabilities of anoter CSW service (2.0.2)
-        final AcceptVersionsType versions = new AcceptVersionsType(CSW_202_VERSION, "2.0.0");
-        final SectionsType sections       = new SectionsType("All");
-        final AcceptFormatsType formats   = new AcceptFormatsType(MimeType.TEXT_XML, MimeType.APPLICATION_XML);
-        getCapabilitiesRequestv202        = new GetCapabilitiesType(versions, sections, formats, null, CSW);
-        
-        //we build the base request to get the capabilities of anoter CSW service (2.0.0)
-        getCapabilitiesRequestv200  = new org.geotoolkit.csw.xml.v200.GetCapabilitiesType(versions, sections, formats, null, CSW);
     }
     
     
@@ -491,17 +476,7 @@ public class DefaultCatalogueHarvester implements CatalogueHarvester {
             report .append("GetRecords operation supported:").append('\n');
             
             // if there is only one DCP (most case)
-            if (getRecordOp.getDCP().size() == 1) {
-                final DCP dcp = getRecordOp.getDCP().get(0);
-                final List<JAXBElement<RequestMethodType>> protocols = dcp.getHTTP().getRealGetOrPost();
-                report.append("available protocols:").append('\n');
-                for (JAXBElement<RequestMethodType> jb : protocols) {
-                    report .append(jb.getName().getLocalPart()).append('\n');
-                }
-                
-            // if there is multiple DCP
-            } else if (getRecordOp.getDCP().size() > 1) {
-                report.append("multiple DCP").append('\n');
+            if (!getRecordOp.getDCP().isEmpty()) {
                 int i = 0;
                 for (DCP dcp: getRecordOp.getDCP()) {
                     report.append("DCP ").append(i).append(':').append('\n');
@@ -519,14 +494,7 @@ public class DefaultCatalogueHarvester implements CatalogueHarvester {
             }
             
             //we look for the different output schema available
-            DomainType outputDomain = getRecordOp.getParameter("outputSchema");
-            if (outputDomain == null) {
-                outputDomain = getRecordOp.getParameter("OutputSchema");
-                if (outputDomain == null) {
-                    outputDomain = getRecordOp.getParameter("OUTPUTSCHEMA");
-                }
-            }
-            
+            DomainType outputDomain = getRecordOp.getParameterIgnoreCase("outputSchema");
             if (outputDomain != null) {
                 final List<String> availableOutputSchema = StringUtilities.cleanStrings(outputDomain.getValue());
                 final String defaultValue                = outputDomain.getDefaultValue();
@@ -554,20 +522,10 @@ public class DefaultCatalogueHarvester implements CatalogueHarvester {
             }
             
             // we look for the different Type names
-            DomainType typeNameDomain = getRecordOp.getParameter("typeName");
+            DomainType typeNameDomain = getRecordOp.getParameterIgnoreCase("typename");
             if (typeNameDomain == null) {
-                typeNameDomain = getRecordOp.getParameter("TypeName");
                 if (typeNameDomain == null) {
-                    typeNameDomain = getRecordOp.getParameter("TYPENAME");
-                    if (typeNameDomain == null) {
-                        typeNameDomain = getRecordOp.getParameter("typeNames");
-                        if (typeNameDomain == null) {
-                            typeNameDomain = getRecordOp.getParameter("TypeNames");
-                            if (typeNameDomain == null) {
-                                typeNameDomain = getRecordOp.getParameter("TYPENAMES");
-                            }
-                        }
-                    }
+                    typeNameDomain = getRecordOp.getParameterIgnoreCase("typenames");
                 }
             }
             
@@ -676,7 +634,6 @@ public class DefaultCatalogueHarvester implements CatalogueHarvester {
      * @throws org.constellation.coverage.web.CstlServiceException
      */
     private Object sendRequest(String sourceURL, Object request) throws MalformedURLException, CstlServiceException, IOException {
-        
         
         final URL source          = new URL(sourceURL);
         final URLConnection conec = source.openConnection();

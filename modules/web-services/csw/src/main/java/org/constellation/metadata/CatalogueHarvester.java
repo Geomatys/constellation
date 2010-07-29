@@ -23,21 +23,43 @@ import java.sql.SQLException;
 import java.util.List;
 
 // JAXB dependencies
+import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
+import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.CstlServiceException;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.GetRecordsRequest;
+import org.geotoolkit.xml.MarshallerPool;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
-public interface CatalogueHarvester {
+public abstract class CatalogueHarvester {
 
+    /**
+     * use for debugging purpose
+     */
+    protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
     
+    /**
+     * A Marshaller / unMarshaller pool to send request to another CSW services / to get object from harvested resource.
+     */
+    protected final MarshallerPool marshallerPool;
+
+    /**
+     * A writer for the database
+     */
+    protected final MetadataWriter metadataWriter;
+
+    public CatalogueHarvester(MarshallerPool marshallerPool, MetadataWriter metadataWriter) throws MetadataIoException {
+        this.marshallerPool = marshallerPool;
+        this.metadataWriter = metadataWriter;
+    }
     
     /**
      * Harvest another CSW service by getting all this records ans storing it into the database
@@ -46,14 +68,14 @@ public interface CatalogueHarvester {
      * 
      * @return An array containing: the number of inserted records, the number of updated records and the number of deleted records.
      */
-    int[] harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, CstlServiceException, SQLException;
+    public abstract int[] harvestCatalogue(String sourceURL) throws MalformedURLException, IOException, CstlServiceException, SQLException;
     
     /**
      * Transfer The request to all the servers specified in distributedServers.
      * 
      * @return
      */
-    DistributedResults transferGetRecordsRequest(GetRecordsRequest request, List<String> distributedServers, int startPosition, int maxRecords);
+    public abstract DistributedResults transferGetRecordsRequest(GetRecordsRequest request, List<String> distributedServers, int startPosition, int maxRecords);
         
     /**
      * Harvest a single record and storing it into the database
@@ -63,8 +85,8 @@ public interface CatalogueHarvester {
      * 
      * @return An array containing: the number of inserted records, the number of updated records and the number of deleted records.
      */
-    int[] harvestSingle(String sourceURL, String resourceType) throws MalformedURLException, IOException, CstlServiceException, JAXBException;
+    public abstract int[] harvestSingle(String sourceURL, String resourceType) throws MalformedURLException, IOException, CstlServiceException, JAXBException;
 
     
-    void destroy();
+    public abstract void destroy();
 }

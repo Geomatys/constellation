@@ -60,22 +60,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  *
  * @author Guilhem Legal
  */
-public class ByIDHarvester implements CatalogueHarvester {
-
-    /**
-     * use for debugging purpose
-     */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
-
-    /**
-     * A Marshaller / unMarshaller pool to send request to another CSW services / to get object from harvested resource.
-     */
-    private final MarshallerPool marshallerPool;
-
-    /**
-     * A writer for the database
-     */
-    private final MetadataWriter metadataWriter;
+public class ByIDHarvester extends CatalogueHarvester {
 
     private static final String GET_RECORD_BY_ID_REQUEST = "?service=CSW&request=getRecordbyid&version=2.0.2&outputSchema=http://www.isotc211.org/2005/gmd&outputformat=text/xml&ELEMENTSETNAME=full&id=";
 
@@ -85,11 +70,10 @@ public class ByIDHarvester implements CatalogueHarvester {
      * Build a new catalogue harvester with the write part.
      */
     public ByIDHarvester(MarshallerPool marshallerPool, MetadataWriter metadataWriter, String identifierDirectory) throws MetadataIoException {
-        this.marshallerPool = marshallerPool;
-        this.metadataWriter = metadataWriter;
+        super(marshallerPool, metadataWriter);
         if (identifierDirectory != null) {
             identifierDirectoryPath = identifierDirectory;
-            File f = new File(identifierDirectoryPath);
+            final File f = new File(identifierDirectoryPath);
             if (f.exists() && f.isDirectory()) {
                 LOGGER.log(Level.INFO, "Getting identifier file from :{0}", f.getPath());
             } else {
@@ -102,7 +86,7 @@ public class ByIDHarvester implements CatalogueHarvester {
 
 
     private List<String> parseIdentifierFile(int currentFile) {
-        List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<String>();
         FileInputStream in = null;
         try {
             File f = new File(identifierDirectoryPath + "id" + currentFile);
@@ -111,8 +95,8 @@ public class ByIDHarvester implements CatalogueHarvester {
                 return result;
             }
             in = new FileInputStream(f);
-            InputStreamReader ipsr = new InputStreamReader(in);
-            BufferedReader br = new BufferedReader(ipsr);
+            final InputStreamReader ipsr = new InputStreamReader(in);
+            final BufferedReader br = new BufferedReader(ipsr);
             //we skip the character already read
             String line;
             while ((line = br.readLine()) != null) {
@@ -163,7 +147,7 @@ public class ByIDHarvester implements CatalogueHarvester {
                 LOGGER.log(Level.INFO, "current identifier:{0}", identifier);
 
 
-                String currentSourceURL = sourceURL + GET_RECORD_BY_ID_REQUEST + identifier;
+                final String currentSourceURL = sourceURL + GET_RECORD_BY_ID_REQUEST + identifier;
                 final Object harvested = sendRequest(currentSourceURL);
 
 
