@@ -59,6 +59,8 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/structure-mdweb.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-base-data.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-base-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-data.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19108-data.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-schema_v2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));

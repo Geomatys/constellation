@@ -2410,6 +2410,8 @@ public class SOSWorkerTest {
         assertEquals(expProcess.getPositions().getPositionList().getPosition(), resProcess.getPositions().getPositionList().getPosition());
         assertEquals(expProcess.getPositions().getPositionList(), resProcess.getPositions().getPositionList());
         assertEquals(expProcess.getPositions(), resProcess.getPositions());
+        assertEquals(expProcess.getSMLLocation().getPoint().getUomLabels(), resProcess.getSMLLocation().getPoint().getUomLabels());
+        assertEquals(expProcess.getSMLLocation().getPoint().getAxisLabels(), resProcess.getSMLLocation().getPoint().getAxisLabels());
         assertEquals(expProcess.getSMLLocation(), resProcess.getSMLLocation());
         assertEquals(expProcess.getSpatialReferenceFrame(), resProcess.getSpatialReferenceFrame());
         assertEquals(expProcess.getSrsName(), resProcess.getSrsName());

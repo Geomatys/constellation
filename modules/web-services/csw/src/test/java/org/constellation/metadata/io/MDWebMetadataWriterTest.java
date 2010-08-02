@@ -18,6 +18,7 @@
 
 package org.constellation.metadata.io;
 
+import java.io.StringReader;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import java.sql.Connection;
 import java.util.Iterator;
@@ -81,11 +82,7 @@ public class MDWebMetadataWriterTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/DC-schema.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/ebrim-schema.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
-        //sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data.sql"));
-        //sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-5.sql"));
-        
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-schema_v2.sql"));
-        //sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
 
         //we write the configuration file
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
@@ -556,17 +553,77 @@ public class MDWebMetadataWriterTest {
 
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         DefaultMetadata absExpResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta10.xml"));
-
         writer.storeMetadata(absExpResult);
-
-
         Object absResult = reader.getMetadata("5:CSWCat", AbstractMetadataReader.ISO_19115,  null);
-
         assertTrue(absResult != null);
         assertTrue(absResult instanceof DefaultMetadata);
         DefaultMetadata result = (DefaultMetadata) absResult;
         DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta10.xml"));
 
         CSWworkerTest.metadataEquals(expResult,result);
+        
+        
+        absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_11));
+        writer.storeMetadata(absExpResult);
+        absResult = reader.getMetadata("6:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        result = (DefaultMetadata) absResult;
+        expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_11));
+
+        CSWworkerTest.metadataEquals(expResult,result);
+
+        absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_12));
+        writer.storeMetadata(absExpResult);
+        absResult = reader.getMetadata("7:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        result = (DefaultMetadata) absResult;
+        expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_12));
+
+        CSWworkerTest.metadataEquals(expResult,result);
+
+        absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_13));
+        writer.storeMetadata(absExpResult);
+        absResult = reader.getMetadata("8:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        result = (DefaultMetadata) absResult;
+        expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_13));
+
+        CSWworkerTest.metadataEquals(expResult,result);
+
+        absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_14));
+        writer.storeMetadata(absExpResult);
+        absResult = reader.getMetadata("9:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        result = (DefaultMetadata) absResult;
+        expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_14));
+
+        CSWworkerTest.metadataEquals(expResult,result);
+
+        absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_15));
+        writer.storeMetadata(absExpResult);
+        absResult = reader.getMetadata("10:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        result = (DefaultMetadata) absResult;
+        expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_15));
+
+        CSWworkerTest.metadataEquals(expResult,result);
+
+        absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_16));
+        writer.storeMetadata(absExpResult);
+        absResult = reader.getMetadata("11:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof DefaultMetadata);
+        result = (DefaultMetadata) absResult;
+        expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_16));
+
+        CSWworkerTest.metadataEquals(expResult,result);
+
+
+        pool.release(unmarshaller);
     }
 }

@@ -205,14 +205,6 @@ INSERT INTO "Schemas"."Properties"  VALUES('identifier', NULL, 'ISO 19108', NULL
 INSERT INTO "Schemas"."Properties"  VALUES('verticalCSProperty', NULL, 'ISO 19108', NULL, 0, 1,'VerticalCRS','VerticalCS', NULL, 'O',0 , 'ISO 19108','ISO 19108',' ');
 INSERT INTO "Schemas"."Properties"  VALUES('verticalDatumProperty', NULL, 'ISO 19108', NULL, 0, 1,'VerticalCRS','VerticalDatum', NULL, 'O',0 , 'ISO 19108','ISO 19108',' ');
 
-/*-------------------------------------------------*
- *--------------  Classe LineString----------------*
- *-------------------------------------------------*/
- INSERT INTO "Schemas"."Classes"  VALUES('LineString',NULL,'ISO 19108',NULL,0, NULL,NULL, ' ');
- INSERT INTO "Schemas"."Properties"  VALUES('identifier', NULL, 'ISO 19108', NULL, 0, 1,'LineString','CharacterString', NULL, 'O',0 , 'ISO 19103','ISO 19108',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('name', NULL, 'ISO 19108', NULL, 0, 1,'LineString','CharacterString', NULL, 'O',1 , 'ISO 19103','ISO 19108',' ');
- INSERT INTO "Schemas"."Properties"  VALUES('coordinates', NULL, 'ISO 19108', NULL, 0, 1,'LineString','CharacterString', NULL, 'O',2 , 'ISO 19103','ISO 19108',' ');
-
 INSERT INTO "Schemas"."CodeLists"  VALUES ('MD_RestrictionCode', 'RestrictCd', 'ISO 19115', NULL, 0, 'CodeList', NULL, ' ');
 INSERT INTO "Schemas"."CodeLists"  VALUES ('DS_AssociationTypeCode', 'AscTypeCd', 'ISO 19115', NULL, 0, 'CodeList', NULL, ' ');
 INSERT INTO "Schemas"."CodeLists"  VALUES ('MW_LengthUnitCode', 'LUnitCd', 'ISO 19115', NULL, 0, 'CodeList', NULL, ' ');
@@ -1875,9 +1867,6 @@ INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataMaintenan
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataMaintenance:contact:contactInfo:onlineResource:name','name', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataMaintenance:contact:contactInfo:onlineResource', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES  ('ISO 19115:MD_Metadata:metadataMaintenance:contact:contactInfo:onlineResource:description','description', 'ISO 19115', 'CI_OnlineResource', 'ISO 19115:MD_Metadata:metadataMaintenance:contact:contactInfo:onlineResource', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:metadataMaintenance:maintenanceAndUpdateFrequency', 'maintenanceAndUpdateFrequency', 'ISO 19115', 'MD_MaintenanceInformation', 'ISO 19115:MD_Metadata:metadataMaintenance', 'ISO 19115');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement4:polygon:identifier', 'identifier', 'ISO 19115', 'LineString', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement4:polygon', 'ISO 19108');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement4:polygon:name', 'name', 'ISO 19115', 'LineString', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement4:polygon', 'ISO 19108');
-INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement4:polygon:coordinates', 'coordinates', 'ISO 19115', 'LineString', 'ISO 19115:MD_Metadata:identificationInfo:extent:geographicElement4:polygon', 'ISO 19108');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:citedResponsibleParty', 'citedResponsibleParty', 'ISO 19115', 'CI_Citation', 'ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:citedResponsibleParty:contactInfo', 'contactInfo', 'ISO 19115', 'CI_ResponsibleParty', 'ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:citedResponsibleParty', 'ISO 19115');
 INSERT INTO "Schemas"."Paths"  VALUES ('ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:citedResponsibleParty:contactInfo:onlineResource', 'onlineResource', 'ISO 19115', 'CI_Contact', 'ISO 19115:MD_Metadata:dataQualityInfo:report:result:specification:citedResponsibleParty:contactInfo', 'ISO 19115');

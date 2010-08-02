@@ -15,7 +15,7 @@ public class DefaultTileExample {
 
     private DefaultTileExample() {}
     
-    /*public final static TileMatrixSet BLUEMARBLE;
+    public final static TileMatrixSet BLUEMARBLE;
     static {
         BLUEMARBLE = new TileMatrixSet(new CodeType("BlueMarble"), "urn:ogc:def:crs:OGC:1.3:CRS84");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
@@ -33,9 +33,9 @@ public class DefaultTileExample {
         tm.add(createTileMatrix("L02",  90,  45, 480, 480, 0.00833333333333333, -180, 90));
         tm.add(createTileMatrix("L01",  180, 90, 480, 480, 0.00416666666666667, -180, 90));
         BLUEMARBLE.setTileMatrix(tm);
-    }*/
+    }
 
-    public final static TileMatrixSet BLUEMARBLE;
+    /*public final static TileMatrixSet BLUEMARBLE;
     static {
         BLUEMARBLE = new TileMatrixSet(new CodeType("BlueMarble"), "urn:ogc:def:crs:OGC:1.3:CRS84");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
@@ -50,7 +50,7 @@ public class DefaultTileExample {
         tm.add(createTileMatrix("L02",  256, 85, 480, 480, 0.00833333333333333, -180, 90));
         tm.add(createTileMatrix("L01",  512, 512, 480, 480, 0.00416666666666667, -180, 90));
         BLUEMARBLE.setTileMatrix(tm);
-    }
+    }*/
 
     public final static TileMatrixSet ORTHO_THAU;
     static {
@@ -147,7 +147,7 @@ public class DefaultTileExample {
         }  else if ("OrthoThau".equals(name)) {
             return "/France/OrthoLittoral/Thau/";
         } else if ("BlueMarble".equals(name)) {
-            return "/home/guilhem/mosaique/ouput/";
+            return "/Monde/BlueMarble/S480/";
         } else if ("UNESCO".equals(name)) {
             return "/Monde/UNESCO/";
         }

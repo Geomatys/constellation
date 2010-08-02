@@ -306,10 +306,6 @@ INSERT INTO "Schemas"."CodeListElements"  VALUES ('processor', NULL, 'ISO 19115'
  INSERT INTO "Schemas"."Properties"  VALUES('axisLabels', NULL, 'ISO 19108', NULL, 0, 2147483647,'DirectPosition','CharacterString', NULL, 'O',3 , 'ISO 19103','ISO 19108', ' ');
  INSERT INTO "Schemas"."Properties"  VALUES('uomLabels', NULL, 'ISO 19108', NULL, 0, 2147483647,'DirectPosition','CharacterString', NULL, 'O',4 , 'ISO 19103','ISO 19108', ' ');
 
- INSERT INTO "Schemas"."Classes"  VALUES ('Point', NULL, 'ISO 19108', 'A Point is defined by a single coordinate tuple.', 0, NULL, NULL, ' ');
- INSERT INTO "Schemas"."Properties"  VALUES ('id', NULL, 'ISO 19108', NULL, 0, 1, 'Point', 'ID', NULL, 'O', 1, 'ISO 19103', 'ISO 19108', 'C');
- INSERT INTO "Schemas"."Properties"  VALUES ('pos', NULL, 'ISO 19108', NULL, 0, 1, 'Point', 'DirectPosition', NULL, 'O', 2, 'ISO 19108', 'ISO 19108', ' ');
-
  INSERT INTO "Schemas"."Classes"  VALUES ('TemporalCSRef', NULL, 'ISO 19108', NULL, 0, NULL, NULL, ' ');
  INSERT INTO "Schemas"."Properties"  VALUES ('temporalCS', NULL, 'ISO 19108', NULL, 0, 1, 'TemporalCSRef', 'CharacterString', NULL, 'O', 0, 'ISO 19103', 'ISO 19108', ' ');
  INSERT INTO "Schemas"."Properties"  VALUES ('href', NULL, 'Xlink', NULL, 0, 1, 'TemporalCSRef', 'CharacterString', NULL, 'O', 1, 'ISO 19103', 'ISO 19108', 'P');
