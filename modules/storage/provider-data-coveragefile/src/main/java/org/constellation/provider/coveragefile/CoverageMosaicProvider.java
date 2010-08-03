@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageReader;
 import javax.imageio.metadata.IIOMetadata;
 
@@ -198,8 +200,15 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
                     return gridGeom;
                 }
             };
+            try {
+                System.out.println(">>>>>>>>>>>>>>>> " +tiles.size() + "    " + crs );
+                reader.setInput(tiles);
+                index.put(name, reader);
+            } catch (CoverageStoreException ex) {
+                Logger.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load mosaic reader.", ex);
+            }
 
-            index.put(name, reader);
+            
         }
     }
 
@@ -228,7 +237,10 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
             final File[] list = file.listFiles();
             if (list != null) {
                 for (int i = 0; i < list.length; i++) {
-                    crs = visit(list[i],tiles);
+                    CoordinateReferenceSystem ccrs = visit(list[i],tiles);
+                    if(ccrs != null){
+                        crs = ccrs;
+                    }
                 }
             }
         } else {
@@ -247,12 +259,13 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
     private CoordinateReferenceSystem test(final File candidate, Collection<Tile> tiles){
         if (candidate.isFile()){
             try {
-                final ImageReader reader = XImageIO.getReaderBySuffix(candidate, Boolean.TRUE, Boolean.TRUE);
+                final ImageReader reader = XImageIO.getReader(candidate, Boolean.TRUE, Boolean.FALSE);
                 final IIOMetadata metadata = reader.getImageMetadata(0);
 
                 if(metadata instanceof SpatialMetadata){
                     final SpatialMetadata meta = (SpatialMetadata) metadata;
                     final CoordinateReferenceSystem crs = meta.getInstanceForType(CoordinateReferenceSystem.class);
+                    System.out.println("++++++++++++++ CRS : " + crs);
                     final RectifiedGrid grid = meta.getInstanceForType(RectifiedGrid.class);
                     final MathTransform trs = MetadataHelper.INSTANCE.getGridToCRS(grid);
 

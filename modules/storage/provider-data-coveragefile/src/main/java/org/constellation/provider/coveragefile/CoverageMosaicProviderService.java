@@ -27,6 +27,7 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.Provider;
 import org.constellation.provider.configuration.ProviderSource;
+import org.geotoolkit.image.io.plugin.GeoTiffImageReader;
 
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.io.plugin.WorldFileImageWriter;
@@ -57,6 +58,7 @@ public class CoverageMosaicProviderService extends AbstractProviderService<Name,
         Registry.setDefaultCodecPreferences();
         WorldFileImageReader.Spi.registerDefaults(null);
         WorldFileImageWriter.Spi.registerDefaults(null);
+        GeoTiffImageReader.Spi.registerDefaults(null);
     }
 
     public CoverageMosaicProviderService(){
