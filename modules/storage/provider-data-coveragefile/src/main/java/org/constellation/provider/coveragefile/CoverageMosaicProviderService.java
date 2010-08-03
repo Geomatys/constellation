@@ -28,51 +28,46 @@ import org.constellation.provider.LayerProviderService;
 import org.constellation.provider.Provider;
 import org.constellation.provider.configuration.ProviderSource;
 
-import org.geotoolkit.image.io.plugin.GeoTiffImageReader;
 import org.geotoolkit.image.io.plugin.WorldFileImageReader;
 import org.geotoolkit.image.io.plugin.WorldFileImageWriter;
 import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.util.logging.Logging;
-
 import org.opengis.feature.type.Name;
 
-import static org.constellation.provider.coveragefile.CoverageFileProvider.*;
+import static org.constellation.provider.coveragefile.CoverageMosaicProvider.*;
 
 /**
- * Service providing file coverage reader.
+ * Service providing mosaic coverage reader.
  * @version $Id$
  *
  * @author Johann Sorel (Geomatys)
  */
-public class CoverageFileProviderService extends AbstractProviderService<Name,LayerDetails> implements LayerProviderService {
+public class CoverageMosaicProviderService extends AbstractProviderService<Name,LayerDetails> implements LayerProviderService {
 
     /**
      * Default logger.
      */
-    private static final Logger LOGGER = Logging.getLogger(CoverageFileProviderService.class);
-    private static final String ERROR_MSG = "[PROVIDER]> Invalid file coverage provider config";
+    private static final Logger LOGGER = Logging.getLogger(CoverageMosaicProviderService.class);
+    private static final String ERROR_MSG = "[PROVIDER]> Invalid mosaic coverage provider config";
 
-    private static final Collection<CoverageFileProvider> PROVIDERS = new ArrayList<CoverageFileProvider>();
-    private static final Collection<CoverageFileProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
+    private static final Collection<CoverageMosaicProvider> PROVIDERS = new ArrayList<CoverageMosaicProvider>();
+    private static final Collection<CoverageMosaicProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
     static {
-        //load additional readers.
         Registry.setDefaultCodecPreferences();
         WorldFileImageReader.Spi.registerDefaults(null);
         WorldFileImageWriter.Spi.registerDefaults(null);
-        GeoTiffImageReader.Spi.registerDefaults(null);
-        //DimapImageReader.Spi.registerDefaults(null);
     }
 
-    public CoverageFileProviderService(){
-        super("coverage-file");
+    public CoverageMosaicProviderService(){
+        super("coverage-mosaic");
     }
 
     /**
      * {@inheritDoc }
      */
     @Override
-    public Collection<CoverageFileProvider> getProviders() {
+    public Collection<CoverageMosaicProvider> getProviders() {
         return IMMUTABLE;
     }
 
@@ -95,10 +90,10 @@ public class CoverageFileProviderService extends AbstractProviderService<Name,La
     @Override
     protected void loadProvider(ProviderSource ps){
         try {
-            final CoverageFileProvider provider = new CoverageFileProvider(ps);
+            final CoverageMosaicProvider provider = new CoverageMosaicProvider(ps);
             PROVIDERS.add(provider);
-            LOGGER.log(Level.INFO, "[PROVIDER]> File coverage provider created : "
-                    + provider.getSource().parameters.get(KEY_FOLDER_PATH));
+            LOGGER.log(Level.INFO, "[PROVIDER]> Mosaic coverage provider created : {0}",
+                    provider.getSource().parameters.get(KEY_FOLDER_PATH));
         } catch (Exception ex) {
             // we should not catch exception, but here it's better to start all source we can
             // rather than letting a potential exception block the provider proxy

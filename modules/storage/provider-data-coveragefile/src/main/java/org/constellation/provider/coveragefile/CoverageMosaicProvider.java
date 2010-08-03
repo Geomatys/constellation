@@ -16,33 +16,40 @@
  */
 package org.constellation.provider.coveragefile;
 
+import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 
+import org.geotoolkit.coverage.grid.GridGeometry2D;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
 import org.geotoolkit.coverage.io.ImageCoverageReader;
 import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.image.io.XImageIO;
+import org.geotoolkit.image.io.metadata.MetadataHelper;
+import org.geotoolkit.image.io.metadata.SpatialMetadata;
+import org.geotoolkit.image.io.mosaic.Tile;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
-import org.geotoolkit.util.collection.Cache;
-import org.geotoolkit.util.logging.Logging;
+import org.opengis.coverage.grid.RectifiedGrid;
 
 import org.opengis.feature.type.Name;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
 
 /**
@@ -50,35 +57,12 @@ import org.opengis.feature.type.Name;
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
-public class CoverageFileProvider extends AbstractLayerProvider{
+public class CoverageMosaicProvider extends AbstractLayerProvider{
 
     public static final String KEY_FOLDER_PATH = "path";
     public static final String KEY_NAMESPACE = "namespace";
 
-    private static final Logger LOGGER = Logging.getLogger(CoverageFileProvider.class);
-
-    private final Map<Name,File> index = new HashMap<Name,File>(){
-
-        @Override
-        public File get(Object key) {
-            if(key instanceof Name && ((Name)key).isGlobal()){
-                String nmsp = source.parameters.get(KEY_NAMESPACE);
-                if (nmsp == null) {
-                    nmsp = DEFAULT_NAMESPACE;
-                } else if (nmsp.equals("no namespace")) {
-                    nmsp = null;
-                }
-
-                key = new DefaultName(nmsp, ((Name)key).getLocalPart());
-            }
-
-            return super.get(key);
-        }
-
-    };
-
-    private final Map<Name,GridCoverageReader> cache = new Cache<Name, GridCoverageReader>(10, 10, true){
-
+    private final Map<Name,GridCoverageReader> index = new HashMap<Name,GridCoverageReader>(){
         @Override
         public GridCoverageReader get(Object key) {
             if(key instanceof Name && ((Name)key).isGlobal()){
@@ -94,13 +78,12 @@ public class CoverageFileProvider extends AbstractLayerProvider{
 
             return super.get(key);
         }
-
     };
 
     private final ProviderSource source;
     private final File folder;
 
-    protected CoverageFileProvider(ProviderSource source) throws IOException, SQLException {
+    protected CoverageMosaicProvider(ProviderSource source) throws IOException, SQLException {
         this.source = source;
         final String path = source.parameters.get(KEY_FOLDER_PATH);
 
@@ -114,7 +97,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
             throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
         }
 
-        visit(folder);
+        reload();
     }
 
     @Override
@@ -151,26 +134,7 @@ public class CoverageFileProvider extends AbstractLayerProvider{
      */
     @Override
     public LayerDetails get(final Name key) {
-        GridCoverageReader reader = cache.get(key);
-
-        if (reader == null) {
-            //reader is not in the cache, try to load it
-            final File f = index.get(key);
-            if (f != null) {
-                try {
-                    //we have this data source in the folder
-                    reader = loadReader(f);
-                } catch (IOException ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
-                } catch (CoverageStoreException ex) {
-                    LOGGER.log(Level.SEVERE, null, ex);
-                }
-                if (reader != null) {
-                    //cache the reader
-                    cache.put(key, reader);
-                }
-            }
-        }
+        final GridCoverageReader reader = index.get(key);
 
         if (reader != null) {
             final String name = key.getLocalPart();
@@ -187,13 +151,6 @@ public class CoverageFileProvider extends AbstractLayerProvider{
         return null;
     }
 
-    private GridCoverageReader loadReader(File f) throws IOException, CoverageStoreException{
-        final ImageCoverageReader reader = new ImageCoverageReader();
-        reader.setInput(f);
-        return reader;
-    }
-
-
     @Override
     public LayerDetails get(Name key, String service) {
        if (source.services.contains(service) || source.services.isEmpty()) {
@@ -209,8 +166,40 @@ public class CoverageFileProvider extends AbstractLayerProvider{
     public void reload() {
         synchronized(this){
             index.clear();
-            cache.clear();
-            visit(folder);
+
+            //our folder is a collection of tiles for the same layer
+            final Collection<Tile> tiles = new ArrayList<Tile>();
+            final CoordinateReferenceSystem crs = visit(folder,tiles);
+
+            //find the namespace
+            String nmsp = source.parameters.get(KEY_NAMESPACE);
+            if (nmsp == null) {
+                nmsp = DEFAULT_NAMESPACE;
+            } else if (nmsp.equals("no namespace")) {
+                nmsp = null;
+            }
+
+            //find the layer name
+            final Name name;
+            if(!source.layers.isEmpty()){
+                //we use the first layer name
+                name = new DefaultName(nmsp, source.layers.get(0).name);
+            }else{
+                //the name is the folder name
+                name = new DefaultName(nmsp, folder.getName());
+            }
+
+            ImageCoverageReader reader = new ImageCoverageReader(){
+                @Override
+                public GridGeometry2D getGridGeometry(int index) throws CoverageStoreException {
+                    //override the CRS
+                    GridGeometry2D gridGeom = super.getGridGeometry(index);                    
+                    gridGeom = new GridGeometry2D(gridGeom.getGridRange(), gridGeom.getGridToCRS(), crs);                    
+                    return gridGeom;
+                }
+            };
+
+            index.put(name, reader);
         }
     }
 
@@ -221,58 +210,62 @@ public class CoverageFileProvider extends AbstractLayerProvider{
     public void dispose() {
         synchronized(this){
             index.clear();
-            cache.clear();
             source.layers.clear();
             source.parameters.clear();
         }
     }
 
     /**
-     * Visit all files and directories contained in the directory specified, and add
-     * all shape files in {@link #index}.
+     * Visit all files and directories contained in the directory specified.
      *
      * @param file The starting file or folder.
      */
-    private void visit(final File file) {
+    private CoordinateReferenceSystem visit(final File file, Collection<Tile> tiles) {
+
+        CoordinateReferenceSystem crs = null;
+
         if (file.isDirectory()) {
             final File[] list = file.listFiles();
             if (list != null) {
                 for (int i = 0; i < list.length; i++) {
-                    visit(list[i]);
+                    crs = visit(list[i],tiles);
                 }
             }
         } else {
-            test(file);
+            CoordinateReferenceSystem ccrs = test(file,tiles);
+            if(ccrs != null){
+                crs = ccrs;
+            }
         }
+
+        return crs;
     }
 
     /**
-     *
-     * @param candidate Candidate to be a world image file.
+     * @param candidate Candidate to be an coverage tile.
      */
-    private void test(final File candidate){
+    private CoordinateReferenceSystem test(final File candidate, Collection<Tile> tiles){
         if (candidate.isFile()){
             try {
-                //don't comment this block, This raise an error if no reader for the file can be found
-                //this way we are sure that the file is an image.
                 final ImageReader reader = XImageIO.getReaderBySuffix(candidate, Boolean.TRUE, Boolean.TRUE);
+                final IIOMetadata metadata = reader.getImageMetadata(0);
 
-                final String fullName = candidate.getName();
-                final int idx = fullName.lastIndexOf('.');
-                final String name = fullName.substring(0, idx);
-                if (source.loadAll || source.containsLayer(name)){
-                    String nmsp = source.parameters.get(KEY_NAMESPACE);
-                    if (nmsp == null) {
-                        nmsp = DEFAULT_NAMESPACE;
-                    } else if (nmsp.equals("no namespace")) {
-                        nmsp = null;
-                    }
-                    index.put(new DefaultName(nmsp,name), candidate);
+                if(metadata instanceof SpatialMetadata){
+                    final SpatialMetadata meta = (SpatialMetadata) metadata;
+                    final CoordinateReferenceSystem crs = meta.getInstanceForType(CoordinateReferenceSystem.class);
+                    final RectifiedGrid grid = meta.getInstanceForType(RectifiedGrid.class);
+                    final MathTransform trs = MetadataHelper.INSTANCE.getGridToCRS(grid);
+
+                    final Tile tile = new Tile(reader.getOriginatingProvider(), candidate, 0,null,(AffineTransform)trs);
+                    tiles.add(tile);
+                    return crs;
                 }
 
             } catch (IOException ex) {
+                //don't log, this can happen very often when testing non image files
             }
         }
+        return null;
     }
 
     @Override

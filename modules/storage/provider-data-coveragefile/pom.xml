@@ -49,6 +49,8 @@
     the JARs list that Maven will put into the directory "target/binaries".
   -->
   <dependencies>
+
+
     <dependency>
         <groupId>org.constellation.storage</groupId>
         <artifactId>cstl-store-provider</artifactId>
@@ -58,6 +60,10 @@
     <dependency>
         <groupId>org.geotoolkit.pending</groupId>
         <artifactId>geotk-go2-style-extension</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.geotoolkit.pending</groupId>
+        <artifactId>geotk-coverageio-geotiff</artifactId>
     </dependency>
 
   </dependencies>

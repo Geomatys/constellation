@@ -69,7 +69,7 @@ import org.opengis.style.Symbolizer;
  * @version $Id$
  * @author Johann Sorel (Geomatys)
  */
-class CoverageFileLayerDetails implements CoverageLayerDetails {
+class GridCoverageReaderLayerDetails implements CoverageLayerDetails {
     private final GridCoverageReader reader;
 
     /**
@@ -88,7 +88,7 @@ class CoverageFileLayerDetails implements CoverageLayerDetails {
      * @param Coverage The database connection.
      * @param layer The layer to consider in the database.
      */
-    CoverageFileLayerDetails(final GridCoverageReader reader, final List<String> favorites,
+    GridCoverageReaderLayerDetails(final GridCoverageReader reader, final List<String> favorites,
             final Name elevationModel, final Name name) {
         this.reader = reader;
         this.name = name;
@@ -238,7 +238,7 @@ class CoverageFileLayerDetails implements CoverageLayerDetails {
             return DefaultLegendService.portray(template, context, dimension);
 
         } catch (PortrayalException ex) {
-            Logger.getLogger(CoverageFileLayerDetails.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GridCoverageReaderLayerDetails.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return DefaultGlyphService.create(style, dimension,null);
