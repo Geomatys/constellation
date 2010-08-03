@@ -94,6 +94,7 @@ import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 import org.geotoolkit.wmts.xml.v100.GetTile;
 import org.geotoolkit.wmts.xml.v100.Themes;
 import org.geotoolkit.wmts.xml.v100.TileMatrixSet;
+import org.geotoolkit.wmts.xml.v100.TileMatrixSetLink;
 import org.geotoolkit.xml.MarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -206,7 +207,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         ServiceProvider       sp = null;
         OperationsMetadata    om = null;
         ContentsType        cont = null;
-        Themes            themes = null;
+        List<Themes>      themes = null;
 
         SectionsType sections = requestCapabilities.getSections();
         if (sections == null) {
@@ -363,7 +364,6 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
                             inputGeoBox.getNorthBoundLatitude());
 
                 // we build The Style part
-                OnlineResourceType or = new OnlineResourceType(legendUrlPng);
                 
                 final List<String> stylesName = layer.getFavoriteStyles();
                 final List<Style> styles = new ArrayList<Style>();
@@ -377,12 +377,13 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
                         } catch (PortrayalException ex) {
                             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                         }
-                        final LegendURL legendURL1 = new LegendURL(MimeType.IMAGE_PNG, or,
+                        final LegendURL legendURL1 = new LegendURL(MimeType.IMAGE_PNG, 
                                 BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height), 0.0, 0.0);
+                        legendURL1.setHref(legendUrlPng);
 
-                        or = new OnlineResourceType(legendUrlGif);
-                        final LegendURL legendURL2 = new LegendURL(MimeType.IMAGE_GIF, or,
+                        final LegendURL legendURL2 = new LegendURL(MimeType.IMAGE_GIF, 
                                 BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height), 0.0, 0.0);
+                        legendURL2.setHref(legendUrlGif);
 
                         final Style style = new Style(new CodeType(styleName), Arrays.asList(legendURL1, legendURL2));
                         styles.add(style);
@@ -396,7 +397,9 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
                  */
                 final TileMatrixSet outputMatrixSet = DefaultTileExample.getTileMatrixSet(layerName);
                 if (outputMatrixSet != null) {
-                    outputLayer.getTileMatrixSet().add(layerName);
+                    final TileMatrixSetLink tmsl = new TileMatrixSetLink();
+                    tmsl.setTileMatrixSet(layerName);
+                    outputLayer.getTileMatrixSetLink().add(tmsl);
                     tileSets.add(outputMatrixSet);
                 }
                 layers.add(outputLayer);
@@ -411,7 +414,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         if (sections.containsSection("Themes") || sections.containsSection("All")) {
             // TODO
             
-            themes = new Themes();
+            themes = new ArrayList<Themes>();
         }
 
         c = new Capabilities(si, sp, om, "1.0.0", null, cont, themes);

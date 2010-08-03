@@ -132,7 +132,7 @@ public class WMTSService {
             final String mimeType = ImageIOUtilities.fileExtensionToMimeType(requestTile.getFormat());
             ImageIOUtilities.writeImage(buffered, mimeType, byteOut);*/
             final BinaryPayload binaryPayLoad = new BinaryPayload();
-            binaryPayLoad.setPayloadContent(byteOut.toByteArray());
+            binaryPayLoad.setBinaryContent(byteOut.toByteArray());
             binaryPayLoad.setFormat(requestTile.getFormat());
             byteOut.close();
             return binaryPayLoad;
