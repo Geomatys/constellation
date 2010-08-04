@@ -213,15 +213,22 @@ public final class CSWQueryable {
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:endPosition");
         paths.add("ISO 19115:MD_Metadata:identificationInfo:extent:temporalElement:extent:position");
         ISO_QUERYABLE.put("TempExtent_end", paths);
-        
-       
-        
-        // the following element are described in Service part of ISO 19139 not yet used in MDWeb 
+
+        /**
+         * ISO 19119 specific queryable
+         */
         paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:serviceType");
         ISO_QUERYABLE.put("ServiceType", paths);
+
+        paths = new ArrayList<String>();
+        paths.add("ISO 19115:MD_Metadata:identificationInfo:couplingType");
+        ISO_QUERYABLE.put("CouplingType", paths);
+
+        //TODO  the following element are described in Service part of ISO 19139 not yet used.
+        paths = new ArrayList<String>();
         ISO_QUERYABLE.put("ServiceTypeVersion", paths);
         ISO_QUERYABLE.put("Operation", paths);
-        ISO_QUERYABLE.put("CouplingType", paths);
         ISO_QUERYABLE.put("OperatesOn", paths);
         ISO_QUERYABLE.put("OperatesOnIdentifier", paths);
         ISO_QUERYABLE.put("OperatesOnWithOpName", paths);

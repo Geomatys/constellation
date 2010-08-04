@@ -67,6 +67,7 @@ import org.geotoolkit.resources.NIOUtilities;
 
 // geoAPI dependencies
 import org.opengis.util.InternationalString;
+import org.opengis.util.LocalName;
 
 
 /**
@@ -478,6 +479,9 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         } else if (obj instanceof InternationalString) {
             final InternationalString is = (InternationalString) obj;
             result = is.toString();
+        } else if (obj instanceof LocalName) {
+            final LocalName ln = (LocalName) obj;
+            result = ln.toString();
         } else if (obj instanceof Double) {
             result = obj.toString();
         } else if (obj instanceof java.util.Locale) {

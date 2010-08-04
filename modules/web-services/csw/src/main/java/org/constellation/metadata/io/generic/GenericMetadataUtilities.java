@@ -137,7 +137,7 @@ public final class GenericMetadataUtilities {
      * @param date The date to parse.
      */
     public static Date parseDate(String date) {
-        if (date == null)
+        if (date == null || date.isEmpty())
             return null;
         int i = 0;
         while (i < DATE_FORMATS.size()) {
@@ -152,7 +152,7 @@ public final class GenericMetadataUtilities {
                 i++;
             }
         }
-        LOGGER.log(Level.WARNING, "unable to parse the date: {0}", date);
+        LOGGER.log(Level.WARNING, "unable to parse the date: [{0}]", date);
         return null;
     }
 
