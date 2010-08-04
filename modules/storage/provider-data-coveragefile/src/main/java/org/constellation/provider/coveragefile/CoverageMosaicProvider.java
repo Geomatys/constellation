@@ -16,43 +16,29 @@
  */
 package org.constellation.provider.coveragefile;
 
-import java.awt.geom.AffineTransform;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageReader;
-import javax.imageio.metadata.IIOMetadata;
 
 import org.constellation.provider.AbstractLayerProvider;
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.configuration.ProviderLayer;
 import org.constellation.provider.configuration.ProviderSource;
 
-import org.geotoolkit.coverage.grid.GridGeometry2D;
 import org.geotoolkit.coverage.io.CoverageStoreException;
 import org.geotoolkit.coverage.io.GridCoverageReader;
-import org.geotoolkit.coverage.io.ImageCoverageReader;
+import org.geotoolkit.coverage.io.GridCoverageReaders;
 import org.geotoolkit.feature.DefaultName;
-import org.geotoolkit.image.io.XImageIO;
-import org.geotoolkit.image.io.metadata.MetadataHelper;
-import org.geotoolkit.image.io.metadata.SpatialMetadata;
-import org.geotoolkit.image.io.mosaic.Tile;
 import org.geotoolkit.map.ElevationModel;
 import org.geotoolkit.map.MapBuilder;
-import org.opengis.coverage.grid.RectifiedGrid;
 
 import org.opengis.feature.type.Name;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-
 
 /**
  *
@@ -169,10 +155,6 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
         synchronized(this){
             index.clear();
 
-            //our folder is a collection of tiles for the same layer
-            final Collection<Tile> tiles = new ArrayList<Tile>();
-            final CoordinateReferenceSystem crs = visit(folder,tiles);
-
             //find the namespace
             String nmsp = source.parameters.get(KEY_NAMESPACE);
             if (nmsp == null) {
@@ -191,23 +173,14 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
                 name = new DefaultName(nmsp, folder.getName());
             }
 
-            ImageCoverageReader reader = new ImageCoverageReader(){
-                @Override
-                public GridGeometry2D getGridGeometry(int index) throws CoverageStoreException {
-                    //override the CRS
-                    GridGeometry2D gridGeom = super.getGridGeometry(index);                    
-                    gridGeom = new GridGeometry2D(gridGeom.getGridRange(), gridGeom.getGridToCRS(), crs);                    
-                    return gridGeom;
-                }
-            };
-            try {
-                System.out.println(">>>>>>>>>>>>>>>> " +tiles.size() + "    " + crs );
-                reader.setInput(tiles);
+            try{
+                GridCoverageReader reader = GridCoverageReaders.openMosaic(folder);
                 index.put(name, reader);
-            } catch (CoverageStoreException ex) {
+            }catch(IOException ex){
+                Logger.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load mosaic reader.", ex);
+            }catch(CoverageStoreException ex){
                 Logger.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load mosaic reader.", ex);
             }
-
             
         }
     }
@@ -225,62 +198,8 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
     }
 
     /**
-     * Visit all files and directories contained in the directory specified.
-     *
-     * @param file The starting file or folder.
+     * {@inheritDoc }
      */
-    private CoordinateReferenceSystem visit(final File file, Collection<Tile> tiles) {
-
-        CoordinateReferenceSystem crs = null;
-
-        if (file.isDirectory()) {
-            final File[] list = file.listFiles();
-            if (list != null) {
-                for (int i = 0; i < list.length; i++) {
-                    CoordinateReferenceSystem ccrs = visit(list[i],tiles);
-                    if(ccrs != null){
-                        crs = ccrs;
-                    }
-                }
-            }
-        } else {
-            CoordinateReferenceSystem ccrs = test(file,tiles);
-            if(ccrs != null){
-                crs = ccrs;
-            }
-        }
-
-        return crs;
-    }
-
-    /**
-     * @param candidate Candidate to be an coverage tile.
-     */
-    private CoordinateReferenceSystem test(final File candidate, Collection<Tile> tiles){
-        if (candidate.isFile()){
-            try {
-                final ImageReader reader = XImageIO.getReader(candidate, Boolean.TRUE, Boolean.FALSE);
-                final IIOMetadata metadata = reader.getImageMetadata(0);
-
-                if(metadata instanceof SpatialMetadata){
-                    final SpatialMetadata meta = (SpatialMetadata) metadata;
-                    final CoordinateReferenceSystem crs = meta.getInstanceForType(CoordinateReferenceSystem.class);
-                    System.out.println("++++++++++++++ CRS : " + crs);
-                    final RectifiedGrid grid = meta.getInstanceForType(RectifiedGrid.class);
-                    final MathTransform trs = MetadataHelper.INSTANCE.getGridToCRS(grid);
-
-                    final Tile tile = new Tile(reader.getOriginatingProvider(), candidate, 0,null,(AffineTransform)trs);
-                    tiles.add(tile);
-                    return crs;
-                }
-
-            } catch (IOException ex) {
-                //don't log, this can happen very often when testing non image files
-            }
-        }
-        return null;
-    }
-
     @Override
     public ElevationModel getElevationModel(Name name) {
 
