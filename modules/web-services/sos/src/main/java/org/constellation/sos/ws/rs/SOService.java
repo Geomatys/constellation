@@ -75,6 +75,7 @@ public class SOService extends OGCWebService {
         worker = new SOSworker(null);
         setXMLContext("org.geotoolkit.sos.xml.v100:" +
                       "org.geotoolkit.gml.xml.v311:" +
+//                      "org.geotoolkit.internal.jaxb.referencing:" +
                       "org.geotoolkit.swe.xml.v100:" +
                       "org.geotoolkit.swe.xml.v101:" +
                       "org.geotoolkit.observation.xml.v100:" +
@@ -219,7 +220,6 @@ public class SOService extends OGCWebService {
 
              if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
                 worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
-                worker.cacheCapabilities();
                 GetCapabilities gc = (GetCapabilities)objectRequest;
                 /*
                  * if the parameters have been send by GET or POST kvp,
@@ -229,12 +229,15 @@ public class SOService extends OGCWebService {
 
                     gc = createNewGetCapabilities();
                 }
-                if (gc.getVersion() != null)
+                if (gc.getVersion() != null) {
                     serviceDef = getVersionFromNumber(gc.getVersion().toString());
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getCapabilities(gc), sw);
+                }
+                final Capabilities capa = worker.getCapabilities(gc);
 
-                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                /*final StringWriter sw = new StringWriter();
+                marshaller.marshal(capa, sw);*/
+
+                return Response.ok(capa, worker.getOutputFormat()).build();
 
              }
 
