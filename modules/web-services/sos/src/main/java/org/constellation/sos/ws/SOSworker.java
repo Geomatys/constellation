@@ -44,6 +44,7 @@ import java.util.logging.Logger;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -368,6 +369,10 @@ public class SOSworker {
             this.verifySynchronization = configuration.isVerifySynchronization();
             this.keepCapabilities      = configuration.isKeepCapabilities();
 
+            if (keepCapabilities) {
+                cacheCapabilities(configurationDirectory);
+            }
+
             // the file who record the map between phisycal ID and DB ID.
             loadMapping(configurationDirectory);
 
@@ -474,7 +479,7 @@ public class SOSworker {
     /**
      * Log some informations about the implementations classes for reader / writer / filter object.
      */
-    public final void logInfos() {
+    private final void logInfos() {
         final String loaded =  " loaded.\n";
         final StringBuilder infos = new StringBuilder();
 
@@ -516,13 +521,21 @@ public class SOSworker {
         LOGGER.info(infos.toString());
     }
 
-    public void cacheCapabilities() throws CstlServiceException {
+    private void cacheCapabilities(File configurationDirectory) throws JAXBException {
         //we fill the cachedCapabilities if we have to
-        if (keepCapabilities && cachedCapabilities == null) {
-            LOGGER.info("adding capabilities document in cache");
-            keepCapabilities = false;
-            cachedCapabilities = getCapabilities(new GetCapabilities("1.0.0", "text/xml"));
-            keepCapabilities = true;
+        LOGGER.info("adding capabilities document in cache");
+        final Unmarshaller capaUM = JAXBContext.newInstance(Capabilities.class, org.geotoolkit.internal.jaxb.referencing.ObjectFactory.class).createUnmarshaller();
+        final File configFile = new File(configurationDirectory, "cached-offerings.xml");
+        if (configFile.exists()) {
+            Object object = capaUM.unmarshal(configFile);
+            if (object instanceof JAXBElement) {
+                object = ((JAXBElement)object).getValue();
+            }
+            if (object instanceof Capabilities) {
+                cachedCapabilities = (Capabilities) object;
+            } else {
+                LOGGER.severe("cached capabilities file does not contains Capablities object.");
+            }
         }
     }
     
@@ -640,18 +653,16 @@ public class SOSworker {
 
            om = localCapabilities.getOperationsMetadata();
 
+           //we remove the operation not supported in this profile (transactional/discovery)
+           if (profile == DISCOVERY) {
+                om.removeOperation("InsertObservation");
+                om.removeOperation("RegisterSensor");
+            }
+
+            //we update the URL
+            OGCWebService.updateOWSURL(om.getOperation(), serviceURL, SOS);
+
            if (!keepCapabilities) {
-
-               //we remove the operation not supported in this profile (transactional/discovery)
-               if (profile == DISCOVERY) {
-                   om.removeOperation("InsertObservation");
-                   om.removeOperation("RegisterSensor");
-               }
-
-
-               //we update the URL
-               OGCWebService.updateOWSURL(om.getOperation(), serviceURL, SOS);
-
 
                //we update the parameter in operation metadata.
                final Operation go = om.getOperation("GetObservation");
@@ -951,6 +962,8 @@ public class SOSworker {
             if (singlePhenomenons.size() > 0 || compositePhenomenons.size() > 0) {
                 localOmFilter.setObservedProperties(singlePhenomenons, compositePhenomenons);
             }
+        } else {
+            throw new CstlServiceException("You must specify at least One phenomenon", MISSING_PARAMETER_VALUE, "observedProperty");
         }
 
 
@@ -1549,8 +1562,7 @@ public class SOSworker {
         }
     }
 
-    public List<SamplingFeature> spatialFiltering(BBOXType bbox) throws CstlServiceException {
-
+    private List<SamplingFeature> spatialFiltering(BBOXType bbox) throws CstlServiceException {
         final EnvelopeEntry e = bbox.getEnvelope();
         if (isWellFormedEnvelope(e)) {
 
