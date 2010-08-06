@@ -75,7 +75,7 @@ public class SOService extends OGCWebService {
         worker = new SOSworker(null);
         setXMLContext("org.geotoolkit.sos.xml.v100:" +
                       "org.geotoolkit.gml.xml.v311:" +
-//                      "org.geotoolkit.internal.jaxb.referencing:" +
+                      "org.geotoolkit.internal.jaxb.geometry:" +
                       "org.geotoolkit.swe.xml.v100:" +
                       "org.geotoolkit.swe.xml.v101:" +
                       "org.geotoolkit.observation.xml.v100:" +

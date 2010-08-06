@@ -61,7 +61,8 @@ public class UtilsTest {
                                        + "org.geotoolkit.observation.xml.v100:"
                                        + "org.geotoolkit.sml.xml.v100:"
                                        + "org.geotoolkit.sampling.xml.v100:"
-                                       + "org.geotoolkit.swe.xml.v101");
+                                       + "org.geotoolkit.swe.xml.v101:"
+                                       + "org.geotoolkit.internal.jaxb.geometry");
     }
 
     @AfterClass

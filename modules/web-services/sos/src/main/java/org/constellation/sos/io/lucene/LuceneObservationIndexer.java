@@ -83,7 +83,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
             throw new IndexingException("The data directory does not exist: ");
         }
         try {
-            marshallerPool = new MarshallerPool("org.geotoolkit.observation.xml.v100:org.geotoolkit.sampling.xml.v100");
+            marshallerPool = new MarshallerPool("org.geotoolkit.observation.xml.v100:org.geotoolkit.sampling.xml.v100:org.geotoolkit.internal.jaxb.geometry");
         } catch(JAXBException ex) {
             throw new IndexingException("JAXB exception while initializing the file observation reader", ex);
         }

@@ -106,7 +106,8 @@ public class WFSWorkerTest {
             pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110" +
             		  ":org.geotoolkit.ogc.xml.v110" +
             		  ":org.geotoolkit.gml.xml.v311" +
-                          ":org.geotoolkit.xsd.xml.v2001");
+                          ":org.geotoolkit.xsd.xml.v2001"+
+                          ":org.geotoolkit.internal.jaxb.geometry");
 
             worker = new DefaultWFSWorker(pool);
             worker.setLogLevel(Level.FINER);

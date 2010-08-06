@@ -66,7 +66,8 @@ public class WFSRequestTest {
         pool = new MarshallerPool("org.constellation.ws:" +
                                   "org.geotoolkit.wfs.xml.v110:" +
                                   "org.geotoolkit.ows.xml.v100:" +
-                                  "org.geotoolkit.gml.xml.v311");
+                                  "org.geotoolkit.gml.xml.v311:" +
+                                  "org.geotoolkit.internal.jaxb.geometry");
     }
 
     @AfterClass

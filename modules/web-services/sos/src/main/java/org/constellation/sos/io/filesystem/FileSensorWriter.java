@@ -67,7 +67,7 @@ public class FileSensorWriter implements SensorWriter {
         }
         this.dataDirectory = configuration.getDataDirectory();
         try {
-            marshallerPool = new MarshallerPool("org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
+            marshallerPool = new MarshallerPool("org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101:org.geotoolkit.internal.jaxb.geometry");
         } catch (JAXBException ex) {
             throw new MetadataIoException("Unable to initialize the fileSensorWriter JAXB context", ex, NO_APPLICABLE_CODE);
         }

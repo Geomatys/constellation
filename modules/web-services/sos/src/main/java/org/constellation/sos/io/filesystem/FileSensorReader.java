@@ -56,7 +56,7 @@ public class FileSensorReader implements SensorReader {
     public FileSensorReader(Automatic configuration) throws MetadataIoException  {
         try {
             //we initialize the unmarshaller
-            marshallerPool = new MarshallerPool("org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101");
+            marshallerPool = new MarshallerPool("org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101:org.geotoolkit.internal.jaxb.geometry");
 
             this.dataDirectory  = configuration.getDataDirectory();
         } catch (JAXBException ex) {

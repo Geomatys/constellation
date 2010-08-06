@@ -116,7 +116,8 @@ public class WMSService extends GridWebService {
         setXMLContext("org.constellation.ws:" +
                       "org.geotoolkit.wms.xml.v111:" +
                       "org.geotoolkit.wms.xml.v130:" +
-                      "org.geotoolkit.sld.xml.v110",
+                      "org.geotoolkit.sld.xml.v110:" +
+                      "org.geotoolkit.internal.jaxb.geometry",
                       "");
 
         worker = new DefaultWMSWorker(getMarshallerPool());

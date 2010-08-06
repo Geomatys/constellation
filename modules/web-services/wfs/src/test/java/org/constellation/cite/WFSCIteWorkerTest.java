@@ -60,9 +60,10 @@ public class WFSCIteWorkerTest {
     static {
         try {
             pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110" +
-            		  ":org.geotoolkit.ogc.xml.v110" +
-            		  ":org.geotoolkit.gml.xml.v311" +
-                          ":org.geotoolkit.xsd.xml.v2001");
+            		  ":org.geotoolkit.ogc.xml.v110"  +
+            		  ":org.geotoolkit.gml.xml.v311"  +
+                          ":org.geotoolkit.xsd.xml.v2001" +
+                          ":org.geotoolkit.internal.jaxb.geometry");
         } catch (Exception ex) {
 
         }

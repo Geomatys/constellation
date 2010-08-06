@@ -78,7 +78,8 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
                     "org.geotoolkit.ows.xml.v100:" +
                     "org.geotoolkit.wcs.xml.v100:" +
                     "org.geotoolkit.wcs.xml.v111:" +
-                    "org.geotoolkit.gml.xml.v311");
+                    "org.geotoolkit.gml.xml.v311:" +
+                    "org.geotoolkit.internal.jaxb.geometry");
         WORKER = new WCSWorker(POOL);
         // Default instanciation of the worker' servlet context and uri context.
         WORKER.initServletContext(new ServletContextImpl());

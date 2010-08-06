@@ -65,7 +65,8 @@ import org.geotoolkit.xml.MarshallerPool;
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
 @XmlSeeAlso({org.geotoolkit.sml.xml.v100.ObjectFactory.class,
              org.geotoolkit.sml.xml.v101.ObjectFactory.class,
-             org.geotoolkit.sampling.xml.v100.ObjectFactory.class})
+             org.geotoolkit.sampling.xml.v100.ObjectFactory.class,
+             org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class})
 public class SOService {
     
     /**

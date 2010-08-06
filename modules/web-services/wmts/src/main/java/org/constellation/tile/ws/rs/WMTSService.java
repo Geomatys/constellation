@@ -81,7 +81,7 @@ public class WMTSService extends GridWebService {
             setXMLContext("org.geotoolkit.wmts.xml.v100:" +
                           "org.geotoolkit.ows.xml.v110:"  +
                           "org.geotoolkit.gml.xml.v311:"  +
-                          "org.geotoolkit.internal.jaxb.referencing",
+                          "org.geotoolkit.internal.jaxb.geometry",
                           "http://www.opengis.net/wmts");
             worker = new DefaultWMTSWorker(getMarshallerPool());
 

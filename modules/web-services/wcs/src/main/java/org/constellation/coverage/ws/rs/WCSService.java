@@ -115,7 +115,8 @@ public class WCSService extends GridWebService {
                       "org.geotoolkit.ows.xml.v100:" +
                       "org.geotoolkit.wcs.xml.v100:" +
                       "org.geotoolkit.wcs.xml.v111:" +
-                      "org.geotoolkit.gml.xml.v311",
+                      "org.geotoolkit.gml.xml.v311:"  +
+                      "org.geotoolkit.internal.jaxb.geometry",
                       "");
 
         worker = new WCSWorker(getMarshallerPool());

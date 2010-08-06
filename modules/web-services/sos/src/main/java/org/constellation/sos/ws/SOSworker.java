@@ -524,7 +524,7 @@ public class SOSworker {
     private void cacheCapabilities(File configurationDirectory) throws JAXBException {
         //we fill the cachedCapabilities if we have to
         LOGGER.info("adding capabilities document in cache");
-        final Unmarshaller capaUM = JAXBContext.newInstance(Capabilities.class).createUnmarshaller(); //, org.geotoolkit.internal.jaxb.referencing.ObjectFactory.class
+        final Unmarshaller capaUM = JAXBContext.newInstance(Capabilities.class, org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class).createUnmarshaller();
         final File configFile = new File(configurationDirectory, "cached-offerings.xml");
         if (configFile.exists()) {
             Object object = capaUM.unmarshal(configFile);

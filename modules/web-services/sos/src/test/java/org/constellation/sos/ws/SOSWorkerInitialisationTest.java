@@ -53,7 +53,7 @@ public class SOSWorkerInitialisationTest {
             configurationDirectory.mkdir();
         }
 
-        MarshallerPool pool       = new MarshallerPool("org.geotoolkit.sos.xml.v100");
+        MarshallerPool pool       = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.internal.jaxb.geometry");
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         skeletonCapabilities      = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
         pool.release(unmarshaller);
@@ -163,7 +163,7 @@ public class SOSWorkerInitialisationTest {
         configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
 
-        Marshaller marshaller = JAXBContext.newInstance("org.geotoolkit.sos.xml.v100").createMarshaller();
+        Marshaller marshaller = JAXBContext.newInstance("org.geotoolkit.sos.xml.v100:org.geotoolkit.internal.jaxb.geometry").createMarshaller();
         marshaller.marshal(request, configFile);
 
         worker = new SOSworker(configurationDirectory);

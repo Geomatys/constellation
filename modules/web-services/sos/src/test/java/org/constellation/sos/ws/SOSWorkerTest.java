@@ -100,8 +100,8 @@ public class SOSWorkerTest {
                                        + "org.geotoolkit.observation.xml.v100:"
                                        + "org.geotoolkit.sml.xml.v100:"
                                        + "org.geotoolkit.sampling.xml.v100:"
-                                       + "org.geotoolkit.swe.xml.v101");
- //                                      + "org.geotoolkit.internal.jaxb.referencing");
+                                       + "org.geotoolkit.swe.xml.v101:" 
+                                       + "org.geotoolkit.internal.jaxb.geometry");
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
         capabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
         marshallerPool.release(unmarshaller);

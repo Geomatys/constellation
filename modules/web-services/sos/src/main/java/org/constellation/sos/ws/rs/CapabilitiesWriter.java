@@ -48,10 +48,10 @@ public class CapabilitiesWriter<T extends Capabilities> implements MessageBodyWr
     static {
         MarshallerPool candidate = null;
         try {
-            candidate = new AnchoredMarshallerPool("http://www.opengis.net/sos/1.0",
+            candidate = new AnchoredMarshallerPool(null,
                     "org.geotoolkit.sos.xml.v100:" +
-                    "org.geotoolkit.gml.xml.v311",
-                    //"org.geotoolkit.internal.jaxb.referencing",
+                    "org.geotoolkit.gml.xml.v311:" +
+                    "org.geotoolkit.internal.jaxb.geometry",
                     "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd");
         } catch (JAXBException ex) {
            LOGGER.log(Level.SEVERE, "JAXBException while initializing Capabilities writer", ex);

@@ -78,7 +78,7 @@ public class SosIOTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-         marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.ows.xml.v110");
+         marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.ows.xml.v110:org.geotoolkit.internal.jaxb.geometry");
     }
 
     @AfterClass

@@ -108,7 +108,8 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
         }
         pool = new MarshallerPool("org.constellation.ws:" +
                                   "org.geotoolkit.wms.xml.v111:" +
-                                  "org.geotoolkit.sld.xml.v110");
+                                  "org.geotoolkit.sld.xml.v110:" +
+                                  "org.geotoolkit.internal.jaxb.geometry");
     }
 
     /**
