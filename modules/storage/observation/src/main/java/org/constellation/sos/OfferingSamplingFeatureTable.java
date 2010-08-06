@@ -25,6 +25,7 @@ import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.gml.v311.ReferenceTable;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sos.xml.v100.OfferingSamplingFeatureEntry;
 import org.geotoolkit.util.Utilities;
@@ -88,7 +89,7 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
     }
 
     @Override
-    protected OfferingSamplingFeatureEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected OfferingSamplingFeatureEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingSamplingFeatureQuery query = (OfferingSamplingFeatureQuery) super.query;
         ReferenceEntry samplingFeature;
         
@@ -105,8 +106,8 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
-        super.configure(type, statement);
+    protected void configure(final LocalCache lc, final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
+        super.configure(lc, type, statement);
         final OfferingSamplingFeatureQuery query = (OfferingSamplingFeatureQuery) super.query;
         if (!type.equals(QueryType.INSERT)) {
             statement.setString(indexOf(query.byOffering), idOffering);
@@ -132,10 +133,11 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
         final OfferingSamplingFeatureQuery query  = (OfferingSamplingFeatureQuery) super.query;
         String idSF = "";
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
-                final Stmt statement = getStatement(QueryType.EXISTS);
+                final Stmt statement = getStatement(lc, QueryType.EXISTS);
                 statement.statement.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
                 if ( samplingFeatures == null) {
                     samplingFeatures = getDatabase().getTable(ReferenceTable.class);
@@ -147,13 +149,13 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
                 if(result.next()) {
                     success = true;
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                     return;
                 }
                 result.close();
-                release(statement);
+                release(lc, statement);
                 
-                final Stmt insert    = getStatement(QueryType.INSERT);
+                final Stmt insert    = getStatement(lc, QueryType.INSERT);
                 insert.statement.setString(indexOf(query.idOffering), offSamplingFeature.getIdOffering());
                 if ( samplingFeatures == null) {
                     samplingFeatures = getDatabase().getTable(ReferenceTable.class);
@@ -162,11 +164,11 @@ public class OfferingSamplingFeatureTable extends SingletonTable<OfferingSamplin
                 insert.statement.setString(indexOf(query.samplingFeature), idSF);
 
                 updateSingleton(insert.statement);
-                release(insert);
+                release(lc, insert);
                 
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
     }

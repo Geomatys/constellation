@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.observation.xml.v100.SurveyProcedureEntry;
 import org.opengis.observation.sampling.SurveyProcedure;
@@ -71,7 +72,7 @@ public class SurveyProcedureTable extends SingletonTable<SurveyProcedureEntry>{
      * Construit une survey procedure pour l'enregistrement courant.
      */
     @Override
-    protected SurveyProcedureEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected SurveyProcedureEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
          //final SurveyProcedureQuery localQuery = (SurveyProcedureQuery) super.query;
          return null;/* new SurveyProcedureEntry(results.getString(indexOf(query.name   )),
                                          results.getString(indexOf(query.operator)),

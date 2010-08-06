@@ -30,6 +30,7 @@ import org.geotoolkit.internal.sql.table.SingletonTable;
 
 import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 
 /**
@@ -85,7 +86,7 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
      * @throws java.sql.SQLException
      */
     @Override
-    protected EnvelopeEntry createEntry(ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected EnvelopeEntry createEntry(final LocalCache loc, ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final EnvelopeQuery query = (EnvelopeQuery) super.query;
         //on lit le premier point
         List<Double> value = new ArrayList<Double>();
@@ -116,28 +117,29 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
         final EnvelopeQuery query = (EnvelopeQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (envelope.getId() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(query.id), envelope.getId());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return envelope.getId();
                     } else {
                         id = envelope.getId();
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
 
-                    id = searchFreeIdentifier("envelope:");
+                    id = searchFreeIdentifier(lc, "envelope:");
                 }
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.id), id);
                 if (envelope.getSrsName() != null) {
                     statement.statement.setString(indexOf(query.srsName), envelope.getSrsName());
@@ -167,10 +169,10 @@ public class EnvelopeTable extends SingletonTable<EnvelopeEntry> {
                     statement.statement.setNull(indexOf(query.upperCornerY), java.sql.Types.DOUBLE);
                 }
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

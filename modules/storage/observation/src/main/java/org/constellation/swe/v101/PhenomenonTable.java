@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
@@ -73,7 +74,7 @@ public class PhenomenonTable extends SingletonTable<PhenomenonEntry> {
      * Construit un phénomène pour l'enregistrement courant.
      */
     @Override
-    protected PhenomenonEntry createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
+    protected PhenomenonEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
         final PhenomenonQuery localQuery = (PhenomenonQuery) super.query;
         return new PhenomenonEntry(results.getString(indexOf(localQuery.identifier)),
                                    results.getString(indexOf(localQuery.name)),
@@ -90,36 +91,37 @@ public class PhenomenonTable extends SingletonTable<PhenomenonEntry> {
         final PhenomenonQuery localQuery  = (PhenomenonQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (pheno.getId() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(localQuery.identifier), pheno.getId());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc,statement);
                         return pheno.getId();
                     } else {
                         id = pheno.getId();
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier("pheno");
+                    id = searchFreeIdentifier(lc, "pheno");
                 }
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(localQuery.identifier), id);
                 statement.statement.setString(indexOf(localQuery.name), pheno.getName());
                 statement.statement.setString(indexOf(localQuery.remarks), pheno.getDescription());
 
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

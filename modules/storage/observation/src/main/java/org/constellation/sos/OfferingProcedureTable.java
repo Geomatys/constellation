@@ -25,6 +25,7 @@ import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.gml.v311.ReferenceTable;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;
 import org.geotoolkit.util.Utilities;
@@ -80,7 +81,7 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
 
     
     @Override
-    protected OfferingProcedureEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected OfferingProcedureEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingProcedureQuery query = (OfferingProcedureQuery) super.query;
         
         if (process == null) {
@@ -95,8 +96,8 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
-        super.configure(type, statement);
+    protected void configure(final LocalCache lc, final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
+        super.configure(lc, type, statement);
         final OfferingProcedureQuery query = (OfferingProcedureQuery) super.query;
         if (! type.equals(QueryType.INSERT))
             statement.setString(indexOf(query.byOffering), idOffering);
@@ -124,10 +125,11 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
         final OfferingProcedureQuery query  = (OfferingProcedureQuery) super.query;
         String idProc = "";
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
-                final Stmt statement = getStatement(QueryType.EXISTS);
+                final Stmt statement = getStatement(lc, QueryType.EXISTS);
                 statement.statement.setString(indexOf(query.idOffering), offProc.getIdOffering());
 
                 if (process == null) {
@@ -139,21 +141,21 @@ public class OfferingProcedureTable extends SingletonTable<OfferingProcedureEntr
                 final ResultSet result = statement.statement.executeQuery();
                 if(result.next()) {
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                     success = true;
                     return;
                 }
                 result.close();
-                release(statement);
+                release(lc, statement);
 
-                final Stmt insert    = getStatement(QueryType.INSERT);
+                final Stmt insert    = getStatement(lc, QueryType.INSERT);
                 insert.statement.setString(indexOf(query.idOffering), offProc.getIdOffering());
                 insert.statement.setString(indexOf(query.procedure), idProc);
                 updateSingleton(insert.statement);
-                release(insert);
+                release(lc, insert);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
     }

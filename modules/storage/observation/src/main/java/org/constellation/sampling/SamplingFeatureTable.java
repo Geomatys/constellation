@@ -26,6 +26,7 @@ import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 
 /**
@@ -113,7 +114,7 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
     @Override
-    protected SamplingFeatureEntry createEntry(final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected SamplingFeatureEntry createEntry(final LocalCache lc, final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
         final SamplingFeatureQuery query = (SamplingFeatureQuery) super.query;
         // TODO result.getString(indexOf(query.sampledFeature))
         return new SamplingFeatureEntry(result.getString(indexOf(query.identifier)),
@@ -148,28 +149,29 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
         final SamplingFeatureQuery query  = (SamplingFeatureQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (station.getId() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(query.identifier), station.getId());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return station.getId();
                     } else {
                         id = station.getId();
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier("station");
+                    id = searchFreeIdentifier(lc, "station");
                 }
 
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.identifier), id);
 
                 if (station.getDescription() != null) {
@@ -183,10 +185,10 @@ public class SamplingFeatureTable extends SingletonTable<SamplingFeatureEntry> {
                 statement.statement.setString(indexOf(query.sampledFeature), (String)i.next());
 
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

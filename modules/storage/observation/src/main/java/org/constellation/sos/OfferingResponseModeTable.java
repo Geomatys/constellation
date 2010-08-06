@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
@@ -74,7 +75,7 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
     }
 
     @Override
-    protected OfferingResponseModeEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected OfferingResponseModeEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingResponseModeQuery query = (OfferingResponseModeQuery) super.query;
         
         
@@ -87,8 +88,8 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
-        super.configure(type, statement);
+    protected void configure(final LocalCache lc, final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
+        super.configure(lc, type, statement);
         final OfferingResponseModeQuery query = (OfferingResponseModeQuery) super.query;
         if (! type.equals(QueryType.INSERT))
             statement.setString(indexOf(query.byOffering), idOffering);
@@ -115,30 +116,31 @@ public class OfferingResponseModeTable extends SingletonTable<OfferingResponseMo
     public void getIdentifier(OfferingResponseModeEntry offres) throws SQLException, CatalogException {
         final OfferingResponseModeQuery query  = (OfferingResponseModeQuery) super.query;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
-                final Stmt statement = getStatement(QueryType.EXISTS);
+                final Stmt statement = getStatement(lc, QueryType.EXISTS);
                 statement.statement.setString(indexOf(query.idOffering), offres.getIdOffering());
                 statement.statement.setString(indexOf(query.mode), offres.getMode().name());
                 final ResultSet result = statement.statement.executeQuery();
                 if(result.next()) {
                     success = true;
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                     return;
                 }
                 result.close();
-                release(statement);
+                release(lc, statement);
 
-                final Stmt insert    = getStatement(QueryType.INSERT);
+                final Stmt insert    = getStatement(lc, QueryType.INSERT);
                 insert.statement.setString(indexOf(query.idOffering), offres.getIdOffering());
                 insert.statement.setString(indexOf(query.mode), offres.getMode().name() );
                 updateSingleton(insert.statement);
                 success = true;
-                release(insert);
+                release(lc, insert);
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
     }

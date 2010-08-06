@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
@@ -73,7 +74,7 @@ public class ProcessTable extends SingletonTable<ProcessEntry> {
      * Construit une procédure pour l'enregistrement courant.
      */
     @Override
-    protected ProcessEntry createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException {
+    protected ProcessEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException {
         final ProcessQuery query = (ProcessQuery) super.query;
         return new ProcessEntry(results.getString(indexOf(query.name)));
     }
@@ -88,36 +89,37 @@ public class ProcessTable extends SingletonTable<ProcessEntry> {
         final ProcessQuery query  = (ProcessQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (proc.getName() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(query.name), proc.getName());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return proc.getName();
                     } else {
                         id = proc.getName();
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier("procedure");
+                    id = searchFreeIdentifier(lc, "procedure");
                 }
 
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
 
                 statement.statement.setString(indexOf(query.name), id);
                 statement.statement.setNull(indexOf(query.remarks), java.sql.Types.VARCHAR);
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

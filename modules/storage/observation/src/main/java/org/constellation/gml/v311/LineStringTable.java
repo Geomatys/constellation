@@ -67,8 +67,9 @@ public class LineStringTable extends Table {
     public List<DirectPositionEntry> getEntries(final String idLineString) throws CatalogException, SQLException {
         final LineStringQuery query = (LineStringQuery) this.query;
         final List<DirectPositionEntry> positions = new ArrayList<DirectPositionEntry>();
-        synchronized (getLock()) {
-            final LocalCache.Stmt ce = getStatement(QueryType.LIST);
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            final LocalCache.Stmt ce = getStatement(lc, QueryType.LIST);
             final PreparedStatement statement = ce.statement;
             statement.setString(indexOf(query.byIdentifier), idLineString);
             final int  xIndex = indexOf(query.xValue);
@@ -90,7 +91,7 @@ public class LineStringTable extends Table {
                 positions.add(new DirectPositionEntry(name, pos));
             }
             results.close();
-            release(ce);
+            release(lc, ce);
         }
         return positions;
     }

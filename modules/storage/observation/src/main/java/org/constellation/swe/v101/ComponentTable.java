@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
@@ -80,7 +81,7 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
     
     
     @Override
-    protected ComponentEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected ComponentEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final ComponentQuery query = (ComponentQuery) super.query;
         
         if (phenomenons == null) {
@@ -95,8 +96,8 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
-        super.configure(type, statement);
+    protected void configure(final LocalCache lc, final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
+        super.configure(lc, type, statement);
         final ComponentQuery query = (ComponentQuery) super.query;
         if (! type.equals(QueryType.INSERT))
             statement.setString(indexOf(query.byComposite), idCompositePhenomenon);
@@ -123,35 +124,36 @@ public class ComponentTable extends SingletonTable<ComponentEntry>{
     public void getIdentifier(String idComposite, PhenomenonEntry pheno) throws SQLException, CatalogException {
         final ComponentQuery query  = (ComponentQuery) super.query;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (phenomenons == null) {
                     phenomenons = getDatabase().getTable(PhenomenonTable.class);
                 }
                 final String idPheno = phenomenons.getIdentifier(pheno);
 
-                Stmt statement = getStatement(QueryType.EXISTS);
+                Stmt statement = getStatement(lc, QueryType.EXISTS);
                 statement.statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
                 statement.statement.setString(indexOf(query.idComponent), idPheno);
                 final ResultSet result = statement.statement.executeQuery();
                 if(result.next()) {
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                     success = true;
                     return ;
                 }
                 result.close();
-                release(statement);
+                release(lc, statement);
 
-                statement = getStatement(QueryType.INSERT);
+                statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.idCompositePhenomenon), idComposite);
                 statement.statement.setString(indexOf(query.idComponent), idPheno);
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
     }

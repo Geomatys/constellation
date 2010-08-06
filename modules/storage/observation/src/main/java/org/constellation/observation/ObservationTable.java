@@ -43,6 +43,7 @@ import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.observation.xml.v100.ProcessEntry;
@@ -225,7 +226,7 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
      * Construit une observation pour l'enregistrement courant.
      */
     @Override
-    public ObservationEntry createEntry(final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
+    public ObservationEntry createEntry(final LocalCache lc, final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
         final ObservationQuery query = (ObservationQuery) super.query;
         
         if (phenomenons == null) {
@@ -331,27 +332,28 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
         final ObservationQuery query = (ObservationQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (obs.getName() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(query.name), obs.getName());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return obs.getName();
                     } else {
                         id = obs.getName();
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier("urn:object:observation:BRGM");
+                    id = searchFreeIdentifier(lc, "urn:object:observation:BRGM");
                 }
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.name),         id);
                 statement.statement.setString(indexOf(query.description),  obs.getDefinition());
 
@@ -494,11 +496,11 @@ public class ObservationTable extends SingletonTable<ObservationEntry> {
                 statement.statement.setNull(indexOf(query.resultDefinition),   java.sql.Types.VARCHAR);
                 
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
                 try {
-                    transactionEnd(success);
+                    transactionEnd(lc, success);
                 } catch (SQLException e) {
                     log("getIdentifier", new LogRecord(Level.WARNING, "Error in transationEnd"));
                 }

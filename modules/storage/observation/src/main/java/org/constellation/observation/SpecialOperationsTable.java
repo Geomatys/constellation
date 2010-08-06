@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.Table;
 
 /**
@@ -56,8 +57,9 @@ public class SpecialOperationsTable extends Table{
 
 
     public boolean observationExists(final String template) throws SQLException {
-        synchronized (getLock()) {
-            final PreparedStatement stmt = getConnection().prepareStatement(" SELECT \"name\" FROM \"observation\".\"observations\"" +
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            final PreparedStatement stmt = lc.connection().prepareStatement(" SELECT \"name\" FROM \"observation\".\"observations\"" +
                                                                            " WHERE \"name\"=? " +
                                                                            " UNION " +
                                                                            " SELECT \"name\" FROM \"observation\".\"measurements\" " +
@@ -74,8 +76,9 @@ public class SpecialOperationsTable extends Table{
     }
 
     public int observationCount(final String observationIdBase) throws SQLException {
-        synchronized (getLock()) {
-            final Statement stmt     = getConnection().createStatement();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            final Statement stmt     = lc.connection().createStatement();
             final ResultSet r        = stmt.executeQuery("SELECT Count(*) FROM \"observation\".\"observations\" WHERE \"name\" LIKE '%" + observationIdBase + "%' ");
 
             r.next();
@@ -87,8 +90,9 @@ public class SpecialOperationsTable extends Table{
     }
 
     public int measureCount(final String observationIdBase) throws SQLException {
-        synchronized (getLock()) {
-            final Statement stmt     = getConnection().createStatement();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            final Statement stmt     = lc.connection().createStatement();
             final ResultSet r        = stmt.executeQuery("SELECT Count(*) FROM \"observation\".\"measurements\" WHERE \"name\" LIKE '%" + observationIdBase + "%'  ");
 
             r.next();
@@ -100,8 +104,9 @@ public class SpecialOperationsTable extends Table{
     }
 
     public Timestamp getMinTimeOffering() throws SQLException {
-        synchronized (getLock()) {
-            final Statement stmt     = getConnection().createStatement();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            final Statement stmt     = lc.connection().createStatement();
             final ResultSet r        = stmt.executeQuery("select MIN(\"event_time_begin\") from \"sos\".\"observation_offerings\"");
 
             final Timestamp result;

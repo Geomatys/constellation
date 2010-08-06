@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
@@ -72,7 +73,7 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
      * @param results un resultSet contenant un tuple de la table de encodage textuel.
      */
     @Override
-    protected TextBlockEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected TextBlockEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final TextBlockQuery localQuery = (TextBlockQuery) super.query;
         return new TextBlockEntry(results.getString(indexOf(localQuery.id )),
                                   results.getString(indexOf(localQuery.tokenSeparator )),
@@ -90,11 +91,12 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
         final TextBlockQuery localQuery  = (TextBlockQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (textbloc.getId() == null) {
-                    final Stmt statement = getStatement(QueryType.LIST);
+                    final Stmt statement = getStatement(lc, QueryType.LIST);
                     statement.statement.setString(indexOf(localQuery.byBlockSeparator), textbloc.getBlockSeparator());
                     statement.statement.setString(indexOf(localQuery.byDecimalSeparator), textbloc.getDecimalSeparator());
                     statement.statement.setString(indexOf(localQuery.byTokenSeparator), textbloc.getTokenSeparator());
@@ -102,30 +104,30 @@ public class TextBlockTable extends SingletonTable<TextBlockEntry>{
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return result.getString("id_encoding");
                     } else {
-                        id = searchFreeIdentifier("textblock");
+                        id = searchFreeIdentifier(lc, "textblock");
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 //if the id is not null we assume that the textBlock is already recorded int the database
                 } else {
                     id = textbloc.getId();
                     return id;
                 }
 
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(localQuery.id), id);
                 statement.statement.setString(indexOf(localQuery.decimalSeparator), textbloc.getDecimalSeparator());
                 statement.statement.setString(indexOf(localQuery.blockSeparator)  , textbloc.getBlockSeparator());
                 statement.statement.setString(indexOf(localQuery.tokenSeparator)  , textbloc.getTokenSeparator());
 
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

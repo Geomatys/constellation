@@ -37,6 +37,7 @@ import org.geotoolkit.gml.xml.v311.TimeIndeterminateValueType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
@@ -159,7 +160,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
      * @throws java.sql.SQLException
      */
     @Override
-    protected ObservationOfferingEntry createEntry(ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected ObservationOfferingEntry createEntry(final LocalCache lc, ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
          final ObservationOfferingQuery query = (ObservationOfferingQuery) super.query;
          final String idOffering              = results.getString(indexOf(query.id));
 
@@ -282,27 +283,28 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
         final ObservationOfferingQuery query = (ObservationOfferingQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (off.getName() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(query.id), off.getId());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return off.getId();
                     } else {
                         id = off.getId();
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier("urn:BRGM:offering:");
+                    id = searchFreeIdentifier(lc, "urn:BRGM:offering:");
                 }
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.name), off.getName());
                 statement.statement.setString(indexOf(query.id), id);
                 if (off.getDescription() != null) {
@@ -363,7 +365,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
                 statement.statement.setString(indexOf(query.resultModelLocalPart), off.getResultModel().get(0).getLocalPart());
 
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
 
                 // we insert the response mode
                 if (off.getResponseMode() != null && off.getResponseMode().size() != 0){
@@ -393,7 +395,7 @@ public class ObservationOfferingTable extends SingletonTable<ObservationOffering
                 }
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

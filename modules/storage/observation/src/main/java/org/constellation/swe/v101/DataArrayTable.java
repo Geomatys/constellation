@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
@@ -87,7 +88,7 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
      * Construit un data block pour l'enregistrement courant.
      */
     @Override
-    protected DataArrayEntry createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
+    protected DataArrayEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
         final DataArrayQuery query = (DataArrayQuery) super.query;
         final String idArray = results.getString(indexOf(query.idArray));
         if (dataRecords == null) {
@@ -122,8 +123,9 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
         final DataArrayQuery query  = (DataArrayQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             //first we get the identifier form sub object
             int count = 0;
             if (array.getElementCount() != null && array.getElementCount().getCount() != null) {
@@ -137,24 +139,24 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
 
             try {
                 if (array.getId() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(query.idArray), array.getId());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return array.getId();
                     } else {
                         id = array.getId();
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier("dataArray");
+                    id = searchFreeIdentifier(lc, "dataArray");
                 }
 
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.idArray), id);
                 statement.statement.setInt(indexOf(query.elementCount), count);
 
@@ -167,11 +169,11 @@ public class DataArrayTable extends SingletonTable<DataArrayEntry>{
                 statement.statement.setString(indexOf(query.elementType), dataRecords.getIdentifier((SimpleDataRecordEntry)array.getElementType(), id));
 
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
 
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

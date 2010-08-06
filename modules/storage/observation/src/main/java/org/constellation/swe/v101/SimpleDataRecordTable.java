@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.internal.sql.table.QueryType;
@@ -108,7 +109,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
      * Construit un data record pour l'enregistrement courant.
      */
     @Override
-    protected SimpleDataRecordEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected SimpleDataRecordEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
         final String idDataBlock = results.getString(indexOf(query.idBlock));
         final String idDataRecord = results.getString(indexOf(query.idDataRecord));
@@ -132,8 +133,8 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
-        super.configure(type, statement);
+    protected void configure(final LocalCache lc, final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
+        super.configure(lc, type, statement);
         final SimpleDataRecordQuery query = (SimpleDataRecordQuery) super.query;
         if (!type.equals(QueryType.INSERT))
             statement.setString(indexOf(query.byIdBlock), idDataBlock);
@@ -150,29 +151,30 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
         final SimpleDataRecordQuery query  = (SimpleDataRecordQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (datarecord.getId() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(query.idBlock),      dataBlockId);
                     statement.statement.setString(indexOf(query.idDataRecord), datarecord.getId());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return datarecord.getId();
                     } else {
                         id = datarecord.getId();
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier("datarecord");
+                    id = searchFreeIdentifier(lc, "datarecord");
                 }
 
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.idDataRecord), id);
                 statement.statement.setString(indexOf(query.idBlock),      dataBlockId);
                 if (datarecord.getDefinition() != null) {
@@ -182,7 +184,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
                 }
                 statement.statement.setBoolean(indexOf(query.fixed),       datarecord.isFixed());
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
 
                 if (fields == null) {
                     fields = getDatabase().getTable(AnyScalarTable.class);
@@ -199,7 +201,7 @@ public class SimpleDataRecordTable extends SingletonTable<SimpleDataRecordEntry>
                 }
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

@@ -23,6 +23,7 @@ import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.gml.xml.v311.UnitOfMeasureEntry;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 
 /**
@@ -69,7 +70,7 @@ public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry> {
      * Crée une entrée pour l'untié de mesure courante.
      */
     @Override
-    protected UnitOfMeasureEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected UnitOfMeasureEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
           final UnitOfMeasureQuery query = (UnitOfMeasureQuery) super.query;
           return new UnitOfMeasureEntry(results.getString(indexOf(query.id )),
                                          results.getString(indexOf(query.name )),
@@ -87,38 +88,39 @@ public class UnitOfMeasureTable extends SingletonTable<UnitOfMeasureEntry> {
         final UnitOfMeasureQuery query  = (UnitOfMeasureQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (uom.getId() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(query.id), uom.getId());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return uom.getId();
                     } else {
                         id = uom.getId();
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier("uom");
+                    id = searchFreeIdentifier(lc, "uom");
                 }
 
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
 
                 statement.statement.setString(indexOf(query.id),           id);
                 statement.statement.setString(indexOf(query.name),         uom.getName());
                 statement.statement.setString(indexOf(query.quantityType), uom.getQuantityType());
                 statement.statement.setString(indexOf(query.unitSystem),   uom.getUnitsSystem());
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

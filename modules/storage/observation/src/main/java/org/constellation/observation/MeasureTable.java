@@ -25,6 +25,7 @@ import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.gml.v311.UnitOfMeasureTable;
 import org.geotoolkit.gml.xml.v311.UnitOfMeasureEntry;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.observation.xml.v100.MeasureEntry;
 
@@ -78,7 +79,7 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
      * Construit un resultat de mesure pour l'enregistrement courant.
      */
     @Override
-    protected MeasureEntry createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
+    protected MeasureEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
         final MeasureQuery query = (MeasureQuery) super.query;
         if(uoms == null) {
             uoms =  getDatabase().getTable(UnitOfMeasureTable.class);
@@ -99,28 +100,29 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
         final MeasureQuery query  = (MeasureQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-        transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+        transactionBegin(lc);
             try {
                 if (meas.getName() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(query.name), meas.getName());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return meas.getName();
                     } else {
                         id = meas.getName();
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier("mesure");
+                    id = searchFreeIdentifier(lc, "mesure");
                 }
 
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
 
                 statement.statement.setString(indexOf(query.name), id);
                 if (uoms == null) {
@@ -133,10 +135,10 @@ public class MeasureTable extends SingletonTable<MeasureEntry> {
                 }
                 statement.statement.setDouble(indexOf(query.value), meas.getValue());
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

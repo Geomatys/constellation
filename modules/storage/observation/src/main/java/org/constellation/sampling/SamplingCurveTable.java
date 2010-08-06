@@ -36,6 +36,7 @@ import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.gml.xml.v311.LineStringType;
 import org.geotoolkit.gml.xml.v311.MeasureType;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 
@@ -94,7 +95,7 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
     @Override
-    protected SamplingCurveType createEntry(final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected SamplingCurveType createEntry(final LocalCache lc, final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
         final SamplingCurveQuery query = (SamplingCurveQuery) super.query;
         final String curveId = result.getString(indexOf(query.curveIdentifier));
 
@@ -137,12 +138,13 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
         final SamplingCurveQuery query  = (SamplingCurveQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 // the station recived by xml have no ID so we use the name as a second primary key
                 if (station.getName() != null) {
-                    final Stmt statement = getStatement(QueryType.LIST);
+                    final Stmt statement = getStatement(lc, QueryType.LIST);
                     statement.statement.setString(indexOf(query.byName), station.getName());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
@@ -150,22 +152,22 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
                         id = result.getString("id");
                         station.setId(id);
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return id;
                     } else {
                         if (station.getId() != null) {
                             id = station.getId();
                         } else {
-                           id = searchFreeIdentifier("station");
+                           id = searchFreeIdentifier(lc, "station");
                         }
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
                    throw new CatalogException("the station must have a name");
                 }
                 station.setId(id);
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.identifier), id);
 
                 if (station.getDescription() != null) {
@@ -208,10 +210,10 @@ public class SamplingCurveTable extends SingletonTable<SamplingCurveType> {
                     statement.statement.setNull(indexOf(query.lengthValue), java.sql.Types.DOUBLE);
                 }
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

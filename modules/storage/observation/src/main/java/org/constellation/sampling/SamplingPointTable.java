@@ -30,6 +30,7 @@ import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 
@@ -76,7 +77,7 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
      * createEntry}(name, identifier, ...)</code> avec ces informations.
      */
     @Override
-    protected SamplingPointEntry createEntry(final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected SamplingPointEntry createEntry(final LocalCache lc, final ResultSet result, Comparable<?> identifier) throws CatalogException, SQLException {
         final SamplingPointQuery query = (SamplingPointQuery) super.query;
         
         final List<Double> value = new ArrayList<Double>();
@@ -106,12 +107,13 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
         final SamplingPointQuery query  = (SamplingPointQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 // the station recived by xml have no ID so we use the name as a second primary key
                 if (station.getName() != null) {
-                    final Stmt statement = getStatement(QueryType.LIST);
+                    final Stmt statement = getStatement(lc, QueryType.LIST);
                     statement.statement.setString(indexOf(query.byName), station.getName());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
@@ -119,23 +121,23 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
                         id = result.getString("id");
                         station.setId(id);
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return id;
                     } else {
                         if (station.getId() != null) {
                             id = station.getId();
                         } else {
-                           id = searchFreeIdentifier("station");
+                           id = searchFreeIdentifier(lc, "station");
                         }
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                     
                 } else {
                    throw new CatalogException("the station must have a name");
                 }
                 station.setId(id);
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.identifier), id);
 
                 if (station.getDescription() != null) {
@@ -167,10 +169,10 @@ public class SamplingPointTable extends SingletonTable<SamplingPointEntry> {
                     statement.statement.setNull(indexOf(query.srsDimension), java.sql.Types.INTEGER);
                 }
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

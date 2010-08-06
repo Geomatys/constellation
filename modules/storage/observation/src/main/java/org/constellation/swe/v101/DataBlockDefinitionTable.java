@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
@@ -88,7 +89,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
      * Construit un data block pour l'enregistrement courant.
      */
     @Override
-    protected DataBlockDefinitionEntry createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
+    protected DataBlockDefinitionEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException, CatalogException {
         final DataBlockDefinitionQuery query = (DataBlockDefinitionQuery) super.query;
         final String idDataBlock = results.getString(indexOf(query.id));
         
@@ -117,27 +118,28 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
         final DataBlockDefinitionQuery query  = (DataBlockDefinitionQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (databloc.getId() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(query.id), databloc.getId());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return databloc.getId();
                     } else {
                         id = databloc.getId();
                     }
                     result.close();
                 } else {
-                    id = searchFreeIdentifier("datablockDef");
+                    id = searchFreeIdentifier(lc, "datablockDef");
                 }
 
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.id), id);
 
                 if (textBlockEncodings == null) {
@@ -146,7 +148,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
                 final AbstractEncodingPropertyType encProp = databloc.getEncoding();
                 statement.statement.setString(indexOf(query.encoding), textBlockEncodings.getIdentifier((TextBlockEntry) encProp.getEncoding()));
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 
                 if (dataRecords == null) {
                     dataRecords = getDatabase().getTable(SimpleDataRecordTable.class);
@@ -160,7 +162,7 @@ public class DataBlockDefinitionTable extends SingletonTable<DataBlockDefinition
                 }
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

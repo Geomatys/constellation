@@ -23,6 +23,7 @@ import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 
 /**
@@ -68,7 +69,7 @@ public class ReferenceTable extends SingletonTable<ReferenceEntry>{
      * Construit une reference pour l'enregistrement courant.
      */
     @Override
-    protected ReferenceEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected ReferenceEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final ReferenceQuery query = (ReferenceQuery) super.query;
         return new ReferenceEntry(results.getString(indexOf(query.idReference)),
                                   results.getString(indexOf(query.href)));
@@ -84,11 +85,12 @@ public class ReferenceTable extends SingletonTable<ReferenceEntry>{
         final ReferenceQuery query  = (ReferenceQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (ref.getId() == null) {
-                    final Stmt statement = getStatement(QueryType.LIST_ID);
+                    final Stmt statement = getStatement(lc, QueryType.LIST_ID);
                     if (ref.getActuate() != null) {
                         statement.statement.setString(indexOf(query.byActuate), ref.getActuate());
                     } else {
@@ -134,19 +136,19 @@ public class ReferenceTable extends SingletonTable<ReferenceEntry>{
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return result.getString("id_reference");
                     } else {
-                        id = searchFreeIdentifier("reference");
+                        id = searchFreeIdentifier(lc, "reference");
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
                     id = ref.getId();
                     return id;
                 }
 
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.idReference), id);
 
                 if (ref.getActuate() != null) {
@@ -190,10 +192,10 @@ public class ReferenceTable extends SingletonTable<ReferenceEntry>{
                     statement.statement.setNull(indexOf(query.type), java.sql.Types.VARCHAR);
                 }
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

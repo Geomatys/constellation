@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
@@ -126,7 +127,7 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
      * Construit un data block pour l'enregistrement courant.
      */
     @Override
-    protected AnyScalarPropertyType createEntry(final ResultSet results, Comparable<?> identifier) throws SQLException {
+    protected AnyScalarPropertyType createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws SQLException {
         final AnyScalarQuery query = (AnyScalarQuery) super.query;
         AbstractDataComponentEntry component = null;
         if (results.getString(indexOf(query.type)).equals("Quantity")) {
@@ -151,8 +152,8 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
-        super.configure(type, statement);
+    protected void configure(final LocalCache lc, final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
+        super.configure(lc, type, statement);
         final AnyScalarQuery query = (AnyScalarQuery) super.query;
         if(!type.equals(QueryType.INSERT)){
             statement.setString(indexOf(query.byIdDataRecord), idDataRecord);
@@ -171,11 +172,12 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
         final AnyScalarQuery query  = (AnyScalarQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (field.getName() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(query.byIdDataBlock), blockId);
                     statement.statement.setString(indexOf(query.idDataRecord),  dataRecordId);
                     statement.statement.setString(indexOf(query.name),          field.getName());
@@ -183,18 +185,18 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return field.getName();
                     } else {
                         id = field.getName();
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier("field");
+                    id = searchFreeIdentifier(lc, "field");
                 }
 
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.idDataRecord), dataRecordId);
                 statement.statement.setString(indexOf(query.idDataBlock),  blockId);
                 statement.statement.setString(indexOf(query.name),         id);
@@ -252,10 +254,10 @@ public class AnyScalarTable extends SingletonTable<AnyScalarPropertyType>{
                     throw new CatalogException("Unexpected scalar Type:" + field.getValue());
                 }
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;

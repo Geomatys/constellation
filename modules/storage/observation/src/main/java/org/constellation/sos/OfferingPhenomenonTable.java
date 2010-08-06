@@ -25,6 +25,7 @@ import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.swe.v101.CompositePhenomenonTable;
 import org.constellation.swe.v101.PhenomenonTable;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
@@ -85,7 +86,7 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
     
     
     @Override
-    protected OfferingPhenomenonEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected OfferingPhenomenonEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
         final OfferingPhenomenonQuery query = (OfferingPhenomenonQuery) super.query;
         PhenomenonEntry phenomenon;
         
@@ -107,8 +108,8 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
      * Specifie les parametres a utiliser dans la requetes de type "type".
      */
     @Override
-    protected void configure(final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
-        super.configure(type, statement);
+    protected void configure(final LocalCache lc, final QueryType type, final PreparedStatement statement) throws SQLException, CatalogException {
+        super.configure(lc, type, statement);
         final OfferingPhenomenonQuery query = (OfferingPhenomenonQuery) super.query;
         if (! type.equals(QueryType.INSERT))
             statement.setString(indexOf(query.byOffering), idOffering);
@@ -136,10 +137,11 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
         final OfferingPhenomenonQuery query  = (OfferingPhenomenonQuery) super.query;
         String idPheno = "";
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
-                final Stmt statement = getStatement(QueryType.EXISTS);
+                final Stmt statement = getStatement(lc, QueryType.EXISTS);
 
                 statement.statement.setString(indexOf(query.idOffering), offPheno.getIdOffering());
 
@@ -165,13 +167,13 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
                 if(result.next()) {
                     success = true;
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                     return;
                 }
                 result.close();
-                release(statement);
+                release(lc, statement);
 
-                final Stmt insert    = getStatement(QueryType.INSERT);
+                final Stmt insert    = getStatement(lc, QueryType.INSERT);
                 insert.statement.setString(indexOf(query.idOffering), offPheno.getIdOffering());
                 if (offPheno.getComponent() instanceof CompositePhenomenonEntry) {
                     if (compositePhenomenons == null) {
@@ -190,10 +192,10 @@ public class OfferingPhenomenonTable extends SingletonTable<OfferingPhenomenonEn
 
                 }
                 updateSingleton(insert.statement);
-                release(insert);
+                release(lc, insert);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
     }

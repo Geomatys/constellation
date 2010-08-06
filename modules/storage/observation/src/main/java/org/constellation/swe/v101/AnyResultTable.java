@@ -28,6 +28,7 @@ import org.geotoolkit.internal.sql.table.QueryType;
 import org.geotoolkit.internal.sql.table.SingletonTable;
 import org.constellation.gml.v311.ReferenceTable;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.swe.xml.v101.AnyResultEntry;
 import org.geotoolkit.swe.xml.v101.DataArrayEntry;
@@ -89,7 +90,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
      * Construit une reference pour l'enregistrement courant.
      */
     @Override
-    protected AnyResultEntry createEntry(final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
+    protected AnyResultEntry createEntry(final LocalCache lc, final ResultSet results, Comparable<?> identifier) throws CatalogException, SQLException {
          final AnyResultQuery query = (AnyResultQuery) super.query;
          final String idRef = results.getString(indexOf(query.reference));
          if (idRef != null) {
@@ -122,10 +123,11 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
     public String getIdentifier(final Object result) throws SQLException, CatalogException {
         final AnyResultQuery query = (AnyResultQuery) super.query;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
-                Stmt statement = getStatement(QueryType.LIST);
+                Stmt statement = getStatement(lc, QueryType.LIST);
                 ResultSet results;
                 if (result instanceof AnyResultEntry) {
                     final DataArrayEntry array = ((AnyResultEntry)result).getArray();
@@ -155,13 +157,13 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                 results.close();
                 if (r != null) {
                     success = true;
-                    release(statement);
+                    release(lc, statement);
                     return r;
                 }
-                release(statement);
+                release(lc, statement);
 
-                final Statement p = getConnection().createStatement();
-                statement = getStatement(QueryType.INSERT);
+                final Statement p = lc.connection().createStatement();
+                statement = getStatement(lc, QueryType.INSERT);
 
                 results = p.executeQuery("SELECT max(\"id_result\") FROM \"observation\".\"any_results\"");
                 if (results.next()) {
@@ -221,7 +223,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                 }
 
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 
                 //we get the new id generated
                 results = p.executeQuery("SELECT max(\"id_result\") FROM \"observation\".\"any_results\"" );
@@ -236,7 +238,7 @@ public class AnyResultTable extends SingletonTable<AnyResultEntry>{
                 success = true;
                 return id;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
     }

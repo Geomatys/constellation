@@ -33,6 +33,7 @@ import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
 import org.geotoolkit.gml.xml.v311.TimePeriodType;
 import org.geotoolkit.gml.xml.v311.TimePositionType;
+import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.LocalCache.Stmt;
 import org.geotoolkit.observation.xml.v100.MeasureEntry;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
@@ -148,7 +149,7 @@ public class MeasurementTable extends SingletonTable<MeasurementEntry> {
      * Construit une mesure pour l'enregistrement courant
      */
     @Override
-    public MeasurementEntry createEntry(final ResultSet result, Comparable<?> identifier) throws SQLException, CatalogException {
+    public MeasurementEntry createEntry(final LocalCache lc, final ResultSet result, Comparable<?> identifier) throws SQLException, CatalogException {
         final MeasurementQuery query = (MeasurementQuery) super.query;
         
         if (phenomenons == null) {
@@ -236,27 +237,28 @@ public class MeasurementTable extends SingletonTable<MeasurementEntry> {
         final MeasurementQuery query = (MeasurementQuery) super.query;
         String id;
         boolean success = false;
-        synchronized (getLock()) {
-            transactionBegin();
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            transactionBegin(lc);
             try {
                 if (meas.getName() != null) {
-                    final Stmt statement = getStatement(QueryType.EXISTS);
+                    final Stmt statement = getStatement(lc, QueryType.EXISTS);
                     statement.statement.setString(indexOf(query.name), meas.getName());
                     final ResultSet result = statement.statement.executeQuery();
                     if(result.next()) {
                         success = true;
                         result.close();
-                        release(statement);
+                        release(lc, statement);
                         return meas.getName();
                     } else {
                         id = meas.getName();
                     }
                     result.close();
-                    release(statement);
+                    release(lc, statement);
                 } else {
-                    id = searchFreeIdentifier("urn:BRGM:measurement:");
+                    id = searchFreeIdentifier(lc, "urn:BRGM:measurement:");
                 }
-                final Stmt statement = getStatement(QueryType.INSERT);
+                final Stmt statement = getStatement(lc, QueryType.INSERT);
                 statement.statement.setString(indexOf(query.name),         id);
                 statement.statement.setString(indexOf(query.description),  meas.getDefinition());
                 statement.statement.setString(indexOf(query.distribution), "normale");
@@ -375,10 +377,10 @@ public class MeasurementTable extends SingletonTable<MeasurementEntry> {
                 statement.statement.setNull(indexOf(query.resultDefinition),   java.sql.Types.VARCHAR);
 
                 updateSingleton(statement.statement);
-                release(statement);
+                release(lc, statement);
                 success = true;
             } finally {
-                transactionEnd(success);
+                transactionEnd(lc, success);
             }
         }
         return id;
