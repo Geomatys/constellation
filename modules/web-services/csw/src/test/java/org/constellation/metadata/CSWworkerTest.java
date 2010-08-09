@@ -18,6 +18,9 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
 import org.opengis.metadata.constraint.Constraints;
 import org.opengis.metadata.citation.Citation;
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 // constellation dependencies
+import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -121,7 +125,30 @@ public class CSWworkerTest {
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
 
     protected static Capabilities skeletonCapabilities;
-    
+
+    public static void fillPoolAnchor(AnchoredMarshallerPool pool) {
+        try {
+            pool.addAnchor("Common Data Index record", new URI("SDN:L231:3:CDI"));
+            pool.addAnchor("France", new URI("SDN:C320:2:FR"));
+            pool.addAnchor("EPSG:4326", new URI("SDN:L101:2:4326"));
+            pool.addAnchor("2", new URI("SDN:C371:1:2"));
+            pool.addAnchor("35", new URI("SDN:C371:1:35"));
+            pool.addAnchor("Transmittance and attenuance of the water column", new URI("SDN:P021:35:ATTN"));
+            pool.addAnchor("Electrical conductivity of the water column", new URI("SDN:P021:35:CNDC"));
+            pool.addAnchor("Dissolved oxygen parameters in the water column", new URI("SDN:P021:35:DOXY"));
+            pool.addAnchor("Light extinction and diffusion coefficients", new URI("SDN:P021:35:EXCO"));
+            pool.addAnchor("Dissolved noble gas concentration parameters in the water column", new URI("SDN:P021:35:HEXC"));
+            pool.addAnchor("Optical backscatter", new URI("SDN:P021:35:OPBS"));
+            pool.addAnchor("Salinity of the water column", new URI("SDN:P021:35:PSAL"));
+            pool.addAnchor("Dissolved concentration parameters for 'other' gases in the water column", new URI("SDN:P021:35:SCOX"));
+            pool.addAnchor("Temperature of the water column", new URI("SDN:P021:35:TEMP"));
+            pool.addAnchor("Visible waveband radiance and irradiance measurements in the atmosphere", new URI("SDN:P021:35:VSRA"));
+            pool.addAnchor("Visible waveband radiance and irradiance measurements in the water column", new URI("SDN:P021:35:VSRW"));
+            pool.addAnchor("MEDATLAS ASCII", new URI("SDN:L241:1:MEDATLAS"));
+        } catch (URISyntaxException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
+    }
     /**
      * Tests the getcapabilities method
      *

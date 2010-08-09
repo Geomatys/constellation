@@ -26,7 +26,7 @@ import java.util.List;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.metadata.AnchorPool;
+import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.metadata.CSWworkerTest;
 import org.constellation.util.Util;
 import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
@@ -65,7 +65,8 @@ public class MDWebMetadataWriterTest {
         List<Class> classes = EBRIMClassesContext.getAllClassesList();
         classes.add(org.geotoolkit.sml.xml.v100.ObjectFactory.class);
 
-        pool = new AnchorPool(classes);
+        pool = new AnchoredMarshallerPool(classes.toArray(new Class[]{}));
+        CSWworkerTest.fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         final String url = "jdbc:derby:memory:MMWTest;create=true";
         ds               = new DefaultDataSource(url);

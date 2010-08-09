@@ -20,13 +20,13 @@ package org.constellation.metadata;
 
 import java.io.File;
 import java.sql.Connection;
-import java.util.Arrays;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.util.Util;
 
 import org.geotoolkit.csw.xml.CSWClassesContext;
@@ -89,7 +89,8 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             pool.release(marshaller);
         }
         pool.release(unmarshaller);
-        pool = new AnchorPool(Arrays.asList(CSWClassesContext.getAllClasses()));
+        pool = new AnchoredMarshallerPool(CSWClassesContext.getAllClasses());
+        fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         Unmarshaller u = pool.acquireUnmarshaller();
         skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));

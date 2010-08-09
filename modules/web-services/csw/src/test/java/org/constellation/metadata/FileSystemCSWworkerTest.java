@@ -27,6 +27,7 @@ import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
+import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
@@ -71,7 +72,8 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         }
 
         pool.release(unmarshaller);
-        pool = new AnchorPool(Arrays.asList(EBRIMClassesContext.getAllClasses()));
+        pool = new AnchoredMarshallerPool(EBRIMClassesContext.getAllClasses());
+        fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         Unmarshaller u = pool.acquireUnmarshaller();
         skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));

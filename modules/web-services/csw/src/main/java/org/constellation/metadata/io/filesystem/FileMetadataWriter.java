@@ -101,7 +101,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         }
         
         try {
-            marshallerPool = new MarshallerPool(EBRIMClassesContext.getAllClasses());
+            marshallerPool = EBRIMClassesContext.getMarshallerPool();
         } catch (JAXBException ex) {
             throw new MetadataIoException("JAXB exception while creating unmarshaller", NO_APPLICABLE_CODE);
         }

@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.util.Util;
+import org.geotoolkit.csw.xml.CSWClassesContext;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.xml.MarshallerPool;
 
@@ -33,7 +34,7 @@ public abstract class AbstractAnalyzerTest {
 
     public static List<Object> fillTestData() throws JAXBException {
         List<Object> result       = new ArrayList<Object>();
-        MarshallerPool pool       = new MarshallerPool(DefaultMetadata.class);
+        MarshallerPool pool       = CSWClassesContext.getMarshallerPool();
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));

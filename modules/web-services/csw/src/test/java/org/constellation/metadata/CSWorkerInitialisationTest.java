@@ -62,7 +62,7 @@ public class CSWorkerInitialisationTest {
         if (!configurationDirectory.exists()) {
             configurationDirectory.mkdir();
         }
-        pool = new MarshallerPool(CSWClassesContext.getAllClasses());
+        pool = CSWClassesContext.getMarshallerPool();
         Unmarshaller u = pool.acquireUnmarshaller();
 
         skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));

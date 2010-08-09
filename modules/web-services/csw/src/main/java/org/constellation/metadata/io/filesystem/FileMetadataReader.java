@@ -134,7 +134,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
             throw new MetadataIoException("cause: unable to find the data directory", NO_APPLICABLE_CODE);
         }
         try {
-            marshallerPool = new MarshallerPool(EBRIMClassesContext.getAllClasses());
+            marshallerPool = EBRIMClassesContext.getMarshallerPool();
         } catch (JAXBException ex) {
             throw new MetadataIoException("cause: JAXB exception while creating unmarshaller", ex, NO_APPLICABLE_CODE);
         }

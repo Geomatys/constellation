@@ -40,6 +40,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 // Junit dependencies
+import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -86,6 +87,7 @@ import org.geotoolkit.temporal.object.DefaultPosition;
 import org.geotoolkit.util.SimpleInternationalString;
 
 // GeoAPI dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.metadata.Datatype;
 import org.opengis.metadata.ExtendedElementInformation;
 import org.opengis.metadata.citation.DateType;
@@ -117,7 +119,7 @@ import org.opengis.util.InternationalString;
  * @author Guilhem Legal
  */
 public class MetadataUnmarshallTest {
-    private static AnchorPool testPool;
+    private static MarshallerPool testPool;
     private static Unmarshaller unmarshaller;
     private static Marshaller marshaller;
 
@@ -127,7 +129,8 @@ public class MetadataUnmarshallTest {
     public static void setUp() throws JAXBException, URISyntaxException {
         final List<Class> classes = CSWClassesContext.FRA_CLASSES;
         classes.add(DefaultMetadata.class);
-        testPool = new AnchorPool(classes);
+        testPool = new AnchoredMarshallerPool(classes.toArray(new Class[]{}));
+        CSWworkerTest.fillPoolAnchor((AnchoredMarshallerPool) testPool);
     }
 
     @After

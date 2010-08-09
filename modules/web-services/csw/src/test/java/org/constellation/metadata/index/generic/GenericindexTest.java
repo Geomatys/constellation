@@ -577,10 +577,7 @@ public class GenericindexTest {
 
     public static List<Object> fillTestData() throws JAXBException {
         List<Object> result = new ArrayList<Object>();
-        final List<Class> classes = CSWClassesContext.FRA_CLASSES;
-        classes.add(DefaultMetadata.class);
-        classes.add(AbstractRecordType.class);
-        MarshallerPool pool          = new MarshallerPool(classes.toArray(new Class[1]));
+        final MarshallerPool pool    = CSWClassesContext.getMarshallerPool();
         Unmarshaller unmarshaller    = pool.acquireUnmarshaller();
 
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
