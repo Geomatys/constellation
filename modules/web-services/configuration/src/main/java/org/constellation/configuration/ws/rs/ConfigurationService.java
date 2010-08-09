@@ -116,7 +116,7 @@ public final class ConfigurationService extends AbstractWebService  {
         super();
         indexing = false;
         try {
-            setXMLContext("org.geotoolkit.ows.xml.v110:org.constellation.configuration:org.geotoolkit.skos.xml", "");
+            setXMLContext("org.geotoolkit.ows.xml.v110:org.constellation.configuration:org.geotoolkit.skos.xml:org.geotoolkit.internal.jaxb.geometry", "");
             final AbstractConfigurerFactory configurerfactory = factory.getServiceProvider(AbstractConfigurerFactory.class, null, null, null);
             cswConfigurer      = configurerfactory.getCSWConfigurer(cn);
             cswFunctionEnabled = true;

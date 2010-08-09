@@ -29,10 +29,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
-import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -262,7 +260,8 @@ public final class ServicesBean {
                                             WCSCapabilitiesType.class,
                                             org.geotoolkit.csw.xml.v202.Capabilities.class,
                                             UserData.class,
-                                            org.geotoolkit.sos.xml.v100.Capabilities.class);
+                                            org.geotoolkit.sos.xml.v100.Capabilities.class,
+                                            org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class);
     }
 
     /**
