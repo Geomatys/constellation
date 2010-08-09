@@ -68,6 +68,18 @@
         <artifactId>geotk-utility-jdbc</artifactId>
     </dependency>
 
+    <!--
+      Temporary dependency to fix a bug in netcdf 4.1 version.
+      To remove when moving to netcdf 4.2.
+      The version of this dependency is declared here intentionaly,
+      because it is a temporary dependency.
+    -->
+    <dependency>
+      <groupId>edu.wisc</groupId>
+      <artifactId>visad-nodods</artifactId>
+      <version>SNAPSHOT</version>
+    </dependency>
+
     <dependency>
         <groupId>postgresql</groupId>
         <artifactId>postgresql</artifactId>
