@@ -21,16 +21,16 @@ package org.constellation.metadata.ws.rs;
 import java.io.IOException;
 import org.apache.xml.serialize.XMLSerializer;
 import java.io.StringWriter;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 
 // jersey dependencies
 import com.sun.jersey.spi.resource.Singleton;
-import java.io.File;
-import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -46,13 +46,13 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
-import org.constellation.configuration.HarvestTasks;
 import org.constellation.jaxb.MarshallWarnings;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 
+// Geotoolkit dependencies
 import org.geotoolkit.csw.xml.DescribeRecord;
 import org.geotoolkit.csw.xml.GetCapabilities;
 import org.geotoolkit.csw.xml.GetDomain;
@@ -82,7 +82,6 @@ import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.util.XArrays;
 import org.geotoolkit.xml.Catching;
 import org.geotoolkit.xml.Namespaces;
 
@@ -126,8 +125,14 @@ public class CSWService extends OGCWebService {
     protected CSWService(final String serviceID, final Map<String, CSWworker> workers) {
         super(ServiceDef.CSW_2_0_2);
         this.serviceID = serviceID;
-        if (setClassesContext()) {
+        try {
+            setXMLContext("", EBRIMClassesContext.getAllClasses());
             this.workers = workers;
+        } catch (JAXBException ex) {
+             LOGGER.severe("The CSW service is not running."       + '\n' +
+                          " cause  : Error creating XML context." + '\n' +
+                          " error  : " + ex.getMessage()          + '\n' +
+                          " details: " + ex.toString());
         }
         this.serializer = getXMLSerializer();
     }
@@ -139,30 +144,19 @@ public class CSWService extends OGCWebService {
     protected CSWService(final File configDirectory, String serviceID) {
         super(ServiceDef.CSW_2_0_2);
         this.serviceID = serviceID;
-        if (setClassesContext()) {
+        try {
+            setXMLContext("", EBRIMClassesContext.getAllClasses());
             final CSWworker worker = new CSWworker(serviceID, getMarshallerPool(), configDirectory);
             this.workers = new HashMap<String, CSWworker>();
             workers.put(serviceID, worker);
-        }
-         this.serializer = getXMLSerializer();
-    }
 
-
-    private boolean setClassesContext() {
-        try {
-            Class[] classes = EBRIMClassesContext.getAllClasses();
-            classes = XArrays.resize(classes, classes.length + 1);
-            classes[classes.length - 1] = HarvestTasks.class;
-
-            setXMLContext("", classes);
-            return true;
-        } catch (JAXBException ex){
-            LOGGER.severe("The CSW service is not running."       + '\n' +
+        } catch (JAXBException ex) {
+             LOGGER.severe("The CSW service is not running."       + '\n' +
                           " cause  : Error creating XML context." + '\n' +
                           " error  : " + ex.getMessage()          + '\n' +
                           " details: " + ex.toString());
         }
-        return false;
+        this.serializer = getXMLSerializer();
     }
 
     /**

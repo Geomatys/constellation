@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 // JAXB dependencies
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
@@ -33,6 +34,7 @@ import org.constellation.ws.CstlServiceException;
 
 // Geotoolkit dependencies
 import org.geotoolkit.csw.xml.GetRecordsRequest;
+import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
 import org.geotoolkit.xml.MarshallerPool;
 
 /**
@@ -56,9 +58,13 @@ public abstract class CatalogueHarvester {
      */
     protected final MetadataWriter metadataWriter;
 
-    public CatalogueHarvester(MarshallerPool marshallerPool, MetadataWriter metadataWriter) throws MetadataIoException {
-        this.marshallerPool = marshallerPool;
-        this.metadataWriter = metadataWriter;
+    public CatalogueHarvester(MetadataWriter metadataWriter) throws MetadataIoException {
+        try {
+            this.marshallerPool = EBRIMClassesContext.getMarshallerPool();
+            this.metadataWriter = metadataWriter;
+        } catch (JAXBException ex) {
+           throw new MetadataIoException(ex);
+        }
     }
     
     /**

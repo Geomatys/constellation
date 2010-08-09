@@ -38,6 +38,7 @@ import org.constellation.configuration.HarvestTask;
 import org.constellation.configuration.HarvestTasks;
 import org.constellation.metadata.utils.MailSendingUtilities;
 import org.constellation.ws.CstlServiceException;
+import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
 import org.geotoolkit.xml.MarshallerPool;
 
 /**
@@ -70,8 +71,16 @@ public class HarvestTaskSchreduler {
 
     private final CatalogueHarvester catalogueHarvester;
 
-    public HarvestTaskSchreduler(MarshallerPool marshallerPool, File configDir, CatalogueHarvester catalogueHarvester) {
-        this.marshallerPool     = marshallerPool;
+    public HarvestTaskSchreduler(File configDir, CatalogueHarvester catalogueHarvester) {
+        final List<Class> classes = EBRIMClassesContext.getAllClassesList();
+        classes.add(HarvestTasks.class);
+        MarshallerPool candidate = null;
+        try {
+            candidate = new MarshallerPool(classes.toArray(new Class[classes.size()]));
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+        }
+        this.marshallerPool     = candidate;
         this.configDir          = configDir;
         this.catalogueHarvester = catalogueHarvester;
         initializeHarvestTask();

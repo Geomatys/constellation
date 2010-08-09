@@ -79,6 +79,7 @@ import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
 import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.csw.xml.AbstractCswRequest;
+import org.geotoolkit.csw.xml.CSWClassesContext;
 import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.ElementSetName;
@@ -136,6 +137,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // GeoAPI dependencies
+import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.util.CodeList;
 
@@ -178,11 +180,6 @@ public class CSWworker {
     private String outputFormat;
     
     /**
-     * A unMarshaller to get object from harvested resource.
-     */
-    private MarshallerPool marshallerPool;
-    
-    /**
      * A lucene index searcher to make quick search on the metadatas.
      */
     private AbstractIndexSearcher indexSearcher;
@@ -217,6 +214,11 @@ public class CSWworker {
      */
     private List<QName> supportedTypeNames;
     
+    /**
+     * A map of QName - xsd svhema object
+     */
+    private final Map<QName, Object> schemas = new HashMap<QName, Object>();
+
     /**
      * A list of supported MIME type. 
      */
@@ -273,7 +275,6 @@ public class CSWworker {
     public CSWworker(final String serviceID, final MarshallerPool marshallerPool, File configDir) {
 
         final String notWorkingMsg = "The CSW service is not working!";
-        this.marshallerPool  = marshallerPool;
         if (configDir == null) {
             configDir    = getConfigDirectory();
             if (configDir == null) {
@@ -297,6 +298,7 @@ public class CSWworker {
                 init(configuration, serviceID, configDir);
                 initializeSupportedTypeNames();
                 initializeAcceptedResourceType();
+                initializeRecordSchema();
                 initializeAnchorsMap();
                 loadCascadedService(configDir);
                 String suffix = "";
@@ -321,6 +323,10 @@ public class CSWworker {
             LOGGER.warning(notWorkingMsg + "\nCause: IllegalArgumentException: " + e.getLocalizedMessage());
             LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
             isStarted = false;
+        } catch (CstlServiceException e) {
+            LOGGER.warning(notWorkingMsg + "\nCause: CstlServiceException: " + e.getLocalizedMessage());
+            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+            isStarted = false;
         }
     }
 
@@ -338,6 +344,7 @@ public class CSWworker {
             init(configuration, serviceID, configDir);
             initializeSupportedTypeNames();
             initializeAcceptedResourceType();
+            initializeRecordSchema();
             initializeAnchorsMap();
             loadCascadedService(configDir);
             String suffix = "";
@@ -357,6 +364,14 @@ public class CSWworker {
             isStarted = false;
         } catch (IllegalArgumentException e) {
             LOGGER.warning(notWorkingMsg + "\nCause: IllegalArgumentException: " + e.getLocalizedMessage());
+            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+            isStarted = false;
+        } catch (CstlServiceException e) {
+            LOGGER.warning(notWorkingMsg + "\nCause: CstlServiceException: " + e.getLocalizedMessage());
+            LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
+            isStarted = false;
+        }  catch (JAXBException e) {
+            LOGGER.warning(notWorkingMsg + "\nCause: JAXBException: " + e.getLocalizedMessage());
             LOGGER.log(Level.WARNING, e.getLocalizedMessage(), e);
             isStarted = false;
         }
@@ -391,11 +406,11 @@ public class CSWworker {
         if (profile == TRANSACTIONAL) {
             mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer);
             if (configuration.getByIdHarvester() != null && configuration.getByIdHarvester().equalsIgnoreCase("true")) {
-                catalogueHarvester    = new ByIDHarvester(marshallerPool, mdWriter, configuration.getIdentifierDirectory());
+                catalogueHarvester    = new ByIDHarvester(mdWriter, configuration.getIdentifierDirectory());
             } else {
-                catalogueHarvester    = new DefaultCatalogueHarvester(marshallerPool, mdWriter);//
+                catalogueHarvester    = new DefaultCatalogueHarvester(mdWriter);
             }
-            harvestTaskSchreduler     = new HarvestTaskSchreduler(marshallerPool, configDir, catalogueHarvester);
+            harvestTaskSchreduler     = new HarvestTaskSchreduler(configDir, catalogueHarvester);
         } else {
             indexer.destroy();
         }
@@ -437,12 +452,33 @@ public class CSWworker {
         }
     }
 
+    private void initializeRecordSchema() throws CstlServiceException {
+        MarshallerPool pool     = null;
+        Unmarshaller unmarshaller = null;
+        try {
+            pool         =  CSWClassesContext.getMarshallerPool();
+            unmarshaller = pool.acquireUnmarshaller();
+
+            schemas.put(RECORD_QNAME,            unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/record.xsd")));
+            schemas.put(METADATA_QNAME,          unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/metadata.xsd")));
+            schemas.put(EXTRINSIC_OBJECT_QNAME,    unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd")));
+            schemas.put(EXTRINSIC_OBJECT_25_QNAME, unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd")));
+
+        } catch (JAXBException ex) {
+            throw new CstlServiceException("JAXB Exception when trying to parse xsd file", ex, NO_APPLICABLE_CODE);
+        } finally {
+            if (unmarshaller != null && pool != null) {
+                pool.release(unmarshaller);
+            }
+        }
+    }
+
     /**
      * Initialize the Anchors in function of the reader capacity.
      */
-    private void initializeAnchorsMap() {
-        if (marshallerPool instanceof AnchoredMarshallerPool) {
-            final AnchoredMarshallerPool pool = (AnchoredMarshallerPool) marshallerPool;
+    private void initializeAnchorsMap() throws JAXBException {
+        if (EBRIMClassesContext.getMarshallerPool() instanceof AnchoredMarshallerPool) {
+            final AnchoredMarshallerPool pool = (AnchoredMarshallerPool) EBRIMClassesContext.getMarshallerPool();
             final Map<String, URI> concepts = mdReader.getConceptMap();
             int nbWord = 0;
             for (Entry<String, URI> entry: concepts.entrySet()) {
@@ -452,6 +488,8 @@ public class CSWworker {
             if (nbWord > 0) {
                 LOGGER.log(Level.INFO, "{0} words put in pool.", nbWord);
             }
+        } else {
+            LOGGER.severe("NOT an anchoredMarshaller Pool");
         }
     }
     
@@ -1130,73 +1168,57 @@ public class CSWworker {
     public DescribeRecordResponseType describeRecord(final DescribeRecord request) throws CstlServiceException{
         LOGGER.log(logLevel, "DescribeRecords request processing\n");
         final long startTime = System.currentTimeMillis();
-        DescribeRecordResponseType response;
-        Unmarshaller unmarshaller = null;
-        try {
-            verifyBaseRequest(request);
-            unmarshaller = this.marshallerPool.acquireUnmarshaller();
-            
-            // we initialize the output format of the response
-            initializeOutputFormat(request);
         
-            // we initialize the type names
-            List<QName> typeNames = (List<QName>)request.getTypeName();
-            if (typeNames == null || typeNames.isEmpty()) {
-                typeNames = supportedTypeNames;
-            }
-            
-            // we initialize the schema language
-            String schemaLanguage = request.getSchemaLanguage(); 
-            if (schemaLanguage == null) {
-                schemaLanguage = "http://www.w3.org/XML/Schema";
-            
-            } else if (!schemaLanguage.equals("http://www.w3.org/XML/Schema") && !schemaLanguage.equalsIgnoreCase("XMLSCHEMA")){
-               
-                throw new CstlServiceException("The server does not support this schema language: " + schemaLanguage + '\n' +
-                                              " supported ones are: XMLSCHEMA or http://www.w3.org/XML/Schema",
-                                              INVALID_PARAMETER_VALUE, "schemaLanguage"); 
-            }
-            final List<SchemaComponentType> components   = new ArrayList<SchemaComponentType>();
+        verifyBaseRequest(request);
 
-            if (typeNames.contains(RECORD_QNAME)) {
+        // we initialize the output format of the response
+        initializeOutputFormat(request);
 
-                
-                final Object object = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/record.xsd"));
-                final SchemaComponentType component = new SchemaComponentType(Namespaces.CSW_202, schemaLanguage, object);
-                components.add(component);
-            }
-            
-            if (typeNames.contains(METADATA_QNAME)) {
-
-                final Object object = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/metadata.xsd"));
-                final SchemaComponentType component = new SchemaComponentType(Namespaces.GMD, schemaLanguage, object);
-                components.add(component);
-            }
-            
-            if (containsOneOfEbrim30(typeNames)) {
-                final Object object = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-3.0.xsd"));
-                final SchemaComponentType component = new SchemaComponentType(EBRIM_30, schemaLanguage, object);
-                components.add(component);
-            }
-            
-            if (containsOneOfEbrim25(typeNames)) {
-                final Object object = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/ebrim-2.5.xsd"));
-                final SchemaComponentType component = new SchemaComponentType(EBRIM_25, schemaLanguage, object);
-                components.add(component);
-            }
-                
-                
-            response  = new DescribeRecordResponseType(components);
-            
-        } catch (JAXBException ex) {
-            throw new CstlServiceException("JAXB Exception when trying to parse xsd file", ex, NO_APPLICABLE_CODE);
-        } finally {
-            if (unmarshaller != null) {
-                this.marshallerPool.release(unmarshaller);
-            }
+        // we initialize the type names
+        List<QName> typeNames = (List<QName>)request.getTypeName();
+        if (typeNames == null || typeNames.isEmpty()) {
+            typeNames = supportedTypeNames;
         }
+
+        // we initialize the schema language
+        String schemaLanguage = request.getSchemaLanguage();
+        if (schemaLanguage == null) {
+            schemaLanguage = "http://www.w3.org/XML/Schema";
+
+        } else if (!schemaLanguage.equals("http://www.w3.org/XML/Schema") && !schemaLanguage.equalsIgnoreCase("XMLSCHEMA")){
+
+            throw new CstlServiceException("The server does not support this schema language: " + schemaLanguage + '\n' +
+                                          " supported ones are: XMLSCHEMA or http://www.w3.org/XML/Schema",
+                                          INVALID_PARAMETER_VALUE, "schemaLanguage");
+        }
+        final List<SchemaComponentType> components   = new ArrayList<SchemaComponentType>();
+
+        if (typeNames.contains(RECORD_QNAME)) {
+            final Object object = schemas.get(RECORD_QNAME);
+            final SchemaComponentType component = new SchemaComponentType(Namespaces.CSW_202, schemaLanguage, object);
+            components.add(component);
+        }
+
+        if (typeNames.contains(METADATA_QNAME)) {
+            final Object object = schemas.get(METADATA_QNAME);
+            final SchemaComponentType component = new SchemaComponentType(Namespaces.GMD, schemaLanguage, object);
+            components.add(component);
+        }
+
+        if (containsOneOfEbrim30(typeNames)) {
+            final Object object = schemas.get(EXTRINSIC_OBJECT_QNAME);
+            final SchemaComponentType component = new SchemaComponentType(EBRIM_30, schemaLanguage, object);
+            components.add(component);
+        }
+
+        if (containsOneOfEbrim25(typeNames)) {
+            final Object object = schemas.get(EXTRINSIC_OBJECT_25_QNAME);
+            final SchemaComponentType component = new SchemaComponentType(EBRIM_25, schemaLanguage, object);
+            components.add(component);
+        }
+
         LOGGER.log(logLevel, "DescribeRecords request processed in " + (System.currentTimeMillis() - startTime) + MS);
-        return response;
+        return new DescribeRecordResponseType(components);
     }
     
     /**
@@ -1761,10 +1783,4 @@ public class CSWworker {
         }
     }
 
-    /**
-     * @param marshallerPool the marshallerPool to set
-     */
-    public void setMarshallerPool(MarshallerPool marshallerPool) {
-        this.marshallerPool = marshallerPool;
-    }
 }

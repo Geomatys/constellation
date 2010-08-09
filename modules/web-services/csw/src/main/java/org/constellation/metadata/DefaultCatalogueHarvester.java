@@ -75,7 +75,6 @@ import org.geotoolkit.ogc.xml.v110.NotType;
 import org.geotoolkit.ogc.xml.v110.PropertyIsLikeType;
 import org.geotoolkit.ogc.xml.v110.PropertyNameType;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -152,8 +151,8 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
     /**
      * Build a new catalogue harvester with the write part.
      */
-    public DefaultCatalogueHarvester(MarshallerPool marshallerPool, MetadataWriter metadataWriter) throws MetadataIoException {
-       super(marshallerPool, metadataWriter);
+    public DefaultCatalogueHarvester(MetadataWriter metadataWriter) throws MetadataIoException {
+       super(metadataWriter);
         initializeRequest();
     }
     

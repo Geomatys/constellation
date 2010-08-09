@@ -41,28 +41,20 @@ import org.constellation.metadata.CSWworker;
 import org.constellation.provider.configuration.ConfigDirectory;
 
 //geotoolkit dependencies
-import org.geotoolkit.csw.xml.ElementSetType;
-import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.DescribeRecordResponseType;
 import org.geotoolkit.csw.xml.v202.DescribeRecordType;
-import org.geotoolkit.csw.xml.v202.DistributedSearchType;
-import org.geotoolkit.csw.xml.v202.ElementSetNameType;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.geotoolkit.csw.xml.v202.GetDomainResponseType;
 import org.geotoolkit.csw.xml.v202.GetDomainType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
-import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordsType;
 import org.geotoolkit.csw.xml.v202.HarvestResponseType;
 import org.geotoolkit.csw.xml.v202.HarvestType;
-import org.geotoolkit.csw.xml.v202.QueryConstraintType;
-import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.csw.xml.v202.TransactionResponseType;
 import org.geotoolkit.csw.xml.v202.TransactionType;
-import org.geotoolkit.ows.xml.v100.ExceptionReport;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
+import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 
@@ -100,17 +92,7 @@ public class CSWService {
     public CSWService() {
 
        try {
-           marshallerPool =
-                   new MarshallerPool(DefaultMetadata.class, Capabilities.class, DescribeRecordType.class
-                            ,DistributedSearchType.class, ElementSetNameType.class, ElementSetType.class
-                            ,GetCapabilitiesType.class, GetDomainType.class, GetRecordByIdType.class
-                            ,GetRecordsType.class, HarvestType.class, QueryConstraintType.class
-                            ,QueryType.class, ResultType.class, TransactionType.class
-                            ,GetRecordsResponseType.class, GetRecordByIdResponseType.class
-                            ,DescribeRecordResponseType.class, GetDomainResponseType.class
-                            ,TransactionResponseType.class, HarvestResponseType.class
-                            ,ExceptionReport.class, org.geotoolkit.ows.xml.v110.ExceptionReport.class
-                            ,org.geotoolkit.dublincore.xml.v2.terms.ObjectFactory.class);
+           marshallerPool = EBRIMClassesContext.getMarshallerPool();
 
            worker = new CSWworker("", marshallerPool, null);
            //TODO find real url

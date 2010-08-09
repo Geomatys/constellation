@@ -32,7 +32,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 // JAXB dependencies
 import javax.xml.bind.JAXBElement;
@@ -49,7 +48,6 @@ import org.geotoolkit.csw.xml.GetRecordsRequest;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v100.ExceptionType;
-import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -69,8 +67,8 @@ public class ByIDHarvester extends CatalogueHarvester {
     /**
      * Build a new catalogue harvester with the write part.
      */
-    public ByIDHarvester(MarshallerPool marshallerPool, MetadataWriter metadataWriter, String identifierDirectory) throws MetadataIoException {
-        super(marshallerPool, metadataWriter);
+    public ByIDHarvester(MetadataWriter metadataWriter, String identifierDirectory) throws MetadataIoException {
+        super(metadataWriter);
         if (identifierDirectory != null) {
             identifierDirectoryPath = identifierDirectory;
             final File f = new File(identifierDirectoryPath);
