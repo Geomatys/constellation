@@ -21,9 +21,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -40,6 +40,7 @@ import org.geotoolkit.xml.MarshallerPool;
  * @author Guilhem Legal (Geomatys)
  */
 @Provider
+@Produces("application/xml,text/xml,*/*")
 public class CapabilitiesWriter<T extends Capabilities> implements MessageBodyWriter<T> {
 
     private static final Logger LOGGER = Logger.getLogger("org.constellation.wfs.ws.rs");
