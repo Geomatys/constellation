@@ -670,6 +670,7 @@ public class WMSService extends GridWebService {
     @Override
     public void destroy() {
         LOGGER.info("Shutting down the REST WMS service facade.");
+        worker.destroy();
     }
 }
 

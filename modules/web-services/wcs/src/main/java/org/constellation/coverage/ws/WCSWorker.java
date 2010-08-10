@@ -18,7 +18,6 @@ package org.constellation.coverage.ws;
 
 // J2SE dependencies
 import java.awt.Color;
-import org.geotoolkit.wcs.xml.v111.InterpolationMethodType;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -109,6 +108,7 @@ import org.geotoolkit.wcs.xml.v111.CoverageDescriptions;
 import org.geotoolkit.wcs.xml.v111.CoverageDomainType;
 import org.geotoolkit.wcs.xml.v111.CoverageSummaryType;
 import org.geotoolkit.wcs.xml.v111.FieldType;
+import org.geotoolkit.wcs.xml.v111.InterpolationMethodType;
 import org.geotoolkit.wcs.xml.v111.InterpolationMethods;
 import org.geotoolkit.wcs.xml.v111.RangeType;
 import org.geotoolkit.xml.MarshallerPool;
@@ -169,6 +169,12 @@ public final class WCSWorker extends AbstractWorker {
             SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.BICUBIC);
             SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.NEAREST_NEIGHBOR);
     }
+
+    /**
+     * Output responses of a GetCapabilities request.
+     */
+    private static final Map<String,GetCapabilitiesResponse> capsResponses =
+            new HashMap<String,GetCapabilitiesResponse>();
 
     /**
      * Initializes the marshaller pool for the WCS.
@@ -508,13 +514,17 @@ public final class WCSWorker extends AbstractWorker {
             version = "1.0.0";
         }
 
-        //this.actingVersion = new ServiceVersion(ServiceType.WCS, version);
-        final String format;
+        // If the getCapabilities response is in cache, we just return it.
+        if (capsResponses.containsKey(version)) {
+            return capsResponses.get(version);
+        }
 
+        final String format;
+        final GetCapabilitiesResponse response;
         if (version.equals(ServiceDef.WCS_1_0_0.version.toString()) &&
             request instanceof org.geotoolkit.wcs.xml.v100.GetCapabilitiesType)
         {
-            return getCapabilities100((org.geotoolkit.wcs.xml.v100.GetCapabilitiesType) request);
+            response = getCapabilities100((org.geotoolkit.wcs.xml.v100.GetCapabilitiesType) request);
         } else if (version.equals(ServiceDef.WCS_1_1_1.version.toString()) &&
                    request instanceof org.geotoolkit.wcs.xml.v111.GetCapabilitiesType)
         {
@@ -531,11 +541,14 @@ public final class WCSWorker extends AbstractWorker {
                 }
             }
 
-            return getCapabilities111((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType) request);
+            response = getCapabilities111((org.geotoolkit.wcs.xml.v111.GetCapabilitiesType) request);
         } else {
             throw new CstlServiceException("The version number specified for this request " +
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
+
+        capsResponses.put(version, response);
+        return response;
     }
 
     /**
@@ -1112,6 +1125,16 @@ public final class WCSWorker extends AbstractWorker {
                    postMethod.getOnlineResource().setHref(getUriContext().getBaseUri().toString() + "wcs?SERVICE=WCS&");
                }
            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroy() {
+        if (!capsResponses.isEmpty()) {
+            capsResponses.clear();
         }
     }
 }

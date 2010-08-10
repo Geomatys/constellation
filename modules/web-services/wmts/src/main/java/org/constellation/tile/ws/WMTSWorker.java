@@ -20,10 +20,10 @@ package org.constellation.tile.ws;
 import java.awt.image.BufferedImage;
 
 //Constellation dependencies
-import java.awt.image.RenderedImage;
 import java.io.File;
 
 import org.constellation.ws.CstlServiceException;
+import org.constellation.ws.Worker;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
@@ -40,7 +40,7 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
  * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
-public interface WMTSWorker {
+public interface WMTSWorker extends Worker {
 
     /**
      * Returns an unmarshalled {@linkplain Capabilities get capabilities} object.
@@ -66,7 +66,7 @@ public interface WMTSWorker {
      */
     File getTile(final GetTile getTile) throws CstlServiceException;
 
-    public void setServiceURL(String serviceURL);
+    void setServiceURL(String serviceURL);
 
-    public void setSkeletonCapabilities(final Capabilities skeletonCapabilities);
+    void setSkeletonCapabilities(final Capabilities skeletonCapabilities);
 }

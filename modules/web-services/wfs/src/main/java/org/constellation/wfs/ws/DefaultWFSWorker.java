@@ -1044,4 +1044,11 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
        this.namespaceMapping = namespaceMapping;
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    public void destroy() {
+    }
+
 }

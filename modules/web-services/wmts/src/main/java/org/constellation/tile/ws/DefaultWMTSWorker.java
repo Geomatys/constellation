@@ -781,4 +781,11 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         }
         return style;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroy() {
+    }
 }

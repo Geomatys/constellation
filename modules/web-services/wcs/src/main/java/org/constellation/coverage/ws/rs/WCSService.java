@@ -748,5 +748,6 @@ public class WCSService extends GridWebService {
     @Override
     public void destroy() {
         LOGGER.info("Shutting down the REST WCS service facade");
+        worker.destroy();
     }
 }

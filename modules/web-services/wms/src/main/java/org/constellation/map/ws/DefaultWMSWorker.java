@@ -128,6 +128,12 @@ import static org.constellation.query.wms.WMSQuery.*;
  */
 public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
     /**
+     * Output responses of a GetCapabilities request.
+     */
+    private static final Map<String,AbstractWMSCapabilities> capsResponses =
+            new HashMap<String,AbstractWMSCapabilities>();
+
+    /**
      * Initializes the marshaller pool for the WMS.
      */
     public DefaultWMSWorker(final MarshallerPool marshallerPool) {
@@ -169,8 +175,10 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
      */
     @Override
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab) throws CstlServiceException {
-
         final String queryVersion = getCapab.getVersion().toString();
+        if (capsResponses.containsKey(queryVersion)) {
+            return capsResponses.get(queryVersion);
+        }
 
         //Add accepted CRS codes
         final List<String> crs = new ArrayList<String>();
@@ -494,6 +502,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                     new EXGeographicBoundingBox(-180.0, -90.0, 180.0, 90.0), layers);
 
         inCapabilities.getCapability().setLayer(mainLayer);
+        capsResponses.put(queryVersion, inCapabilities);
         return inCapabilities;
     }
 
@@ -934,5 +943,15 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             styles.add(style);
         }
         return styles;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void destroy() {
+        if (!capsResponses.isEmpty()) {
+            capsResponses.clear();
+        }
     }
 }

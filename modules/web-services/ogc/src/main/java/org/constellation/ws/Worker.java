@@ -29,6 +29,10 @@ import javax.ws.rs.core.UriInfo;
  * @author Johann Sorel (Geomatys)
  */
 public interface Worker {
+    /**
+     * Destroy the worker and free the resources.
+     */
+    void destroy();
 
     /**
      * Initialize the {@see #uriContext} information.
