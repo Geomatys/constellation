@@ -41,8 +41,6 @@ import org.constellation.ServiceDef;
 import org.constellation.coverage.ws.WCSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.ServiceExceptionReport;
-import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.rs.GridWebService;
 import static org.constellation.query.wcs.WCSQuery.*;
 
@@ -69,6 +67,8 @@ import org.geotoolkit.wcs.xml.GetCapabilitiesResponse;
 import org.geotoolkit.wcs.xml.GetCoverage;
 import org.geotoolkit.wcs.xml.v111.GridCrsType;
 import org.geotoolkit.wcs.xml.v111.RangeSubsetType.FieldSubset;
+import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
+import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -111,7 +111,7 @@ public class WCSService extends GridWebService {
 
         setFullRequestLog(true);
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        setXMLContext("org.constellation.ws:" +
+        setXMLContext("org.geotoolkit.ogc.xml.exception:" +
                       "org.geotoolkit.ows.xml.v100:" +
                       "org.geotoolkit.wcs.xml.v100:" +
                       "org.geotoolkit.wcs.xml.v111:" +
@@ -119,7 +119,7 @@ public class WCSService extends GridWebService {
                       "org.geotoolkit.internal.jaxb.geometry",
                       "");
 
-        worker = new WCSWorker(getMarshallerPool());
+        worker = new WCSWorker();
         LOGGER.info("WCS service running");
     }
 

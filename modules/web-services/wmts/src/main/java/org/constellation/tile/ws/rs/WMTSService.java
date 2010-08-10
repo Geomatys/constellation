@@ -83,7 +83,7 @@ public class WMTSService extends GridWebService {
                           "org.geotoolkit.gml.xml.v311:"  +
                           "org.geotoolkit.internal.jaxb.geometry",
                           "http://www.opengis.net/wmts");
-            worker = new DefaultWMTSWorker(getMarshallerPool());
+            worker = new DefaultWMTSWorker();
 
         } catch (JAXBException ex){
             LOGGER.severe("The WMTS service is not running.\n"      +

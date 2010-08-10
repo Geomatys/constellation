@@ -66,6 +66,7 @@ import org.geotoolkit.ogc.xml.v110.SortPropertyType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.v110.AllSomeType;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
 import org.geotoolkit.wfs.xml.v110.DescribeFeatureTypeType;
@@ -85,6 +86,7 @@ import org.geotoolkit.wfs.xml.v110.WFSCapabilitiesType;
 import org.geotoolkit.xml.DomCompare;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.Schema;
+import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -103,13 +105,9 @@ public class WFSWorkerTest {
     private static WFSWorker worker ;
     static {
         try {
-            pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110" +
-            		  ":org.geotoolkit.ogc.xml.v110" +
-            		  ":org.geotoolkit.gml.xml.v311" +
-                          ":org.geotoolkit.xsd.xml.v2001"+
-                          ":org.geotoolkit.internal.jaxb.geometry");
+            pool = WFSMarshallerPool.getInstance();
 
-            worker = new DefaultWFSWorker(pool);
+            worker = new DefaultWFSWorker();
             worker.setLogLevel(Level.FINER);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -253,6 +251,7 @@ public class WFSWorkerTest {
                 FileUtilities.getFileFromResource("org.constellation.wfs.xml.WFSCapabilities1-1-0-sp.xml"),
                 sw.toString());
 
+        pool.release(marshaller);
     }
 
      /**
@@ -652,7 +651,7 @@ public class WFSWorkerTest {
      */
     @Test
     public void DescribeFeatureTest() throws Exception {
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Unmarshaller unmarshaller = XSDMarshallerPool.getInstance().acquireUnmarshaller();
 
         /**
          * Test 1 : describe Feature type bridges
@@ -692,6 +691,8 @@ public class WFSWorkerTest {
         ExpResult = (Schema) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/wfs/xsd/system.xsd"));
 
         assertEquals(ExpResult, result);
+
+        XSDMarshallerPool.getInstance().release(unmarshaller);
     }
 
     /**

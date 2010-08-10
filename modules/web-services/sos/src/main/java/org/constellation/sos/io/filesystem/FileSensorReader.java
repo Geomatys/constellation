@@ -55,14 +55,11 @@ public class FileSensorReader implements SensorReader {
     private File dataDirectory;
     
     public FileSensorReader(Automatic configuration) throws MetadataIoException  {
-        try {
-            //we initialize the unmarshaller
-            marshallerPool = SensorMLMarshallerPool.getInstance();
-
-            this.dataDirectory  = configuration.getDataDirectory();
-        } catch (JAXBException ex) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, ex.getMessage(), ex);
-            throw new MetadataIoException("JAXBException while starting the file system Sensor reader", ex, NO_APPLICABLE_CODE);
+        //we initialize the unmarshaller
+        marshallerPool = SensorMLMarshallerPool.getInstance();
+        dataDirectory  = configuration.getDataDirectory();
+        if (marshallerPool == null) {
+            throw new MetadataIoException("JAXBException while starting the file system Sensor reader", NO_APPLICABLE_CODE);
         } 
     }
 

@@ -41,6 +41,7 @@ import org.geotoolkit.gml.xml.v311.PointPropertyType;
 import org.geotoolkit.gml.xml.v311.PointType;
 import org.geotoolkit.ogc.xml.v110.EqualsType;
 import org.geotoolkit.ogc.xml.v110.FilterType;
+import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
@@ -56,28 +57,10 @@ import static org.junit.Assert.*;
  */
 public class WFSCIteWorkerTest {
 
-    private static MarshallerPool pool;
+    private static final WFSWorker worker;
     static {
-        try {
-            pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110" +
-            		  ":org.geotoolkit.ogc.xml.v110"  +
-            		  ":org.geotoolkit.gml.xml.v311"  +
-                          ":org.geotoolkit.xsd.xml.v2001" +
-                          ":org.geotoolkit.internal.jaxb.geometry");
-        } catch (Exception ex) {
-
-        }
-
-    }
-    private static WFSWorker worker ;
-    static {
-        try {
-
-            worker = new DefaultWFSWorker(pool);
-            worker.setLogLevel(Level.FINER);
-        } catch (Exception ex) {
-
-        }
+        worker = new DefaultWFSWorker();
+        worker.setLogLevel(Level.FINER);
     }
 
     private XmlFeatureWriter featureWriter;

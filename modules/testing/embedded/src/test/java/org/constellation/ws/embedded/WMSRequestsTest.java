@@ -17,7 +17,6 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
-import org.geotoolkit.feature.DefaultName;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,7 +33,6 @@ import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.register.RegisterException;
 import org.constellation.test.ImageTesting;
-import org.constellation.ws.ServiceExceptionReport;
 
 // Geotoolkit dependencies
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
@@ -44,6 +42,8 @@ import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v111.Layer;
 import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
+import org.geotoolkit.feature.DefaultName;
 
 // JUnit dependencies
 import org.junit.*;
@@ -106,7 +106,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             layers = null;
             assumeNoException(ex);
         }
-        pool = new MarshallerPool("org.constellation.ws:" +
+        pool = new MarshallerPool("org.geotoolkit.ogc.xml.exception:" +
                                   "org.geotoolkit.wms.xml.v111:" +
                                   "org.geotoolkit.sld.xml.v110:" +
                                   "org.geotoolkit.internal.jaxb.geometry");

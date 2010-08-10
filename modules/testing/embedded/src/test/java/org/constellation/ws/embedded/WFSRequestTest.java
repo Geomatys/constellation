@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.constellation.util.Util;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
+import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
 import org.geotoolkit.wfs.xml.v110.InsertResultsType;
 import org.geotoolkit.wfs.xml.v110.InsertedFeatureType;
@@ -64,11 +66,7 @@ public class WFSRequestTest {
     @BeforeClass
     public static void initLayerList() throws JAXBException {
         // Get the list of layers
-        pool = new MarshallerPool("org.constellation.ws:" +
-                                  "org.geotoolkit.wfs.xml.v110:" +
-                                  "org.geotoolkit.ows.xml.v100:" +
-                                  "org.geotoolkit.gml.xml.v311:" +
-                                  "org.geotoolkit.internal.jaxb.geometry");
+        pool = WFSMarshallerPool.getInstance();
     }
 
     @AfterClass
@@ -91,16 +89,8 @@ public class WFSRequestTest {
         URLConnection conec = getCapsUrl.openConnection();
 
         postRequestFile(conec, "org/constellation/xml/Insert-SamplingPoint-1.xml");
+        Object obj = unmarshallResponse(conec);
         
-        // Try to unmarshall something from the response returned by the server.
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object obj = unmarshaller.unmarshal(conec.getInputStream());
-        
-        pool.release(unmarshaller);
-
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement) obj).getValue();
-        }
         assertTrue(obj instanceof TransactionResponseType);
 
         TransactionResponseType result = (TransactionResponseType) obj;
@@ -126,34 +116,8 @@ public class WFSRequestTest {
         conec = getCapsUrl.openConnection();
 
         postRequestObject(conec, request);
-
-        // Try to unmarshall something from the response returned by the server.
-        
-        StringWriter sw     = new StringWriter();
-        BufferedReader in   = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
-        char [] buffer = new char[1024];
-        int size;
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-
-        String xmlResult    = sw.toString();
-        xmlResult = removeXmlns(xmlResult);
-        xmlResult = xmlResult.replaceAll("xsi:schemaLocation=\"[^\"]*\" ", "");
-        
-        sw     = new StringWriter();
-        in     = new BufferedReader(new InputStreamReader(Util.getResourceAsStream("org/constellation/xml/samplingPointCollection-1.xml"), "UTF-8"));
-        buffer = new char[1024];
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-        String xmlExpResult = sw.toString();
-        
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-        xmlExpResult = removeXmlns(xmlExpResult);
+        String xmlResult    = getStringResponse(conec);
+        String xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-1.xml");
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -163,14 +127,8 @@ public class WFSRequestTest {
         postRequestFile(conec, "org/constellation/xml/Insert-SamplingPoint-2.xml");
 
         // Try to unmarshall something from the response returned by the server.
-        unmarshaller = pool.acquireUnmarshaller();
-        obj          = unmarshaller.unmarshal(conec.getInputStream());
-        in.close();
-        pool.release(unmarshaller);
-
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement) obj).getValue();
-        }
+        obj = unmarshallResponse(conec);
+        
         assertTrue(obj instanceof TransactionResponseType);
 
         result = (TransactionResponseType) obj;
@@ -197,31 +155,9 @@ public class WFSRequestTest {
         postRequestObject(conec, request);
 
         // Try to unmarshall something from the response returned by the server.
-
-        sw     = new StringWriter();
-        in     = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
-        buffer = new char[1024];
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-
-        xmlResult    = sw.toString();
-        xmlResult = removeXmlns(xmlResult);
-        xmlResult = xmlResult.replaceAll("xsi:schemaLocation=\"[^\"]*\" ", "");
-
-        sw     = new StringWriter();
-        in     = new BufferedReader(new InputStreamReader(Util.getResourceAsStream("org/constellation/xml/samplingPointCollection-2.xml"), "UTF-8"));
-        buffer = new char[1024];
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-        xmlExpResult = sw.toString();
-
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-        xmlExpResult = removeXmlns(xmlExpResult);
+        xmlResult    = getStringResponse(conec);
+        
+        xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-2.xml");
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -232,14 +168,8 @@ public class WFSRequestTest {
         postRequestFile(conec, "org/constellation/xml/Insert-SamplingPoint-3.xml");
         
         // Try to unmarshall something from the response returned by the server.
-        unmarshaller = pool.acquireUnmarshaller();
-        obj          = unmarshaller.unmarshal(conec.getInputStream());
-        in.close();
-        pool.release(unmarshaller);
+        obj = unmarshallResponse(conec);
 
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement) obj).getValue();
-        }
         assertTrue(obj instanceof TransactionResponseType);
 
         result = (TransactionResponseType) obj;
@@ -266,31 +196,9 @@ public class WFSRequestTest {
         postRequestObject(conec, request);
         
         // Try to unmarshall something from the response returned by the server.
+        xmlResult    = getStringResponse(conec);
 
-        sw     = new StringWriter();
-        in     = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
-        buffer = new char[1024];
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-
-        xmlResult    = sw.toString();
-        xmlResult = removeXmlns(xmlResult);
-        xmlResult = xmlResult.replaceAll("xsi:schemaLocation=\"[^\"]*\" ", "");
-
-        sw     = new StringWriter();
-        in     = new BufferedReader(new InputStreamReader(Util.getResourceAsStream("org/constellation/xml/samplingPointCollection-3.xml"), "UTF-8"));
-        buffer = new char[1024];
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-        xmlExpResult = sw.toString();
-
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-        xmlExpResult = removeXmlns(xmlExpResult);
+        xmlExpResult = getStringFromFile("org/constellation/xml/samplingPointCollection-3.xml");
 
         assertEquals(xmlExpResult, xmlResult);
 
@@ -308,13 +216,8 @@ public class WFSRequestTest {
         postRequestFile(conec, "org/constellation/xml/Update-NamedPlaces-1.xml");
         
         // Try to unmarshall something from the response returned by the server.
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object obj          = unmarshaller.unmarshal(conec.getInputStream());
-        pool.release(unmarshaller);
+        Object obj = unmarshallResponse(conec);
 
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement) obj).getValue();
-        }
         assertTrue(obj instanceof TransactionResponseType);
 
         TransactionResponseType result = (TransactionResponseType) obj;
@@ -338,32 +241,8 @@ public class WFSRequestTest {
         postRequestObject(conec, request);
 
         // Try to unmarshall something from the response returned by the server.
-
-        StringWriter sw     = new StringWriter();
-        BufferedReader in     = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
-        char[] buffer = new char[1024];
-        int size;
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-
-        String xmlResult    = sw.toString();
-        xmlResult = removeXmlns(xmlResult);
-        xmlResult = xmlResult.replaceAll("xsi:schemaLocation=\"[^\"]*\" ", "");
-
-        sw     = new StringWriter();
-        in     = new BufferedReader(new InputStreamReader(Util.getResourceAsStream("org/constellation/xml/namedPlacesCollection-1.xml"), "UTF-8"));
-        buffer = new char[1024];
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-        String xmlExpResult = sw.toString();
-
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-        xmlExpResult = removeXmlns(xmlExpResult);
+        String xmlResult    = getStringResponse(conec);
+        String xmlExpResult = getStringFromFile("org/constellation/xml/namedPlacesCollection-1.xml");
 
         assertEquals(xmlExpResult, xmlResult);
     }
@@ -406,5 +285,51 @@ public class WFSRequestTest {
 
         wr.write(sw.toString());
         wr.flush();
+    }
+
+    public Object unmarshallResponse(URLConnection conec) throws JAXBException, IOException {
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object obj = unmarshaller.unmarshal(conec.getInputStream());
+
+        pool.release(unmarshaller);
+
+        if (obj instanceof JAXBElement) {
+            obj = ((JAXBElement) obj).getValue();
+        }
+        return obj;
+    }
+
+    public String getStringResponse(URLConnection conec) throws UnsupportedEncodingException, IOException {
+        // Try to unmarshall something from the response returned by the server.
+        final StringWriter sw     = new StringWriter();
+        final BufferedReader in   = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
+        char [] buffer = new char[1024];
+        int size;
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+        String xmlResult = sw.toString();
+        xmlResult = removeXmlns(xmlResult);
+        xmlResult = xmlResult.replaceAll("xsi:schemaLocation=\"[^\"]*\" ", "");
+        return xmlResult;
+    }
+
+    public String getStringFromFile(String filePath) throws UnsupportedEncodingException, IOException {
+        final StringWriter sw     = new StringWriter();
+        final BufferedReader in   = new BufferedReader(new InputStreamReader(Util.getResourceAsStream(filePath), "UTF-8"));
+        char [] buffer = new char[1024];
+        int size;
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+        String xmlExpResult = sw.toString();
+
+        //we unformat the expected result
+        xmlExpResult = xmlExpResult.replace("\n", "");
+        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
+        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
+        xmlExpResult = removeXmlns(xmlExpResult);
+
+        return xmlExpResult;
     }
 }

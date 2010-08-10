@@ -56,11 +56,6 @@ public abstract class AbstractWorker implements Worker {
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.ws");
 
     /**
-     * The web service unmarshaller, which will use the web service name space.
-     */
-    protected final MarshallerPool marshallerPool;
-    
-    /**
      * Contains information about the HTTP exchange of the request, for instance, 
      * the HTTP headers.
      */
@@ -89,8 +84,7 @@ public abstract class AbstractWorker implements Worker {
      */
     private final Map<String,Object> capabilities = new HashMap<String,Object>();
 
-    public AbstractWorker(final MarshallerPool marshallerPool) {
-        this.marshallerPool = marshallerPool;
+    public AbstractWorker() {
     }
     
     /**
@@ -174,7 +168,7 @@ public abstract class AbstractWorker implements Worker {
             final File f = getFile(fileName, home);
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                unmarshaller = getMarshallerPool().acquireUnmarshaller();
                 // If the file is not present in the configuration directory, take the one in resource.
                 if (!f.exists()) {
                     final InputStream in = getClass().getResourceAsStream(fileName);
@@ -192,7 +186,7 @@ public abstract class AbstractWorker implements Worker {
 
             } finally {
                 if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
+                    getMarshallerPool().release(unmarshaller);
                 }
             }
 
@@ -246,4 +240,6 @@ public abstract class AbstractWorker implements Worker {
             return new File(path, fileName);
          else return path;
     }
+
+    protected abstract MarshallerPool getMarshallerPool();
 }

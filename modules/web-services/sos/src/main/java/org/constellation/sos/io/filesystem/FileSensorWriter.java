@@ -66,11 +66,10 @@ public class FileSensorWriter implements SensorWriter {
         if (configuration.getDataDirectory() == null) {
             throw new MetadataIoException("The sensor data directory is null", NO_APPLICABLE_CODE);
         }
-        this.dataDirectory = configuration.getDataDirectory();
-        try {
-            marshallerPool =  SensorMLMarshallerPool.getInstance();
-        } catch (JAXBException ex) {
-            throw new MetadataIoException("Unable to initialize the fileSensorWriter JAXB context", ex, NO_APPLICABLE_CODE);
+        this.dataDirectory  = configuration.getDataDirectory();
+        this.marshallerPool =  SensorMLMarshallerPool.getInstance();
+        if (marshallerPool == null) {
+            throw new MetadataIoException("Unable to initialize the fileSensorWriter JAXB context", NO_APPLICABLE_CODE);
         }
 
     }

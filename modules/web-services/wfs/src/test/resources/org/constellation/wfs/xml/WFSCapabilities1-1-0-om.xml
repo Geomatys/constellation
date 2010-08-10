@@ -5,8 +5,7 @@
     xmlns:ogc="http://www.opengis.net/ogc"
     xmlns:gml="http://www.opengis.net/gml"
     xmlns:xlink="http://www.w3.org/1999/xlink"
-    xmlns:ins="http://www.inspire.org"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    xmlns:ins="http://www.inspire.org">
     <ows:OperationsMetadata>
         <ows:Operation name="GetCapabilities">
             <ows:DCP>

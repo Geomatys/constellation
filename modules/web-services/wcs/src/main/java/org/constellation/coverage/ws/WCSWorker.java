@@ -77,6 +77,7 @@ import org.geotoolkit.resources.Errors;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.wcs.xml.WCSMarshallerPool;
 import org.geotoolkit.wcs.xml.DescribeCoverage;
 import org.geotoolkit.wcs.xml.DescribeCoverageResponse;
 import org.geotoolkit.wcs.xml.GetCoverage;
@@ -179,8 +180,13 @@ public final class WCSWorker extends AbstractWorker {
     /**
      * Initializes the marshaller pool for the WCS.
      */
-    public WCSWorker(final MarshallerPool marshallerPool) {
-        super(marshallerPool);
+    public WCSWorker() {
+        super();
+    }
+
+    @Override
+    protected MarshallerPool getMarshallerPool() {
+        return WCSMarshallerPool.getInstance();
     }
 
     /**

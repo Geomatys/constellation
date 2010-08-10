@@ -88,6 +88,7 @@ import org.geotoolkit.storage.DataStoreException;
 
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.OGCWebService;
+import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
@@ -153,11 +154,14 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
     /**
      * Instanciates the working class for a SOAP client, that do request on a SOAP PEP service.
      */
-    public DefaultWMTSWorker(final MarshallerPool marshallerPool) {
-        super(marshallerPool);
+    public DefaultWMTSWorker() {
         LOGGER.info("WMTS Service started");
     }
 
+    @Override
+    protected MarshallerPool getMarshallerPool() {
+        return WMTSMarshallerPool.getInstance();
+    }
     /**
      * {@inheritDoc}
      */

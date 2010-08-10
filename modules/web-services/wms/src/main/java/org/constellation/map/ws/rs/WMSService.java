@@ -59,8 +59,6 @@ import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.util.TimeParser;
 import org.constellation.writer.CapabilitiesFilterWriter;
 import org.constellation.writer.ExceptionFilterWriter;
-import org.constellation.ws.ServiceExceptionReport;
-import org.constellation.ws.ServiceExceptionType;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
@@ -76,6 +74,8 @@ import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
+import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
+import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
 import org.geotoolkit.xml.MarshallerPool;
 
 //Geoapi dependencies
@@ -112,14 +112,14 @@ public class WMSService extends GridWebService {
         super(ServiceDef.WMS_1_3_0_SLD, ServiceDef.WMS_1_1_1_SLD);
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        setXMLContext("org.constellation.ws:" +
+        setXMLContext("org.geotoolkit.ogc.xml.exception:" +
                       "org.geotoolkit.wms.xml.v111:" +
                       "org.geotoolkit.wms.xml.v130:" +
                       "org.geotoolkit.sld.xml.v110:" +
                       "org.geotoolkit.internal.jaxb.geometry",
                       "");
 
-        worker = new DefaultWMSWorker(getMarshallerPool());
+        worker = new DefaultWMSWorker();
         setFullRequestLog(true);
         LOGGER.info("WMS service running");
     }
@@ -322,7 +322,7 @@ public class WMSService extends GridWebService {
          */
         final MarshallerPool poolException = new MarshallerPool(
                 Collections.singletonMap(MarshallerPool.ROOT_NAMESPACE_KEY, "http://www.opengis.net/ogc"),
-                "org.constellation.ws");
+                "org.geotoolkit.ogc.xml.exception");
         final Marshaller marsh = poolException.acquireMarshaller();
         try {
             if (serviceDef.equals(ServiceDef.WMS_1_1_1_SLD) || serviceDef.equals(ServiceDef.WMS_1_1_1)) {

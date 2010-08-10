@@ -112,10 +112,6 @@ public class WCSWorkerOutputTest extends WCSWorkerInit {
         assertNotNull(response);
         assertTrue(response instanceof CoverageDescription);
 
-//        final Marshaller marshaller = POOL.acquireMarshaller();
-//        marshaller.marshal(response, System.out);
-//        POOL.release(marshaller);
-
         final CoverageDescription descCov = (CoverageDescription) response;
         // Verifies that the test layer is present into the DescribeCoverage response.
         for (CoverageOfferingType offering : descCov.getCoverageOffering()) {

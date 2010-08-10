@@ -128,10 +128,9 @@ public class WFSService extends OGCWebService {
             		  ":org.geotoolkit.gml.xml.v311"  +
                           ":org.geotoolkit.xsd.xml.v2001" +
                           ":org.geotoolkit.sampling.xml.v100" +
-                          ":org.constellation.ws" +
-                          ":org.geotoolkit.internal.jaxb.geometry"
+                         ":org.geotoolkit.internal.jaxb.geometry"
                           , "");
-            candidate       = new DefaultWFSWorker(getMarshallerPool());
+            candidate       = new DefaultWFSWorker();
 
         } catch (JAXBException ex){
             LOGGER.warning("The WFS service is not running."       + '\n' +

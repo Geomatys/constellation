@@ -94,6 +94,7 @@ import org.geotoolkit.wfs.xml.v110.PropertyType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.geotoolkit.wfs.xml.v110.UpdateElementType;
+import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // GeoAPI dependencies
@@ -148,8 +149,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
      */
     private String outputFormat = "text/xml";
 
-    public DefaultWFSWorker(final MarshallerPool marshallerPool) {
-        super(marshallerPool);
+    public DefaultWFSWorker() {
 
         //todo wait for martin fix
         standardCRS.add("urn:x-ogc:def:crs:EPSG:7.01:4326");
@@ -164,6 +164,10 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 //        }
 
 
+    }
+
+    protected MarshallerPool getMarshallerPool() {
+        return WFSMarshallerPool.getInstance();
     }
 
     /**

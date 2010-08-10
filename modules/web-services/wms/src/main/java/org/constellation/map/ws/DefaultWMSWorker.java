@@ -17,6 +17,7 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
+import java.util.logging.Logger;
 import org.geotoolkit.factory.Hints;
 import org.opengis.feature.type.Name;
 import java.awt.Color;
@@ -136,8 +137,22 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
     /**
      * Initializes the marshaller pool for the WMS.
      */
-    public DefaultWMSWorker(final MarshallerPool marshallerPool) {
-        super(marshallerPool);
+    public DefaultWMSWorker() {
+        super();
+    }
+
+    @Override
+    protected MarshallerPool getMarshallerPool() {
+        try {
+            return new MarshallerPool("org.geotoolkit.ogc.xml.exception:" +
+                                      "org.geotoolkit.wms.xml.v111:" +
+                                      "org.geotoolkit.wms.xml.v130:" +
+                                      "org.geotoolkit.sld.xml.v110:" +
+                                      "org.geotoolkit.internal.jaxb.geometry");
+        } catch (JAXBException ex) {
+            Logger.getLogger(DefaultWMSWorker.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
     }
 
     /**

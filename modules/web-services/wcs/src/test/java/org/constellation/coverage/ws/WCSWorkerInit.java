@@ -65,22 +65,13 @@ public class WCSWorkerInit extends CoverageSQLTestCase {
 
     protected static WCSWorker WORKER;
 
-    protected static MarshallerPool POOL;
-
     /**
      * Initialisation of the worker and the PostGRID data provider before launching
      * the different tests.
      */
     @BeforeClass
     public static void setUpClass() throws Exception {
-        POOL = new AnchoredMarshallerPool("",
-                    "org.constellation.ws:" +
-                    "org.geotoolkit.ows.xml.v100:" +
-                    "org.geotoolkit.wcs.xml.v100:" +
-                    "org.geotoolkit.wcs.xml.v111:" +
-                    "org.geotoolkit.gml.xml.v311:" +
-                    "org.geotoolkit.internal.jaxb.geometry");
-        WORKER = new WCSWorker(POOL);
+        WORKER = new WCSWorker();
         // Default instanciation of the worker' servlet context and uri context.
         WORKER.initServletContext(new ServletContextImpl());
         WORKER.initUriContext(new WebApplicationContext(
