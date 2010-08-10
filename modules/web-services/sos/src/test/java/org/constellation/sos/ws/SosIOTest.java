@@ -38,6 +38,7 @@ import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.sos.xml.v100.EventTime;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
@@ -65,7 +66,7 @@ import static org.junit.Assert.*;
  */
 public class SosIOTest {
 
-    private Logger logger = Logger.getLogger("org.constellation.sos.ws");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.ws");
 
 
     private SOSworker defaultWorker;
@@ -78,7 +79,7 @@ public class SosIOTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-         marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.ows.xml.v110:org.geotoolkit.internal.jaxb.geometry");
+         marshallerPool = SOSMarshallerPool.getInstance();
     }
 
     @AfterClass
@@ -172,7 +173,7 @@ public class SosIOTest {
             marshallerPool.release(marshaller);
             
         } else {
-            logger.info("configuration files missing skipping test");
+            LOGGER.info("configuration files missing skipping test");
         }
 
     }
@@ -265,7 +266,7 @@ public class SosIOTest {
             assertEquals(expResult4, result4);
 
         } else {
-            logger.info("configuration files missing skipping test");
+            LOGGER.info("configuration files missing skipping test");
         }
     }
 
@@ -309,7 +310,7 @@ public class SosIOTest {
             assertEquals(expResult2, result2);
 
         } else {
-            logger.info("configuration files missing skipping test");
+            LOGGER.info("configuration files missing skipping test");
         }
     }
 }

@@ -44,8 +44,8 @@ import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.observation.xml.v100.ProcessEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
-import org.geotoolkit.xml.MarshallerPool;
 
 /**
  *
@@ -56,8 +56,6 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
     private File observationDirectory;
 
     private File observationTemplateDirectory;
-
-    private MarshallerPool marshallerPool;
 
     private boolean template = false;
 
@@ -82,11 +80,6 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
         } else {
             throw new IndexingException("The data directory does not exist: ");
         }
-        try {
-            marshallerPool = new MarshallerPool("org.geotoolkit.observation.xml.v100:org.geotoolkit.sampling.xml.v100:org.geotoolkit.internal.jaxb.geometry");
-        } catch(JAXBException ex) {
-            throw new IndexingException("JAXB exception while initializing the file observation reader", ex);
-        }
         if (create)
             createIndex();
 
@@ -105,7 +98,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
         int nbTemplate    = 0;
         Unmarshaller unmarshaller = null;
         try {
-            unmarshaller = marshallerPool.acquireUnmarshaller();
+            unmarshaller = SOSMarshallerPool.getInstance().acquireUnmarshaller();
             writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
 
             // getting the objects list and index avery item in the IndexWriter.
@@ -155,7 +148,7 @@ public class LuceneObservationIndexer extends AbstractIndexer<ObservationEntry> 
             LOGGER.severe("JAXB Exception while indexing: " + msg);
             throw new IndexingException("JAXBException while indexing documents.", ex);
         } finally {
-            if (unmarshaller != null) marshallerPool.release(unmarshaller);
+            if (unmarshaller != null) SOSMarshallerPool.getInstance().release(unmarshaller);
         }
 
         LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms\nObservations indexed: "

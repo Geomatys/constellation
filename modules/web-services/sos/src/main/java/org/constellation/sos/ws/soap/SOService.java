@@ -53,8 +53,8 @@ import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.constellation.sos.ws.SOSworker;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.xml.MarshallerPool;
 
 
 /**
@@ -85,20 +85,10 @@ public class SOService {
     private SOSworker worker;
     
     /**
-     * A JAXB unmarshaller used to create java object from XML file.
-     */
-    private MarshallerPool marshallerPool;
-    
-    /**
      * Initialize the database connection.
      */
     public SOService() throws CstlServiceException {
        worker                      = new SOSworker(null);
-        try {
-            marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.observation.xml.v100");
-        } catch (JAXBException ex) {
-           LOGGER.log(Level.SEVERE, "unable to create the JAXBContext", ex);
-        }
 
        //TODO find real url
        worker.setServiceURL("http://localhost:8080/SOServer/SOService");
@@ -233,11 +223,11 @@ public class SOService {
                 return FileUtilities.getDirectoryFromResource(configUrl);
             }
             try {
-                final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+                final Unmarshaller unmarshaller = SOSMarshallerPool.getInstance().acquireUnmarshaller();
                 final File f                    = new File(configDir, fileName);
                 LOGGER.info(f.toString());
                 response                        = unmarshaller.unmarshal(f);
-                marshallerPool.release(unmarshaller);
+                SOSMarshallerPool.getInstance().release(unmarshaller);
             } catch(JAXBException ex) {
                 LOGGER.log(Level.SEVERE, "unable to unmarshall the capabilities file", ex);
             }

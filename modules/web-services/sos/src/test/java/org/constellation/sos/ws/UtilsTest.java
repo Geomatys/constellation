@@ -17,6 +17,7 @@
 
 package org.constellation.sos.ws;
 
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,12 +58,7 @@ public class UtilsTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:"
-                                       + "org.geotoolkit.observation.xml.v100:"
-                                       + "org.geotoolkit.sml.xml.v100:"
-                                       + "org.geotoolkit.sampling.xml.v100:"
-                                       + "org.geotoolkit.swe.xml.v101:"
-                                       + "org.geotoolkit.internal.jaxb.geometry");
+        marshallerPool = SensorMLMarshallerPool.getInstance();
     }
 
     @AfterClass

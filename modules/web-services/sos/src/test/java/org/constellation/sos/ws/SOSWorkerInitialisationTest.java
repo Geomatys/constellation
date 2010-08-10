@@ -31,7 +31,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // JUnit dependencies
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -53,10 +53,9 @@ public class SOSWorkerInitialisationTest {
             configurationDirectory.mkdir();
         }
 
-        MarshallerPool pool       = new MarshallerPool("org.geotoolkit.sos.xml.v100:org.geotoolkit.internal.jaxb.geometry");
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Unmarshaller unmarshaller = SOSMarshallerPool.getInstance().acquireUnmarshaller();
         skeletonCapabilities      = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
-        pool.release(unmarshaller);
+        SOSMarshallerPool.getInstance().release(unmarshaller);
     }
 
     @AfterClass

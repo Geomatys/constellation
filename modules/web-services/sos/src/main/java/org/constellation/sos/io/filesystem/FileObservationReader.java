@@ -17,6 +17,7 @@
 
 package org.constellation.sos.io.filesystem;
 
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,14 +88,9 @@ public class FileObservationReader implements ObservationReader {
         } else {
             throw new CstlServiceException("There is no data Directory", NO_APPLICABLE_CODE);
         }
-        try {
-            marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:" +
-                                                "org.geotoolkit.observation.xml.v100:" +
-                                                "org.geotoolkit.sampling.xml.v100:" +
-                                                "org.geotoolkit.swe.xml.v101:" +
-                                                "org.geotoolkit.internal.jaxb.geometry");
-        } catch(JAXBException ex) {
-            throw new CstlServiceException("JAXB exception while initializing the file observation reader", ex, NO_APPLICABLE_CODE);
+        this.marshallerPool = SOSMarshallerPool.getInstance();
+        if (marshallerPool == null) {
+            throw new CstlServiceException("JAXB exception while initializing the file observation reader", NO_APPLICABLE_CODE);
         }
 
     }

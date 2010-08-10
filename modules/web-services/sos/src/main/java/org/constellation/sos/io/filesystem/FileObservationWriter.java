@@ -35,6 +35,7 @@ import org.geotoolkit.gml.xml.v311.DirectPositionType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.OfferingPhenomenonEntry;
 import org.geotoolkit.sos.xml.v100.OfferingProcedureEntry;
@@ -94,13 +95,10 @@ public class FileObservationWriter implements ObservationWriter {
         }
         try {
             indexer        = new LuceneObservationIndexer(configuration, "");
-            marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:" +
-                                                "org.geotoolkit.observation.xml.v100:" +
-                                                "org.geotoolkit.sampling.xml.v100:" +
-                                                "org.geotoolkit.swe.xml.v101:"+
-                                                "org.geotoolkit.internal.jaxb.geometry");
-        } catch(JAXBException ex) {
-            throw new CstlServiceException("JAXB exception while initializing the file observation reader", ex, NO_APPLICABLE_CODE);
+            marshallerPool = SOSMarshallerPool.getInstance();
+            if (marshallerPool == null){
+                throw new CstlServiceException("JAXB exception while initializing the file observation reader", NO_APPLICABLE_CODE);
+            }
         } catch (IndexingException ex) {
             throw new CstlServiceException("Indexing exception while initializing the file observation reader", ex, NO_APPLICABLE_CODE);
         }
