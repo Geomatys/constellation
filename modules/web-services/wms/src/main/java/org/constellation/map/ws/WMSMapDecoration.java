@@ -44,6 +44,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.geotoolkit.display.exception.PortrayalException;
+import org.geotoolkit.display2d.GO2Hints;
 import org.geotoolkit.display2d.canvas.J2DCanvas;
 import org.geotoolkit.display2d.ext.BackgroundTemplate;
 import org.geotoolkit.display2d.ext.DefaultBackgroundTemplate;
@@ -140,6 +141,20 @@ public final class WMSMapDecoration {
     private static final String POSTION_WEST        = "west";
     private static final String POSTION_CENTER      = "center";
 
+    //rendering Hints
+    private static final String HINT_ANTIALIASING           = "antialiasing"; //boolean value
+    private static final String HINT_INTERPOLATION          = "interpolation";
+    private static final String BILINEAR                    = "bilinear";
+    private static final String BICUBIC                     = "bicubic";
+    private static final String HINT_RENDERING              = "rendering";
+    private static final String QUALITY                     = "quality";
+    private static final String SPEED                       = "speed";
+    private static final String HINT_GENERALIZE             = "generalize"; //boolean value
+    private static final String HINT_GENERALIZE_FACTOR      = "generalize-factor";
+    private static final String HINT_MULTITHREAD            = "multithread"; //boolean value
+    private static final String HINT_RENDERING_ORDER        = "rendering-order";
+    private static final String FEATURE_ORDER               = "feature";
+    private static final String SYMBOLIZER_ORDER            = "symbolizer";
 
     /**
      * Decoration extension for map queries.
@@ -219,32 +234,60 @@ public final class WMSMapDecoration {
         hints = new Hints();
         final Map<String,String> params = parseParameters(document.getDocumentElement());
         for (String key : params.keySet()) {
-            if ("antialiasing".equalsIgnoreCase(key)) {
+            if (HINT_ANTIALIASING.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
-                if ("true".equalsIgnoreCase(value)) {
+                if (Boolean.parseBoolean(value)) {
                     hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 } else {
                     hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
                 }
-            }
-            if ("interpolation".equalsIgnoreCase(key)) {
+            }else if(HINT_INTERPOLATION.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
-                if ("bilinear".equalsIgnoreCase(value)) {
+                if (BILINEAR.equalsIgnoreCase(value)) {
                     hints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                } else if ("bicubic".equalsIgnoreCase(value)) {
+                } else if (BICUBIC.equalsIgnoreCase(value)) {
                     hints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
                 } else {
                     hints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
                 }
-            }
-            if ("rendering".equalsIgnoreCase(key)) {
+            }else if(HINT_RENDERING.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
-                if ("quality".equalsIgnoreCase(value)) {
+                if (QUALITY.equalsIgnoreCase(value)) {
                     hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                } else if ("speed".equalsIgnoreCase(value)) {
+                } else if (SPEED.equalsIgnoreCase(value)) {
                     hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
                 } else {
                     hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_DEFAULT);
+                }
+            }else if(HINT_GENERALIZE.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                if (Boolean.parseBoolean(value)) {
+                    hints.put(GO2Hints.KEY_GENERALIZE, Boolean.TRUE);
+                } else {
+                    hints.put(GO2Hints.KEY_GENERALIZE, Boolean.FALSE);
+                }
+            }else if(HINT_GENERALIZE_FACTOR.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                try{
+                    hints.put(GO2Hints.KEY_GENERALIZE_FACTOR, Double.valueOf(value));
+                }catch(NumberFormatException ne){
+                    hints.put(GO2Hints.KEY_GENERALIZE_FACTOR, GO2Hints.GENERALIZE_FACTOR_DEFAULT);
+                    LOGGER.log(Level.WARNING, "Illegal generalization factor : {0}", value);
+                }
+            }else if(HINT_MULTITHREAD.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                if (Boolean.parseBoolean(value)) {
+                    hints.put(GO2Hints.KEY_MULTI_THREAD, Boolean.TRUE);
+                } else {
+                    hints.put(GO2Hints.KEY_MULTI_THREAD, Boolean.FALSE);
+                }
+            }else if(HINT_RENDERING_ORDER.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                if (SYMBOLIZER_ORDER.equalsIgnoreCase(value)) {
+                    hints.put(GO2Hints.KEY_SYMBOL_RENDERING_ORDER, GO2Hints.SYMBOL_RENDERING_PRIME);
+                } else {
+                    //any other case including feature order
+                    hints.put(GO2Hints.KEY_SYMBOL_RENDERING_ORDER, GO2Hints.SYMBOL_RENDERING_SECOND);
                 }
             }
         }
