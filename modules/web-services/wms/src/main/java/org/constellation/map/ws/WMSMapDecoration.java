@@ -42,7 +42,9 @@ import javax.swing.SwingConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.constellation.provider.configuration.ConfigDirectory;
+
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.GO2Hints;
 import org.geotoolkit.display2d.canvas.J2DCanvas;
@@ -73,8 +75,10 @@ import org.geotoolkit.lang.ThreadSafe;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.Converters;
 import org.geotoolkit.util.logging.Logging;
+
 import org.opengis.util.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -156,11 +160,15 @@ public final class WMSMapDecoration {
     private static final String FEATURE_ORDER               = "feature";
     private static final String SYMBOLIZER_ORDER            = "symbolizer";
 
+    //compression hint, value should look like : image/png:0.1,image/jpeg:0.4
+    private static final String HINT_COMPRESSION            = "compression";
+
     /**
      * Decoration extension for map queries.
      */
     private static PortrayalExtension extension = null;
     private static Hints hints = null;
+    private static Map<String,Float> compressions = null;
 
     /**
      * The default legend template.
@@ -220,6 +228,18 @@ public final class WMSMapDecoration {
         return hints;
     }
 
+    /**
+     * @return Float or null if no compression has been set for the given mime type.
+     */
+    public static synchronized Float getCompression(String mime){
+        getExtension();
+        if(compressions != null){
+            return compressions.get(mime.toLowerCase());
+        }else{
+            return null;
+        }
+    }
+
     public static PortrayalExtension read(File configFile)
             throws ParserConfigurationException, SAXException, IOException{
 
@@ -232,6 +252,8 @@ public final class WMSMapDecoration {
         final Document document = constructeur.parse(configFile);
 
         hints = new Hints();
+        compressions = new HashMap<String, Float>();
+
         final Map<String,String> params = parseParameters(document.getDocumentElement());
         for (String key : params.keySet()) {
             if (HINT_ANTIALIASING.equalsIgnoreCase(key)) {
@@ -288,6 +310,28 @@ public final class WMSMapDecoration {
                 } else {
                     //any other case including feature order
                     hints.put(GO2Hints.KEY_SYMBOL_RENDERING_ORDER, GO2Hints.SYMBOL_RENDERING_SECOND);
+                }
+            }else if(HINT_COMPRESSION.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                final String[] parts = value.split(",");
+                for(String part : parts){
+                    final String[] types = part.split(":");
+                    if(types.length != 2){
+                        continue;
+                    }
+
+                    final String mime = types[0].toLowerCase();
+                    try{
+                        final Float comp = Float.valueOf(types[1]);
+                        if(comp <0 || comp >1){
+                            LOGGER.log(Level.WARNING, "Invalid compression : "+comp+" for type : "+mime);
+                        }else{
+                            compressions.put(mime, comp);
+                        }
+                    }catch(NumberFormatException ex){
+                        LOGGER.log(Level.WARNING, "Invalid compression : "+types[1]+" for type : "+mime);
+                    }
+
                 }
             }
         }
