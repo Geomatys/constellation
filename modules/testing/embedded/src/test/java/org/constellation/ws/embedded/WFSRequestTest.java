@@ -20,6 +20,7 @@ package org.constellation.ws.embedded;
 // JUnit dependencies
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -89,25 +90,12 @@ public class WFSRequestTest {
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
 
-        conec.setDoOutput(true);
-        conec.setRequestProperty("Content-Type", "text/xml");
-        OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
-        final InputStream is  = Util.getResourceAsStream("org/constellation/xml/Insert-SamplingPoint-1.xml");
-        StringWriter sw       = new StringWriter();
-        BufferedReader in     = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        char[] buffer         = new char[1024];
-        int size;
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-                    
-        wr.write(sw.toString());
-        wr.flush();
-
+        postRequestFile(conec, "org/constellation/xml/Insert-SamplingPoint-1.xml");
+        
         // Try to unmarshall something from the response returned by the server.
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object obj = unmarshaller.unmarshal(conec.getInputStream());
-        in.close();
+        
         pool.release(unmarshaller);
 
         if (obj instanceof JAXBElement) {
@@ -137,21 +125,14 @@ public class WFSRequestTest {
         // for a POST request
         conec = getCapsUrl.openConnection();
 
-        conec.setDoOutput(true);
-        conec.setRequestProperty("Content-Type", "text/xml");
-        wr = new OutputStreamWriter(conec.getOutputStream());
-        sw = new StringWriter();
-        Marshaller marshaller = pool.acquireMarshaller();
-        marshaller.marshal(request, sw);
-
-        wr.write(sw.toString());
-        wr.flush();
+        postRequestObject(conec, request);
 
         // Try to unmarshall something from the response returned by the server.
         
-        sw     = new StringWriter();
-        in     = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
-        buffer = new char[1024];
+        StringWriter sw     = new StringWriter();
+        BufferedReader in   = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
+        char [] buffer = new char[1024];
+        int size;
         while ((size = in.read(buffer, 0, 1024)) > 0) {
             sw.append(new String(buffer, 0, size));
         }
@@ -179,19 +160,7 @@ public class WFSRequestTest {
         // for a POST request
         conec = getCapsUrl.openConnection();
 
-        conec.setDoOutput(true);
-        conec.setRequestProperty("Content-Type", "text/xml");
-        wr = new OutputStreamWriter(conec.getOutputStream());
-        final InputStream is2  = Util.getResourceAsStream("org/constellation/xml/Insert-SamplingPoint-2.xml");
-        sw                     = new StringWriter();
-        in                     = new BufferedReader(new InputStreamReader(is2, "UTF-8"));
-        buffer                 = new char[1024];
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-
-        wr.write(sw.toString());
-        wr.flush();
+        postRequestFile(conec, "org/constellation/xml/Insert-SamplingPoint-2.xml");
 
         // Try to unmarshall something from the response returned by the server.
         unmarshaller = pool.acquireUnmarshaller();
@@ -225,15 +194,7 @@ public class WFSRequestTest {
         // for a POST request
         conec = getCapsUrl.openConnection();
 
-        conec.setDoOutput(true);
-        conec.setRequestProperty("Content-Type", "text/xml");
-        wr = new OutputStreamWriter(conec.getOutputStream());
-        sw = new StringWriter();
-        marshaller = pool.acquireMarshaller();
-        marshaller.marshal(request, sw);
-
-        wr.write(sw.toString());
-        wr.flush();
+        postRequestObject(conec, request);
 
         // Try to unmarshall something from the response returned by the server.
 
@@ -268,20 +229,8 @@ public class WFSRequestTest {
         // for a POST request
         conec = getCapsUrl.openConnection();
 
-        conec.setDoOutput(true);
-        conec.setRequestProperty("Content-Type", "text/xml");
-        wr = new OutputStreamWriter(conec.getOutputStream());
-        final InputStream is3  = Util.getResourceAsStream("org/constellation/xml/Insert-SamplingPoint-3.xml");
-        sw                     = new StringWriter();
-        in                     = new BufferedReader(new InputStreamReader(is3, "UTF-8"));
-        buffer                 = new char[1024];
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-
-        wr.write(sw.toString());
-        wr.flush();
-
+        postRequestFile(conec, "org/constellation/xml/Insert-SamplingPoint-3.xml");
+        
         // Try to unmarshall something from the response returned by the server.
         unmarshaller = pool.acquireUnmarshaller();
         obj          = unmarshaller.unmarshal(conec.getInputStream());
@@ -314,16 +263,8 @@ public class WFSRequestTest {
         // for a POST request
         conec = getCapsUrl.openConnection();
 
-        conec.setDoOutput(true);
-        conec.setRequestProperty("Content-Type", "text/xml");
-        wr = new OutputStreamWriter(conec.getOutputStream());
-        sw = new StringWriter();
-        marshaller = pool.acquireMarshaller();
-        marshaller.marshal(request, sw);
-
-        wr.write(sw.toString());
-        wr.flush();
-
+        postRequestObject(conec, request);
+        
         // Try to unmarshall something from the response returned by the server.
 
         sw     = new StringWriter();
@@ -364,25 +305,11 @@ public class WFSRequestTest {
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
 
-        conec.setDoOutput(true);
-        conec.setRequestProperty("Content-Type", "text/xml");
-        OutputStreamWriter wr  = new OutputStreamWriter(conec.getOutputStream());
-        final InputStream is3  = Util.getResourceAsStream("org/constellation/xml/Update-NamedPlaces-1.xml");
-        StringWriter sw        = new StringWriter();
-        BufferedReader in      = new BufferedReader(new InputStreamReader(is3, "UTF-8"));
-        char[] buffer          = new char[1024];
-        int size;
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-
-        wr.write(sw.toString());
-        wr.flush();
-
+        postRequestFile(conec, "org/constellation/xml/Update-NamedPlaces-1.xml");
+        
         // Try to unmarshall something from the response returned by the server.
         Unmarshaller unmarshaller = pool.acquireUnmarshaller();
         Object obj          = unmarshaller.unmarshal(conec.getInputStream());
-        in.close();
         pool.release(unmarshaller);
 
         if (obj instanceof JAXBElement) {
@@ -408,21 +335,14 @@ public class WFSRequestTest {
         // for a POST request
         conec = getCapsUrl.openConnection();
 
-        conec.setDoOutput(true);
-        conec.setRequestProperty("Content-Type", "text/xml");
-        wr = new OutputStreamWriter(conec.getOutputStream());
-        sw = new StringWriter();
-        Marshaller marshaller = pool.acquireMarshaller();
-        marshaller.marshal(request, sw);
-
-        wr.write(sw.toString());
-        wr.flush();
+        postRequestObject(conec, request);
 
         // Try to unmarshall something from the response returned by the server.
 
-        sw     = new StringWriter();
-        in     = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
-        buffer = new char[1024];
+        StringWriter sw     = new StringWriter();
+        BufferedReader in     = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
+        char[] buffer = new char[1024];
+        int size;
         while ((size = in.read(buffer, 0, 1024)) > 0) {
             sw.append(new String(buffer, 0, size));
         }
@@ -457,4 +377,34 @@ public class WFSRequestTest {
         return s;
     }
 
+    public void postRequestFile(URLConnection conec, String filePath) throws IOException {
+
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", "text/xml");
+        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+        final InputStream is = Util.getResourceAsStream(filePath);
+        final StringWriter sw = new StringWriter();
+        final BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+        char[] buffer = new char[1024];
+        int size;
+        while ((size = in.read(buffer, 0, 1024)) > 0) {
+            sw.append(new String(buffer, 0, size));
+        }
+        wr.write(sw.toString());
+        wr.flush();
+        in.close();
+
+    }
+
+    public void postRequestObject(URLConnection conec, Object request) throws IOException, JAXBException {
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", "text/xml");
+        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+        final StringWriter sw = new StringWriter();
+        Marshaller marshaller = pool.acquireMarshaller();
+        marshaller.marshal(request, sw);
+
+        wr.write(sw.toString());
+        wr.flush();
+    }
 }

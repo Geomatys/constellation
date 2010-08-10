@@ -68,7 +68,6 @@ import org.constellation.ws.rs.GridWebService;
 //GeotoolKit dependencies
 import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
-import org.geotoolkit.feature.DefaultName;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;

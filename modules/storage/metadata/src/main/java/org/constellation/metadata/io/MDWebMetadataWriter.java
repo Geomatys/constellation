@@ -38,8 +38,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.lang.model.type.PrimitiveType;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 
@@ -921,34 +919,51 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
      * @return a primitive class.
      */
     private Classe getPrimitiveTypeFromName(String className) throws MD_IOException {
-        
+        final String mdwclassName;
+        final Standard mdwStandard;
         if (className.equals("String") || className.equals("SimpleInternationalString") || className.equals("BaseUnit")) {
-            return mdWriter.getClasse("CharacterString", Standard.ISO_19103);
-        } else if (className.equals("DefaultInternationalString")) {
-            return mdWriter.getClasse("PT_FreeText", Standard.ISO_19115);
+            mdwclassName = "CharacterString";
+            mdwStandard  = Standard.ISO_19103;
+        } else if (className.equalsIgnoreCase("DefaultInternationalString")) {
+            mdwclassName = "PT_FreeText";
+            mdwStandard  = Standard.ISO_19115;
         } else if (className.equalsIgnoreCase("Date")) {
-            return mdWriter.getClasse(className, Standard.ISO_19103);
+            mdwclassName = className;
+            mdwStandard  = Standard.ISO_19103;
         } else if (className.equalsIgnoreCase("URI")) {
-            return mdWriter.getClasse(className, Standard.ISO_19103);
+            mdwclassName = className;
+            mdwStandard = Standard.ISO_19103;
         }  else if (className.equalsIgnoreCase("Integer")) {
-            return mdWriter.getClasse(className, Standard.ISO_19103);
+            mdwclassName = className;
+            mdwStandard = Standard.ISO_19103;
         }  else if (className.equalsIgnoreCase("Long")) {
-            return mdWriter.getClasse("Integer", Standard.ISO_19103);
+            mdwclassName = "Integer";
+            mdwStandard = Standard.ISO_19103;
         } else if (className.equalsIgnoreCase("Boolean")) {
-            return mdWriter.getClasse(className, Standard.ISO_19103);
+            mdwclassName = className;
+            mdwStandard  = Standard.ISO_19103;
         }  else if (className.equalsIgnoreCase("URL")) {
-            return mdWriter.getClasse(className, Standard.ISO_19115);
+            mdwclassName = className;
+            mdwStandard  = Standard.ISO_19115;
         //special case for locale codeList.
         } else if (className.equals("Locale")) {
-            return mdWriter.getClasse("LanguageCode", Standard.ISO_19115);
+            mdwclassName = "LanguageCode";
+            mdwStandard = Standard.ISO_19115;
         //special case for Role codeList.
         } else if (className.equals("Role")) {
-            return mdWriter.getClasse("CI_RoleCode", Standard.ISO_19115);
+            mdwclassName = "CI_RoleCode";
+            mdwStandard = Standard.ISO_19115;
         } else if (className.equals("Double")) {
-            return mdWriter.getClasse("Real", Standard.ISO_19103);
+            mdwclassName = "Real";
+            mdwStandard = Standard.ISO_19103;
         } else {
             return null;
         }
+        final Classe result = mdWriter.getClasse(mdwclassName, mdwStandard);
+        if (result == null) {
+            LOGGER.warning("The database does not conatins the primitive type:" + mdwclassName + " in the standard:" + mdwStandard.getName());
+        }
+        return result;
     }
     
     

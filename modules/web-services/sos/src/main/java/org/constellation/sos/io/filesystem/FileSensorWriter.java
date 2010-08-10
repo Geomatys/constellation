@@ -17,6 +17,7 @@
 
 package org.constellation.sos.io.filesystem;
 
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class FileSensorWriter implements SensorWriter {
         }
         this.dataDirectory = configuration.getDataDirectory();
         try {
-            marshallerPool = new MarshallerPool("org.geotoolkit.sml.xml.v100:org.geotoolkit.sml.xml.v101:org.geotoolkit.internal.jaxb.geometry");
+            marshallerPool =  SensorMLMarshallerPool.getInstance();
         } catch (JAXBException ex) {
             throw new MetadataIoException("Unable to initialize the fileSensorWriter JAXB context", ex, NO_APPLICABLE_CODE);
         }

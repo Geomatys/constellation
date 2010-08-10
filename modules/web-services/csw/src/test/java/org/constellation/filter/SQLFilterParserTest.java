@@ -26,6 +26,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 import org.geotoolkit.csw.xml.v202.QueryConstraintType;
+import org.geotoolkit.ogc.xml.FilterMarshallerPool;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
@@ -45,7 +46,7 @@ public class SQLFilterParserTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        pool = new MarshallerPool("org.geotoolkit.ogc.xml.v110:org.geotoolkit.gml.xml.v311:org.geotoolkit.internal.jaxb.geometry");
+        pool = FilterMarshallerPool.getInstance();
     }
 
     @AfterClass

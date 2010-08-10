@@ -62,19 +62,16 @@ public class CapabilitiesWriter<T extends Capabilities> implements MessageBodyWr
 
     @Override
     public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
-        System.out.println("isWritable:" + Capabilities.class.isAssignableFrom(type));
         return Capabilities.class.isAssignableFrom(type);
     }
 
     @Override
     public long getSize(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
-        System.out.println("get size");
         return -1;
     }
 
     @Override
     public void writeTo(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
-        System.out.println("write to");
         Marshaller m = null;
         try {
             m = pool.acquireMarshaller();

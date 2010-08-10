@@ -32,6 +32,7 @@ import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
+import org.geotoolkit.ogc.xml.FilterMarshallerPool;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.LiteralType;
 import org.geotoolkit.ogc.xml.v110.LowerBoundaryType;
@@ -59,7 +60,7 @@ public class FilterParserTest {
    
     @BeforeClass
     public static void setUpClass() throws Exception {
-        pool = new MarshallerPool("org.geotoolkit.ogc.xml.v110:org.geotoolkit.gml.xml.v311:org.geotoolkit.internal.jaxb.geometry");
+        pool = FilterMarshallerPool.getInstance();
     }
 
     @AfterClass
