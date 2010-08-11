@@ -44,7 +44,7 @@ public class GenericConfigurationXMLBindingTest {
 
     @Before
     public void setUp() throws JAXBException {
-        pool = new MarshallerPool(Automatic.class, SOSConfiguration.class, org.constellation.generic.filter.Query.class);
+        pool = GenericDatabaseMarshallerPool.getInstance();
         unmarshaller = pool.acquireUnmarshaller();
         marshaller   = pool.acquireMarshaller();
     }
@@ -335,7 +335,7 @@ public class GenericConfigurationXMLBindingTest {
 
         StringReader sr = new StringReader(xml);
 
-        org.constellation.generic.filter.Query result = (org.constellation.generic.filter.Query) unmarshaller.unmarshal(sr);
+        FilterQuery result = (FilterQuery) unmarshaller.unmarshal(sr);
 
 
         FilterSelect select = new FilterSelect();
@@ -356,7 +356,7 @@ public class GenericConfigurationXMLBindingTest {
         order.setvalue("loc.platform_code, loc.instrument_code");
         order.setSens("ASC");
 
-        org.constellation.generic.filter.Query expResult = new org.constellation.generic.filter.Query();
+        FilterQuery expResult = new FilterQuery();
         expResult.setName("ObservationAffinage");
         expResult.addSelect(select);
         expResult.addFrom(from);
@@ -439,7 +439,7 @@ public class GenericConfigurationXMLBindingTest {
         order.setvalue("loc.platform_code, loc.instrument_code");
         order.setSens("ASC");
 
-        org.constellation.generic.filter.Query query = new org.constellation.generic.filter.Query();
+        FilterQuery query = new FilterQuery();
         query.setName("ObservationAffinage");
         query.addSelect(select);
         query.addFrom(from);

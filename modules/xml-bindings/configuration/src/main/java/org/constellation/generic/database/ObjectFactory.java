@@ -128,4 +128,12 @@ public class ObjectFactory {
     public FilterSelect createFilterSelect() {
         return new FilterSelect();
     }
+
+    /**
+     * Create an instance of {@link Query }
+     *
+     */
+    public FilterQuery createFilterQuery() {
+        return new FilterQuery();
+    }
 }

@@ -29,6 +29,7 @@ import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
@@ -75,7 +76,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
        
 
-        MarshallerPool pool   = new MarshallerPool(org.constellation.configuration.ObjectFactory.class);
+        MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
         Marshaller marshaller =  pool.acquireMarshaller();
 
         

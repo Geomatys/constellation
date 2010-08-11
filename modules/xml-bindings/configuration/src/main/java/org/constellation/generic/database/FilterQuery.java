@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.generic.filter;
+package org.constellation.generic.database;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,12 +29,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import org.constellation.generic.database.FilterSelect;
-import org.constellation.generic.database.From;
-import org.constellation.generic.database.Groupby;
-import org.constellation.generic.database.Orderby;
-import org.constellation.generic.database.QueryList;
-import org.constellation.generic.database.Where;
 import org.geotoolkit.util.Utilities;
 
 /**
@@ -51,7 +45,7 @@ import org.geotoolkit.util.Utilities;
     "groupby"
 })
 @XmlRootElement(name = "query", namespace="http://constellation.generic.filter.org")
-public class Query {
+public class FilterQuery {
 
     @XmlAttribute(required = true)
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
@@ -377,8 +371,8 @@ public class Query {
         if (object == this) {
             return true;
         }
-        if (object instanceof Query) {
-            final Query that = (Query) object;
+        if (object instanceof FilterQuery) {
+            final FilterQuery that = (FilterQuery) object;
 
             return Utilities.equals(this.from,    that.from) &&
                    Utilities.equals(this.name,    that.name) &&

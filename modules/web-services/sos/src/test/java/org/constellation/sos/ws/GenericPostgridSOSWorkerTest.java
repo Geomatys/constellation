@@ -28,7 +28,8 @@ import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
-import org.constellation.generic.filter.Query;
+import org.constellation.generic.database.FilterQuery;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
@@ -58,7 +59,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
 
 
-        MarshallerPool pool   = new MarshallerPool(org.constellation.configuration.ObjectFactory.class, org.constellation.generic.filter.ObjectFactory.class);
+        MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
         Marshaller marshaller =  pool.acquireMarshaller();
 
 
@@ -76,7 +77,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
 
             //we write the configuration file
             File filterFile = new File(configDir, "affinage.xml");
-            Query query = (Query) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/affinage.xml"));
+            FilterQuery query = (FilterQuery) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/affinage.xml"));
             marshaller.marshal(query, filterFile);
 
             //we write the configuration file

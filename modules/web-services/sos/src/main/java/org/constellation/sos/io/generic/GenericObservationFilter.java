@@ -29,7 +29,6 @@ import java.util.Properties;
 // JAXB dependencies
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
@@ -38,8 +37,9 @@ import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.From;
-import org.constellation.generic.filter.Query;
-import org.constellation.generic.filter.Select;
+import org.constellation.generic.database.FilterQuery;
+import org.constellation.generic.database.FilterSelect;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.generic.database.Where;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
@@ -63,9 +63,9 @@ import static org.constellation.sos.ws.SOSConstants.*;
  */
 public class GenericObservationFilter implements ObservationFilter {
 
-    private final Query configurationQuery;
+    private final FilterQuery configurationQuery;
 
-    private Query currentQuery;
+    private FilterQuery currentQuery;
 
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
@@ -114,18 +114,18 @@ public class GenericObservationFilter implements ObservationFilter {
             throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
         }
         try {
-            final JAXBContext context = JAXBContext.newInstance("org.constellation.generic.filter");
-            final Unmarshaller unmarshaller = context.createUnmarshaller();
+            final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
             final File affinage = new File(configuration.getConfigurationDirectory(), "affinage.xml");
             if (affinage.exists()) {
                 final Object object = unmarshaller.unmarshal(affinage);
-                if (object instanceof Query)
-                    this.configurationQuery = (Query) object;
+                if (object instanceof FilterQuery)
+                    this.configurationQuery = (FilterQuery) object;
                 else
                     throw new CstlServiceException("Invalid content in affinage.xml", NO_APPLICABLE_CODE);
             } else {
                 throw new CstlServiceException("Unable to find affinage.xml", NO_APPLICABLE_CODE);
             }
+            GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
             this.connection = db.getConnection();
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXBException in genericObservationFilter constructor", NO_APPLICABLE_CODE);
@@ -140,10 +140,10 @@ public class GenericObservationFilter implements ObservationFilter {
      */
     @Override
     public void initFilterObservation(ResponseModeType requestMode, QName resultModel) {
-        currentQuery        = new Query();
-        final Select select = configurationQuery.getSelect("filterObservation");
-        final From from     = configurationQuery.getFrom("observations");
-        final Where where   = configurationQuery.getWhere("observationType");
+        currentQuery              = new FilterQuery();
+        final FilterSelect select = configurationQuery.getSelect("filterObservation");
+        final From from           = configurationQuery.getFrom("observations");
+        final Where where         = configurationQuery.getWhere("observationType");
 
         if (requestMode == INLINE) {
             where.replaceVariable("observationIdBase", observationIdBase, false);
@@ -160,10 +160,10 @@ public class GenericObservationFilter implements ObservationFilter {
      */
     @Override
     public void initFilterGetResult(Observation template, QName resultModel) {
-        currentQuery        = new Query();
-        final Select select = configurationQuery.getSelect("filterResult");
-        final From from     = configurationQuery.getFrom("observations");
-        final Where where   = configurationQuery.getWhere(PROCEDURE);
+        currentQuery              = new FilterQuery();
+        final FilterSelect select = configurationQuery.getSelect("filterResult");
+        final From from           = configurationQuery.getFrom("observations");
+        final Where where         = configurationQuery.getWhere(PROCEDURE);
 
         final ProcessEntry process = (ProcessEntry) template.getProcedure();
         where.replaceVariable(PROCEDURE, process.getHref(), true);
@@ -177,7 +177,7 @@ public class GenericObservationFilter implements ObservationFilter {
      */
     @Override
     public void setProcedure(List<String> procedures, ObservationOfferingEntry off) {
-        if (procedures.size() != 0) {
+        if (!procedures.isEmpty()) {
             for (String s : procedures) {
                 if (s != null) {
                     String dbId = map.getProperty(s);
@@ -340,7 +340,7 @@ public class GenericObservationFilter implements ObservationFilter {
             return results;
 
         } catch (SQLException ex) {
-            LOGGER.severe("SQLExcpetion while executing the query: " + request);
+            LOGGER.severe("SQLException while executing the query: " + request);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage() + '\n' + "while executing the request:" + request,
                                           NO_APPLICABLE_CODE);
         }

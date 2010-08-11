@@ -30,6 +30,7 @@ import org.constellation.configuration.ObservationReaderType;
 import org.constellation.configuration.ObservationWriterType;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
 import org.geotoolkit.resources.NIOUtilities;
 import org.geotoolkit.xml.MarshallerPool;
@@ -46,7 +47,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        MarshallerPool pool   = new MarshallerPool(org.constellation.configuration.ObjectFactory.class);
+        MarshallerPool pool   = GenericDatabaseMarshallerPool.getInstance();
         Marshaller marshaller =  pool.acquireMarshaller();
 
 

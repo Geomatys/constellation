@@ -31,7 +31,7 @@ public class GenericDatabaseMarshallerPool {
     private static MarshallerPool instance;
     static {
         try {
-            instance = new MarshallerPool("org.constellation.generic.database");
+            instance = new MarshallerPool("org.constellation.configuration:org.constellation.generic.database");
         } catch (JAXBException ex) {
             Logger.getLogger(GenericDatabaseMarshallerPool.class.getName()).log(Level.SEVERE, null, ex);
         }
