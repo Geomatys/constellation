@@ -229,7 +229,9 @@ public class CSWService extends OGCWebService {
                           */
                         gc = createNewGetCapabilitiesRequest();
                     }
-                    serviceDef = getVersionFromNumber(gc.getVersion().toString());
+                    if (gc.getVersion() != null) {
+                        serviceDef = getVersionFromNumber(gc.getVersion().toString());
+                    }
                     worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
 
                     final StringWriter sw = new StringWriter();

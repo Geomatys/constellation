@@ -26,7 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.Cstl;
@@ -41,7 +40,6 @@ import org.geotoolkit.sld.xml.v110.TypeNameType;
 import org.geotoolkit.wms.xml.v111.LatLonBoundingBox;
 import org.geotoolkit.wms.xml.v111.Layer;
 import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
-import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.feature.DefaultName;
 
@@ -60,9 +58,7 @@ import static org.junit.Assume.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public class WMSRequestsTest extends AbstractGrizzlyServer {
-
-    private static MarshallerPool pool;
+public class WMSRequestsTest extends AbstractTestRequest {
 
     /**
      * URLs which will be tested on the server.
@@ -125,15 +121,9 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             return;
         }
 
-        // Try to get something from the wrong url.
-        final InputStream in = wrongUrl.openStream();
-
         // Try to marshall something from the response returned by the server.
         // The response should be a ServiceExceptionReport.
-        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        final Object obj = unmarshaller.unmarshal(in);
-        in.close();
-        pool.release(unmarshaller);
+        final Object obj = unmarshallResponse(wrongUrl);
         assertTrue(obj instanceof ServiceExceptionReport);
     }
 
@@ -184,15 +174,9 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             return;
         }
 
-        // Creates a valid GetCapabilities url.
-        final InputStream in = getCapsUrl.openStream();
-
         // Try to marshall something from the response returned by the server.
         // The response should be a WMT_MS_Capabilities.
-        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        final Object obj = unmarshaller.unmarshal(in);
-        in.close();
-        pool.release(unmarshaller);
+        final Object obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof WMT_MS_Capabilities);
 
         final WMT_MS_Capabilities responseCaps = (WMT_MS_Capabilities)obj;
@@ -296,14 +280,9 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             return;
         }
 
-        final InputStream in = describeUrl.openStream();
-
         // Try to marshall something from the response returned by the server.
         // The response should be a WMT_MS_Capabilities.
-        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        final Object obj = unmarshaller.unmarshal(in);
-        in.close();
-        pool.release(unmarshaller);
+        final Object obj = unmarshallResponse(describeUrl);
         assertTrue(obj instanceof DescribeLayerResponseType);
 
         // Tests on the response

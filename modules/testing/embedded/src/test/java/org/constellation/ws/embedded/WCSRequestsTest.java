@@ -17,18 +17,16 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
-import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
-import javax.xml.bind.Unmarshaller;
 import org.constellation.Cstl;
 import org.constellation.ServiceDef;
 import org.constellation.register.RegisterException;
@@ -41,7 +39,7 @@ import org.geotoolkit.wcs.xml.v100.CoverageOfferingBriefType;
 import org.geotoolkit.wcs.xml.v100.CoverageOfferingType;
 import org.geotoolkit.wcs.xml.v100.LonLatEnvelopeType;
 import org.geotoolkit.wcs.xml.v100.WCSCapabilitiesType;
-import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 
 // JUnit dependencies
 import org.junit.*;
@@ -57,8 +55,7 @@ import static org.junit.Assume.*;
  * @author Cédric Briançon (Geomatys)
  * @since 0.3
  */
-public class WCSRequestsTest extends AbstractGrizzlyServer {
-    private static MarshallerPool pool;
+public class WCSRequestsTest extends AbstractTestRequest {
 
     /**
      * URLs which will be tested on the server.
@@ -114,15 +111,9 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             return;
         }
 
-        // Try to get something from the wrong url.
-        final InputStream in = wrongUrl.openStream();
-
         // Try to marshall something from the response returned by the server.
         // The response should be a ServiceExceptionReport.
-        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        final Object obj = unmarshaller.unmarshal(in);
-        in.close();
-        pool.release(unmarshaller);
+        final Object obj = unmarshallResponse(wrongUrl);
         assertTrue(obj instanceof ServiceExceptionReport);
     }
 
@@ -201,18 +192,9 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             return;
         }
 
-        // Try to get the result of this request from the url.
-        final InputStream in = getCapsUrl.openStream();
-
         // Try to marshall something from the response returned by the server.
         // The response should be a WCSCapabilitiesType.
-        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object obj = unmarshaller.unmarshal(in);
-        in.close();
-        pool.release(unmarshaller);
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement) obj).getValue();
-        }
+        final Object obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof WCSCapabilitiesType);
 
         final WCSCapabilitiesType responseCaps = (WCSCapabilitiesType)obj;
@@ -256,18 +238,9 @@ public class WCSRequestsTest extends AbstractGrizzlyServer {
             return;
         }
 
-        // Try to get the result of the DescribeCoverage request from the url.
-        final InputStream in = getCapsUrl.openStream();
-
         // Try to marshall something from the response returned by the server.
         // The response should be a WCSCapabilitiesType.
-        final Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object obj = unmarshaller.unmarshal(in);
-        in.close();
-        pool.release(unmarshaller);
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement) obj).getValue();
-        }
+        final Object obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof CoverageDescription);
 
         final CoverageDescription responseDesc = (CoverageDescription)obj;

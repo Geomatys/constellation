@@ -18,25 +18,14 @@
 package org.constellation.ws.embedded;
 
 // JUnit dependencies
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import org.constellation.util.Util;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
@@ -46,7 +35,6 @@ import org.geotoolkit.wfs.xml.v110.QueryType;
 import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
-import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -54,18 +42,15 @@ import static org.junit.Assert.*;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class WFSRequestTest {
+public class WFSRequestTest extends AbstractTestRequest {
 
-    private static MarshallerPool pool;
-    
     private static final String WFS_POST_URL = "http://localhost:9090/wfs?";
 
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
-    public static void initLayerList() throws JAXBException {
-        // Get the list of layers
+    public static void initPool() throws JAXBException {
         pool = WFSMarshallerPool.getInstance();
     }
 
@@ -247,89 +232,4 @@ public class WFSRequestTest {
         assertEquals(xmlExpResult, xmlResult);
     }
 
-    public String removeXmlns(String xml) {
-        String s = xml;
-        s = s.replaceAll("xmlns=\"[^\"]*\" ", "");
-        s = s.replaceAll("xmlns=\"[^\"]*\"", "");
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\" ", "");
-        s = s.replaceAll("xmlns:[^=]*=\"[^\"]*\"", "");
-        return s;
-    }
-
-    public void postRequestFile(URLConnection conec, String filePath) throws IOException {
-
-        conec.setDoOutput(true);
-        conec.setRequestProperty("Content-Type", "text/xml");
-        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
-        final InputStream is = Util.getResourceAsStream(filePath);
-        final StringWriter sw = new StringWriter();
-        final BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        char[] buffer = new char[1024];
-        int size;
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-        wr.write(sw.toString());
-        wr.flush();
-        in.close();
-
-    }
-
-    public void postRequestObject(URLConnection conec, Object request) throws IOException, JAXBException {
-        conec.setDoOutput(true);
-        conec.setRequestProperty("Content-Type", "text/xml");
-        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
-        final StringWriter sw = new StringWriter();
-        Marshaller marshaller = pool.acquireMarshaller();
-        marshaller.marshal(request, sw);
-
-        wr.write(sw.toString());
-        wr.flush();
-    }
-
-    public Object unmarshallResponse(URLConnection conec) throws JAXBException, IOException {
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
-        Object obj = unmarshaller.unmarshal(conec.getInputStream());
-
-        pool.release(unmarshaller);
-
-        if (obj instanceof JAXBElement) {
-            obj = ((JAXBElement) obj).getValue();
-        }
-        return obj;
-    }
-
-    public String getStringResponse(URLConnection conec) throws UnsupportedEncodingException, IOException {
-        // Try to unmarshall something from the response returned by the server.
-        final StringWriter sw     = new StringWriter();
-        final BufferedReader in   = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
-        char [] buffer = new char[1024];
-        int size;
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-        String xmlResult = sw.toString();
-        xmlResult = removeXmlns(xmlResult);
-        xmlResult = xmlResult.replaceAll("xsi:schemaLocation=\"[^\"]*\" ", "");
-        return xmlResult;
-    }
-
-    public String getStringFromFile(String filePath) throws UnsupportedEncodingException, IOException {
-        final StringWriter sw     = new StringWriter();
-        final BufferedReader in   = new BufferedReader(new InputStreamReader(Util.getResourceAsStream(filePath), "UTF-8"));
-        char [] buffer = new char[1024];
-        int size;
-        while ((size = in.read(buffer, 0, 1024)) > 0) {
-            sw.append(new String(buffer, 0, size));
-        }
-        String xmlExpResult = sw.toString();
-
-        //we unformat the expected result
-        xmlExpResult = xmlExpResult.replace("\n", "");
-        xmlExpResult = xmlExpResult.replace("<?xml version='1.0'?>", "<?xml version='1.0' encoding='UTF-8'?>");
-        xmlExpResult = xmlExpResult.replaceAll("> *<", "><");
-        xmlExpResult = removeXmlns(xmlExpResult);
-
-        return xmlExpResult;
-    }
 }

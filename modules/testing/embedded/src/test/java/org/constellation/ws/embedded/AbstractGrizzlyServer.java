@@ -85,7 +85,7 @@ public abstract class AbstractGrizzlyServer extends CoverageSQLTestCase {
 
     private static DefaultDataSource ds;
     
-    private static Logger LOGGER = Logger.getLogger("org.constellation.ws.embedded");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.ws.embedded");
     /**
      * Initialize the Grizzly server, on which WCS and WMS requests will be sent,
      * and defines a PostGrid data provider.
