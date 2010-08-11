@@ -46,6 +46,7 @@ import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.feature.DefaultName;
 
 // JUnit dependencies
+import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static org.junit.Assume.*;
@@ -106,10 +107,7 @@ public class WMSRequestsTest extends AbstractGrizzlyServer {
             layers = null;
             assumeNoException(ex);
         }
-        pool = new MarshallerPool("org.geotoolkit.ogc.xml.exception:" +
-                                  "org.geotoolkit.wms.xml.v111:" +
-                                  "org.geotoolkit.sld.xml.v110:" +
-                                  "org.geotoolkit.internal.jaxb.geometry");
+        pool = WMSMarshallerPool.getInstance();
     }
 
     /**
