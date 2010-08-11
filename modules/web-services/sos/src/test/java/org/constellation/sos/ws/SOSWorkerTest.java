@@ -50,6 +50,7 @@ import org.geotoolkit.ogc.xml.v110.BBOXType;
 import org.geotoolkit.ogc.xml.v110.BinaryTemporalOpType;
 import org.geotoolkit.sampling.xml.v100.SamplingCurveType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import org.geotoolkit.sml.xml.v100.ComponentPropertyType;
 import org.geotoolkit.sml.xml.v100.ComponentType;
 import org.geotoolkit.sml.xml.v100.SensorML;
@@ -347,7 +348,7 @@ public class SOSWorkerTest {
      * @throws java.lang.Exception
      */
     public void DescribeSensorTest() throws Exception {
-        Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
+        Unmarshaller unmarshaller = SensorMLMarshallerPool.getInstance().acquireUnmarshaller();
 
        
         /**
@@ -574,7 +575,7 @@ public class SOSWorkerTest {
         assertEquals(expResult.getMember(), result.getMember());
         assertEquals(expResult, result);
 
-        marshallerPool.release(unmarshaller);
+        SensorMLMarshallerPool.getInstance().release(unmarshaller);
     }
 
     /**
@@ -2102,8 +2103,6 @@ public class SOSWorkerTest {
         assertEquals(expResult.getResult().getValue(), result.getResult().getValue());
         assertEquals(expResult.getResult(), result.getResult());
         assertEquals(expResult, result);
-
-        marshallerPool.release(unmarshaller);
 
          /**
          *   getObservation with procedure urn:ogc:object:sensor:GEOM:3

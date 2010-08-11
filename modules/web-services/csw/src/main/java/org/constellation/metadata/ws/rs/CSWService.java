@@ -146,7 +146,7 @@ public class CSWService extends OGCWebService {
         this.serviceID = serviceID;
         try {
             setXMLContext("", EBRIMClassesContext.getAllClasses());
-            final CSWworker worker = new CSWworker(serviceID, getMarshallerPool(), configDirectory);
+            final CSWworker worker = new CSWworker(serviceID, configDirectory);
             this.workers = new HashMap<String, CSWworker>();
             workers.put(serviceID, worker);
 

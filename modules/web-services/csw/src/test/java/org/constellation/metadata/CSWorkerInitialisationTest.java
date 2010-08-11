@@ -124,7 +124,7 @@ public class CSWorkerInitialisationTest {
         /**
          * Test 1: No configuration file.
          */
-        CSWworker worker = new CSWworker("", pool, configurationDirectory);
+        CSWworker worker = new CSWworker("", configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
@@ -148,7 +148,7 @@ public class CSWorkerInitialisationTest {
         File configFile = new File(configurationDirectory, "config.xml");
         configFile.createNewFile();
         
-        worker = new CSWworker("", pool, configurationDirectory);
+        worker = new CSWworker("",  configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
@@ -180,7 +180,7 @@ public class CSWorkerInitialisationTest {
         }
 
 
-        worker = new CSWworker("", pool, configurationDirectory);
+        worker = new CSWworker("",  configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
@@ -207,7 +207,7 @@ public class CSWorkerInitialisationTest {
         Marshaller tempMarshaller = JAXBContext.newInstance(UnknowObject.class, Automatic.class).createMarshaller();
         tempMarshaller.marshal(new UnknowObject(), configFile);
 
-        worker = new CSWworker("", pool, configurationDirectory);
+        worker = new CSWworker("",  configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
@@ -234,7 +234,7 @@ public class CSWorkerInitialisationTest {
         Automatic configuration = new Automatic(null, s);
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", pool, configurationDirectory);
+        worker = new CSWworker("",  configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
@@ -261,7 +261,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("whatever", s);
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", pool, configurationDirectory);
+        worker = new CSWworker("",  configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
@@ -288,7 +288,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", s);
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", pool, configurationDirectory);
+        worker = new CSWworker("",  configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
@@ -314,7 +314,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", new BDD());
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", pool, configurationDirectory);
+        worker = new CSWworker("",  configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
@@ -340,7 +340,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", new BDD(null, null, null, null));
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", pool, configurationDirectory);
+        worker = new CSWworker("",  configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
@@ -366,7 +366,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", new BDD(null, "whatever", null, null));
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", pool, configurationDirectory);
+        worker = new CSWworker("",  configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
@@ -392,7 +392,7 @@ public class CSWorkerInitialisationTest {
         configuration = new Automatic("mdweb", new BDD("org.postgresql.Driver", "whatever", null, null));
         tempMarshaller.marshal(configuration, configFile);
 
-        worker = new CSWworker("", pool, configurationDirectory);
+        worker = new CSWworker("",  configurationDirectory);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 

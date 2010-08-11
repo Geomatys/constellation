@@ -79,7 +79,6 @@ import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
 import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.csw.xml.AbstractCswRequest;
-import org.geotoolkit.csw.xml.CSWClassesContext;
 import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.ElementSetName;
@@ -131,13 +130,13 @@ import org.geotoolkit.ows.xml.v100.ServiceProvider;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
-import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // GeoAPI dependencies
 import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
+import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.util.CodeList;
 
@@ -269,10 +268,9 @@ public class CSWworker {
      * Build a new CSW worker with the specified configuration directory
      *
      * @param serviceID The service identifier (used in multiple CSW context). default value is "".
-     * @param marshallerPool A JAXB marshaller pool to send xml to another CSW service used by the harvester.
      * 
      */
-    public CSWworker(final String serviceID, final MarshallerPool marshallerPool, File configDir) {
+    public CSWworker(final String serviceID, File configDir) {
 
         final String notWorkingMsg = "The CSW service is not working!";
         if (configDir == null) {
@@ -453,11 +451,9 @@ public class CSWworker {
     }
 
     private void initializeRecordSchema() throws CstlServiceException {
-        MarshallerPool pool     = null;
         Unmarshaller unmarshaller = null;
         try {
-            pool         =  CSWClassesContext.getMarshallerPool();
-            unmarshaller = pool.acquireUnmarshaller();
+            unmarshaller = XSDMarshallerPool.getInstance().acquireUnmarshaller();
 
             schemas.put(RECORD_QNAME,            unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/record.xsd")));
             schemas.put(METADATA_QNAME,          unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/metadata.xsd")));
@@ -467,8 +463,8 @@ public class CSWworker {
         } catch (JAXBException ex) {
             throw new CstlServiceException("JAXB Exception when trying to parse xsd file", ex, NO_APPLICABLE_CODE);
         } finally {
-            if (unmarshaller != null && pool != null) {
-                pool.release(unmarshaller);
+            if (unmarshaller != null) {
+                XSDMarshallerPool.getInstance().release(unmarshaller);
             }
         }
     }

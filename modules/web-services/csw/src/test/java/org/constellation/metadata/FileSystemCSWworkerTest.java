@@ -22,16 +22,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.logging.Level;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
-import org.geotoolkit.xml.MarshallerPool;
 import org.junit.*;
 
 /**
@@ -44,8 +43,6 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
 
-        pool = new MarshallerPool(org.constellation.generic.database.ObjectFactory.class);
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
         File configDir = new File("CSWWorkerTest");
         if (!configDir.exists()) {
@@ -66,12 +63,11 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
             //we write the configuration file
             File configFile = new File(configDir, "config.xml");
             Automatic configuration = new Automatic("filesystem", dataDirectory.getPath());
-            final Marshaller marshaller = pool.acquireMarshaller();
+            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
-            pool.release(marshaller);
+            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
         }
 
-        pool.release(unmarshaller);
         pool = new AnchoredMarshallerPool(EBRIMClassesContext.getAllClasses());
         fillPoolAnchor((AnchoredMarshallerPool) pool);
 
@@ -79,7 +75,7 @@ public class FileSystemCSWworkerTest extends CSWworkerTest {
         skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
         pool.release(u);
 
-        worker = new CSWworker("", pool, configDir);
+        worker = new CSWworker("", configDir);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 

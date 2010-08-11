@@ -38,6 +38,7 @@ import org.constellation.configuration.CSWCascadingType;
 import org.constellation.configuration.exception.ConfigurationException;
 import org.constellation.configuration.filter.ConfigurationFileFilter;
 import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.CSWMetadataReader;
@@ -101,8 +102,7 @@ public abstract class AbstractCSWConfigurer {
         }
         
         try {
-            final MarshallerPool pool = new MarshallerPool("org.constellation.generic.database");
-            final Unmarshaller configUnmarshaller = pool.acquireUnmarshaller();
+            final Unmarshaller configUnmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
             cswfactory = factory.getServiceProvider(AbstractCSWFactory.class, null, null, null);
 
             for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(null))) {
@@ -113,7 +113,7 @@ public abstract class AbstractCSWConfigurer {
                 config.setConfigurationDirectory(cswConfigDir);
                 serviceConfiguration.put(id, config);
             }
-            pool.release(configUnmarshaller);
+            GenericDatabaseMarshallerPool.getInstance().release(configUnmarshaller);
             
         } catch (JAXBException ex) {
             throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service", ex.getMessage());
@@ -200,8 +200,7 @@ public abstract class AbstractCSWConfigurer {
             throw new ConfigurationException("No configuration directory have been found");
         }
         try {
-            final MarshallerPool pool = new MarshallerPool("org.constellation.generic.database");
-            final Unmarshaller configUnmarshaller = pool.acquireUnmarshaller();
+            final Unmarshaller configUnmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
 
             for (File configFile : cswConfigDir.listFiles(new ConfigurationFileFilter(null))) {
                 //we get the csw ID (if single mode return "")
@@ -211,7 +210,7 @@ public abstract class AbstractCSWConfigurer {
                 config.setConfigurationDirectory(cswConfigDir);
                 serviceConfiguration.put(id, config);
             }
-            pool.release(configUnmarshaller);
+            GenericDatabaseMarshallerPool.getInstance().release(configUnmarshaller);
 
         } catch (JAXBException ex) {
             throw new ConfigurationException("JAXBexception while setting the JAXB context for configuration service", ex.getMessage());

@@ -82,27 +82,12 @@ public class CSWService {
     private CSWworker worker;
 
     /**
-     * A JAXB unmarshaller used to create java object from XML file.
-     */
-    private MarshallerPool marshallerPool;
-    
-    /**
      * Initialize the database connection.
      */
     public CSWService() {
-
-       try {
-           marshallerPool = EBRIMClassesContext.getMarshallerPool();
-
-           worker = new CSWworker("", marshallerPool, null);
-           //TODO find real url
-           worker.setServiceURL("http://localhost:8080/CSWServer/CSWService");
-       } catch (JAXBException ex){
-           LOGGER.severe("The CSW service is not running."       + '\n' +
-                         " cause  : Error creating XML context." + '\n' +
-                         " error  : " + ex.getMessage()          + '\n' +
-                         " details: " + ex.toString());
-        }
+       worker = new CSWworker("", null);
+       //TODO find real url
+       worker.setServiceURL("http://localhost:8080/CSWServer/CSWService");
     }
     
     /**
@@ -235,12 +220,12 @@ public class CSWService {
             LOGGER.info(f.toString());
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = marshallerPool.acquireUnmarshaller();
+                unmarshaller = EBRIMClassesContext.getMarshallerPool().acquireUnmarshaller();
                 response = unmarshaller.unmarshal(f);
                 capabilities.put(fileName, response);
             } finally {
                 if (unmarshaller != null) {
-                    marshallerPool.release(unmarshaller);
+                    EBRIMClassesContext.getMarshallerPool().release(unmarshaller);
                 }
             }
         }

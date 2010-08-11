@@ -26,6 +26,7 @@ import javax.xml.bind.Unmarshaller;
 
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.util.Util;
 
@@ -34,7 +35,6 @@ import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.resources.NIOUtilities;
-import org.geotoolkit.xml.MarshallerPool;
 
 import org.junit.*;
 
@@ -48,9 +48,6 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
     
     @BeforeClass
     public static void setUpClass() throws Exception {
-
-        pool = new MarshallerPool(org.constellation.generic.database.ObjectFactory.class);
-        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
 
         dbDirectory    = new File("CSWWorkerTestDatabase");
 
@@ -84,11 +81,10 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
             File configFile = new File(configDir, "config.xml");
             BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
             Automatic configuration = new Automatic("mdweb", bdd);
-            final Marshaller marshaller = pool.acquireMarshaller();
+            final Marshaller marshaller = GenericDatabaseMarshallerPool.getInstance().acquireMarshaller();
             marshaller.marshal(configuration, configFile);
-            pool.release(marshaller);
+            GenericDatabaseMarshallerPool.getInstance().release(marshaller);
         }
-        pool.release(unmarshaller);
         pool = new AnchoredMarshallerPool(CSWClassesContext.getAllClasses());
         fillPoolAnchor((AnchoredMarshallerPool) pool);
 
@@ -96,7 +92,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
         pool.release(u);
 
-        worker = new CSWworker("", pool, configDir);
+        worker = new CSWworker("", configDir);
         worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
     }
