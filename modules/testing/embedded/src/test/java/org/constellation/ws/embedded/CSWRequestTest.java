@@ -23,7 +23,7 @@ import java.io.File;
 import javax.xml.bind.JAXBException;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
-import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -41,7 +41,7 @@ public class CSWRequestTest extends AbstractTestRequest {
     @BeforeClass
     public static void initPool() throws JAXBException {
         // Get the list of layers
-        pool = EBRIMClassesContext.getMarshallerPool();
+        pool = EBRIMMarshallerPool.getInstance();
     }
 
     @AfterClass

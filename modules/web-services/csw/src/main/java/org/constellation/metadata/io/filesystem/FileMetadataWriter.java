@@ -54,7 +54,7 @@ import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.util.ReflectionUtilities;
 
 // GeoApi dependencies
-import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.opengis.util.InternationalString;
 
 
@@ -99,13 +99,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         if (dataDirectory == null || !dataDirectory.exists()) {
             throw new MetadataIoException("Unable to find the data directory", NO_APPLICABLE_CODE);
         }
-        
-        try {
-            marshallerPool = EBRIMClassesContext.getMarshallerPool();
-        } catch (JAXBException ex) {
-            throw new MetadataIoException("JAXB exception while creating unmarshaller", NO_APPLICABLE_CODE);
-        }
-        
+        marshallerPool = EBRIMMarshallerPool.getInstance();
     }
 
     /**

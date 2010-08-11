@@ -57,7 +57,6 @@ import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.util.TimeParser;
-import org.constellation.writer.CapabilitiesFilterWriter;
 import org.constellation.writer.ExceptionFilterWriter;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
@@ -146,10 +145,8 @@ public class WMSService extends GridWebService {
         final UriInfo uriContext = getUriContext();
         final QueryContext queryContext = new QueryContext();
 
-        Marshaller marshaller = null;
         ServiceDef version = null;
         try {
-            marshaller = getMarshallerPool().acquireMarshaller();
             final String request = (String) getParameter(KEY_REQUEST, true);
             logParameters();
 
@@ -217,23 +214,8 @@ public class WMSService extends GridWebService {
                 worker.initServletContext(getServletContext());
                 worker.initUriContext(uriContext);
                 final AbstractWMSCapabilities capabilities = worker.getCapabilities(requestCapab);
-                //workaround because 1.1.1 is defined with a DTD rather than an XSD
-                //we marshall the response and return the XML String
-                final StringWriter sw = new StringWriter();
-                if (version.equals(ServiceDef.WMS_1_1_1_SLD) || version.equals(ServiceDef.WMS_1_1_1)) {
-                    final CapabilitiesFilterWriter swCaps = new CapabilitiesFilterWriter(sw);
-                    try {
-                        swCaps.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
-                        swCaps.write("<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n");
-                    } catch (IOException ex) {
-                        throw new JAXBException(ex);
-                    }
-                    marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
-                    marshaller.marshal(capabilities, swCaps);
-                } else {
-                    marshaller.marshal(capabilities, sw);
-                }
-                return Response.ok(sw.toString(), requestCapab.getFormat()).build();
+                
+                return Response.ok(capabilities, requestCapab.getFormat()).build();
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
                 final GetLegendGraphic requestLegend = adaptGetLegendGraphic();
@@ -256,20 +238,13 @@ public class WMSService extends GridWebService {
                 version = getVersionFromNumber(describeLayer.getVersion().toString());
                 worker.initUriContext(uriContext);
                 final DescribeLayerResponseType response = worker.describeLayer(describeLayer);
-                //We need to marshall the string to XML
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(response, sw);
-                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
+                return Response.ok(response, MimeType.TEXT_XML).build();
             }
             throw new CstlServiceException("The operation " + request + " is not supported by the service",
                                            OPERATION_NOT_SUPPORTED, KEY_REQUEST.toLowerCase());
         } catch (CstlServiceException ex) {
             return processExceptionResponse(queryContext, ex, version);
-        } finally {
-            if (marshaller != null) {
-                getMarshallerPool().release(marshaller);
-            }
-        }
+        } 
     }
 
     /**

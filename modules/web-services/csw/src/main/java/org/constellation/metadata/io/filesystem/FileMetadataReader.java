@@ -73,7 +73,7 @@ import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.ows.xml.v100.BoundingBoxType;
 import org.geotoolkit.dublincore.xml.v2.elements.SimpleLiteral;
-import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.util.StringUtilities;
 import static org.geotoolkit.ows.xml.v100.ObjectFactory._BoundingBox_QNAME;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -133,11 +133,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         if (dataDirectory == null || !dataDirectory.exists() || !dataDirectory.isDirectory()) {
             throw new MetadataIoException("cause: unable to find the data directory", NO_APPLICABLE_CODE);
         }
-        try {
-            marshallerPool = EBRIMClassesContext.getMarshallerPool();
-        } catch (JAXBException ex) {
-            throw new MetadataIoException("cause: JAXB exception while creating unmarshaller", ex, NO_APPLICABLE_CODE);
-        }
+        marshallerPool = EBRIMMarshallerPool.getInstance();
     }
 
     /**

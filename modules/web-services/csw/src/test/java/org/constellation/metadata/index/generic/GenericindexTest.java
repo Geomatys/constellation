@@ -37,17 +37,14 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
 // geotools dependencies
-import org.geotoolkit.csw.xml.CSWClassesContext;
-import org.geotoolkit.csw.xml.v202.AbstractRecordType;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.geometry.GeneralEnvelope;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 
 // GeoAPI dependencies
@@ -577,8 +574,7 @@ public class GenericindexTest {
 
     public static List<Object> fillTestData() throws JAXBException {
         List<Object> result = new ArrayList<Object>();
-        final MarshallerPool pool    = CSWClassesContext.getMarshallerPool();
-        Unmarshaller unmarshaller    = pool.acquireUnmarshaller();
+        Unmarshaller unmarshaller    = CSWMarshallerPool.getInstance().acquireUnmarshaller();
 
         Object obj = unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
         result.add(obj);
@@ -604,7 +600,7 @@ public class GenericindexTest {
         }
         result.add(obj);
 
-        pool.release(unmarshaller);
+        CSWMarshallerPool.getInstance().release(unmarshaller);
         
         return result;
     }

@@ -137,7 +137,6 @@ public class WCSService extends GridWebService {
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         final UriInfo uriContext = getUriContext();
 
-        Marshaller marshaller = null;
         ServiceDef serviceDef = null;
 
         worker.initHTTPContext(getHttpContext());
@@ -145,8 +144,6 @@ public class WCSService extends GridWebService {
         worker.initServletContext(getServletContext());
         worker.initUriContext(getUriContext());
         try {
-
-            marshaller = getMarshallerPool().acquireMarshaller();
             // Handle an empty request by sending a basic web page.
             if ((null == objectRequest) && (0 == uriContext.getQueryParameters().size())) {
                 return Response.ok(getIndexPage(), MimeType.TEXT_HTML).build();
@@ -175,9 +172,7 @@ public class WCSService extends GridWebService {
                 serviceDef = getVersionFromNumber(getcaps.getVersion().toString());
                
                 final GetCapabilitiesResponse capsResponse = worker.getCapabilities(getcaps);
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(capsResponse, sw);
-                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
+                return Response.ok(capsResponse, MimeType.TEXT_XML).build();
             }
 
             if ( DESCRIBECOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof DescribeCoverage) )
@@ -202,10 +197,7 @@ public class WCSService extends GridWebService {
                 }
                 serviceDef = getVersionFromNumber(desccov.getVersion().toString());
                 final DescribeCoverageResponse describeResponse = worker.describeCoverage(desccov);
-                //we marshall the response and return the XML String
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(describeResponse, sw);
-                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
+                return Response.ok(describeResponse, MimeType.TEXT_XML).build();
             }
 
             if ( GETCOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof GetCoverage) )
@@ -276,10 +268,6 @@ public class WCSService extends GridWebService {
              */
             return processExceptionResponse(ex, serviceDef);
 
-        } finally {
-            if (marshaller != null) {
-                getMarshallerPool().release(marshaller);
-            }
         }
     }
 

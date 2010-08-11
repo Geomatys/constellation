@@ -135,7 +135,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
 
 // GeoAPI dependencies
-import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 import org.opengis.filter.sort.SortOrder;
 import org.opengis.util.CodeList;
@@ -473,8 +473,8 @@ public class CSWworker {
      * Initialize the Anchors in function of the reader capacity.
      */
     private void initializeAnchorsMap() throws JAXBException {
-        if (EBRIMClassesContext.getMarshallerPool() instanceof AnchoredMarshallerPool) {
-            final AnchoredMarshallerPool pool = (AnchoredMarshallerPool) EBRIMClassesContext.getMarshallerPool();
+        if (EBRIMMarshallerPool.getInstance() instanceof AnchoredMarshallerPool) {
+            final AnchoredMarshallerPool pool = (AnchoredMarshallerPool) EBRIMMarshallerPool.getInstance();
             final Map<String, URI> concepts = mdReader.getConceptMap();
             int nbWord = 0;
             for (Entry<String, URI> entry: concepts.entrySet()) {

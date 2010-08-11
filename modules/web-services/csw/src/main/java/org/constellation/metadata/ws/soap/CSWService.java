@@ -54,9 +54,8 @@ import org.geotoolkit.csw.xml.v202.HarvestResponseType;
 import org.geotoolkit.csw.xml.v202.HarvestType;
 import org.geotoolkit.csw.xml.v202.TransactionResponseType;
 import org.geotoolkit.csw.xml.v202.TransactionType;
-import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.xml.MarshallerPool;
 
 /**
  *
@@ -220,12 +219,12 @@ public class CSWService {
             LOGGER.info(f.toString());
             Unmarshaller unmarshaller = null;
             try {
-                unmarshaller = EBRIMClassesContext.getMarshallerPool().acquireUnmarshaller();
+                unmarshaller = EBRIMMarshallerPool.getInstance().acquireUnmarshaller();
                 response = unmarshaller.unmarshal(f);
                 capabilities.put(fileName, response);
             } finally {
                 if (unmarshaller != null) {
-                    EBRIMClassesContext.getMarshallerPool().release(unmarshaller);
+                    EBRIMMarshallerPool.getInstance().release(unmarshaller);
                 }
             }
         }

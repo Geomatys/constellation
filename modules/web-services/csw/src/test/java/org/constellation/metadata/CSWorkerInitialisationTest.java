@@ -33,7 +33,7 @@ import org.constellation.generic.database.BDD;
 import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
-import org.geotoolkit.csw.xml.CSWClassesContext;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.geotoolkit.xml.MarshallerPool;
@@ -62,7 +62,7 @@ public class CSWorkerInitialisationTest {
         if (!configurationDirectory.exists()) {
             configurationDirectory.mkdir();
         }
-        pool = CSWClassesContext.getMarshallerPool();
+        pool = CSWMarshallerPool.getInstance();
         Unmarshaller u = pool.acquireUnmarshaller();
 
         skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
