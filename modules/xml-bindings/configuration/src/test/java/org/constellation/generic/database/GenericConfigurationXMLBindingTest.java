@@ -338,7 +338,7 @@ public class GenericConfigurationXMLBindingTest {
         org.constellation.generic.filter.Query result = (org.constellation.generic.filter.Query) unmarshaller.unmarshal(sr);
 
 
-        org.constellation.generic.filter.Select select = new org.constellation.generic.filter.Select();
+        FilterSelect select = new FilterSelect();
         select.setGroup("filterObservation");
         select.setType("text");
         select.setvalue("loc.location_date");
@@ -421,7 +421,7 @@ public class GenericConfigurationXMLBindingTest {
         "    <orderby group=\"observations\" sens=\"ASC\">loc.platform_code, loc.instrument_code</orderby>"         + '\n' +
         "</ns3:query>" + '\n';
 
-        org.constellation.generic.filter.Select select = new org.constellation.generic.filter.Select();
+        FilterSelect select = new FilterSelect();
         select.setGroup("filterObservation");
         select.setType("text");
         select.setvalue("loc.location_date");

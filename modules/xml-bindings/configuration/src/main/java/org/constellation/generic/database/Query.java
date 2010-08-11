@@ -39,14 +39,14 @@ import org.geotoolkit.util.Utilities;
 @XmlRootElement(name = "query")
 public class Query {
 
-    @XmlElement(required = true)
-    private Select select;
     @XmlAttribute(required = true)
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
     private String name;
     @XmlAttribute
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
     private String option;
+    @XmlElement(required = true)
+    private Select select;
     @XmlElement(required = true)
     private List<From> from;
     private List<Where> where;
@@ -262,21 +262,21 @@ public class Query {
             s.append("select:").append(select).append('\n');
         if (option != null)
             s.append("option: ").append(option).append('\n');
-        if (from != null && from.size() != 0) {
+        if (from != null && !from.isEmpty()) {
             int i = 0;
             for (From f: from) {
                 s.append(i).append(':').append(f).append('\n');
                 i++;
             }
         }
-       if ( where != null &&  where.size() != 0) {
+       if ( where != null &&  !where.isEmpty()) {
             int i = 0;
             for (Where f:  where) {
                 s.append(i).append(':').append(f).append('\n');
                 i++;
             }
         }
-        if (orderBy != null && orderBy.size() != 0) {
+        if (orderBy != null && !orderBy.isEmpty()) {
             int i = 0;
             for (Orderby f : orderBy) {
                 s.append(i).append(':').append(f).append('\n');

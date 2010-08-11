@@ -113,4 +113,19 @@ public class ObjectFactory {
         return new Orderby();
     }
 
+    /**
+     * Create an instance of {@link Groupby }
+     *
+     */
+    public Groupby createGroupby() {
+        return new Groupby();
+    }
+
+    /**
+     * Create an instance of {@link Select }
+     *
+     */
+    public FilterSelect createFilterSelect() {
+        return new FilterSelect();
+    }
 }

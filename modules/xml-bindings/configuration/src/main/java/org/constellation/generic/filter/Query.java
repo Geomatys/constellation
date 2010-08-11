@@ -29,7 +29,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.constellation.generic.database.FilterSelect;
 import org.constellation.generic.database.From;
+import org.constellation.generic.database.Groupby;
 import org.constellation.generic.database.Orderby;
 import org.constellation.generic.database.QueryList;
 import org.constellation.generic.database.Where;
@@ -57,18 +59,18 @@ public class Query {
     @XmlAttribute
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
     private String option;
-
-    private HashMap<String, String> parameters;
-
-    private QueryList statique;
-
     @XmlElement(required = true)
-    private List<Select> select;
+    private List<FilterSelect> select;
     @XmlElement(required = true)
     private List<From> from;
     private List<Where> where;
     private List<Orderby> orderby;
     private List<Groupby> groupby;
+
+    private HashMap<String, String> parameters;
+
+    private QueryList statique;
+
 
     /**
      * Gets the value of the name property.
@@ -101,9 +103,9 @@ public class Query {
     /**
      * Gets the value of the select property.
      */
-    public List<Select> getSelect() {
+    public List<FilterSelect> getSelect() {
         if (select == null) {
-            select = new ArrayList<Select>();
+            select = new ArrayList<FilterSelect>();
         }
         return this.select;
     }
@@ -111,8 +113,8 @@ public class Query {
     /**
      * Gets the value of the select property for the specified group name.
      */
-    public Select getSelect(String group) {
-        for(Select s: getSelect()) {
+    public FilterSelect getSelect(String group) {
+        for(FilterSelect s: getSelect()) {
             if (group != null && group.equals(s.getGroup())) {
                 return s;
             }
@@ -120,7 +122,7 @@ public class Query {
         return null;
     }
 
-    public void addSelect(Select select) {
+    public void addSelect(FilterSelect select) {
         this.getSelect().add(select);
     }
 
@@ -244,7 +246,7 @@ public class Query {
         StringBuilder sb = new StringBuilder();
         if (select != null) {
             sb.append("SELECT ");
-            for (Select s : select) {
+            for (FilterSelect s : select) {
                 sb.append(s.getvalue()).append(" , ");
             }
             if (select.size() > 0)
@@ -322,7 +324,7 @@ public class Query {
         }
         if (select != null) {
             sb.append("SELECT: ");
-            for (Select s : select) {
+            for (FilterSelect s : select) {
                 sb.append(s).append('\n');
             }
         }

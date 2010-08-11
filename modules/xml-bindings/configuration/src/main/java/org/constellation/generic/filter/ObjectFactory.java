@@ -40,14 +40,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Groupby }
-     * 
-     */
-    public Groupby createGroupby() {
-        return new Groupby();
-    }
-
-    /**
      * Create an instance of {@link Query }
      * 
      */
@@ -55,11 +47,4 @@ public class ObjectFactory {
         return new Query();
     }
 
-    /**
-     * Create an instance of {@link Select }
-     * 
-     */
-    public Select createSelect() {
-        return new Select();
-    }
 }

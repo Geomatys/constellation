@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.generic.filter;
+package org.constellation.generic.database;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -37,7 +37,7 @@ import org.geotoolkit.util.Utilities;
     "value"
 })
 @XmlRootElement(name = "select")
-public class Select {
+public class FilterSelect {
 
     @XmlAttribute(required = true)
     @XmlJavaTypeAdapter(NormalizedStringAdapter.class)
@@ -193,8 +193,8 @@ public class Select {
         if (object == this) {
             return true;
         }
-        if (object instanceof Select) {
-            final Select that = (Select) object;
+        if (object instanceof FilterSelect) {
+            final FilterSelect that = (FilterSelect) object;
 
             return Utilities.equals(this.alias, that.alias) &&
                    Utilities.equals(this.align, that.align) &&
