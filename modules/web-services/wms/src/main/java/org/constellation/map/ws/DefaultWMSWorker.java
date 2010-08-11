@@ -52,6 +52,7 @@ import org.constellation.map.visitor.CSVGraphicVisitor;
 import org.constellation.map.visitor.GMLGraphicVisitor;
 import org.constellation.map.visitor.HTMLGraphicVisitor;
 import org.constellation.map.visitor.TextGraphicVisitor;
+import org.constellation.portrayal.internal.PortrayalResponse;
 import org.constellation.portrayal.PortrayalUtil;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.LayerDetails;
@@ -73,6 +74,7 @@ import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.GO2Utilities;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.service.CanvasDef;
+import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
@@ -756,7 +758,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
      * @throws CstlServiceException if the layer does not support GetLegendGraphic requests.
      */
     @Override
-    public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
+    public PortrayalResponse getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
         final LayerDetails layer = getLayerReference(getLegend.getLayer(), getLegend.getVersion().toString());
         final String layerName = layer.getName().toString();
         if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
@@ -833,7 +835,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             throw new CstlServiceException("The requested layer \""+ layerName +"\" does not support "
                     + "GetLegendGraphic request", NO_APPLICABLE_CODE, KEY_LAYER.toLowerCase());
         }
-        return image;
+        return new PortrayalResponse(image);
     }
 
     /**
@@ -845,7 +847,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
      * @throws CstlServiceException
      */
     @Override
-    public BufferedImage getMap(final GetMap getMap) throws CstlServiceException {
+    public PortrayalResponse getMap(final GetMap getMap) throws CstlServiceException {
 
     	//
     	// Note this is almost the same logic as in getFeatureInfo
@@ -863,7 +865,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         } catch (CstlServiceException ex) {
         	//TODO: distinguish
             if (errorInImage) {
-                return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize());
+                return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
             } else {
                 throw new CstlServiceException(ex, LAYER_NOT_DEFINED, KEY_LAYERS.toLowerCase());
             }
@@ -895,7 +897,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             sdef.setContext(context);
         } catch (PortrayalException ex) {
             if (errorInImage) {
-                return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize() );
+                return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
             } else {
                 throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
             }
@@ -930,18 +932,11 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         final CanvasDef cdef = new CanvasDef(canvasDimension,background);
 
         // 4. IMAGE
-        BufferedImage image;
-        try {
-            image = Cstl.getPortrayalService().portray(sdef, vdef, cdef);
-        } catch (PortrayalException ex) {
-            if (errorInImage) {
-                return Cstl.getPortrayalService().writeInImage(ex, getMap.getSize() );
-            } else {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-            }
-        }
+        final String mime = getMap.getFormat();
+        final OutputDef odef = new OutputDef(mime, new Object());
+        odef.setCompression(WMSMapDecoration.getCompression(mime));
 
-        return image;
+        return new PortrayalResponse(cdef, sdef, vdef, odef);
     }
 
 

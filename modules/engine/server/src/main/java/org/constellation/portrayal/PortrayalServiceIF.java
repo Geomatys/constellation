@@ -20,9 +20,9 @@ import java.awt.Dimension;
 import java.awt.Shape;
 import java.awt.image.BufferedImage;
 
-import org.geotoolkit.display.canvas.GraphicVisitor;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
+import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
@@ -55,6 +55,22 @@ public interface PortrayalServiceIF {
     BufferedImage portray(final SceneDef sdef,
             final ViewDef vdef,
             final CanvasDef cdef)
+            throws PortrayalException;
+
+    /**
+     * Portray a set of Layers over a given geographic extent with a given
+     * resolution in the provided output.
+     * @param sdef A structure which defines the scene.
+     * @param vdef A structure which defines the view.
+     * @param cdef A structure which defines the canvas.
+     * @param odef A structure which defines the output.
+     *
+     * @throws PortrayalException For errors during portrayal, TODO: common examples?
+     */
+    void portray(final SceneDef sdef,
+            final ViewDef vdef,
+            final CanvasDef cdef,
+            final OutputDef odef)
             throws PortrayalException;
 
     /**
