@@ -76,13 +76,13 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
         final String path = source.parameters.get(KEY_FOLDER_PATH);
 
         if (path == null) {
-            throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
+            throw new IllegalArgumentException("Found configuration file but a path parameter is not defined.");
         }
 
         folder = new File(path);
 
-        if (folder == null || !folder.exists() || !folder.isDirectory()) {
-            throw new IllegalArgumentException("Provided File does not exits or is not a folder.");
+        if (!folder.exists()) {
+            throw new IllegalArgumentException("Did not find a tile manager definition file or a mosaic directory for path: "+ path);
         }
 
         reload();
