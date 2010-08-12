@@ -142,12 +142,10 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
 
         try {
             DefaultPortrayalService.portray(cdef,sdef,vdef,odef);
+        }catch(PortrayalException ex){
+            throw ex;
         } catch(Exception ex) {
-            if (ex instanceof PortrayalException) {
-                throw (PortrayalException)ex;
-            } else {
-                throw new PortrayalException(ex);
-            }
+            throw new PortrayalException(ex);
         } finally {
             sdef.getContext().layers().clear();
         }
