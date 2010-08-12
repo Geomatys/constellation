@@ -16,6 +16,9 @@
  */
 package org.constellation.writer;
 
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
 
@@ -38,6 +41,17 @@ public final class CapabilitiesFilterWriter extends AbstractFilterWriter {
      */
     public CapabilitiesFilterWriter(Writer out) {
         super(out);
+    }
+
+    /**
+     * Create a new filtered outputStream for WMS 1.1.1 Capabilities.
+     *
+     * @param out A Output stream object to provide the underlying stream.
+     * @param enc The character encoding.
+     * @throws NullPointerException if <code>out</code> is <code>null</code>
+     */
+    public CapabilitiesFilterWriter(OutputStream out, String enc) throws UnsupportedEncodingException {
+        super(new OutputStreamWriter(out, enc));
     }
 
     /**

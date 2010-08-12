@@ -15,12 +15,13 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.map.ws.rs;
+package org.constellation.sos.ws.rs;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -30,10 +31,9 @@ import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.constellation.writer.CapabilitiesFilterWriter;
-import org.geotoolkit.wms.xml.WMSResponse;
-import org.geotoolkit.wms.xml.WMSMarshallerPool;
-import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
+import org.geotoolkit.ows.xml.ExceptionReportMarshallerPool;
+import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 
 /**
  *
@@ -41,13 +41,17 @@ import org.geotoolkit.wms.xml.v111.WMT_MS_Capabilities;
  */
 @Provider
 @Produces("application/xml,text/xml,*/*")
-public class WMSResponseWriter<T extends WMSResponse> implements MessageBodyWriter<T>  {
+public class SensorMLWriter<T extends AbstractSensorML> implements MessageBodyWriter<T>  {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.map.ws.rs");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.ws.rs.provider");
+
+    private static final String SML_101_XSD = "http://www.opengis.net/sensorML/1.0.1 http://schemas.opengis.net/sensorML/1.0.1/sensorML.xsd";
+
+    private static final String SML_100_XSD = "http://www.opengis.net/sensorML/1.0 http://schemas.opengis.net/sensorML/1.0.0/sensorML.xsd";
 
     @Override
     public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
-        return WMSResponse.class.isAssignableFrom(type);
+        return AbstractSensorML.class.isAssignableFrom(type);
     }
 
     @Override
@@ -59,28 +63,22 @@ public class WMSResponseWriter<T extends WMSResponse> implements MessageBodyWrit
     public void writeTo(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
         Marshaller m = null;
         try {
-            m = WMSMarshallerPool.getInstance().acquireMarshaller();
-            //workaround because 1.1.1 is defined with a DTD rather than an XSD
-            if (t instanceof WMT_MS_Capabilities) {
-                final String enc = "UTF8";
-                final CapabilitiesFilterWriter swCaps = new CapabilitiesFilterWriter(out, enc);
-                try {
-                    String s   = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-                                 "<!DOCTYPE WMT_MS_Capabilities SYSTEM \"http://schemas.opengis.net/wms/1.1.1/WMS_MS_Capabilities.dtd\">\n";
-                    swCaps.write(s);
-                } catch (IOException ex) {
-                    throw new JAXBException(ex);
-                }
-                m.setProperty(Marshaller.JAXB_FRAGMENT, true);
-                m.marshal(t, swCaps);
+            m = SensorMLMarshallerPool.getInstance().acquireMarshaller();
+            if (t.getVersion() != null && t.getVersion().equals("1.0.1")) {
+                m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, SML_101_XSD);
             } else {
-                m.marshal(t, out);
-            } 
+                if (t.getVersion() == null) {
+                    LOGGER.warning("there is no version for sensorML file");
+                }
+                m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, SML_100_XSD);
+            }
+            m.marshal(t, out);
+
         } catch (JAXBException ex) {
-            LOGGER.severe("JAXB exception while writing the describeLayer response");
+            LOGGER.log(Level.SEVERE, "JAXB exception while writing the SensorML response");
         } finally {
             if (m != null) {
-                 WMSMarshallerPool.getInstance().release(m);
+                 ExceptionReportMarshallerPool.getInstance().release(m);
             }
         }
     }

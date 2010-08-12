@@ -29,12 +29,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.text.ParseException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -43,7 +40,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 //Constellation dependencies
 import org.constellation.ServiceDef;
@@ -57,12 +53,12 @@ import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.util.TimeParser;
-import org.constellation.writer.ExceptionFilterWriter;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
 
 //GeotoolKit dependencies
+import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
 import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
 import org.geotoolkit.referencing.CRS;
@@ -76,7 +72,6 @@ import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
-import org.geotoolkit.xml.MarshallerPool;
 
 //Geoapi dependencies
 import org.opengis.geometry.Envelope;
@@ -284,41 +279,17 @@ public class WMSService extends GridWebService {
         final ServiceExceptionReport report = new ServiceExceptionReport(version,
                 (locator == null) ? new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode()) :
                                     new ServiceExceptionType(ex.getMessage(), ex.getExceptionCode(), locator));
-        final StringWriter sw = new StringWriter();
-        /*
-         * For WMS 1.1.1, we need to define another marshalling pool, with just the service exception
-         * packages. Actually that package does not contain any reference to namespace, consequently
-         * the service exception marshalled file will not contain namespaces definitions.
-         * This is what we want since the service exception report already owns a DTD.
-         */
-        final MarshallerPool poolException = new MarshallerPool(
-                Collections.singletonMap(MarshallerPool.ROOT_NAMESPACE_KEY, "http://www.opengis.net/ogc"),
-                "org.geotoolkit.ogc.xml.exception");
-        final Marshaller marsh = poolException.acquireMarshaller();
-        try {
-            if (serviceDef.equals(ServiceDef.WMS_1_1_1_SLD) || serviceDef.equals(ServiceDef.WMS_1_1_1)) {
-                final ExceptionFilterWriter swException = new ExceptionFilterWriter(sw);
-                try {
-                    swException.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
-                    swException.write("<!DOCTYPE ServiceExceptionReport SYSTEM \"http://schemas.opengis.net/wms/1.1.1/exception_1_1_1.dtd\">\n");
-                } catch (IOException io) {
-                    throw new JAXBException(io);
-                }
-                marsh.setProperty(Marshaller.JAXB_FRAGMENT, true);
-                marsh.marshal(report, swException);
-            } else {
-                marsh.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
-                        "http://www.opengis.net/ogc http://schemas.opengis.net/wms/1.3.0/exceptions_1_3_0.xsd");
-                marsh.marshal(report, sw);
-            }
-        } finally {
-            if (marsh != null) {
-                poolException.release(marsh);
-            }
+        
+
+        final String schemaLocation;
+        if (serviceDef.equals(ServiceDef.WMS_1_1_1_SLD) || serviceDef.equals(ServiceDef.WMS_1_1_1)) {
+            schemaLocation = "http://schemas.opengis.net/wms/1.1.1/exception_1_1_1.dtd";
+        } else {
+            schemaLocation = "http://www.opengis.net/ogc http://schemas.opengis.net/wms/1.3.0/exceptions_1_3_0.xsd";
         }
-        final String mimeException = (serviceDef.version.equals(ServiceDef.WMS_1_1_1_SLD.version)) ?
-                                                                MimeType.APP_SE_XML : MimeType.TEXT_XML;
-        return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), mimeException).build();
+        final SchemaLocatedExceptionResponse response = new SchemaLocatedExceptionResponse(report, schemaLocation);
+        final String mimeException = (serviceDef.version.equals(ServiceDef.WMS_1_1_1_SLD.version)) ? MimeType.APP_SE_XML : MimeType.TEXT_XML;
+        return Response.ok(response, mimeException).build();
     }
 
     /**

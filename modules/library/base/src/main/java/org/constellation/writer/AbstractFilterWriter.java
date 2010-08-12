@@ -117,7 +117,7 @@ public abstract class AbstractFilterWriter extends FilterWriter {
      */
     @Override
     public void flush() throws IOException {
-        out.write(buffer.toString());
+        out.write(filterLine(buffer));
         buffer.setLength(0);
         super.flush();
     }
@@ -130,7 +130,7 @@ public abstract class AbstractFilterWriter extends FilterWriter {
      */
     @Override
     public void close() throws IOException {
-        out.write(buffer.toString());
+        out.write(filterLine(buffer));
         buffer.setLength(0);
         super.close();
     }

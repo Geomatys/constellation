@@ -123,13 +123,13 @@ public class WFSService extends OGCWebService {
 
         WFSWorker candidate              = null;
         try {
-            setXMLContext("org.geotoolkit.wfs.xml.v110"   +
+            final MarshallerPool pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110"   +
             		  ":org.geotoolkit.ogc.xml.v110"  +
             		  ":org.geotoolkit.gml.xml.v311"  +
                           ":org.geotoolkit.xsd.xml.v2001" +
                           ":org.geotoolkit.sampling.xml.v100" +
-                         ":org.geotoolkit.internal.jaxb.geometry"
-                          , "");
+                         ":org.geotoolkit.internal.jaxb.geometry");
+            setXMLContext(pool);
             candidate       = new DefaultWFSWorker();
 
         } catch (JAXBException ex){
@@ -381,7 +381,9 @@ public class WFSService extends OGCWebService {
                 final Versioned ar = (Versioned) request;
                 if (ar.getVersion() != null)
                     getUriContext().getQueryParameters().add(VERSION, ar.getVersion().toString());
-            } if (request != null) {
+            }
+
+            if (request != null) {
                 LOGGER.finer("request type:" + request.getClass().getName());
             }
             return treatIncomingRequest(request);

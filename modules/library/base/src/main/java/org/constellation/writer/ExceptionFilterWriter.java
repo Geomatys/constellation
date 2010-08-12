@@ -16,6 +16,9 @@
  */
 package org.constellation.writer;
 
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 
 
@@ -40,6 +43,16 @@ public final class ExceptionFilterWriter extends AbstractFilterWriter {
     }
 
     /**
+     * Create a new filtered writer for WMS 1.1.1 Exception.
+     *
+     * @param out  a Writer object to provide the underlying stream.
+     * @throws NullPointerException if <code>out</code> is <code>null</code>
+     */
+    public ExceptionFilterWriter(OutputStream out, String enc) throws UnsupportedEncodingException {
+        super(new OutputStreamWriter(out, enc));
+    }
+
+    /**
      * Remove the namespaces declaration from the ServiceExceptionReport tag.
      *
      * @param buffer A line to filter.
@@ -47,9 +60,10 @@ public final class ExceptionFilterWriter extends AbstractFilterWriter {
     @Override
     protected String filterLine(final StringBuilder buffer) {
         String line = buffer.toString();
-        if (line.trim().startsWith("<ServiceExceptionReport")) {
+        if (line.trim().startsWith("<ServiceExceptionReport") || line.trim().startsWith("<ogc:ServiceExceptionReport")) {
             line = "<ServiceExceptionReport version=\"1.1.1\">";
         }
+        line = line.replace("ogc:", "");
         return line;
     }
 

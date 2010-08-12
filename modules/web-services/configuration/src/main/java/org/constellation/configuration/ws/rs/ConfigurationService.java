@@ -69,6 +69,7 @@ import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.xml.MarshallerPool;
 
 /**
  * Web service for administration and configuration operations.
@@ -116,13 +117,13 @@ public final class ConfigurationService extends AbstractWebService  {
         super();
         indexing = false;
         try {
-            setXMLContext("org.geotoolkit.ows.xml.v110:org.constellation.configuration:org.geotoolkit.skos.xml:org.geotoolkit.internal.jaxb.geometry", "");
+            final MarshallerPool pool = new MarshallerPool("org.geotoolkit.ows.xml.v110:org.constellation.configuration:org.geotoolkit.skos.xml:org.geotoolkit.internal.jaxb.geometry");
+            setXMLContext(pool);
             final AbstractConfigurerFactory configurerfactory = factory.getServiceProvider(AbstractConfigurerFactory.class, null, null, null);
             cswConfigurer      = configurerfactory.getCSWConfigurer(cn);
             cswFunctionEnabled = true;
         } catch (JAXBException ex) {
-            LOGGER.severe("JAXBException while setting the JAXB context for configuration service:" + ex.getMessage());
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            LOGGER.log(Level.SEVERE, "JAXBException while setting the JAXB context for configuration service:" + ex.getMessage(), ex);
             cswFunctionEnabled = false;
         } catch (ConfigurationException ex) {
             LOGGER.warning("Specific CSW operation will not be available." + '\n' + ex);
@@ -424,7 +425,7 @@ public final class ConfigurationService extends AbstractWebService  {
         
         verifyBaseAttribute(service, fileName);
         
-        if (newProperties == null || newProperties.size() == 0) {
+        if (newProperties == null || newProperties.isEmpty()) {
              throw new CstlServiceException("You must specify a non empty properties parameter.", MISSING_PARAMETER_VALUE, 
                      "properties");
         }
@@ -505,7 +506,7 @@ public final class ConfigurationService extends AbstractWebService  {
         LOGGER.info("uploading");
         try  {
             final String layer = getParameter("layer", false);
-            LOGGER.info("LAYER= " + layer);
+            LOGGER.log(Level.INFO, "LAYER= {0}", layer);
             // TODO: implement upload action here.
             in.close();
         } catch (CstlServiceException ex) {

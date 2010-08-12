@@ -18,11 +18,11 @@
 package org.constellation.coverage.ws.rs;
 
 // Jersey dependencies
+import org.geotoolkit.ows.xml.ExceptionResponse;
 import com.sun.jersey.spi.resource.Singleton;
 
 // J2SE dependencies
 import java.awt.image.RenderedImage;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +33,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
@@ -41,6 +40,7 @@ import org.constellation.coverage.ws.WCSWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
+import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
 import static org.constellation.query.wcs.WCSQuery.*;
 
 // Geotoolkit dependencies
@@ -280,7 +280,7 @@ public class WCSService extends GridWebService {
         }
 
         // SEND THE HTTP RESPONSE
-        final Object report;
+        final ExceptionResponse report;
         if (serviceDef == null) {
             // TODO: Get the best version for WCS. For the moment, just 1.0.0.
             serviceDef = ServiceDef.WCS_1_0_0;
@@ -291,22 +291,12 @@ public class WCSService extends GridWebService {
         if (isOWS(serviceDef)) {
             report = new ExceptionReport(ex.getMessage(), code, locator, serviceDef.exceptionVersion.toString());
         } else {
-            report = new ServiceExceptionReport(serviceDef.exceptionVersion,
-                         (locator == null) ? new ServiceExceptionType(ex.getMessage(), code) :
-                                             new ServiceExceptionType(ex.getMessage(), code, locator));
-        }
-        final StringWriter sw = new StringWriter();
-        Marshaller marshaller = null;
-        try {
-            marshaller = getMarshallerPool().acquireMarshaller();
-            marshaller.marshal(report, sw);
-        } finally {
-            if (marshaller != null) {
-                getMarshallerPool().release(marshaller);
-            }
-        }
+            final ServiceExceptionReport exReport = new ServiceExceptionReport(serviceDef.exceptionVersion,
+                         (locator == null) ? new ServiceExceptionType(ex.getMessage(), code) : new ServiceExceptionType(ex.getMessage(), code, locator));
 
-        return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), MimeType.APP_SE_XML).build();
+            report = new SchemaLocatedExceptionResponse(exReport, "http://www.opengis.net/ogc http://schemas.opengis.net/wcs/1.0.0/OGC-exception.xsd");
+        }
+        return Response.ok(report, MimeType.APP_SE_XML).build();
     }
 
     /**
