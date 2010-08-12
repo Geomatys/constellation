@@ -17,6 +17,7 @@
 package org.constellation.ws.embedded;
 
 // J2SE dependencies
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -24,7 +25,6 @@ import java.net.URL;
 import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.Cstl;
@@ -62,6 +62,18 @@ public class WCSRequestsTest extends AbstractTestRequest {
      */
     private static final String WCS_FALSE_REQUEST =
             "http://localhost:9090/wcs?request=SomethingElse";
+
+    private static final String WCS_FALSE_REQUEST_100 =
+            "http://localhost:9090/wcs?request=GetCoverage&service=WCS&version=1.0.0&" +
+                                      "format=image/png&width=1024&height=512&" +
+                                      "crs=EPSG:4326&bbox=-180,-90,180,90&" +
+                                      "coverage=wrongLayer";
+
+    private static final String WCS_FALSE_REQUEST_111 =
+            "http://localhost:9090/wcs?request=GetCoverage&service=WCS&version=1.1.1&" +
+                                      "format=image/png&width=1024&height=512&" +
+                                      "crs=EPSG:4326&boundingbox=-180,-90,180,90,EPSG4326&" +
+                                      "identifier=wrongLayer";
 
     private static final String WCS_GETCOVERAGE =
             "http://localhost:9090/wcs?request=GetCoverage&service=WCS&version=1.0.0&" +
@@ -103,7 +115,7 @@ public class WCSRequestsTest extends AbstractTestRequest {
     @Test
     public void testWCSWrongRequest() throws JAXBException, IOException {
         // Creates an intentional wrong url, regarding the WCS version 1.0.0 standard
-        final URL wrongUrl;
+        URL wrongUrl;
         try {
             wrongUrl = new URL(WCS_FALSE_REQUEST);
         } catch (MalformedURLException ex) {
@@ -113,8 +125,32 @@ public class WCSRequestsTest extends AbstractTestRequest {
 
         // Try to marshall something from the response returned by the server.
         // The response should be a ServiceExceptionReport.
-        final Object obj = unmarshallResponse(wrongUrl);
+        Object obj = unmarshallResponse(wrongUrl);
         assertTrue(obj instanceof ServiceExceptionReport);
+
+        try {
+            wrongUrl = new URL(WCS_FALSE_REQUEST_100);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a ServiceExceptionReport.
+        obj = unmarshallResponse(wrongUrl);
+        assertTrue(obj instanceof ServiceExceptionReport);
+
+        try {
+            wrongUrl = new URL(WCS_FALSE_REQUEST_111);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a OWS ExceptionReport.
+        obj = unmarshallResponse(wrongUrl);
+        assertTrue("exception type:" + obj.getClass().getName(), obj instanceof ExceptionReport);
     }
 
     /**

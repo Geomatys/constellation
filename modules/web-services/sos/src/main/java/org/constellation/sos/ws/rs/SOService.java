@@ -54,7 +54,6 @@ import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
-import org.geotoolkit.util.StringUtilities;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -82,8 +81,7 @@ public class SOService extends OGCWebService {
                       "org.geotoolkit.sampling.xml.v100:" +
                       "org.geotoolkit.sml.xml.v100:" +
                       "org.geotoolkit.sml.xml.v101", "",
-                "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd",
-                "http://www.opengis.net/ows/1.1 http://schemas.opengis.net/ows/1.1.0/owsExceptionReport.xsd");
+                "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd");
     }
 
     @Override
@@ -273,41 +271,21 @@ public class SOService extends OGCWebService {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
 
-        if (isJaxBContextValid()) {
-            if (serviceDef == null) {
-                serviceDef = getBestVersion(null);
-            }
-            String exceptionCode = ex.getExceptionCode().name();
-            if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
-                exceptionCode = exceptionCode.replace("_", "");
-                exceptionCode = exceptionCode.toLowerCase();
-                final org.geotoolkit.ows.xml.OWSExceptionCode code = CodeLists.valueOf(org.geotoolkit.ows.xml.OWSExceptionCode.class, exceptionCode);
-                exceptionCode = code.name();
-            }
-            final StringWriter sw = new StringWriter();
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(),
-                                                         serviceDef.exceptionVersion.toString());
-            Marshaller marshaller = null;
-            try {
-                marshaller = getMarshallerPool().acquireMarshaller();
-
-                if (exceptionSchemaLocation != null) {
-                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, exceptionSchemaLocation);
-                }
-                marshaller.marshal(report, sw);
-                // we restore the main schema location
-                if (schemaLocation != null) {
-                    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
-                }
-            } finally {
-                if (marshaller != null) {
-                    getMarshallerPool().release(marshaller);
-                }
-            }
-            return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
-        } else {
-            return Response.ok("The SOS server is not running cause: unable to create JAXB context!", MimeType.TEXT_PLAIN).build();
+        
+        if (serviceDef == null) {
+            serviceDef = getBestVersion(null);
         }
+        String exceptionCode = ex.getExceptionCode().name();
+        if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
+            exceptionCode = exceptionCode.replace("_", "");
+            exceptionCode = exceptionCode.toLowerCase();
+            final org.geotoolkit.ows.xml.OWSExceptionCode code = CodeLists.valueOf(org.geotoolkit.ows.xml.OWSExceptionCode.class, exceptionCode);
+            exceptionCode = code.name();
+        }
+        final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(),
+                                                     serviceDef.exceptionVersion.toString());
+        return Response.ok(report, MimeType.TEXT_XML).build();
+        
     }
 
     /**

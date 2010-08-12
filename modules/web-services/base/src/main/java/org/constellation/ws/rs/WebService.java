@@ -317,16 +317,16 @@ public abstract class WebService {
 
             if (request instanceof Versioned) {
                 final Versioned ar = (Versioned) request;
-                if (ar.getVersion() != null)
+                if (ar.getVersion() != null) {
                     getUriContext().getQueryParameters().add("VERSION", ar.getVersion().toString());
-            } if (request != null) {
-                final String type;
-                if (request instanceof JAXBElement) {
-                    type = ((JAXBElement)request).getDeclaredType().getName();
-                } else {
-                    type = request.getClass().getName();
                 }
-                LOGGER.log(Level.FINER, "request type:{0}", type);
+            }
+
+            if (request != null) {
+                if (request instanceof JAXBElement) {
+                    request = ((JAXBElement) request).getValue();
+                } 
+                LOGGER.log(Level.FINER, "request type:{0}", request.getClass().getName());
             }
             return treatIncomingRequest(request);
         } else {

@@ -170,10 +170,6 @@ public class WFSService extends OGCWebService {
         try {
             marshaller = getMarshallerPool().acquireMarshaller();
 
-            if (objectRequest instanceof JAXBElement) {
-                objectRequest = ((JAXBElement<?>)objectRequest).getValue();
-            }
-
             final String request = (objectRequest == null) ? getParameter(KEY_REQUEST, true) : null;
             logParameters();
 
@@ -264,32 +260,18 @@ public class WFSService extends OGCWebService {
         } else {
             LOGGER.severe("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
-        if (isJaxBContextValid()) {
-            if (serviceDef == null) {
-                serviceDef = getBestVersion(null);
-            }
-            final String version = serviceDef.exceptionVersion.toString();
-            String exceptionCode;
-            if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
-                exceptionCode = StringUtilities.transformCodeName(ex.getExceptionCode().name());
-            } else {
-                exceptionCode = ex.getExceptionCode().name();
-            }
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(), version);
-            final StringWriter sw = new StringWriter();
-            Marshaller marshaller = null;
-            try {
-                marshaller = getMarshallerPool().acquireMarshaller();
-                marshaller.marshal(report, sw);
-            } finally {
-                if (marshaller != null) {
-                    getMarshallerPool().release(marshaller);
-                }
-            }
-            return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), "text/xml").build();
-        } else {
-            return Response.ok("The WFS server is not running cause: unable to create JAXB context!", "text/plain").build();
+        if (serviceDef == null) {
+            serviceDef = getBestVersion(null);
         }
+        final String version = serviceDef.exceptionVersion.toString();
+        String exceptionCode;
+        if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
+            exceptionCode = StringUtilities.transformCodeName(ex.getExceptionCode().name());
+        } else {
+            exceptionCode = ex.getExceptionCode().name();
+        }
+        final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(), version);
+        return Response.ok(report, "text/xml").build();
     }
 
     /**
@@ -400,13 +382,7 @@ public class WFSService extends OGCWebService {
                 if (ar.getVersion() != null)
                     getUriContext().getQueryParameters().add(VERSION, ar.getVersion().toString());
             } if (request != null) {
-                String type = "";
-                if (request instanceof JAXBElement) {
-                    type = ((JAXBElement)request).getDeclaredType().getName();
-                } else {
-                    type = request.getClass().getName();
-                }
-                LOGGER.finer("request type:" + type);
+                LOGGER.finer("request type:" + request.getClass().getName());
             }
             return treatIncomingRequest(request);
         } else {

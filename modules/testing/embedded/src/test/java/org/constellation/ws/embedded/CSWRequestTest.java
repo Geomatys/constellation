@@ -38,6 +38,7 @@ import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
 import org.geotoolkit.csw.xml.v202.ObjectFactory;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -82,6 +83,25 @@ public class CSWRequestTest extends AbstractTestRequest {
         Object obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof Capabilities);
+
+    }
+
+    @Test
+    public void testCSWError() throws Exception {
+
+        // Creates a valid GetCapabilities url.
+        final URL getCapsUrl = new URL(CSW_POST_URL);
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        final GetCapabilitiesType request = new GetCapabilitiesType("SOS");
+
+        postRequestObject(conec, request);
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof ExceptionReport);
 
     }
 

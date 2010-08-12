@@ -28,7 +28,9 @@ public abstract class AbstractWebService extends WebService {
 
     /**
      * A flag indicating if the JAXBContext is properly build.
+     * @Deprecated MarshallerPool must be created elsewhere
      */
+    @Deprecated
     private boolean workingContext = false;
 
     /**
@@ -37,13 +39,10 @@ public abstract class AbstractWebService extends WebService {
     private MarshallerPool marshallerPool;
 
     /**
-     * The xsd schema location for exception report.
-     */
-    protected String exceptionSchemaLocation = null;
-
-    /**
      * The xsd schema location for all the returned xml.
+     * @Deprecated should be declared directly in the marshallerPool (or object writer).
      */
+    @Deprecated
     protected String schemaLocation = null;
 
     /**
@@ -57,6 +56,7 @@ public abstract class AbstractWebService extends WebService {
     /**
      *  A flag indicating if the JAXBContext is properly build.
      */
+    @Deprecated
     protected synchronized boolean isJaxBContextValid(){
         return workingContext;
     }
@@ -67,22 +67,13 @@ public abstract class AbstractWebService extends WebService {
      * @param packagesName A list of package containing JAXB annoted classes.
      * @param rootNamespace The main namespace for all the document.
      *
+     * @Deprecated use setXMLContext(final MarshallerPool pool)
+     *
      * @throws JAXBException
      */
+    @Deprecated
     protected synchronized void setXMLContext(final String packagesName, final String rootNamespace) throws JAXBException {
-        setXMLContext(packagesName, rootNamespace, schemaLocation, exceptionSchemaLocation);
-    }
-
-    /**
-     * Initialize the JAXB context and build the unmarshaller/marshaller
-     *
-     * @param classesName A list of JAXB annoted classes.
-     * @param rootNamespace The main namespace for all the document.
-     *
-     * @throws JAXBException
-     */
-    protected synchronized void setXMLContext(final String rootNamespace, final Class<?>... classes) throws JAXBException {
-        setXMLContext(rootNamespace, null, null, classes);
+        setXMLContext(packagesName, rootNamespace, schemaLocation);
     }
 
     /**
@@ -95,10 +86,10 @@ public abstract class AbstractWebService extends WebService {
      *
      * @throws JAXBException
      */
-    protected synchronized void setXMLContext(final String packagesName, final String rootNamespace, final String schemaLocation, final String exceptionSchemaLocation) throws JAXBException {
+    @Deprecated
+    protected synchronized void setXMLContext(final String packagesName, final String rootNamespace, final String schemaLocation) throws JAXBException {
         LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() +
                 "\n packages: " + packagesName);
-        this.exceptionSchemaLocation = exceptionSchemaLocation;
         this.schemaLocation = schemaLocation;
         try{
             marshallerPool = new AnchoredMarshallerPool(rootNamespace, packagesName, schemaLocation);
@@ -119,18 +110,10 @@ public abstract class AbstractWebService extends WebService {
      *
      * @throws JAXBException
      */
-    protected synchronized void setXMLContext(final String rootNamespace, final String schemaLocation, final String exceptionSchemaLocation, final Class<?>... classes) throws JAXBException {
-        LOGGER.finer("SETTING XML CONTEXT: classes version");
-        this.exceptionSchemaLocation = exceptionSchemaLocation;
-        this.schemaLocation = schemaLocation;
-        
-        try{
-            marshallerPool = new AnchoredMarshallerPool(rootNamespace, schemaLocation, classes);
-            workingContext = true;
-        }catch(JAXBException ex){
-            workingContext = false;
-            throw ex;
-        }
+    protected synchronized void setXMLContext(final MarshallerPool pool) {
+        LOGGER.finer("SETTING XML CONTEXT: marshaller Pool version");
+        marshallerPool = pool;
+        workingContext = true;
     }
 
 }

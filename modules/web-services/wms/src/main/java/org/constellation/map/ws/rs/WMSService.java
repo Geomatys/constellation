@@ -75,6 +75,7 @@ import org.geotoolkit.util.Version;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
+import org.geotoolkit.wms.xml.WMSMarshallerPool;
 import org.geotoolkit.xml.MarshallerPool;
 
 //Geoapi dependencies
@@ -107,16 +108,11 @@ public class WMSService extends GridWebService {
     /**
      * Build a new instance of the webService and initialize the JAXB marshaller.
      */
-    public WMSService() throws JAXBException {
+    public WMSService() {
         super(ServiceDef.WMS_1_3_0_SLD, ServiceDef.WMS_1_1_1_SLD);
 
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        setXMLContext("org.geotoolkit.ogc.xml.exception:" +
-                      "org.geotoolkit.wms.xml.v111:" +
-                      "org.geotoolkit.wms.xml.v130:" +
-                      "org.geotoolkit.sld.xml.v110:" +
-                      "org.geotoolkit.internal.jaxb.geometry",
-                      "");
+        setXMLContext(WMSMarshallerPool.getInstance());
 
         worker = new DefaultWMSWorker();
         setFullRequestLog(true);

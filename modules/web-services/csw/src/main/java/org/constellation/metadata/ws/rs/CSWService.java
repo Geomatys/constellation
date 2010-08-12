@@ -19,7 +19,6 @@ package org.constellation.metadata.ws.rs;
 
 // java se dependencies
 import org.apache.xml.serialize.XMLSerializer;
-import java.io.StringWriter;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +36,6 @@ import javax.ws.rs.core.Response;
 //JAXB dependencies
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
@@ -72,7 +70,7 @@ import org.geotoolkit.csw.xml.v202.GetRecordsType;
 import org.geotoolkit.csw.xml.v202.HarvestType;
 import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.csw.xml.v202.QueryType;
-import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ogc.xml.v110.SortOrderType;
@@ -81,7 +79,6 @@ import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
-import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.Namespaces;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -123,16 +120,9 @@ public class CSWService extends OGCWebService {
      */
     protected CSWService(final String serviceID, final Map<String, CSWworker> workers) {
         super(ServiceDef.CSW_2_0_2);
-        this.serviceID = serviceID;
-        try {
-            setXMLContext("", EBRIMClassesContext.getAllClasses());
-            this.workers = workers;
-        } catch (JAXBException ex) {
-             LOGGER.severe("The CSW service is not running."       + '\n' +
-                          " cause  : Error creating XML context." + '\n' +
-                          " error  : " + ex.getMessage()          + '\n' +
-                          " details: " + ex.toString());
-        }
+        setXMLContext(EBRIMMarshallerPool.getInstance());
+        this.serviceID  = serviceID;
+        this.workers    = workers;
         this.serializer = getXMLSerializer();
     }
 
@@ -142,20 +132,12 @@ public class CSWService extends OGCWebService {
      */
     protected CSWService(final File configDirectory, String serviceID) {
         super(ServiceDef.CSW_2_0_2);
-        this.serviceID = serviceID;
-        try {
-            setXMLContext("", EBRIMClassesContext.getAllClasses());
-            final CSWworker worker = new CSWworker(serviceID, configDirectory);
-            this.workers = new HashMap<String, CSWworker>();
-            workers.put(serviceID, worker);
-
-        } catch (JAXBException ex) {
-             LOGGER.severe("The CSW service is not running."       + '\n' +
-                          " cause  : Error creating XML context." + '\n' +
-                          " error  : " + ex.getMessage()          + '\n' +
-                          " details: " + ex.toString());
-        }
-        this.serializer = getXMLSerializer();
+        setXMLContext(EBRIMMarshallerPool.getInstance());
+        this.serviceID         = serviceID;
+        final CSWworker worker = new CSWworker(serviceID, configDirectory);
+        this.workers           = new HashMap<String, CSWworker>();
+        this.serializer        = getXMLSerializer();
+        workers.put(serviceID, worker);
     }
 
     /**
@@ -203,10 +185,6 @@ public class CSWService extends OGCWebService {
                 worker.setServiceURL(getServiceURL());
                 logParameters();
                 String request = "";
-
-                if (objectRequest instanceof JAXBElement) {
-                    objectRequest = ((JAXBElement)objectRequest).getValue();
-                }
 
                 // if the request is not an xml request we fill the request parameter.
                 if (objectRequest == null) {
@@ -369,26 +347,14 @@ public class CSWService extends OGCWebService {
         } else {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
-        if (isJaxBContextValid()) {
-            if (serviceDef == null) {
-                serviceDef = getBestVersion(null);
-            }
-            final String version = serviceDef.exceptionVersion.toString();
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
-            final StringWriter sw = new StringWriter();
-            Marshaller marshaller = null;
-            try {
-                marshaller = getMarshallerPool().acquireMarshaller();
-                marshaller.marshal(report, sw);
-            } finally {
-                if (marshaller != null) {
-                    getMarshallerPool().release(marshaller);
-                }
-            }
-            return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
-        } else {
-            return Response.ok("The CSW server is not running cause: unable to create JAXB context!", MimeType.TEXT_PLAIN).build();
+        
+        if (serviceDef == null) {
+            serviceDef = getBestVersion(null);
         }
+        final String version = serviceDef.exceptionVersion.toString();
+        final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
+        return Response.ok(report, MimeType.TEXT_XML).build();
+        
     }
     
     /**

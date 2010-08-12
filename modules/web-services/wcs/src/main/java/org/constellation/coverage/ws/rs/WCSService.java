@@ -32,7 +32,6 @@ import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
@@ -69,6 +68,7 @@ import org.geotoolkit.wcs.xml.v111.GridCrsType;
 import org.geotoolkit.wcs.xml.v111.RangeSubsetType.FieldSubset;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
+import org.geotoolkit.wcs.xml.WCSMarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -103,21 +103,13 @@ public class WCSService extends GridWebService {
 
     /**
      * Build a new instance of the webService and initialize the JAXB marshaller.
-     *
-     * @throws JAXBException if the initialization of the XML context fails.
      */
-    public WCSService() throws JAXBException {
+    public WCSService() {
         super(ServiceDef.WCS_1_1_1, ServiceDef.WCS_1_0_0);
 
         setFullRequestLog(true);
         //we build the JAXB marshaller and unmarshaller to bind java/xml
-        setXMLContext("org.geotoolkit.ogc.xml.exception:" +
-                      "org.geotoolkit.ows.xml.v100:" +
-                      "org.geotoolkit.wcs.xml.v100:" +
-                      "org.geotoolkit.wcs.xml.v111:" +
-                      "org.geotoolkit.gml.xml.v311:"  +
-                      "org.geotoolkit.internal.jaxb.geometry",
-                      "");
+        setXMLContext(WCSMarshallerPool.getInstance());
 
         worker = new WCSWorker();
         LOGGER.info("WCS service running");
@@ -150,10 +142,6 @@ public class WCSService extends GridWebService {
             }
 
             String request = "";
-            if (objectRequest instanceof JAXBElement) {
-                objectRequest = ((JAXBElement) objectRequest).getValue();
-            }
-
             // if the request is not an xml request we fill the request parameter.
             if (objectRequest == null) {
                 request = getParameter(KEY_REQUEST, true);

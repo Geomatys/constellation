@@ -44,7 +44,7 @@ import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.util.ImageIOUtilities;
-import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 import org.geotoolkit.wmts.xml.v100.GetTile;
@@ -60,6 +60,7 @@ import static org.constellation.query.Query.KEY_VERSION;
  * @version $Id$
  *
  * @author Cédric Briançon (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  * @since 0.3
  */
 @Path("wmts")
@@ -77,20 +78,8 @@ public class WMTSService extends GridWebService {
      */
     public WMTSService() {
         super(ServiceDef.WMTS_1_0_0);
-        try {
-            setXMLContext("org.geotoolkit.wmts.xml.v100:" +
-                          "org.geotoolkit.ows.xml.v110:"  +
-                          "org.geotoolkit.gml.xml.v311:"  +
-                          "org.geotoolkit.internal.jaxb.geometry",
-                          "http://www.opengis.net/wmts");
-            worker = new DefaultWMTSWorker();
-
-        } catch (JAXBException ex){
-            LOGGER.severe("The WMTS service is not running.\n"      +
-                          " cause  : Error creating XML context.\n" +
-                          " error  : " + ex.getMessage()     + '\n' +
-                          " details: " + ex.toString());
-        }
+        setXMLContext(WMTSMarshallerPool.getInstance());
+        worker = new DefaultWMTSWorker();
     }
 
     /**
@@ -115,10 +104,6 @@ public class WMTSService extends GridWebService {
             marshaller = getMarshallerPool().acquireMarshaller();
             logParameters();
             String request = "";
-
-            if (objectRequest instanceof JAXBElement) {
-                objectRequest = ((JAXBElement) objectRequest).getValue();
-            }
 
             // if the request is not an xml request we fill the request parameter.
             if (objectRequest == null) {
@@ -452,26 +437,14 @@ public class WMTSService extends GridWebService {
             LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
         }
 
-        if (isJaxBContextValid()) {
-            if (serviceDef == null) {
-                serviceDef = getBestVersion(null);
-            }
-            final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(),
-                    ex.getLocator(), serviceDef.exceptionVersion.toString());
-            final StringWriter sw = new StringWriter();
-            Marshaller marshaller = null;
-            try {
-                marshaller = getMarshallerPool().acquireMarshaller();
-                marshaller.marshal(report, sw);
-            } finally {
-                if (marshaller != null) {
-                    getMarshallerPool().release(marshaller);
-                }
-            }
-            return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
-        } else {
-            return Response.ok("The WMTS server is not running cause: unable to create JAXB context!", MimeType.TEXT_PLAIN).build();
+        
+        if (serviceDef == null) {
+            serviceDef = getBestVersion(null);
         }
+        final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(),
+                ex.getLocator(), serviceDef.exceptionVersion.toString());
+        return Response.ok(report, MimeType.TEXT_XML).build();
+        
     }
 
     /**
