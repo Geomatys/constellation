@@ -18,7 +18,6 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
-import java.io.IOException;
 import org.apache.xml.serialize.XMLSerializer;
 import java.io.StringWriter;
 import java.io.File;
@@ -46,13 +45,14 @@ import javax.xml.namespace.QName;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
-import org.constellation.jaxb.MarshallWarnings;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
+import org.constellation.metadata.utils.SerializerResponse;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
+import org.geotoolkit.csw.xml.CSWResponse;
 import org.geotoolkit.csw.xml.DescribeRecord;
 import org.geotoolkit.csw.xml.GetCapabilities;
 import org.geotoolkit.csw.xml.GetDomain;
@@ -82,7 +82,6 @@ import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.util.StringUtilities;
-import org.geotoolkit.xml.Catching;
 import org.geotoolkit.xml.Namespaces;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -196,13 +195,9 @@ public class CSWService extends OGCWebService {
      * @throw JAXBException
      */
     protected Response treatIncomingRequest(Object objectRequest, CSWworker worker) throws JAXBException {
-        Catching.Marshaller marshaller    = null;
         ServiceDef serviceDef           = null;
-        final MarshallWarnings warnings = new MarshallWarnings();
+        
         try {
-            marshaller = getMarshallerPool().acquireMarshaller();
-            marshaller.setObjectConverters(warnings);
-
             if (worker != null) {
 
                 worker.setServiceURL(getServiceURL());
@@ -234,10 +229,7 @@ public class CSWService extends OGCWebService {
                     }
                     worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
 
-                    final StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.getCapabilities(gc), sw);
-
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                    return Response.ok(worker.getCapabilities(gc), worker.getOutputFormat()).build();
 
                 }
 
@@ -253,16 +245,9 @@ public class CSWService extends OGCWebService {
                         gr = createNewGetRecordsRequest();
                     }
                     serviceDef = getVersionFromNumber(gr.getVersion());
-                    final StringWriter sw = new StringWriter();
-                    if (serializer != null) {
-                        // marshal using the Apache XMLSerializer
-                        serializer.setOutputCharStream(sw);
-                        marshaller.marshal(worker.getRecords(gr), serializer.asContentHandler());
-                    } else {
-                        marshaller.marshal(worker.getRecords(gr), sw);
-                    }
-
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                    // we pass the serializer to the messageBodyWriter
+                    final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecords(gr), serializer);
+                    return Response.ok(response, worker.getOutputFormat()).build();
 
                 }
 
@@ -278,17 +263,9 @@ public class CSWService extends OGCWebService {
                         grbi = createNewGetRecordByIdRequest();
                     }
                     serviceDef = getVersionFromNumber(grbi.getVersion());
-                    final StringWriter sw = new StringWriter();
 
-                    if (serializer != null) {
-                        // marshal using the Apache XMLSerializer
-                        serializer.setOutputCharStream(sw);
-                        marshaller.marshal(worker.getRecordById(grbi), serializer.asContentHandler());
-                    } else {
-                        marshaller.marshal(worker.getRecordById(grbi), sw);
-                    }
-
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                    final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecordById(grbi), serializer);
+                    return Response.ok(response, worker.getOutputFormat()).build();
 
                 }
 
@@ -304,11 +281,8 @@ public class CSWService extends OGCWebService {
                         dr = createNewDescribeRecordRequest();
                     }
                     serviceDef = getVersionFromNumber(dr.getVersion());
-                    final StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.describeRecord(dr), sw);
-
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-
+                    
+                    return Response.ok(worker.describeRecord(dr), worker.getOutputFormat()).build();
                 }
 
                 if (request.equalsIgnoreCase("GetDomain") || (objectRequest instanceof GetDomain)) {
@@ -325,11 +299,7 @@ public class CSWService extends OGCWebService {
                     serviceDef = getVersionFromNumber(gd.getVersion());
                     worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
 
-                    final StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.getDomain(gd), sw);
-
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-
+                    return Response.ok(worker.getDomain(gd), worker.getOutputFormat()).build();
                 }
 
                 if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof Transaction)) {
@@ -341,11 +311,8 @@ public class CSWService extends OGCWebService {
                                                        OPERATION_NOT_SUPPORTED, "transaction");
                     }
                     serviceDef = getVersionFromNumber(t.getVersion());
-                    final StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.transaction(t), sw);
 
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-
+                    return Response.ok(worker.transaction(t), worker.getOutputFormat()).build();
                 }
 
                 if (request.equalsIgnoreCase("Harvest") || (objectRequest instanceof HarvestType)) {
@@ -360,11 +327,8 @@ public class CSWService extends OGCWebService {
                         h = createNewHarvestRequest();
                     }
                     serviceDef = getVersionFromNumber(h.getVersion());
-                    final StringWriter sw = new StringWriter();
-                    marshaller.marshal(worker.harvest(h), sw);
-
-                    return Response.ok(sw.toString(), worker.getOutputFormat()).build();
-
+                    
+                    return Response.ok(worker.harvest(h), worker.getOutputFormat()).build();
                 }
 
                 if (request.isEmpty() && objectRequest != null) {
@@ -383,19 +347,7 @@ public class CSWService extends OGCWebService {
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, serviceDef);
 
-        } catch (IOException ex) {
-            return processExceptionResponse(new CstlServiceException("IO exception while using  the XML serializer:" + ex.getLocalizedMessage()), serviceDef);
-
-        } finally {
-            if (marshaller != null) {
-                getMarshallerPool().release(marshaller);
-            }
-            if (!warnings.isEmpty()) {
-               for (String message : warnings.getMessages()) {
-                   LOGGER.warning(message);
-               }
-            }
-        }
+        } 
     }
 
     /**
@@ -888,7 +840,7 @@ public class CSWService extends OGCWebService {
         if (serviceID != null && !serviceID.isEmpty())
             id = '(' + serviceID + ')';
 
-        LOGGER.info("Shutting down the REST CSW service facade " + id + '.');
+        LOGGER.log(Level.INFO, "Shutting down the REST CSW service facade {0}.", id);
         for (final CSWworker worker : workers.values()) {
             worker.destroy();
         }

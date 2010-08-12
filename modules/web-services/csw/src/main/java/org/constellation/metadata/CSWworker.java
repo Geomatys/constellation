@@ -1256,7 +1256,7 @@ public class CSWworker {
                     final String parameter     = token.substring(pointLocation + 1);
                     final Operation o          = skeletonCapabilities.getOperationsMetadata().getOperation(operationName);
                     if (o != null) {
-                        final DomainType param = o.getParameter(parameter);
+                        final DomainType param = o.getParameterIgnoreCase(parameter);
                         QName type;
                         if (operationName.equals("GetCapabilities")) {
                             type = CAPABILITIES_QNAME;

@@ -164,13 +164,14 @@
     <mdweb-meta.version>2.2-SNAPSHOT</mdweb-meta.version>
     <constellation.config>org.constellation.configuration.ws</constellation.config>
     <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
+    <constellation.metadata-provider>org.constellation.metadata.ws.rs.provider</constellation.metadata-provider>
     <constellation.map>org.constellation.map.ws.rs</constellation.map>
     <constellation.tile>org.constellation.tile.ws.rs</constellation.tile>
     <constellation.feature>org.constellation.wfs.ws.rs</constellation.feature>
     <constellation.provider>org.constellation.ws.rs.provider</constellation.provider>
     <constellation.coverage>org.constellation.coverage.ws.rs</constellation.coverage>
     <constellation.sensor>org.constellation.sos.ws.rs</constellation.sensor>
-    <constellation.services.packages>${constellation.config};${constellation.map};${constellation.metadata};${constellation.provider};${constellation.coverage};${constellation.feature};${constellation.sensor};${constellation.tile}</constellation.services.packages>
+    <constellation.services.packages>${constellation.config};${constellation.map};${constellation.metadata};${constellation.provider};${constellation.coverage};${constellation.feature};${constellation.sensor};${constellation.tile};${constellation.metadata-provider}</constellation.services.packages>
     <!-- Defines the source encoding -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -209,7 +210,7 @@
     <profile>
       <id>csw</id>
       <properties>
-        <constellation.services.packages>${constellation.config};${constellation.metadata};${constellation.provider}</constellation.services.packages>
+        <constellation.services.packages>${constellation.config};${constellation.metadata};${constellation.provider};${constellation.metadata-provider}</constellation.services.packages>
       </properties>
     </profile>
     <profile>

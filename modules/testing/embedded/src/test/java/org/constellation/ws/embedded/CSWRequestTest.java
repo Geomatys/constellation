@@ -17,12 +17,26 @@
 
 package org.constellation.ws.embedded;
 
+import org.geotoolkit.csw.xml.DomainValues;
+import java.util.Arrays;
+import java.util.List;
+import org.geotoolkit.csw.xml.v202.GetDomainType;
 import java.net.URLConnection;
 import java.net.URL;
 import java.io.File;
+import java.util.ArrayList;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.v202.Capabilities;
+import org.geotoolkit.csw.xml.v202.DomainValuesType;
+import org.geotoolkit.csw.xml.v202.ElementSetNameType;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
+import org.geotoolkit.csw.xml.v202.GetDomainResponseType;
+import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
+import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
+import org.geotoolkit.csw.xml.v202.ListOfValuesType;
+import org.geotoolkit.csw.xml.v202.ObjectFactory;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -51,13 +65,11 @@ public class CSWRequestTest extends AbstractTestRequest {
             f.delete();
         }
     }
-    /**
-     * TODO
-     */
+
     @Test
     public void testCSWGetCapabilities() throws Exception {
 
-        /* Creates a valid GetCapabilities url.
+        // Creates a valid GetCapabilities url.
         final URL getCapsUrl = new URL(CSW_POST_URL);
 
 
@@ -69,7 +81,57 @@ public class CSWRequestTest extends AbstractTestRequest {
         postRequestObject(conec, request);
         Object obj = unmarshallResponse(conec);
 
-        assertTrue(obj instanceof Capabilities);*/
+        assertTrue(obj instanceof Capabilities);
 
+    }
+
+    @Test
+    public void testCSWGetDomain() throws Exception {
+
+        // Creates a valid GetCapabilities url.
+        final URL getCapsUrl = new URL(CSW_POST_URL);
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        final GetDomainType request = new GetDomainType("CSW", "2.0.2", null, "GetCapabilities.sections");
+
+        postRequestObject(conec, request);
+        Object result = unmarshallResponse(conec);
+
+        assertTrue(result instanceof GetDomainResponseType);
+        
+        List<DomainValues> values = new ArrayList<DomainValues>();
+        ListOfValuesType list = new ListOfValuesType(Arrays.asList("All", "ServiceIdentification", "ServiceProvider", "OperationsMetadata","Filter_Capabilities"));
+        values.add(new DomainValuesType("GetCapabilities.sections", null, list, new QName("http://www.opengis.net/cat/csw/2.0.2", "Capabilities")));
+        GetDomainResponseType expResult = new GetDomainResponseType(values);
+
+        assertEquals(expResult, result);
+    }
+
+    @Test
+    public void testCSWGetRecordByID() throws Exception {
+
+        // Creates a valid GetCapabilities url.
+        final URL getCapsUrl = new URL(CSW_POST_URL);
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        final GetRecordByIdType request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                "text/xml", null, Arrays.asList("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f"));
+
+        final ObjectFactory factory = new ObjectFactory();
+        postRequestObject(conec, factory.createGetRecordById(request));
+        Object result = unmarshallResponse(conec);
+
+        assertTrue(result instanceof GetRecordByIdResponseType);
+
+        GetRecordByIdResponseType grResult = (GetRecordByIdResponseType) result;
+        assertEquals(1, grResult.getAbstractRecord().size());
+
+        
     }
 }
