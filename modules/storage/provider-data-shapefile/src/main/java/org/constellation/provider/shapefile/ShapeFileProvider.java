@@ -150,7 +150,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
             final File f = index.get(key);
             if (f != null) {
                 //we have this data source in the folder
-                store = loadDataStore(f,key.getNamespaceURI());
+                store = loadDataStore(f, source.parameters.get(KEY_NAMESPACE));
                 if (store != null) {
                     //cache the datastore
                     cache.put(key, store);
@@ -245,7 +245,7 @@ public class ShapeFileProvider extends AbstractLayerProvider {
                     String nmsp = source.parameters.get(KEY_NAMESPACE);
                     if (nmsp == null) {
                         nmsp = DEFAULT_NAMESPACE;
-                    } else if (nmsp.equals("no namespace")) {
+                    } else if (nmsp.equals(NO_NAMESPACE)) {
                         nmsp = null;
                     }
                     index.put(new DefaultName(nmsp,name), candidate);

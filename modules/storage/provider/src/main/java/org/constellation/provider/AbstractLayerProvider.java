@@ -33,6 +33,8 @@ public abstract class AbstractLayerProvider implements LayerProvider{
 
     protected static final String DEFAULT_NAMESPACE = "http://geotoolkit.org";
 
+    protected static final String NO_NAMESPACE = "no namespace";
+
     /**
      * {@inheritDoc }
      */
