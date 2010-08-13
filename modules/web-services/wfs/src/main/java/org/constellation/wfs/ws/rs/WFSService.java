@@ -175,29 +175,19 @@ public class WFSService extends OGCWebService {
 
             if (STR_GETCAPABILITIES.equalsIgnoreCase(request) || (objectRequest instanceof GetCapabilitiesType)) {
                 final GetCapabilitiesType model = adaptGetCapabilities(objectRequest);
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getCapabilities(model), sw);
-                return Response.ok(sw.toString(), getOutputFormat()).build();
+                return Response.ok(worker.getCapabilities(model), getOutputFormat()).build();
 
             } else if (STR_DESCRIBEFEATURETYPE.equalsIgnoreCase(request) || (objectRequest instanceof DescribeFeatureTypeType)) {
                 final DescribeFeatureTypeType model = adaptDescribeFeatureType(objectRequest);
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.describeFeatureType(model), sw);
-                return Response.ok(sw.toString(), getOutputFormat()).build();
+                return Response.ok(worker.describeFeatureType(model), getOutputFormat()).build();
 
             } else if (STR_GETFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof GetFeatureType)) {
                 final GetFeatureType model = adaptGetFeatureType(objectRequest);
                 version = getVersionFromNumber(model.getVersion());
                 final Object response = worker.getFeature(model);
-                if (response instanceof FeatureCollection) {
-                    schemaLocations = worker.getSchemaLocations();
-                    return Response.ok(response, getOutputFormat()).build();
-                } else {
-                    final StringWriter sw = new StringWriter();
-                    marshaller.marshal(response, sw);
-                    return Response.ok(sw.toString(), getOutputFormat()).build();
-                }
-
+                schemaLocations = worker.getSchemaLocations();
+                return Response.ok(response, getOutputFormat()).build();
+                
             } else if (STR_GETGMLOBJECT.equalsIgnoreCase(request) || (objectRequest instanceof GetGmlObjectType)) {
                 final GetGmlObjectType model = adaptGetGMLObject(objectRequest);
                 version = getVersionFromNumber(model.getVersion());
@@ -208,16 +198,12 @@ public class WFSService extends OGCWebService {
             } else if (STR_LOCKFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof LockFeatureType)) {
                 final LockFeatureType model = adaptLockFeature(objectRequest);
                 version = getVersionFromNumber(model.getVersion());
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.lockFeature(model), sw);
-                return Response.ok(sw.toString(), getOutputFormat()).build();
+                return Response.ok(worker.lockFeature(model), getOutputFormat()).build();
 
             } else if (STR_TRANSACTION.equalsIgnoreCase(request) || (objectRequest instanceof TransactionType)) {
                 final TransactionType model = adaptTransaction(objectRequest);
                 version = getVersionFromNumber(model.getVersion());
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.transaction(model), sw);
-                return Response.ok(sw.toString(), getOutputFormat()).build();
+                return Response.ok(worker.transaction(model), getOutputFormat()).build();
             }
 
             //unvalid request, throw an error
@@ -384,7 +370,7 @@ public class WFSService extends OGCWebService {
             }
 
             if (request != null) {
-                LOGGER.finer("request type:" + request.getClass().getName());
+                LOGGER.log(Level.FINER, "request type:{0}", request.getClass().getName());
             }
             return treatIncomingRequest(request);
         } else {

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2009, Geomatys
+ *    (C) 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.wfs.ws.rs;
+package org.constellation.sos.ws.rs;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,31 +23,33 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBException;
-import javax.xml.stream.XMLStreamException;
-import org.geotoolkit.data.DataStoreRuntimeException;
-import org.geotoolkit.feature.xml.XmlFeatureWriter;
-import org.geotoolkit.feature.xml.jaxp.JAXPStreamFeatureWriter;
-import org.geotoolkit.data.FeatureCollection;
-import org.geotoolkit.storage.DataStoreException;
+import javax.xml.bind.Marshaller;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.sos.xml.SOSResponse;
 
 /**
  *
  * @author Guilhem Legal (Geomatys)
  */
 @Provider
-public class FeatureCollectionWriter<T extends FeatureCollection> implements MessageBodyWriter<T> {
+@Produces("application/xml,text/xml,*/*")
+public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWriter<T> {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.wfs.ws.rs");
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.ws.rs");
+
+    private static final String schemaLocation =  "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd";
+   
 
     @Override
     public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
-        return FeatureCollection.class.isAssignableFrom(type);
+        return SOSResponse.class.isAssignableFrom(type);
     }
 
     @Override
@@ -57,18 +59,19 @@ public class FeatureCollectionWriter<T extends FeatureCollection> implements Mes
 
     @Override
     public void writeTo(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
+        Marshaller m = null;
         try {
-            final XmlFeatureWriter featureWriter = new JAXPStreamFeatureWriter(WFSService.getSchemaLocations());
-            featureWriter.write(t, out);
+            m = SOSMarshallerPool.getInstance().acquireMarshaller();
+            m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
+            m.marshal(t, out);
         } catch (JAXBException ex) {
-            LOGGER.log(Level.SEVERE, "JAXB exception while writing the feature collection", ex);
-        } catch (XMLStreamException ex) {
-            LOGGER.log(Level.SEVERE, "Stax exception while writing the feature collection", ex);
-        } catch (DataStoreException ex) {
-            LOGGER.log(Level.SEVERE, "DataStore exception while writing the feature collection", ex);
-        } catch (DataStoreRuntimeException ex) {
-            LOGGER.log(Level.SEVERE, "DataStoreRuntimeException exception while writing the feature collection", ex);
+            LOGGER.log(Level.SEVERE, "JAXB exception while writing the SOSResponse File", ex);
+        } finally {
+            if (m != null) {
+                SOSMarshallerPool.getInstance().release(m);
+            }
         }
     }
 
 }
+

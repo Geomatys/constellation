@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -78,7 +79,7 @@ public class CSWResponseWriter<T extends CSWResponse> implements MessageBodyWrit
             }
 
         } catch (JAXBException ex) {
-            LOGGER.severe("JAXB exception while writing the describeLayer response");
+            LOGGER.log(Level.SEVERE, "JAXB exception while writing the CSW response", ex);
         } finally {
             if (m != null) {
                  CSWMarshallerPool.getInstance().release(m);

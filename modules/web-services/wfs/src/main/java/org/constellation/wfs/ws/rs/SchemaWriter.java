@@ -15,7 +15,7 @@
  *    Lesser General Public License for more details.
  */
 
-package org.constellation.sos.ws.rs;
+package org.constellation.wfs.ws.rs;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,13 +27,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.constellation.jaxb.AnchoredMarshallerPool;
-import org.geotoolkit.sos.xml.v100.Capabilities;
-import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.xsd.xml.v2001.Schema;
+import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 
 /**
  *
@@ -41,28 +40,13 @@ import org.geotoolkit.xml.MarshallerPool;
  */
 @Provider
 @Produces("application/xml,text/xml,*/*")
-public class CapabilitiesWriter<T extends Capabilities> implements MessageBodyWriter<T> {
+public class SchemaWriter<T extends Schema> implements MessageBodyWriter<T>  {
 
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.wfs.ws.rs");
-
-    private static final MarshallerPool pool;
-    static {
-        MarshallerPool candidate = null;
-        try {
-            candidate = new AnchoredMarshallerPool(null,
-                    "org.geotoolkit.sos.xml.v100:" +
-                    "org.geotoolkit.gml.xml.v311:" +
-                    "org.geotoolkit.internal.jaxb.geometry",
-                    "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd");
-        } catch (JAXBException ex) {
-           LOGGER.log(Level.SEVERE, "JAXBException while initializing Capabilities writer", ex);
-        }
-        pool = candidate;
-    }
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata.ws.rs");
 
     @Override
     public boolean isWriteable(Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
-        return Capabilities.class.isAssignableFrom(type);
+        return Schema.class.isAssignableFrom(type);
     }
 
     @Override
@@ -74,16 +58,16 @@ public class CapabilitiesWriter<T extends Capabilities> implements MessageBodyWr
     public void writeTo(T t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
         Marshaller m = null;
         try {
-            m = pool.acquireMarshaller();
+            m = XSDMarshallerPool.getInstance().acquireMarshaller();
             m.marshal(t, out);
+
+
         } catch (JAXBException ex) {
-            LOGGER.severe("JAXB exception while writing the capabilities File");
+            LOGGER.log(Level.SEVERE, "JAXB exception while writing the WFS Schema response", ex);
         } finally {
             if (m != null) {
-                pool.release(m);
+                 XSDMarshallerPool.getInstance().release(m);
             }
         }
     }
-
 }
-

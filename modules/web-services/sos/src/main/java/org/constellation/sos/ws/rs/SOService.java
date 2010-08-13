@@ -160,10 +160,7 @@ public class SOService extends OGCWebService {
                                                      OPERATION_NOT_SUPPORTED, "InsertObservation");
                 }
                 serviceDef = getVersionFromNumber(is.getVersion());
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.insertObservation(is), sw);
-
-                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
+                return Response.ok(worker.insertObservation(is), MimeType.TEXT_XML).build();
 
              }
 
@@ -174,10 +171,8 @@ public class SOService extends OGCWebService {
                                                      OPERATION_NOT_SUPPORTED, "GetResult");
                 }
                 serviceDef = getVersionFromNumber(gr.getVersion());
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getResult(gr), sw);
 
-                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
+                return Response.ok(worker.getResult(gr), MimeType.TEXT_XML).build();
 
              }
 
@@ -188,10 +183,8 @@ public class SOService extends OGCWebService {
                                                   OPERATION_NOT_SUPPORTED, "RegisterSensor");
                 }
                 serviceDef = getVersionFromNumber(rs.getVersion());
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.registerSensor(rs), sw);
 
-                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
+                return Response.ok(worker.registerSensor(rs), MimeType.TEXT_XML).build();
 
              }
 
@@ -210,9 +203,6 @@ public class SOService extends OGCWebService {
                     serviceDef = getVersionFromNumber(gc.getVersion().toString());
                 }
                 final Capabilities capa = worker.getCapabilities(gc);
-
-                /*final StringWriter sw = new StringWriter();
-                marshaller.marshal(capa, sw);*/
 
                 return Response.ok(capa, worker.getOutputFormat()).build();
 

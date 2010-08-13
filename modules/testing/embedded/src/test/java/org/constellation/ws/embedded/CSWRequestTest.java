@@ -17,6 +17,9 @@
 
 package org.constellation.ws.embedded;
 
+import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
+import org.geotoolkit.csw.xml.TypeNames;
+import org.geotoolkit.csw.xml.ResultType;
 import org.geotoolkit.csw.xml.DomainValues;
 import java.util.Arrays;
 import java.util.List;
@@ -35,8 +38,11 @@ import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.geotoolkit.csw.xml.v202.GetDomainResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdType;
+import org.geotoolkit.csw.xml.v202.GetRecordsType;
 import org.geotoolkit.csw.xml.v202.ListOfValuesType;
 import org.geotoolkit.csw.xml.v202.ObjectFactory;
+import org.geotoolkit.csw.xml.v202.QueryConstraintType;
+import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.junit.*;
@@ -152,6 +158,29 @@ public class CSWRequestTest extends AbstractTestRequest {
         GetRecordByIdResponseType grResult = (GetRecordByIdResponseType) result;
         assertEquals(1, grResult.getAbstractRecord().size());
 
-        
+    }
+
+    @Test
+    public void testCSWGetRecords() throws Exception {
+
+        // Creates a valid GetCapabilities url.
+        final URL getCapsUrl = new URL(CSW_POST_URL);
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+        final QueryConstraintType constraint = new QueryConstraintType("identifier='urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f'", "1.1.0");
+        final QueryType query = new QueryType(Arrays.asList(TypeNames.RECORD_QNAME), new ElementSetNameType(ElementSetType.FULL), null, constraint);
+        final GetRecordsType request = new GetRecordsType("CSW", "2.0.2", ResultType.RESULTS, null, null, null, 1, 10, query, null);
+                
+        postRequestObject(conec, request);
+        Object result = unmarshallResponse(conec);
+
+        assertTrue(result instanceof GetRecordsResponseType);
+
+        GetRecordsResponseType grResult = (GetRecordsResponseType) result;
+        assertEquals(1, grResult.getSearchResults().getAbstractRecord().size());
+
     }
 }

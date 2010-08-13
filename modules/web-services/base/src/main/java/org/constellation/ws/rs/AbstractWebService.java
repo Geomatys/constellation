@@ -27,13 +27,6 @@ import org.geotoolkit.xml.MarshallerPool;
 public abstract class AbstractWebService extends WebService {
 
     /**
-     * A flag indicating if the JAXBContext is properly build.
-     * @Deprecated MarshallerPool must be created elsewhere
-     */
-    @Deprecated
-    private boolean workingContext = false;
-
-    /**
      * A pool of JAXB unmarshaller used to create Java objects from XML files.
      */
     private MarshallerPool marshallerPool;
@@ -44,14 +37,6 @@ public abstract class AbstractWebService extends WebService {
     @Override
     protected synchronized MarshallerPool getMarshallerPool() {
         return marshallerPool;
-    }
-
-    /**
-     *  A flag indicating if the JAXBContext is properly build.
-     */
-    @Deprecated
-    protected synchronized boolean isJaxBContextValid(){
-        return workingContext;
     }
 
     /**
@@ -66,15 +51,8 @@ public abstract class AbstractWebService extends WebService {
      */
     @Deprecated
     protected synchronized void setXMLContext(final String packagesName, final String rootNamespace, final String schemaLocation) throws JAXBException {
-        LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() +
-                "\n packages: " + packagesName);
-        try{
-            marshallerPool = new AnchoredMarshallerPool(rootNamespace, packagesName, schemaLocation);
-            workingContext = true;
-        }catch(JAXBException ex){
-            workingContext = false;
-            throw ex;
-        }
+        LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + "\n packages: " + packagesName);
+        marshallerPool = new AnchoredMarshallerPool(rootNamespace, packagesName, schemaLocation);
     }
 
     /**
@@ -90,7 +68,6 @@ public abstract class AbstractWebService extends WebService {
     protected synchronized void setXMLContext(final MarshallerPool pool) {
         LOGGER.finer("SETTING XML CONTEXT: marshaller Pool version");
         marshallerPool = pool;
-        workingContext = true;
     }
 
 }

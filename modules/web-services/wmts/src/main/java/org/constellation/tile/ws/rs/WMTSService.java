@@ -16,11 +16,7 @@
  */
 package org.constellation.tile.ws.rs;
 
-import org.constellation.tile.ws.WMTSWorker;
-import org.constellation.tile.ws.DefaultWMTSWorker;
-import org.geotoolkit.wmts.xml.v100.Capabilities;
 import com.sun.jersey.spi.resource.Singleton;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -30,15 +26,20 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 import org.constellation.ServiceDef;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
+import org.constellation.tile.ws.WMTSWorker;
+import org.constellation.tile.ws.DefaultWMTSWorker;
+import static org.constellation.ws.ExceptionCode.*;
+import static org.constellation.query.Query.KEY_REQUEST;
+import static org.constellation.query.Query.KEY_SERVICE;
+import static org.constellation.query.Query.KEY_VERSION;
 
+import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
@@ -48,11 +49,6 @@ import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
 import org.geotoolkit.wmts.xml.v100.GetTile;
-import static org.constellation.ws.ExceptionCode.*;
-import static org.constellation.query.Query.KEY_REQUEST;
-import static org.constellation.query.Query.KEY_SERVICE;
-import static org.constellation.query.Query.KEY_VERSION;
-
 
 /**
  * The REST facade to an OGC Web Map Tile Service, implementing the 1.0.0 version.
@@ -94,14 +90,12 @@ public class WMTSService extends GridWebService {
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
-        Marshaller marshaller = null;
         ServiceDef serviceDef = null;
         try {
             if (worker == null) {
                 throw new CstlServiceException(NOT_WORKING,
                                               NO_APPLICABLE_CODE);
             }
-            marshaller = getMarshallerPool().acquireMarshaller();
             logParameters();
             String request = "";
 
@@ -124,10 +118,7 @@ public class WMTSService extends GridWebService {
                 serviceDef = getVersionFromNumber(gc.getVersion().toString());
                 worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
                 
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getCapabilities(gc), sw);
-
-                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
+                return Response.ok(worker.getCapabilities(gc), MimeType.TEXT_XML).build();
             }
             if (request.equalsIgnoreCase("GetTile") || (objectRequest instanceof GetTile)) {
                 GetTile gt = (GetTile) objectRequest;
@@ -153,19 +144,12 @@ public class WMTSService extends GridWebService {
                     gf = createNewGetFeatureInfoRequest();
                 }
                 serviceDef = getVersionFromNumber(gf.getVersion());
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getFeatureInfo(gf), sw);
-
-                return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
+                return Response.ok(worker.getFeatureInfo(gf), MimeType.TEXT_XML).build();
             }
             throw new CstlServiceException("The operation " + request +
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, serviceDef);
-        } finally {
-            if (marshaller != null) {
-                getMarshallerPool().release(marshaller);
-            }
         }
     }
 
@@ -340,27 +324,19 @@ public class WMTSService extends GridWebService {
                                                   @PathParam("caps") String resourcename)
                                                                      throws JAXBException
     {
-        Marshaller marshaller = null;
         ServiceDef serviceDef = null;
         try {
-            marshaller = getMarshallerPool().acquireMarshaller();
             if (worker == null) {
                 throw new CstlServiceException(NOT_WORKING,
                                               NO_APPLICABLE_CODE);
             }
             final GetCapabilities gc = createNewGetCapabilitiesRequestRestful(version);
             serviceDef = getVersionFromNumber(gc.getVersion().toString());
-            final StringWriter sw = new StringWriter();
-            marshaller.marshal(worker.getCapabilities(gc), sw);
-            return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
+            return Response.ok(worker.getCapabilities(gc), MimeType.TEXT_XML).build();
 
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, serviceDef);
 
-        } finally {
-            if (marshaller != null) {
-                getMarshallerPool().release(marshaller);
-            }
         }
     }
 

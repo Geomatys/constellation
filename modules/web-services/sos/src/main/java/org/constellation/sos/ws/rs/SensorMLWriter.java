@@ -75,7 +75,7 @@ public class SensorMLWriter<T extends AbstractSensorML> implements MessageBodyWr
             m.marshal(t, out);
 
         } catch (JAXBException ex) {
-            LOGGER.log(Level.SEVERE, "JAXB exception while writing the SensorML response");
+            LOGGER.log(Level.SEVERE, "JAXB exception while writing the SensorML response", ex);
         } finally {
             if (m != null) {
                  ExceptionReportMarshallerPool.getInstance().release(m);

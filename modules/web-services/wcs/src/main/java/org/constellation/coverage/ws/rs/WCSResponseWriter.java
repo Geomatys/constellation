@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -60,7 +61,7 @@ public class WCSResponseWriter<T extends WCSResponse> implements MessageBodyWrit
             m = WCSMarshallerPool.getInstance().acquireMarshaller();
             m.marshal(t, out);
         } catch (JAXBException ex) {
-            LOGGER.severe("JAXB exception while writing the describeLayer response");
+            LOGGER.log(Level.SEVERE, "JAXB exception while writing the WCS response", ex);
         } finally {
             if (m != null) {
                  WCSMarshallerPool.getInstance().release(m);
