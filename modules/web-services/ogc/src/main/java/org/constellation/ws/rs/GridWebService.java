@@ -36,7 +36,6 @@ public abstract class GridWebService extends OGCWebService {
     static {
         Installation.allowSystemPreferences = false;
         ImageIO.scanForPlugins();
-        Registry.setDefaultCodecPreferences();
         try {
             Class.forName("javax.media.jai.JAI");
         } catch (ClassNotFoundException ex) {

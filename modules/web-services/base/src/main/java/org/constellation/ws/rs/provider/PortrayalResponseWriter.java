@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -37,6 +39,7 @@ import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.util.ImageIOUtilities;
+import org.geotoolkit.util.logging.Logging;
 
 /**
  * Write a portrayal response in the stream.
@@ -45,6 +48,8 @@ import org.geotoolkit.util.ImageIOUtilities;
  */
 @Provider
 public final class PortrayalResponseWriter implements MessageBodyWriter<PortrayalResponse> {
+
+    private static final Logger LOGGER = Logging.getLogger(PortrayalResponseWriter.class);
 
     @Override
     public long getSize(PortrayalResponse r, Class<?> c, Type t, Annotation[] as, MediaType mt) {
@@ -65,17 +70,28 @@ public final class PortrayalResponseWriter implements MessageBodyWriter<Portraya
             final OutputDef odef = r.getOutputDef();
             odef.setOutput(out);
 
-            System.out.println("Writing Portrayal response.");
-
-            try {
-                CstlPortrayalService.getInstance().portray(sdef, vdef, cdef, odef);
-            } catch (PortrayalException ex) {
-                //should not happen normally since we asked to never fail.
-                throw new IOException(ex);
+            
+            if(LOGGER.isLoggable(Level.FINE)){
+                final long before = System.nanoTime();
+                try {
+                    CstlPortrayalService.getInstance().portray(sdef, vdef, cdef, odef);
+                } catch (PortrayalException ex) {
+                    //should not happen normally since we asked to never fail.
+                    throw new IOException(ex);
+                }
+                final long after = System.nanoTime();
+                LOGGER.log(Level.FINE, "Portraying+Response ({0},Compression:{1}) time = {2} ms",
+                        new Object[]{odef.getMime(),odef.getCompression(),Math.round( (after - before) / 1000000d)});
+            }else{
+                try {
+                    CstlPortrayalService.getInstance().portray(sdef, vdef, cdef, odef);
+                } catch (PortrayalException ex) {
+                    //should not happen normally since we asked to never fail.
+                    throw new IOException(ex);
+                }
             }
         }
 
-        
     }
 
     @Override

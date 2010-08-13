@@ -60,7 +60,10 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
     }
         
     private CstlPortrayalService(){
-        //Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, true);
+        Registry.setDefaultCodecPreferences();
+        Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, true);
+        Registry.setNativeCodecAllowed("jpeg", ImageWriterSpi.class, true);
+        Registry.setNativeCodecAllowed("jpg", ImageWriterSpi.class, true);
     }
 
     /**

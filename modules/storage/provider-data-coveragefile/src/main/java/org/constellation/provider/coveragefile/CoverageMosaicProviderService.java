@@ -55,7 +55,6 @@ public class CoverageMosaicProviderService extends AbstractProviderService<Name,
     private static final Collection<CoverageMosaicProvider> IMMUTABLE = Collections.unmodifiableCollection(PROVIDERS);
 
     static {
-        Registry.setDefaultCodecPreferences();
         WorldFileImageReader.Spi.registerDefaults(null);
         WorldFileImageWriter.Spi.registerDefaults(null);
         GeoTiffImageReader.Spi.registerDefaults(null);
