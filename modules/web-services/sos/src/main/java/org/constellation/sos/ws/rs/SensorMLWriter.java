@@ -31,7 +31,6 @@ import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import org.geotoolkit.ows.xml.ExceptionReportMarshallerPool;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 
@@ -78,7 +77,7 @@ public class SensorMLWriter<T extends AbstractSensorML> implements MessageBodyWr
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the SensorML response", ex);
         } finally {
             if (m != null) {
-                 ExceptionReportMarshallerPool.getInstance().release(m);
+                 SensorMLMarshallerPool.getInstance().release(m);
             }
         }
     }
