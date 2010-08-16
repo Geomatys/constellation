@@ -34,7 +34,6 @@ import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
@@ -243,19 +242,8 @@ public class WMSService extends GridWebService {
      * Otherwise this call will fallback on normal xml error.
      */
     private Response processExceptionResponse(final QueryContext queryContext, final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
-        // Log the exception, even if the request specify that the exception should be in image.
-        // In that precise case, printing the exception in the logs would allow administrator to
-        // follow the user's error.
-        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE)   &&
-            !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED) &&
-            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)   && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE)    &&
-            !ex.getExceptionCode().equals(LAYER_NOT_DEFINED)   && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED)    &&
-            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED))
-        {
-            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
-        } else {
-            LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getLocalizedMessage() + '\n');
-        }
+        logException(ex);
+        
         // Now handle in image response or exception report.
         if (queryContext.isErrorInimage()) {
             final BufferedImage image = DefaultPortrayalService.writeException(ex, new Dimension(600, 400), queryContext.isOpaque());

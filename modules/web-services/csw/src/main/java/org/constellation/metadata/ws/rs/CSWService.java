@@ -34,7 +34,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
 //JAXB dependencies
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -332,21 +331,8 @@ public class CSWService extends OGCWebService {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException
-    {
-        /* We don't print the stack trace:
-         * - if the user have forget a mandatory parameter.
-         * - if the version number is wrong.
-         * - if the user have send a wrong request parameter
-         */
-        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE) &&
-            !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED) &&
-            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)   && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE) &&
-            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)  && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED)) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } else {
-            LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
-        }
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
+        logException(ex);
         
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
@@ -354,7 +340,6 @@ public class CSWService extends OGCWebService {
         final String version = serviceDef.exceptionVersion.toString();
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
         return Response.ok(report, MimeType.TEXT_XML).build();
-        
     }
     
     /**

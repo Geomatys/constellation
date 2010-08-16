@@ -18,6 +18,7 @@
 package org.constellation.ws.rs;
 
 // J2SE dependencies
+import java.util.logging.Level;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -391,6 +392,24 @@ public abstract class OGCWebService extends AbstractWebService {
      */
     public long getLastUpdateTime() {
         return lastUpdateTime;
+    }
+
+    /**
+     * We don't print the stack trace:
+     * - if the user have forget a mandatory parameter.
+     * - if the version number is wrong.
+     * - if the user have send a wrong request parameter
+     */
+    protected void logException(CstlServiceException ex) {
+        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE) &&
+            !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED) &&
+            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)   && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE) &&
+            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)  && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED) &&
+            !ex.getExceptionCode().equals(LAYER_NOT_DEFINED)         && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.LAYER_NOT_DEFINED)) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+        } else {
+            LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
+        }
     }
 
 }

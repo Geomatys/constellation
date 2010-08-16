@@ -168,6 +168,7 @@ public final class ExceptionCode extends CodeList<ExceptionCode> {
     /**
      * Returns the list of exception codes.
      */
+    @Override
     public ExceptionCode[] family() {
         return values();
     }

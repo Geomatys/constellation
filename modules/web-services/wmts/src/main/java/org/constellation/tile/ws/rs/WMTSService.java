@@ -20,7 +20,6 @@ import com.sun.jersey.spi.resource.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import javax.imageio.IIOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -399,20 +398,7 @@ public class WMTSService extends GridWebService {
      */
     @Override
     protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
-        /* We don't print the stack trace:
-         * - if the user have forget a mandatory parameter.
-         * - if the version number is wrong.
-         * - if the user have send a wrong request parameter
-         */
-        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
-                !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE) &&
-                !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } else {
-            LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
-        }
-
+        logException(ex);
         
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);

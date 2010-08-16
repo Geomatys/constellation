@@ -17,6 +17,7 @@
  */
 package org.constellation.sos.ws.rs;
 
+import org.geotoolkit.util.StringUtilities;
 import java.io.StringWriter;
 
 // Jersey dependencies
@@ -28,7 +29,6 @@ import com.sun.jersey.spi.resource.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
 import javax.annotation.PreDestroy;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -50,7 +50,6 @@ import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.constellation.sos.ws.SOSworker;
 import org.constellation.ws.MimeType;
-import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
@@ -202,10 +201,7 @@ public class SOService extends OGCWebService {
                 if (gc.getVersion() != null) {
                     serviceDef = getVersionFromNumber(gc.getVersion().toString());
                 }
-                final Capabilities capa = worker.getCapabilities(gc);
-
-                return Response.ok(capa, worker.getOutputFormat()).build();
-
+                return Response.ok(worker.getCapabilities(gc), worker.getOutputFormat()).build();
              }
 
              throw new CstlServiceException("The operation " + request + " is not supported by the service",
@@ -227,34 +223,20 @@ public class SOService extends OGCWebService {
      */
     @Override
     protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
-        /* We don't print the stack trace:
-         * - if the user have forget a mandatory parameter.
-         * - if the version number is wrong.
-         */
-        if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE)    && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.MISSING_PARAMETER_VALUE) &&
-            !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.VERSION_NEGOTIATION_FAILED) &&
-            !ex.getExceptionCode().equals(INVALID_PARAMETER_VALUE)   && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.INVALID_PARAMETER_VALUE) &&
-            !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)  && !ex.getExceptionCode().equals(org.constellation.ws.ExceptionCode.OPERATION_NOT_SUPPORTED)) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        } else {
-            LOGGER.info("SENDING EXCEPTION: " + ex.getExceptionCode().name() + " " + ex.getMessage() + '\n');
-        }
-
+        logException(ex);
         
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
-        String exceptionCode = ex.getExceptionCode().name();
+        final String exceptionCode;
         if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
-            exceptionCode = exceptionCode.replace("_", "");
-            exceptionCode = exceptionCode.toLowerCase();
-            final org.geotoolkit.ows.xml.OWSExceptionCode code = CodeLists.valueOf(org.geotoolkit.ows.xml.OWSExceptionCode.class, exceptionCode);
-            exceptionCode = code.name();
+            exceptionCode = StringUtilities.transformCodeName(ex.getExceptionCode().name());
+        } else {
+            exceptionCode = ex.getExceptionCode().name();
         }
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(),
                                                      serviceDef.exceptionVersion.toString());
         return Response.ok(report, MimeType.TEXT_XML).build();
-        
     }
 
     /**

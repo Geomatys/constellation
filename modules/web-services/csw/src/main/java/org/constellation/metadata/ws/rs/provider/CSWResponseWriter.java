@@ -68,7 +68,6 @@ public class CSWResponseWriter<T extends CSWResponse> implements MessageBodyWrit
                 final SerializerResponse response = (SerializerResponse) t;
                 final XMLSerializer serializer    = response.getSerializer();
                 if (serializer != null) {
-                    System.out.println("using serializer");
                     serializer.setOutputByteStream(out);
                     m.marshal(response.getResponse(), serializer.asContentHandler());
                 } else  {
