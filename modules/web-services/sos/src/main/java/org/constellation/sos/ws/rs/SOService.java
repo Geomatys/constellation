@@ -17,21 +17,17 @@
  */
 package org.constellation.sos.ws.rs;
 
-import org.geotoolkit.util.StringUtilities;
-import java.io.StringWriter;
-
 // Jersey dependencies
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import javax.annotation.PreDestroy;
 import com.sun.jersey.spi.resource.Singleton;
 
 //JAXB dependencies
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-import javax.annotation.PreDestroy;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
@@ -52,6 +48,8 @@ import org.constellation.sos.ws.SOSworker;
 import org.constellation.ws.MimeType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.sml.xml.AbstractSensorML;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.sos.xml.SOSResponseWrapper;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -71,24 +69,13 @@ public class SOService extends OGCWebService {
     public SOService() throws JAXBException, CstlServiceException {
         super(ServiceDef.SOS_1_0_0);
         worker = new SOSworker(null);
-        setXMLContext("org.geotoolkit.sos.xml.v100:" +
-                      "org.geotoolkit.gml.xml.v311:" +
-                      "org.geotoolkit.internal.jaxb.geometry:" +
-                      "org.geotoolkit.swe.xml.v100:" +
-                      "org.geotoolkit.swe.xml.v101:" +
-                      "org.geotoolkit.observation.xml.v100:" +
-                      "org.geotoolkit.sampling.xml.v100:" +
-                      "org.geotoolkit.sml.xml.v100:" +
-                      "org.geotoolkit.sml.xml.v101", "",
-                "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd");
+        setXMLContext(SOSMarshallerPool.getInstance());
     }
 
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
-        Marshaller marshaller = null;
         ServiceDef serviceDef = null;
         try {
-             marshaller = getMarshallerPool().acquireMarshaller();
              worker.setServiceURL(getServiceURL());
              logParameters();
              String request = "";
@@ -98,8 +85,7 @@ public class SOService extends OGCWebService {
              if (request.equalsIgnoreCase("GetObservation") || (objectRequest instanceof GetObservation)) {
                 final GetObservation go = (GetObservation) objectRequest;
                 if (go == null){
-                    throw new CstlServiceException("The operation GetObservation is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "GetObservation");
+                    throwUnsupportedGetMethod("GetObservation");
                 }
                 serviceDef = getVersionFromNumber(go.getVersion());
                 final Object response = worker.getObservation(go);
@@ -108,20 +94,15 @@ public class SOService extends OGCWebService {
                 if (outputFormat != null  && outputFormat.startsWith(MimeType.TEXT_XML)) {
                     outputFormat = MimeType.TEXT_XML;
                 }
-
-                String marshalled;
+                Object marshalled;
                 if (response instanceof ObservationCollectionEntry) {
-                     final StringWriter sw = new StringWriter();
-                     marshaller.marshal(response, sw);
-                     marshalled = sw.toString();
+                    marshalled = new SOSResponseWrapper((ObservationCollectionEntry) response);
                 } else if (response instanceof String) {
                     marshalled = (String) response;
                 } else {
                     throw new IllegalArgumentException("Unexpected response type from SOSWorker.getObservation()");
                 }
-
                 return Response.ok(marshalled, outputFormat).build();
-
              }
 
              if (request.equalsIgnoreCase("DescribeSensor") || (objectRequest instanceof DescribeSensor)) {
@@ -139,24 +120,19 @@ public class SOService extends OGCWebService {
                 final GetFeatureOfInterest gf = (GetFeatureOfInterest)objectRequest;
 
                 if (gf == null) {
-
-                    throw new CstlServiceException("The operation GetFeatureOfInterest is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "GetFeatureOfInterest");
+                    throwUnsupportedGetMethod("GetFeatureOfInterest");
                 }
                 if (gf.getVersion() != null)
                     serviceDef = getVersionFromNumber(gf.getVersion());
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getFeatureOfInterest(gf), sw);
-
-                return Response.ok(sw.toString(), worker.getOutputFormat()).build();
+                final SOSResponseWrapper response = new SOSResponseWrapper(worker.getFeatureOfInterest(gf));
+                return Response.ok(response, worker.getOutputFormat()).build();
 
              }
 
              if (request.equalsIgnoreCase("InsertObservation") || (objectRequest instanceof InsertObservation)) {
                 final InsertObservation is = (InsertObservation)objectRequest;
                 if (is == null){
-                    throw new CstlServiceException("The operation InsertObservation is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "InsertObservation");
+                    throwUnsupportedGetMethod("InsertObservation");
                 }
                 serviceDef = getVersionFromNumber(is.getVersion());
                 return Response.ok(worker.insertObservation(is), MimeType.TEXT_XML).build();
@@ -166,8 +142,7 @@ public class SOService extends OGCWebService {
              if (request.equalsIgnoreCase("GetResult") || (objectRequest instanceof GetResult)) {
                 final GetResult gr = (GetResult)objectRequest;
                 if (gr == null){
-                    throw new CstlServiceException("The operation GetResult is only requestable in XML",
-                                                     OPERATION_NOT_SUPPORTED, "GetResult");
+                    throwUnsupportedGetMethod("GetResult");
                 }
                 serviceDef = getVersionFromNumber(gr.getVersion());
 
@@ -178,8 +153,7 @@ public class SOService extends OGCWebService {
              if (request.equalsIgnoreCase("RegisterSensor") || (objectRequest instanceof RegisterSensor)) {
                 final RegisterSensor rs = (RegisterSensor)objectRequest;
                 if (rs == null){
-                    throw new CstlServiceException("The operation RegisterSensor is only requestable in XML",
-                                                  OPERATION_NOT_SUPPORTED, "RegisterSensor");
+                    throwUnsupportedGetMethod("RegisterSensor");
                 }
                 serviceDef = getVersionFromNumber(rs.getVersion());
 
@@ -211,29 +185,25 @@ public class SOService extends OGCWebService {
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, serviceDef);
 
-        } finally {
-            if (marshaller != null) {
-                getMarshallerPool().release(marshaller);
-            }
         }
     }
 
+    private void throwUnsupportedGetMethod(String operationName) throws CstlServiceException {
+        throw new CstlServiceException("The operation " + operationName + " is only requestable in XML",
+                                                  OPERATION_NOT_SUPPORTED, operationName);
+    }
+    
     /**
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
         logException(ex);
         
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
-        final String exceptionCode;
-        if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
-            exceptionCode = StringUtilities.transformCodeName(ex.getExceptionCode().name());
-        } else {
-            exceptionCode = ex.getExceptionCode().name();
-        }
+        final String exceptionCode = getExceptionCodeRepresentation(ex.getExceptionCode());
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(),
                                                      serviceDef.exceptionVersion.toString());
         return Response.ok(report, MimeType.TEXT_XML).build();

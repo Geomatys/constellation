@@ -55,6 +55,7 @@ import org.geotoolkit.sml.xml.v100.ComponentPropertyType;
 import org.geotoolkit.sml.xml.v100.ComponentType;
 import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.sml.xml.v100.SystemType;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.v100.EventTime;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetObservation;
@@ -97,12 +98,7 @@ public class SOSWorkerTest {
     protected static final String URL = "http://pulsar.geomatys.fr/SOServer/SOService";
 
     protected static void init() throws JAXBException {
-        marshallerPool = new MarshallerPool("org.geotoolkit.sos.xml.v100:"
-                                       + "org.geotoolkit.observation.xml.v100:"
-                                       + "org.geotoolkit.sml.xml.v100:"
-                                       + "org.geotoolkit.sampling.xml.v100:"
-                                       + "org.geotoolkit.swe.xml.v101:" 
-                                       + "org.geotoolkit.internal.jaxb.geometry");
+        marshallerPool = SOSMarshallerPool.getInstance();
         Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
         capabilities = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
         marshallerPool.release(unmarshaller);

@@ -126,7 +126,7 @@ public final class ConfigurationService extends AbstractWebService  {
             LOGGER.log(Level.SEVERE, "JAXBException while setting the JAXB context for configuration service:" + ex.getMessage(), ex);
             cswFunctionEnabled = false;
         } catch (ConfigurationException ex) {
-            LOGGER.warning("Specific CSW operation will not be available." + '\n' + ex);
+            LOGGER.log(Level.WARNING, "Specific CSW operation will not be available.\n", ex);
             cswFunctionEnabled = false;
         } catch (FactoryNotFoundException ex) {
             LOGGER.warning("Factory not found for CSWConfigurer, specific CSW operation will not be available.");
@@ -280,13 +280,11 @@ public final class ConfigurationService extends AbstractWebService  {
             if (!ex.getExceptionCode().equals(MISSING_PARAMETER_VALUE) &&
                     !ex.getExceptionCode().equals(VERSION_NEGOTIATION_FAILED) &&
                     !ex.getExceptionCode().equals(OPERATION_NOT_SUPPORTED)) {
-                LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+                LOGGER.log(Level.WARNING, ex.getMessage(), ex);
             } else {
                 LOGGER.info(ex.getMessage());
             }
-            final StringWriter sw = new StringWriter();
-            marshaller.marshal(report, sw);
-            return Response.ok(StringUtilities.cleanSpecialCharacter(sw.toString()), MimeType.TEXT_XML).build();
+            return Response.ok(report, MimeType.TEXT_XML).build();
             
         } finally {
             if (marshaller != null) {
@@ -323,23 +321,11 @@ public final class ConfigurationService extends AbstractWebService  {
      * @return
      */
     @Override
-    protected Response launchException(final String message, final String codeName, final String locator) throws JAXBException {
-        Marshaller marshaller = null;
-        try {
-            marshaller = getMarshallerPool().acquireMarshaller();
-
-            final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
-            final ExceptionReport report = new ExceptionReport(message, code.name(), locator,
-                                                           ServiceDef.CONFIG.exceptionVersion.toString());
-            final StringWriter sw = new StringWriter();
-            marshaller.marshal(report, sw);
-            return Response.ok(sw.toString(), MimeType.TEXT_XML).build();
-            
-        } finally {
-            if (marshaller != null) {
-                getMarshallerPool().release(marshaller);
-            }
-        }
+    protected Response launchException(final String message, final String codeName, final String locator) {
+        final OWSExceptionCode code = OWSExceptionCode.valueOf(codeName);
+        final ExceptionReport report = new ExceptionReport(message, code.name(), locator,
+                                                       ServiceDef.CONFIG.exceptionVersion.toString());
+        return Response.ok(report, MimeType.TEXT_XML).build();
     }
 
     /**

@@ -18,6 +18,8 @@
 package org.constellation.ws.rs;
 
 // J2SE dependencies
+import org.opengis.util.CodeList;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.io.File;
 import java.io.FileInputStream;
@@ -46,7 +48,7 @@ import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
-import static org.constellation.ws.ExceptionCode.*;
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 
 /**
@@ -177,10 +179,8 @@ public abstract class OGCWebService extends AbstractWebService {
      * @param serviceDef The service definition, from which the version number of exception report will
      *                   be extracted.
      * @return An XML representing the exception.
-     *
-     * @throws JAXBException if an error occurs during the marshalling of the exception.
      */
-    protected abstract Response processExceptionResponse(final CstlServiceException ex, final ServiceDef serviceDef) throws JAXBException;
+    protected abstract Response processExceptionResponse(final CstlServiceException ex, final ServiceDef serviceDef);
 
     /**
      * The shared method to build a service ExceptionReport.
@@ -190,7 +190,7 @@ public abstract class OGCWebService extends AbstractWebService {
      * @return
      */
     @Override
-    protected Response launchException(final String message, String codeName, final String locator) throws JAXBException {
+    protected Response launchException(final String message, String codeName, final String locator) {
         if (isOWS(actingVersion)) {
             codeName = StringUtilities.transformCodeName(codeName);
         }
@@ -412,4 +412,45 @@ public abstract class OGCWebService extends AbstractWebService {
         }
     }
 
+    /**
+     * Extract The mapping between namespace and prefix in a namespace parameter of a GET request.
+     *
+     * @param namespace a String with the pattern: xmlns(ns1=http://my_ns1.com),xmlns(ns2=http://my_ns2.com),xmlns(ns3=http://my_ns3.com)
+     * @return a Map of @{<prefix, namespace>}.
+     * @throws CstlServiceException if the parameter namespace is malformed.
+     */
+    protected Map<String,String> extractNamespace(String namespace) throws CstlServiceException {
+        final Map<String, String> namespaces = new HashMap<String, String>();
+        if (namespace != null) {
+            final StringTokenizer tokens = new StringTokenizer(namespace, ",;");
+            while (tokens.hasMoreTokens()) {
+                String token = tokens.nextToken().trim();
+                if (token.startsWith("xmlns(") && token.endsWith(")")) {
+                    token = token.substring(6, token.length() -1);
+                    if (token.indexOf('=') != -1) {
+                        final String prefix = token.substring(0, token.indexOf('='));
+                        final String url    = token.substring(token.indexOf('=') + 1);
+                        namespaces.put(prefix, url);
+                    } else {
+                         throw new CstlServiceException("The namespace parameter is malformed : [" + token + "] the good pattern is xmlns(ns1=http://my_ns1.com)",
+                                                  INVALID_PARAMETER_VALUE, "namespace");
+                    }
+                } else {
+                    throw new CstlServiceException("The namespace attribute is malformed: good pattern is \"xmlns(ns1=http://namespace1),xmlns(ns2=http://namespace2)\"",
+                                                       INVALID_PARAMETER_VALUE, "namespace");
+                }
+            }
+        }
+        return namespaces;
+    }
+
+    protected String getExceptionCodeRepresentation(CodeList exceptionCode) {
+        final String codeRepresentation;
+        if (exceptionCode instanceof org.constellation.ws.ExceptionCode) {
+            codeRepresentation = StringUtilities.transformCodeName(exceptionCode.name());
+        } else {
+            codeRepresentation = exceptionCode.name();
+        }
+        return codeRepresentation;
+    }
 }

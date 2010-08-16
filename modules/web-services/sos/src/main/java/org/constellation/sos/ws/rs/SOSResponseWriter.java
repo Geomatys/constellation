@@ -33,6 +33,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.SOSResponse;
+import org.geotoolkit.sos.xml.SOSResponseWrapper;
 
 /**
  *
@@ -63,7 +64,11 @@ public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWrit
         try {
             m = SOSMarshallerPool.getInstance().acquireMarshaller();
             m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
-            m.marshal(t, out);
+            if (t instanceof SOSResponseWrapper) {
+                m.marshal(((SOSResponseWrapper)t).getCollection(),  out);
+            } else {
+                m.marshal(t, out);
+            }
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the SOSResponse File", ex);
         } finally {

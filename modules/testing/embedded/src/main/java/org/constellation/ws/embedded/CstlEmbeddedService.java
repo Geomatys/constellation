@@ -151,6 +151,7 @@ public class CstlEmbeddedService extends CommandLine {
             "org.constellation.map.ws.rs",
             "org.constellation.coverage.ws.rs",
             "org.constellation.wfs.ws.rs",
+            "org.constellation.sos.ws.rs",
             "org.constellation.metadata.ws.rs",
             "org.constellation.metadata.ws.rs.provider",
             "org.constellation.ws.rs.provider"
@@ -194,7 +195,7 @@ public class CstlEmbeddedService extends CommandLine {
         grizzlyWebContainerProperties.put("com.sun.jersey.config.property.resourceConfigClass",
                 "com.sun.jersey.api.core.PackagesResourceConfig");
 
-        LOGGER.info("Starting grizzly server at: " + f.format(new Date()));
+        LOGGER.log(Level.INFO, "Starting grizzly server at: {0}", f.format(new Date()));
 
         SelectorThread threadSelector = null;
         try {
@@ -207,13 +208,13 @@ public class CstlEmbeddedService extends CommandLine {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
         }
 
-        LOGGER.info("Started Grizzly application server for: " + uri);
-        LOGGER.info("The service definition file can be found at: " + uri + "application.wadl");
+        LOGGER.log(Level.INFO, "Started Grizzly application server for: {0}", uri);
+        LOGGER.log(Level.INFO, "The service definition file can be found at: {0}application.wadl", uri);
 
         stayAlive();
 
         threadSelector.stopEndpoint();
-        LOGGER.info("*Stopped grizzly server at: " + f.format(new Date()) + ".");
+        LOGGER.log(Level.INFO, "*Stopped grizzly server at: {0}.", f.format(new Date()));
     }
 
     /**
@@ -228,7 +229,7 @@ public class CstlEmbeddedService extends CommandLine {
         }
 
 
-        LOGGER.info("Starting jax-ws server at: " + f.format(new Date()));
+        LOGGER.log(Level.INFO, "Starting jax-ws server at: {0}", f.format(new Date()));
 
         final String service = uri.toString() + "pep";
         Endpoint ep = null;
@@ -239,13 +240,13 @@ public class CstlEmbeddedService extends CommandLine {
 //            e.printStackTrace();
 //        }
 
-        LOGGER.info("Started jax-ws application server for: " + service);
-        LOGGER.info("The service definition file can be found at: " + service + "?wsdl");
+        LOGGER.log(Level.INFO, "Started jax-ws application server for: {0}", service);
+        LOGGER.log(Level.INFO, "The service definition file can be found at: {0}?wsdl", service);
 
         stayAlive();
 
         ep.stop();
-        LOGGER.info("*Stopped jax-ws server at: " + f.format(new Date()) + ".");
+        LOGGER.log(Level.INFO, "*Stopped jax-ws server at: {0}.", f.format(new Date()));
     }
 
     /**
@@ -265,7 +266,7 @@ public class CstlEmbeddedService extends CommandLine {
                 Thread.sleep(duration);
             } catch (InterruptedException iex) {
                 LOGGER.fine("The grizzly thread has received an interrupted request.");
-                LOGGER.info("*Stopped grizzly server at: " + f.format(new Date()) + ".");
+                LOGGER.log(Level.INFO, "*Stopped grizzly server at: {0}.", f.format(new Date()));
             }
         } else {
             //Listen and wait for <ENTER>

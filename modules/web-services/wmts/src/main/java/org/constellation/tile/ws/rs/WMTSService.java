@@ -315,13 +315,12 @@ public class WMTSService extends GridWebService {
      * @param resourcename The name of the resource file.
      *
      * @return The XML formatted response, for an OWS GetCapabilities of the WMTS standard.
-     * @throws JAXBException
      */
     @GET
     @Path("{version}/{caps}")
     public Response processGetCapabilitiesRestful(@PathParam("version") String version,
                                                   @PathParam("caps") String resourcename)
-                                                                     throws JAXBException
+                                                                     
     {
         ServiceDef serviceDef = null;
         try {
@@ -350,7 +349,6 @@ public class WMTSService extends GridWebService {
      * @param format The format extension, like png.
      *
      * @return The response containing the tile.
-     * @throws JAXBException
      */
     @GET
     @Path("{layer}/{tileMatrixSet}/{tileMatrix}/{tileRow}/{tileCol}.{format}")
@@ -360,7 +358,6 @@ public class WMTSService extends GridWebService {
                                           @PathParam("tileRow") String tileRow,
                                           @PathParam("tileCol") String tileCol,
                                           @PathParam("format") String format)
-                                          throws JAXBException
     {
         try {
             if (worker == null) {
@@ -394,10 +391,9 @@ public class WMTSService extends GridWebService {
      * @param ex The exception that has been generated during the webservice operation requested.
      * @return An XML representing the exception.
      *
-     * @throws JAXBException if an error occurs during the marshalling of the exception.
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
         logException(ex);
         
         if (serviceDef == null) {

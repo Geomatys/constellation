@@ -128,10 +128,9 @@ public class WMSService extends GridWebService {
      *                          {@code uriContext} field.
      * @return a Response, either an image or an XML document depending on the
      *           user's request.
-     * @throw JAXBException
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+    public Response treatIncomingRequest(Object objectRequest) {
         final UriInfo uriContext = getUriContext();
         final QueryContext queryContext = new QueryContext();
 
@@ -241,7 +240,7 @@ public class WMSService extends GridWebService {
      * Generate an error response in image if query asks it.
      * Otherwise this call will fallback on normal xml error.
      */
-    private Response processExceptionResponse(final QueryContext queryContext, final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
+    private Response processExceptionResponse(final QueryContext queryContext, final CstlServiceException ex, ServiceDef serviceDef) {
         logException(ex);
         
         // Now handle in image response or exception report.
@@ -257,7 +256,7 @@ public class WMSService extends GridWebService {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException{
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
 
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);

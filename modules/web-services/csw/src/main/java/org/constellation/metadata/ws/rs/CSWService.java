@@ -331,7 +331,7 @@ public class CSWService extends OGCWebService {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
         logException(ex);
         
         if (serviceDef == null) {
@@ -589,39 +589,6 @@ public class CSWService extends OGCWebService {
             
     }
 
-    /**
-     * 
-     * @param namespace
-     * @return
-     * @throws CstlServiceException
-     */
-    private Map<String,String> extractNamespace(String namespace) throws CstlServiceException {
-        final Map<String, String> namespaces = new HashMap<String, String>();
-        StringTokenizer tokens;
-
-        if (namespace != null) {
-            tokens = new StringTokenizer(namespace, ",;");
-            while (tokens.hasMoreTokens()) {
-                String token = tokens.nextToken().trim();
-                if (token.startsWith("xmlns(") && token.endsWith(")")) {
-                    token = token.substring(6, token.length() -1);
-                    if (token.indexOf('=') != -1) {
-                        final String prefix = token.substring(0, token.indexOf('='));
-                        final String url    = token.substring(token.indexOf('=') + 1);
-                        namespaces.put(prefix, url);
-                    } else {
-                         throw new CstlServiceException("The namespace " + token + MALFORMED,
-                                                       INVALID_PARAMETER_VALUE, NAMESPACE);
-                    }
-                } else {
-                    throw new CstlServiceException("The namespace attribute is malformed: good pattern is \"xmlns(ns1=http://namespace1),xmlns(ns2=http://namespace2)\"",
-                                                       INVALID_PARAMETER_VALUE, NAMESPACE);
-                }
-            }
-        }
-        return namespaces;
-    }
-    
     /**
      * Build a new GetRecordById request object with the url parameters 
      */

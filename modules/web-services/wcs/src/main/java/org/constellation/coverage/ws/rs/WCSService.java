@@ -262,7 +262,7 @@ public class WCSService extends GridWebService {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
         logException(ex);
 
         // SEND THE HTTP RESPONSE

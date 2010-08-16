@@ -97,6 +97,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.constellation.web-services</groupId>
+      <artifactId>cstl-web-sos</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.constellation.storage</groupId>
       <artifactId>cstl-store-data-postgis</artifactId>
       <version>${project.version}</version>

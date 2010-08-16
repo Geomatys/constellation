@@ -200,11 +200,10 @@ public final class WCSWorker extends AbstractWorker {
      * @param request A {@linkplain AbstractDescribeCoverage request} with the
      *                parameters of the user message.
      * @return An XML document giving the full description of the requested coverages.
-     * @throws JAXBException
      * @throws CstlServiceException
      */
     public DescribeCoverageResponse describeCoverage(final DescribeCoverage request)
-                                          throws JAXBException, CstlServiceException
+                                          throws CstlServiceException
     {
         final String version = request.getVersion().toString();
         if (version == null) {
@@ -233,12 +232,11 @@ public final class WCSWorker extends AbstractWorker {
      *                request done by the user.
      * @return an XML document giving the full description of a coverage, in version 1.0.0.
      *
-     * @throws JAXBException
      * @throws CstlServiceException
      */
     private DescribeCoverageResponse describeCoverage100(
             final org.geotoolkit.wcs.xml.v100.DescribeCoverageType request)
-                            throws JAXBException, CstlServiceException
+                            throws CstlServiceException
     {
         if (request.getCoverage().isEmpty()) {
             throw new CstlServiceException("The parameter COVERAGE must be specified.",
@@ -375,12 +373,11 @@ public final class WCSWorker extends AbstractWorker {
      *                request done by the user.
      * @return an XML document giving the full description of a coverage, in version 1.1.1.
      *
-     * @throws JAXBException
      * @throws CstlServiceException
      */
     private DescribeCoverageResponse describeCoverage111(
             final org.geotoolkit.wcs.xml.v111.DescribeCoverageType request)
-                            throws JAXBException, CstlServiceException
+                            throws CstlServiceException
     {
         if (request.getIdentifier().isEmpty()) {
             throw new CstlServiceException("The parameter IDENTIFIER must be specified",
@@ -816,11 +813,10 @@ public final class WCSWorker extends AbstractWorker {
      * @param request The request done by the user.
      * @return An {@linkplain RenderedImage image}, or a data representation.
      *
-     * @throws JAXBException
      * @throws CstlServiceException
      */
     public RenderedImage getCoverage(final GetCoverage request)
-                     throws JAXBException, CstlServiceException
+                     throws CstlServiceException
     {
         final String inputVersion = request.getVersion().toString();
         if (inputVersion == null) {

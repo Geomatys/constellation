@@ -221,7 +221,7 @@ public abstract class WebService {
      * @param locator
      * @return
      */
-    protected abstract Response launchException(String message, String codeName, String locator) throws JAXBException;
+    protected abstract Response launchException(String message, String codeName, String locator);
 
     /**
      * Provide the marshaller pool.
@@ -338,11 +338,10 @@ public abstract class WebService {
      * Treat the incoming POST request encoded in text plain.
      *
      * @return an xml exception report.
-     * @throw JAXBException
      */
     @POST
     @Consumes("text/plain")
-    public Response doPOSTPlain(InputStream is) throws JAXBException  {
+    public Response doPOSTPlain(InputStream is) {
         LOGGER.severe("request POST plain sending Exception");
         return launchException("The plain text content type is not allowed. Send " +
         		       "a message body with key=value pairs in the " +

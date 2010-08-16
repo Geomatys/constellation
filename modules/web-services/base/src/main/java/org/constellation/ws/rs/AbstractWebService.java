@@ -17,7 +17,6 @@
 package org.constellation.ws.rs;
 
 import javax.xml.bind.JAXBException;
-import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.geotoolkit.xml.MarshallerPool;
 
 /**
@@ -37,22 +36,6 @@ public abstract class AbstractWebService extends WebService {
     @Override
     protected synchronized MarshallerPool getMarshallerPool() {
         return marshallerPool;
-    }
-
-    /**
-     * Initialize the JAXB context and build the unmarshaller/marshaller
-     *
-     * @param packagesName A list of package containing JAXB annoted classes.
-     * @param rootNamespace The main namespace for all the document.
-     * @param schemaLocation The main xsd schema location for all the returned xml.
-     * @param exceptionSchemaLocation The xsd schema location for exception report.
-     *
-     * @throws JAXBException
-     */
-    @Deprecated
-    protected synchronized void setXMLContext(final String packagesName, final String rootNamespace, final String schemaLocation) throws JAXBException {
-        LOGGER.finer("SETTING XML CONTEXT: class " + this.getClass().getSimpleName() + "\n packages: " + packagesName);
-        marshallerPool = new AnchoredMarshallerPool(rootNamespace, packagesName, schemaLocation);
     }
 
     /**

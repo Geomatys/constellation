@@ -45,6 +45,8 @@ import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
+
+// JUnit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 

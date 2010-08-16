@@ -22,7 +22,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -75,7 +74,6 @@ import org.geotoolkit.ows.xml.v100.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v100.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
 import org.geotoolkit.ows.xml.v100.SectionsType;
-import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Versioned;
 import org.geotoolkit.wfs.xml.v110.AllSomeType;
 import org.geotoolkit.wfs.xml.v110.DeleteElementType;
@@ -232,19 +230,14 @@ public class WFSService extends OGCWebService {
      * {@inheritDoc}
      */
     @Override
-    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) throws JAXBException {
+    protected Response processExceptionResponse(final CstlServiceException ex, ServiceDef serviceDef) {
         logException(ex);
         
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
         final String version = serviceDef.exceptionVersion.toString();
-        final String exceptionCode;
-        if (ex.getExceptionCode() instanceof org.constellation.ws.ExceptionCode) {
-            exceptionCode = StringUtilities.transformCodeName(ex.getExceptionCode().name());
-        } else {
-            exceptionCode = ex.getExceptionCode().name();
-        }
+        final String exceptionCode = getExceptionCodeRepresentation(ex.getExceptionCode());
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(), version);
         return Response.ok(report, "text/xml").build();
     }
@@ -444,7 +437,7 @@ public class WFSService extends OGCWebService {
             outputFormat = "text/xml; subtype=gml/3.1.1";
         }
         final String namespace = getParameter(NAMESPACE, false);
-        final Map<String, String> mapping = extractMapping(namespace);
+        final Map<String, String> mapping = extractNamespace(namespace);
 
         final String typeName = getParameter("typeName", false);
         final List<QName> typeNames = extractTypeName(typeName, mapping);
@@ -517,7 +510,7 @@ public class WFSService extends OGCWebService {
             outputFormat = "text/xml; subtype=gml/3.1.1";
         }
         final String namespace = getParameter(NAMESPACE, false);
-        final Map<String, String> mapping = extractMapping(namespace);
+        final Map<String, String> mapping = extractNamespace(namespace);
 
         final String result = getParameter("resultType", false);
         ResultTypeType resultType = null;
@@ -652,7 +645,7 @@ public class WFSService extends OGCWebService {
         }
 
         final String namespace            = getParameter(NAMESPACE, false);
-        final Map<String, String> mapping = extractMapping(namespace);
+        final Map<String, String> mapping = extractNamespace(namespace);
 
         final String typeName       = getParameter("typeName", true);
         final List<QName> typeNames = extractTypeName(typeName, mapping);
@@ -677,7 +670,7 @@ public class WFSService extends OGCWebService {
         }
 
         final String namespace            = getParameter(NAMESPACE, false);
-        final Map<String, String> mapping = extractMapping(namespace);
+        final Map<String, String> mapping = extractNamespace(namespace);
 
         final String typeName       = getParameter("typeName", true);
         final List<QName> typeNames = extractTypeName(typeName, mapping);
@@ -689,36 +682,6 @@ public class WFSService extends OGCWebService {
         final QName typeNamee = typeNames.get(0);
         final DeleteElementType delete = new DeleteElementType(filter, handle, typeNamee);
         return new TransactionType(service, version, handle, releaseAction, delete);
-    }
-
-    /**
-     * Extract The mapping between namespace and prefix in a namespace parameter of a GET request.
-     *
-     * @param namespace a String with the pattern: xmlns(ns1=http://my_ns1.com),xmlns(ns2=http://my_ns2.com),xmlns(ns3=http://my_ns3.com)
-     *
-     * @return a Map of @{<prefix, namespace>}.
-     *
-     * @throws CstlServiceException if the parameter namespace is malformed.
-     */
-    private Map<String, String> extractMapping(String namespace) throws CstlServiceException {
-        final Map<String, String> mapping = new HashMap<String, String>();
-        if (namespace != null) {
-            final StringTokenizer tokens = new StringTokenizer(namespace, ",;");
-            while (tokens.hasMoreTokens()) {
-                final String token = tokens.nextToken().trim();
-                if (token.indexOf("xmlns(") != -1 && token.indexOf(')') != -1 && token.indexOf('=') != -1) {
-                    final String tmp    = token.substring(token.indexOf("xmlns(") + 6, token.indexOf(')'));
-                    final String prefix = tmp.substring(0, tmp.indexOf('='));
-                    final String namesp = tmp.substring(tmp.indexOf('=') + 1);
-                    mapping.put(prefix, namesp);
-
-                } else {
-                    throw new CstlServiceException("The namespace parameter is malformed : [" + token + "] the good pattern is xmlns(ns1=http://my_ns1.com)",
-                                                  INVALID_PARAMETER_VALUE, NAMESPACE);
-                }
-            }
-        }
-        return mapping;
     }
 
     /**
