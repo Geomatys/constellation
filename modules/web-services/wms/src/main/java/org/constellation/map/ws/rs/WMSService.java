@@ -17,9 +17,6 @@
  */
 package org.constellation.map.ws.rs;
 
-import org.constellation.util.Util;
-import java.util.ArrayList;
-import org.opengis.feature.type.Name;
 import com.sun.jersey.spi.resource.Singleton;
 
 //J2SE dependencies
@@ -32,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.PreDestroy;
@@ -51,7 +49,7 @@ import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.GetCapabilities;
 import org.constellation.query.wms.GetFeatureInfo;
 import org.constellation.query.wms.GetLegendGraphic;
-import org.constellation.util.TimeParser;
+import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
@@ -66,6 +64,7 @@ import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.sld.xml.XMLUtilities;
 import org.geotoolkit.sld.xml.v110.DescribeLayerResponseType;
 import org.geotoolkit.util.StringUtilities;
+import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.wms.xml.AbstractWMSCapabilities;
 import org.geotoolkit.ogc.xml.exception.ServiceExceptionReport;
@@ -73,6 +72,7 @@ import org.geotoolkit.ogc.xml.exception.ServiceExceptionType;
 import org.geotoolkit.wms.xml.WMSMarshallerPool;
 
 //Geoapi dependencies
+import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.util.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

@@ -16,11 +16,11 @@
  */
 package org.constellation.tile.ws;
 
+import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.wmts.xml.v100.TileMatrix;
 import java.io.File;
 import org.opengis.coverage.Coverage;
 import java.text.ParseException;
-import org.constellation.util.TimeParser;
 import org.geotoolkit.wmts.xml.v100.DimensionNameValue;
 import org.constellation.tile.visitor.GMLGraphicVisitor;
 import org.constellation.tile.visitor.HTMLGraphicVisitor;
@@ -46,7 +46,6 @@ import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.ext.legend.DefaultLegendTemplate;
 import org.geotoolkit.ows.xml.v110.CodeType;
 import java.math.BigInteger;
-import org.geotoolkit.ows.xml.v110.OnlineResourceType;
 import org.constellation.provider.CoverageLayerDetails;
 import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.style.MutableStyle;
@@ -58,7 +57,7 @@ import org.opengis.feature.type.Name;
 import org.geotoolkit.util.MeasurementRange;
 import javax.measure.unit.Unit;
 import java.util.Iterator;
-import org.constellation.util.PeriodUtilities;
+import org.geotoolkit.util.PeriodUtilities;
 import java.util.TimeZone;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;

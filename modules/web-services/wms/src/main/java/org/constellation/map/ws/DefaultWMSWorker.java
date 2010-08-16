@@ -58,7 +58,7 @@ import org.constellation.query.wms.GetLegendGraphic;
 import org.constellation.query.wms.GetMap;
 import org.constellation.query.wms.WMSQuery;
 import org.constellation.register.RegisterException;
-import org.constellation.util.PeriodUtilities;
+import org.geotoolkit.util.PeriodUtilities;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
