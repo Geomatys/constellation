@@ -18,7 +18,6 @@ package org.constellation.portrayal.internal;
 
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
-import javax.imageio.spi.ImageWriterSpi;
 
 import org.constellation.portrayal.PortrayalServiceIF;
 
@@ -32,7 +31,6 @@ import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
-import org.geotoolkit.image.jai.Registry;
 
 
 /**
@@ -59,11 +57,7 @@ public final class CstlPortrayalService implements PortrayalServiceIF {
         return INSTANCE;
     }
         
-    private CstlPortrayalService(){
-        Registry.setDefaultCodecPreferences();
-        Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, true);
-        Registry.setNativeCodecAllowed("jpeg", ImageWriterSpi.class, true);
-        Registry.setNativeCodecAllowed("jpg", ImageWriterSpi.class, true);
+    private CstlPortrayalService(){       
     }
 
     /**

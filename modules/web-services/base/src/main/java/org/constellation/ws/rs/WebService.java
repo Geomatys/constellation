@@ -61,6 +61,7 @@ import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 
 import static org.constellation.ws.ExceptionCode.*;
+import org.geotoolkit.image.jai.Registry;
 import org.xml.sax.SAXException;
 
 
@@ -132,6 +133,13 @@ public abstract class WebService {
     private static final boolean RUNNING_ON_GLASSFISH;
 
     static {
+        //loading JAI codecs
+         Registry.setDefaultCodecPreferences();
+//        Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, false);
+//        Registry.setNativeCodecAllowed("jpeg", ImageWriterSpi.class, false);
+//        Registry.setNativeCodecAllowed("jpg", ImageWriterSpi.class, false);
+
+
         RUNNING_ON_GLASSFISH = (System.getProperty("domain.name") != null) ? true : false;
         Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);
     }
