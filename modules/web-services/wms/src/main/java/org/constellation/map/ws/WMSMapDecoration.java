@@ -160,6 +160,7 @@ public final class WMSMapDecoration {
     private static final String HINT_RENDERING_ORDER        = "rendering-order";
     private static final String FEATURE_ORDER               = "feature";
     private static final String SYMBOLIZER_ORDER            = "symbolizer";
+    private static final String HINT_COVERAGE_WRITER        = "coverage-writer"; //boolean value
 
     //compression hint, value should look like : image/png:0.1,image/jpeg:0.4
     private static final String HINT_COMPRESSION            = "compression";
@@ -274,11 +275,7 @@ public final class WMSMapDecoration {
                 }
             }else if(HINT_GENERALIZE.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
-                if (Boolean.parseBoolean(value)) {
-                    hints.put(GO2Hints.KEY_GENERALIZE, Boolean.TRUE);
-                } else {
-                    hints.put(GO2Hints.KEY_GENERALIZE, Boolean.FALSE);
-                }
+                hints.put(GO2Hints.KEY_GENERALIZE, Boolean.parseBoolean(value));
             }else if(HINT_GENERALIZE_FACTOR.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
                 try{
@@ -289,11 +286,7 @@ public final class WMSMapDecoration {
                 }
             }else if(HINT_MULTITHREAD.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
-                if (Boolean.parseBoolean(value)) {
-                    hints.put(GO2Hints.KEY_MULTI_THREAD, Boolean.TRUE);
-                } else {
-                    hints.put(GO2Hints.KEY_MULTI_THREAD, Boolean.FALSE);
-                }
+                hints.put(GO2Hints.KEY_MULTI_THREAD, Boolean.parseBoolean(value));
             }else if(HINT_RENDERING_ORDER.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
                 if (SYMBOLIZER_ORDER.equalsIgnoreCase(value)) {
@@ -324,6 +317,9 @@ public final class WMSMapDecoration {
                     }
 
                 }
+            }else if(HINT_COVERAGE_WRITER.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                hints.put(GO2Hints.KEY_COVERAGE_WRITER, Boolean.parseBoolean(value));
             }
         }
 
@@ -351,6 +347,16 @@ public final class WMSMapDecoration {
     public static LegendTemplate getDefaultLegendTemplate(){
         getExtension(); //will force parsing the file
         return legendTemplate;
+    }
+
+    /**
+     * @return true if the coverage writer is enable, which implies writing
+     * directly in the output stream.
+     */
+    public static boolean writeInStream(){
+        final Hints hints = getHints();
+        final Object val = hints.get(GO2Hints.KEY_COVERAGE_WRITER);
+        return GO2Hints.COVERAGE_WRITER_ON.equals(val);
     }
 
     private static void parseDecoration(final DecorationExtension deco, final Element decoNode){

@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.measure.unit.Unit;
 import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBElement;
@@ -936,7 +937,18 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         final OutputDef odef = new OutputDef(mime, new Object());
         odef.setCompression(WMSMapDecoration.getCompression(mime));
 
-        return new PortrayalResponse(cdef, sdef, vdef, odef);
+        final PortrayalResponse response = new PortrayalResponse(cdef, sdef, vdef, odef);
+        try {
+            response.prepareNow();
+        } catch (PortrayalException ex) {
+            if (errorInImage) {
+                return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
+            } else {
+                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            }
+        }
+
+        return response;
     }
 
 

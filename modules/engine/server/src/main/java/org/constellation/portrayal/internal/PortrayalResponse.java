@@ -18,6 +18,7 @@
 package org.constellation.portrayal.internal;
 
 import java.awt.image.BufferedImage;
+import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.OutputDef;
 import org.geotoolkit.display2d.service.SceneDef;
@@ -34,7 +35,7 @@ public final class PortrayalResponse {
     private final SceneDef sceneDef;
     private final ViewDef viewDef;
     private final OutputDef outputDef;
-    private final BufferedImage image;
+    private BufferedImage image;
 
     public PortrayalResponse(CanvasDef canvasDef, SceneDef sceneDef, ViewDef viewDef, OutputDef outputDef) {
         this.canvasDef = canvasDef;
@@ -51,6 +52,11 @@ public final class PortrayalResponse {
         this.outputDef = null;
         this.image = image;
     }
+
+    public void prepareNow() throws PortrayalException{
+        image = CstlPortrayalService.getInstance().portray(sceneDef, viewDef, canvasDef);
+    }
+
 
     public CanvasDef getCanvasDef() {
         return canvasDef;
@@ -71,5 +77,5 @@ public final class PortrayalResponse {
     public ViewDef getViewDef() {
         return viewDef;
     }
-
+    
 }

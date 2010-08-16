@@ -32,6 +32,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.constellation.portrayal.internal.CstlPortrayalService;
 import org.constellation.portrayal.internal.PortrayalResponse;
+import org.constellation.ws.CstlServiceException;
 
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.service.CanvasDef;
