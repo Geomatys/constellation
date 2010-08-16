@@ -166,6 +166,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
     }
 
+    @Override
     protected MarshallerPool getMarshallerPool() {
         return WFSMarshallerPool.getInstance();
     }

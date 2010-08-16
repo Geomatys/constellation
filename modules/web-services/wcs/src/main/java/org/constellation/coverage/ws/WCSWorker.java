@@ -154,7 +154,8 @@ public final class WCSWorker extends AbstractWorker {
     /**
      * A list of supported interpolation
      */
-    private final static List<org.geotoolkit.wcs.xml.v100.InterpolationMethod> SUPPORTED_INTERPOLATIONS_V100 = new ArrayList<org.geotoolkit.wcs.xml.v100.InterpolationMethod>();
+    private static final List<org.geotoolkit.wcs.xml.v100.InterpolationMethod> SUPPORTED_INTERPOLATIONS_V100 =
+            new ArrayList<org.geotoolkit.wcs.xml.v100.InterpolationMethod>();
     static {
             SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BILINEAR);
             SUPPORTED_INTERPOLATIONS_V100.add(org.geotoolkit.wcs.xml.v100.InterpolationMethod.BICUBIC);
@@ -164,7 +165,8 @@ public final class WCSWorker extends AbstractWorker {
     /**
      * A list of supported interpolation
      */
-    private final static List<org.geotoolkit.wcs.xml.v111.InterpolationMethod> SUPPORTED_INTERPOLATIONS_V111 = new ArrayList<org.geotoolkit.wcs.xml.v111.InterpolationMethod>();
+    private static final List<org.geotoolkit.wcs.xml.v111.InterpolationMethod> SUPPORTED_INTERPOLATIONS_V111 =
+            new ArrayList<org.geotoolkit.wcs.xml.v111.InterpolationMethod>();
     static {
             SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.BILINEAR);
             SUPPORTED_INTERPOLATIONS_V111.add(org.geotoolkit.wcs.xml.v111.InterpolationMethod.BICUBIC);
@@ -174,15 +176,8 @@ public final class WCSWorker extends AbstractWorker {
     /**
      * Output responses of a GetCapabilities request.
      */
-    private static final Map<String,GetCapabilitiesResponse> capsResponses =
+    private static final Map<String,GetCapabilitiesResponse> CAPS_RESPONSE =
             new HashMap<String,GetCapabilitiesResponse>();
-
-    /**
-     * Initializes the marshaller pool for the WCS.
-     */
-    public WCSWorker() {
-        super();
-    }
 
     @Override
     protected MarshallerPool getMarshallerPool() {
@@ -206,8 +201,8 @@ public final class WCSWorker extends AbstractWorker {
                                           throws CstlServiceException
     {
         final String version = request.getVersion().toString();
-        if (version == null) {
-            throw new CstlServiceException("The parameter SERVICE must be specified.",
+        if (version.isEmpty()) {
+            throw new CstlServiceException("The parameter VERSION must be specified.",
                            MISSING_PARAMETER_VALUE, KEY_VERSION.toLowerCase());
         }
 
@@ -512,14 +507,14 @@ public final class WCSWorker extends AbstractWorker {
     {
         //we begin by extract the base attribute
         String version = request.getVersion().toString();
-        if (version == null) {
+        if (version.isEmpty()) {
             // For the moment the only version that we really support is this one.
             version = "1.0.0";
         }
 
         // If the getCapabilities response is in cache, we just return it.
-        if (capsResponses.containsKey(version)) {
-            return capsResponses.get(version);
+        if (CAPS_RESPONSE.containsKey(version)) {
+            return CAPS_RESPONSE.get(version);
         }
 
         final String format;
@@ -550,7 +545,7 @@ public final class WCSWorker extends AbstractWorker {
                     "is not handled.", VERSION_NEGOTIATION_FAILED, KEY_VERSION.toLowerCase());
         }
 
-        capsResponses.put(version, response);
+        CAPS_RESPONSE.put(version, response);
         return response;
     }
 
@@ -1135,8 +1130,8 @@ public final class WCSWorker extends AbstractWorker {
      */
     @Override
     public void destroy() {
-        if (!capsResponses.isEmpty()) {
-            capsResponses.clear();
+        if (!CAPS_RESPONSE.isEmpty()) {
+            CAPS_RESPONSE.clear();
         }
     }
 }
