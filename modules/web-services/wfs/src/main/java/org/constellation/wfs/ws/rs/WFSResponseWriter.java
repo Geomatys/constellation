@@ -59,9 +59,11 @@ public class WFSResponseWriter<T extends WFSResponse> implements MessageBodyWrit
         Marshaller m = null;
         try {
             m = WFSMarshallerPool.getInstance().acquireMarshaller();
-            m.marshal(t, out);
-            
-
+            if (t instanceof WFSResponseWrapper) {
+                m.marshal(((WFSResponseWrapper)t).getResponse(), out);
+            } else {
+                m.marshal(t, out);
+            }
         } catch (JAXBException ex) {
             LOGGER.log(Level.SEVERE, "JAXB exception while writing the WFS response", ex);
         } finally {

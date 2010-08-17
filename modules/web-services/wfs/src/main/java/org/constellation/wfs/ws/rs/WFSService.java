@@ -18,7 +18,6 @@
 package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +30,6 @@ import java.util.logging.Logger;
 import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.ValidationEvent;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
@@ -157,7 +155,6 @@ public class WFSService extends OGCWebService {
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
 
-        Marshaller marshaller = null;
         ServiceDef version    = null;
 
         worker.initHTTPContext(getHttpContext());
@@ -166,8 +163,6 @@ public class WFSService extends OGCWebService {
         worker.initUriContext(getUriContext());
 
         try {
-            marshaller = getMarshallerPool().acquireMarshaller();
-
             final String request = (objectRequest == null) ? getParameter(KEY_REQUEST, true) : null;
             logParameters();
 
@@ -189,9 +184,8 @@ public class WFSService extends OGCWebService {
             } else if (STR_GETGMLOBJECT.equalsIgnoreCase(request) || (objectRequest instanceof GetGmlObjectType)) {
                 final GetGmlObjectType model = adaptGetGMLObject(objectRequest);
                 version = getVersionFromNumber(model.getVersion());
-                final StringWriter sw = new StringWriter();
-                marshaller.marshal(worker.getGMLObject(model), sw);
-                return Response.ok(sw.toString(), getOutputFormat()).build();
+                final WFSResponseWrapper response = new WFSResponseWrapper(worker.getGMLObject(model));
+                return Response.ok(response, getOutputFormat()).build();
 
             } else if (STR_LOCKFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof LockFeatureType)) {
                 final LockFeatureType model = adaptLockFeature(objectRequest);
@@ -219,10 +213,6 @@ public class WFSService extends OGCWebService {
 
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, version);
-        } finally {
-            if (marshaller != null) {
-                getMarshallerPool().release(marshaller);
-            }
         }
     }
 
@@ -539,8 +529,12 @@ public class WFSService extends OGCWebService {
 
         }
 
-        final String xmlFilter  = getParameter(FILTER, false);
-        FilterType filter = extractFilter(xmlFilter);
+        final Object xmlFilter  = getComplexParameter(FILTER, false);
+
+        FilterType filter = null;
+        if (xmlFilter instanceof FilterType) {
+            filter = (FilterType) xmlFilter;
+        }
 
         final String bbox = getParameter("bbox", false);
         if (bbox != null) {
@@ -650,8 +644,14 @@ public class WFSService extends OGCWebService {
         final String typeName       = getParameter("typeName", true);
         final List<QName> typeNames = extractTypeName(typeName, mapping);
 
-        final String xmlFilter  = getParameter(FILTER, false);
-        final FilterType filter = extractFilter(xmlFilter);
+        final Object xmlFilter  = getComplexParameter(FILTER, false);
+        final FilterType filter;
+        if (xmlFilter instanceof FilterType) {
+            filter = (FilterType) xmlFilter;
+        } else {
+            filter = null;
+        }
+        
         // TODO
         final QName typeNamee = typeNames.get(0);
         final LockType lock = new LockType(filter, handle, typeNamee);
@@ -675,8 +675,13 @@ public class WFSService extends OGCWebService {
         final String typeName       = getParameter("typeName", true);
         final List<QName> typeNames = extractTypeName(typeName, mapping);
 
-        final String xmlFilter  = getParameter(FILTER, false);
-        final FilterType filter = extractFilter(xmlFilter);
+        final Object xmlFilter  = getComplexParameter(FILTER, false);
+        final FilterType filter;
+        if (xmlFilter instanceof FilterType) {
+            filter = (FilterType) xmlFilter;
+        } else {
+            filter = null;
+        }
 
         // TODO
         final QName typeNamee = typeNames.get(0);
@@ -718,46 +723,6 @@ public class WFSService extends OGCWebService {
             }
         }
         return typeNames;
-    }
-
-    /**
-     * Extract an OGC Filter from a String parameter in a GET Request.
-     * @param xmlFilter An piece of XML in a String.
-     *
-     * @return An OGC FIlter.
-     *
-     * @throws CstlServiceException if the XML is malformed or if the root type of the unmarshalled object is not a filter.
-     */
-    private FilterType extractFilter(String xmlFilter) throws CstlServiceException {
-        FilterType filter = null;
-        if (xmlFilter != null) {
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = getMarshallerPool().acquireUnmarshaller();
-                Object obj = unmarshaller.unmarshal(new StringReader(xmlFilter));
-                if (obj instanceof JAXBElement) {
-                    obj = ((JAXBElement)obj).getValue();
-                }
-                if (!(obj instanceof FilterType)) {
-                    String type = "null";
-                    if (obj != null) {
-                        type = obj.getClass().getName();
-                    }
-                    throw new CstlServiceException("The xml filter does not have the good type:" + type,
-                                                  INVALID_PARAMETER_VALUE, FILTER);
-                } else {
-                    filter = (FilterType) obj;
-                }
-            } catch (JAXBException ex) {
-                throw new CstlServiceException("The service was unable to read the xml filter:" + ex.getMessage(),
-                                                  INVALID_PARAMETER_VALUE, FILTER);
-            } finally {
-                if (unmarshaller != null) {
-                    getMarshallerPool().release(unmarshaller);
-                }
-            }
-        }
-        return filter;
     }
 
     public static Map<String, String> getSchemaLocations() {

@@ -18,6 +18,8 @@
 package org.constellation.ws.embedded;
 
 // JUnit dependencies
+import org.geotoolkit.xml.MarshallerPool;
+import java.net.MalformedURLException;
 import java.io.File;
 import java.net.URL;
 import java.net.URLConnection;
@@ -27,6 +29,7 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import org.geotoolkit.ogc.xml.v110.FeatureIdType;
+import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 import org.geotoolkit.wfs.xml.WFSMarshallerPool;
 import org.geotoolkit.wfs.xml.v110.FeatureCollectionType;
 import org.geotoolkit.wfs.xml.v110.GetFeatureType;
@@ -37,6 +40,7 @@ import org.geotoolkit.wfs.xml.v110.ResultTypeType;
 import org.geotoolkit.wfs.xml.v110.TransactionResponseType;
 import org.geotoolkit.wfs.xml.v110.TransactionSummaryType;
 import org.junit.*;
+import static org.junit.Assume.*;
 import static org.junit.Assert.*;
 
 /**
@@ -47,12 +51,26 @@ public class WFSRequestTest extends AbstractTestRequest {
 
     private static final String WFS_POST_URL = "http://localhost:9090/wfs?";
 
+    private static final String WFS_GETFEATURE_URL = "http://localhost:9090/wfs?request=getFeature&service=WFS&version=1.1.0&"
+            + "typename=sa:SamplingPoint&namespace=xmlns(sa=http://www.opengis.net/sampling/1.0)&"
+            + "filter=%3Cogc:Filter%20xmlns:ogc=%22http://www.opengis.net/ogc%22%20xmlns:gml=%22http://www.opengis.net/gml%22%3E"
+            + "%3Cogc:PropertyIsEqualTo%3E"
+            + "%3Cogc:PropertyName%3Egml:name%3C/ogc:PropertyName%3E"
+            + "%3Cogc:Literal%3E10972X0137-PONT%3C/ogc:Literal%3E"
+            + "%3C/ogc:PropertyIsEqualTo%3E"
+            + "%3C/ogc:Filter%3E";
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
     @BeforeClass
     public static void initPool() throws JAXBException {
-        pool = WFSMarshallerPool.getInstance();
+        pool = new MarshallerPool("org.geotoolkit.wfs.xml.v110"   +
+            		  ":org.geotoolkit.ogc.xml.v110"  +
+            		  ":org.geotoolkit.gml.xml.v311"  +
+                          ":org.geotoolkit.xsd.xml.v2001" +
+                          ":org.geotoolkit.sampling.xml.v100" +
+                         ":org.geotoolkit.internal.jaxb.geometry");
     }
 
     @AfterClass
@@ -66,7 +84,7 @@ public class WFSRequestTest extends AbstractTestRequest {
     /**
      */
     @Test
-    public void testWFSGetFeature() throws Exception {
+    public void testWFSGetFeaturePOST() throws Exception {
 
         // Creates a valid GetCapabilities url.
         final URL getCapsUrl = new URL(WFS_POST_URL);
@@ -82,6 +100,32 @@ public class WFSRequestTest extends AbstractTestRequest {
 
         assertTrue(obj instanceof FeatureCollectionType);
 
+    }
+
+    /**
+     */
+    @Test
+    public void testWFSGetFeatureGET() throws Exception {
+        final URL getfeatsUrl;
+        try {
+            getfeatsUrl = new URL(WFS_GETFEATURE_URL);
+        } catch (MalformedURLException ex) {
+            assumeNoException(ex);
+            return;
+        }
+
+        Object obj = unmarshallResponse(getfeatsUrl);
+
+        assertTrue(obj instanceof FeatureCollectionType);
+
+        FeatureCollectionType feat = (FeatureCollectionType) obj;
+        assertEquals(1, feat.getFeatureMember().size());
+
+        assertTrue("expected samplingPoint but was:" +  feat.getFeatureMember().get(0),
+                feat.getFeatureMember().get(0).getAbstractFeature() instanceof SamplingPointEntry);
+        SamplingPointEntry sp = (SamplingPointEntry) feat.getFeatureMember().get(0).getAbstractFeature();
+
+        assertEquals("10972X0137-PONT", sp.getName());
     }
 
     /**
