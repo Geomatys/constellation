@@ -397,7 +397,7 @@ public abstract class GenericReader  {
                     advancedJdbcDriver = false;
                 }
             }
-            if (type == java.sql.Types.INTEGER) {
+            if (type == java.sql.Types.INTEGER || type == java.sql.Types.SMALLINT) {
                 try {
                     final int id = Integer.parseInt(parameter);
                     stmt.setInt(i, id);

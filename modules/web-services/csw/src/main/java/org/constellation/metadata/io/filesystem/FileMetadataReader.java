@@ -159,6 +159,34 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     }
 
     /**
+     * Try to find a file named identifier.xml or identifier
+     *
+     * @param identifier
+     * @param directory
+     * @return
+     */
+    private File getFileFromIdentifier(String identifier, File directory) {
+        // try to find the file in the current directory
+        File metadataFile = new File (directory,  identifier + XML_EXT);
+        if (!metadataFile.exists()) {
+            metadataFile = new File (directory,  identifier);
+        }
+        if (metadataFile.exists()) {
+            return metadataFile;
+        } else {
+            for (File child : directory.listFiles()) {
+                if (child.isDirectory()) {
+                    File result = getFileFromIdentifier(identifier, child);
+                    if (result != null && result.exists()) {
+                        return result;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Unmarshall The file designed by the path dataDirectory/identifier.xml
      * If the file is not present or if it is impossible to unmarshall it it return an exception.
      *
@@ -167,7 +195,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      * @throws org.constellation.ws.MetadataIoException
      */
     private Object getObjectFromFile(String identifier) throws MetadataIoException {
-        final File metadataFile = new File (dataDirectory,  identifier + XML_EXT);
+        final File metadataFile = getFileFromIdentifier(identifier, dataDirectory);
         if (metadataFile.exists()) {
             Unmarshaller unmarshaller = null;
             try {
@@ -181,16 +209,15 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                 }
                 return metadata;
             } catch (JAXBException ex) {
-                throw new MetadataIoException(METAFILE_MSG + identifier + ".xml can not be unmarshalled" + "\n" +
+                throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
                         "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
             } finally {
                 if (unmarshaller != null) {
                     marshallerPool.release(unmarshaller);
                 }
             }
-        } else {
-            throw new MetadataIoException(METAFILE_MSG + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
-        }
+        } 
+        throw new MetadataIoException(METAFILE_MSG + identifier + ".xml is not present", INVALID_PARAMETER_VALUE);
     }
 
     /**
@@ -467,7 +494,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
 
             if (!paths.isEmpty()) {
 
-                final List<String> values         = getAllValuesFromPaths(paths);
+                final List<String> values         = getAllValuesFromPaths(paths, dataDirectory);
                 final ListOfValuesType listValues = new ListOfValuesType(values);
                 final DomainValuesType value      = new DomainValuesType(null, token, listValues, METADATA_QNAME);
                 responseList.add(value);
@@ -482,32 +509,40 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
     }
 
     /**
-     * Return all the String values correspounding to the specified list of papth through the metadata.
+     * Return all the String values correspounding to the specified list of path through the metadata.
      * 
      * @param paths
      * @return
      * @throws MetadataIoException
      */
-    private List<String> getAllValuesFromPaths(List<String> paths) throws MetadataIoException {
+    private List<String> getAllValuesFromPaths(List<String> paths, File directory) throws MetadataIoException {
         final List<String> result = new ArrayList<String>();
         Unmarshaller unmarshaller = null;
         try {
-            for (File metadataFile : dataDirectory.listFiles()) {
-                try {
-                    unmarshaller = marshallerPool.acquireUnmarshaller();
-                    Object metadata = unmarshaller.unmarshal(metadataFile);
-                    if (metadata instanceof JAXBElement) {
-                        metadata = ((JAXBElement) metadata).getValue();
+            unmarshaller    = marshallerPool.acquireUnmarshaller();
+            for (File metadataFile : directory.listFiles()) {
+                if (!metadataFile.isDirectory()) {
+                    try {
+                        Object metadata = unmarshaller.unmarshal(metadataFile);
+                        if (metadata instanceof JAXBElement) {
+                            metadata = ((JAXBElement) metadata).getValue();
+                        }
+                        final String value = GenericIndexer.extractValues(metadata, paths);
+                        if (value != null && !value.equals("null")) {
+                            result.add(value);
+                        }
+                    } catch (JAXBException ex) {
+                        // throw or continue to the next file?
+                        throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
+                                "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
                     }
-                    final String value = GenericIndexer.extractValues(metadata, paths);
-                    if (value != null && !value.equals("null")) {
-                        result.add(value);
-                    }
-                } catch (JAXBException ex) {
-                    throw new MetadataIoException(METAFILE_MSG + metadataFile.getName() + " can not be unmarshalled" + "\n" +
-                            "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
+                } else {
+                    result.addAll(getAllValuesFromPaths(paths, metadataFile));
                 }
             }
+        } catch (JAXBException ex) {
+            throw new MetadataIoException("Error while getting unmarshaller from pool\ncause: " + ex.getMessage(), NO_APPLICABLE_CODE);
+
         } finally {
             if (unmarshaller != null) {
                 marshallerPool.release(unmarshaller);
@@ -537,10 +572,18 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     @Override
     public List<? extends Object> getAllEntries() throws MetadataIoException {
+        return getAllEntries(dataDirectory);
+    }
+    
+    /**
+     *
+     */
+    public List<? extends Object> getAllEntries(File directory) throws MetadataIoException {
         final List<Object> results = new ArrayList<Object>();
-        for (File f : dataDirectory.listFiles()) {
-            if (f.getName().endsWith(XML_EXT)) {
-                final String identifier = f.getName().substring(0, f.getName().indexOf(XML_EXT));
+        for (File f : directory.listFiles()) {
+            final String fileName = f.getName();
+            if (fileName.endsWith(XML_EXT)) {
+                final String identifier = fileName.substring(0, fileName.lastIndexOf(XML_EXT));
                 Unmarshaller unmarshaller = null;
                 try {
                     unmarshaller = marshallerPool.acquireUnmarshaller();
@@ -553,15 +596,19 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                     }
                     results.add(metadata);
                 } catch (JAXBException ex) {
-                    throw new MetadataIoException(METAFILE_MSG + f.getPath() + " can not be unmarshalled" + "\n" +
-                            "cause: " + ex.getMessage(), INVALID_PARAMETER_VALUE);
+                    // throw or continue to the next file?
+                    throw new MetadataIoException(METAFILE_MSG + f.getPath() + " can not be unmarshalled\ncause: "
+                            + ex.getMessage(), ex, INVALID_PARAMETER_VALUE);
                 } finally {
                     if (unmarshaller != null) {
                         marshallerPool.release(unmarshaller);
                     }
                 }
+            } else if (f.isDirectory()) {
+                results.addAll(getAllEntries(f));
             } else {
-                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
+                // throw or continue to the next file?
+                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
             }
         }
         return results;
@@ -572,13 +619,23 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
      */
     @Override
     public List<String> getAllIdentifiers() throws MetadataIoException {
+        return getAllIdentifiers(dataDirectory);
+    }
+
+    /**
+     * 
+     */
+    public List<String> getAllIdentifiers(File directory) throws MetadataIoException {
         final List<String> results = new ArrayList<String>();
-        for (File f : dataDirectory.listFiles()) {
-            if (f.getName().endsWith(XML_EXT)) {
-                final String identifier = f.getName().substring(0, f.getName().indexOf(".xml"));
+        for (File f : directory.listFiles()) {
+            final String fileName = f.getName();
+            if (fileName.endsWith(XML_EXT)) {
+                final String identifier = fileName.substring(0, fileName.lastIndexOf(".xml"));
                 results.add(identifier);
+            } else if (f.isDirectory()){
+                results.addAll(getAllIdentifiers(f));
             } else {
-                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " is not present", INVALID_PARAMETER_VALUE);
+                throw new MetadataIoException(METAFILE_MSG + f.getPath() + " does not ands with .xml or is not a directory", INVALID_PARAMETER_VALUE);
             }
         }
         return results;

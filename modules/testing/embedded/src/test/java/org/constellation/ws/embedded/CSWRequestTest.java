@@ -123,7 +123,7 @@ public class CSWRequestTest extends AbstractTestRequest {
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
 
-        final GetDomainType request = new GetDomainType("CSW", "2.0.2", null, "GetCapabilities.sections");
+        GetDomainType request = new GetDomainType("CSW", "2.0.2", null, "GetCapabilities.sections");
 
         postRequestObject(conec, request);
         Object result = unmarshallResponse(conec);
@@ -134,6 +134,23 @@ public class CSWRequestTest extends AbstractTestRequest {
         ListOfValuesType list = new ListOfValuesType(Arrays.asList("All", "ServiceIdentification", "ServiceProvider", "OperationsMetadata","Filter_Capabilities"));
         values.add(new DomainValuesType("GetCapabilities.sections", null, list, new QName("http://www.opengis.net/cat/csw/2.0.2", "Capabilities")));
         GetDomainResponseType expResult = new GetDomainResponseType(values);
+
+        assertEquals(expResult, result);
+
+        request = new GetDomainType("CSW", "2.0.2", "title", null);
+
+        conec = getCapsUrl.openConnection();
+
+        postRequestObject(conec, request);
+        result = unmarshallResponse(conec);
+
+        assertTrue(result instanceof GetDomainResponseType);
+
+        values = new ArrayList<DomainValues>();
+        list = new ListOfValuesType(Arrays.asList("Aliquam fermentum purus quis arcu","Fuscé vitae ligulä","Lorem ipsum","Lorem ipsum dolor sit amet",
+                "Maecenas enim","Mauris sed neque","Ut facilisis justo ut lacus","Vestibulum massa purus","Ñunç elementum"));
+        values.add(new DomainValuesType(null, "title", list, new QName("http://www.isotc211.org/2005/gmd", "MD_Metadata")));
+        expResult = new GetDomainResponseType(values);
 
         assertEquals(expResult, result);
     }
@@ -148,7 +165,7 @@ public class CSWRequestTest extends AbstractTestRequest {
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
 
-        final GetRecordByIdType request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+        GetRecordByIdType request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
                 "text/xml", null, Arrays.asList("urn:uuid:19887a8a-f6b0-4a63-ae56-7fba0e17801f"));
 
         final ObjectFactory factory = new ObjectFactory();
@@ -158,6 +175,20 @@ public class CSWRequestTest extends AbstractTestRequest {
         assertTrue(result instanceof GetRecordByIdResponseType);
 
         GetRecordByIdResponseType grResult = (GetRecordByIdResponseType) result;
+        assertEquals(1, grResult.getAbstractRecord().size());
+
+
+        request = new GetRecordByIdType("CSW", "2.0.2", new ElementSetNameType(ElementSetType.FULL),
+                "text/xml", null, Arrays.asList("urn:uuid:ab42a8c4-95e8-4630-bf79-33e59241605a"));
+
+        conec = getCapsUrl.openConnection();
+        
+        postRequestObject(conec, factory.createGetRecordById(request));
+        result = unmarshallResponse(conec);
+
+        assertTrue(result instanceof GetRecordByIdResponseType);
+
+        grResult = (GetRecordByIdResponseType) result;
         assertEquals(1, grResult.getAbstractRecord().size());
 
     }
