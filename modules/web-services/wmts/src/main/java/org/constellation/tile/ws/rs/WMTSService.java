@@ -115,7 +115,7 @@ public class WMTSService extends GridWebService {
                     gc = createNewGetCapabilitiesRequest();
                 }
                 serviceDef = getVersionFromNumber(gc.getVersion().toString());
-                worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
+                worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject("1.0.0"));
                 
                 return Response.ok(worker.getCapabilities(gc), MimeType.TEXT_XML).build();
             }
@@ -399,7 +399,9 @@ public class WMTSService extends GridWebService {
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
-        final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(),
+        final String codeName = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
+
+        final ExceptionReport report = new ExceptionReport(ex.getMessage(), codeName,
                 ex.getLocator(), serviceDef.exceptionVersion.toString());
         return Response.ok(report, MimeType.TEXT_XML).build();
         

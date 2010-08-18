@@ -82,11 +82,7 @@ public abstract class OGCWebService extends AbstractWebService {
      * avoid modification after instanciation.
      */
     private final UnmodifiableArrayList<ServiceDef> supportedVersions;
-    /**
-     * The version of the WMS specification for this request.
-     */
-    @Deprecated
-    private ServiceDef actingVersion;
+    
     /**
      * The name of the serviceType (WMS, WCS,...)
      */
@@ -124,10 +120,7 @@ public abstract class OGCWebService extends AbstractWebService {
         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
 
         final ServiceDef firstDef = this.supportedVersions.get(0);
-        this.serviceType = firstDef.specification.toString();
-        // We set that the current version is probably the highest one, the best one, which should
-        // be the first in the list of supported version.
-        this.actingVersion = firstDef;
+        this.serviceType          = firstDef.specification.toString();
     }
 
     /**
@@ -146,22 +139,6 @@ public abstract class OGCWebService extends AbstractWebService {
             messageb.append(" must be specified");
             throw new CstlServiceException(messageb.toString(), VERSION_NEGOTIATION_FAILED);
         }
-    }
-
-    /**
-     * Return the current version of the Web ServiceType.
-     */
-    @Deprecated
-    protected ServiceDef getActingVersion() {
-        return this.actingVersion;
-    }
-
-    /**
-     * Return the current version of the Web ServiceType.
-     */
-    @Deprecated
-    protected void setActingVersion(String versionNumber) {
-        actingVersion = getVersionFromNumber(versionNumber);
     }
 
     /**
@@ -191,22 +168,25 @@ public abstract class OGCWebService extends AbstractWebService {
      */
     @Override
     protected Response launchException(final String message, String codeName, final String locator) {
-        if (isOWS(actingVersion)) {
-            codeName = StringUtilities.transformCodeName(codeName);
-        }
         final OWSExceptionCode code   = CodeLists.valueOf(OWSExceptionCode.class, codeName);
         final CstlServiceException ex = new CstlServiceException(message, code, locator);
         return processExceptionResponse(ex, supportedVersions.get(0));
     }
 
     /**
-     * Returns the file where to read the capabilities document for each serviceType.
-     * If no such file is found, then this method returns {@code null}.
-     *
-     * @return The capabilities Object, or {@code null} if none.
+     * Return the correct representation of an OWS exceptionCode
+     * 
+     * @param exceptionCode
+     * @return
      */
-    public Object getStaticCapabilitiesObject() throws JAXBException {
-        return getStaticCapabilitiesObject(getActingVersion().version);
+    protected String getOWSExceptionCodeRepresentation(CodeList exceptionCode) {
+        final String codeRepresentation;
+        if (exceptionCode instanceof org.constellation.ws.ExceptionCode) {
+            codeRepresentation = StringUtilities.transformCodeName(exceptionCode.name());
+        } else {
+            codeRepresentation = exceptionCode.name();
+        }
+        return codeRepresentation;
     }
 
     /**
@@ -219,8 +199,8 @@ public abstract class OGCWebService extends AbstractWebService {
      *
      * @return The capabilities Object, or {@code null} if none.
      */
-    private Object getStaticCapabilitiesObject(final Version version) throws JAXBException {
-        final String fileName = this.serviceType + "Capabilities" + version.toString() + ".xml";
+    protected Object getStaticCapabilitiesObject(final String version) throws JAXBException {
+        final String fileName = this.serviceType + "Capabilities" + version + ".xml";
         final File changeFile = getFile("change.properties");
         final Properties p    = new Properties();
 
@@ -442,15 +422,5 @@ public abstract class OGCWebService extends AbstractWebService {
             }
         }
         return namespaces;
-    }
-
-    protected String getExceptionCodeRepresentation(CodeList exceptionCode) {
-        final String codeRepresentation;
-        if (exceptionCode instanceof org.constellation.ws.ExceptionCode) {
-            codeRepresentation = StringUtilities.transformCodeName(exceptionCode.name());
-        } else {
-            codeRepresentation = exceptionCode.name();
-        }
-        return codeRepresentation;
     }
 }

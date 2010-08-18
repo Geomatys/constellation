@@ -162,7 +162,7 @@ public class SOService extends OGCWebService {
              }
 
              if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
-                worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
+                worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject("1.0.0"));
                 GetCapabilities gc = (GetCapabilities)objectRequest;
                 /*
                  * if the parameters have been send by GET or POST kvp,
@@ -203,7 +203,7 @@ public class SOService extends OGCWebService {
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
-        final String exceptionCode = getExceptionCodeRepresentation(ex.getExceptionCode());
+        final String exceptionCode = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(),
                                                      serviceDef.exceptionVersion.toString());
         return Response.ok(report, MimeType.TEXT_XML).build();

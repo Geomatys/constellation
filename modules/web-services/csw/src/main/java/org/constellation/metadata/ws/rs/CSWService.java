@@ -204,7 +204,7 @@ public class CSWService extends OGCWebService {
                     if (gc.getVersion() != null) {
                         serviceDef = getVersionFromNumber(gc.getVersion().toString());
                     }
-                    worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
+                    worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject("2.0.2"));
 
                     return Response.ok(worker.getCapabilities(gc), worker.getOutputFormat()).build();
 
@@ -274,7 +274,7 @@ public class CSWService extends OGCWebService {
                         gd = createNewGetDomainRequest();
                     }
                     serviceDef = getVersionFromNumber(gd.getVersion());
-                    worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject());
+                    worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject("2.0.2"));
 
                     return Response.ok(worker.getDomain(gd), worker.getOutputFormat()).build();
                 }
@@ -337,8 +337,9 @@ public class CSWService extends OGCWebService {
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
-        final String version = serviceDef.exceptionVersion.toString();
-        final ExceptionReport report = new ExceptionReport(ex.getMessage(), ex.getExceptionCode().name(), ex.getLocator(), version);
+        final String version         = serviceDef.exceptionVersion.toString();
+        final String code            = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
+        final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), version);
         return Response.ok(report, MimeType.TEXT_XML).build();
     }
     

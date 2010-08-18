@@ -111,6 +111,10 @@ public class CSWRequestTest extends AbstractTestRequest {
 
         assertTrue(obj instanceof ExceptionReport);
 
+        ExceptionReport result = (ExceptionReport) obj;
+
+        assertEquals("InvalidParameterValue", result.getException().get(0).getExceptionCode());
+
     }
 
     @Test

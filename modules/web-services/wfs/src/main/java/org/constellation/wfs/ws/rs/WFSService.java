@@ -226,8 +226,8 @@ public class WFSService extends OGCWebService {
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
-        final String version = serviceDef.exceptionVersion.toString();
-        final String exceptionCode = getExceptionCodeRepresentation(ex.getExceptionCode());
+        final String version         = serviceDef.exceptionVersion.toString();
+        final String exceptionCode   = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(), version);
         return Response.ok(report, "text/xml").build();
     }
