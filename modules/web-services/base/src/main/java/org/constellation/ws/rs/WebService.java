@@ -255,9 +255,10 @@ public abstract class WebService {
         final StringTokenizer tokens = new StringTokenizer(request, "&");
         final StringBuilder log = new StringBuilder();
         while (tokens.hasMoreTokens()) {
-            final String token = tokens.nextToken().trim();
-            final String paramName  = token.substring(0, token.indexOf('='));
-            final String paramValue = token.substring(token.indexOf('=')+ 1);
+            final String token      = tokens.nextToken().trim();
+            final int equalsIndex   = token.indexOf('=');
+            final String paramName  = token.substring(0, equalsIndex);
+            final String paramValue = token.substring(equalsIndex + 1);
             log.append("put: ").append(paramName).append("=").append(paramValue).append('\n');
             getUriContext().getQueryParameters().add(paramName, paramValue);
         }

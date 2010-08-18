@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.ws.WebServiceException;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
+import org.geotoolkit.util.Version;
 
 
 /**
@@ -49,6 +50,17 @@ public class SOAPServiceException extends WebServiceException {
     public SOAPServiceException(String message, String code, String v) {
         super(message);
         this.exception = new ExceptionReport(message, code, null,  v);
+
+        this.setStackTrace(new StackTraceElement[0]);
+    }
+
+    public SOAPServiceException(String message, String code, Version v) {
+        super(message);
+        String version = null;
+        if (v != null) {
+            version = v.toString();
+        }
+        this.exception = new ExceptionReport(message, code, null,  version);
 
         this.setStackTrace(new StackTraceElement[0]);
     }

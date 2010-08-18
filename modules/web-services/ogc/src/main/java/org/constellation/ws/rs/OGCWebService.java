@@ -84,10 +84,6 @@ public abstract class OGCWebService extends AbstractWebService {
     private final UnmodifiableArrayList<ServiceDef> supportedVersions;
     
     /**
-     * The name of the serviceType (WMS, WCS,...)
-     */
-    private final String serviceType;//TODO: use the ServiceType[type] enum.
-    /**
      * A map containing the Capabilities Object already load from file.
      */
     private final Map<String,Object> capabilities = new HashMap<String,Object>();
@@ -118,9 +114,6 @@ public abstract class OGCWebService extends AbstractWebService {
         
         //guarantee it will not be modified
         this.supportedVersions = UnmodifiableArrayList.wrap(supportedVersions.clone());
-
-        final ServiceDef firstDef = this.supportedVersions.get(0);
-        this.serviceType          = firstDef.specification.toString();
     }
 
     /**
@@ -199,8 +192,8 @@ public abstract class OGCWebService extends AbstractWebService {
      *
      * @return The capabilities Object, or {@code null} if none.
      */
-    protected Object getStaticCapabilitiesObject(final String version) throws JAXBException {
-        final String fileName = this.serviceType + "Capabilities" + version + ".xml";
+    protected Object getStaticCapabilitiesObject(final ServiceDef def) throws JAXBException {
+        final String fileName = def.specification.toString() + "Capabilities" + def.version.toString() + ".xml";
         final File changeFile = getFile("change.properties");
         final Properties p    = new Properties();
 
@@ -331,23 +324,6 @@ public abstract class OGCWebService extends AbstractWebService {
             }
         }
         return firstSpecifiedVersion;
-    }
-
-    /**
-     * Returns whether the service is OWS, or not.
-     *
-     * @param def The service definition to consider.
-     * @return True if the service is OWS, false otherwise.
-     */
-    protected boolean isOWS(final ServiceDef def) {
-        if (def == null) {
-            throw new IllegalArgumentException("Unable to know if the service is OWS because it is not defined.");
-        }
-        return  def.equals(ServiceDef.CSW_2_0_2) || def.equals(ServiceDef.PDP)        ||
-                def.equals(ServiceDef.PEP)       || def.equals(ServiceDef.SOS_1_0_0)  ||
-                def.equals(ServiceDef.WCS_1_1_1) || def.equals(ServiceDef.WCS_1_1_0)  ||
-                def.equals(ServiceDef.WCS_1_1_2) || def.equals(ServiceDef.WMTS_1_0_0) ||
-                def.equals(ServiceDef.WFS_1_1_0) ;
     }
 
     /**

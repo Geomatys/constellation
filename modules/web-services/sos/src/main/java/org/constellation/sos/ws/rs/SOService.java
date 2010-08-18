@@ -78,17 +78,17 @@ public class SOService extends OGCWebService {
         try {
              worker.setServiceURL(getServiceURL());
              logParameters();
-             String request = "";
-             if (objectRequest == null)
-                request = (String) getParameter("REQUEST", true);
 
-             if (request.equalsIgnoreCase("GetObservation") || (objectRequest instanceof GetObservation)) {
+             String request = "";
+             if (objectRequest == null) {
+                request = (String) getParameter("REQUEST", true);
+                objectRequest = adaptQuery(request);
+             }
+
+             if (objectRequest instanceof GetObservation) {
                 final GetObservation go = (GetObservation) objectRequest;
-                if (go == null){
-                    throwUnsupportedGetMethod("GetObservation");
-                }
-                serviceDef = getVersionFromNumber(go.getVersion());
-                final Object response = worker.getObservation(go);
+                serviceDef              = getVersionFromNumber(go.getVersion());
+                final Object response   = worker.getObservation(go);
 
                 String outputFormat = go.getResponseFormat();
                 if (outputFormat != null  && outputFormat.startsWith(MimeType.TEXT_XML)) {
@@ -105,76 +105,44 @@ public class SOService extends OGCWebService {
                 return Response.ok(marshalled, outputFormat).build();
              }
 
-             if (request.equalsIgnoreCase("DescribeSensor") || (objectRequest instanceof DescribeSensor)) {
-                DescribeSensor ds = (DescribeSensor)objectRequest;
-                if (ds == null){
-                    ds = createDescribeSensor();
-                }
-                serviceDef = getVersionFromNumber(ds.getVersion());
-                
+             if (objectRequest instanceof DescribeSensor) {
+                DescribeSensor ds             = (DescribeSensor)objectRequest;
+                serviceDef                    = getVersionFromNumber(ds.getVersion());
                 final AbstractSensorML sensor = worker.describeSensor(ds);
                 return Response.ok(sensor, MimeType.TEXT_XML).build();
              }
 
-             if (request.equalsIgnoreCase("GetFeatureInterest") || (objectRequest instanceof GetFeatureOfInterest)) {
-                final GetFeatureOfInterest gf = (GetFeatureOfInterest)objectRequest;
-
-                if (gf == null) {
-                    throwUnsupportedGetMethod("GetFeatureOfInterest");
-                }
-                if (gf.getVersion() != null)
-                    serviceDef = getVersionFromNumber(gf.getVersion());
+             if (objectRequest instanceof GetFeatureOfInterest) {
+                final GetFeatureOfInterest gf     = (GetFeatureOfInterest)objectRequest;
+                serviceDef                        = getVersionFromNumber(gf.getVersion());
                 final SOSResponseWrapper response = new SOSResponseWrapper(worker.getFeatureOfInterest(gf));
                 return Response.ok(response, worker.getOutputFormat()).build();
-
              }
 
-             if (request.equalsIgnoreCase("InsertObservation") || (objectRequest instanceof InsertObservation)) {
+             if (objectRequest instanceof InsertObservation) {
                 final InsertObservation is = (InsertObservation)objectRequest;
-                if (is == null){
-                    throwUnsupportedGetMethod("InsertObservation");
-                }
-                serviceDef = getVersionFromNumber(is.getVersion());
+                serviceDef                 = getVersionFromNumber(is.getVersion());
                 return Response.ok(worker.insertObservation(is), MimeType.TEXT_XML).build();
-
              }
 
-             if (request.equalsIgnoreCase("GetResult") || (objectRequest instanceof GetResult)) {
+             if (objectRequest instanceof GetResult) {
                 final GetResult gr = (GetResult)objectRequest;
-                if (gr == null){
-                    throwUnsupportedGetMethod("GetResult");
-                }
-                serviceDef = getVersionFromNumber(gr.getVersion());
+                serviceDef         = getVersionFromNumber(gr.getVersion());
 
                 return Response.ok(worker.getResult(gr), MimeType.TEXT_XML).build();
-
              }
 
-             if (request.equalsIgnoreCase("RegisterSensor") || (objectRequest instanceof RegisterSensor)) {
+             if (objectRequest instanceof RegisterSensor) {
                 final RegisterSensor rs = (RegisterSensor)objectRequest;
-                if (rs == null){
-                    throwUnsupportedGetMethod("RegisterSensor");
-                }
-                serviceDef = getVersionFromNumber(rs.getVersion());
+                serviceDef              = getVersionFromNumber(rs.getVersion());
 
                 return Response.ok(worker.registerSensor(rs), MimeType.TEXT_XML).build();
-
              }
 
-             if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
-                worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject("1.0.0"));
+             if (objectRequest instanceof GetCapabilities) {
+                worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.SOS_1_0_0));
                 GetCapabilities gc = (GetCapabilities)objectRequest;
-                /*
-                 * if the parameters have been send by GET or POST kvp,
-                 * we build a request object with this parameter.
-                 */
-                if (gc == null) {
-
-                    gc = createNewGetCapabilities();
-                }
-                if (gc.getVersion() != null) {
-                    serviceDef = getVersionFromNumber(gc.getVersion().toString());
-                }
+                serviceDef         = getVersionFromNumber(gc.getVersion());
                 return Response.ok(worker.getCapabilities(gc), worker.getOutputFormat()).build();
              }
 
@@ -203,16 +171,34 @@ public class SOService extends OGCWebService {
         if (serviceDef == null) {
             serviceDef = getBestVersion(null);
         }
-        final String exceptionCode = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
+        final String exceptionCode   = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), exceptionCode, ex.getLocator(),
                                                      serviceDef.exceptionVersion.toString());
         return Response.ok(report, MimeType.TEXT_XML).build();
     }
 
+    private Object adaptQuery(String request) throws CstlServiceException {
+         if ("GetObservation"    .equalsIgnoreCase(request) ||
+             "GetFeatureInterest".equalsIgnoreCase(request) ||
+             "InsertObservation" .equalsIgnoreCase(request) ||
+             "GetResult"         .equalsIgnoreCase(request) ||
+             "RegisterSensor"    .equalsIgnoreCase(request)
+         ){
+             throwUnsupportedGetMethod(request);
+
+         } else if ("DescribeSensor".equalsIgnoreCase(request)) {
+             return createDescribeSensor();
+         } else if ("GetCapabilities".equalsIgnoreCase(request)) {
+             return createNewGetCapabilities();
+         }
+         throw new CstlServiceException("The operation " + request + " is not supported by the service",
+                        INVALID_PARAMETER_VALUE, "request");
+    }
+    
     /**
      * Build a new getCapabilities request from kvp encoding
      */
-    private GetCapabilities createNewGetCapabilities() throws CstlServiceException, JAXBException {
+    private GetCapabilities createNewGetCapabilities() throws CstlServiceException {
 
         String version = getParameter("acceptVersions", false);
         AcceptVersionsType versions;
@@ -258,7 +244,7 @@ public class SOService extends OGCWebService {
     /**
      * Build a new getCapabilities request from kvp encoding
      */
-    private DescribeSensor createDescribeSensor() throws CstlServiceException, JAXBException {
+    private DescribeSensor createDescribeSensor() throws CstlServiceException {
 
         return new DescribeSensor(getParameter("VERSION", true),
                                   getParameter("SERVICE", true),

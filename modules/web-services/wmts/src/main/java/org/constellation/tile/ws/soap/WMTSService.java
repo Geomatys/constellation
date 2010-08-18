@@ -140,7 +140,7 @@ public class WMTSService {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                            requestTile.getVersion());*/
         } catch (IOException ex) {
-            throw new SOAPServiceException(ex.getMessage(), ExceptionCode.NO_APPLICABLE_CODE.name(), null);
+            throw new SOAPServiceException(ex.getMessage(), ExceptionCode.NO_APPLICABLE_CODE.name(), requestTile.getVersion());
         }
     }
 }

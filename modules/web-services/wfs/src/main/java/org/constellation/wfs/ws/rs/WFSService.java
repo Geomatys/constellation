@@ -166,34 +166,39 @@ public class WFSService extends OGCWebService {
             final String request = (objectRequest == null) ? getParameter(KEY_REQUEST, true) : null;
             logParameters();
 
-            if (STR_GETCAPABILITIES.equalsIgnoreCase(request) || (objectRequest instanceof GetCapabilitiesType)) {
-                final GetCapabilitiesType model = adaptGetCapabilities(objectRequest);
+            // if the request is not an xml request we fill the request parameter.
+            if (objectRequest == null) {
+                objectRequest = adaptQuery(request);
+            }
+
+            if (objectRequest instanceof GetCapabilitiesType) {
+                final GetCapabilitiesType model = (GetCapabilitiesType) objectRequest;
                 return Response.ok(worker.getCapabilities(model), getOutputFormat()).build();
 
-            } else if (STR_DESCRIBEFEATURETYPE.equalsIgnoreCase(request) || (objectRequest instanceof DescribeFeatureTypeType)) {
-                final DescribeFeatureTypeType model = adaptDescribeFeatureType(objectRequest);
+            } else if (objectRequest instanceof DescribeFeatureTypeType) {
+                final DescribeFeatureTypeType model = (DescribeFeatureTypeType) objectRequest;
                 return Response.ok(worker.describeFeatureType(model), getOutputFormat()).build();
 
-            } else if (STR_GETFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof GetFeatureType)) {
-                final GetFeatureType model = adaptGetFeatureType(objectRequest);
+            } else if (objectRequest instanceof GetFeatureType) {
+                final GetFeatureType model = (GetFeatureType) objectRequest;
                 version = getVersionFromNumber(model.getVersion());
                 final Object response = worker.getFeature(model);
                 schemaLocations = worker.getSchemaLocations();
                 return Response.ok(response, getOutputFormat()).build();
                 
-            } else if (STR_GETGMLOBJECT.equalsIgnoreCase(request) || (objectRequest instanceof GetGmlObjectType)) {
-                final GetGmlObjectType model = adaptGetGMLObject(objectRequest);
+            } else if (objectRequest instanceof GetGmlObjectType) {
+                final GetGmlObjectType model = (GetGmlObjectType) objectRequest;
                 version = getVersionFromNumber(model.getVersion());
                 final WFSResponseWrapper response = new WFSResponseWrapper(worker.getGMLObject(model));
                 return Response.ok(response, getOutputFormat()).build();
 
-            } else if (STR_LOCKFEATURE.equalsIgnoreCase(request) || (objectRequest instanceof LockFeatureType)) {
-                final LockFeatureType model = adaptLockFeature(objectRequest);
+            } else if (objectRequest instanceof LockFeatureType) {
+                final LockFeatureType model = (LockFeatureType) objectRequest;
                 version = getVersionFromNumber(model.getVersion());
                 return Response.ok(worker.lockFeature(model), getOutputFormat()).build();
 
-            } else if (STR_TRANSACTION.equalsIgnoreCase(request) || (objectRequest instanceof TransactionType)) {
-                final TransactionType model = adaptTransaction(objectRequest);
+            } else if (objectRequest instanceof TransactionType) {
+                final TransactionType model = (TransactionType) objectRequest;
                 version = getVersionFromNumber(model.getVersion());
                 return Response.ok(worker.transaction(model), getOutputFormat()).build();
             }
@@ -350,63 +355,22 @@ public class WFSService extends OGCWebService {
         }
     }
 
-    private GetCapabilitiesType adaptGetCapabilities(Object objectRequest) throws CstlServiceException {
-        if (objectRequest instanceof GetCapabilitiesType){
-            return (GetCapabilitiesType)objectRequest;
-        } else {
-            //use a default getCapabilities request
+    private Object adaptQuery(String request) throws CstlServiceException {
+        if (STR_GETCAPABILITIES.equalsIgnoreCase(request)) {
             return createNewGetCapabilitiesRequest();
-        }
-    }
-
-    private DescribeFeatureTypeType adaptDescribeFeatureType(Object objectRequest) throws CstlServiceException {
-        if (objectRequest instanceof DescribeFeatureTypeType){
-            return (DescribeFeatureTypeType)objectRequest;
-        } else {
-            //build a simple describe request
-            //todo we must handle the query parameters here
+        } else if (STR_DESCRIBEFEATURETYPE.equalsIgnoreCase(request)) {
             return createNewDescribeFeatureTypeRequest();
-        }
-    }
-
-    private GetFeatureType adaptGetFeatureType(Object objectRequest) throws CstlServiceException {
-        if (objectRequest instanceof GetFeatureType){
-            return (GetFeatureType)objectRequest;
-        } else {
-            //build a simple get feature type request
-            //todo we must handle the query parameters here
+        } else if (STR_GETFEATURE.equalsIgnoreCase(request)) {
             return createNewGetFeatureRequest();
-        }
-    }
-
-    private GetGmlObjectType adaptGetGMLObject(Object objectRequest) throws CstlServiceException {
-        if (objectRequest instanceof GetGmlObjectType){
-            return (GetGmlObjectType)objectRequest;
-        } else {
-            //build a simple get gml object request
-            //todo we must handle the query parameters here
+        } else if (STR_GETGMLOBJECT.equalsIgnoreCase(request)) {
             return createNewGetGmlObjectRequest();
-        }
-    }
-
-    private LockFeatureType adaptLockFeature(Object objectRequest) throws CstlServiceException {
-        if (objectRequest instanceof LockFeatureType){
-            return (LockFeatureType)objectRequest;
-        } else {
-            //build a simple lock feature request
-            //todo we must handle the query parameters here
+        } else if (STR_LOCKFEATURE.equalsIgnoreCase(request)) {
             return createNewLockFeatureRequest();
-        }
-    }
-
-    private TransactionType adaptTransaction(Object objectRequest) throws CstlServiceException {
-        if (objectRequest instanceof TransactionType){
-            return (TransactionType)objectRequest;
-        } else {
-            //build a simple transaction request
-            //todo we must handle the query parameters here
+        } else if (STR_TRANSACTION.equalsIgnoreCase(request)) {
             return createNewTransactionRequest();
         }
+        throw new CstlServiceException("The operation " + request + " is not supported by the service",
+                        INVALID_PARAMETER_VALUE, "request");
     }
 
     /**

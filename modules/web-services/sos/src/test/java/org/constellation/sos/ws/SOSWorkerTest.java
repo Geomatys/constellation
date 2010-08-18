@@ -298,7 +298,7 @@ public class SOSWorkerTest {
          * Test 1 bad outputFormat
          */
         boolean exLaunched = false;
-        DescribeSensor request  = new DescribeSensor("urn:ogc:object:sensor:GEOM:1", "text/xml; subtype=\"SensorML/1.0.0\"");
+        DescribeSensor request  = new DescribeSensor("1.0.0", "SOS", "urn:ogc:object:sensor:GEOM:1", "text/xml; subtype=\"SensorML/1.0.0\"");
         try {
             worker.describeSensor(request);
         } catch (CstlServiceException ex) {
@@ -312,7 +312,7 @@ public class SOSWorkerTest {
          * Test 2 missing outputFormat
          */
         exLaunched = false;
-        request  = new DescribeSensor("urn:ogc:object:sensor:GEOM:1", null);
+        request  = new DescribeSensor("1.0.0", "SOS", "urn:ogc:object:sensor:GEOM:1", null);
         try {
             worker.describeSensor(request);
         } catch (CstlServiceException ex) {
@@ -326,7 +326,7 @@ public class SOSWorkerTest {
          * Test 3 missing sensorID
          */
         exLaunched = false;
-        request  = new DescribeSensor(null, "text/xml;subtype=\"SensorML/1.0.0\"");
+        request  = new DescribeSensor("1.0.0", "SOS", null, "text/xml;subtype=\"SensorML/1.0.0\"");
         try {
             worker.describeSensor(request);
         } catch (CstlServiceException ex) {
@@ -350,7 +350,7 @@ public class SOSWorkerTest {
         /**
          * Test 1 system sensor
          */
-        DescribeSensor request  = new DescribeSensor("urn:ogc:object:sensor:GEOM:1", "text/xml;subtype=\"SensorML/1.0.0\"");
+        DescribeSensor request  = new DescribeSensor("1.0.0", "SOS", "urn:ogc:object:sensor:GEOM:1", "text/xml;subtype=\"SensorML/1.0.0\"");
         AbstractSensorML absResult = (AbstractSensorML) worker.describeSensor(request);
 
         AbstractSensorML absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/system.xml"));
@@ -478,7 +478,7 @@ public class SOSWorkerTest {
         /**
          * Test 2 component sensor
          */
-        request  = new DescribeSensor("urn:ogc:object:sensor:GEOM:2", "text/xml;subtype=\"SensorML/1.0.0\"");
+        request  = new DescribeSensor("1.0.0", "SOS", "urn:ogc:object:sensor:GEOM:2", "text/xml;subtype=\"SensorML/1.0.0\"");
         absResult = (AbstractSensorML) worker.describeSensor(request);
 
         absExpResult = (AbstractSensorML) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/xml/sml/component.xml"));
@@ -2307,7 +2307,7 @@ public class SOSWorkerTest {
         /**
          * we verify that the sensor is wel registred
          */
-        DescribeSensor DSrequest  = new DescribeSensor("urn:ogc:object:sensor:GEOM:6", "text/xml;subtype=\"SensorML/1.0.0\"");
+        DescribeSensor DSrequest  = new DescribeSensor("1.0.0","SOS","urn:ogc:object:sensor:GEOM:6", "text/xml;subtype=\"SensorML/1.0.0\"");
         AbstractSensorML absResult = (AbstractSensorML) worker.describeSensor(DSrequest);
 
         

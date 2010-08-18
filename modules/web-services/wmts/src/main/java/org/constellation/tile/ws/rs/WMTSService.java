@@ -96,60 +96,61 @@ public class WMTSService extends GridWebService {
                                               NO_APPLICABLE_CODE);
             }
             logParameters();
-            String request = "";
+            worker.setServiceURL(getServiceURL());
 
             // if the request is not an xml request we fill the request parameter.
             if (objectRequest == null) {
-                request = getParameter(KEY_REQUEST, true);
+                final String request = getParameter(KEY_REQUEST, true);
+                objectRequest        = adaptQuery(request);
             }
-            worker.setServiceURL(getServiceURL());
-            
-            if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
-                GetCapabilities gc = (GetCapabilities) objectRequest;
 
-                if (gc == null) {
-                    /*
-                     * if the parameters have been send by GET or POST kvp,
-                     * we build a request object with this parameter.
-                     */
-                    gc = createNewGetCapabilitiesRequest();
-                }
-                serviceDef = getVersionFromNumber(gc.getVersion().toString());
-                worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject("1.0.0"));
+            if (objectRequest instanceof GetCapabilities) {
+                final GetCapabilities gc = (GetCapabilities) objectRequest;
+                serviceDef               = getVersionFromNumber(gc.getVersion());
+                worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.WMTS_1_0_0));
                 
                 return Response.ok(worker.getCapabilities(gc), MimeType.TEXT_XML).build();
             }
-            if (request.equalsIgnoreCase("GetTile") || (objectRequest instanceof GetTile)) {
-                GetTile gt = (GetTile) objectRequest;
-
-                if (gt == null) {
-                    /*
-                     * if the parameters have been send by GET or POST kvp,
-                     * we build a request object with this parameter.
-                     */
-                    gt = createNewGetTileRequest();
-                }
-                serviceDef = getVersionFromNumber(gt.getVersion());
+            if (objectRequest instanceof GetTile) {
+                final GetTile gt = (GetTile) objectRequest;
+                serviceDef       = getVersionFromNumber(gt.getVersion());
                 return Response.ok(worker.getTile(gt), gt.getFormat()).build();
             }
-            if (request.equalsIgnoreCase("GetFeatureInfo") || (objectRequest instanceof GetFeatureInfo)) {
-                GetFeatureInfo gf = (GetFeatureInfo) objectRequest;
-
-                if (gf == null) {
-                    /*
-                     * if the parameters have been send by GET or POST kvp,
-                     * we build a request object with this parameter.
-                     */
-                    gf = createNewGetFeatureInfoRequest();
-                }
-                serviceDef = getVersionFromNumber(gf.getVersion());
+            if (objectRequest instanceof GetFeatureInfo) {
+                final GetFeatureInfo gf = (GetFeatureInfo) objectRequest;
+                serviceDef              = getVersionFromNumber(gf.getVersion());
                 return Response.ok(worker.getFeatureInfo(gf), MimeType.TEXT_XML).build();
+            }
+
+            String request = "undefined request";
+            if (objectRequest != null) {
+                request = objectRequest.getClass().getName();
             }
             throw new CstlServiceException("The operation " + request +
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, serviceDef);
         }
+    }
+
+    /**
+     * Build request object fom KVP parameters.
+     *
+     * @param request
+     * @return
+     * @throws CstlServiceException
+     */
+    private Object adaptQuery(String request) throws CstlServiceException {
+
+        if ("GetCapabilities".equalsIgnoreCase(request)) {
+            return createNewGetCapabilitiesRequest();
+        } else if ("GetTile".equalsIgnoreCase(request)) {
+            return createNewGetTileRequest();
+        } else if ("GetFeatureInfo".equalsIgnoreCase(request)) {
+            return createNewGetFeatureInfoRequest();
+        }
+        throw new CstlServiceException("The operation " + request + " is not supported by the service",
+                        INVALID_PARAMETER_VALUE, "request");
     }
 
     /**

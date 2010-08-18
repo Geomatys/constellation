@@ -1908,7 +1908,7 @@ public class SOSworker {
                 throw new CstlServiceException("service must be specified!", MISSING_PARAMETER_VALUE, SERVICE);
             }
             if (request.getVersion()!= null) {
-                if (!request.getVersion().equals(VERSION)) {
+                if (!request.getVersion().toString().equals(VERSION)) {
                     throw new CstlServiceException("version must be \"1.0.0\"!", VERSION_NEGOTIATION_FAILED);
                 }
             } else {

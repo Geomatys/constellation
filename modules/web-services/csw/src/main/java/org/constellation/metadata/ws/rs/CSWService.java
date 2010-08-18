@@ -70,6 +70,7 @@ import org.geotoolkit.csw.xml.v202.HarvestType;
 import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.csw.xml.v202.QueryType;
 import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ogc.xml.v110.FilterType;
 import org.geotoolkit.ogc.xml.v110.SortByType;
 import org.geotoolkit.ogc.xml.v110.SortOrderType;
@@ -183,137 +184,77 @@ public class CSWService extends OGCWebService {
 
                 worker.setServiceURL(getServiceURL());
                 logParameters();
-                String request = "";
 
                 // if the request is not an xml request we fill the request parameter.
                 if (objectRequest == null) {
-                    request = (String) getParameter("REQUEST", true);
+                    final String request = (String) getParameter("REQUEST", true);
+                    objectRequest        = adaptQuery(request);
                 }
 
-                if (request.equalsIgnoreCase("GetCapabilities") || (objectRequest instanceof GetCapabilities)) {
+                if (objectRequest instanceof GetCapabilities) {
 
-                    GetCapabilities gc = (GetCapabilities)objectRequest;
-
-                    if (gc == null) {
-                         /*
-                          * if the parameters have been send by GET or POST kvp,
-                          * we build a request object with this parameter.
-                          */
-                        gc = createNewGetCapabilitiesRequest();
-                    }
-                    if (gc.getVersion() != null) {
-                        serviceDef = getVersionFromNumber(gc.getVersion().toString());
-                    }
-                    worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject("2.0.2"));
-
+                    final GetCapabilities gc = (GetCapabilities)objectRequest;
+                    serviceDef               = getVersionFromNumber(gc.getVersion());
+                    worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.CSW_2_0_2));
                     return Response.ok(worker.getCapabilities(gc), worker.getOutputFormat()).build();
-
                 }
 
-                if (request.equalsIgnoreCase("GetRecords") || (objectRequest instanceof GetRecordsRequest)) {
+                if (objectRequest instanceof GetRecordsRequest) {
 
-                    GetRecordsRequest gr = (GetRecordsRequest)objectRequest;
+                    final GetRecordsRequest gr = (GetRecordsRequest)objectRequest;
+                    serviceDef                 = getVersionFromNumber(gr.getVersion());
 
-                    if (gr == null) {
-                        /*
-                        * if the parameters have been send by GET or POST kvp,
-                        * we build a request object with this parameter.
-                        */
-                        gr = createNewGetRecordsRequest();
-                    }
-                    serviceDef = getVersionFromNumber(gr.getVersion());
                     // we pass the serializer to the messageBodyWriter
                     final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecords(gr), serializer);
                     return Response.ok(response, worker.getOutputFormat()).build();
 
                 }
 
-                if (request.equalsIgnoreCase("GetRecordById") || (objectRequest instanceof GetRecordById)) {
+                if (objectRequest instanceof GetRecordById) {
 
-                    GetRecordById grbi = (GetRecordById)objectRequest;
-
-                    if (grbi == null) {
-                        /*
-                        * if the parameters have been send by GET or POST kvp,
-                        * we build a request object with this parameter.
-                        */
-                        grbi = createNewGetRecordByIdRequest();
-                    }
-                    serviceDef = getVersionFromNumber(grbi.getVersion());
+                    final GetRecordById grbi = (GetRecordById)objectRequest;
+                    serviceDef               = getVersionFromNumber(grbi.getVersion());
 
                     final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecordById(grbi), serializer);
                     return Response.ok(response, worker.getOutputFormat()).build();
 
                 }
 
-                if (request.equalsIgnoreCase("DescribeRecord") || (objectRequest instanceof DescribeRecord)) {
+                if (objectRequest instanceof DescribeRecord) {
 
-                    DescribeRecord dr = (DescribeRecord)objectRequest;
-
-                    if (dr == null) {
-                        /*
-                         * if the parameters have been send by GET or POST kvp,
-                         * we build a request object with this parameter.
-                         */
-                        dr = createNewDescribeRecordRequest();
-                    }
-                    serviceDef = getVersionFromNumber(dr.getVersion());
-                    
+                    final DescribeRecord dr = (DescribeRecord)objectRequest;
+                    serviceDef              = getVersionFromNumber(dr.getVersion());
                     return Response.ok(worker.describeRecord(dr), worker.getOutputFormat()).build();
                 }
 
-                if (request.equalsIgnoreCase("GetDomain") || (objectRequest instanceof GetDomain)) {
+                if (objectRequest instanceof GetDomain) {
 
-                    GetDomain gd = (GetDomain)objectRequest;
-
-                    if (gd == null) {
-                        /*
-                        * if the parameters have been send by GET or POST kvp,
-                        * we build a request object with this parameter.
-                        */
-                        gd = createNewGetDomainRequest();
-                    }
-                    serviceDef = getVersionFromNumber(gd.getVersion());
-                    worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject("2.0.2"));
+                    final GetDomain gd = (GetDomain)objectRequest;
+                    serviceDef         = getVersionFromNumber(gd.getVersion());
+                    worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.CSW_2_0_2));
 
                     return Response.ok(worker.getDomain(gd), worker.getOutputFormat()).build();
                 }
 
-                if (request.equalsIgnoreCase("Transaction") || (objectRequest instanceof Transaction)) {
+                if (objectRequest instanceof Transaction) {
 
                     final Transaction t = (Transaction)objectRequest;
-
-                    if (t == null) {
-                         throw new CstlServiceException("The Operation transaction is not available in KVP",
-                                                       OPERATION_NOT_SUPPORTED, "transaction");
-                    }
-                    serviceDef = getVersionFromNumber(t.getVersion());
+                    serviceDef          = getVersionFromNumber(t.getVersion());
 
                     return Response.ok(worker.transaction(t), worker.getOutputFormat()).build();
                 }
 
-                if (request.equalsIgnoreCase("Harvest") || (objectRequest instanceof HarvestType)) {
+                if (objectRequest instanceof HarvestType) {
 
-                    HarvestType h = (HarvestType)objectRequest;
-
-                    if (h == null) {
-                        /*
-                         * if the parameters have been send by GET or POST kvp,
-                         * we build a request object with this parameter.
-                         */
-                        h = createNewHarvestRequest();
-                    }
-                    serviceDef = getVersionFromNumber(h.getVersion());
-                    
+                    final HarvestType h = (HarvestType)objectRequest;
+                    serviceDef          = getVersionFromNumber(h.getVersion());
                     return Response.ok(worker.harvest(h), worker.getOutputFormat()).build();
                 }
 
-                if (request.isEmpty() && objectRequest != null) {
+                String request = "undefined request";
+                if (objectRequest != null) {
                     request = objectRequest.getClass().getName();
-                } else if (request.isEmpty() && objectRequest == null) {
-                    request = "undefined request";
-                }
-
+                } 
                 throw new CstlServiceException("The operation " + request + " is not supported by the service",
                         INVALID_PARAMETER_VALUE, "request");
 
@@ -341,6 +282,52 @@ public class CSWService extends OGCWebService {
         final String code            = getOWSExceptionCodeRepresentation(ex.getExceptionCode());
         final ExceptionReport report = new ExceptionReport(ex.getMessage(), code, ex.getLocator(), version);
         return Response.ok(report, MimeType.TEXT_XML).build();
+    }
+
+
+    /**
+     * Build request object fom KVP parameters.
+     * 
+     * @param request
+     * @return
+     * @throws CstlServiceException
+     */
+    private RequestBase adaptQuery(String request) throws CstlServiceException {
+        
+        if ("GetCapabilities".equalsIgnoreCase(request)) {
+            return createNewGetCapabilitiesRequest();
+        } else if ("GetRecords".equalsIgnoreCase(request)) {
+            return createNewGetRecordsRequest();
+        } else if ("GetRecordById".equalsIgnoreCase(request)) {
+            return createNewGetRecordByIdRequest();
+        } else if ("DescribeRecord".equalsIgnoreCase(request)) {
+            return createNewDescribeRecordRequest();
+        } else if ("GetDomain".equalsIgnoreCase(request)) {
+            return createNewGetDomainRequest();
+        } else if ("Transaction".equalsIgnoreCase(request)) {
+            throw new CstlServiceException("The Operation transaction is not available in KVP", OPERATION_NOT_SUPPORTED, "transaction");
+        } else if ("Harvest".equalsIgnoreCase(request)) {
+            return createNewHarvestRequest();
+        }
+        throw new CstlServiceException("The operation " + request + " is not supported by the service",
+                        INVALID_PARAMETER_VALUE, "request");
+    }
+
+    /**
+     * Destroy all the resource and close the connection when the web application is undeployed.
+     */
+    @PreDestroy
+    @Override
+    public void destroy() {
+        String id = "";
+        if (serviceID != null && !serviceID.isEmpty())
+            id = '(' + serviceID + ')';
+
+        LOGGER.log(Level.INFO, "Shutting down the REST CSW service facade {0}.", id);
+        for (final CSWworker worker : workers.values()) {
+            worker.destroy();
+        }
+        workers.clear();
     }
     
     /**
@@ -747,22 +734,5 @@ public class CSWService extends OGCWebService {
                                resourceFormat, 
                                handler, 
                                harvestInterval);
-    }
-    
-    /**
-     * Destroy all the resource and close the connection when the web application is undeployed.
-     */
-    @PreDestroy
-    @Override
-    public void destroy() {
-        String id = "";
-        if (serviceID != null && !serviceID.isEmpty())
-            id = '(' + serviceID + ')';
-
-        LOGGER.log(Level.INFO, "Shutting down the REST CSW service facade {0}.", id);
-        for (final CSWworker worker : workers.values()) {
-            worker.destroy();
-        }
-        workers.clear();
     }
 }

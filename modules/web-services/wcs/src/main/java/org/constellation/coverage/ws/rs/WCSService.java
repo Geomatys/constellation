@@ -144,26 +144,22 @@ public class WCSService extends GridWebService {
             // if the request is not an xml request we fill the request parameter.
             if (objectRequest == null) {
                 request = getParameter(KEY_REQUEST, true);
+                objectRequest = adaptQuery(request);
             }
 
             //TODO: fix logging of request, which may be in the objectRequest
             //      and not in the parameter.
             logParameters();
 
-            if ( GETCAPABILITIES.equalsIgnoreCase(request) || (objectRequest instanceof GetCapabilities) )
-            {
+            if (objectRequest instanceof GetCapabilities){
                 GetCapabilities getcaps = (GetCapabilities)objectRequest;
-                if (getcaps == null) {
-                    getcaps = adaptKvpGetCapabilitiesRequest();
-                }
-                serviceDef = getVersionFromNumber(getcaps.getVersion().toString());
+                serviceDef              = getVersionFromNumber(getcaps.getVersion().toString());
                
                 final GetCapabilitiesResponse capsResponse = worker.getCapabilities(getcaps);
                 return Response.ok(capsResponse, MimeType.TEXT_XML).build();
             }
 
-            if ( DESCRIBECOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof DescribeCoverage) )
-            {
+            if (objectRequest instanceof DescribeCoverage) {
                 DescribeCoverage desccov = (DescribeCoverage)objectRequest;
 
                 //TODO: move me into the worker.
@@ -176,9 +172,7 @@ public class WCSService extends GridWebService {
                                    NO_APPLICABLE_CODE, "store");
                 }*/
 
-                if (desccov == null) {
-                    desccov = adaptKvpDescribeCoverageRequest();
-                } else if (desccov.getVersion() == null) {
+                if (desccov.getVersion() == null) {
                     throw new CstlServiceException("The parameter version must be specified",
                         MISSING_PARAMETER_VALUE, "version");
                 }
@@ -187,8 +181,7 @@ public class WCSService extends GridWebService {
                 return Response.ok(describeResponse, MimeType.TEXT_XML).build();
             }
 
-            if ( GETCOVERAGE.equalsIgnoreCase(request) || (objectRequest instanceof GetCoverage) )
-            {
+            if (objectRequest instanceof GetCoverage) {
                 GetCoverage getcov = (GetCoverage)objectRequest;
                 //TODO: move me into the worker.
                 //verifyBaseParameter(0);
@@ -274,7 +267,7 @@ public class WCSService extends GridWebService {
         }
         final String locator = ex.getLocator();
         final String code = StringUtilities.transformCodeName(ex.getExceptionCode().name());
-        if (isOWS(serviceDef)) {
+        if (serviceDef.owsCompliant) {
             report = new ExceptionReport(ex.getMessage(), code, locator, serviceDef.exceptionVersion.toString());
         } else {
             final ServiceExceptionReport exReport = new ServiceExceptionReport(serviceDef.exceptionVersion,
@@ -283,6 +276,18 @@ public class WCSService extends GridWebService {
             report = new SchemaLocatedExceptionResponse(exReport, "http://www.opengis.net/ogc http://schemas.opengis.net/wcs/1.0.0/OGC-exception.xsd");
         }
         return Response.ok(report, MimeType.APP_SE_XML).build();
+    }
+
+    public Object adaptQuery(String request) throws CstlServiceException {
+        if (GETCAPABILITIES.equalsIgnoreCase(request)) {
+            return adaptKvpGetCapabilitiesRequest();
+        } else if (GETCOVERAGE.equalsIgnoreCase(request)) {
+            return adaptKvpGetCoverageRequest();
+        } else if (DESCRIBECOVERAGE.equalsIgnoreCase(request)) {
+            return adaptKvpDescribeCoverageRequest();
+        }
+        throw new CstlServiceException("The operation " + request + " is not supported by the service",
+                        INVALID_PARAMETER_VALUE, "request");
     }
 
     /**

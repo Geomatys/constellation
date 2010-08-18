@@ -84,7 +84,6 @@ import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.ElementSetName;
 import org.geotoolkit.csw.xml.GetDomain;
 import org.geotoolkit.csw.xml.GetRecordById;
-import org.geotoolkit.csw.xml.RequestBase;
 import org.geotoolkit.csw.xml.GetRecordByIdResponse;
 import org.geotoolkit.csw.xml.GetRecordsRequest;
 import org.geotoolkit.csw.xml.GetCapabilities;
@@ -982,7 +981,7 @@ public class CSWworker {
             }
         }
         
-        response = new GetRecordsResponseType(id, System.currentTimeMillis(), request.getVersion(), searchResults);
+        response = new GetRecordsResponseType(id, System.currentTimeMillis(), request.getVersion().toString(), searchResults);
         LOGGER.log(logLevel, "GetRecords request processed in " + (System.currentTimeMillis() - startTime) + MS);
         return response;
     }
@@ -1456,7 +1455,7 @@ public class CSWworker {
                                                                           totalUpdated,
                                                                           totalDeleted,
                                                                           requestID);
-        final TransactionResponseType response = new TransactionResponseType(summary, null, request.getVersion());
+        final TransactionResponseType response = new TransactionResponseType(summary, null, request.getVersion().toString());
         LOGGER.log(logLevel, "Transaction request processed in " + (System.currentTimeMillis() - startTime) + MS);
         return response;
     }
@@ -1522,7 +1521,7 @@ public class CSWworker {
                                                                                       totalUpdated,
                                                                                       totalDeleted,
                                                                                       null);
-                    final TransactionResponseType transactionResponse = new TransactionResponseType(summary, null, request.getVersion());
+                    final TransactionResponseType transactionResponse = new TransactionResponseType(summary, null, request.getVersion().toString());
                     response = new HarvestResponseType(transactionResponse);
 
                 //mode asynchronous
@@ -1607,7 +1606,7 @@ public class CSWworker {
      * 
      * @param request an object request with the base attribute (all except GetCapabilities request); 
      */ 
-    private void verifyBaseRequest(final RequestBase request) throws CstlServiceException {
+    private void verifyBaseRequest(final AbstractCswRequest request) throws CstlServiceException {
         isWorking();
         if (request != null) {
             if (request.getService() != null) {
@@ -1625,9 +1624,9 @@ public class CSWworker {
                  *
                  * TODO remove this
                  */
-                if (request.getVersion().equals(CSW_202_VERSION)) {
+                if (request.getVersion().toString().equals(CSW_202_VERSION)) {
                     this.actingVersion = ServiceDef.CSW_2_0_2;
-                } else if (request.getVersion().equals("2.0.0") && (request instanceof GetDomain)) {
+                } else if (request.getVersion().toString().equals("2.0.0") && (request instanceof GetDomain)) {
                     this.actingVersion = ServiceDef.CSW_2_0_0;
 
                 } else {

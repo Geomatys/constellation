@@ -87,7 +87,7 @@ public class SOSRequestTest extends AbstractTestRequest {
         // for a POST request
         URLConnection conec = getCapsUrl.openConnection();
 
-        final DescribeSensor request = new DescribeSensor("urn:ogc:object:sensor:SunSpot:0014.4F01.0000.261A", "text/xml;subtype=\"SensorML/1.0.1\"");
+        final DescribeSensor request = new DescribeSensor("1.0.0","SOS","urn:ogc:object:sensor:SunSpot:0014.4F01.0000.261A", "text/xml;subtype=\"SensorML/1.0.1\"");
 
         postRequestObject(conec, request);
         Object obj = unmarshallResponse(conec);
