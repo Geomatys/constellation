@@ -32,7 +32,7 @@ import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
-import org.geotoolkit.resources.NIOUtilities;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 
 
@@ -53,7 +53,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
 
         File configDir = new File("SOSWorkerTest");
         if (configDir.exists()) {
-            NIOUtilities.deleteDirectory(configDir);
+            FileUtilities.deleteDirectory(configDir);
         }
         if (!configDir.exists()) {
             configDir.mkdir();
@@ -130,7 +130,7 @@ public class FileSystemSOSWorkerTest extends SOSWorkerTest {
         if (worker != null) {
             worker.destroy();
         }
-        NIOUtilities.deleteDirectory(new File("SOSWorkerTest"));
+        FileUtilities.deleteDirectory(new File("SOSWorkerTest"));
     }
 
     @Before

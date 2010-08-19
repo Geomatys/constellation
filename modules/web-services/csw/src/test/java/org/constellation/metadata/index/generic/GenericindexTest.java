@@ -36,7 +36,7 @@ import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
-// geotools dependencies
+// geotoolkit dependencies
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
@@ -46,9 +46,9 @@ import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.util.FileUtilities;
 
 // GeoAPI dependencies
-import org.geotoolkit.resources.NIOUtilities;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 //Junit dependencies
@@ -76,7 +76,7 @@ public class GenericindexTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         File configDirectory      = new File("GenericIndexTest");
-        NIOUtilities.deleteDirectory(new File("GenericIndexTest"));
+        FileUtilities.deleteDirectory(new File("GenericIndexTest"));
         List<Object> object       = fillTestData();
         indexer                    = new GenericIndexer(object, null, configDirectory, "");
         indexSearcher               = new AbstractIndexSearcher(configDirectory, "");
@@ -87,7 +87,7 @@ public class GenericindexTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        NIOUtilities.deleteDirectory(new File("GenericIndexTest"));
+        FileUtilities.deleteDirectory(new File("GenericIndexTest"));
     }
 
 

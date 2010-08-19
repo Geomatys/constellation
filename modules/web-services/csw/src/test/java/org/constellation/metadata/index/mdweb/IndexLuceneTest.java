@@ -49,9 +49,9 @@ import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
+import org.geotoolkit.util.FileUtilities;
 
 // MDWeb dependencies
-import org.geotoolkit.resources.NIOUtilities;
 import org.mdweb.io.MD_IOException;
 import org.mdweb.io.sql.v20.Writer20;
 import org.mdweb.model.schemas.Classe;
@@ -94,7 +94,7 @@ public class IndexLuceneTest {
     public static void setUpClass() throws Exception {
         configDirectory = new File("config-test");
         if (configDirectory.exists()) {
-            NIOUtilities.deleteDirectory(configDirectory);
+            FileUtilities.deleteDirectory(configDirectory);
         }
         configDirectory.mkdir();
 
@@ -123,7 +123,7 @@ public class IndexLuceneTest {
     public static void tearDownClass() throws Exception {
         configDirectory = new File("config-test");
         if (configDirectory.exists()) {
-            NIOUtilities.deleteDirectory(configDirectory);
+            FileUtilities.deleteDirectory(configDirectory);
         }
         ds.shutdown();
     }

@@ -33,7 +33,7 @@ import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
-import org.geotoolkit.resources.NIOUtilities;
+import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.xml.MarshallerPool;
 
 import org.junit.*;
@@ -67,7 +67,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
 
         final File configDir = new File("GPGSOSWorkerTest");
         if (configDir.exists()) {
-            NIOUtilities.deleteDirectory(configDir);
+            FileUtilities.deleteDirectory(configDir);
         }
 
         if (!configDir.exists()) {
@@ -117,7 +117,7 @@ public class GenericPostgridSOSWorkerTest extends SOSWorkerTest {
             worker.destroy();
         }
 
-        NIOUtilities.deleteDirectory(new File("GPGSOSWorkerTest"));
+        FileUtilities.deleteDirectory(new File("GPGSOSWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();

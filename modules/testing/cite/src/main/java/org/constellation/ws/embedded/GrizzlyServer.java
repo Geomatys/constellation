@@ -43,7 +43,6 @@ import org.constellation.provider.shapefile.ShapeFileProviderService;
 import org.constellation.provider.sld.SLDProvider;
 import org.constellation.provider.sld.SLDProviderService;
 import org.geotoolkit.internal.io.IOUtilities;
-import org.geotoolkit.resources.NIOUtilities;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.logging.Logging;
 
@@ -269,7 +268,7 @@ public final class GrizzlyServer {
         final File outputDir = new File(tmpDir, "Constellation");
         if (outputDir != null && outputDir.exists()) {
             if (outputDir.canWrite()) {
-                if (!NIOUtilities.deleteDirectory(outputDir)) {
+                if (!FileUtilities.deleteDirectory(outputDir)) {
                     LOGGER.log(Level.INFO, "Unable to delete folder {0}", outputDir.getAbsolutePath());
                 }
             } else {

@@ -37,10 +37,10 @@ import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
+import org.geotoolkit.util.FileUtilities;
 
 //Junit dependencies
 import org.geotoolkit.referencing.CRS;
-import org.geotoolkit.resources.NIOUtilities;
 import org.junit.*;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -64,7 +64,7 @@ public class StandardAnalyzerTest extends AbstractAnalyzerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        NIOUtilities.deleteDirectory(configDirectory);
+        FileUtilities.deleteDirectory(configDirectory);
         List<Object> object = fillTestData();
         GenericIndexer indexer = new GenericIndexer(object, null, configDirectory, "", new StandardAnalyzer(Version.LUCENE_CURRENT), Level.FINER);
         indexSearcher          = new AbstractIndexSearcher(configDirectory, "", new StandardAnalyzer(Version.LUCENE_CURRENT));
@@ -73,7 +73,7 @@ public class StandardAnalyzerTest extends AbstractAnalyzerTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
-        NIOUtilities.deleteDirectory(configDirectory);
+        FileUtilities.deleteDirectory(configDirectory);
     }
 
     @Before

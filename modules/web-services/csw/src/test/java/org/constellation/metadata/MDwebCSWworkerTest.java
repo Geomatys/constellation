@@ -34,7 +34,7 @@ import org.geotoolkit.csw.xml.CSWClassesContext;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.internal.sql.ScriptRunner;
-import org.geotoolkit.resources.NIOUtilities;
+import org.geotoolkit.util.FileUtilities;
 
 import org.junit.*;
 
@@ -53,7 +53,7 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
 
         File configDir = new File("CSWWorkerTest");
         if (configDir.exists()) {
-            NIOUtilities.deleteDirectory(new File("CSWWorkerTest"));
+            FileUtilities.deleteDirectory(new File("CSWWorkerTest"));
         }
 
         if (!configDir.exists()) {
@@ -102,8 +102,8 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         if (worker != null) {
             worker.destroy();
         }
-        NIOUtilities.deleteDirectory(dbDirectory);
-        NIOUtilities.deleteDirectory(new File("CSWWorkerTest"));
+        FileUtilities.deleteDirectory(dbDirectory);
+        FileUtilities.deleteDirectory(new File("CSWWorkerTest"));
         File derbyLog = new File("derby.log");
         if (derbyLog.exists()) {
             derbyLog.delete();

@@ -63,7 +63,7 @@ import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
 import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
 import org.geotoolkit.lucene.IndexingException;
-import org.geotoolkit.resources.NIOUtilities;
+import org.geotoolkit.util.FileUtilities;
 
 // geoAPI dependencies
 import org.opengis.util.InternationalString;
@@ -209,7 +209,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
     private void stopIndexation(IndexWriter writer, String serviceID) throws IOException {
         writer.optimize();
         writer.close();
-        NIOUtilities.deleteDirectory(getFileDirectory());
+        FileUtilities.deleteDirectory(getFileDirectory());
         if (indexationToStop.contains(serviceID)) {
             indexationToStop.remove(serviceID);
         }
