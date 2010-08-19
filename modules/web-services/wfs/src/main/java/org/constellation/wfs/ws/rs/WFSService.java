@@ -18,6 +18,7 @@
 package org.constellation.wfs.ws.rs;
 
 // J2SE dependencies
+import org.geotoolkit.ows.xml.RequestBase;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -163,57 +164,49 @@ public class WFSService extends OGCWebService {
         worker.initUriContext(getUriContext());
 
         try {
-            final String request = (objectRequest == null) ? getParameter(KEY_REQUEST, true) : null;
             logParameters();
 
             // if the request is not an xml request we fill the request parameter.
+            final RequestBase request;
             if (objectRequest == null) {
-                objectRequest = adaptQuery(request);
+                request = adaptQuery(getParameter(KEY_REQUEST, true));
+            } else if (objectRequest instanceof RequestBase) {
+                request = (RequestBase) objectRequest;
+            } else {
+                throw new CstlServiceException("The operation " + objectRequest.getClass().getName() + " is not supported by the service",
+                        INVALID_PARAMETER_VALUE, "request");
             }
+            version = getVersionFromNumber(request.getVersion());
 
-            if (objectRequest instanceof GetCapabilitiesType) {
-                final GetCapabilitiesType model = (GetCapabilitiesType) objectRequest;
+            if (request instanceof GetCapabilitiesType) {
+                final GetCapabilitiesType model = (GetCapabilitiesType) request;
                 return Response.ok(worker.getCapabilities(model), getOutputFormat()).build();
 
-            } else if (objectRequest instanceof DescribeFeatureTypeType) {
-                final DescribeFeatureTypeType model = (DescribeFeatureTypeType) objectRequest;
+            } else if (request instanceof DescribeFeatureTypeType) {
+                final DescribeFeatureTypeType model = (DescribeFeatureTypeType) request;
                 return Response.ok(worker.describeFeatureType(model), getOutputFormat()).build();
 
-            } else if (objectRequest instanceof GetFeatureType) {
-                final GetFeatureType model = (GetFeatureType) objectRequest;
-                version = getVersionFromNumber(model.getVersion());
+            } else if (request instanceof GetFeatureType) {
+                final GetFeatureType model = (GetFeatureType) request;
                 final Object response = worker.getFeature(model);
                 schemaLocations = worker.getSchemaLocations();
                 return Response.ok(response, getOutputFormat()).build();
                 
-            } else if (objectRequest instanceof GetGmlObjectType) {
-                final GetGmlObjectType model = (GetGmlObjectType) objectRequest;
-                version = getVersionFromNumber(model.getVersion());
+            } else if (request instanceof GetGmlObjectType) {
+                final GetGmlObjectType model = (GetGmlObjectType) request;
                 final WFSResponseWrapper response = new WFSResponseWrapper(worker.getGMLObject(model));
                 return Response.ok(response, getOutputFormat()).build();
 
-            } else if (objectRequest instanceof LockFeatureType) {
-                final LockFeatureType model = (LockFeatureType) objectRequest;
-                version = getVersionFromNumber(model.getVersion());
+            } else if (request instanceof LockFeatureType) {
+                final LockFeatureType model = (LockFeatureType) request;
                 return Response.ok(worker.lockFeature(model), getOutputFormat()).build();
 
-            } else if (objectRequest instanceof TransactionType) {
-                final TransactionType model = (TransactionType) objectRequest;
-                version = getVersionFromNumber(model.getVersion());
+            } else if (request instanceof TransactionType) {
+                final TransactionType model = (TransactionType) request;
                 return Response.ok(worker.transaction(model), getOutputFormat()).build();
             }
 
-            //unvalid request, throw an error
-            final String invalidRequest;
-            if ( request == null && objectRequest != null){
-                invalidRequest = objectRequest.getClass().getName();
-            }else if (request == null && objectRequest == null){
-                invalidRequest = "undefined request";
-            } else {
-                invalidRequest = request;
-            }
-
-            throw new CstlServiceException("The operation " + invalidRequest + " is not supported by the service",
+            throw new CstlServiceException("The operation " + request.getClass().getName() + " is not supported by the service",
                                           INVALID_PARAMETER_VALUE, "request");
 
         } catch (CstlServiceException ex) {
@@ -355,7 +348,7 @@ public class WFSService extends OGCWebService {
         }
     }
 
-    private Object adaptQuery(String request) throws CstlServiceException {
+    private RequestBase adaptQuery(String request) throws CstlServiceException {
         if (STR_GETCAPABILITIES.equalsIgnoreCase(request)) {
             return createNewGetCapabilitiesRequest();
         } else if (STR_DESCRIBEFEATURETYPE.equalsIgnoreCase(request)) {

@@ -18,6 +18,7 @@
 package org.constellation.sos.ws.rs;
 
 // Jersey dependencies
+import org.geotoolkit.ows.xml.RequestBase;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import javax.annotation.PreDestroy;
@@ -76,18 +77,23 @@ public class SOService extends OGCWebService {
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         ServiceDef serviceDef = null;
         try {
-             worker.setServiceURL(getServiceURL());
-             logParameters();
+            worker.setServiceURL(getServiceURL());
+            logParameters();
 
-             String request = "";
-             if (objectRequest == null) {
-                request = (String) getParameter("REQUEST", true);
-                objectRequest = adaptQuery(request);
-             }
+            final RequestBase request;
+            if (objectRequest == null) {
+                request = adaptQuery(getParameter("REQUEST", true));
+            } else if (objectRequest instanceof RequestBase) {
+                request = (RequestBase) objectRequest;
+            } else {
+                throw new CstlServiceException("The operation " + objectRequest.getClass().getName() + " is not supported by the service",
+                        INVALID_PARAMETER_VALUE, "request");
+            }
+
+            serviceDef = getVersionFromNumber(request.getVersion());
 
              if (objectRequest instanceof GetObservation) {
                 final GetObservation go = (GetObservation) objectRequest;
-                serviceDef              = getVersionFromNumber(go.getVersion());
                 final Object response   = worker.getObservation(go);
 
                 String outputFormat = go.getResponseFormat();
@@ -107,42 +113,34 @@ public class SOService extends OGCWebService {
 
              if (objectRequest instanceof DescribeSensor) {
                 DescribeSensor ds             = (DescribeSensor)objectRequest;
-                serviceDef                    = getVersionFromNumber(ds.getVersion());
                 final AbstractSensorML sensor = worker.describeSensor(ds);
                 return Response.ok(sensor, MimeType.TEXT_XML).build();
              }
 
              if (objectRequest instanceof GetFeatureOfInterest) {
                 final GetFeatureOfInterest gf     = (GetFeatureOfInterest)objectRequest;
-                serviceDef                        = getVersionFromNumber(gf.getVersion());
                 final SOSResponseWrapper response = new SOSResponseWrapper(worker.getFeatureOfInterest(gf));
                 return Response.ok(response, worker.getOutputFormat()).build();
              }
 
              if (objectRequest instanceof InsertObservation) {
                 final InsertObservation is = (InsertObservation)objectRequest;
-                serviceDef                 = getVersionFromNumber(is.getVersion());
                 return Response.ok(worker.insertObservation(is), MimeType.TEXT_XML).build();
              }
 
              if (objectRequest instanceof GetResult) {
                 final GetResult gr = (GetResult)objectRequest;
-                serviceDef         = getVersionFromNumber(gr.getVersion());
-
                 return Response.ok(worker.getResult(gr), MimeType.TEXT_XML).build();
              }
 
              if (objectRequest instanceof RegisterSensor) {
                 final RegisterSensor rs = (RegisterSensor)objectRequest;
-                serviceDef              = getVersionFromNumber(rs.getVersion());
-
                 return Response.ok(worker.registerSensor(rs), MimeType.TEXT_XML).build();
              }
 
              if (objectRequest instanceof GetCapabilities) {
                 worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.SOS_1_0_0));
                 GetCapabilities gc = (GetCapabilities)objectRequest;
-                serviceDef         = getVersionFromNumber(gc.getVersion());
                 return Response.ok(worker.getCapabilities(gc), worker.getOutputFormat()).build();
              }
 
@@ -177,7 +175,14 @@ public class SOService extends OGCWebService {
         return Response.ok(report, MimeType.TEXT_XML).build();
     }
 
-    private Object adaptQuery(String request) throws CstlServiceException {
+    /**
+     * Build request object fom KVP parameters.
+     *
+     * @param request
+     * @return
+     * @throws CstlServiceException
+     */
+    private RequestBase adaptQuery(String request) throws CstlServiceException {
          if ("GetObservation"    .equalsIgnoreCase(request) ||
              "GetFeatureInterest".equalsIgnoreCase(request) ||
              "InsertObservation" .equalsIgnoreCase(request) ||

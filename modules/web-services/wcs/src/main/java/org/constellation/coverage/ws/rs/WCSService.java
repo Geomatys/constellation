@@ -153,7 +153,7 @@ public class WCSService extends GridWebService {
 
             if (objectRequest instanceof GetCapabilities){
                 GetCapabilities getcaps = (GetCapabilities)objectRequest;
-                serviceDef              = getVersionFromNumber(getcaps.getVersion().toString());
+                serviceDef              = getVersionFromNumber(getcaps.getVersion());
                
                 final GetCapabilitiesResponse capsResponse = worker.getCapabilities(getcaps);
                 return Response.ok(capsResponse, MimeType.TEXT_XML).build();
@@ -176,7 +176,7 @@ public class WCSService extends GridWebService {
                     throw new CstlServiceException("The parameter version must be specified",
                         MISSING_PARAMETER_VALUE, "version");
                 }
-                serviceDef = getVersionFromNumber(desccov.getVersion().toString());
+                serviceDef = getVersionFromNumber(desccov.getVersion());
                 final DescribeCoverageResponse describeResponse = worker.describeCoverage(desccov);
                 return Response.ok(describeResponse, MimeType.TEXT_XML).build();
             }
@@ -195,7 +195,7 @@ public class WCSService extends GridWebService {
                     throw new CstlServiceException("The parameter format must be specified",
                         MISSING_PARAMETER_VALUE, "format");
                 }
-                serviceDef = getVersionFromNumber(getcov.getVersion().toString());
+                serviceDef = getVersionFromNumber(getcov.getVersion());
                 String format = getcov.getFormat();
                 if (!format.equalsIgnoreCase(MimeType.IMAGE_BMP)  && !format.equalsIgnoreCase(BMP)  &&
                     !format.equalsIgnoreCase(MimeType.IMAGE_GIF)  && !format.equalsIgnoreCase(GIF)  &&

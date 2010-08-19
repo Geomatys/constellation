@@ -37,6 +37,7 @@ import static org.constellation.ws.ExceptionCode.*;
 import static org.constellation.query.Query.KEY_REQUEST;
 import static org.constellation.query.Query.KEY_SERVICE;
 import static org.constellation.query.Query.KEY_VERSION;
+import org.geotoolkit.ows.xml.RequestBase;
 
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
@@ -88,7 +89,7 @@ public class WMTSService extends GridWebService {
      * @throw JAXBException
      */
     @Override
-    public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
+    public Response treatIncomingRequest(final Object objectRequest) throws JAXBException {
         ServiceDef serviceDef = null;
         try {
             if (worker == null) {
@@ -99,34 +100,33 @@ public class WMTSService extends GridWebService {
             worker.setServiceURL(getServiceURL());
 
             // if the request is not an xml request we fill the request parameter.
+            final RequestBase request;
             if (objectRequest == null) {
-                final String request = getParameter(KEY_REQUEST, true);
-                objectRequest        = adaptQuery(request);
+                request = adaptQuery(getParameter(KEY_REQUEST, true));
+            } else if (objectRequest instanceof RequestBase) {
+                request = (RequestBase) objectRequest;
+            } else {
+                throw new CstlServiceException("The operation " + objectRequest.getClass().getName() + " is not supported by the service",
+                        INVALID_PARAMETER_VALUE, "request");
             }
+            serviceDef = getVersionFromNumber(request.getVersion());
 
-            if (objectRequest instanceof GetCapabilities) {
-                final GetCapabilities gc = (GetCapabilities) objectRequest;
-                serviceDef               = getVersionFromNumber(gc.getVersion());
+            if (request instanceof GetCapabilities) {
+                final GetCapabilities gc = (GetCapabilities) request;
                 worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.WMTS_1_0_0));
                 
                 return Response.ok(worker.getCapabilities(gc), MimeType.TEXT_XML).build();
             }
-            if (objectRequest instanceof GetTile) {
-                final GetTile gt = (GetTile) objectRequest;
-                serviceDef       = getVersionFromNumber(gt.getVersion());
+            if (request instanceof GetTile) {
+                final GetTile gt = (GetTile) request;
                 return Response.ok(worker.getTile(gt), gt.getFormat()).build();
             }
-            if (objectRequest instanceof GetFeatureInfo) {
-                final GetFeatureInfo gf = (GetFeatureInfo) objectRequest;
-                serviceDef              = getVersionFromNumber(gf.getVersion());
+            if (request instanceof GetFeatureInfo) {
+                final GetFeatureInfo gf = (GetFeatureInfo) request;
                 return Response.ok(worker.getFeatureInfo(gf), MimeType.TEXT_XML).build();
             }
 
-            String request = "undefined request";
-            if (objectRequest != null) {
-                request = objectRequest.getClass().getName();
-            }
-            throw new CstlServiceException("The operation " + request +
+            throw new CstlServiceException("The operation " + request.getClass().getName() +
                     " is not supported by the service", OPERATION_NOT_SUPPORTED, "request");
         } catch (CstlServiceException ex) {
             return processExceptionResponse(ex, serviceDef);
@@ -140,7 +140,7 @@ public class WMTSService extends GridWebService {
      * @return
      * @throws CstlServiceException
      */
-    private Object adaptQuery(String request) throws CstlServiceException {
+    private RequestBase adaptQuery(String request) throws CstlServiceException {
 
         if ("GetCapabilities".equalsIgnoreCase(request)) {
             return createNewGetCapabilitiesRequest();
@@ -330,7 +330,7 @@ public class WMTSService extends GridWebService {
                                               NO_APPLICABLE_CODE);
             }
             final GetCapabilities gc = createNewGetCapabilitiesRequestRestful(version);
-            serviceDef = getVersionFromNumber(gc.getVersion().toString());
+            serviceDef = getVersionFromNumber(gc.getVersion());
             return Response.ok(worker.getCapabilities(gc), MimeType.TEXT_XML).build();
 
         } catch (CstlServiceException ex) {

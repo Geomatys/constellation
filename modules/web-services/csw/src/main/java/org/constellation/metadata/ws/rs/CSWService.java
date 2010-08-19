@@ -176,8 +176,8 @@ public class CSWService extends OGCWebService {
      * @return an xml response.
      * @throw JAXBException
      */
-    protected Response treatIncomingRequest(Object objectRequest, CSWworker worker) throws JAXBException {
-        ServiceDef serviceDef           = null;
+    protected Response treatIncomingRequest(final Object objectRequest, CSWworker worker) throws JAXBException {
+        ServiceDef serviceDef = null;
         
         try {
             if (worker != null) {
@@ -186,23 +186,28 @@ public class CSWService extends OGCWebService {
                 logParameters();
 
                 // if the request is not an xml request we fill the request parameter.
+                final RequestBase request;
                 if (objectRequest == null) {
-                    final String request = (String) getParameter("REQUEST", true);
-                    objectRequest        = adaptQuery(request);
+                    request = adaptQuery(getParameter("REQUEST", true));
+                } else if (objectRequest instanceof RequestBase) {
+                    request = (RequestBase) objectRequest;
+                } else {
+                    throw new CstlServiceException("The operation " +  objectRequest.getClass().getName() + " is not supported by the service",
+                        INVALID_PARAMETER_VALUE, "request");
                 }
 
-                if (objectRequest instanceof GetCapabilities) {
+                serviceDef = getVersionFromNumber(request.getVersion());
 
-                    final GetCapabilities gc = (GetCapabilities)objectRequest;
-                    serviceDef               = getVersionFromNumber(gc.getVersion());
+                if (request instanceof GetCapabilities) {
+
+                    final GetCapabilities gc = (GetCapabilities)request;
                     worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.CSW_2_0_2));
                     return Response.ok(worker.getCapabilities(gc), worker.getOutputFormat()).build();
                 }
 
-                if (objectRequest instanceof GetRecordsRequest) {
+                if (request instanceof GetRecordsRequest) {
 
-                    final GetRecordsRequest gr = (GetRecordsRequest)objectRequest;
-                    serviceDef                 = getVersionFromNumber(gr.getVersion());
+                    final GetRecordsRequest gr = (GetRecordsRequest)request;
 
                     // we pass the serializer to the messageBodyWriter
                     final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecords(gr), serializer);
@@ -210,52 +215,42 @@ public class CSWService extends OGCWebService {
 
                 }
 
-                if (objectRequest instanceof GetRecordById) {
+                if (request instanceof GetRecordById) {
 
-                    final GetRecordById grbi = (GetRecordById)objectRequest;
-                    serviceDef               = getVersionFromNumber(grbi.getVersion());
+                    final GetRecordById grbi = (GetRecordById)request;
 
+                    // we pass the serializer to the messageBodyWriter
                     final SerializerResponse response = new SerializerResponse((CSWResponse) worker.getRecordById(grbi), serializer);
                     return Response.ok(response, worker.getOutputFormat()).build();
 
                 }
 
-                if (objectRequest instanceof DescribeRecord) {
+                if (request instanceof DescribeRecord) {
 
-                    final DescribeRecord dr = (DescribeRecord)objectRequest;
-                    serviceDef              = getVersionFromNumber(dr.getVersion());
+                    final DescribeRecord dr = (DescribeRecord)request;
                     return Response.ok(worker.describeRecord(dr), worker.getOutputFormat()).build();
                 }
 
-                if (objectRequest instanceof GetDomain) {
+                if (request instanceof GetDomain) {
 
-                    final GetDomain gd = (GetDomain)objectRequest;
-                    serviceDef         = getVersionFromNumber(gd.getVersion());
+                    final GetDomain gd = (GetDomain)request;
                     worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.CSW_2_0_2));
-
                     return Response.ok(worker.getDomain(gd), worker.getOutputFormat()).build();
                 }
 
-                if (objectRequest instanceof Transaction) {
+                if (request instanceof Transaction) {
 
-                    final Transaction t = (Transaction)objectRequest;
-                    serviceDef          = getVersionFromNumber(t.getVersion());
-
+                    final Transaction t = (Transaction)request;
                     return Response.ok(worker.transaction(t), worker.getOutputFormat()).build();
                 }
 
-                if (objectRequest instanceof HarvestType) {
+                if (request instanceof HarvestType) {
 
-                    final HarvestType h = (HarvestType)objectRequest;
-                    serviceDef          = getVersionFromNumber(h.getVersion());
+                    final HarvestType h = (HarvestType)request;
                     return Response.ok(worker.harvest(h), worker.getOutputFormat()).build();
                 }
 
-                String request = "undefined request";
-                if (objectRequest != null) {
-                    request = objectRequest.getClass().getName();
-                } 
-                throw new CstlServiceException("The operation " + request + " is not supported by the service",
+                throw new CstlServiceException("The operation " +  request.getClass().getName() + " is not supported by the service",
                         INVALID_PARAMETER_VALUE, "request");
 
             } else {

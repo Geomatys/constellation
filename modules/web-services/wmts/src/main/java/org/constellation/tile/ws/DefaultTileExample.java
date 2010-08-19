@@ -97,17 +97,17 @@ public class DefaultTileExample {
     static {
         UNESCO = new TileMatrixSet(new CodeType("UNESCO"), "urn:ogc:def:crs:EPSG:4326");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
-        tm.add(createTileMatrix("L20", 1,   1,   200, 100, 1.80000000002088,-180,90));
-        tm.add(createTileMatrix("L19", 2,   1,   200, 200, 0.90000000001044,-180,90));
-        tm.add(createTileMatrix("L18", 3,   2,   200, 200, 0.60000000000696,-180,90));
-        tm.add(createTileMatrix("L17", 4,   2,   200, 200, 0.45000000000522,-180,90));
-        tm.add(createTileMatrix("L16", 6,   3,   200, 200, 0.30000000000348,-180,90));
-        tm.add(createTileMatrix("L15", 8,   4,   200, 200, 0.22500000000261,-180,90));
-        tm.add(createTileMatrix("L14", 9,   4,   200, 200, 0.20000000000232,-180,90));
-        tm.add(createTileMatrix("L13", 12,  6,   200, 200, 0.15000000000174,-180,90));
-        tm.add(createTileMatrix("L12", 18,  8,   200, 200, 0.10000000000116,-180,90));
-        tm.add(createTileMatrix("L11", 24,  11,  200, 200, 0.07500000000087,-180,90));
-        tm.add(createTileMatrix("L10", 27,  12,  200, 200, 0.06666666666744,-180,90));
+        tm.add(createTileMatrix("L20", 1,   1,    200, 100, 1.80000000002088,-180,90));
+        tm.add(createTileMatrix("L19", 2,   1,    200, 200, 0.90000000001044,-180,90));
+        tm.add(createTileMatrix("L18", 3,   2,    200, 200, 0.60000000000696,-180,90));
+        tm.add(createTileMatrix("L17", 4,   2,    200, 200, 0.45000000000522,-180,90));
+        tm.add(createTileMatrix("L16", 6,   3,    200, 200, 0.30000000000348,-180,90));
+        tm.add(createTileMatrix("L15", 8,   4,    200, 200, 0.22500000000261,-180,90));
+        tm.add(createTileMatrix("L14", 9,   4,    200, 200, 0.20000000000232,-180,90));
+        tm.add(createTileMatrix("L13", 12,  6,    200, 200, 0.15000000000174,-180,90));
+        tm.add(createTileMatrix("L12", 18,  8,    200, 200, 0.10000000000116,-180,90));
+        tm.add(createTileMatrix("L11", 24,  11,   200, 200, 0.07500000000087,-180,90));
+        tm.add(createTileMatrix("L10", 27,  12,   200, 200, 0.06666666666744,-180,90));
         tm.add(createTileMatrix("L09",  36,  16,  200, 200, 0.05000000000058,-180,90));
         tm.add(createTileMatrix("L08",  54,  23,  200, 200, 0.03333333333372,-180,90));
         tm.add(createTileMatrix("L07",  72,  31,  200, 200, 0.02500000000029,-180,90));
@@ -118,6 +118,24 @@ public class DefaultTileExample {
         tm.add(createTileMatrix("L02",  324, 136, 200, 200, 0.00555555555562,-180,90));
         tm.add(createTileMatrix("L01",  648, 272, 200, 200, 0.00277777777781,-180,90));
         UNESCO.setTileMatrix(tm);
+    }
+
+    public final static TileMatrixSet ORTHO_ALPES_JPEG;
+    static {
+        ORTHO_ALPES_JPEG = new TileMatrixSet(new CodeType("ORTHO_ALPES_JPEG"), "urn:ogc:def:crs:EPSG:2154");
+        final List<TileMatrix> tm = new ArrayList<TileMatrix>();
+        tm.add(createTileMatrix("L11",  24,  11,  256, 256, 0.07500000000087,-180,90));
+        tm.add(createTileMatrix("L10",  27,  12,  256, 256, 0.06666666666744,-180,90));
+        tm.add(createTileMatrix("L09",  36,  16,  256, 256, 0.05000000000058,-180,90));
+        tm.add(createTileMatrix("L08",  54,  23,  256, 256, 0.03333333333372,-180,90));
+        tm.add(createTileMatrix("L07",  72,  31,  256, 256, 0.02500000000029,-180,90));
+        tm.add(createTileMatrix("L06",  81,  34,  256, 256, 0.02222222222248,-180,90));
+        tm.add(createTileMatrix("L05",  108, 46,  256, 256, 0.01666666666686,-180,90));
+        tm.add(createTileMatrix("L04",  8,  658,  256, 256, 0.01111111111124,-180,90));
+        tm.add(createTileMatrix("L03",  4,  329,  256, 256, 0.00833333333343,-180,90));
+        tm.add(createTileMatrix("L02",  2,  165, 256, 256, 0.00555555555562,-180,90));
+        tm.add(createTileMatrix("L01",  1,  83, 256, 256, 0.00277777777781,-180,90));
+        ORTHO_ALPES_JPEG.setTileMatrix(tm);
     }
 
 //    layer,numTiles,width,height,uniformSize,scaleX,scaleY,horizontalSRID
@@ -161,8 +179,8 @@ public class DefaultTileExample {
         tm.setMatrixWidth(nX);
         scale *= 1852 * 60; // conversion des degres vers des metres
         tm.setScaleDenominator(1 / scale);
-        tm.getTopLeftCorner().add(-180.0);
-        tm.getTopLeftCorner().add(90.0);
+        tm.getTopLeftCorner().add(tlc1);
+        tm.getTopLeftCorner().add(tlc2);
 
         tm.setTileHeight(mHeight);
         tm.setTileWidth(mWidth);

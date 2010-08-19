@@ -62,6 +62,7 @@ import org.geotoolkit.temporal.object.DefaultPosition;
 import org.geotoolkit.csw.xml.v202.RecordType;
 import org.geotoolkit.ebrim.xml.v250.RegistryObjectType;
 import org.geotoolkit.ebrim.xml.v300.IdentifiableType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.util.FileUtilities;
 
@@ -299,7 +300,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             } catch (InterruptedException ex) {
                LOGGER.log(Level.WARNING, "InterruptedException in parralele create document:\n{0}", ex.getMessage());
             } catch (ExecutionException ex) {
-               LOGGER.log(Level.WARNING, "ExecutionException in parralele create document:\n{0}", ex.getMessage());
+               LOGGER.log(Level.WARNING, "ExecutionException in parralele create document:\n" + ex.getMessage(), ex);
             }
         }
     }
@@ -509,6 +510,17 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
                 result = DATE_FORMAT.format(pos.getDate());
             }
             
+        } else if (obj instanceof TimePositionType) {
+            final TimePositionType pos = (TimePositionType) obj;
+            final Date d = pos.getDate();
+            if (d != null) {
+                synchronized(DATE_FORMAT) {
+                    result = DATE_FORMAT.format(d);
+                }
+            } else {
+               result = NULL_VALUE;
+            }
+
         } else if (obj instanceof DefaultInstant) {
             final DefaultInstant inst = (DefaultInstant)obj;
             if (inst.getPosition() != null && inst.getPosition().getDate() != null) {

@@ -152,7 +152,7 @@ public class WMSService extends GridWebService {
                 isVersionSupported(versionSt);
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final GetMap requestMap = adaptGetMap(versionSt, true, queryContext);
-                version = getVersionFromNumber(requestMap.getVersion().toString());
+                version = getVersionFromNumber(requestMap.getVersion());
                 final BufferedImage map = worker.getMap(requestMap);
                 return Response.ok(map, requestMap.getFormat()).build();
             }
@@ -168,7 +168,7 @@ public class WMSService extends GridWebService {
                 isVersionSupported(versionSt);
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final GetFeatureInfo requestFeatureInfo = adaptGetFeatureInfo(versionSt, queryContext);
-                version = getVersionFromNumber(requestFeatureInfo.getVersion().toString());
+                version = getVersionFromNumber(requestFeatureInfo.getVersion());
                 final String result = worker.getFeatureInfo(requestFeatureInfo);
                 //Need to reset the GML mime format to XML for browsers
                 String infoFormat = requestFeatureInfo.getInfoFormat();
@@ -198,7 +198,7 @@ public class WMSService extends GridWebService {
                 }
                 final GetCapabilities requestCapab = adaptGetCapabilities(versionSt);
                 if (version == null) {
-                    version = getVersionFromNumber(requestCapab.getVersion().toString());
+                    version = getVersionFromNumber(requestCapab.getVersion());
                 }
                 worker.initServletContext(getServletContext());
                 worker.initUriContext(uriContext);
@@ -208,7 +208,7 @@ public class WMSService extends GridWebService {
             }
             if (GETLEGENDGRAPHIC.equalsIgnoreCase(request)) {
                 final GetLegendGraphic requestLegend = adaptGetLegendGraphic();
-                version = getVersionFromNumber(requestLegend.getVersion().toString());
+                version = getVersionFromNumber(requestLegend.getVersion());
                 final BufferedImage legend = worker.getLegendGraphic(requestLegend);
                 return Response.ok(legend, requestLegend.getFormat()).build();
             }
@@ -224,7 +224,7 @@ public class WMSService extends GridWebService {
                 isVersionSupported(versionSt);
                 version = ServiceDef.getServiceDefinition(ServiceDef.Specification.WMS.toString(), versionSt);
                 final DescribeLayer describeLayer = adaptDescribeLayer(versionSt);
-                version = getVersionFromNumber(describeLayer.getVersion().toString());
+                version = getVersionFromNumber(describeLayer.getVersion());
                 worker.initUriContext(uriContext);
                 final DescribeLayerResponseType response = worker.describeLayer(describeLayer);
                 return Response.ok(response, MimeType.TEXT_XML).build();
