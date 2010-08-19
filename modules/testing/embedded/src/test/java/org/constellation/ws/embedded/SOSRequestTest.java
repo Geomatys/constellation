@@ -30,6 +30,7 @@ import java.io.File;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import javax.xml.bind.JAXBException;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.geotoolkit.sampling.xml.v100.SamplingPointEntry;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
@@ -59,6 +60,26 @@ public class SOSRequestTest extends AbstractTestRequest {
         if (f.exists()) {
             f.delete();
         }
+    }
+
+    @Test
+    public void testSOSInvalidRequest() throws Exception {
+        // Creates a valid GetCapabilities url.
+        final URL getCapsUrl = new URL(SOS_POST_URL);
+
+
+        // for a POST request
+        URLConnection conec = getCapsUrl.openConnection();
+
+
+        postRequestPlain(conec, "test");
+        Object obj = unmarshallResponse(conec);
+
+        assertTrue(obj instanceof ExceptionReport);
+
+        ExceptionReport report = (ExceptionReport) obj;
+
+        assertEquals("InvalidRequest", report.getException().get(0).getExceptionCode());
     }
 
     @Test

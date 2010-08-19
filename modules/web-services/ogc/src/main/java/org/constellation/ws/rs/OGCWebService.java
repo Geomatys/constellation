@@ -161,9 +161,13 @@ public abstract class OGCWebService extends AbstractWebService {
      */
     @Override
     protected Response launchException(final String message, String codeName, final String locator) {
+        ServiceDef mainVersion = supportedVersions.get(0);
+        if (mainVersion.owsCompliant) {
+            codeName = StringUtilities.transformCodeName(codeName);
+        }
         final OWSExceptionCode code   = CodeLists.valueOf(OWSExceptionCode.class, codeName);
         final CstlServiceException ex = new CstlServiceException(message, code, locator);
-        return processExceptionResponse(ex, supportedVersions.get(0));
+        return processExceptionResponse(ex, mainVersion);
     }
 
     /**

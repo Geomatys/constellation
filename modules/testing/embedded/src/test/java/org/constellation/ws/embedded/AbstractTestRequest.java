@@ -69,6 +69,16 @@ public class AbstractTestRequest extends AbstractGrizzlyServer {
 
     }
 
+    public void postRequestPlain(URLConnection conec, String request) throws IOException {
+
+        conec.setDoOutput(true);
+        conec.setRequestProperty("Content-Type", "text/plain");
+        final OutputStreamWriter wr = new OutputStreamWriter(conec.getOutputStream());
+        wr.write(request);
+        wr.flush();
+        
+    }
+
     public void postRequestObject(URLConnection conec, Object request) throws IOException, JAXBException {
         conec.setDoOutput(true);
         conec.setRequestProperty("Content-Type", "text/xml");
@@ -94,7 +104,6 @@ public class AbstractTestRequest extends AbstractGrizzlyServer {
     }
 
     public String getStringResponse(URLConnection conec) throws UnsupportedEncodingException, IOException {
-        // Try to unmarshall something from the response returned by the server.
         final StringWriter sw     = new StringWriter();
         final BufferedReader in   = new BufferedReader(new InputStreamReader(conec.getInputStream(), "UTF-8"));
         char [] buffer = new char[1024];
