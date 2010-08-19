@@ -17,8 +17,6 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
-import org.geotoolkit.factory.Hints;
-import org.opengis.feature.type.Name;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -37,6 +35,7 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import javax.measure.unit.Unit;
+import javax.measure.unit.UnitFormat;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 
@@ -71,6 +70,7 @@ import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.display2d.service.SceneDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
+import org.geotoolkit.factory.Hints;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
@@ -100,6 +100,7 @@ import org.geotoolkit.wms.xml.v130.EXGeographicBoundingBox;
 import org.geotoolkit.wms.xml.v130.OperationType;
 
 //Geoapi dependencies
+import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
 import org.opengis.referencing.operation.TransformException;
@@ -344,11 +345,18 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                 defaut = minRange + "," + maxRange;
                 final Unit<?> u = firstRange.getUnits();
                 final String unit = (u != null) ? u.toString() : null;
+                String unitSymbol;
+                try {
+                    unitSymbol = UnitFormat.getInstance().format(u);
+                } catch (IllegalArgumentException e) {
+                    // Workaround for one more bug in javax.measure...
+                    unitSymbol = unit;
+                }
                 dim = (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) ?
-                    new org.geotoolkit.wms.xml.v111.Dimension("dim_range", unit, defaut,
-                                                           minRange + "," + maxRange) :
-                    new org.geotoolkit.wms.xml.v130.Dimension("dim_range", unit, defaut,
-                                                           minRange + "," + maxRange);
+                    new org.geotoolkit.wms.xml.v111.Dimension(minRange + "," + maxRange, "dim_range", unit,
+                                                              unitSymbol, defaut, null, null, null) :
+                    new org.geotoolkit.wms.xml.v130.Dimension(minRange + "," + maxRange, "dim_range", unit,
+                                                              unitSymbol, defaut, null, null, null);
                 dimensions.add(dim);
             }
 
