@@ -21,7 +21,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -194,9 +193,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         //Generate the correct URL in the static part. ?TODO: clarify this.
         final AbstractWMSCapabilities inCapabilities;
         try {
-            inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(getServletContext().getRealPath("WEB-INF"), queryVersion, "WMS");
-        } catch (IOException e) {
-            throw new CstlServiceException(e, NO_APPLICABLE_CODE);
+            inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(queryVersion, "WMS");
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }

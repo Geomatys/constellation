@@ -149,8 +149,14 @@ public abstract class AbstractWorker implements Worker {
      * @throws JAXBException
      * @throws IOException
      */
-    protected Object getStaticCapabilitiesObject(final String home, final String version, final String service) throws JAXBException, IOException {
+    protected Object getStaticCapabilitiesObject(final String version, final String service) throws JAXBException {
         final String fileName = service + "Capabilities" + version + ".xml";
+        final String home;
+        if (getServletContext() != null) {
+            home     = getServletContext().getRealPath("WEB-INF");
+        } else {
+            home = null;
+        }
         final boolean update  = WebServiceUtilities.getUpdateCapabilitiesFlag(home);
 
         //Look if the template capabilities is already in cache.
@@ -178,7 +184,8 @@ public abstract class AbstractWorker implements Worker {
                 }
 
                 capabilities.put(fileName, response);
-
+            } catch (IOException ex) {
+                LOGGER.warning("Unable to close the skeleton capabilities input stream.");
             } finally {
                 if (unmarshaller != null) {
                     getMarshallerPool().release(unmarshaller);

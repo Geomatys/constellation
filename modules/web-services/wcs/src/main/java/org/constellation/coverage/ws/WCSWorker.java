@@ -580,14 +580,9 @@ public final class WCSWorker extends AbstractWorker {
         }
 
         // We unmarshall the static capabilities document.
-        final WCSCapabilitiesType staticCapabilities;
-        try {
-            staticCapabilities = (WCSCapabilitiesType) getStaticCapabilitiesObject(getServletContext().getRealPath("WEB-INF"),
-                    ServiceDef.WCS_1_0_0.version.toString(), ServiceDef.Specification.WCS.toString());
-        } catch (IOException e) {
-            throw new CstlServiceException("IO exception while getting Services Metadata: " + e.getMessage(),
-                    NO_APPLICABLE_CODE);
-        }
+        final WCSCapabilitiesType staticCapabilities =
+                (WCSCapabilitiesType) getStaticCapabilitiesObject(ServiceDef.WCS_1_0_0.version.toString(), ServiceDef.Specification.WCS.toString());
+        
         if (requestedSection == null || requestedSection.equals("/WCS_Capabilities/Capability") ||
                                         requestedSection.equals("/"))
         {
@@ -715,14 +710,8 @@ public final class WCSWorker extends AbstractWorker {
         }
 
         // We unmarshall the static capabilities document.
-        final Capabilities staticCapabilities;
-        try {
-            staticCapabilities = (Capabilities) getStaticCapabilitiesObject(getServletContext().getRealPath("WEB-INF"),
-                    ServiceDef.WCS_1_1_1.version.toString(), ServiceDef.Specification.WCS.toString());
-        } catch (IOException e) {
-            throw new CstlServiceException(e, NO_APPLICABLE_CODE);
-        }
-
+        final Capabilities staticCapabilities = (Capabilities) getStaticCapabilitiesObject(ServiceDef.WCS_1_1_1.version.toString(), ServiceDef.Specification.WCS.toString());
+        
         ServiceIdentification si = null;
         ServiceProvider sp = null;
         OperationsMetadata om = null;

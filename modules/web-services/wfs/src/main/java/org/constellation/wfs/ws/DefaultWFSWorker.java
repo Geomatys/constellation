@@ -17,7 +17,6 @@
 
 package org.constellation.wfs.ws;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -188,13 +187,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
         
         final WFSCapabilitiesType inCapabilities;
         try {
-            String deployedDir = null;
-            if (getServletContext() != null) {
-                deployedDir = getServletContext().getRealPath("WEB-INF");
-            }
-            inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(deployedDir, actingVersion.version.toString(), "WFS");
-        } catch (IOException e) {
-            throw new CstlServiceException(e, NO_APPLICABLE_CODE);
+            inCapabilities = (WFSCapabilitiesType) getStaticCapabilitiesObject(actingVersion.version.toString(), "WFS");
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
