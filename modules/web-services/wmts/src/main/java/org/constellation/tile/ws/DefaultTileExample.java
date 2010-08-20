@@ -124,17 +124,17 @@ public class DefaultTileExample {
     static {
         ORTHO_ALPES_JPEG = new TileMatrixSet(new CodeType("ORTHO_ALPES_JPEG"), "urn:ogc:def:crs:EPSG:2154");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
-        tm.add(createTileMatrix("L11",  1,  83,      256, 256, 512, -180,90));
-        tm.add(createTileMatrix("L10",  2,  165,     256, 256, 256, -180,90));
-        tm.add(createTileMatrix("L09",  4,  329,     256, 256, 128, -180,90));
-        tm.add(createTileMatrix("L08",  8,  658,     256, 256, 64,  -180,90));
-        tm.add(createTileMatrix("L07",  15, 1316,    256, 256, 32,  -180,90));
-        tm.add(createTileMatrix("L06",  30,  2632,   256, 256, 16,  -180,90));
-        tm.add(createTileMatrix("L05",  59,  5263,   256, 256, 8,   -180,90));
-        tm.add(createTileMatrix("L04",  118, 10525,  256, 256, 4,   -180,90));
-        tm.add(createTileMatrix("L03",  235, 21050,  256, 256, 2,   -180,90));
-        tm.add(createTileMatrix("L02",  469, 42099,  256, 256, 1,   -180,90));
-        tm.add(createTileMatrix("L01",  938, 84197,  256, 256, 0.5, -180,90));
+        tm.add( createTileMatrix("L11",    16,    16,  256, 256, 512,       0, 8388608 ) );    // 2097152
+        tm.add( createTileMatrix("L10",    32,    32,  256, 256, 256,       0, 8388608 ) );    // 1048576
+        tm.add( createTileMatrix("L09",    64,    64,  256, 256, 128,       0, 8388608 ) );    //  524288
+        tm.add( createTileMatrix("L08",   128,   128,  256, 256,  64,       0, 8388608 ) );    //  262144
+        tm.add( createTileMatrix("L07",   256,   256,  256, 256,  32,       0, 8388608 ) );    //  131072
+        tm.add( createTileMatrix("L06",   512,   512,  256, 256,  16,       0, 8388608 ) );    //   65536
+        tm.add( createTileMatrix("L05",  1024,  1024,  256, 256,   8,       0, 8388608 ) );    //   32768
+        tm.add( createTileMatrix("L04",  2048,  2048,  256, 256,   4,       0, 8388608 ) );    //   16384
+        tm.add( createTileMatrix("L03",  4096,  4096,  256, 256,   2,       0, 8388608 ) );    //    8192
+        tm.add( createTileMatrix("L02",  8129,  8129,  256, 256,   1,       0, 8388608 ) );    //    4096
+        tm.add( createTileMatrix("L01", 16384, 16384,  256, 256, 0.5,       0, 8388608 ) );    //    2048
         ORTHO_ALPES_JPEG.setTileMatrix(tm);
     }
 
