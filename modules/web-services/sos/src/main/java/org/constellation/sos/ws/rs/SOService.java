@@ -92,8 +92,8 @@ public class SOService extends OGCWebService {
 
             serviceDef = getVersionFromNumber(request.getVersion());
 
-             if (objectRequest instanceof GetObservation) {
-                final GetObservation go = (GetObservation) objectRequest;
+             if (request instanceof GetObservation) {
+                final GetObservation go = (GetObservation) request;
                 final Object response   = worker.getObservation(go);
 
                 String outputFormat = go.getResponseFormat();
@@ -111,36 +111,36 @@ public class SOService extends OGCWebService {
                 return Response.ok(marshalled, outputFormat).build();
              }
 
-             if (objectRequest instanceof DescribeSensor) {
-                DescribeSensor ds             = (DescribeSensor)objectRequest;
+             if (request instanceof DescribeSensor) {
+                DescribeSensor ds             = (DescribeSensor)request;
                 final AbstractSensorML sensor = worker.describeSensor(ds);
                 return Response.ok(sensor, MimeType.TEXT_XML).build();
              }
 
-             if (objectRequest instanceof GetFeatureOfInterest) {
-                final GetFeatureOfInterest gf     = (GetFeatureOfInterest)objectRequest;
+             if (request instanceof GetFeatureOfInterest) {
+                final GetFeatureOfInterest gf     = (GetFeatureOfInterest)request;
                 final SOSResponseWrapper response = new SOSResponseWrapper(worker.getFeatureOfInterest(gf));
                 return Response.ok(response, worker.getOutputFormat()).build();
              }
 
-             if (objectRequest instanceof InsertObservation) {
-                final InsertObservation is = (InsertObservation)objectRequest;
+             if (request instanceof InsertObservation) {
+                final InsertObservation is = (InsertObservation)request;
                 return Response.ok(worker.insertObservation(is), MimeType.TEXT_XML).build();
              }
 
-             if (objectRequest instanceof GetResult) {
-                final GetResult gr = (GetResult)objectRequest;
+             if (request instanceof GetResult) {
+                final GetResult gr = (GetResult)request;
                 return Response.ok(worker.getResult(gr), MimeType.TEXT_XML).build();
              }
 
-             if (objectRequest instanceof RegisterSensor) {
-                final RegisterSensor rs = (RegisterSensor)objectRequest;
+             if (request instanceof RegisterSensor) {
+                final RegisterSensor rs = (RegisterSensor)request;
                 return Response.ok(worker.registerSensor(rs), MimeType.TEXT_XML).build();
              }
 
-             if (objectRequest instanceof GetCapabilities) {
+             if (request instanceof GetCapabilities) {
                 worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.SOS_1_0_0));
-                GetCapabilities gc = (GetCapabilities)objectRequest;
+                GetCapabilities gc = (GetCapabilities)request;
                 return Response.ok(worker.getCapabilities(gc), worker.getOutputFormat()).build();
              }
 

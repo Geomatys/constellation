@@ -45,6 +45,8 @@ public class SOSRequestTest extends AbstractTestRequest {
 
     private static final String SOS_POST_URL = "http://localhost:9090/sos?";
 
+    private static final String SOS_GETCAPABILITIES_URL = "http://localhost:9090/sos?request=GetCapabilities&service=SOS&version=1.0.0";
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -85,7 +87,7 @@ public class SOSRequestTest extends AbstractTestRequest {
     @Test
     public void testSOSGetCapabilities() throws Exception {
         // Creates a valid GetCapabilities url.
-        final URL getCapsUrl = new URL(SOS_POST_URL);
+        URL getCapsUrl = new URL(SOS_POST_URL);
 
 
         // for a POST request
@@ -96,6 +98,15 @@ public class SOSRequestTest extends AbstractTestRequest {
         postRequestObject(conec, request);
         Object obj = unmarshallResponse(conec);
 
+        assertTrue(obj instanceof Capabilities);
+
+        // Creates a valid GetCapabilties url.
+        getCapsUrl = new URL(SOS_GETCAPABILITIES_URL);
+
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WMT_MS_Capabilities.
+        obj = unmarshallResponse(getCapsUrl);
         assertTrue(obj instanceof Capabilities);
     }
 
