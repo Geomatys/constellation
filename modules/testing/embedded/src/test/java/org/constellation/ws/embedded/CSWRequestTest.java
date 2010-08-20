@@ -17,6 +17,7 @@
 
 package org.constellation.ws.embedded;
 
+import org.geotoolkit.ows.xml.v100.Operation;
 import org.geotoolkit.csw.xml.v202.GetRecordsResponseType;
 import org.geotoolkit.csw.xml.TypeNames;
 import org.geotoolkit.csw.xml.ResultType;
@@ -58,6 +59,8 @@ public class CSWRequestTest extends AbstractTestRequest {
 
     private static final String CSW_POST_URL = "http://localhost:9090/csw?";
 
+    private static final String CSW_GETCAPABILITIES_URL = "http://localhost:9090/csw?request=GetCapabilities&service=CSW&version=2.0.2";
+
     /**
      * Initialize the list of layers from the defined providers in Constellation's configuration.
      */
@@ -79,7 +82,7 @@ public class CSWRequestTest extends AbstractTestRequest {
     public void testCSWGetCapabilities() throws Exception {
 
         // Creates a valid GetCapabilities url.
-        final URL getCapsUrl = new URL(CSW_POST_URL);
+        URL getCapsUrl = new URL(CSW_POST_URL);
 
 
         // for a POST request
@@ -92,6 +95,25 @@ public class CSWRequestTest extends AbstractTestRequest {
 
         assertTrue(obj instanceof Capabilities);
 
+        Capabilities c = (Capabilities) obj;
+
+        assertTrue(c.getOperationsMetadata() != null);
+
+        Operation op = c.getOperationsMetadata().getOperation("GetRecords");
+
+        assertTrue(op != null);
+        assertTrue(op.getDCP().size() > 0);
+
+        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), CSW_POST_URL);
+
+        // Creates a valid GetCapabilties url.
+        getCapsUrl = new URL(CSW_GETCAPABILITIES_URL);
+
+
+        // Try to marshall something from the response returned by the server.
+        // The response should be a WMT_MS_Capabilities.
+        obj = unmarshallResponse(getCapsUrl);
+        assertTrue(obj instanceof Capabilities);
     }
 
     @Test

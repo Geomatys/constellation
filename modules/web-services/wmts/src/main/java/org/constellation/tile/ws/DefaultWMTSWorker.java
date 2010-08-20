@@ -16,78 +16,69 @@
  */
 package org.constellation.tile.ws;
 
-import org.geotoolkit.util.TimeParser;
-import org.geotoolkit.wmts.xml.v100.TileMatrix;
 import java.io.File;
-import org.opengis.coverage.Coverage;
 import java.text.ParseException;
-import org.geotoolkit.wmts.xml.v100.DimensionNameValue;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+import java.awt.Rectangle;
+import java.awt.Font;
+import java.awt.Insets;
+import java.awt.Color;
+import java.awt.BasicStroke;
+import java.math.BigInteger;
+import javax.measure.unit.Unit;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Iterator;
+import java.util.TimeZone;
+import java.util.logging.Level;
+import java.util.Date;
+import java.util.SortedSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.constellation.tile.visitor.GMLGraphicVisitor;
 import org.constellation.tile.visitor.HTMLGraphicVisitor;
 import org.constellation.tile.visitor.CSVGraphicVisitor;
 import org.constellation.tile.visitor.TextGraphicVisitor;
-import java.awt.Rectangle;
+import org.constellation.portrayal.PortrayalUtil;
+import org.constellation.util.Util;
+import org.constellation.provider.CoverageLayerDetails;
+import org.constellation.provider.StyleProviderProxy;
+import org.constellation.register.RegisterException;
+import org.constellation.Cstl;
+import org.constellation.ServiceDef;
+import org.constellation.provider.LayerDetails;
+import org.constellation.ws.MimeType;
+import org.constellation.ws.AbstractWorker;
+import org.constellation.ws.CstlServiceException;
+
+import org.geotoolkit.util.TimeParser;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
 import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.CanvasDef;
 import org.geotoolkit.map.MapContext;
-import org.constellation.portrayal.PortrayalUtil;
 import org.geotoolkit.display2d.service.SceneDef;
-import java.util.HashMap;
-import java.util.Map;
-import org.constellation.util.Util;
-import java.awt.Font;
-import java.awt.Insets;
-import java.awt.Color;
-import java.awt.BasicStroke;
 import org.geotoolkit.display2d.ext.DefaultBackgroundTemplate;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.display2d.ext.legend.DefaultLegendTemplate;
 import org.geotoolkit.ows.xml.v110.CodeType;
-import java.math.BigInteger;
-import org.constellation.provider.CoverageLayerDetails;
-import org.constellation.provider.StyleProviderProxy;
 import org.geotoolkit.style.MutableStyle;
-import org.geotoolkit.wmts.xml.v100.Style;
-import org.geotoolkit.wmts.xml.v100.LegendURL;
 import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.ows.xml.v110.BoundingBoxType;
-import org.opengis.feature.type.Name;
 import org.geotoolkit.util.MeasurementRange;
-import javax.measure.unit.Unit;
-import java.util.Iterator;
 import org.geotoolkit.util.PeriodUtilities;
-import java.util.TimeZone;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
-import java.util.logging.Level;
-import java.util.Date;
-import java.util.SortedSet;
-import org.geotoolkit.wmts.xml.v100.Dimension;
-import org.opengis.metadata.extent.GeographicBoundingBox;
-import org.geotoolkit.wmts.xml.v100.LayerType;
-import java.util.ArrayList;
-import org.constellation.register.RegisterException;
-import org.constellation.Cstl;
-import org.constellation.ServiceDef;
-import org.constellation.provider.LayerDetails;
+import org.geotoolkit.ows.xml.v110.BoundingBoxType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
-import org.geotoolkit.wmts.xml.v100.ContentsType;
 import org.geotoolkit.ows.xml.v110.OperationsMetadata;
 import org.geotoolkit.ows.xml.v110.ServiceProvider;
 import org.geotoolkit.ows.xml.v110.ServiceIdentification;
-import org.constellation.ws.MimeType;
-import java.util.Arrays;
-import java.util.List;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
-import org.constellation.ws.AbstractWorker;
-import org.geotoolkit.storage.DataStoreException;
-
-import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.OGCWebService;
-import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
+import org.geotoolkit.wmts.xml.v100.TileMatrix;
+import org.geotoolkit.wmts.xml.v100.DimensionNameValue;
+import org.geotoolkit.wmts.xml.v100.ContentsType;
 import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.wmts.xml.v100.GetCapabilities;
 import org.geotoolkit.wmts.xml.v100.GetFeatureInfo;
@@ -95,9 +86,18 @@ import org.geotoolkit.wmts.xml.v100.GetTile;
 import org.geotoolkit.wmts.xml.v100.Themes;
 import org.geotoolkit.wmts.xml.v100.TileMatrixSet;
 import org.geotoolkit.wmts.xml.v100.TileMatrixSetLink;
+import org.geotoolkit.wmts.xml.v100.Dimension;
+import org.geotoolkit.wmts.xml.v100.LayerType;
+import org.geotoolkit.wmts.xml.v100.Style;
+import org.geotoolkit.wmts.xml.v100.LegendURL;
+import org.geotoolkit.wmts.xml.WMTSMarshallerPool;
+import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.xml.MarshallerPool;
-
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+
+import org.opengis.coverage.Coverage;
+import org.opengis.feature.type.Name;
+import org.opengis.metadata.extent.GeographicBoundingBox;
 
 /**
  * Working part of the WMTS service.
@@ -239,7 +239,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
            om = skeletonCapabilities.getOperationsMetadata();
 
            //we update the URL
-           OGCWebService.updateOWSURL(om.getOperation(), serviceURL, "WMTS");
+           om.updateURL(serviceURL, "WMTS");
 
         }
 
@@ -444,7 +444,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
 
         List<String> rootDirectories;
         try { // WE catch the exception from either service version
-            rootDirectories = Cstl.getRegister().getRootDirectory();;
+            rootDirectories = Cstl.getRegister().getRootDirectory();
 
         } catch (RegisterException regex) {
             throw new CstlServiceException(regex, LAYER_NOT_DEFINED);
@@ -656,14 +656,19 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         final String col              = getLettersFromInt(columnIndex, matrix.getMatrixWidth()); // letter
         final String line             = getNumbersFromInt(rowIndex, matrix.getMatrixHeight()); // number
         final List<String> rootDir    = getRootDirectories();
-        final String fileName         = rootDir.get(0) + DefaultTileExample.getPathForMatrixSet(matrixSetName) + level + '_' + col + line + ".png";
-        //final String fileName         = DefaultTileExample.getPathForMatrixSet(matrixSetName) + level + '_' + col + line + ".png";
+        final DefaultTileExample.Path path = DefaultTileExample.getPathForMatrixSet(matrixSetName);
+        final String fileName;
+        if (path.isAbsolute) {
+            fileName         = path.path + level + '_' + col + line + ".png";
+        } else {
+            fileName         = rootDir.get(0) + path.path + level + '_' + col + line + ".png";
+        }
 
         final File f = new File(fileName);
         if (f.exists()) {
-            LOGGER.info("OKKKK:" + f.getPath());
+            LOGGER.info("returning existing file:" + f.getPath());
         } else {
-            LOGGER.info("not exist:" + f.getPath());
+            LOGGER.info("file does not exist:" + f.getPath());
             throw new CstlServiceException("The correspounding file has not been found", NO_APPLICABLE_CODE);
         }
 

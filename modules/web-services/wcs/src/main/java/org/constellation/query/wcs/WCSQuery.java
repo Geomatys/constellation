@@ -16,9 +16,7 @@
  */
 package org.constellation.query.wcs;
 
-import org.constellation.query.DefaultQueryService;
 import org.constellation.query.Query;
-import org.constellation.query.QueryService;
 
 
 /**
@@ -34,7 +32,7 @@ public interface WCSQuery extends Query {
     /**
      * WCS Query service
      */
-    QueryService WCS_SERVICE = new DefaultQueryService("WCS");
+    String WCS_SERVICE = "WCS";
 
     /**
      * Request parameters.

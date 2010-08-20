@@ -490,26 +490,6 @@ public abstract class WebService {
     }
 
     /**
-     * Return a file located in WEB-INF deployed directory.
-     *
-     * @param fileName The name of the file requested.
-     * @return The specified file.
-     */
-    protected File getFile(String fileName) {
-         File path;
-
-         //we try to get the deployed "WEB-INF" directory
-         final String home = getServletContext().getRealPath("WEB-INF");
-
-         if (home == null || !(path = new File(home)).isDirectory()) {
-            path = ConfigDirectory.getConfigDirectory();
-         }
-         if (fileName != null)
-            return new File(path, fileName);
-         else return path;
-    }
-
-    /**
      * Return the service url obtain by the first request made.
      * something like : http://localhost:8080/constellation/WS
      *

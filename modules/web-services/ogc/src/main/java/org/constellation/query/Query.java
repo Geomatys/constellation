@@ -61,7 +61,7 @@ public interface Query {
     /**
      * Returns the service name. Never {@code null}.
      */
-    QueryService getService();
+    String getService();
 
     /**
      * Returns the version of the service chosen, or {@code null} if not specified.

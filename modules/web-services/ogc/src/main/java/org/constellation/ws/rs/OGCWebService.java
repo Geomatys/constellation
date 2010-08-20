@@ -22,14 +22,10 @@ import org.opengis.util.CodeList;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -39,10 +35,8 @@ import org.constellation.ServiceDef;
 import org.constellation.ws.CstlServiceException;
 
 // Geotools dependencies
+import org.constellation.ws.WebServiceUtilities;
 import org.geotoolkit.internal.CodeLists;
-import org.geotoolkit.ows.xml.AbstractDCP;
-import org.geotoolkit.ows.xml.AbstractOnlineResourceType;
-import org.geotoolkit.ows.xml.AbstractOperation;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
@@ -198,34 +192,19 @@ public abstract class OGCWebService extends AbstractWebService {
      */
     protected Object getStaticCapabilitiesObject(final ServiceDef def) throws JAXBException {
         final String fileName = def.specification.toString() + "Capabilities" + def.version.toString() + ".xml";
-        final File changeFile = getFile("change.properties");
-        final Properties p    = new Properties();
-
-        // if the flag file is present we load the properties
-        if (changeFile != null && changeFile.exists()) {
-            try {
-                final FileInputStream in = new FileInputStream(changeFile);
-                p.load(in);
-                in.close();
-            } catch (IOException ex) {
-                LOGGER.warning("Unable to read the change.properties file");
-            }
-        } else {
-            p.put("update", "false");
-        }
-
-        //we recup the capabilities file and unmarshall it
+       
+        final String home    = getServletContext().getRealPath("WEB-INF");
+        final boolean update = WebServiceUtilities.getUpdateCapabilitiesFlag(home);
 
         //we look if we have already put it in cache
         Object response = capabilities.get(fileName);
-        final boolean update = p.getProperty("update").equals("true");
 
         if (response == null || update) {
             if (update) {
                 LOGGER.info("updating metadata");
             }
 
-            final File f = getFile(fileName);
+            final File f = WebServiceUtilities.getFile(fileName, home);
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = getMarshallerPool().acquireUnmarshaller();
@@ -250,19 +229,9 @@ public abstract class OGCWebService extends AbstractWebService {
             if (response != null) {
                 capabilities.put(fileName, response);
                 lastUpdateTime = System.currentTimeMillis();
-                p.put("update", "false");
             }
 
-           // if the flag file is present we store the properties
-           if (changeFile != null && changeFile.exists()) {
-               try {
-                   final FileOutputStream out = new FileOutputStream(changeFile);
-                   p.store(out, "updated from WebService");
-                   out.close();
-               } catch (IOException ex) {
-                   LOGGER.warning("Unable to write the change.properties file");
-               }
-           }
+            WebServiceUtilities.storeUpdateCapabilitiesFlag(home);
        }
        return response;
         
@@ -328,23 +297,6 @@ public abstract class OGCWebService extends AbstractWebService {
             }
         }
         return firstSpecifiedVersion;
-    }
-
-    /**
-     * Update all the url in a OWS capabilities document.
-     *
-     * @param operations A list of OWS operation.
-     * @param url The url of the web application.
-     * @param serviceType the initials of the web serviceType (WMS, SOS, WCS, CSW, ...). This string correspound to the resource name in lower case.
-     */
-    public static void updateOWSURL(List<? extends AbstractOperation> operations, String url, String service) {
-        for (AbstractOperation op:operations) {
-            for (AbstractDCP dcp: op.getDCP()) {
-                for (AbstractOnlineResourceType method:dcp.getHTTP().getGetOrPost()) {
-                    method.setHref(url + service.toLowerCase() + "?");
-                }
-            }
-       }
     }
 
     /**

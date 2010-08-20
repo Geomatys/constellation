@@ -18,8 +18,6 @@ package org.constellation.query.wms;
 
 import javax.ws.rs.core.MultivaluedMap;
 import org.constellation.query.Query;
-import org.constellation.query.QueryService;
-import org.constellation.query.DefaultQueryService;
 import org.constellation.query.DefaultQueryRequest;
 import org.constellation.query.QueryRequest;
 import org.geotoolkit.lang.Immutable;
@@ -51,7 +49,7 @@ public abstract class WMSQuery implements Query {
     /**
      * WMS Query service
      */
-    public static final QueryService WMS_SERVICE = new DefaultQueryService("WMS");
+    public static final String WMS_SERVICE = "WMS";
 
     /**
      * Key for the {@code DescribeLayer} request.
@@ -176,7 +174,7 @@ public abstract class WMSQuery implements Query {
      * {@inheritDoc}
      */
     @Override
-    public final QueryService getService() {
+    public final String getService() {
         return WMS_SERVICE;
     }
 

@@ -28,11 +28,11 @@ import org.geotoolkit.util.Version;
 public final class DefaultQuery implements Query{
 
     private final QueryRequest request;
-    private final QueryService service;
+    private final String service;
     private final Version version;
     private final String exception;
 
-    public DefaultQuery(QueryRequest request, QueryService service, Version version, String exception) {
+    public DefaultQuery(QueryRequest request, String service, Version version, String exception) {
         this.request = request;
         this.service = service;
         this.version = version;
@@ -51,7 +51,7 @@ public final class DefaultQuery implements Query{
      * {@inheritDoc }
      */
     @Override
-    public QueryService getService() {
+    public String getService() {
         return service;
     }
 

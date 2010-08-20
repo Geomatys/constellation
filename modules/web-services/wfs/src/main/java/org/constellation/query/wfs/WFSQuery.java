@@ -17,8 +17,6 @@
 package org.constellation.query.wfs;
 
 import org.constellation.query.Query;
-import org.constellation.query.QueryService;
-import org.constellation.query.DefaultQueryService;
 import org.constellation.query.DefaultQueryRequest;
 import org.constellation.query.QueryRequest;
 import org.geotoolkit.util.Version;
@@ -45,7 +43,7 @@ public abstract class WFSQuery implements Query {
     /**
      * WFS Query service
      */
-    public static final QueryService WFS_SERVICE = new DefaultQueryService("WFS");
+    public static final String WFS_SERVICE = "WFS";
 
     /**
      * Key for the {@code GetCapabilities} request.
@@ -92,7 +90,7 @@ public abstract class WFSQuery implements Query {
      * {@inheritDoc}
      */
     @Override
-    public final QueryService getService() {
+    public final String getService() {
         return WFS_SERVICE;
     }
 

@@ -124,17 +124,17 @@ public class DefaultTileExample {
     static {
         ORTHO_ALPES_JPEG = new TileMatrixSet(new CodeType("ORTHO_ALPES_JPEG"), "urn:ogc:def:crs:EPSG:2154");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
-        tm.add(createTileMatrix("L11",  1,  83,  256, 256, 0.07500000000087,-180,90));
-        tm.add(createTileMatrix("L10",  2,  165,  256, 256, 0.06666666666744,-180,90));
-        tm.add(createTileMatrix("L09",  4,  329,  256, 256, 0.05000000000058,-180,90));
-        tm.add(createTileMatrix("L08",  8,  658,  256, 256, 0.03333333333372,-180,90));
-        tm.add(createTileMatrix("L07",  15, 1316,  256, 256, 0.02500000000029,-180,90));
-        tm.add(createTileMatrix("L06",  30,  2632,  256, 256, 0.02222222222248,-180,90));
-        tm.add(createTileMatrix("L05",  59,  5263,  256, 256, 0.01666666666686,-180,90));
-        tm.add(createTileMatrix("L04",  118, 10525, 256, 256, 0.01111111111124,-180,90));
-        tm.add(createTileMatrix("L03",  235, 21050,  256, 256, 0.00833333333343,-180,90));
-        tm.add(createTileMatrix("L02",  469, 42099,  256, 256, 0.00555555555562,-180,90));
-        tm.add(createTileMatrix("L01",  938, 84197,  256, 256, 0.00277777777781,-180,90));
+        tm.add(createTileMatrix("L11",  1,  83,      256, 256, 512, -180,90));
+        tm.add(createTileMatrix("L10",  2,  165,     256, 256, 256, -180,90));
+        tm.add(createTileMatrix("L09",  4,  329,     256, 256, 128, -180,90));
+        tm.add(createTileMatrix("L08",  8,  658,     256, 256, 64,  -180,90));
+        tm.add(createTileMatrix("L07",  15, 1316,    256, 256, 32,  -180,90));
+        tm.add(createTileMatrix("L06",  30,  2632,   256, 256, 16,  -180,90));
+        tm.add(createTileMatrix("L05",  59,  5263,   256, 256, 8,   -180,90));
+        tm.add(createTileMatrix("L04",  118, 10525,  256, 256, 4,   -180,90));
+        tm.add(createTileMatrix("L03",  235, 21050,  256, 256, 2,   -180,90));
+        tm.add(createTileMatrix("L02",  469, 42099,  256, 256, 1,   -180,90));
+        tm.add(createTileMatrix("L01",  938, 84197,  256, 256, 0.5, -180,90));
         ORTHO_ALPES_JPEG.setTileMatrix(tm);
     }
 
@@ -153,21 +153,25 @@ public class DefaultTileExample {
             return BLUEMARBLE;
         } else if ("UNESCO".equals(name)) {
             return UNESCO;
+        } else if ("ORTHO_ALPES_JPEG".equals(name)) {
+            return ORTHO_ALPES_JPEG;
         }
         return null;
     }
 
-    public static String getPathForMatrixSet(String name) {
+    public static Path getPathForMatrixSet(String name) {
         if ("ThauScan25IGN".equals(name)) {
-            return "/France/Scan/IGN/BassinDeThau/Scan25/";
+            return new Path(false, "/France/Scan/IGN/BassinDeThau/Scan25/");
         } else if ("ThauScan250IGN".equals(name)) {
-            return "/France/Scan/IGN/BassinDeThau/Scan250/";
+            return new Path(false, "/France/Scan/IGN/BassinDeThau/Scan250/");
         }  else if ("OrthoThau".equals(name)) {
-            return "/France/OrthoLittoral/Thau/";
+            return new Path(false, "/France/OrthoLittoral/Thau/");
         } else if ("BlueMarble".equals(name)) {
-            return "/Monde/BlueMarble/S480/";
+            return new Path(false, "/Monde/BlueMarble/S480/");
         } else if ("UNESCO".equals(name)) {
-            return "/Monde/UNESCO/";
+            return new Path(false, "/Monde/UNESCO/");
+         }else if ("ORTHO_ALPES_JPEG".equals(name)) {
+            return new Path(true, "/media/ign/ORTHO_ALPES_JPEG");
         }
         return null;
     }
@@ -188,4 +192,15 @@ public class DefaultTileExample {
         return tm;
     }
 
+    public static class Path {
+        public final boolean isAbsolute;
+
+        public final String path;
+
+        public Path(boolean isAbsolute, String path) {
+            this.isAbsolute = isAbsolute;
+            this.path       = path;
+        }
+
+    }
 }

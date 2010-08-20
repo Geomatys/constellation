@@ -47,7 +47,6 @@ import org.constellation.util.StyleUtils;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.rs.OGCWebService;
 
 // Geotoolkit dependencies
 import org.geotoolkit.coverage.grid.GridCoverage2D;
@@ -738,8 +737,7 @@ public final class WCSWorker extends AbstractWorker {
         if (requestedSections.contains("OperationsMetadata") || requestedSections.contains(all)) {
             om = staticCapabilities.getOperationsMetadata();
             //we update the url in the static part.
-            OGCWebService.updateOWSURL(om.getOperation(), getUriContext().getBaseUri().toString(),
-                    ServiceDef.Specification.WCS.toString());
+            om.updateURL(getUriContext().getBaseUri().toString(), ServiceDef.Specification.WCS.toString());
         }
         final Capabilities responsev111 = new Capabilities(si, sp, om, ServiceDef.WCS_1_1_1.version.toString(), null, null);
 

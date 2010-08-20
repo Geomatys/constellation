@@ -19,14 +19,10 @@ package org.constellation.ws;
 //J2SE dependencies
 import com.sun.jersey.api.core.HttpContext;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletContext;
@@ -35,7 +31,6 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.constellation.provider.configuration.ConfigDirectory;
 import org.geotoolkit.util.logging.Logging;
 import org.geotoolkit.xml.MarshallerPool;
 
@@ -156,7 +151,7 @@ public abstract class AbstractWorker implements Worker {
      */
     protected Object getStaticCapabilitiesObject(final String home, final String version, final String service) throws JAXBException, IOException {
         final String fileName = service + "Capabilities" + version + ".xml";
-        final boolean update  = getUpdateCapabilitiesFlag(home);
+        final boolean update  = WebServiceUtilities.getUpdateCapabilitiesFlag(home);
 
         //Look if the template capabilities is already in cache.
         Object response = capabilities.get(fileName);
@@ -165,7 +160,7 @@ public abstract class AbstractWorker implements Worker {
                 LOGGER.log(logLevel, "updating metadata");
             }
 
-            final File f = getFile(fileName, home);
+            final File f = WebServiceUtilities.getFile(fileName, home);
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = getMarshallerPool().acquireUnmarshaller();
@@ -190,55 +185,9 @@ public abstract class AbstractWorker implements Worker {
                 }
             }
 
-            storeUpdateCapabilitiesFlag(home);
+            WebServiceUtilities.storeUpdateCapabilitiesFlag(home);
         }
         return response;
-    }
-
-    private boolean getUpdateCapabilitiesFlag(String home) throws FileNotFoundException, IOException {
-        final Properties p = new Properties();
-
-        // if the flag file is present we load the properties
-        final File changeFile = getFile("change.properties", home);
-        if (changeFile != null && changeFile.exists()) {
-            final FileInputStream in = new FileInputStream(changeFile);
-            p.load(in);
-            in.close();
-        } else {
-            p.put("update", "false");
-        }
-
-        return  p.getProperty("update").equals("true");
-    }
-
-    private void storeUpdateCapabilitiesFlag(final String home) throws FileNotFoundException, IOException {
-        final Properties p = new Properties();
-        final File changeFile = getFile("change.properties", home);
-        p.put("update", "false");
-
-        // if the flag file is present we store the properties
-        if (changeFile != null && changeFile.exists()) {
-            final FileOutputStream out = new FileOutputStream(changeFile);
-            p.store(out, "updated from WebService");
-            out.close();
-        }
-    }
-
-    /**
-     * Return a file located in the home directory. In this implementation, it should be
-     * the WEB-INF directory of the deployed service.
-     *
-     * @param fileName The name of the file requested.
-     * @return The specified file.
-     */
-    private File getFile(final String fileName, final String home) {
-         File path;
-         if (home == null || !(path = new File(home)).isDirectory()) {
-            path = ConfigDirectory.getConfigDirectory();
-         }
-         if (fileName != null)
-            return new File(path, fileName);
-         else return path;
     }
 
     protected abstract MarshallerPool getMarshallerPool();

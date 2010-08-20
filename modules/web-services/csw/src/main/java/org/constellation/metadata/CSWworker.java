@@ -64,7 +64,6 @@ import org.constellation.metadata.factory.AbstractCSWFactory;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.util.Util;
-import org.constellation.ws.rs.OGCWebService;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 
@@ -604,7 +603,7 @@ public class CSWworker {
                 }
             
                 // we update the URL
-                OGCWebService.updateOWSURL(om.getOperation(), serviceURL, CSW);
+                om.updateURL(serviceURL, CSW);
 
                 // we add the cascaded services (if there is some)
                 final DomainType cascadedCSW  = om.getConstraint("FederatedCatalogues");

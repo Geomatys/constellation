@@ -74,7 +74,7 @@ public final class GetCapabilities extends WMSQuery {
         final StringBuilder kvp = new StringBuilder();
         //Obligatory Parameters
         kvp.append(KEY_REQUEST).append('=').append(GETCAPABILITIES).append('&')
-           .append(KEY_SERVICE).append('=').append(getService().getName());
+           .append(KEY_SERVICE).append('=').append(getService());
 
         //Optional Parameters
         final Version version = getVersion();

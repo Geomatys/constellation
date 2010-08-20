@@ -70,7 +70,6 @@ import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
-import org.constellation.ws.rs.OGCWebService;
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.Utils.*;
 import static org.constellation.sos.ws.Normalizer.*;
@@ -660,7 +659,7 @@ public class SOSworker {
             }
 
             //we update the URL
-            OGCWebService.updateOWSURL(om.getOperation(), serviceURL, SOS);
+            om.updateURL(serviceURL, SOS);
 
            if (!keepCapabilities) {
 

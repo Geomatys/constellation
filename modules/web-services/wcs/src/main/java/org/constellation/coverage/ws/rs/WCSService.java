@@ -18,6 +18,7 @@
 package org.constellation.coverage.ws.rs;
 
 // Jersey dependencies
+import org.geotoolkit.ows.xml.RequestBase;
 import org.geotoolkit.ows.xml.ExceptionResponse;
 import com.sun.jersey.spi.resource.Singleton;
 
@@ -278,7 +279,7 @@ public class WCSService extends GridWebService {
         return Response.ok(report, MimeType.APP_SE_XML).build();
     }
 
-    public Object adaptQuery(String request) throws CstlServiceException {
+    public RequestBase adaptQuery(String request) throws CstlServiceException {
         if (GETCAPABILITIES.equalsIgnoreCase(request)) {
             return adaptKvpGetCapabilitiesRequest();
         } else if (GETCOVERAGE.equalsIgnoreCase(request)) {

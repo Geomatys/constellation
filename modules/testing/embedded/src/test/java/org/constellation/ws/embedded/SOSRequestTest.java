@@ -18,6 +18,7 @@
 package org.constellation.ws.embedded;
 
 // JUnit dependencies
+import org.geotoolkit.ows.xml.v110.Operation;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import java.util.Arrays;
@@ -99,6 +100,17 @@ public class SOSRequestTest extends AbstractTestRequest {
         Object obj = unmarshallResponse(conec);
 
         assertTrue(obj instanceof Capabilities);
+
+        Capabilities c = (Capabilities) obj;
+
+        assertTrue(c.getOperationsMetadata() != null);
+
+        Operation op = c.getOperationsMetadata().getOperation("GetObservation");
+
+        assertTrue(op != null);
+        assertTrue(op.getDCP().size() > 0);
+
+        assertEquals(op.getDCP().get(0).getHTTP().getGetOrPost().get(0).getHref(), SOS_POST_URL);
 
         // Creates a valid GetCapabilties url.
         getCapsUrl = new URL(SOS_GETCAPABILITIES_URL);

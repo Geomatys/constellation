@@ -39,7 +39,6 @@ import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.rs.OGCWebService;
 import static org.constellation.wfs.ws.WFSConstants.*;
 
 // Geotoolkit dependencies
@@ -202,7 +201,7 @@ public class DefaultWFSWorker extends AbstractWorker implements WFSWorker {
 
         if (getUriContext() != null) {
             final String url = getUriContext().getBaseUri().toString();
-            OGCWebService.updateOWSURL(inCapabilities.getOperationsMetadata().getOperation(), url, "WFS");
+            inCapabilities.getOperationsMetadata().updateURL(url, "WFS");
         }
 
         final WFSCapabilitiesType result = new WFSCapabilitiesType("1.1.0");
