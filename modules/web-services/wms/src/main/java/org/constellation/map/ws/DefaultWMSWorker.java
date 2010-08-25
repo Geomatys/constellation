@@ -938,13 +938,15 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         odef.setCompression(WMSMapDecoration.getCompression(mime));
 
         final PortrayalResponse response = new PortrayalResponse(cdef, sdef, vdef, odef);
-        try {
-            response.prepareNow();
-        } catch (PortrayalException ex) {
-            if (errorInImage) {
-                return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
-            } else {
-                throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        if(!WMSMapDecoration.writeInStream()){
+            try {
+                response.prepareNow();
+            } catch (PortrayalException ex) {
+                if (errorInImage) {
+                    return new PortrayalResponse(Cstl.getPortrayalService().writeInImage(ex, getMap.getSize()));
+                } else {
+                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+                }
             }
         }
 

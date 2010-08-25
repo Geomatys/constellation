@@ -30,6 +30,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map.Entry;
+import javax.imageio.spi.ImageWriterSpi;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
@@ -134,11 +135,9 @@ public abstract class WebService {
 
     static {
         //loading JAI codecs
-         Registry.setDefaultCodecPreferences();
-//        Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, false);
-//        Registry.setNativeCodecAllowed("jpeg", ImageWriterSpi.class, false);
-//        Registry.setNativeCodecAllowed("jpg", ImageWriterSpi.class, false);
-
+        Registry.setDefaultCodecPreferences();
+        Registry.setNativeCodecAllowed("png", ImageWriterSpi.class, true);
+        Registry.setNativeCodecAllowed("jpeg", ImageWriterSpi.class, true);
 
         RUNNING_ON_GLASSFISH = (System.getProperty("domain.name") != null) ? true : false;
         Hints.putSystemDefault(Hints.LENIENT_DATUM_SHIFT, Boolean.TRUE);

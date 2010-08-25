@@ -92,6 +92,8 @@ import org.xml.sax.SAXException;
 @ThreadSafe(concurrent=false)
 public final class WMSMapDecoration {
 
+    public static final PortrayalExtension EMPTY_EXTENSION = new DecorationExtension();
+
     private static final Logger LOGGER = Logging.getLogger(WMSMapDecoration.class);
 
     private static final String TAG_GETLEGEND   = "GetLegendTemplate";
@@ -182,32 +184,32 @@ public final class WMSMapDecoration {
      * @return PortrayalExtension
      */
     public static synchronized PortrayalExtension getExtension() {
-
-        if(extension != null) return extension;
-
-        //load the portrayal extension
-        final String path = ConfigDirectory.getConfigDirectory().getPath() + File.separator + "WMSPortrayal.xml";
-
-        final File f = new File(path);
-        if(f.exists()){
-            try {
-                extension = read(f);
-            } catch (ParserConfigurationException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
-            } catch (SAXException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
-            } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, null, ex);
-            }
-        }
-
-        //no configuration available, make an empty
+ 
         if(extension == null){
-            LOGGER.log(Level.FINE, "No WMS portrayal extension found, will create an empty extension");
-            extension = new DecorationExtension();
-        }
-
-        return extension;
+            //load the portrayal extension
+            final String path = ConfigDirectory.getConfigDirectory().getPath() + File.separator + "WMSPortrayal.xml";
+ 
+            final File f = new File(path);
+            if(f.exists()){
+                try {
+                    extension = read(f);
+                } catch (ParserConfigurationException ex) {
+                    LOGGER.log(Level.WARNING, null, ex);
+                } catch (SAXException ex) {
+                    LOGGER.log(Level.WARNING, null, ex);
+                } catch (IOException ex) {
+                    LOGGER.log(Level.WARNING, null, ex);
+                }
+            }
+ 
+            //no configuration available, make an empty
+            if(extension == null){
+                LOGGER.log(Level.FINE, "No WMS portrayal extension found, will create an empty extension");
+                extension = EMPTY_EXTENSION;
+             }
+         }
+ 
+        return (extension == EMPTY_EXTENSION)? null : extension;
     }
 
     /**
@@ -338,7 +340,11 @@ public final class WMSMapDecoration {
             parseDecoration(ext, decoNode);
         }
 
-        return ext;
+        if(ext.decorations.isEmpty()){
+            return EMPTY_EXTENSION;
+        }else{
+            return ext;
+        }
     }
 
     /**
