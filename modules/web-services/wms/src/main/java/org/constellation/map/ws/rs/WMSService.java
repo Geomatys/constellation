@@ -3,7 +3,7 @@
  *    http://www.constellation-sdi.org
  *
  *    (C) 2005, Institut de Recherche pour le Développement
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -557,10 +557,12 @@ public class WMSService extends GridWebService {
                 sld = sldparser.readSLD(in,
                         StyledLayerDescriptor.V_1_0_0);
             } catch (JAXBException ex) {
-                throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
+                // If a JAXBException occurs it can be because it is not parsed in the
+                // good version. Let's just continue with the other version.
+                LOGGER.finest(ex.getLocalizedMessage());
             } catch (FactoryException ex) {
                     throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
-                }
+            }
             if (sld == null) {
                 try {
                     sld = sldparser.readSLD(in,
