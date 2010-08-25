@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -742,6 +743,18 @@ public final class WMSMapDecoration {
             
         }
 
+    }
+
+    /**
+     * This method clear the portrayal extension value.
+     */
+    public static void reload(){
+        extension = null;
+    }
+
+    public static Map getCompressions(){
+        getHints();
+        return compressions != null ? compressions : Collections.emptyMap();
     }
 
 

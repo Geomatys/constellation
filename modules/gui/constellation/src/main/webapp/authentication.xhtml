@@ -5,7 +5,7 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:a4j="http://richfaces.org/a4j">
-    
+
     <f:view>
         <html>
             <head>
@@ -20,9 +20,15 @@
                         <h:commandLink value="Logout" action="#{navigationBean.logout}" style="float:right;margin-right:15px;" rendered="#{navigationBean.authenticated}" />
                         <h:outputText value="Not authenticated" style="float:right;margin-right:15px;" rendered="#{!navigationBean.authenticated}" />
                     </div>
-                    <ui:include id="menu" src="pages/menu.xhtml" />
-                    <ui:include id="include" src="#{navigationBean.currentHref}"/>
-               </h:form>
+                    <h:panelGrid columns="2" columnClasses="#{navigationBean.authenticated ? 'col1,col2' : ''} " style="width:100%;margin-top:20px;">
+                        <h:panelGroup id="leftpanel" rendered="#{navigationBean.authenticated}">
+                            <ui:include id="menu" src="pages/menu.xhtml" />
+                        </h:panelGroup>
+                        <h:panelGroup id="rightpanel">
+                            <ui:include id="include" src="#{navigationBean.currentHref}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:form>
             </body>
         </html>
     </f:view>

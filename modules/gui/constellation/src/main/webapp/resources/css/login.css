@@ -1,6 +1,6 @@
 html{
-	overflow-y:hidden;
-	overflow-x:hidden;
+    overflow-y:hidden;
+    overflow-x:hidden;
 }
 
 
@@ -8,34 +8,36 @@ html{
 * html .boxhead h2 {height: 1%;} /* For IE 5 PC */
 
 .sidebox {
-	margin: 0 auto; /* center for now */
-	width:460px; /* ems so it will grow */
-	background: url(../img/sbbody-r.gif) no-repeat bottom right;
-	font-size: 100%;
+    margin: 0 auto; /* center for now */
+    width:460px; /* ems so it will grow */
+    background: url(../img/sbbody-r.gif) no-repeat bottom right;
+    font-size: 100%;
+    height:220px;
 }
 .boxhead {
-	background: url(../img/sbhead-r.gif) no-repeat top right;
-	margin: 0;
-	padding: 0;
-	text-align: center;
-        height : 22px;
+    background: url(../img/sbhead-tl.gif) no-repeat;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    height : 22px;
+    margin:0 0 0 8px;
 }
 .boxhead h2 {
-	background: url(../img/sbhead-l.gif) no-repeat top left;
-	margin: 0;
-	padding: 22px 30px 5px;
-	color: black;
-	font-weight: bold;
-	font-size: 1.2em;
-	line-height: 1em;
-        height : 22px;
-	text-shadow: rgba(0,0,0,.4) 0px 2px 5px; /* Safari-only, but cool */
+    background: url(../img/sbhead-l.gif) no-repeat top left;
+    margin: 0;
+    padding: 22px 30px 5px;
+    color: black;
+    font-weight: bold;
+    font-size: 1.2em;
+    line-height: 1em;
+    height : 22px;
+    text-shadow: rgba(0,0,0,.4) 0px 2px 5px; /* Safari-only, but cool */
 }
 .boxbody {
-	background: url(../img/sbbody-l.gif) no-repeat bottom left;
-	margin: 0;
-	padding: 5px 30px 38px;
-        text-align: center;
+    background: url(../img/sbbody-l.gif) no-repeat bottom left;
+    margin: 0;
+    padding: 1px 30px 201px;;
+    text-align: center;
 }
 
 

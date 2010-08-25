@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +44,7 @@ import javax.servlet.ServletContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.constellation.map.ws.WMSMapDecoration;
 
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
@@ -97,7 +99,6 @@ public final class ServicesBean {
     private static final String WMS = "WMS";
     private static final String SOS = "SOS";
     private static final String CSW = "CSW";
-
     private static final String FILLFORM = "fillForm";
     /**
      * The service Identification title
@@ -198,7 +199,6 @@ public final class ServicesBean {
      * The marshaller/unmarshaller pool to store the updates/ read the bases capabilities files.
      */
     private MarshallerPool marshallerPool;
-   
     /**
      * A servlet context allowing to find the path to deployed file.
      */
@@ -217,32 +217,28 @@ public final class ServicesBean {
      * This object record the user data.
      */
     private UserData userData;
-    
     /**
      * The uploaded File.
      */
-  //  private UploadedFile uploadedFile;
-    
+    //  private UploadedFile uploadedFile;
     private String urlPreference = "";
-    
     private boolean existPrefrence = false;
-    
     private SERVICESERROR layerProviderError;
     private SERVICESERROR styleProviderError;
-    
+
     private static enum SERVICESERROR {
-    	LAYERPROVIDERERROR,
-    	STYLEPROVIDERERROR,
-    	NOERROR
+
+        LAYERPROVIDERERROR,
+        STYLEPROVIDERERROR,
+        NOERROR
     }
-    
     /**
      * Debugging purpose
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.bean");
 
     public ServicesBean() throws JAXBException, FileNotFoundException {
-        
+
         userData = new UserData();
 
         // we get the sevlet context to read the capabilities files in the deployed war
@@ -255,13 +251,13 @@ public final class ServicesBean {
 
         //we create the JAXBContext and read the selected file
         marshallerPool = new MarshallerPool(Capabilities.class,
-                                            WMSCapabilities.class,
-                                            WMT_MS_Capabilities.class,
-                                            WCSCapabilitiesType.class,
-                                            org.geotoolkit.csw.xml.v202.Capabilities.class,
-                                            UserData.class,
-                                            org.geotoolkit.sos.xml.v100.Capabilities.class,
-                                            org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class);
+                WMSCapabilities.class,
+                WMT_MS_Capabilities.class,
+                WCSCapabilitiesType.class,
+                org.geotoolkit.csw.xml.v202.Capabilities.class,
+                UserData.class,
+                org.geotoolkit.sos.xml.v100.Capabilities.class,
+                org.geotoolkit.internal.jaxb.geometry.ObjectFactory.class);
     }
 
     /**
@@ -284,15 +280,15 @@ public final class ServicesBean {
         }
 
         //we fill the value of ServiceProvider
-        final AbstractServiceProvider sp        = cap.getServiceProvider();
+        final AbstractServiceProvider sp = cap.getServiceProvider();
         final AbstractResponsiblePartySubset sc = sp.getServiceContact();
-        final AbstractContact ci                = sc.getContactInfo();
-        final AbstractTelephone t               = ci.getPhone();
-        final AbstractAddress a                 = ci.getAddress();
-        this.providerName                       = sp.getProviderName();
-        this.providerSite                       = sp.getProviderSite().getHref();
-        this.individualName                     = sc.getIndividualName();
-        this.positionName                       = sc.getPositionName();
+        final AbstractContact ci = sc.getContactInfo();
+        final AbstractTelephone t = ci.getPhone();
+        final AbstractAddress a = ci.getAddress();
+        this.providerName = sp.getProviderName();
+        this.providerSite = sp.getProviderSite().getHref();
+        this.individualName = sc.getIndividualName();
+        this.positionName = sc.getPositionName();
 
         // Phone party
         if (t.getVoice().size() > 0) {
@@ -324,9 +320,9 @@ public final class ServicesBean {
     private void fillFormFromWMS(WMSCapabilities cap) {
 
         //we fill the default value of Service Identification
-        final Service s         = cap.getService();
-        this.title              = s.getTitle();
-        this.abstractDescription          = s.getAbstract();
+        final Service s = cap.getService();
+        this.title = s.getTitle();
+        this.abstractDescription = s.getAbstract();
         final KeywordList klist = s.getKeywordList();
         if (klist != null) {
             this.keywords = keywordsToSelectItem(klist);
@@ -340,33 +336,33 @@ public final class ServicesBean {
         this.accessConstraints = s.getAccessConstraints();
 
         //we fill the value of ServiceProvider
-        final ContactInformation ci    = s.getContactInformation();
-        final ContactAddress a         = ci.getContactAddress();
+        final ContactInformation ci = s.getContactInformation();
+        final ContactAddress a = ci.getContactAddress();
         final ContactPersonPrimary cpp = ci.getContactPersonPrimary();
-        this.providerName        = cpp.getContactOrganization();
-        this.providerSite        = s.getOnlineResource().getHref();
-        this.individualName      = cpp.getContactPerson();
-        this.positionName        = ci.getContactPosition();
+        this.providerName = cpp.getContactOrganization();
+        this.providerSite = s.getOnlineResource().getHref();
+        this.individualName = cpp.getContactPerson();
+        this.positionName = ci.getContactPosition();
 
         // Phone party
-        this.phoneVoice     = ci.getContactVoiceTelephone();
+        this.phoneVoice = ci.getContactVoiceTelephone();
         this.phoneFacsimile = ci.getContactFacsimileTelephone();
 
         //address party
-        this.deliveryPoint      = a.getAddress();
-        this.city               = a.getCity();
+        this.deliveryPoint = a.getAddress();
+        this.city = a.getCity();
         this.administrativeArea = a.getStateOrProvince();
-        this.postalCode         = a.getPostCode();
-        this.country            = a.getCountry();
-        this.electronicAddress  = ci.getContactElectronicMailAddress();
+        this.postalCode = a.getPostCode();
+        this.country = a.getCountry();
+        this.electronicAddress = ci.getContactElectronicMailAddress();
 
         /*
          * The extras attribute for WMS 
          */
         this.addressType = a.getAddressType();
-        this.layerLimit  = s.getLayerLimit();
-        this.maxHeight   = s.getMaxHeight();
-        this.maxWidth    = s.getMaxWidth();
+        this.layerLimit = s.getLayerLimit();
+        this.maxHeight = s.getMaxHeight();
+        this.maxWidth = s.getMaxWidth();
     }
 
     /**
@@ -422,12 +418,12 @@ public final class ServicesBean {
     public String storeForm() throws JAXBException, IOException, FileNotFoundException {
 
         //we signal to the webService to update is capabilities
-        FileInputStream in   = null;
+        FileInputStream in = null;
         FileOutputStream out = null;
         try {
-            final File f       = new File(servletContext.getRealPath("WEB-INF/change.properties"));
+            final File f = new File(servletContext.getRealPath("WEB-INF/change.properties"));
             final Properties p = new Properties();
-            in                 = new FileInputStream(f);
+            in = new FileInputStream(f);
             p.load(in);
             in.close();
             p.put("update", "true");
@@ -435,41 +431,45 @@ public final class ServicesBean {
             p.store(out, "updated from JSF interface");
             out.close();
         } finally {
-            if (in  != null) in.close();
-            if (out != null) out.close();
+            if (in != null) {
+                in.close();
+            }
+            if (out != null) {
+                out.close();
+            }
         }
         for (Object capa : capabilities) {
 
             //for OWS 1.1.0
             if (capa instanceof org.geotoolkit.ows.xml.v110.CapabilitiesBaseType) {
                 final ServiceIdentification si = getServiceIdentification110();
-                final ServiceProvider sp       = getServiceProvider110();
+                final ServiceProvider sp = getServiceProvider110();
                 ((CapabilitiesBaseType) capa).setServiceProvider(sp);
                 ((CapabilitiesBaseType) capa).setServiceIdentification(si);
 
-            // for OWS 1.0.0
+                // for OWS 1.0.0
             } else if (capa instanceof org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) {
                 final org.geotoolkit.ows.xml.v100.ServiceIdentification si = getServiceIdentification100();
-                final org.geotoolkit.ows.xml.v100.ServiceProvider sp       = getServiceProvider100();
+                final org.geotoolkit.ows.xml.v100.ServiceProvider sp = getServiceProvider100();
                 ((org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) capa).setServiceProvider(sp);
                 ((org.geotoolkit.ows.xml.v100.CapabilitiesBaseType) capa).setServiceIdentification(si);
 
 
-            // for WCS 1.0.0
+                // for WCS 1.0.0
             } else if (capa instanceof WCSCapabilitiesType) {
                 final ServiceType s = getWCSService();
                 ((WCSCapabilitiesType) capa).setService(s);
 
-            // for WMS 1.3.0/1.1.1
+                // for WMS 1.3.0/1.1.1
             } else if (capa instanceof WMSCapabilities || capa instanceof WMT_MS_Capabilities) {
                 final List<AbstractService> s = getWMSService();
-                
+
                 // 1.3.0
-                if (capa instanceof  WMSCapabilities) {
+                if (capa instanceof WMSCapabilities) {
                     ((WMSCapabilities) capa).setService(s.get(0));
                     LOGGER.info("update WMS version 1.3.0");
-                
-                // 1.1.1
+
+                    // 1.1.1
                 } else {
                     ((WMT_MS_Capabilities) capa).setService(s.get(1));
                     LOGGER.info("update WMS version 1.1.1");
@@ -542,7 +542,7 @@ public final class ServicesBean {
         }
 
         final org.geotoolkit.wcs.xml.v100.TelephoneType tel = new org.geotoolkit.wcs.xml.v100.TelephoneType(phoneVoice, phoneFacsimile);
-        final org.geotoolkit.wcs.xml.v100.AddressType adr   = new org.geotoolkit.wcs.xml.v100.AddressType(deliveryPoint,
+        final org.geotoolkit.wcs.xml.v100.AddressType adr = new org.geotoolkit.wcs.xml.v100.AddressType(deliveryPoint,
                 city,
                 administrativeArea,
                 postalCode,
@@ -573,15 +573,15 @@ public final class ServicesBean {
     private List<AbstractService> getWMSService() {
 
         final List<AbstractService> result = new ArrayList<AbstractService>();
-        
+
         // v1.3.0
         final List<Keyword> listKey = new ArrayList<Keyword>();
         for (SelectItem k : keywords) {
             listKey.add(new Keyword((String) k.getValue()));
         }
-        final KeywordList keywordList   = new KeywordList(listKey);
-        final ContactPersonPrimary cpp  = new ContactPersonPrimary(individualName, providerName);
-        final ContactAddress ca         = new ContactAddress(getAddressType(), deliveryPoint, city, administrativeArea,
+        final KeywordList keywordList = new KeywordList(listKey);
+        final ContactPersonPrimary cpp = new ContactPersonPrimary(individualName, providerName);
+        final ContactAddress ca = new ContactAddress(getAddressType(), deliveryPoint, city, administrativeArea,
                 postalCode, country);
 
         final ContactInformation ci = new ContactInformation(cpp, positionName,
@@ -593,7 +593,7 @@ public final class ServicesBean {
                 ci, fees, accessConstraints, getLayerLimit(),
                 getMaxWidth(), getMaxHeight());
         result.add(service130);
-        
+
         // v1.1.1
         final List<org.geotoolkit.wms.xml.v111.Keyword> listKey111 = new ArrayList<org.geotoolkit.wms.xml.v111.Keyword>();
         for (SelectItem k : keywords) {
@@ -613,7 +613,7 @@ public final class ServicesBean {
                 new org.geotoolkit.wms.xml.v111.OnlineResource(providerSite),
                 ci111, fees, accessConstraints);
         result.add(service111);
-        
+
         return result;
     }
 
@@ -683,7 +683,7 @@ public final class ServicesBean {
             int i = 0;
             for (File f : capabilitiesFile) {
                 final OutputStream out = new FileOutputStream(f);
-                marshaller.marshal(capabilities[i],out);
+                marshaller.marshal(capabilities[i], out);
                 out.close();
                 LOGGER.log(Level.INFO, "store {0}", f.getAbsolutePath());
                 i++;
@@ -692,16 +692,16 @@ public final class ServicesBean {
 
             if (webServiceMode.equals(WMS)) {
                 userData.setWMSCapabilities(capabilities);
-            
+
             } else if (webServiceMode.equals(WCS)) {
                 userData.setWCSCapabilities(capabilities);
-                
+
             } else if (webServiceMode.equals(SOS)) {
                 userData.setSOSCapabilities(capabilities);
-                
+
             } else if (webServiceMode.equals(CSW)) {
                 userData.setCSWCapabilities(capabilities);
-                
+
             }
         } catch (IOException ex) {
             LOGGER.severe("IO Exception while storing capabilities file");
@@ -717,7 +717,7 @@ public final class ServicesBean {
         try {
             if (f != null) {
                 final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
-            	userData = (UserData) unmarshaller.unmarshal(f);
+                userData = (UserData) unmarshaller.unmarshal(f);
                 marshallerPool.release(unmarshaller);
             } else {
                 LOGGER.severe("File uploaded null");
@@ -727,27 +727,27 @@ public final class ServicesBean {
             final Marshaller marshaller = marshallerPool.acquireMarshaller();
             // we extract and update WMS user data
             if (userData.getWMSCapabilities() != null) {
-                
+
                 if (userData.getWMSCapabilities().length == 2) {
-                    
+
                     //we begin to write the high lvl document
                     String path = servletContext.getRealPath("WEB-INF/WMSCapabilities1.3.0.xml");
-                    File file   = new File(path);
+                    File file = new File(path);
                     if (file.exists()) {
-                    
+
                         marshaller.marshal(userData.getWMSCapabilities()[0], (OutputStream) new FileOutputStream(file));
-              
+
                     } else {
                         LOGGER.log(Level.WARNING, "WMS capabilities file version 1.3.0 not found at :{0}. unable to load WMS Data", path);
                     }
-        
+
                     // the we add to the list of object to update the other sub version
-                    path  = servletContext.getRealPath("WEB-INF/WMSCapabilities1.1.1.xml");
-                    file  = new File(path);
+                    path = servletContext.getRealPath("WEB-INF/WMSCapabilities1.1.1.xml");
+                    file = new File(path);
                     if (file.exists()) {
-                    
+
                         marshaller.marshal(userData.getWMSCapabilities()[1], (OutputStream) new FileOutputStream(file));
-              
+
                     } else {
                         LOGGER.log(Level.WARNING, "WMS capabilities file version 1.1.1 not found at :{0}. unable to load WMS Data", path);
                     }
@@ -756,30 +756,30 @@ public final class ServicesBean {
                     LOGGER.severe("WMS capabilie file uncomplete (!=2)");
                 }
             }
-            
+
             // we extract and update WCS user data
             if (userData.getWCSCapabilities() != null) {
-                
+
                 if (userData.getWCSCapabilities().length == 2) {
-                    
+
                     //we begin to write the high lvl document
                     String path = servletContext.getRealPath("WEB-INF/WCSCapabilities1.1.1.xml");
-                    File file   = new File(path);
+                    File file = new File(path);
                     if (file.exists()) {
-                    
+
                         marshaller.marshal(userData.getWCSCapabilities()[0], (OutputStream) new FileOutputStream(file));
-              
+
                     } else {
                         LOGGER.log(Level.WARNING, "WCS capabilities file version 1.1.1 not found at :{0}. unable to load WCS Data", path);
                     }
-        
+
                     // the we add to the list of object to update the other sub version
-                    path  = servletContext.getRealPath("WEB-INF/WCSCapabilities1.0.0.xml");
-                    file  = new File(path);
+                    path = servletContext.getRealPath("WEB-INF/WCSCapabilities1.0.0.xml");
+                    file = new File(path);
                     if (file.exists()) {
-                    
+
                         marshaller.marshal(userData.getWCSCapabilities()[1], (OutputStream) new FileOutputStream(file));
-              
+
                     } else {
                         LOGGER.log(Level.WARNING, "WCS capabilities file version 1.0.0 not found at :{0}. unable to load WCS Data", path);
                     }
@@ -788,76 +788,80 @@ public final class ServicesBean {
                     LOGGER.severe("WCS capabilies file uncomplete (!=2)");
                 }
             }
-            
-             // we extract and update CSW user data
+
+            // we extract and update CSW user data
             if (userData.getCSWCapabilities() != null) {
-                
+
                 if (userData.getCSWCapabilities().length == 1) {
-                    
+
                     //we begin to write the high lvl document
                     final String path = servletContext.getRealPath("WEB-INF/CSWCapabilities2.0.2.xml");
-                    final File file   = new File(path);
+                    final File file = new File(path);
                     if (file.exists()) {
-                    
+
                         marshaller.marshal(userData.getCSWCapabilities()[0], (OutputStream) new FileOutputStream(file));
-              
+
                     } else {
                         LOGGER.log(Level.WARNING, "CSW capabilities file version 2.0.2 not found at :{0}. unable to load CSW Data", path);
                     }
-                    
+
                 } else {
                     // TODO afficher fichier non valide
                     LOGGER.severe("WCS capabilies file uncomplete (!=1)");
                 }
             }
-            
-             // we extract and update SOS user data
+
+            // we extract and update SOS user data
             if (userData.getSOSCapabilities() != null) {
-                
+
                 if (userData.getSOSCapabilities().length == 1) {
-                    
+
                     //we begin to write the high lvl document
                     final String path = servletContext.getRealPath("WEB-INF/SOSCapabilities1.0.0.xml");
-                    final File file   = new File(path);
+                    final File file = new File(path);
                     if (file.exists()) {
-                    
+
                         marshaller.marshal(userData.getSOSCapabilities()[0], (OutputStream) new FileOutputStream(file));
-              
+
                     } else {
                         LOGGER.log(Level.WARNING, "SOS capabilities file version 1.0.0 not found at :{0}. unable to load SOS Data", path);
                     }
-                    
+
                 } else {
                     // TODO afficher fichier non valide
                     LOGGER.severe("SOS capabilies file uncomplete (!=1)");
                 }
             }
-            
+
             //we signal to the webService to update is capabilities
-            FileInputStream in   = null;
+            FileInputStream in = null;
             FileOutputStream out = null;
             try {
-                final File change  = new File(servletContext.getRealPath("WEB-INF/change.properties"));
+                final File change = new File(servletContext.getRealPath("WEB-INF/change.properties"));
                 final Properties p = new Properties();
-                in                 = new FileInputStream(change);
+                in = new FileInputStream(change);
                 p.load(in);
 
                 p.put("update", "true");
                 out = new FileOutputStream(change);
                 p.store(out, "updated from JSF interface");
             } finally {
-                if (in  != null) in.close();
-                if (out != null) out.close();
+                if (in != null) {
+                    in.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
             }
 
             marshallerPool.release(marshaller);
-            
+
         } catch (JAXBException ex) {
-           LOGGER.log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, null, ex);
             //TODO afficher quelquechose si le fichier n'est pas valide
         }
     }
-    
+
     public void storeData() throws JAXBException {
         final String url = servletContext.getRealPath("preference.sml");
         setUrlPreference("preference.sml");
@@ -868,12 +872,11 @@ public final class ServicesBean {
         marshaller.marshal(userData, f);
         marshallerPool.release(marshaller);
     }
-    
-    
+
     public String setWMSMode() throws JAXBException, FileNotFoundException {
         LOGGER.info("set WMS mode");
-        webServiceMode    = WMS;
-        capabilities     = new Object[2];
+        webServiceMode = WMS;
+        capabilities = new Object[2];
         capabilitiesFile = new File[2];
         final Unmarshaller unmarshaller = marshallerPool.acquireUnmarshaller();
 
@@ -881,7 +884,7 @@ public final class ServicesBean {
         String path = servletContext.getRealPath("WEB-INF/WMSCapabilities1.3.0.xml");
         capabilitiesFile[0] = new File(path);
         if (capabilitiesFile[0].exists()) {
-            
+
             capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
             fillFormFromWMS((WMSCapabilities) capabilities[0]);
 
@@ -900,7 +903,7 @@ public final class ServicesBean {
             LOGGER.log(Level.WARNING, "WMS capabilities file version 1.1.1 not found at :{0}", path);
         }
         marshallerPool.release(unmarshaller);
-        
+
         return FILLFORM;
 
     }
@@ -916,7 +919,7 @@ public final class ServicesBean {
         String path = servletContext.getRealPath("WEB-INF/WCSCapabilities1.1.1.xml");
         capabilitiesFile[0] = new File(path);
         if (capabilitiesFile[0].exists()) {
-            
+
             capabilities[0] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[0]));
             fillFormFromOWS((Capabilities) capabilities[0]);
 
@@ -930,7 +933,7 @@ public final class ServicesBean {
         if (capabilitiesFile[1].exists()) {
 
             capabilities[1] = unmarshaller.unmarshal(new FileReader(capabilitiesFile[1]));
-            
+
         } else {
             LOGGER.log(Level.WARNING, "WCS capabilities file version 1.0.0 not found at :{0}", path);
         }
@@ -1067,22 +1070,22 @@ public final class ServicesBean {
     public File processSubmitedFile() throws IOException {
         upload();
         final File f = File.createTempFile("userData", "geomatys");
-        InputStream inputStream  = null;
+        InputStream inputStream = null;
         InputStreamReader infile = null;
-        FileWriter writer        = null;
+        FileWriter writer = null;
         try {
-           
-         //   inputStream                = uploadedFile.getInputStream();
-            infile                     = new InputStreamReader(inputStream);
+
+            //   inputStream                = uploadedFile.getInputStream();
+            infile = new InputStreamReader(inputStream);
             final BufferedReader inbuf = new BufferedReader(infile);
-            writer                     = new FileWriter(f);
+            writer = new FileWriter(f);
 
             String line;
             while ((line = inbuf.readLine()) != null) {
                 writer.append(line);
                 writer.append('\n');
             }
-            
+
         } catch (Exception x) {
             final FacesMessage message = new FacesMessage(
                     FacesMessage.SEVERITY_FATAL,
@@ -1091,14 +1094,20 @@ public final class ServicesBean {
             LOGGER.log(Level.WARNING, "Exception in proccesSubmitFile {0}", x.getMessage());
             return null;
         } finally {
-            if (inputStream != null) inputStream.close();
-            if (infile      != null) infile.close();
-            if (writer      != null) writer.close();
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            if (infile != null) {
+                infile.close();
+            }
+            if (writer != null) {
+                writer.close();
+            }
         }
         return f;
     }
-    
-    public String doUpload() throws IOException{
+
+    public String doUpload() throws IOException {
         final File f = processSubmitedFile();
         if (f == null) {
             LOGGER.severe("[doUpload]process uploaded file null");
@@ -1345,13 +1354,13 @@ public final class ServicesBean {
     public void setWebServices(List webServices) {
         this.webServices = webServices;
     }
-/*
+    /*
     public UploadedFile getUploadedFile() {
-        return uploadedFile;
+    return uploadedFile;
     }
 
     public void setUploadedFile(UploadedFile uploadedFile) {
-        this.uploadedFile = uploadedFile;
+    this.uploadedFile = uploadedFile;
     } */
 
     public String getUrlPreference() {
@@ -1370,60 +1379,76 @@ public final class ServicesBean {
         this.existPrefrence = existPrefrence;
     }
 
-    public void reloadLayerProviders(){
+    public void reloadLayerProviders() {
         LayerProviderProxy.getInstance().reload();
     }
 
-    public void reloadStyleProviders(){
+    public void reloadStyleProviders() {
         StyleProviderProxy.getInstance().reload();
     }
 
     public List<String> getLayerProviders() {
-    	final List<String> names = new ArrayList<String>();
-        try {
-	        for(Name n : LayerProviderProxy.getInstance().getKeys()){
-	            if (n.getNamespaceURI() != null) {
-	                names.add("{"+ n.getNamespaceURI() + "}" + n.getLocalPart());
-	            } else {
-	                names.add("{}" + n.getLocalPart());
-	            }
-	        }
-	        Collections.sort(names);
-	        layerProviderError = SERVICESERROR.NOERROR;
-        } catch (IllegalStateException ex) {
-        	LOGGER.log(Level.SEVERE, "An error occurs while trying to load the layer providers.");
-        	layerProviderError = SERVICESERROR.LAYERPROVIDERERROR;
-        }
-        return names;
-    }
-
-    public List<String> getStyleProviders(){
         final List<String> names = new ArrayList<String>();
         try {
-	        names.addAll(StyleProviderProxy.getInstance().getKeys());
-	        Collections.sort(names);
-	        styleProviderError = SERVICESERROR.NOERROR;
+            for (Name n : LayerProviderProxy.getInstance().getKeys()) {
+                if (n.getNamespaceURI() != null) {
+                    names.add("{" + n.getNamespaceURI() + "}" + n.getLocalPart());
+                } else {
+                    names.add("{}" + n.getLocalPart());
+                }
+            }
+            Collections.sort(names);
+            layerProviderError = SERVICESERROR.NOERROR;
         } catch (IllegalStateException ex) {
-        	LOGGER.log(Level.SEVERE, "An error occurs while trying to load the style providers.");
-        	styleProviderError = SERVICESERROR.STYLEPROVIDERERROR;
+            LOGGER.log(Level.SEVERE, "An error occurs while trying to load the layer providers.");
+            layerProviderError = SERVICESERROR.LAYERPROVIDERERROR;
         }
         return names;
     }
 
-	public void setLayerProviderError(SERVICESERROR layerProviderError) {
-		this.layerProviderError = layerProviderError;
-	}
+    public List<String> getStyleProviders() {
+        final List<String> names = new ArrayList<String>();
+        try {
+            names.addAll(StyleProviderProxy.getInstance().getKeys());
+            Collections.sort(names);
+            styleProviderError = SERVICESERROR.NOERROR;
+        } catch (IllegalStateException ex) {
+            LOGGER.log(Level.SEVERE, "An error occurs while trying to load the style providers.");
+            styleProviderError = SERVICESERROR.STYLEPROVIDERERROR;
+        }
+        return names;
+    }
 
-	public SERVICESERROR getLayerProviderError() {
-		return layerProviderError;
-	}
+    public void setLayerProviderError(SERVICESERROR layerProviderError) {
+        this.layerProviderError = layerProviderError;
+    }
 
-	public void setStyleProviderError(SERVICESERROR styleProviderError) {
-		this.styleProviderError = styleProviderError;
-	}
+    public SERVICESERROR getLayerProviderError() {
+        return layerProviderError;
+    }
 
-	public SERVICESERROR getStyleProviderError() {
-		return styleProviderError;
-	}
-    
+    public void setStyleProviderError(SERVICESERROR styleProviderError) {
+        this.styleProviderError = styleProviderError;
+    }
+
+    public SERVICESERROR getStyleProviderError() {
+        return styleProviderError;
+    }
+
+    /**
+     * This method is called from services page via a commandbutton action event
+     */
+    public void reloadPortrayal(){
+        WMSMapDecoration.reload();
+    }
+
+    public List<Entry> getHints() {
+        return new ArrayList<Entry>(WMSMapDecoration.getHints().entrySet());
+    }
+
+    public List<Entry> getCompressions(){
+        return new ArrayList<Entry>(WMSMapDecoration.getCompressions().entrySet());
+    }
+
+
 }

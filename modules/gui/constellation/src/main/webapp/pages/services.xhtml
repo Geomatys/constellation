@@ -4,35 +4,57 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:a4j="http://richfaces.org/a4j"
                 xmlns:mfb="http://mapfaces.org/taglib-base">
-                
-    <div style="top:30px;left:11%;width:88%;position:absolute;">
-        <center>
-            <div class="content">
-                <h3>Web Services configuration and maintenance for Constellation</h3>
-                <br/>
-                <a4j:commandLink id="restart-id" action="#{configurationBean.restartServices}" value="Restart the services" />
-            </div>
-            <div class="content" style="height:280px;">
-	            <h:panelGrid id="providers_panel" columns="2" width="100%" columnClasses="colclasse">
-					<a4j:commandButton style="float:left;" action="#{servicesBean.reloadLayerProviders}" value="Reload data providers"></a4j:commandButton>
-					<a4j:commandButton style="float:right;" reRender="stylePane" action="#{servicesBean.reloadStyleProviders}" value="Reload styles providers"></a4j:commandButton>
-					
-					<h:panelGroup id="layerPane" styleClass="list" style="left:30px;">
-			            <a4j:repeat value="#{servicesBean.layerProviders}" rendered="#{servicesBean.layerProviderError != 'LAYERPROVIDERERROR'}" var="x">
-			                <h:outputText value="#{x}"/><br/>
-			            </a4j:repeat>
-			            <h:outputText style="color:red;" value="An error occure while trying to load the layer providers." rendered="#{servicesBean.layerProviderError == 'LAYERPROVIDERERROR'}" />
-			        </h:panelGroup>
-			        
-			        <h:panelGroup id="stylePane" styleClass="list" style="right:30px;">
-			            <a4j:repeat value="#{servicesBean.styleProviders}" rendered="#{servicesBean.styleProviderError != 'STYLEPROVIDERERROR'}" var="x">
-			                <h:outputText value="#{x}"/><br/>
-			            </a4j:repeat>
-			            <h:outputText style="color:red;" value="An error occure while trying to load the style providers." rendered="#{servicesBean.styleProviderError == 'STYLEPROVIDERERROR'}" />
-			        </h:panelGroup>
-			    </h:panelGrid>
-			</div>
-		</center>
-	</div>
-    
+
+    <div style="height:500px;overflow:auto;width:100%;">
+        <div class="content">
+            <h3>Web Services configuration and maintenance for Constellation</h3>
+            <br/>
+            <a4j:commandLink id="restart-id" action="#{configurationBean.restartServices}" value="Restart the services" />
+        </div>
+        <div class="content" style="height:280px;">
+            <h:panelGrid id="providers_panel" columns="2" width="100%" columnClasses="colclasse">
+                <a4j:commandButton style="" action="#{servicesBean.reloadLayerProviders}" value="Reload data providers"></a4j:commandButton>
+                <a4j:commandButton style="" reRender="stylePane" action="#{servicesBean.reloadStyleProviders}" value="Reload styles providers"></a4j:commandButton>
+                <h:panelGroup layout="block" styleClass="list">
+                    <h:panelGroup id="layerPane" styleClass="listcontent">
+                        <a4j:repeat value="#{servicesBean.layerProviders}" rendered="#{servicesBean.layerProviderError != 'LAYERPROVIDERERROR'}" var="x">
+                            <h:outputText value="#{x}"/><br/>
+                        </a4j:repeat>
+                        <h:outputText style="color:red;" value="An error occure while trying to load the layer providers." rendered="#{servicesBean.layerProviderError == 'LAYERPROVIDERERROR'}" />
+                    </h:panelGroup>
+                </h:panelGroup>
+                <h:panelGroup layout="block" styleClass="list">
+                    <h:panelGroup id="stylePane" styleClass="listcontent" style="">
+                        <a4j:repeat value="#{servicesBean.styleProviders}" rendered="#{servicesBean.styleProviderError != 'STYLEPROVIDERERROR'}" var="x">
+                            <h:outputText value="#{x}"/><br/>
+                        </a4j:repeat>
+                        <h:outputText style="color:red;" value="An error occure while trying to load the style providers." rendered="#{servicesBean.styleProviderError == 'STYLEPROVIDERERROR'}" />
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:panelGrid>
+        </div>
+        <div class="content" style="height:300px;">
+            <h:commandButton value="Reload Portrayal config" title="Reload Portrayal configuration" action="#{servicesBean.reloadPortrayal}"/>
+            <h:panelGrid columns="2" width="100%" columnClasses="colclasse">
+                <h:panelGroup layout="block" styleClass="list">
+                    <a4j:repeat value="#{servicesBean.hints}" var="hint" rendered="#{servicesBean.compressions != null}">
+                        <h:panelGrid columns="2" styleClass="listcontent">
+                            <h:outputText value="#{hint.key}" style="color:DodgerBlue"/>
+                            <h:outputText value=" = #{hint.value}" style="color:green"/>
+                        </h:panelGrid>
+                    </a4j:repeat>
+                </h:panelGroup>
+                <h:panelGroup layout="block" styleClass="list">
+                    <a4j:repeat value="#{servicesBean.compressions}" var="compress" rendered="#{servicesBean.compressions != null}">
+                        <h:panelGrid columns="2" styleClass="listcontent">
+                            <h:outputText value="#{compress.key} " style="color:DodgerBlue"/>
+                            <h:outputText value=" = #{compress.value}" style="color:green"/>
+                        </h:panelGrid>
+                    </a4j:repeat>
+                </h:panelGroup>
+            </h:panelGrid>
+        </div>
+
+    </div>
+
 </ui:composition>

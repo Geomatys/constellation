@@ -228,6 +228,11 @@
       <artifactId>cstl-store-style-unnormalize</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+        <groupId>org.constellation.web-services</groupId>
+        <artifactId>cstl-web-wms</artifactId>
+        <version>${project.version}</version>
+    </dependency>
     <!-- The 4 xml bindings are added here, because the JSF interface uses
          those bindings to marshall capabilities.
     -->
@@ -265,8 +270,8 @@
     <!-- mapfaces -->
     <dependency>
         <groupId>org.mapfaces</groupId>
-       <artifactId>mapfaces-core</artifactId>
-       <version>0.41-SNAPSHOT</version>
+       <artifactId>mapfaces-base</artifactId>
+       <version>0.41</version>
     </dependency>
 
     <!-- FACELET -->
