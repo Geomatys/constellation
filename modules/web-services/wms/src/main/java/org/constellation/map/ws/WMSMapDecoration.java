@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.imageio.spi.ImageReaderSpi;
+import javax.imageio.spi.ImageWriterSpi;
 import javax.measure.unit.Unit;
 import javax.swing.SwingConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -71,6 +73,8 @@ import org.geotoolkit.display2d.ext.text.GraphicTextJ2D;
 import org.geotoolkit.display2d.ext.text.TextTemplate;
 import org.geotoolkit.display2d.service.PortrayalExtension;
 import org.geotoolkit.factory.Hints;
+import org.geotoolkit.image.io.XImageIO;
+import org.geotoolkit.image.jai.Registry;
 import org.geotoolkit.lang.ThreadSafe;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.util.Converters;
@@ -163,6 +167,9 @@ public final class WMSMapDecoration {
     private static final String FEATURE_ORDER               = "feature";
     private static final String SYMBOLIZER_ORDER            = "symbolizer";
     private static final String HINT_COVERAGE_WRITER        = "coverage-writer"; //boolean value
+    private static final String HINT_PARALLAL_BUFFER        = "parallal-buffer"; //boolean value
+    private static final String HINT_NATIVE_READER          = "jai-native-reader";
+    private static final String HINT_NATIVE_WRITER          = "jai-native-writer";
 
     //compression hint, value should look like : image/png:0.1,image/jpeg:0.4
     private static final String HINT_COMPRESSION            = "compression";
@@ -322,6 +329,41 @@ public final class WMSMapDecoration {
             }else if(HINT_COVERAGE_WRITER.equalsIgnoreCase(key)) {
                 final String value = params.get(key);
                 hints.put(GO2Hints.KEY_COVERAGE_WRITER, Boolean.parseBoolean(value));
+            }else if(HINT_PARALLAL_BUFFER.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                hints.put(GO2Hints.KEY_PARALLAL_BUFFER, Boolean.parseBoolean(value));
+            }else if(HINT_NATIVE_READER.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                final String[] parts = value.split(",");
+
+                //reset values, only allow pure java readers
+                for(String jn : ImageIO.getReaderFormatNames()){
+                    Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, false);
+                }
+
+                //allow natives readers only on thoses requested
+                for(String part : parts){
+                    final String[] javaNames = XImageIO.getFormatNamesByMimeType(part, true, false);
+                    for(String jn : javaNames){
+                        Registry.setNativeCodecAllowed(jn, ImageReaderSpi.class, true);
+                    }
+                }
+            }else if(HINT_NATIVE_WRITER.equalsIgnoreCase(key)) {
+                final String value = params.get(key);
+                final String[] parts = value.split(",");
+
+                //reset values, only allow pure java writers
+                for(String jn : ImageIO.getWriterFormatNames()){
+                    Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, false);
+                }
+
+                //allow natives writers only on thoses requested
+                for(String part : parts){
+                    final String[] javaNames = XImageIO.getFormatNamesByMimeType(part, false, true);
+                    for(String jn : javaNames){
+                        Registry.setNativeCodecAllowed(jn, ImageWriterSpi.class, true);
+                    }
+                }
             }
         }
 
