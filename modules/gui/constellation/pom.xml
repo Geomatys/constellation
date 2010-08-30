@@ -271,7 +271,7 @@
     <dependency>
         <groupId>org.mapfaces</groupId>
        <artifactId>mapfaces-base</artifactId>
-       <version>0.41</version>
+       <version>0.42-SNAPSHOT</version>
     </dependency>
 
     <!-- FACELET -->
