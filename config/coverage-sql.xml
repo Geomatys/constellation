@@ -1,0 +1,11 @@
+<Config>
+	<!--Source load_all="true">
+                <Parameter name="database">jdbc:postgresql://server:port/database</Parameter>
+                <Parameter name="user">user</Parameter>
+                <Parameter name="password">password</Parameter>
+                <Parameter name="readOnly">false</Parameter>
+                <Parameter name="driver">org.postgresql.Driver</Parameter>
+                <Parameter name="rootDirectory">/path/to/image/base/folder</Parameter>
+		<Parameter name="namespace">namespace</Parameter>
+	</Source-->
+</Config>

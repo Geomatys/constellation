@@ -1,0 +1,14 @@
+<Config>
+	<!--Source load_all="true">
+		<Parameter name="path">/path/to/mosaic/folder</Parameter>
+		<Parameter name="namespace">namespace</Parameter>
+		<Layer name="mosaic name"/>	
+	</Source-->
+
+	<!--Source load_all="true">
+		<Parameter name="path">/path/to/TileManager.serialized</Parameter>
+		<Parameter name="namespace">namespace</Parameter>
+		<Layer name="tile manager name"/>	
+	</Source-->
+
+</Config>

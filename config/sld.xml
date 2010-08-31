@@ -1,0 +1,5 @@
+<Config>
+	<!--Source load_all="true">
+		<Parameter name="path">/path/to/styles/folder</Parameter>
+	</Source-->
+</Config>

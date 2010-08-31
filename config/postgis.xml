@@ -1,0 +1,11 @@
+<Config>
+	<!--Source load_all="true">
+		<Parameter name="host">server</Parameter>
+		<Parameter name="port">5432</Parameter>
+		<Parameter name="database">database</Parameter>
+		<Parameter name="schema">public</Parameter>
+		<Parameter name="user">user</Parameter>
+		<Parameter name="passwd">password</Parameter>
+                <Parameter name="namespace">namespace</Parameter>                
+	</Source-->
+</Config>
