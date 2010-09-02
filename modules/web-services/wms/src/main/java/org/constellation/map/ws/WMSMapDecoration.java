@@ -165,11 +165,11 @@ public final class WMSMapDecoration {
     private static final String HINT_COMPRESSION            = "compression";
 
     /**
-     * Decoration extension for map queries.
+     * Decoration extension and hints for map queries.
      */
     private static PortrayalExtension extension = null;
-    private static Hints hints = null;
-    private static Map<String,Float> compressions = null;
+    private static final Hints hints = new Hints();
+    private static final Map<String,Float> compressions = new HashMap<String, Float>();
 
     /**
      * The default legend template.
@@ -192,7 +192,7 @@ public final class WMSMapDecoration {
     /**
      * First call to this method will parse the configuration file if there is one.
      * 
-     * @return PortrayalExtension, never null
+     * @return PortrayalExtension
      */
     public static synchronized PortrayalExtension getExtension() {
 
@@ -220,13 +220,16 @@ public final class WMSMapDecoration {
             extension = new DecorationExtension();
         }
 
-
         return extension;
     }
 
+    /**
+     * @return a copy of the hints defined in the wms portrayal configuration file.
+     */
     public static synchronized Hints getHints() {
         getExtension();
-        return hints;
+        //return a copy to avoid modifications
+        return new Hints(hints);
     }
 
     /**
@@ -241,19 +244,20 @@ public final class WMSMapDecoration {
         }
     }
 
-    public static PortrayalExtension read(File configFile)
+    private static PortrayalExtension read(File configFile)
             throws ParserConfigurationException, SAXException, IOException{
 
         if(!configFile.exists()){
             return null;
         }
 
+        hints.clear();
+        compressions.clear();
+
+
         final DocumentBuilderFactory fabrique = DocumentBuilderFactory.newInstance();
         final DocumentBuilder constructeur = fabrique.newDocumentBuilder();
         final Document document = constructeur.parse(configFile);
-
-        hints = new Hints();
-        compressions = new HashMap<String, Float>();
 
         final Map<String,String> params = parseParameters(document.getDocumentElement());
         for (String key : params.keySet()) {
@@ -752,9 +756,12 @@ public final class WMSMapDecoration {
         extension = null;
     }
 
-    public static Map getCompressions(){
+    /**
+     * @return a copy of all compressions defined in the configuration file.
+     */
+    public static Map<String,Float> getCompressions(){
         getHints();
-        return compressions != null ? compressions : Collections.emptyMap();
+        return new HashMap(compressions);
     }
 
 
