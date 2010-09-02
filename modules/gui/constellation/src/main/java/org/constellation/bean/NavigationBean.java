@@ -44,6 +44,7 @@ public class NavigationBean {
     private static final String HOME_HREF = "pages/home.xhtml";
     private static final String SERVICES_HREF = "pages/services.xhtml";
     private static final String USERCONFIG_HREF = "pages/configuration.xhtml";
+    private static final String LAYERS_HREF = "pages/layers.xhtml";
     
     private String login;
     private String passwd;
@@ -117,6 +118,10 @@ public class NavigationBean {
     
     public void goToUserConfiguration() {
     	currentHref = USERCONFIG_HREF;
+    }
+
+    public void goToLayers(){
+        currentHref = LAYERS_HREF;
     }
 
     private boolean checkEqualProperty(final Properties properties, final String property, final String value) {

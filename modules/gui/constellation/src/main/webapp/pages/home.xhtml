@@ -6,7 +6,12 @@
 
     <div style="">
 
-        <center><h:graphicImage url="resources/img/constellation400.png"/><br/><h:outputText value="Welcome admin !" rendered="#{navigationBean.authenticated}" style="margin-top:20;margin-left:50px;"/><br/><br/><br/></center>
+        <center>
+            <h:graphicImage url="resources/img/constellation400.png"/>
+            <br/>
+            <h:outputText value="Welcome admin !" rendered="#{navigationBean.authenticated}" style="margin-top:20px;margin-left:50px;"/>
+            <br/><br/><br/>
+        </center>
 
         <h:panelGroup layout="block" styleClass="sidebox" rendered="#{!navigationBean.authenticated}">
 

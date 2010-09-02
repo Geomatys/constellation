@@ -4,7 +4,8 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:a4j="http://richfaces.org/a4j">
+                xmlns:a4j="http://richfaces.org/a4j"
+                xmlns:mf="http://mapfaces.org/taglib">
 
     <f:view>
         <html>
@@ -13,6 +14,10 @@
                 <title>Constellation</title>
                 <link rel="stylesheet" type="text/css" href="resources/css/style.css"/>
                 <link rel="stylesheet" type="text/css" href="resources/css/login.css"/>
+                <mf:Resources/>
+                <style type="text/css">
+                    .mftreetable li {list-style-type:none;}
+                </style>
             </head>
             <body>
                 <h:form id="form">
