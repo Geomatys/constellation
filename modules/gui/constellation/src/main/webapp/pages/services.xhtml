@@ -12,7 +12,7 @@
         </div>
         <div class="content" style="height:280px;">
             <h:panelGrid id="providers_panel" columns="2" width="100%" columnClasses="colclasse">
-                <a4j:commandButton style="" action="#{servicesBean.reloadLayerProviders}" value="Reload data providers"></a4j:commandButton>
+                <a4j:commandButton style="" reRender="layerPane" action="#{servicesBean.reloadLayerProviders}" value="Reload data providers"></a4j:commandButton>
                 <a4j:commandButton style="" reRender="stylePane" action="#{servicesBean.reloadStyleProviders}" value="Reload styles providers"></a4j:commandButton>
                 <h:panelGroup layout="block" styleClass="list">
                     <h:panelGroup id="layerPane" styleClass="listcontent">
