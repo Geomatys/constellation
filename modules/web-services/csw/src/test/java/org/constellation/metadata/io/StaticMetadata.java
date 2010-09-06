@@ -159,5 +159,48 @@ public class StaticMetadata {
         "   </gmd:identificationInfo>" + '\n' +
         "</gmd:MD_Metadata>";
 
+        public static final String META_17 =
+        "<gmd:MD_Metadata xmlns:gmd=\"http://www.isotc211.org/2005/gmd\" xmlns:gml=\"http://www.opengis.net/gml\" xmlns:gco=\"http://www.isotc211.org/2005/gco\">" + '\n' +
+        "<gmd:spatialRepresentationInfo>" + '\n' +
+        "<gmd:MD_Georectified>" + '\n' +
+        "    <gmd:numberOfDimensions>" + '\n' +
+        "        <gco:Integer>2</gco:Integer>" + '\n' +
+        "    </gmd:numberOfDimensions>" + '\n' +
+        "    <gmd:axisDimensionProperties>" + '\n' +
+        "        <gmd:MD_Dimension>" + '\n' +
+        "            <gmd:dimensionName>" + '\n' +
+        "                <gmd:MD_DimensionNameTypeCode codeList=\"#xpointer(//*[@gml:id='MD_DimensionNameTypeCode'])\" codeListValue=\"row\"/>" + '\n' +
+        "            </gmd:dimensionName>" + '\n' +
+        "            <gmd:dimensionSize>" + '\n' +
+        "                <gco:Integer>1</gco:Integer>" + '\n' +
+        "            </gmd:dimensionSize>" + '\n' +
+        "        </gmd:MD_Dimension>" + '\n' +
+        "    </gmd:axisDimensionProperties>" + '\n' +
+        "    <gmd:cellGeometry>" + '\n' +
+        "        <gmd:MD_CellGeometryCode codeList=\"#xpointer(//*[@gml:id='MD_CellGeometryCode'])\" codeListValue=\"point\"/>" + '\n' +
+        "    </gmd:cellGeometry>" + '\n' +
+        "    <gmd:transformationParameterAvailability>" + '\n' +
+        "        <gco:Boolean>false</gco:Boolean>" + '\n' +
+        "    </gmd:transformationParameterAvailability>" + '\n' +
+        "    <gmd:checkPointAvailability>" + '\n' +
+        "        <gco:Boolean>false</gco:Boolean>" + '\n' +
+        "    </gmd:checkPointAvailability>" + '\n' +
+        "    <gmd:cornerPoints>" + '\n' +
+        "        <gml:Point gml:id=\"cornerPoints.1\" srsName=\"#epsg:2154\">" + '\n' +
+        "            <gml:pos>857000 6526000</gml:pos>" + '\n' +
+        "        </gml:Point>" + '\n' +
+        "    </gmd:cornerPoints>" + '\n' +
+        "    <gmd:cornerPoints>" + '\n' +
+        "        <gml:Point gml:id=\"cornerPoints.2\" srsName=\"#epsg:2154\">" + '\n' +
+        "            <gml:pos>858000 6526000</gml:pos>" + '\n' +
+        "        </gml:Point>" + '\n' +
+        "    </gmd:cornerPoints>" + '\n' +
+       // "    <gmd:pointInPixel>" + '\n' +
+       // "        <gmd:MD_PixelOrientationCode>center</gmd:MD_PixelOrientationCode>" + '\n' +
+       // "    </gmd:pointInPixel>" + '\n' +
+        "</gmd:MD_Georectified>" + '\n' +
+        "</gmd:spatialRepresentationInfo>" + '\n' +
+        "</gmd:MD_Metadata>";
+
 
 }

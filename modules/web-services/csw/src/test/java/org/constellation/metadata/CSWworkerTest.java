@@ -18,6 +18,8 @@
 package org.constellation.metadata;
 
 // J2SE dependencies
+import org.opengis.metadata.spatial.Georectified;
+import org.opengis.metadata.spatial.SpatialRepresentation;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Level;
@@ -2209,6 +2211,32 @@ public class CSWworkerTest {
             assertEquals(expResult.getReferenceSystemInfo().iterator().next(), result.getReferenceSystemInfo().iterator().next());
         }
         assertEquals(expResult.getReferenceSystemInfo(), result.getReferenceSystemInfo());
+        if (expResult.getSpatialRepresentationInfo() != null && result.getSpatialRepresentationInfo() != null) {
+            assertEquals(expResult.getSpatialRepresentationInfo().size(), result.getSpatialRepresentationInfo().size());
+            Iterator<SpatialRepresentation> expIt = expResult.getSpatialRepresentationInfo().iterator();
+            Iterator<SpatialRepresentation> resIt = result.getSpatialRepresentationInfo().iterator();
+            while (expIt.hasNext()) {
+                SpatialRepresentation expSpa  = expIt.next();
+                SpatialRepresentation  resSpa = resIt.next();
+                if (expSpa instanceof Georectified) {
+                    Georectified expRect = (Georectified) expSpa;
+                    Georectified resRect = (Georectified) resSpa;
+                    assertEquals(expRect.getAxisDimensionProperties(), resRect.getAxisDimensionProperties());
+                    assertEquals(expRect.getCellGeometry(), resRect.getCellGeometry());
+                    assertEquals(expRect.getCenterPoint(), resRect.getCenterPoint());
+                    assertEquals(expRect.getCheckPointDescription(), resRect.getCheckPointDescription());
+                    assertEquals(expRect.getCheckPoints(), resRect.getCheckPoints());
+                    assertEquals(expRect.getCornerPoints(), resRect.getCornerPoints());
+                    assertEquals(expRect.getPointInPixel(), resRect.getPointInPixel());
+                    assertEquals(expRect.getTransformationDimensionDescription(), resRect.getTransformationDimensionDescription());
+                    assertEquals(expRect.getTransformationDimensionMapping(), resRect.getTransformationDimensionMapping());
+                    assertEquals(expRect.getNumberOfDimensions(), resRect.getNumberOfDimensions());
+                    assertEquals(expRect, resRect);
+                }
+                assertEquals(expSpa, resSpa);
+            }
+        }
+        assertEquals(expResult.getSpatialRepresentationInfo(), result.getSpatialRepresentationInfo());
         assertEquals(expResult.getSpatialRepresentationInfo(), result.getSpatialRepresentationInfo());
         assertEquals(expResult, result);
     }

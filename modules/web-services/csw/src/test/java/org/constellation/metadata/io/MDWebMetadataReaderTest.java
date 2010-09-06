@@ -210,6 +210,24 @@ public class MDWebMetadataReaderTest {
         pool.release(unmarshaller);
     }
 
+      /**
+     * Tests the getMetadata method for ISO 19119 data
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getMetadataISOGeoRectifiedTest() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object result = reader.getMetadata("22:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_17));
+
+        assertTrue(result instanceof DefaultMetadata);
+        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+
+        pool.release(unmarshaller);
+    }
 
     /**
      * Tests the getMetadata method for SML data
