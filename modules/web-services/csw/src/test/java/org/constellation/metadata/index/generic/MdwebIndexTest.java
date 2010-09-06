@@ -170,12 +170,12 @@ public class MdwebIndexTest {
         logger.finer("SimpleSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("5:CSWCat");
-        expectedResult.add("4:CSWCat");
-        expectedResult.add("3:CSWCat");
         expectedResult.add("2:CSWCat");
-        expectedResult.add("8:CSWCat");
+        expectedResult.add("3:CSWCat");
+        expectedResult.add("4:CSWCat");
+        expectedResult.add("5:CSWCat");
         expectedResult.add("7:CSWCat");
+        expectedResult.add("8:CSWCat");
 
 
         assertEquals(expectedResult, result);
@@ -220,8 +220,9 @@ public class MdwebIndexTest {
         logger.finer("wildCharSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("3:CSWCat");
         expectedResult.add("2:CSWCat");
+        expectedResult.add("3:CSWCat");
+        
 
         assertEquals(expectedResult, result);
 
@@ -255,10 +256,11 @@ public class MdwebIndexTest {
 
         logger.finer("wilCharSearch 3:\n" + resultReport);
 
-        assertTrue(result.contains("4:CSWCat"));
-        assertTrue(result.contains("6:CSWCat"));
         assertTrue(result.contains("2:CSWCat"));
         assertTrue(result.contains("3:CSWCat"));
+        assertTrue(result.contains("4:CSWCat"));
+        assertTrue(result.contains("6:CSWCat"));
+        
 
          /**
          * Test 4 wildCharSearch: anstract LIKE *onnees CTD NEDIPROD VI 120
@@ -302,9 +304,9 @@ public class MdwebIndexTest {
         logger.finer("DateSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("5:CSWCat");
-        expectedResult.add("4:CSWCat");
         expectedResult.add("3:CSWCat");
+        expectedResult.add("4:CSWCat");
+        expectedResult.add("5:CSWCat");
         expectedResult.add("6:CSWCat");
         expectedResult.add("8:CSWCat");
 
@@ -322,8 +324,8 @@ public class MdwebIndexTest {
         logger.finer("DateSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("5:CSWCat");
         expectedResult.add("4:CSWCat");
+        expectedResult.add("5:CSWCat");
         expectedResult.add("8:CSWCat");
 
         assertEquals(expectedResult, result);
@@ -492,8 +494,8 @@ public class MdwebIndexTest {
         logger.finer("spatialSearch 1:\n" + resultReport);
 
         List<String> expectedResult = new ArrayList<String>();
-        expectedResult.add("5:CSWCat");
         expectedResult.add("4:CSWCat");
+        expectedResult.add("5:CSWCat");
         expectedResult.add("8:CSWCat");
 
         assertEquals(expectedResult, result);
@@ -519,8 +521,8 @@ public class MdwebIndexTest {
         logger.finer("spatialSearch 2:\n" + resultReport);
 
         expectedResult = new ArrayList<String>();
-        expectedResult.add("3:CSWCat");
         expectedResult.add("2:CSWCat");
+        expectedResult.add("3:CSWCat");
         expectedResult.add("6:CSWCat");
         expectedResult.add("7:CSWCat");
 

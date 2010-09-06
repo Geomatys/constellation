@@ -170,7 +170,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
             LOGGER.severe("CstlServiceException while indexing document: " + ex.getMessage());
             throw new IndexingException("CstlServiceException while indexing documents.", ex);
         }
-        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+        LOGGER.info("Index creation process in " + (System.currentTimeMillis() - time) + " ms\n" +
                 " documents indexed: " + nbEntries);
     }
 
@@ -203,7 +203,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         } catch (IOException ex) {
             LOGGER.log(Level.WARNING, IO_SINGLE_MSG, ex);
         }
-        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms" + '\n' +
+        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms\n" +
                 " documents indexed: " + nbEntries);
     }
 
@@ -619,7 +619,7 @@ public class GenericIndexer extends AbstractCSWIndexer<Object> {
         final Object conditionalObj = getAttributeValue(metadata, conditionalAttribute);
         LOGGER.finer("contionalObj: "     + getStringValue(conditionalObj) + '\n' +
                      "conditionalValue: " + conditionalValue               + '\n' +
-                     "match? " +conditionalValue.equals(getStringValue(conditionalObj)));
+                     "match? "            + conditionalValue.equals(getStringValue(conditionalObj)));
         return conditionalValue.equalsIgnoreCase(getStringValue(conditionalObj));
     }
     

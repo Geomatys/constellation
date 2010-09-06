@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import javax.sql.DataSource;
 
@@ -135,8 +136,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void createIndex() throws IndexingException {
+    @Deprecated
+    public void createIndexHeavy() throws IndexingException {
         LOGGER.log(logLevel, "Creating lucene index for MDWeb database please wait...");
 
         final long time = System.currentTimeMillis();
@@ -180,6 +181,57 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms\nRecordSets: " +
                 nbRecordSets + " documents indexed: " + nbForms + ".");
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createIndex() throws IndexingException {
+        LOGGER.log(logLevel, "(light memory) Creating lucene index for MDWeb database please wait...");
+
+        final long time = System.currentTimeMillis();
+        IndexWriter writer;
+        int nbRecordSets = 0;
+        int nbForms = 0;
+        try {
+            writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
+
+            // getting the objects list and index avery item in the IndexWriter.
+            final List<RecordSet> cats       = mdWebReader.getRecordSets();
+            final List<RecordSet> catToIndex = new ArrayList<RecordSet>();
+            for (RecordSet r : cats) {
+                if (r.getExposure() != EXPOSURE.INTERNAL) {
+                    catToIndex.add(r);
+                } else {
+                    LOGGER.log(logLevel, "RecordSet:{0} is internal we exclude it.", r.getCode());
+                }
+            }
+            nbRecordSets = cats.size();
+            final Set<Entry<Integer, RecordSet>> results = mdWebReader.getAllIdentifiers(catToIndex);
+            LOGGER.log(logLevel, results.size() + " forms to read.");
+            for (Entry<Integer, RecordSet> entry : results) {
+                Form form = mdWebReader.getForm(entry.getValue(), entry.getKey());
+                if ((form.getType() == null || form.getType().equals(Form.TYPE.NORMALFORM)) && form.isPublished()) {
+                    indexDocument(writer, form);
+                    nbForms++;
+                } else {
+                     LOGGER.log(logLevel, "The form " + form.getTitle() + '(' + form.getId() + ") is a context (or is not published) so we don't index it");
+                }
+            }
+            writer.optimize();
+            writer.close();
+
+        } catch (IOException ex) {
+            LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
+            throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
+        } catch (MD_IOException ex) {
+            LOGGER.severe("SQLException while indexing document: " + ex.getMessage());
+            throw new IndexingException("SQLException while indexing documents.", ex);
+        }
+        LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms\nRecordSets: " +
+                nbRecordSets + " documents indexed: " + nbForms + ".");
+    }
+
 
     /**
      * {@inheritDoc}
