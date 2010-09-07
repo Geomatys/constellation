@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.metadata;
+package org.constellation.metadata.harvest;
 
 // J2SE dependencies
 import java.io.IOException;
@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
+import org.constellation.metadata.DistributedResults;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.CstlServiceException;
 

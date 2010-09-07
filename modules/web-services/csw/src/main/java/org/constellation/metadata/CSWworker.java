@@ -72,6 +72,9 @@ import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
 
 //geotoolkit dependencies
+import org.constellation.metadata.harvest.ByIDHarvester;
+import org.constellation.metadata.harvest.CatalogueHarvester;
+import org.constellation.metadata.harvest.DefaultCatalogueHarvester;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.inspire.xml.InspireCapabilitiesType;

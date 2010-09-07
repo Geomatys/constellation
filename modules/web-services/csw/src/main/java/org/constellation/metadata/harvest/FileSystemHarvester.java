@@ -14,8 +14,9 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.metadata;
+package org.constellation.metadata.harvest;
 
+import org.constellation.metadata.DistributedResults;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import javax.xml.bind.JAXBElement;
 import java.util.logging.Level;

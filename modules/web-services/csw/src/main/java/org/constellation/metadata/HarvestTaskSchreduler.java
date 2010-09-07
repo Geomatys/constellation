@@ -34,10 +34,13 @@ import javax.naming.NamingException;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
 import org.constellation.configuration.HarvestTask;
 import org.constellation.configuration.HarvestTasks;
+import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.metadata.utils.MailSendingUtilities;
 import org.constellation.ws.CstlServiceException;
+
 import org.geotoolkit.xml.MarshallerPool;
 
 /**

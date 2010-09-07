@@ -14,11 +14,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package org.constellation.metadata;
+package org.constellation.metadata.harvest;
 
 // J2SE dependencies
-import java.io.File;
-import java.io.FileOutputStream;
+import org.constellation.metadata.DistributedResults;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
