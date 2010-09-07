@@ -17,6 +17,7 @@
 
 package org.constellation.configuration.ws.rs;
 
+import org.geotoolkit.util.FileUtilities;
 import java.io.File;
 
 // Constellation dependencies
@@ -55,6 +56,17 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
     
     @Override
     protected File getConfigurationDirectory() {
-        return SERVCE_DIRECTORY.get("CSW");
+        File configDir = FileUtilities.getDirectoryFromResource("configuration");
+
+        /*
+         * if the configuration files are put under the WEB-INF/classes/csw_configuration directory of the WAR file.
+         */
+        if (configDir == null || !configDir.exists()) {
+            configDir = FileUtilities.getDirectoryFromResource("csw_configuration");
+            if (configDir == null || !configDir.exists()) {
+                return SERVCE_DIRECTORY.get("CSW");
+            }
+        }
+        return configDir;
     }
 }

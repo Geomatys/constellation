@@ -56,7 +56,6 @@ import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.lucene.index.AbstractIndexer.IndexDirectoryFilter;
 import org.geotoolkit.util.FileUtilities;
-import org.geotoolkit.xml.MarshallerPool;
 
 /**
  * The base for The CSW configurer.
@@ -265,7 +264,14 @@ public abstract class AbstractCSWConfigurer {
      * @throws CstlServiceException
      */
     public AcknowlegementType refreshIndex(boolean asynchrone, String id) throws CstlServiceException {
-        LOGGER.info("refresh index requested");
+        String suffix = "";
+        if (asynchrone) {
+            suffix = " (asynchrone)";
+        }
+        if (id != null && !id.isEmpty()) {
+            suffix = suffix + " id:" + id;
+        }
+        LOGGER.info("refresh index requested" + suffix);
         try {
             refreshServiceConfiguration();
         } catch (ConfigurationException ex) {
@@ -294,8 +300,10 @@ public abstract class AbstractCSWConfigurer {
      * @throws org.constellation.ws.CstlServiceException
      */
     private void synchroneIndexRefresh(File configurationDirectory, String id) throws CstlServiceException {
+        boolean deleted = false;
         //we delete each index directory
         for (File indexDir : configurationDirectory.listFiles(new IndexDirectoryFilter(id))) {
+            deleted = true;
             for (File f : indexDir.listFiles()) {
                 final boolean sucess = f.delete();
                 if (!sucess) {
@@ -306,8 +314,13 @@ public abstract class AbstractCSWConfigurer {
                 throw new CstlServiceException("The service can't delete the index folder.", NO_APPLICABLE_CODE);
             }
         }
-        //then we restart the services
-        restart();
+
+        //if we have deleted something we restart the services
+        if (deleted) {
+            restart();
+        } else {
+            LOGGER.info("there is no index correspounding to " + id + " to delete");
+        }
     }
 
     /**

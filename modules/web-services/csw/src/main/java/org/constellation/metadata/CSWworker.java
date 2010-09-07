@@ -1637,7 +1637,6 @@ public class CSWworker {
          } else { 
             throw new CstlServiceException("The request is null!", NO_APPLICABLE_CODE);
          }  
-        
     }
     
     /**
@@ -1717,7 +1716,7 @@ public class CSWworker {
          * if the configuration files are put under the WEB-INF/classes/csw_configuration directory of the WAR file.
          */
         if (configDir == null || !configDir.exists()) {
-            configDir = FileUtilities.getDirectoryFromResource("csw_configuration");
+            configDir = FileUtilities.getDirectoryFromResource(configUrl);
         }
 
        // else we search the .constellation directory
