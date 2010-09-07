@@ -23,12 +23,10 @@ import java.sql.SQLException;
 import java.util.List;
 
 // JAXB dependencies
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 
 // Constellation dependencies
-import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.CstlServiceException;
 
@@ -58,7 +56,12 @@ public abstract class CatalogueHarvester {
      */
     protected final MetadataWriter metadataWriter;
 
-    public CatalogueHarvester(MetadataWriter metadataWriter) throws MetadataIoException {
+    /**
+     * Build a new Catalogue harvester xith the specified metadataWriter.
+     *
+     * @param metadataWriter A writer to store matadata in the datasource.
+     */
+    public CatalogueHarvester(MetadataWriter metadataWriter) {
         this.marshallerPool = EBRIMMarshallerPool.getInstance();
         this.metadataWriter = metadataWriter;
     }

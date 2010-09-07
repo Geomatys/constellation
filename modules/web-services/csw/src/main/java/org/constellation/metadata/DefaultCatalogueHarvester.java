@@ -65,7 +65,6 @@ import org.geotoolkit.ows.xml.v100.CapabilitiesBaseType;
 import org.geotoolkit.ows.xml.v100.DCP;
 import org.geotoolkit.ows.xml.v100.DomainType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
-import org.geotoolkit.ows.xml.v100.ExceptionType;
 import org.geotoolkit.ows.xml.v100.Operation;
 import org.geotoolkit.ows.xml.v100.OperationsMetadata;
 import org.geotoolkit.ows.xml.v100.RequestMethodType;
@@ -151,7 +150,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
     /**
      * Build a new catalogue harvester with the write part.
      */
-    public DefaultCatalogueHarvester(MetadataWriter metadataWriter) throws MetadataIoException {
+    public DefaultCatalogueHarvester(MetadataWriter metadataWriter) {
        super(metadataWriter);
         initializeRequest();
     }
@@ -379,14 +378,6 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
                 // if the distant service has launch a standardized exception    
                 } else if (harvested instanceof ExceptionReport) {
                     final ExceptionReport ex = (ExceptionReport) harvested;
-                    final StringBuilder msg  = new StringBuilder();
-                    if (ex.getException() != null && ex.getException().size() > 0) {
-                        for (ExceptionType e:ex.getException()) {
-                            for (String s: e.getExceptionText()) {
-                                msg.append(s).append('\n');
-                            }
-                        }
-                    }
                     final CstlServiceException exe = new CstlServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
                                                                       NO_APPLICABLE_CODE);
                     LOGGER.log(Level.WARNING, "The distant service has throw a webService exception: \n{0}", exe.toString());
@@ -736,10 +727,13 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
     
     /**
      * Replace the special namespace by those of ISO/TC
-     * 
+     *
+     * Deprecated : we don't have to support this speciel case.
+     *
      * @param s An xml piece before unmarshaling.
      * @return
      */
+    @Deprecated
     private String restoreGoodNamespace(String s) {
        s = s.replace("MD_Metadata ", "MD_Metadata xmlns:gco=\"http://www.isotc211.org/2005/gco\" ");
        s = s.replace("http://schemas.opengis.net/iso19115full", Namespaces.GMD);
@@ -874,26 +868,16 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
         Unmarshaller unmarshaller = null;
         try {
             unmarshaller = marshallerPool.acquireUnmarshaller();
-            final URL source = new URL(sourceURL);
-            final URLConnection conec = source.openConnection();
-
-            // we get the source document
-            final File fileToHarvest = File.createTempFile("harvested", "xml");
-            fileToHarvest.deleteOnExit();
-            final InputStream in = conec.getInputStream();
-            final FileOutputStream out = new FileOutputStream(fileToHarvest);
-            final byte[] buffer = new byte[1024];
-            int size;
-
-            while ((size = in.read(buffer, 0, 1024)) > 0) {
-                out.write(buffer, 0, size);
-            }
 
             if (resourceType.equals(Namespaces.GMD) ||
-                    resourceType.equals(Namespaces.CSW_202) ||
-                    resourceType.equals("http://www.isotc211.org/2005/gfc")) {
+                resourceType.equals(Namespaces.CSW_202) ||
+                resourceType.equals("http://www.isotc211.org/2005/gfc")) {
 
-                final Object harvested = unmarshaller.unmarshal(fileToHarvest);
+                final URL source          = new URL(sourceURL);
+                final URLConnection conec = source.openConnection();
+                final InputStream in      = conec.getInputStream();
+                final Object harvested    = unmarshaller.unmarshal(in);
+
                 if (harvested == null) {
                     throw new CstlServiceException("The resource can not be parsed.",
                             INVALID_PARAMETER_VALUE, "Source");

@@ -20,7 +20,6 @@ package org.constellation.metadata;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
-import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,8 +46,8 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.csw.xml.GetRecordsRequest;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
-import org.geotoolkit.ows.xml.v100.ExceptionType;
 import org.geotoolkit.xml.Namespaces;
+import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -56,16 +55,30 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  * This catalogue harvester is a special tool used to harvest a CSW.
  * we must have a list of identifier stored in n file named id0, id1, ....idn
  *
+ * Each file must have one identifier by line.
+ *
  * @author Guilhem Legal
  */
 public class ByIDHarvester extends CatalogueHarvester {
 
+    /**
+     * Default GET GetRecordById request to complete with an identifier.
+     */
     private static final String GET_RECORD_BY_ID_REQUEST = "?service=CSW&request=getRecordbyid&version=2.0.2&outputSchema=http://www.isotc211.org/2005/gmd&outputformat=text/xml&ELEMENTSETNAME=full&id=";
 
+    /**
+     * The path of the directory containing the files fill with identifiers.
+     */
     private String identifierDirectoryPath;
 
     /**
-     * Build a new catalogue harvester with the write part.
+     * Build a new catalogue harvester using a list of identifiers stored in one or more Files.
+     *
+     * @param metadataWriter The Writer allowing to store the metadata in the datasource.
+     * @param identifierDirectory a Path of the directory containing the identifier files.
+     * 
+     * @throws MetadataIoException If the parameters identifierDirectory does not point to a valid and existing directory,
+     *                             or if its {@code null}.
      */
     public ByIDHarvester(MetadataWriter metadataWriter, String identifierDirectory) throws MetadataIoException {
         super(metadataWriter);
@@ -83,6 +96,13 @@ public class ByIDHarvester extends CatalogueHarvester {
     }
 
 
+    /**
+     * Parse the identifier file named "id + currentPath" and return a List of string.
+     * The list is constitued of each line of the file.
+     *
+     * @param currentFile an integer pointing to the current file to read.
+     * @return A list of identifier correspoundong of each line of the identifier file.
+     */
     private List<String> parseIdentifierFile(int currentFile) {
         final List<String> result = new ArrayList<String>();
         FileInputStream in = null;
@@ -194,20 +214,11 @@ public class ByIDHarvester extends CatalogueHarvester {
                         }
                     }
 
-
                 /*
                  * We have receved an error
                  */
                 } else if (harvested instanceof ExceptionReport) {
                     final ExceptionReport ex = (ExceptionReport) harvested;
-                    final StringBuilder msg  = new StringBuilder();
-                    if (ex.getException() != null && ex.getException().size() > 0) {
-                        for (ExceptionType e:ex.getException()) {
-                            for (String s: e.getExceptionText()) {
-                                msg.append(s).append('\n');
-                            }
-                        }
-                    }
                     final CstlServiceException exe = new CstlServiceException("The distant service has throw a webService exception: " + ex.getException().get(0),
                                                                       NO_APPLICABLE_CODE);
                     LOGGER.log(Level.WARNING, "The distant service has throw a webService exception: \n{0}", exe.toString());
@@ -319,18 +330,15 @@ public class ByIDHarvester extends CatalogueHarvester {
         Unmarshaller unmarshaller = null;
         try {
             unmarshaller              = marshallerPool.acquireUnmarshaller();
-            final URL source          = new URL(sourceURL);
-            final URLConnection conec = source.openConnection();
-
-            // we get the source document
-            final File fileToHarvest = File.createTempFile("harvested", "xml");
-            fileToHarvest.deleteOnExit();
-            final InputStream in = conec.getInputStream();
-
-            if (resourceType.equals(Namespaces.GMD) || resourceType.equals(Namespaces.CSW_202) ||
+            
+            if (resourceType.equals(Namespaces.GMD) ||
+                resourceType.equals(Namespaces.CSW_202) ||
                 resourceType.equals("http://www.isotc211.org/2005/gfc")) {
 
-                final Object harvested = unmarshaller.unmarshal(in);
+                final URL source          = new URL(sourceURL);
+                final URLConnection conec = source.openConnection();
+                final InputStream in      = conec.getInputStream();
+                final Object harvested    = unmarshaller.unmarshal(in);
                 if (harvested == null) {
                     throw new CstlServiceException("The resource can not be parsed.", INVALID_PARAMETER_VALUE, "Source");
                 }
@@ -361,7 +369,8 @@ public class ByIDHarvester extends CatalogueHarvester {
 
     @Override
     public void destroy() {
-        if (metadataWriter != null)
+        if (metadataWriter != null) {
             metadataWriter.destroy();
+        }
     }
 }
