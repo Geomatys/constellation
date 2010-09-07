@@ -33,6 +33,11 @@ import org.constellation.metadata.io.mdweb.MDWebCSWMetadataReader;
 import org.constellation.metadata.io.mdweb.MDWebCSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 import static org.constellation.generic.database.Automatic.*;
+import org.constellation.metadata.harvest.ByIDHarvester;
+import org.constellation.metadata.harvest.CatalogueHarvester;
+import org.constellation.metadata.harvest.DefaultCatalogueHarvester;
+import org.constellation.metadata.harvest.FileSystemHarvester;
+import org.constellation.metadata.io.MetadataWriter;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
 import org.geotoolkit.lucene.index.AbstractIndexer;
@@ -115,6 +120,26 @@ public class DefaultCSWFactory extends AbstractCSWFactory {
                 return new AbstractIndexSearcher(configDirectory, serviceID);
             default:
                 throw new IllegalArgumentException(UNKNOW_DATABASE_TYPE + dbType + DEFAULT_FACTORY);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public CatalogueHarvester getCatalogueHarvester(Automatic configuration, MetadataWriter writer) throws MetadataIoException {
+        int type = -1;
+        if (configuration != null)
+            type = configuration.getHarvestType();
+        switch (type) {
+            case DEFAULT:
+                return new DefaultCatalogueHarvester(writer);
+            case FILESYSTEM:
+                return new FileSystemHarvester(writer);
+            case BYID:
+                return new ByIDHarvester(writer, configuration.getIdentifierDirectory());
+            default:
+                throw new IllegalArgumentException("Unknow harvester type: " + type + DEFAULT_FACTORY);
         }
     }
 }

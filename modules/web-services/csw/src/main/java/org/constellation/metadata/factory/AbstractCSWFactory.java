@@ -22,11 +22,13 @@ import java.io.File;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
+import org.constellation.metadata.harvest.CatalogueHarvester;
 import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.CSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
 
 // Geotoolkit dependencies
+import org.constellation.metadata.io.MetadataWriter;
 import org.geotoolkit.factory.Factory;
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexSearcher;
@@ -83,4 +85,7 @@ public abstract class AbstractCSWFactory extends Factory {
      * @throws IndexingException
      */
     public abstract AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws IndexingException;
+
+    public abstract CatalogueHarvester getCatalogueHarvester(Automatic configuration, MetadataWriter writer) throws MetadataIoException;
+
 }

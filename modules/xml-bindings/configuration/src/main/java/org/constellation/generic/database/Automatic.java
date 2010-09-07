@@ -53,6 +53,8 @@ public class Automatic {
     public static final int PRODSPEC   = 7;
     @XmlTransient
     public static final int SERV       = 8;
+    @XmlTransient
+    public static final int BYID       = 9;
 
     /**
      * The database connection informations.
@@ -129,9 +131,9 @@ public class Automatic {
     /**
      * In the case of a CSW configuration,
      * you can use this flag to substitute the Default catalogue harvester,
-     * by a ByIdHarvester.
+     * by a ByIdHarvester or a fileSystemHarvester.
      */
-    private String byIdHarvester;
+    private String harvester;
 
     /**
      * In the case of CSW with a ByIdHarvester,
@@ -231,6 +233,15 @@ public class Automatic {
             return PRODLINE;
         else if ("prodspec".equalsIgnoreCase(format))
             return PRODSPEC;
+        else
+            return DEFAULT;
+    }
+
+    public int getHarvestType() {
+        if ("filesystem".equalsIgnoreCase(harvester))
+            return FILESYSTEM;
+        else if ("byid".equalsIgnoreCase(harvester))
+            return BYID;
         else
             return DEFAULT;
     }
@@ -349,15 +360,15 @@ public class Automatic {
      /**
      * @return the byIdHarvester
      */
-    public String getByIdHarvester() {
-        return byIdHarvester;
+    public String getHarvester() {
+        return harvester;
     }
 
     /**
      * @param byIdHarvester the byIdHarvester to set
      */
-    public void setByIdHarvester(String byIdHarvester) {
-        this.byIdHarvester = byIdHarvester;
+    public void setHarvester(String harvester) {
+        this.harvester = harvester;
     }
 
     /**
@@ -413,8 +424,8 @@ public class Automatic {
         if (noIndexation != null) {
             s.append("noIndexation:").append(noIndexation).append('\n');
         }
-        if (byIdHarvester != null) {
-            s.append("byIdHarvester:").append(byIdHarvester).append('\n');
+        if (harvester != null) {
+            s.append("harvester:").append(harvester).append('\n');
         }
         if (identifierDirectory != null) {
             s.append("identifierDirectory: ").append(identifierDirectory).append('\n');
@@ -444,7 +455,7 @@ public class Automatic {
                    Utilities.equals(this.storeMapping,     that.storeMapping)     &&
                    Utilities.equals(this.thesaurus,        that.thesaurus)        &&
                    Utilities.equals(this.noIndexation,     that.noIndexation)     &&
-                   Utilities.equals(this.byIdHarvester,    that.byIdHarvester)     &&
+                   Utilities.equals(this.harvester,        that.harvester)        &&
                    Utilities.equals(this.noIndexation,     that.noIndexation)     &&
                    Utilities.equals(this.queries,          that.queries);
         }
@@ -466,6 +477,7 @@ public class Automatic {
         hash = 37 * hash + (this.dataDirectory != null ? this.dataDirectory.hashCode() : 0);
         hash = 37 * hash + (this.defaultRecordSet != null ? this.defaultRecordSet.hashCode() : 0);
         hash = 37 * hash + (this.noIndexation != null ? this.noIndexation.hashCode() : 0);
+        hash = 37 * hash + (this.harvester != null ? this.harvester.hashCode() : 0);
         return hash;
     }
 

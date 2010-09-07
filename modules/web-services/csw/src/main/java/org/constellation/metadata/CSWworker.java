@@ -72,9 +72,7 @@ import static org.constellation.metadata.CSWQueryable.*;
 import static org.constellation.metadata.CSWConstants.*;
 
 //geotoolkit dependencies
-import org.constellation.metadata.harvest.ByIDHarvester;
 import org.constellation.metadata.harvest.CatalogueHarvester;
-import org.constellation.metadata.harvest.DefaultCatalogueHarvester;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
@@ -404,11 +402,7 @@ public class CSWworker {
         indexSearcher                 = cswfactory.getIndexSearcher(datasourceType, configDir, serviceID);
         if (profile == TRANSACTIONAL) {
             mdWriter                  = cswfactory.getMetadataWriter(configuration, indexer);
-            if (configuration.getByIdHarvester() != null && configuration.getByIdHarvester().equalsIgnoreCase("true")) {
-                catalogueHarvester    = new ByIDHarvester(mdWriter, configuration.getIdentifierDirectory());
-            } else {
-                catalogueHarvester    = new DefaultCatalogueHarvester(mdWriter);
-            }
+            catalogueHarvester        = cswfactory.getCatalogueHarvester(configuration, mdWriter);
             harvestTaskSchreduler     = new HarvestTaskSchreduler(configDir, catalogueHarvester);
         } else {
             indexer.destroy();
