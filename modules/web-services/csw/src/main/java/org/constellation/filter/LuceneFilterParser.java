@@ -60,7 +60,7 @@ import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
  */
 public class LuceneFilterParser extends FilterParser {
 
-    private final static String DEFAULT_FIELD = "metafile:doc";
+    private static final String DEFAULT_FIELD = "metafile:doc";
 
     /**
      * {@inheritDoc}

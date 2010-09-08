@@ -483,7 +483,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
             }
             
             //we look for the different output schema available
-            DomainType outputDomain = getRecordOp.getParameterIgnoreCase("outputSchema");
+            final DomainType outputDomain = getRecordOp.getParameterIgnoreCase("outputSchema");
             if (outputDomain != null) {
                 final List<String> availableOutputSchema = StringUtilities.cleanStrings(outputDomain.getValue());
                 final String defaultValue                = outputDomain.getDefaultValue();
@@ -513,9 +513,7 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
             // we look for the different Type names
             DomainType typeNameDomain = getRecordOp.getParameterIgnoreCase("typename");
             if (typeNameDomain == null) {
-                if (typeNameDomain == null) {
-                    typeNameDomain = getRecordOp.getParameterIgnoreCase("typenames");
-                }
+                typeNameDomain = getRecordOp.getParameterIgnoreCase("typenames");
             }
             
             final List<QName>  typeNamesQname = new ArrayList<QName>();

@@ -79,9 +79,6 @@ public abstract class AbstractWorker implements Worker {
      */
     private final Map<String,Object> capabilities = new HashMap<String,Object>();
 
-    public AbstractWorker() {
-    }
-    
     /**
      * {@inheritDoc }
      */

@@ -161,7 +161,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             final Set<Entry<Integer, RecordSet>> results = mdWebReader.getAllIdentifiers(catToIndex);
             LOGGER.log(logLevel, results.size() + " forms to read.");
             for (Entry<Integer, RecordSet> entry : results) {
-                Form form = mdWebReader.getForm(entry.getValue(), entry.getKey());
+                final Form form = mdWebReader.getForm(entry.getValue(), entry.getKey());
                 if ((form.getType() == null || form.getType().equals(Form.TYPE.NORMALFORM)) && form.isPublished()) {
                     indexDocument(writer, form);
                     nbForms++;

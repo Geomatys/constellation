@@ -108,7 +108,7 @@ public class ByIDHarvester extends CatalogueHarvester {
         final List<String> result = new ArrayList<String>();
         FileInputStream in = null;
         try {
-            File f = new File(identifierDirectoryPath + "id" + currentFile);
+            final File f = new File(identifierDirectoryPath + "id" + currentFile);
             if (!f.exists()) {
                 LOGGER.log(Level.WARNING, "the file " + identifierDirectoryPath + "id{0} does not exist", currentFile);
                 return result;

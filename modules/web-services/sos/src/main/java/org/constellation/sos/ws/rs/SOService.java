@@ -112,7 +112,7 @@ public class SOService extends OGCWebService {
              }
 
              if (request instanceof DescribeSensor) {
-                DescribeSensor ds             = (DescribeSensor)request;
+                final DescribeSensor ds       = (DescribeSensor)request;
                 final AbstractSensorML sensor = worker.describeSensor(ds);
                 return Response.ok(sensor, MimeType.TEXT_XML).build();
              }
@@ -140,7 +140,7 @@ public class SOService extends OGCWebService {
 
              if (request instanceof GetCapabilities) {
                 worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.SOS_1_0_0));
-                GetCapabilities gc = (GetCapabilities)request;
+                final GetCapabilities gc = (GetCapabilities)request;
                 return Response.ok(worker.getCapabilities(gc), worker.getOutputFormat()).build();
              }
 

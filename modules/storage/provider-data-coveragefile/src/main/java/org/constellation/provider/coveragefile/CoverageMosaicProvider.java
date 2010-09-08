@@ -174,7 +174,7 @@ public class CoverageMosaicProvider extends AbstractLayerProvider{
             }
 
             try{
-                GridCoverageReader reader = GridCoverageReaders.openMosaic(folder);
+                final GridCoverageReader reader = GridCoverageReaders.openMosaic(folder);
                 index.put(name, reader);
             }catch(IOException ex){
                 Logger.getLogger(CoverageMosaicProvider.class.getName()).log(Level.WARNING, "Failed to load mosaic reader.", ex);

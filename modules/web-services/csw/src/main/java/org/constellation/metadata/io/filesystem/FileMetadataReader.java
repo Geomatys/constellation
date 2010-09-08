@@ -176,7 +176,7 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
         } else {
             for (File child : directory.listFiles()) {
                 if (child.isDirectory()) {
-                    File result = getFileFromIdentifier(identifier, child);
+                    final File result = getFileFromIdentifier(identifier, child);
                     if (result != null && result.exists()) {
                         return result;
                     }
@@ -259,16 +259,11 @@ public class FileMetadataReader extends AbstractMetadataReader implements CSWMet
                             ReflectionUtilities.invokeMethod(setter, customRecord, param);
                         } else {
                             final String paramDesc = param.getClass().getSimpleName();
-                            final String localPart = qn.getLocalPart();
-                            LOGGER.warning("No setter have been found for attribute " + localPart +" of type " + paramDesc + " in the class RecordType");
+                            LOGGER.warning("No setter have been found for attribute " + qn.getLocalPart() +" of type " + paramDesc + " in the class RecordType");
                         }
 
                     } catch (IllegalArgumentException ex) {
-                        String localPart = "null";
-                        if (qn != null) {
-                            localPart = qn.getLocalPart();
-                        }
-                        LOGGER.warning("illegal argument exception while invoking the method for attribute" + localPart + " in the classe RecordType");
+                        LOGGER.warning("illegal argument exception while invoking the method for attribute" + qn.getLocalPart() + " in the classe RecordType");
                     }
                 } else {
                     LOGGER.warning("An elementName was null.");

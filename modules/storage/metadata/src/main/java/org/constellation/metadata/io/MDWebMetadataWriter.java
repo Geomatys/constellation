@@ -624,7 +624,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     } else if (!propName.equals("unitOfMeasure") && !propName.equals("verticalDatum")) {
                         final Class valueClass = object.getClass();
                         try {
-                            Field field = valueClass.getDeclaredField(propName);
+                            final Field field = valueClass.getDeclaredField(propName);
                             field.setAccessible(true);
                             final Object propertyValue;
                             if (field != null) {

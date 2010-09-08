@@ -70,41 +70,41 @@ public class NavigationBean {
     }
     
     public void authentify() throws IOException {
-    	final Properties properties = getProperties();
-		
-		if (login.isEmpty() || passwd.isEmpty()) {
-			authenticationError = AUTHENTICATIONERROR.EMPTYFIELD;
-		} else {
-			if (checkEqualProperty(properties, "user", login) && checkEqualProperty(properties, "passwd", passwd)) {
-				authenticated = true;
-				authenticationError = AUTHENTICATIONERROR.SUCCESS;
-			} else {
-				authenticated = false;
-				authenticationError = AUTHENTICATIONERROR.MISMATCH;
-			}
-		}
+        final Properties properties = getProperties();
+
+        if (login.isEmpty() || passwd.isEmpty()) {
+            authenticationError = AUTHENTICATIONERROR.EMPTYFIELD;
+        } else {
+            if (checkEqualProperty(properties, "user", login) && checkEqualProperty(properties, "passwd", passwd)) {
+                authenticated = true;
+                authenticationError = AUTHENTICATIONERROR.SUCCESS;
+            } else {
+                authenticated = false;
+                authenticationError = AUTHENTICATIONERROR.MISMATCH;
+            }
+        }
     }
     
     public void changePasswd() throws IOException {
-    	if (checkEqualProperty(getProperties(), "passwd", passwd)) {
-    		if (newPasswd1.isEmpty() || newLogin.isEmpty()) {
-    			// error
-    		} else {
-    			if (newPasswd1.equals(newPasswd2)) {
-    				final Properties properties = new Properties();
-    				properties.setProperty("user", newLogin);
-    				properties.setProperty("passwd", newPasswd1);
-    				
-    				final ServletContext sc = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
-    				
-    				final File file = new File(sc.getRealPath(AUTH_FILE_PATH));
-    				final FileOutputStream fos = new FileOutputStream(file);
-    				properties.store(fos, "Config");
-    			}
-    		}
-    	} else {
-    		// error
-    	}
+    	   if (checkEqualProperty(getProperties(), "passwd", passwd)) {
+            if (newPasswd1.isEmpty() || newLogin.isEmpty()) {
+                // error
+            } else {
+                if (newPasswd1.equals(newPasswd2)) {
+                    final Properties properties = new Properties();
+                    properties.setProperty("user", newLogin);
+                    properties.setProperty("passwd", newPasswd1);
+
+                    final ServletContext sc = (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
+
+                    final File file = new File(sc.getRealPath(AUTH_FILE_PATH));
+                    final FileOutputStream fos = new FileOutputStream(file);
+                    properties.store(fos, "Config");
+                }
+            }
+        } else {
+            // error
+        }
     }
     
     public void logout() {
@@ -125,50 +125,46 @@ public class NavigationBean {
     }
 
     private boolean checkEqualProperty(final Properties properties, final String property, final String value) {
-    	if ((properties != null) && (property != null) && (value != null)) {
-	    	final String cfgProperty = properties.getProperty(property);
-			if (value.equals(cfgProperty)) {
-				return true;
-			} else {
-				return false;
-			}
-	    }
-    	return false;
+        if ((properties != null) && (property != null) && (value != null)) {
+            final String cfgProperty = properties.getProperty(property);
+            return value.equals(cfgProperty);
+        }
+        return false;
     }
-    
+
     private Properties getProperties() throws IOException {
-    	final Properties properties = new Properties();
-    	InputStream inputStream = null;
-    	final FacesContext context = FacesContext.getCurrentInstance();
-    	if (context != null) {
-    		final ExternalContext externalContext = context.getExternalContext();
-    		if (externalContext != null) {
-    			final ServletContext sc = (ServletContext) externalContext.getContext();
-    			if (sc != null) {
-    				try {
-						inputStream = new FileInputStream(sc.getRealPath(AUTH_FILE_PATH));
-					} catch (FileNotFoundException e) {
-						LOGGER.log(Level.SEVERE, "No configuration file found.");
-						authenticationError = AUTHENTICATIONERROR.CONFIGFILENOTFOUND;
-					}
-    			}
-    		}
-    	}
-    	
-    	if (inputStream == null) {
-    		inputStream = getClass().getResourceAsStream(AUTH_FILE_PATH);
-    	}
-    	
-    	if (inputStream == null) {
-    		authenticationError = AUTHENTICATIONERROR.CONFIGFILENOTFOUND;
-    	} else {
-    		try {
-				properties.load(inputStream);
-    		} finally {
-	    		inputStream.close();
-	    	}
-    	}
-    	return properties;
+        final Properties properties = new Properties();
+        InputStream inputStream = null;
+        final FacesContext context = FacesContext.getCurrentInstance();
+        if (context != null) {
+            final ExternalContext externalContext = context.getExternalContext();
+            if (externalContext != null) {
+                final ServletContext sc = (ServletContext) externalContext.getContext();
+                if (sc != null) {
+                    try {
+                        inputStream = new FileInputStream(sc.getRealPath(AUTH_FILE_PATH));
+                    } catch (FileNotFoundException e) {
+                        LOGGER.log(Level.SEVERE, "No configuration file found.");
+                        authenticationError = AUTHENTICATIONERROR.CONFIGFILENOTFOUND;
+                    }
+                }
+            }
+        }
+
+        if (inputStream == null) {
+            inputStream = getClass().getResourceAsStream(AUTH_FILE_PATH);
+        }
+
+        if (inputStream == null) {
+            authenticationError = AUTHENTICATIONERROR.CONFIGFILENOTFOUND;
+        } else {
+            try {
+                properties.load(inputStream);
+            } finally {
+                inputStream.close();
+            }
+        }
+        return properties;
     }
     
     public String getLogin() {
@@ -187,52 +183,52 @@ public class NavigationBean {
         this.passwd = password;
     }
 
-	public void setAuthenticated(boolean authenticated) {
-		this.authenticated = authenticated;
-	}
+    public void setAuthenticated(boolean authenticated) {
+            this.authenticated = authenticated;
+    }
 
-	public boolean isAuthenticated() {
-		return authenticated;
-	}
+    public boolean isAuthenticated() {
+            return authenticated;
+    }
 
-	public void setAuthenticationError(AUTHENTICATIONERROR authenticationError) {
-		this.authenticationError = authenticationError;
-	}
+    public void setAuthenticationError(AUTHENTICATIONERROR authenticationError) {
+            this.authenticationError = authenticationError;
+    }
 
-	public AUTHENTICATIONERROR getAuthenticationError() {
-		return authenticationError;
-	}
+    public AUTHENTICATIONERROR getAuthenticationError() {
+            return authenticationError;
+    }
 
-	public void setCurrentHref(String currentHref) {
-		this.currentHref = currentHref;
-	}
+    public void setCurrentHref(String currentHref) {
+            this.currentHref = currentHref;
+    }
 
-	public String getCurrentHref() {
-		return currentHref;
-	}
+    public String getCurrentHref() {
+            return currentHref;
+    }
 
-	public void setNewLogin(String newLogin) {
-		this.newLogin = newLogin;
-	}
+    public void setNewLogin(String newLogin) {
+            this.newLogin = newLogin;
+    }
 
-	public String getNewLogin() {
-		return newLogin;
-	}
+    public String getNewLogin() {
+            return newLogin;
+    }
 
-	public void setNewPasswd1(String newPasswd1) {
-		this.newPasswd1 = newPasswd1;
-	}
+    public void setNewPasswd1(String newPasswd1) {
+            this.newPasswd1 = newPasswd1;
+    }
 
-	public String getNewPasswd1() {
-		return newPasswd1;
-	}
+    public String getNewPasswd1() {
+            return newPasswd1;
+    }
 
-	public void setNewPasswd2(String newPasswd2) {
-		this.newPasswd2 = newPasswd2;
-	}
+    public void setNewPasswd2(String newPasswd2) {
+            this.newPasswd2 = newPasswd2;
+    }
 
-	public String getNewPasswd2() {
-		return newPasswd2;
-	}
+    public String getNewPasswd2() {
+            return newPasswd2;
+    }
 
 }

@@ -445,6 +445,11 @@ public class CSWworker {
         }
     }
 
+    /**
+     * Load from the resource the XSD schemas used for the reponse of describeRecord.
+     * 
+     * @throws CstlServiceException if there is a JAXBException while using the unmarshaller.
+     */
     private void initializeRecordSchema() throws CstlServiceException {
         Unmarshaller unmarshaller = null;
         try {

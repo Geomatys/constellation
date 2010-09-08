@@ -17,7 +17,6 @@
  */
 package org.constellation.ws.rs;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.StringTokenizer;
@@ -52,7 +51,6 @@ import javax.xml.bind.UnmarshalException;
 // Constellation dependencies
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 

@@ -572,7 +572,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             } else if (className.equals("DefaultInternationalString")) {
 
                 String ptvalue = null;
-                Map<Locale, String> map = new HashMap<Locale, String>();
+                final Map<Locale, String> map = new HashMap<Locale, String>();
                 //We search the children of the value
                 for (Value childValue : value.getChildren()) {
                     if (childValue instanceof TextValue) {
@@ -591,7 +591,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                             if (lvalue != null && locale != null) {
                                 if (locale.startsWith("#locale-")) {
                                     locale = locale.substring(locale.indexOf('-') + 1);
-                                    Locale loc = Locales.parse(locale);
+                                    final Locale loc = Locales.parse(locale);
                                     map.put(loc, lvalue);
                                 } else {
                                     LOGGER.warning("Malformed values: child of LocalisedCharacterString `\"locale\"does not starts with '#locale-'");
@@ -604,7 +604,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         }
                     }
                 }
-                DefaultInternationalString resultIS = new DefaultInternationalString(ptvalue);
+                final DefaultInternationalString resultIS = new DefaultInternationalString(ptvalue);
                 for (Entry<Locale, String> entry : map.entrySet()) {
                     resultIS.add(entry.getKey(), entry.getValue());
                 }

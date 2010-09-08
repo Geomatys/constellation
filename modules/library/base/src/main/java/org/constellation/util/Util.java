@@ -147,7 +147,7 @@ public final class Util {
     }
 
     /**
-     * Parse a String to ionstanciate a named Layer (namespace : name).
+     * Parse a String to instanciate a named Layer (namespace : name).
      * @param layerName
      * @return
      */

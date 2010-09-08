@@ -34,7 +34,7 @@ public class WebServiceUtilities {
 
     private static final Logger LOGGER = Logging.getLogger(WebServiceUtilities.class);
 
-    public WebServiceUtilities(){}
+    private WebServiceUtilities(){}
 
     public static boolean getUpdateCapabilitiesFlag(String home) {
         final Properties p = new Properties();

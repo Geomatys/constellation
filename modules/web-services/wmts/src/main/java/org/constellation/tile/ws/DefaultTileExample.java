@@ -11,11 +11,11 @@ import org.geotoolkit.wmts.xml.v100.TileMatrixSet;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class DefaultTileExample {
+public final class DefaultTileExample {
 
     private DefaultTileExample() {}
     
-    public final static TileMatrixSet BLUEMARBLE;
+    public static final TileMatrixSet BLUEMARBLE;
     static {
         BLUEMARBLE = new TileMatrixSet(new CodeType("BlueMarble"), "urn:ogc:def:crs:OGC:1.3:CRS84");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
@@ -35,7 +35,7 @@ public class DefaultTileExample {
         BLUEMARBLE.setTileMatrix(tm);
     }
 
-    /*public final static TileMatrixSet BLUEMARBLE;
+    /*public static final TileMatrixSet BLUEMARBLE;
     static {
         BLUEMARBLE = new TileMatrixSet(new CodeType("BlueMarble"), "urn:ogc:def:crs:OGC:1.3:CRS84");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
@@ -52,7 +52,7 @@ public class DefaultTileExample {
         BLUEMARBLE.setTileMatrix(tm);
     }*/
 
-    public final static TileMatrixSet ORTHO_THAU;
+    public static final TileMatrixSet ORTHO_THAU;
     static {
         ORTHO_THAU = new TileMatrixSet(new CodeType("OrthoThau"), "urn:ogc:def:crs:EPSG:27582");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
@@ -68,7 +68,7 @@ public class DefaultTileExample {
         ORTHO_THAU.setTileMatrix(tm);
     }
 
-    public final static TileMatrixSet THAU_SCAN_250_IGN;
+    public static final TileMatrixSet THAU_SCAN_250_IGN;
     static {
         THAU_SCAN_250_IGN = new TileMatrixSet(new CodeType("ThauScan250IGN"), "urn:ogc:def:crs:EPSG:27582");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
@@ -81,7 +81,7 @@ public class DefaultTileExample {
         THAU_SCAN_250_IGN.setTileMatrix(tm);
     }
 
-    public final static TileMatrixSet THAU_SCAN_25_IGN;
+    public static final TileMatrixSet THAU_SCAN_25_IGN;
     static {
         THAU_SCAN_25_IGN = new TileMatrixSet(new CodeType("ThauScan25IGN"), "urn:ogc:def:crs:EPSG:27593");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
@@ -93,7 +93,7 @@ public class DefaultTileExample {
         THAU_SCAN_25_IGN.setTileMatrix(tm);
     }
 
-    public final static TileMatrixSet UNESCO;
+    public static final TileMatrixSet UNESCO;
     static {
         UNESCO = new TileMatrixSet(new CodeType("UNESCO"), "urn:ogc:def:crs:EPSG:4326");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();
@@ -120,7 +120,7 @@ public class DefaultTileExample {
         UNESCO.setTileMatrix(tm);
     }
 
-    public final static TileMatrixSet ORTHO_ALPES_JPEG;
+    public static final TileMatrixSet ORTHO_ALPES_JPEG;
     static {
         ORTHO_ALPES_JPEG = new TileMatrixSet(new CodeType("ORTHO_ALPES_JPEG"), "urn:ogc:def:crs:EPSG:2154");
         final List<TileMatrix> tm = new ArrayList<TileMatrix>();

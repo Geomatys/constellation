@@ -86,6 +86,15 @@ public abstract class AbstractCSWFactory extends Factory {
      */
     public abstract AbstractIndexSearcher getIndexSearcher(int dbType, File configDir, String serviceID) throws IndexingException;
 
+    /**
+     * Return a catalogue harvester in the specified implementation type.
+     *
+     * @param configuration  A configuration object containing all the information about the choosen harvester implementation.
+     * @param writer A metadata writer to store the harvested metadata into the datasource.
+     *
+     * @return A Catalogue harvester implementation.
+     * @throws MetadataIoException
+     */
     public abstract CatalogueHarvester getCatalogueHarvester(Automatic configuration, MetadataWriter writer) throws MetadataIoException;
 
 }

@@ -153,7 +153,7 @@ public class WCSService extends GridWebService {
             logParameters();
 
             if (objectRequest instanceof GetCapabilities){
-                GetCapabilities getcaps = (GetCapabilities)objectRequest;
+                final GetCapabilities getcaps = (GetCapabilities)objectRequest;
                 serviceDef              = getVersionFromNumber(getcaps.getVersion());
                
                 final GetCapabilitiesResponse capsResponse = worker.getCapabilities(getcaps);
@@ -161,7 +161,7 @@ public class WCSService extends GridWebService {
             }
 
             if (objectRequest instanceof DescribeCoverage) {
-                DescribeCoverage desccov = (DescribeCoverage)objectRequest;
+                final DescribeCoverage desccov = (DescribeCoverage)objectRequest;
 
                 //TODO: move me into the worker.
                 //verifyBaseParameter(0);
@@ -183,13 +183,11 @@ public class WCSService extends GridWebService {
             }
 
             if (objectRequest instanceof GetCoverage) {
-                GetCoverage getcov = (GetCoverage)objectRequest;
+                final GetCoverage getcov = (GetCoverage)objectRequest;
                 //TODO: move me into the worker.
                 //verifyBaseParameter(0);
 
-                if (getcov == null) {
-                    getcov = adaptKvpGetCoverageRequest();
-                } else if (getcov.getVersion() == null) {
+                if (getcov.getVersion() == null) {
                     throw new CstlServiceException("The parameter version must be specified",
                         MISSING_PARAMETER_VALUE, "version");
                 } else if (getcov.getFormat() == null) {
@@ -198,42 +196,13 @@ public class WCSService extends GridWebService {
                 }
                 serviceDef = getVersionFromNumber(getcov.getVersion());
                 String format = getcov.getFormat();
-                if (!format.equalsIgnoreCase(MimeType.IMAGE_BMP)  && !format.equalsIgnoreCase(BMP)  &&
-                    !format.equalsIgnoreCase(MimeType.IMAGE_GIF)  && !format.equalsIgnoreCase(GIF)  &&
-                    !format.equalsIgnoreCase(MimeType.IMAGE_JPEG) && !format.equalsIgnoreCase(JPEG) &&
-                    !format.equalsIgnoreCase(JPG)                 && !format.equalsIgnoreCase(TIF)  &&
-                    !format.equalsIgnoreCase(MimeType.IMAGE_TIFF) && !format.equalsIgnoreCase(TIFF) &&
-                    !format.equalsIgnoreCase(MimeType.IMAGE_PNG)  && !format.equalsIgnoreCase(PNG)  &&
-                    !format.equalsIgnoreCase(GEOTIFF)             && !format.equalsIgnoreCase(NETCDF) &&
-                    !format.equalsIgnoreCase(MATRIX)              && !format.equalsIgnoreCase(ASCII_GRID))
-                {
+                if (!isSupportedFormat(format)){
                     throw new CstlServiceException("The format specified is not recognized. Please choose a known format " +
                         "for your coverage, defined in a DescribeCoverage response on the coverage.", INVALID_FORMAT,
                         KEY_FORMAT.toLowerCase());
                 }
                 final RenderedImage rendered = worker.getCoverage(getcov);
-                if (format.equalsIgnoreCase(MATRIX)) {
-                    format = "text/x-matrix";
-                }
-                if (format.equalsIgnoreCase(ASCII_GRID)) {
-                    format = "text/x-ascii-grid";
-                }
-                // Convert the supported image type into known mime-type.
-                if (format.equalsIgnoreCase(PNG)) {
-                    format = MimeType.IMAGE_PNG;
-                }
-                if (format.equalsIgnoreCase(GIF)) {
-                    format = MimeType.IMAGE_GIF;
-                }
-                if (format.equalsIgnoreCase(BMP)) {
-                    format = MimeType.IMAGE_BMP;
-                }
-                if (format.equalsIgnoreCase(JPEG) || format.equalsIgnoreCase(JPG)) {
-                    format = MimeType.IMAGE_JPEG;
-                }
-                if (format.equalsIgnoreCase(TIF) || format.equalsIgnoreCase(TIFF)) {
-                    format = MimeType.IMAGE_TIFF;
-                }
+                format = getOutputFormat(format);
                 return Response.ok(rendered, format).build();
             }
 
@@ -252,6 +221,38 @@ public class WCSService extends GridWebService {
         }
     }
 
+    private String getOutputFormat(String format) {
+        if (format.equalsIgnoreCase(MATRIX)) {
+            format = "text/x-matrix";
+        } else if (format.equalsIgnoreCase(ASCII_GRID)) {
+            format = "text/x-ascii-grid";
+
+        // Convert the supported image type into known mime-type.
+        } else if (format.equalsIgnoreCase(PNG)) {
+            format = MimeType.IMAGE_PNG;
+        } else if (format.equalsIgnoreCase(GIF)) {
+            format = MimeType.IMAGE_GIF;
+        } else if (format.equalsIgnoreCase(BMP)) {
+            format = MimeType.IMAGE_BMP;
+        } else if (format.equalsIgnoreCase(JPEG) || format.equalsIgnoreCase(JPG)) {
+            format = MimeType.IMAGE_JPEG;
+        } else if (format.equalsIgnoreCase(TIF) || format.equalsIgnoreCase(TIFF)) {
+            format = MimeType.IMAGE_TIFF;
+        }
+        return format;
+    }
+
+    private boolean isSupportedFormat(String format) {
+        return format.equalsIgnoreCase(MimeType.IMAGE_BMP)  ||format.equalsIgnoreCase(BMP)  ||
+               format.equalsIgnoreCase(MimeType.IMAGE_GIF)   ||format.equalsIgnoreCase(GIF)  ||
+               format.equalsIgnoreCase(MimeType.IMAGE_JPEG)  ||format.equalsIgnoreCase(JPEG) ||
+               format.equalsIgnoreCase(JPG)                  ||format.equalsIgnoreCase(TIF)  ||
+               format.equalsIgnoreCase(MimeType.IMAGE_TIFF)  ||format.equalsIgnoreCase(TIFF) ||
+               format.equalsIgnoreCase(MimeType.IMAGE_PNG)  ||format.equalsIgnoreCase(PNG)  ||
+               format.equalsIgnoreCase(GEOTIFF)              ||format.equalsIgnoreCase(NETCDF) ||
+               format.equalsIgnoreCase(MATRIX)               ||format.equalsIgnoreCase(ASCII_GRID);
+    }
+    
     /**
      * {@inheritDoc}
      */

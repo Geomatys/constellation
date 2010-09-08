@@ -108,7 +108,7 @@ public class CstlXMLSerializer extends XMLSerializer {
                     throw new SAXException(msg);
                 }
                 if (namespaceURI != null && !namespaceURI.equals("")) {
-                    String prefix = getPrefix(namespaceURI);
+                    final String prefix = getPrefix(namespaceURI);
                     if (prefix != null && prefix.length() > 0) {
                         rawName = prefix + ":" + localName;
                     } else {

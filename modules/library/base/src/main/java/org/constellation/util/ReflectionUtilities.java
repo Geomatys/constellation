@@ -621,6 +621,14 @@ public final class ReflectionUtilities {
         return null;
     }
 
+    /**
+     * Return a java field from the specified class(or any of its super class)
+     * or {@code null} if it does not exist.
+     *
+     * @param attribName
+     * @param classe
+     * @return
+     */
     public static Field getFieldFromName(String attribName, Class classe) {
         Field field      = null;
         Class tempClasse = classe;

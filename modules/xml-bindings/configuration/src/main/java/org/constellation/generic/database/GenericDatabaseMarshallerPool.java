@@ -26,7 +26,7 @@ import org.geotoolkit.xml.MarshallerPool;
  *
  * @author Guilhem Legal (Geomatys)
  */
-public class GenericDatabaseMarshallerPool {
+public final class GenericDatabaseMarshallerPool {
 
     private static MarshallerPool instance;
     static {

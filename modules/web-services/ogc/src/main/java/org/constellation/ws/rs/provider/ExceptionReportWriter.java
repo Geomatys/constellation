@@ -69,7 +69,7 @@ public class ExceptionReportWriter<T extends ExceptionResponse> implements Messa
             } else if (t instanceof org.geotoolkit.ows.xml.v110.ExceptionReport) {
                 m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, OWS_110_XSD);
             } else if (t instanceof SchemaLocatedExceptionResponse) {
-                SchemaLocatedExceptionResponse response = (SchemaLocatedExceptionResponse) t;
+                final SchemaLocatedExceptionResponse response = (SchemaLocatedExceptionResponse) t;
                 t = (T)response.getResponse();
 
                 /*

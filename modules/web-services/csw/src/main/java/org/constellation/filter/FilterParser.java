@@ -261,12 +261,7 @@ public abstract class FilterParser {
                     addDateComparisonFilter(response, propertyName, literalValue, "<=");
 
                 } else {
-                    final String operator;
-                    if (bc != null) {
-                        operator = bc.getClass().getSimpleName();
-                    } else {
-                        operator = "null";
-                    }
+                    final String operator = bc.getClass().getSimpleName();
                     throw new CstlServiceException("Unkwnow comparison operator: " + operator,
                                                      INVALID_PARAMETER_VALUE, QUERY_CONSTRAINT);
                 }
@@ -644,7 +639,7 @@ public abstract class FilterParser {
      */
     protected boolean isDateField(final PropertyName pName) {
         if (pName != null && pName.getPropertyName() != null) {
-            String propertyName = pName.getPropertyName();
+            final String propertyName = pName.getPropertyName();
             return propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")
                 || propertyName.equalsIgnoreCase("TempExtent_begin") || propertyName.equalsIgnoreCase("TempExtent_end");
         }

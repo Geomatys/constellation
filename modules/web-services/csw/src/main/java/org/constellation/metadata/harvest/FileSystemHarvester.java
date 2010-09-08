@@ -66,7 +66,7 @@ public class FileSystemHarvester extends CatalogueHarvester {
                                           NO_APPLICABLE_CODE, "sourceURL");
         }
         //we initialize the getRecords request
-        int nbRecordInserted = harvestDirectory(dataDirectory);
+        final int nbRecordInserted = harvestDirectory(dataDirectory);
         // TODO
         int nbRecordUpdated  = 0;
 
