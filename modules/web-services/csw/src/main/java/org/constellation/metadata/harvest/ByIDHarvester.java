@@ -47,7 +47,6 @@ import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.csw.xml.GetRecordsRequest;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import org.geotoolkit.ows.xml.v100.ExceptionReport;
-import org.geotoolkit.xml.Namespaces;
 import org.geotoolkit.csw.xml.v202.GetRecordByIdResponseType;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -300,9 +299,6 @@ public class ByIDHarvester extends CatalogueHarvester {
         return harvested;
     }
 
-
-    
-
     /**
      * Transfer The request to all the servers specified in distributedServers.
      *
@@ -314,64 +310,14 @@ public class ByIDHarvester extends CatalogueHarvester {
     }
 
 
-    /**
-     * Harvest a single record and storing it into the database
-     *
-     * @param sourceURL The URL of the resource.
-     * @param resourceType The record schema of the document to harvest.
-     *
-     * @return An array containing: the number of inserted records, the number of updated records and the number of deleted records.
-     */
     @Override
-    public int[] harvestSingle(String sourceURL, String resourceType) throws MalformedURLException, IOException, CstlServiceException, JAXBException {
-        final int[] result = new int[3];
-        result[0] = 0;
-        result[1] = 0;
-        result[2] = 0;
-        Unmarshaller unmarshaller = null;
+    protected InputStream getSingleMetadata(String sourceURL) throws CstlServiceException {
         try {
-            unmarshaller              = marshallerPool.acquireUnmarshaller();
-            
-            if (resourceType.equals(Namespaces.GMD) ||
-                resourceType.equals(Namespaces.CSW_202) ||
-                resourceType.equals("http://www.isotc211.org/2005/gfc")) {
-
-                final URL source          = new URL(sourceURL);
-                final URLConnection conec = source.openConnection();
-                final InputStream in      = conec.getInputStream();
-                final Object harvested    = unmarshaller.unmarshal(in);
-                if (harvested == null) {
-                    throw new CstlServiceException("The resource can not be parsed.", INVALID_PARAMETER_VALUE, "Source");
-                }
-
-                LOGGER.log(Level.INFO, "Object Type of the harvested Resource: {0}", harvested.getClass().getName());
-
-                // ugly patch TODO handle update in mdweb
-                try {
-                    if (metadataWriter.storeMetadata(harvested)) {
-                        result[0] = 1;
-                    }
-                } catch (IllegalArgumentException e) {
-                    result[1] = 1;
-                }  catch (MetadataIoException ex) {
-                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-                }
-            } else {
-                throw new CstlServiceException("unexpected resourceType: " + resourceType, NO_APPLICABLE_CODE);
-            }
-        } finally {
-            if (unmarshaller != null) {
-                marshallerPool.release(unmarshaller);
-            }
-        }
-        return result;
-    }
-
-
-    @Override
-    public void destroy() {
-        if (metadataWriter != null) {
-            metadataWriter.destroy();
+            final URL source = new URL(sourceURL);
+            final URLConnection conec = source.openConnection();
+            return conec.getInputStream();
+        } catch (IOException ex) {
+            throw new CstlServiceException(ex);
         }
     }
 }

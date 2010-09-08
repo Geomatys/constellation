@@ -16,6 +16,9 @@
  */
 package org.constellation.metadata.harvest;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import org.constellation.metadata.DistributedResults;
 import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 import javax.xml.bind.JAXBElement;
@@ -32,7 +35,6 @@ import org.constellation.metadata.io.MetadataWriter;
 import org.constellation.ws.CstlServiceException;
 import org.geotoolkit.csw.xml.GetRecordsRequest;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
-import org.geotoolkit.xml.Namespaces;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
@@ -79,6 +81,13 @@ public class FileSystemHarvester extends CatalogueHarvester {
     }
     
 
+    /**
+     * Harvest recursively a directy and its children.
+     *
+     * @param dataDirectory
+     * @return
+     * @throws CstlServiceException
+     */
     private int harvestDirectory(File dataDirectory) throws CstlServiceException {
         int nbRecordInserted      = 0;
         Unmarshaller unmarshaller =  null;
@@ -133,58 +142,17 @@ public class FileSystemHarvester extends CatalogueHarvester {
     }
 
     @Override
+    protected InputStream getSingleMetadata(String sourceURL) throws CstlServiceException{
+        try {
+            final File source = new File(sourceURL);
+            return new FileInputStream(source);
+        } catch (FileNotFoundException ex) {
+            throw new CstlServiceException(ex);
+        }
+    }
+    
+    @Override
     public DistributedResults transferGetRecordsRequest(GetRecordsRequest request, List<String> distributedServers, int startPosition, int maxRecords) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-
-    @Override
-    public int[] harvestSingle(String sourceURL, String resourceType) throws MalformedURLException, IOException, CstlServiceException, JAXBException {
-        final int[] result = new int[3];
-        result[0] = 0;
-        result[1] = 0;
-        result[2] = 0;
-        Unmarshaller unmarshaller = null;
-        try {
-            unmarshaller              = marshallerPool.acquireUnmarshaller();
-
-            if (resourceType.equals(Namespaces.GMD) ||
-                resourceType.equals(Namespaces.CSW_202) ||
-                resourceType.equals("http://www.isotc211.org/2005/gfc")) {
-
-                final File source          = new File(sourceURL);
-                final Object harvested    = unmarshaller.unmarshal(source);
-                if (harvested == null) {
-                    throw new CstlServiceException("The resource can not be parsed.", INVALID_PARAMETER_VALUE, "Source");
-                }
-
-                LOGGER.log(Level.INFO, "Object Type of the harvested Resource: {0}", harvested.getClass().getName());
-
-                // ugly patch TODO handle update in mdweb
-                try {
-                    if (metadataWriter.storeMetadata(harvested)) {
-                        result[0] = 1;
-                    }
-                } catch (IllegalArgumentException e) {
-                    result[1] = 1;
-                }  catch (MetadataIoException ex) {
-                    throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
-                }
-            } else {
-                throw new CstlServiceException("unexpected resourceType: " + resourceType, NO_APPLICABLE_CODE);
-            }
-        } finally {
-            if (unmarshaller != null) {
-                marshallerPool.release(unmarshaller);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public void destroy() {
-        if (metadataWriter != null) {
-            metadataWriter.destroy();
-        }
-    }
-
 }
