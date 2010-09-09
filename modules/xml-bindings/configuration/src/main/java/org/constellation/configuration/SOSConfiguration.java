@@ -27,56 +27,122 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.constellation.generic.database.Automatic;
 
 /**
- *
+ * A XML binding object for SOS configuration.
+ * 
  * @author Guilhem Legal (Geomatys)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "SOSConfiguration")
 public class SOSConfiguration {
 
+    /**
+     * Informations about SensorML Datasource.
+     */
     @XmlElement(name="SMLConfiguration")
     private Automatic smlConfiguration;
 
+    /**
+     * Implemetation type for observation filter.
+     */
     private ObservationFilterType observationFilterType;
 
+    /**
+     * Implemetation type for observation reader.
+     */
     private ObservationReaderType observationReaderType;
 
+    /**
+     * Implementation type for observation writer.
+     */
     private ObservationWriterType observationWriterType;
 
+    /**
+     * type of the datasource for SensorML Datasource.
+     */
     @XmlElement(name="SMLType")
     private DataSourceType smlType;
 
+    /**
+     * Informations about O&M Datasource.
+     */
     @XmlElement(name="OMConfiguration")
     private Automatic omConfiguration;
 
+    /**
+     * Other datasource informations (used by sub-implmentations).
+     */
     private List<Automatic> extensions;
 
+    /**
+     * prefix for observations id (example: urn:ogc:object:observation:orgName:)
+     */
     private String observationIdBase;
 
+    /**
+     * prefix for phenomenons id (example: urn:ogc:def:phenomenon:orgName:)
+     */
     private String phenomenonIdBase;
 
+    /**
+     * prefix for observation templates id (example: urn:ogc:object:observationTemplate:orgName:)
+     */
     private String observationTemplateIdBase;
 
+    /**
+     * prefix for sensorML id (example: urn:ogc:object:sensor:orgName:)
+     */
     private String sensorIdBase;
 
+    /**
+     * maximal number of observations permit in the result of  a getObservation request.
+     */
     private int maxObservationByRequest;
 
+    /**
+     * time of validity of a template obtain with a getObservation with resultTemplate.
+     * after this time the template will be destroy.
+     */
     private String templateValidTime;
 
+    /**
+     * profile of the SOS (discovery / transactional)
+     */
     private String profile;
 
+    /**
+     * A directory where to redirect the logs.
+     */
     private String logFolder;
 
+    /**
+     * a debug flag activating some extra logs.
+     */
     private boolean debugMode;
 
+    /**
+     * A debug flag use to verify the synchronization in nearly real time insertion
+     * its not advised to set this flag to true.
+     */
     private boolean verifySynchronization;
 
+    /**
+     * if this flag is set to true, the response of the operation getCapabilities wil not be updated
+     * every request.
+     */
     private boolean keepCapabilities = false;
 
+    /**
+     * Empty constructor used by JAXB.
+     */
     public SOSConfiguration() {
         
     }
 
+    /**
+     * Build a new SOS configuration with the specified SML datasource and O&M datasource.
+     * @param smlConfiguration
+     * @param omConfiguration
+     */
     public SOSConfiguration(Automatic smlConfiguration, Automatic omConfiguration) {
         this.omConfiguration  = omConfiguration;
         this.smlConfiguration = smlConfiguration;
@@ -172,10 +238,18 @@ public class SOSConfiguration {
         this.observationIdBase = observationIdBase;
     }
 
+    /**
+     * return the phenomenon id prefix.
+     * @return
+     */
     public String getPhenomenonIdBase() {
         return phenomenonIdBase;
     }
 
+    /**
+     * set the the phenomenon id prefix.
+     * @param phenomenonIdBase
+     */
     public void setPhenomenonIdBase(String phenomenonIdBase) {
         this.phenomenonIdBase = phenomenonIdBase;
     }
@@ -250,12 +324,20 @@ public class SOSConfiguration {
         this.observationWriterType = observationWriterType;
     }
 
+    /**
+     * Return a flag for the SOS profile (discovery/transactional)
+     * @return
+     */
     public int getProfile() {
         if ("transactional".equalsIgnoreCase(profile))
             return 1;
         return 0;
     }
 
+    /**
+     * set the flag for the SOS profile (discovery/transactional)
+     * @param profile
+     */
     public void setProfile(String profile) {
         this.profile = profile;
     }

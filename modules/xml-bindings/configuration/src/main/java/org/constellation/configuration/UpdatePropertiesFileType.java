@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * An XML binding for a request used to update server property File.
  * 
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
@@ -38,7 +38,7 @@ public class UpdatePropertiesFileType {
     private String fileName;
     
     /**
-     * The name of the service using this configuration file (used for verication)
+     * The name of the service using this configuration file (used for verification)
      */
     private String service;
     
@@ -79,22 +79,42 @@ public class UpdatePropertiesFileType {
         this.properties = properties;
     }
 
+    /**
+     * return name of the properties file.
+     * @return
+     */
     public String getFileName() {
         return fileName;
     }
 
+    /**
+     * Set the name of the properties file.
+     * @param fileName
+     */
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
+    /**
+     * return the name of the service using this configuration file (used for verification)
+     * @return
+     */
     public String getService() {
         return service;
     }
 
+    /**
+     * Set the name of the service using this configuration file (used for verification)
+     * @param service
+     */
     public void setService(String service) {
         this.service = service;
     }
 
+    /**
+     * return a list of key-value properties.
+     * @return
+     */
     public HashMap<String, String> getProperties() {
         if (properties == null) {
             properties = new HashMap<String, String>();
@@ -102,6 +122,10 @@ public class UpdatePropertiesFileType {
         return properties;
     }
 
+    /**
+     * Set a list of key-value properties.
+     * @param properties
+     */
     public void setProperties(HashMap<String, String> properties) {
         this.properties = properties;
     }

@@ -116,6 +116,11 @@ public class FilterQuery {
         return null;
     }
 
+    /**
+     * Add a select clause to the query.
+     *
+     * @param select a SQL Select clause
+     */
     public void addSelect(FilterSelect select) {
         this.getSelect().add(select);
     }
@@ -142,6 +147,11 @@ public class FilterQuery {
         return null;
     }
 
+    /**
+     * Add a FROM clause to the query.
+     *
+     * @param select a SQL FROM clause
+     */
     public void addFrom(From from) {
         this.getFrom().add(from);
     }
@@ -181,6 +191,11 @@ public class FilterQuery {
         return result;
     }
 
+    /**
+     * Add a WHERE clause to the query.
+     *
+     * @param select a SQL WHERE clause
+     */
     public void addWhere(Where where) {
         this.getWhere().add(where);
     }
@@ -207,6 +222,11 @@ public class FilterQuery {
         return null;
     }
 
+    /**
+     * Add a ORDERBY clause to the query.
+     *
+     * @param select a SQL ORDERBY clause
+     */
     public void addOrderby(Orderby orderby) {
         this.getOrderby().add(orderby);
     }
@@ -236,6 +256,10 @@ public class FilterQuery {
     }
     
 
+    /**
+     * Build the concrete SQL text query by combinating all the clause contained in this object.
+     * @return An SQL query.
+     */
     public String buildSQLQuery() {
         StringBuilder sb = new StringBuilder();
         if (select != null) {

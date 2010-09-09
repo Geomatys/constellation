@@ -148,33 +148,67 @@ public class Automatic {
      */
     private Queries queries;
 
+    /**
+     * Constructor used by JAXB
+     */
     public Automatic() {
     }
 
+    /**
+     * Build an configuration object for filesystem datasource.
+     *
+     * @param format type of the implementation.
+     * @param dataDirectory Direcory containing the data file.
+     */
     public Automatic(String format, String dataDirectory) {
         this.format        = format;
         this.dataDirectory = dataDirectory;
     }
 
+    /**
+     * Build an configuration object for SGBD datasource.
+     *
+     * @param format format type of the implementation.
+     * @param bdd A datasource description.
+     */
     public Automatic(String format, BDD bdd) {
         this.format = format;
         this.bdd    = bdd;
     }
 
+    /**
+     * Build an configuration object for SGBD datasource with generic SQL queries.
+     *
+      * @param format format type of the implementation.
+     * @param bdd A datasource description.
+     * @param queries A list of SQL queries
+     */
     public Automatic(String format, BDD bdd, Queries queries) {
         this.format  = format;
         this.bdd     = bdd;
         this.queries = queries;
     }
 
+    /**
+     * return The generic SQL Queries
+     * @return
+     */
     public Queries getQueries() {
         return queries;
     }
 
+    /**
+     * return the database connection informations.
+     * @return
+     */
     public BDD getBdd() {
         return bdd;
     }
 
+    /**
+     * Set the database connection informations.
+     * @param bdd a database description.
+     */
     public void setBdd(BDD bdd) {
         this.bdd = bdd;
     }
@@ -193,14 +227,27 @@ public class Automatic {
         this.configurationDirectory = configurationDirectory;
     }
 
+    /**
+     * return the type of implementation.
+     * @return
+     */
     public String getFormat() {
         return format;
     }
 
+    /**
+     * set the type of implementation.
+     * 
+     * @param format
+     */
     public void setFormat(String format) {
         this.format = format;
     }
-    
+
+    /**
+     * Return the directory containing the data files.
+     * @return
+     */
     public File getDataDirectory() {
         File result = null;
         if (dataDirectory != null) {
@@ -212,10 +259,18 @@ public class Automatic {
         return result;
     }
 
+    /**
+     * set the directory containing the data files.
+     * @param s
+     */
     public void setDataDirectory(String s) {
         this.dataDirectory = s;
     }
 
+    /**
+     * Return the type of implementation as a flag.
+     * @return
+     */
     public int getType() {
         if ("cdi".equalsIgnoreCase(format))
             return CDI;
@@ -237,6 +292,10 @@ public class Automatic {
             return DEFAULT;
     }
 
+    /**
+      * Return the type of harvester implementation as a flag.
+     * @return
+     */
     public int getHarvestType() {
         if ("filesystem".equalsIgnoreCase(harvester))
             return FILESYSTEM;
@@ -246,18 +305,26 @@ public class Automatic {
             return DEFAULT;
     }
 
+    /**
+     * Return the type of profile as a flag.
+     * @return
+     */
     public int getProfile() {
         if ("discovery".equalsIgnoreCase(profile))
             return 0;
         return 1;
     }
 
+    /**
+     * Set the type of profile.
+     * @param profile
+     */
     public void setProfile(String profile) {
         this.profile = profile;
     }
     
     /**
-     * @return the Thesaurus
+     * @return the Thesaurus database informations
      */
     public List<BDD> getThesaurus() {
         if (thesaurus == null) {

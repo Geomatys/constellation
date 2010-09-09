@@ -27,7 +27,7 @@ import org.geotoolkit.util.Utilities;
 
 /**
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Queries {
@@ -42,16 +42,36 @@ public class Queries {
     
     private QueryList multiFixed;
 
+    /**
+     * Empty constructor used by JAXB
+     */
     public Queries() {
 
     }
 
+    /**
+     * Build a new Queries, with a main query and single/multi queries.
+     * put the SQL query which normally return only one result in single and the other in multi.
+     *
+     * @param main The main SQL query (normally used to retrieve all the identifiers)
+     * @param single The SQL queries returning single result.
+     * @param multiFixed The SQL queries returning multiple result.
+     */
     public Queries(QueryPropertyType main, QueryList single, QueryList multiFixed) {
         this.main       = main;
         this.single     = single;
         this.multiFixed = multiFixed;
     }
 
+    /**
+     * Build a new Queries, with a main query and single/multi queries ans static parameters.
+     * put the SQL query which normally return only one result in single and the other in multi.
+     *
+     * @param main The main SQL query (normally used to retrieve all the identifiers)
+     * @param single The SQL queries returning single result.
+     * @param multiFixed The SQL queries returning multiple result.
+     * @param parameters a map of varName/varValue.
+     */
     public Queries(QueryPropertyType main, QueryList single, QueryList multiFixed, HashMap<String, String> parameters) {
         this.main       = main;
         this.single     = single;
@@ -59,22 +79,50 @@ public class Queries {
         this.parameters = parameters;
     }
 
+    /**
+     * Return the mainQuery.
+     * @return
+     */
     public QueryPropertyType getMain() {
         return main;
     }
-    
+
+    /**
+     * Return the SQL queries returning multiple results.
+     * @return
+     */
     public QueryList getMultiFixed() {
         return multiFixed;
     }
-    
-      public QueryList getSingle() {
+
+    /**
+     * Set  the SQL queries returing multiple results.
+     * @param single
+     */
+    public void setMultiFixed(QueryList multi) {
+        this.multiFixed = multi;
+    }
+
+    /**
+     * Return the SQL queries returing single result.
+     * @return
+     */
+    public QueryList getSingle() {
         return single;
     }
 
+    /**
+     * Set  the SQL queries returing single result.
+     * @param single
+     */
     public void setSingle(QueryList single) {
         this.single = single;
     }
 
+    /**
+     * return all the SQL queries (single + multifixed) but NOT the main query.
+     * @return A list of SQL Query.
+     */
     public List<Query> getAllQueries() {
         final List<Query> queries = new ArrayList<Query>();
         if (single != null) {
@@ -86,6 +134,12 @@ public class Queries {
         return queries;
     }
 
+    /**
+     * Return the specified query.
+     *
+     * @param queryName The name of the query we search.
+     * @return
+     */
     public Query getQueryByName(String queryName) {
         Query q = single.getQueryByName(queryName);
         if (q == null) {

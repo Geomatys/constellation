@@ -23,23 +23,38 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
+ * A single response object indicating the success or failure of an operation.
  *
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
 @XmlRootElement(name = "Acknowlegement")
 public class AcknowlegementType {
 
+    /**
+     * An explanation message.
+     */
     private String message;
-    
+
+    /**
+     * the status of the request operation
+     */
     private String status;
-    
+
+    /**
+     * Empty constructor, by default status is set to "success".
+     */
     public AcknowlegementType() {
         status  = "succeed";
         message = null;
     }
-    
+
+    /**
+     * Build a new Acknowlegement with the specified status and message.
+     * @param status
+     * @param message
+     */
     public AcknowlegementType(String status, String message) {
         this.status  = status;
         this.message = message;

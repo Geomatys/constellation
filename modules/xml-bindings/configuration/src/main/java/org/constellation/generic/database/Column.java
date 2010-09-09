@@ -24,36 +24,68 @@ import org.geotoolkit.util.Utilities;
 
 /**
  *
- * @author guilhem
+ * @author Guilhem Legal (Geomatys)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Column {
-    
+
+    /**
+     * the alias of the column
+     */
     private String var;
-    
+
+    /**
+     * the sql code in the select
+     * (most of the time the name of the column but it can be a function)
+     */
     private String sql;
 
+    /**
+     * EMpty constructor used by JAXB.
+     */
     public Column() {
 
     }
 
+    /**
+     * Build a new Column.
+     * 
+     * @param var the alias of the column.
+     * @param sql the column name (or a function)
+     */
     public Column(String var, String sql) {
         this.sql = sql;
         this.var = var;
     }
 
+    /**
+     * return the alias of the column.
+     * @return
+     */
     public String getVar() {
         return var;
     }
 
+    /**
+     * Set the alias of the column.
+     * @param var
+     */
     public void setVar(String var) {
         this.var = var;
     }
 
+    /**
+     * return the column name (or function)
+     * @return
+     */
     public String getSql() {
         return sql;
     }
 
+    /**
+     * set the column name (or function)
+     * @param sql
+     */
     public void setSql(String sql) {
         this.sql = sql;
     }

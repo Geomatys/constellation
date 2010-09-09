@@ -31,9 +31,15 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "")
 @XmlRootElement(name = "CSWCascading")
 public class CSWCascadingType {
-    
+
+    /**
+     * map of id / url CSW service.
+     */
     private HashMap<String, String> cascadedServices;
-    
+
+    /**
+     * If this flag is set to false, the list of Cascaded service will be overwritten.
+     */
     private boolean append;
     
     /**
@@ -52,6 +58,10 @@ public class CSWCascadingType {
         
     }
 
+    /**
+     * Return a map of id / url of Cascaded CSW service.
+     * @return
+     */
     public HashMap<String, String> getCascadedServices() {
         if (cascadedServices == null) {
             cascadedServices = new HashMap<String, String>();
@@ -59,14 +69,26 @@ public class CSWCascadingType {
         return cascadedServices;
     }
 
+    /**
+     * set the map of id / url of Cascaded CSW service.
+     * @param cascadedServices
+     */
     public void setCascadedServices(HashMap<String, String> cascadedServices) {
         this.cascadedServices = cascadedServices;
     }
 
+    /**
+     * return the value of the flag "append".
+     * @return
+     */
     public boolean isAppend() {
         return append;
     }
 
+    /**
+     * Set the value of the flag "append".
+     * @param append
+     */
     public void setAppend(boolean append) {
         this.append = append;
     }

@@ -50,14 +50,26 @@ public class Where {
     @XmlValue
     private String value;
 
+    /**
+     * Constrcutor used by JAXB.
+     */
     public Where() {
 
     }
 
+    /**
+     * Simple constructor with a single value.
+     * @param value
+     */
     public Where(String value) {
         this.value = value;
     }
-    
+
+    /**
+     * clone a where object.
+     *
+     * @param original the where object to clone.
+     */
     public Where(Where original) {
         if (original != null) {
             this.group    = original.group;
@@ -108,6 +120,21 @@ public class Where {
         this.value = value;
     }
 
+    /**
+     * Replace the specified variable in the WHERE text by the submitted value, with or without quote.
+     * The variable must be precede by a "&"
+     *
+     * exemple: if where.value="table1.field1=&var1 AND table1.field2 = table2.field1"
+     * calling replaceVariable("var1", "xxx", false) will modify where.value to :
+     * "table1.field1=xxx AND table1.field2 = table2.field1"
+     *
+     * calling replaceVariable("var1", "xxx", false) will modify where.value to :
+     * "table1.field1='xxx' AND table1.field2 = table2.field1"
+     *
+     * @param varName
+     * @param varValue
+     * @param withQuote
+     */
     public void replaceVariable(String varName, String varValue, boolean withQuote) {
         if (varValue != null) {
             if (withQuote) {
@@ -120,6 +147,12 @@ public class Where {
 
 
 
+    /**
+     * same mecanism as replaceVariable(String varName, String varValue, boolean withQuote)
+     * but all the varName/varValue are contained in a map.
+     * 
+     * @param parameters a map of varName/varValue.
+     */
     public void replaceVariable(HashMap<String, String> parameters) {
         for (Entry<String, String> entry : parameters.entrySet()) {
             value = value.replaceAll('&' + entry.getKey(), entry.getValue());

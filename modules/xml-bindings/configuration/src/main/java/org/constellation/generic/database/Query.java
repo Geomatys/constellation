@@ -33,7 +33,7 @@ import org.geotoolkit.util.Utilities;
 
 
 /**
- * 
+ * @author Guilhem Legal (Geomatys)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "query")
@@ -53,16 +53,34 @@ public class Query {
     private List<Orderby> orderBy;
     private Union union;
 
+    /**
+     * Constructor used by JAXB
+     */
     public Query() {
 
     }
 
+    /**
+     * Build a SQL query with SELECT and FROM clause.
+     *
+     * @param name The name of the SQL query.
+     * @param select The SELECT clause.
+     * @param from The FROM clause.
+     */
     public Query(String name, Select select, From from) {
         this.name   = name;
         this.select = select;
         this.from   = Arrays.asList(from);
     }
 
+    /**
+     * Build a SQL query with SELECT ,FROM and WHERE clause.
+     *
+     * @param name The name of the SQL query.
+     * @param select The SELECT clause.
+     * @param from The FROM clause.
+     * @param where The WHERE clause.
+     */
     public Query(String name, Select select, From from, Where where) {
         this.name   = name;
         this.select = select;
@@ -70,6 +88,16 @@ public class Query {
         this.where  = Arrays.asList(where);
     }
 
+    /**
+     *
+    * Build a SQL query with SELECT ,FROM, WHERE and ORDERBY clause.
+     *
+     * @param name The name of the SQL query.
+     * @param select The SELECT clause.
+     * @param from The FROM clause.
+     * @param where The WHERE clause.
+     * @param orderBy The ORDERBy clause.
+     */
     public Query(String name, Select select, From from, Where where, Orderby orderBy) {
         this.name    = name;
         this.select  = select;
@@ -185,13 +213,18 @@ public class Query {
         this.union = union;
     }
 
+    /**
+     * Build the SQL query text by using the different clause contained in this object.
+     *
+     * @return A SQL query string.
+     */
     public String buildSQLQuery() {
         return buildSQLQuery(new HashMap<String, String>());
     }
     /**
      * Return an textual SQL query for a preparedStatement (contains '?').
      * 
-     * @param query
+     * @param staticParameters A map of varName/varValue to replace in the SQL text.
      * @return
      */
     public String buildSQLQuery(HashMap<String, String> staticParameters) {

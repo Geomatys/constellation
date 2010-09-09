@@ -47,10 +47,17 @@ public class From {
     @XmlValue
     private String value;
 
+    /**
+     * Empty constrcutor used by JAXB..
+     */
     public From() {
 
     }
 
+    /**
+     * Build a FROM clause with the value.
+     * @param value the string to add after the FROM in th SQL request.
+     */
     public From(String value) {
         this.value = value;
     }

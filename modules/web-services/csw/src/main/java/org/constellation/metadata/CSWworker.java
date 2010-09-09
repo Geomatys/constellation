@@ -1156,7 +1156,7 @@ public class CSWworker {
     }
     
     /**
-     * TODO
+     * Return one or more xsd schemas correspounding to the metadata records.
      * 
      * @param request
      * @return
@@ -1218,7 +1218,9 @@ public class CSWworker {
     }
     
     /**
-     * TODO
+     * Return a list / range of values for the specified property.
+     * The property can be a parameter of the GetCapabilities document or
+     * a property of the metadatas.
      * 
      * @param request
      * @return

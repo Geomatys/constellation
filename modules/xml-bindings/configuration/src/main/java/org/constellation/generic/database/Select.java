@@ -26,30 +26,54 @@ import org.geotoolkit.util.Utilities;
 
 
 /**
- * 
+ * @author Guilhem Legal (Geomatys)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Select {
 
-   private List<Column> col;
+    /**
+     * A list of Column to add in the select and their alias.
+     */
+    private List<Column> col;
 
-   public Select() {
+    /**
+     * Empty constrcutor used by JAXB..
+     */
+    public Select() {
+    }
 
-   }
-
-   public Select(String var, String sql) {
-       this.col = new ArrayList<Column>();
+    /**
+     * Build a select with a single Column.
+     *
+     * exemple: new Select("var1", "p.identifier") will give in SQL :
+     * SELECT p.identifier as var1
+     *
+     * @param var the alias of the column
+     * @param sql the column itself
+     */
+    public Select(String var, String sql) {
+        this.col = new ArrayList<Column>();
        this.col.add(new Column(var, sql));
-   }
+    }
 
-   public Select(Column col) {
-       this.col = new ArrayList<Column>();
-       this.col.add(col);
-   }
+    /**
+     * Build a select with a single Column.
+     *
+     * @param col the column to add to the select CLAUSE.
+     */
+    public Select(Column col) {
+        this.col = new ArrayList<Column>();
+        this.col.add(col);
+    }
 
-   public Select(List<Column> col) {
-       this.col = col;
-   }
+    /**
+     * Build a select with multiple Column.
+     *
+     * @param col the columns to add to the select CLAUSE.
+     */
+    public Select(List<Column> col) {
+        this.col = col;
+    }
 
     /**
      * Gets the value of the alias property.

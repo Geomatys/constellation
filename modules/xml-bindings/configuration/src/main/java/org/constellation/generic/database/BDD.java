@@ -69,10 +69,21 @@ public class BDD {
      */
     private String password;
 
+    /**
+     * Constructor used by JAXB
+     */
     public BDD() {
 
     }
 
+    /**
+     * Build a new Datasource informations.
+     *
+     * @param className the type of the driver (such as "org.postgresql.Driver").
+     * @param connectURL the url of the database.
+     * @param user The user name.
+     * @param password The password.
+     */
     public BDD(String className, String connectURL, String user, String password) {
         this.className  = className;
         this.connectURL = connectURL;
@@ -80,22 +91,42 @@ public class BDD {
         this.user       = user;
     }
 
+    /**
+     * Return the type of the driver (such as "org.postgresql.Driver").
+     * @return
+     */
     public String getClassName() {
         return className;
     }
 
+    /**
+     * Return the url of the database
+     * @return
+     */
     public String getConnectURL() {
         return connectURL;
     }
 
+    /**
+     * Return  The user name.
+     * @return
+     */
     public String getUser() {
         return user;
     }
 
+    /**
+     * return the passsword of the user.
+     * @return
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * extract the host name from the database url.
+     * @return
+     */
     public String getHostName() {
         if (connectURL != null && connectURL.indexOf("://") != -1) {
             String hostName = connectURL.substring(connectURL.indexOf("://") + 3);
@@ -109,6 +140,10 @@ public class BDD {
         return null;
     }
 
+    /**
+     * extract the database name from the database url.
+     * @return
+     */
     public String getDatabaseName() {
         if (connectURL != null && connectURL.lastIndexOf('/') != -1) {
             return connectURL.substring(connectURL.lastIndexOf('/') + 1);
@@ -116,6 +151,10 @@ public class BDD {
         return null;
     }
 
+    /**
+     * extract the port number from the database url or 5432 if its not present.
+     * @return
+     */
     public int getPortNumber() {
         if (connectURL != null && connectURL.lastIndexOf(':') != -1) {
             String portName = connectURL.substring(connectURL.lastIndexOf(':') + 1);
@@ -257,6 +296,10 @@ public class BDD {
         return source;
     }
 
+    /**
+     * Fill the datasource suplied with the informations extracted from the database URL.
+     * @param pgSource
+     */
     private void fillSourceFromURL(BaseDataSource pgSource) {
          // exemple : jdbc:postgresql://localhost:5432/mdweb-SML
          String url = connectURL.substring(18);

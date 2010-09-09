@@ -32,28 +32,52 @@ import org.geotoolkit.util.Utilities;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class QueryList {
 
-
+    /**
+     * A list of SQL query.
+     */
     private List<Query> query;
 
+    /**
+     * constructor used by JAXB.
+     */
     public QueryList() {
 
     }
 
+    /**
+     * build a query list with only one query.
+     *
+     * @param query A SQL Query.
+     */
     public QueryList(Query query) {
         this.query = new ArrayList<Query>();
         this.query.add(query);
     }
 
+    /**
+     * build a query list with the specified queries.
+     * @param query
+     */
     public QueryList(List<Query> query) {
         this.query = query;
     }
 
+    /**
+     * Return the list of query.
+     * @return
+     */
     public List<Query> getQuery() {
         if (query == null)
             query = new ArrayList<Query>();
         return query;
     }
 
+    /**
+     * Return the query named "name" of {@code null}
+     * if there is no such query.
+     * @param name
+     * @return
+     */
     public Query getQueryByName(String name) {
         if (query != null) {
             for (Query q : query) {
