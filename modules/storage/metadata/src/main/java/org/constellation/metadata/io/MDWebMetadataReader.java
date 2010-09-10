@@ -196,6 +196,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             } else {
                 throw new MetadataIoException("unexpected database version:" + version);
             }
+            ((AbstractReader) mdReader).setReadProfile(false);
         } catch (SQLException ex) {
             throw new MetadataIoException("SQLException while initializing the MDWeb reader:" +'\n'+
                                            "cause:" + ex.getMessage());

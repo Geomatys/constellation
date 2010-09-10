@@ -49,9 +49,6 @@ import static org.constellation.metadata.CSWQueryable.*;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.CodeList;
 import org.mdweb.model.schemas.CodeListElement;
-import org.mdweb.model.schemas.Locale;
-import org.mdweb.model.schemas.Path;
-import org.mdweb.model.schemas.Property;
 import org.mdweb.model.schemas.Standard;
 import org.mdweb.model.storage.RecordSet;
 import org.mdweb.model.storage.Form;
@@ -59,6 +56,7 @@ import org.mdweb.model.storage.TextValue;
 import org.mdweb.model.storage.Value;
 import org.mdweb.io.Reader;
 import org.mdweb.io.MD_IOException;
+import org.mdweb.io.sql.AbstractReader;
 import org.mdweb.io.sql.v20.Reader20;
 import org.mdweb.io.sql.v21.Reader21;
 import org.mdweb.model.storage.RecordSet.EXPOSURE;
@@ -113,6 +111,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             } else {
                 throw new IndexingException("unexpected database version:" + version);
             }
+            ((AbstractReader) mdWebReader).setReadProfile(false);
             initEbrimClasses();
             if (create)
                 createIndex();
@@ -140,10 +139,10 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     public void createIndex() throws IndexingException {
         LOGGER.log(logLevel, "(light memory) Creating lucene index for MDWeb database please wait...");
 
-        final long time = System.currentTimeMillis();
         IndexWriter writer;
+        final long time  = System.currentTimeMillis();
         int nbRecordSets = 0;
-        int nbForms = 0;
+        int nbForms      = 0;
         try {
             writer = new IndexWriter(new SimpleFSDirectory(getFileDirectory()), analyzer, true, IndexWriter.MaxFieldLength.UNLIMITED);
 
@@ -162,12 +161,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             LOGGER.log(logLevel, results.size() + " forms to read.");
             for (Entry<Integer, RecordSet> entry : results) {
                 final Form form = mdWebReader.getForm(entry.getValue(), entry.getKey());
-                if ((form.getType() == null || form.getType().equals(Form.TYPE.NORMALFORM)) && form.isPublished()) {
-                    indexDocument(writer, form);
-                    nbForms++;
-                } else {
-                     LOGGER.log(logLevel, "The form " + form.getTitle() + '(' + form.getId() + ") is a context (or is not published) so we don't index it");
-                }
+                indexDocument(writer, form);
+                nbForms++;
             }
             writer.optimize();
             writer.close();
@@ -200,11 +195,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
 
             nbForms = forms.size();
             for (Form form : forms) {
-                if (form.isPublished()) {
-                    indexDocument(writer, form);
-                } else {
-                   LOGGER.log(logLevel, "The form {0}is not published we don''t index it", form.getId());
-                }
+                indexDocument(writer, form);
             }
             writer.optimize();
             writer.close();
@@ -238,8 +229,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         }
 
         final String identifier = Integer.toString(metadata.getId()) + ':' + metadata.getRecordSet().getCode();
-        doc.add(new Field("id",        identifier,   Field.Store.YES, Field.Index.ANALYZED));
-        doc.add(new Field("Title",     metadata.getTitle(),                Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("id",        identifier,           Field.Store.YES, Field.Index.ANALYZED));
+        doc.add(new Field("Title",     metadata.getTitle(),  Field.Store.YES, Field.Index.ANALYZED));
     }
 
     /**
@@ -362,7 +353,6 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
      */
     private List<Value> getValuesFromPathID(String fullPathID, final Form form) throws MD_IOException {
         final String pathID;
-        Path conditionalPath     = null;
         String conditionalPathID = null;
         String conditionalValue  = null;
         int ordinal              = -1;
@@ -391,14 +381,10 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             }
             pathID = fullPathID;
         }
-        final Path path = mdWebReader.getPath(pathID);
-        if (conditionalPathID != null) {
-            conditionalPath = mdWebReader.getPath(conditionalPathID);
-        }
 
         final List<Value> values;
-        if (conditionalPath == null) {
-            values = form.getValueFromPath(path);
+        if (conditionalPathID == null) {
+            values = form.getValueFromPath(pathID);
             if (ordinal != -1) {
                 final List<Value> toRemove = new ArrayList<Value>();
                 for (Value v : values) {
@@ -410,7 +396,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             }
 
         } else {
-            values = Collections.singletonList(form.getConditionalValueFromPath(path, conditionalPath, conditionalValue));
+            values = Collections.singletonList(form.getConditionalValueFromPath(pathID, conditionalPathID, conditionalValue));
         }
         return values;
     }
@@ -434,22 +420,6 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
     }
 
     /**
-     * Return true if the specified Codelist contains locale Element
-     *
-     * @param cl An MDWeb CodeList
-     *
-     * @return True is the specified CodeList conatins Locale element.
-     */
-    private boolean isLocale(CodeList cl) {
-        boolean locale = false;
-        final List<Property> props = cl.getProperties();
-        if (props != null && props.size() > 0) {
-            locale = props.get(0) instanceof Locale;
-        }
-        return locale;
-    }
-
-    /**
      * Return the text associed with a codeList textValue.
      * 
      * @param tv A TextValue with a type instanceof CodeList.
@@ -462,7 +432,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
         final String result;
 
         // we look if the codelist contains locale element.
-        final boolean locale = isLocale(cl);
+        final boolean locale = cl.isLocale();
 
         if (locale) {
             result = tv.getValue();

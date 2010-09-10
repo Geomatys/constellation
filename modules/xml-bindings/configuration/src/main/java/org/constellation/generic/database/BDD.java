@@ -45,6 +45,8 @@ import org.postgresql.ds.common.BaseDataSource;
 @XmlRootElement(name = "BDD")
 public class BDD {
 
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.generic.database");
+
     public static final String POSTGRES_DRIVER_CLASS = "org.postgresql.Driver";
 
     private static final Map<BDD, Connection> CONNECTION_MAP = new HashMap<BDD, Connection>();
@@ -163,7 +165,7 @@ public class BDD {
                 try {
                     return Integer.parseInt(portName);
                 } catch (NumberFormatException ex) {
-                    Logger.getAnonymousLogger().severe("unable to parse the port number: " + portName);
+                    LOGGER.severe("unable to parse the port number: " + portName);
                     return 5432;
                 }
             } else {
