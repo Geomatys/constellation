@@ -269,29 +269,25 @@
 
     <!-- mapfaces -->
     <dependency>
-        <groupId>org.mapfaces</groupId>
-       <artifactId>mapfaces-map</artifactId>
-       <version>0.42-SNAPSHOT</version>
+      <groupId>org.mapfaces</groupId>
+      <artifactId>mapfaces-map</artifactId>
     </dependency>
 
     <!-- FACELET -->
     <dependency>
-        <groupId>com.sun.facelets</groupId>
-        <artifactId>jsf-facelets</artifactId>
-        <version>1.1.15.B1</version>
+      <groupId>com.sun.facelets</groupId>
+      <artifactId>jsf-facelets</artifactId>
     </dependency>
 
     <!-- JSTL -->
     <dependency>
-        <groupId>jstl</groupId>
-        <artifactId>jstl</artifactId>
-        <version>1.2</version>
+      <groupId>jstl</groupId>
+      <artifactId>jstl</artifactId>
     </dependency>
     
     <dependency>
       <groupId>javax.servlet.jsp</groupId>
       <artifactId>jsp-api</artifactId>
-      <version>2.1</version>
       <scope>provided</scope>
     </dependency>
     
@@ -302,7 +298,6 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

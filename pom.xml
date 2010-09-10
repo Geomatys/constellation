@@ -159,9 +159,13 @@
     be the one declared below.
   -->
   <properties>
+    <!-- Define parent projects versions -->
+    <geoapi.version>2.3-SNAPSHOT</geoapi.version>
     <geotoolkit.version>SNAPSHOT</geotoolkit.version>
     <geotoolkit-pending.version>SNAPSHOT</geotoolkit-pending.version>
     <mdweb-meta.version>2.2-SNAPSHOT</mdweb-meta.version>
+    <mapfaces.version>0.42-SNAPSHOT</mapfaces.version>
+    <!-- Define packages for GUI including -->
     <constellation.config>org.constellation.configuration.ws</constellation.config>
     <constellation.metadata>org.constellation.metadata.ws.rs</constellation.metadata>
     <constellation.metadata-provider>org.constellation.metadata.ws.rs.provider</constellation.metadata-provider>
@@ -271,7 +275,12 @@
       <dependency>
         <groupId>javax.servlet.jsp</groupId>
         <artifactId>jsp-api</artifactId>
-        <version>2.0</version>
+        <version>2.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.facelets</groupId>
+        <artifactId>jsf-facelets</artifactId>
+        <version>1.1.15.B1</version>
       </dependency>
       <dependency>
         <groupId>jstl</groupId>
@@ -282,6 +291,11 @@
         <groupId>javax.measure</groupId>
         <artifactId>jsr-275</artifactId>
         <version>0.9.3</version>
+      </dependency>
+      <dependency>
+        <groupId>javax.mail</groupId>
+        <artifactId>mail</artifactId>
+        <version>1.4.1</version>
       </dependency>
       <dependency>
         <groupId>net.java.dev.opensso</groupId>
@@ -323,7 +337,12 @@
         <artifactId>xercesImpl</artifactId>
         <version>2.7.1</version>
       </dependency>
-
+      <!-- MapFaces -->
+      <dependency>
+        <groupId>org.mapfaces</groupId>
+        <artifactId>mapfaces-map</artifactId>
+        <version>${mapfaces.version}</version>
+      </dependency>
       <!-- mdweb-metamodel -->
       <dependency>
         <groupId>org.mdweb.metamodel</groupId>
@@ -340,7 +359,7 @@
       <dependency>
         <groupId>org.opengis</groupId>
         <artifactId>geoapi-pending</artifactId>
-        <version>2.3-SNAPSHOT</version>
+        <version>${geoapi.version}</version>
       </dependency>
 
       <!-- Geotoolkit version -->
