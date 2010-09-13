@@ -22,11 +22,16 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 import org.geotoolkit.internal.sql.table.Database;
 import org.constellation.generic.database.BDD;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.postgresql.ds.PGSimpleDataSource;
+import org.postgresql.ds.PGConnectionPoolDataSource;
+import org.geotoolkit.jdbc.WrappedDataSource;
 
 /**
  *
@@ -35,6 +40,8 @@ import org.postgresql.ds.PGSimpleDataSource;
 public final class DatabasePool {
 
     private static final Map<BDD, Database> DATABASE_MAP = new HashMap<BDD, Database>();
+
+    private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.io.postgrid");
 
     private DatabasePool(){}
 
@@ -56,15 +63,34 @@ public final class DatabasePool {
     }
 
     private static Database createDatabase(BDD bdd) throws IOException {
-        final DataSource dataSource;
-        if (bdd.getClassName() != null && bdd.getClassName().equals("org.postgresql.Driver")) {
-            final PGSimpleDataSource pgDataSource = new PGSimpleDataSource();
+
+    final DataSource dataSource;
+    DataSource ds =null;
+        try {
+            InitialContext cxt = new InitialContext();
+            if (cxt == null) {
+                LOGGER.warning("no initialContext found!");
+            } else {
+                ds = (DataSource) cxt.lookup("java:/comp/env/jdbc/observation");
+                if (ds == null) {
+                    LOGGER.warning("Data source not found for O&M in JNDI context!");
+                }
+            }
+        } catch (NamingException ex) {
+            LOGGER.log(Level.FINER, "Naming exception while try to get database informations", ex);
+        }
+        if (ds != null) {
+            dataSource = ds;
+            LOGGER.info("using tomcat database pool");
+            
+        } else if (bdd.getClassName() != null && bdd.getClassName().equals("org.postgresql.Driver")) {
+            final PGConnectionPoolDataSource pgDataSource = new PGConnectionPoolDataSource();
             pgDataSource.setServerName(bdd.getHostName());
             pgDataSource.setPortNumber(bdd.getPortNumber());
             pgDataSource.setDatabaseName(bdd.getDatabaseName());
             pgDataSource.setUser(bdd.getUser());
             pgDataSource.setPassword(bdd.getPassword());
-            dataSource = pgDataSource;
+            dataSource = new WrappedDataSource(pgDataSource);
         } else {
             dataSource = new DefaultDataSource(bdd.getConnectURL());
         }

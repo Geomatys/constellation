@@ -40,9 +40,24 @@
         <url-pattern>/WS/*</url-pattern>
     </servlet-mapping>
     
-    <!-- SOAP servlet for constellation web service for Tomcat  --> 
+    <!-- here is a tag to use TOMCAT pooled connection datasource  -->
+
+    <!--resource-ref>
+        <description>postgreSQL Datasource example</description>
+        <res-ref-name>jdbc/observation</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref-->
+
+    <!-- SOAP servlet for constellation web service for Tomcat  
     
+      In Glassfish: To enable SOAP service in glassfish remove the property 'metadata-complete="true"' in the web-app tag (at the top of this document)
+      In Tomcat   : Enable each service by uncommenting the servlet block -->
+
+    
+
     <!-- to enable the SOS service SOAP (in tomcat) uncomment the following servlet -->
+
     <!--listener>
         <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
     </listener>
@@ -70,21 +85,6 @@
     <servlet-mapping>
         <servlet-name>CSWService</servlet-name>
         <url-pattern>/CSWService</url-pattern>
-    </servlet-mapping-->
-
-    <!-- To enable SOAP service in glassfish remove the property  'metadata-complete="true"' in the web-app tag (at the top of this document)-->
-    <!--listener>
-        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
-    </listener>
-    <servlet>
-        <servlet-name>PEPService</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    
-    <servlet-mapping>
-        <servlet-name>PEPService</servlet-name>
-        <url-pattern>/PEPService</url-pattern>
     </servlet-mapping-->
 
     <!-- Servlet for constellation JSF interface -->
@@ -150,7 +150,7 @@
 
 
 
-<!-- RICHFACES see: http://docs.jboss.org/richfaces/latest_3_3_X/en/devguide/html_single/-->
+    <!-- RICHFACES see: http://docs.jboss.org/richfaces/latest_3_3_X/en/devguide/html_single/-->
 
     <!-- Mandatory -->
     <context-param>
