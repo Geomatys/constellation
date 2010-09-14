@@ -189,9 +189,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             versionStmt.close();
             mdConnection.close();
 
-            if (version.startsWith("2.0")) {
+            if (version != null && version.startsWith("2.0")) {
                 mdReader = new Reader20(dataSource, isPostgres);
-            } else if (version.startsWith("2.1")) {
+            } else if (version != null && version.startsWith("2.1")) {
                 mdReader = new Reader21(dataSource, isPostgres);
             } else {
                 throw new MetadataIoException("unexpected database version:" + version);
