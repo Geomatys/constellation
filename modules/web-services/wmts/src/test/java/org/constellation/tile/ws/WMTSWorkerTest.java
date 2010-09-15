@@ -48,10 +48,6 @@ public class WMTSWorkerTest {
     public void tearDown() throws Exception {
     }
 
-     /**
-     * test the feature marshall
-     *
-     */
     @Test
     public void getLettersFromIntTest() throws Exception {
 
@@ -82,5 +78,44 @@ public class WMTSWorkerTest {
         expResult = "ACA";
 
         assertEquals(expResult, result);
+
+        result = DefaultWMTSWorker.getLettersFromInt(1000, 1275);
+        expResult = "BMM";
+
+        assertEquals(expResult, result);
     }
+
+     @Test
+    public void getNumbersFromIntTest() throws Exception {
+
+        String result = DefaultWMTSWorker.getNumbersFromInt(0, 9);
+        String expResult = "1";
+
+        assertEquals(expResult, result);
+
+        result = DefaultWMTSWorker.getNumbersFromInt(0, 11);
+        expResult = "01";
+
+        assertEquals(expResult, result);
+
+        result = DefaultWMTSWorker.getNumbersFromInt(12, 120);
+        expResult = "013";
+
+        assertEquals(expResult, result);
+
+        result = DefaultWMTSWorker.getNumbersFromInt(121, 1300);
+        expResult = "0122";
+
+        assertEquals(expResult, result);
+
+        result = DefaultWMTSWorker.getNumbersFromInt(121, 11300);
+        expResult = "00122";
+
+        assertEquals(expResult, result);
+
+        result = DefaultWMTSWorker.getNumbersFromInt(121, 121300);
+        expResult = "000122";
+
+        assertEquals(expResult, result);
+     }
 }

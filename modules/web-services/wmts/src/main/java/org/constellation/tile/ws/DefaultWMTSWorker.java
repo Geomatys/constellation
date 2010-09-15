@@ -246,18 +246,18 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         if (sections.containsSection("Contents") || sections.containsSection("All")) {
             
             final List<LayerDetails> layerRefs = getAllLayerReferences();
-            
+
             // Build the list of layers
             final List<LayerType> layers = new ArrayList<LayerType>();
             // and the list of matrix set
             final List<TileMatrixSet> tileSets = new ArrayList<TileMatrixSet>();
-            
+
             for (LayerDetails layer : layerRefs){
                 if (!layer.isQueryable(ServiceDef.Query.WMTS_ALL) || !(layer instanceof CoverageLayerDetails)) {
                     continue;
                 }
                 final CoverageLayerDetails coverageLayer = (CoverageLayerDetails) layer;
-
+            
                 /*
                  *  TODO
                  * code = CRS.lookupEpsgCode(inputLayer.getCoverageReference().getCoordinateReferenceSystem(), false);
@@ -268,7 +268,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
                 } catch (DataStoreException exception) {
                     throw new CstlServiceException(exception, NO_APPLICABLE_CODE);
                 }
-
+            
                 if (inputGeoBox == null) {
                     // The layer does not contain geometric information, we do not want this layer
                     // in the capabilities response.
@@ -356,18 +356,18 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
                                                         "FORMAT=";
                 final String legendUrlGif = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;
                 final String legendUrlPng = beginLegendUrl + MimeType.IMAGE_PNG + "&LAYER=" + layerName;
-            
-                /*
-                 * TODO
-                 * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
-                 */
-                final BoundingBoxType outputBBox =
+
+            /*
+             * TODO
+             * Envelope inputBox = inputLayer.getCoverage().getEnvelope();
+             */
+            final BoundingBoxType outputBBox =
                     new BoundingBoxType("EPSG:4326", inputGeoBox.getWestBoundLongitude(),
                             inputGeoBox.getSouthBoundLatitude(), inputGeoBox.getEastBoundLongitude(),
                             inputGeoBox.getNorthBoundLatitude());
 
                 // we build The Style part
-                
+
                 final List<String> stylesName = layer.getFavoriteStyles();
                 final List<Style> styles = new ArrayList<Style>();
                 if (stylesName != null && !stylesName.isEmpty()) {
@@ -380,11 +380,11 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
                         } catch (PortrayalException ex) {
                             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
                         }
-                        final LegendURL legendURL1 = new LegendURL(MimeType.IMAGE_PNG, 
+                        final LegendURL legendURL1 = new LegendURL(MimeType.IMAGE_PNG,
                                 BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height), 0.0, 0.0);
                         legendURL1.setHref(legendUrlPng);
 
-                        final LegendURL legendURL2 = new LegendURL(MimeType.IMAGE_GIF, 
+                        final LegendURL legendURL2 = new LegendURL(MimeType.IMAGE_GIF,
                                 BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height), 0.0, 0.0);
                         legendURL2.setHref(legendUrlGif);
 
@@ -395,19 +395,19 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
 
                 final LayerType outputLayer = new LayerType(layerName, coverageLayer.getRemarks(), outputBBox, styles, dimensions);
 
-                /**
-                 * Hard coded part
-                 */
-                final TileMatrixSet outputMatrixSet = DefaultTileExample.getTileMatrixSet(layerName);
-                if (outputMatrixSet != null) {
-                    final TileMatrixSetLink tmsl = new TileMatrixSetLink();
-                    tmsl.setTileMatrixSet(layerName);
-                    outputLayer.getTileMatrixSetLink().add(tmsl);
-                    tileSets.add(outputMatrixSet);
-                }
-                layers.add(outputLayer);
+            /**
+             * Hard coded part
+             */
+            final TileMatrixSet outputMatrixSet = DefaultTileExample.getTileMatrixSet(layerName);
+            if (outputMatrixSet != null) {
+                final TileMatrixSetLink tmsl = new TileMatrixSetLink();
+                tmsl.setTileMatrixSet(layerName);
+                outputLayer.getTileMatrixSetLink().add(tmsl);
+                tileSets.add(outputMatrixSet);
             }
-        
+            layers.add(outputLayer);
+            }
+            
             cont = new ContentsType();
             cont.setLayers(layers);
             cont.setTileMatrixSet(tileSets);
@@ -591,12 +591,6 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         
         //1 LAYER NOT USED FOR NOW
         final Name layerName = Util.parseLayerName(request.getLayer());
-        LayerDetails layerRef;
-        try{
-            layerRef = getLayerReference(layerName);
-        } catch (CstlServiceException ex) {
-            throw new CstlServiceException(ex, LAYER_NOT_DEFINED, "layer");
-        }
 
         // 2. PARAMETERS NOT USED FOR NOW
         Double elevation =  null;
@@ -669,91 +663,71 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
             LOGGER.info("returning existing file:" + f.getPath());
         } else {
             LOGGER.info("file does not exist:" + f.getPath());
-            throw new CstlServiceException("The correspounding file has not been found", NO_APPLICABLE_CODE);
+            return new File(rootDir + "blank.png");
+            //throw new CstlServiceException("The correspounding file has not been found", NO_APPLICABLE_CODE);
         }
 
         return f;
     }
 
+    /*private String getRootDir() throws CstlServiceException {
+        InputStream is = Util.getResourceAsStream("wmts.properties");
+        if (is == null) {
+            throw new CstlServiceException("Unable to find the wmts.properties file");
+        }
+        Properties p = new Properties();
+        try {
+            p.load(is);
+            return p.getProperty("path");
+        } catch (IOException ex) {
+             throw new CstlServiceException("Unable to load the wmts.properties file", ex, NO_APPLICABLE_CODE);
+        }
+    }*/
+    
     protected static String getNumbersFromInt(Integer i, int max) {
         if (i != null) {
             i = i + 1;
             final int nbChar;
-            if (max < 9) {
+            if (max < 10) {
                 nbChar = 1;
-            } else if (8 < max && max < 100 ){
+            } else if (max < 100 ){
                 nbChar = 2;
-            } else if (99 < max && max < 1000 ){
+            } else if (max < 1000 ){
                 nbChar = 3;
-            } else {
+            } else if (max < 10000 ){
                 nbChar = 4;
+            } else if (max < 100000 ){
+                nbChar = 5;
+            } else if (max < 1000000 ){
+                nbChar = 6;
+            } else if (max < 10000000 ){
+                nbChar = 7;
+            } else {
+                nbChar = 8;
             }
-            String result = i + "";
+            StringBuffer result = new StringBuffer().append(i);
             while (result.length() < nbChar) {
-                result = "0" + result;
+                result.insert(0, "0");
             }
-            return result;
+            return result.toString();
         }
         return null;
     }
 
     protected static String getLettersFromInt(Integer i, int max) {
         if (i != null) {
-            final int nbChar;
-            if (max < 26) {
-                nbChar = 1;
-            } else if (25 < max && max < 676 ){
-                nbChar = 2;
-            } else {
-                nbChar = 3;
+            final int nbChar = (int) Math.floor(Math.log(max) / 3.258096538 + 1E-6) + 1;
+            final StringBuffer buffer = new StringBuffer();
+            while (i != 0) {
+                buffer.insert(0, (char)('A' + (i % 26)));
+                i /= 26;
             }
-            String result = "";
-            while (i >= 26) {
-                int temp = i / 26;
-                i = i - (26 * temp);
-                result += getLetterFromInt(temp);
+            for (int j=buffer.length(); j<nbChar; j++) {
+                buffer.insert(0, 'A');
             }
-            result += getLetterFromInt(i);
-
-            while (result.length() < nbChar) {
-                result = "A" + result;
-            }
-            return result;
+            return buffer.toString();
         }
         return null;
-    }
-
-    private static String getLetterFromInt(Integer i) {
-        switch(i) {
-            case 0:  return "A";
-            case 1:  return "B";
-            case 2:  return "C";
-            case 3:  return "D";
-            case 4:  return "E";
-            case 5:  return "F";
-            case 6:  return "G";
-            case 7:  return "H";
-            case 8:  return "I";
-            case 9:  return "J";
-            case 10: return "K";
-            case 11: return "L";
-            case 12: return "M";
-            case 13: return "N";
-            case 14: return "O";
-            case 15: return "P";
-            case 16: return "Q";
-            case 17: return "R";
-            case 18: return "S";
-            case 19: return "T";
-            case 20: return "U";
-            case 21: return "V";
-            case 22: return "W";
-            case 23: return "X";
-            case 24: return "Y";
-            case 25: return "Z";
-            default:
-                throw new IllegalArgumentException("i must be -1 < i < 26 => i=" + i);
-        }
     }
 
     /**
