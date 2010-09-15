@@ -371,7 +371,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                                                     "FORMAT=";
             final String legendUrlGif = beginLegendUrl + MimeType.IMAGE_GIF + "&LAYER=" + layerName;
             final String legendUrlPng = beginLegendUrl + MimeType.IMAGE_PNG + "&LAYER=" + layerName;
-            final int queryable = (layer.isQueryable(ServiceDef.Query.WMS_GETINFO)) ? 1 : 0;
+            final String queryable = (layer.isQueryable(ServiceDef.Query.WMS_GETINFO)) ? "1" : "0";
             final AbstractLayer outputLayer;
             if (queryVersion.equals(ServiceDef.WMS_1_1_1_SLD.version.toString())) {
                 /*
