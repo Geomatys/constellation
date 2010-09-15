@@ -76,6 +76,7 @@ public class WMTSService extends GridWebService {
         super(ServiceDef.WMTS_1_0_0);
         setXMLContext(WMTSMarshallerPool.getInstance());
         worker = new DefaultWMTSWorker();
+        setFullRequestLog(true);
     }
 
     /**
