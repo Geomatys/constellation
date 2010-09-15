@@ -39,13 +39,23 @@ import org.geotoolkit.jdbc.WrappedDataSource;
  */
 public final class DatabasePool {
 
+    /**
+     * A map of datasource informations / postgrid {@link Database}.
+     */
     private static final Map<BDD, Database> DATABASE_MAP = new HashMap<BDD, Database>();
 
     private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.io.postgrid");
 
     private DatabasePool(){}
 
-    public static Database getDatabase(BDD bdd) throws IOException {
+    /**
+     * Return a {@link Database} from the pool or create a new one if its not present in the pool.
+     *
+     * @param bdd Some database informations.
+     * @return A postgrid {@link Database}.
+     * @throws IOException
+     */
+    public static Database getDatabase(BDD bdd) {
         Database db = DATABASE_MAP.get(bdd);
         if (db == null) {
             db = createDatabase(bdd);
@@ -54,6 +64,15 @@ public final class DatabasePool {
         return db;
     }
 
+    /**
+     * Return a connection from a postgrid {@link Database} if there is one already pooled.
+     * otherwise its return {@code null}.
+     *
+     * @param bdd Some database informations.
+     *
+     * @return A connection to a postrgid {@link Database} or {@code null}.
+     * @throws SQLException
+     */
     public static Connection getDatabaseConnection(BDD bdd) throws SQLException {
         final Database db =  DATABASE_MAP.get(bdd);
         if (db != null) {
@@ -62,7 +81,16 @@ public final class DatabasePool {
         return null;
     }
 
-    private static Database createDatabase(BDD bdd) throws IOException {
+    /**
+     * Build a new postgrid {@link Database}.
+     * first it try to read informations from JNDI context, in this case the parameter bdd will be ignored.
+     * if there is no JNDI context or if the ressource "java:/comp/env/jdbc/observation" does not exist,
+     * it will use the database informations specified to instanciate a postgrid {@link Database}.
+     *
+     * @param bdd Some database informations.
+     * @return A new postgrid {@link Database}
+     */
+    private static Database createDatabase(BDD bdd) {
 
     final DataSource dataSource;
     DataSource ds =null;

@@ -16,7 +16,6 @@
  */
 package org.constellation.sos.io.postgrid;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -51,7 +50,7 @@ import org.opengis.observation.Observation;
 /**
  * Default Observation reader for Postgrid O&M database.
  * 
- * @author Guilhem Legal
+ * @author Guilhem Legal (Geomatys)
  */
 public class DefaultObservationWriter implements ObservationWriter {
 
@@ -90,12 +89,11 @@ public class DefaultObservationWriter implements ObservationWriter {
     private static final String CAT_ERROR_MSG = "The service has throw a Catalog Exception:";
 
     /**
+     * Build a new Observation witer for postgrid datasource.
      *
-     * @param dataSourceOM
-     * @param observationIdBase
-     * @throws java.io.IOException
-     * @throws org.geotoolkit.internal.sql.table.NoSuchTableException
-     * @throws java.sql.SQLException
+     * @param configuration
+     * 
+     * @throws org.constellation.ws.CstlServiceException
      */
     public DefaultObservationWriter(Automatic configuration) throws CstlServiceException {
         if (configuration == null) {
@@ -109,10 +107,6 @@ public class DefaultObservationWriter implements ObservationWriter {
         isPostgres = db.getClassName() != null && db.getClassName().equals("org.postgresql.Driver");
         try {
             omDatabase = DatabasePool.getDatabase(db);
-            /*omDatabase.setProperty(ConfigurationKey.READONLY, "false");
-            if (!isPostgres) {
-                omDatabase.setProperty(ConfigurationKey.ISPOSTGRES, "false");
-            }*/
             
             //we build the database table frequently used.
             obsTable  = omDatabase.getTable(ObservationTable.class);
@@ -121,10 +115,7 @@ public class DefaultObservationWriter implements ObservationWriter {
 
         } catch (NoSuchTableException ex) {
             throw new CstlServiceException("NoSuchTable Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
-        } catch (IOException ex) {
-             throw new CstlServiceException("IO Exception while initalizing the O&M writer:" + ex.getMessage(), NO_APPLICABLE_CODE);
-        }
-
+        } 
     }
 
     /**
@@ -237,7 +228,7 @@ public class DefaultObservationWriter implements ObservationWriter {
                     request = "INSERT INTO \"sos\".\"projected_localisations\" VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + srsName + "))";
                 } else {
                     insert = false;
-                    LOGGER.severe("Projected sensor location already registred for " + physicalID + " keeping old location");
+                    LOGGER.log(Level.INFO, "Projected sensor location already registred for {0} keeping old location", physicalID);
                 }
             } else if (srsName.equals("4326")) {
                 request = request + " \"sos\".\"geographic_localisations\" WHERE id='" + physicalID + "'";
@@ -246,7 +237,7 @@ public class DefaultObservationWriter implements ObservationWriter {
                     request = "INSERT INTO \"sos\".\"geographic_localisations\" VALUES ('" + physicalID + "', GeometryFromText( 'POINT(" + position.getValue().get(0) + ' ' + position.getValue().get(1) + ")', " + srsName + "))";
                 } else {
                     insert = false;
-                    LOGGER.severe("Geographic sensor location already registred for " + physicalID + " keeping old location");
+                    LOGGER.log(Level.INFO, "Geographic sensor location already registred for {0} keeping old location", physicalID);
                 }
             } else {
                 throw new CstlServiceException("This CRS " + srsName + " is not supported", INVALID_PARAMETER_VALUE);

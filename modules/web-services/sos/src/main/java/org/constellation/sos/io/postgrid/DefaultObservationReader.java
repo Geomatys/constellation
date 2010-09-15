@@ -18,7 +18,6 @@
 package org.constellation.sos.io.postgrid;
 
 // J2SE dependencies
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -149,11 +148,7 @@ public class DefaultObservationReader implements ObservationReader {
 
         } catch (SQLException ex) {
             throw new CstlServiceException("SQL Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
-        } catch (IOException ex) {
-             throw new CstlServiceException("IO Exception while initalizing the O&M reader:" + ex.getMessage(), NO_APPLICABLE_CODE);
-        }
-
-
+        } 
     }
 
     /**
