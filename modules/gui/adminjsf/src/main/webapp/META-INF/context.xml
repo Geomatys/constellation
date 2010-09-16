@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/constellation"/>
+<!-- here is a tag to use TOMCAT pooled connection datasource
+   <Resource name="jdbc/observation" 
+          auth="Container"
+          type="javax.sql.DataSource" 
+          driverClassName="org.postgresql.Driver"
+          url="jdbc:postgresql://localhost:5432/observation"
+          username="secret" 
+          password="s3cr3t" 
+          maxActive="100" 
+	  maxIdle="30" 
+	  maxWait="10000"
+          factory="org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory"/>
+</Context-->

@@ -3,6 +3,9 @@
 
     <display-name>constellation</display-name>
 
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
     <login-config>
         <auth-method>BASIC</auth-method>
     </login-config>
@@ -84,7 +87,104 @@
         <url-pattern>/CSWService</url-pattern>
     </servlet-mapping-->
 
+    <!-- Servlet for constellation JSF interface -->
+
+    <!-- Mandatory -->
+    <context-param>
+        <param-name>javax.faces.STATE_SAVING_METHOD</param-name>
+        <param-value>server</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.compressViewState</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.verifyObjects</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.validateXml</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.jsf</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>/faces/*</url-pattern>
+    </servlet-mapping>
+    <context-param>
+        <param-name>javax.faces.CONFIG_FILES</param-name>
+        <param-value>/WEB-INF/faces-config*</param-value>
+    </context-param>
     
+     <!-- Mandatory -->
+    <context-param>
+        <param-name>javax.faces.DEFAULT_SUFFIX</param-name>
+        <param-value>.xhtml</param-value>
+    </context-param>
+    
+     <!--Mandatory in servlet environment-->
+    <context-param>
+        <param-name>org.ajax4jsf.VIEW_HANDLERS</param-name>
+        <param-value>com.sun.facelets.FaceletViewHandler</param-value>
+    </context-param>
+    
+     <!-- Mandatory -->
+
+    <servlet>
+        <servlet-name>Mapfaces Resource Servlet</servlet-name>
+        <servlet-class>org.mapfaces.servlet.ResourceServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Mapfaces Resource Servlet</servlet-name>
+        <url-pattern>/mfRes/*</url-pattern>
+    </servlet-mapping>
+
+
+
+    <!-- RICHFACES see: http://docs.jboss.org/richfaces/latest_3_3_X/en/devguide/html_single/-->
+
+    <!-- Mandatory -->
+    <context-param>
+        <param-name>org.ajax4jsf.RESOURCE_URI_PREFIX</param-name>
+        <param-value>rfRes</param-value>
+    </context-param>
+    
+    <context-param>
+        <param-name>org.richfaces.LoadStyleStrategy</param-name>
+        <param-value>NONE</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.richfaces.LoadScriptStrategy</param-name>
+        <param-value>DEFAULT</param-value>
+    </context-param>
+    <context-param>
+        <param-name>org.ajax4jsf.COMPRESS_SCRIPT</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    
+    <filter>
+      <display-name>Ajax4jsf Filter</display-name>
+      <filter-name>ajax4jsf</filter-name>
+      <filter-class>org.ajax4jsf.Filter</filter-class>
+   </filter>
+   <filter-mapping>
+      <filter-name>ajax4jsf</filter-name>
+      <servlet-name>Faces Servlet</servlet-name>
+      <dispatcher>FORWARD</dispatcher>
+      <dispatcher>REQUEST</dispatcher>
+      <dispatcher>INCLUDE</dispatcher>
+   </filter-mapping>
+    
+
     <!--
         Security role name.
         - In the case of sun-based application server (like glassfish), this fields is mapped

@@ -1,87 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.constellation</groupId>
-    <artifactId>constellation-sdi</artifactId>
-    <version>0.6-SNAPSHOT</version>
-  </parent>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.constellation</groupId>
+        <artifactId>constellation-sdi</artifactId>
+        <version>0.6-SNAPSHOT</version>
+    </parent>
 
 
 
-  <!--
+    <!--
     Module description.
   -->
-  <groupId>org.constellation</groupId>
-  <artifactId>modules</artifactId>
-  <packaging>pom</packaging>
-  <name>Modules</name>
-  <description>
-    Constellation's modules. 
-  </description>
+    <groupId>org.constellation</groupId>
+    <artifactId>modules</artifactId>
+    <packaging>pom</packaging>
+    <name>Modules</name>
+    <description>
+        Constellation's modules.
+    </description>
 
 
-
-  <!--
+    
+    <!--
     Developers and contributors.
   -->
-  <developers>
-    <developer>
-      <id>glegal</id>
-      <name>Guilhem Legal</name>
-      <email>guilhem.legal@geomatys.fr</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-    <developer>
-      <id>desruisseaux</id>
-      <name>Martin Desruisseaux</name>
-      <email>desruisseaux@users.sourceforge.net</email>
-      <organization>Geomatys</organization>
-      <organizationUrl>http://www.geomatys.fr/</organizationUrl>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+1</timezone>
-    </developer>
-  </developers>
+    <developers>
+        <developer>
+            <id>glegal</id>
+            <name>Guilhem Legal</name>
+            <email>guilhem.legal@geomatys.fr</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>desruisseaux</id>
+            <name>Martin Desruisseaux</name>
+            <email>desruisseaux@users.sourceforge.net</email>
+            <organization>Geomatys</organization>
+            <organizationUrl>http://www.geomatys.fr/</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
 
 
-  <!--
+    <!--
     If you don't want to build the GUI modules add -PnoWar.
     Else it will be build by default.
   -->
-  <profiles>
-    <profile>
-      <id>defaultProfile</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>gui</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>noWar</id>
-    </profile>
-  </profiles>
+    <profiles>
+        <profile>
+            <id>defaultProfile</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>gui</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>noWar</id>
+        </profile>
+    </profiles>
 
 
-  <!-- =========================================================== -->
+    <!-- =========================================================== -->
   <!--     Modules included in the build                           -->
   <!-- =========================================================== -->
-  <modules>
-    <module>library</module>
-    <module>xml-bindings</module>
-    <module>storage</module>
-    <module>engine</module>
-    <module>web-services</module>
-    <module>testing</module>
-  </modules>
+    <modules>
+        <module>library</module>
+        <module>xml-bindings</module>
+        <module>storage</module>
+        <module>engine</module>
+        <module>web-services</module>
+        <module>testing</module>
+    </modules>
 
 </project>
