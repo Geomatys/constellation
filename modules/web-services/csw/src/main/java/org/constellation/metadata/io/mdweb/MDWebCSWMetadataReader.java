@@ -276,7 +276,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
             return result;
 
         } catch (MD_IOException e) {
-             throw new MetadataIoException("SQL exception while reading the metadata: " + identifier, NO_APPLICABLE_CODE, "id");
+             throw new MetadataIoException("SQL exception while reading the metadata: " + identifier, e, NO_APPLICABLE_CODE, "id");
         }
     }
 
@@ -666,7 +666,7 @@ public class MDWebCSWMetadataReader extends MDWebMetadataReader implements CSWMe
                 }
             }
         } catch (NumberFormatException ex) {
-            LOGGER.warning("unable to parse a double in bounding box value:\n" + ex.getMessage()) ;
+            LOGGER.log(Level.WARNING, "unable to parse a double in bounding box value:\n{0}", ex.getMessage()) ;
         }
 
         if (eastValue != null && westValue != null && northValue != null && southValue != null) {
