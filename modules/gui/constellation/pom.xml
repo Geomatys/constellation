@@ -244,6 +244,65 @@
             </dependencies>
         </profile>
         <profile>
+            <id>wmswcs</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.constellation.web-services</groupId>
+                    <artifactId>cstl-web-wms</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.web-services</groupId>
+                    <artifactId>cstl-web-wcs</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-data-postgis</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-data-coveragefile</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-data-coveragesql</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-data-shapefile</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-data-sml</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-data-om</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-style-sld</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.constellation.storage</groupId>
+                    <artifactId>cstl-store-style-unnormalize</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.geotoolkit</groupId>
+                    <artifactId>geotk-coverageio-netcdf</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>wfs</id>
             <dependencies>
                 <dependency>
