@@ -45,17 +45,16 @@ import org.constellation.metadata.io.CSWMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
-// Geotools dependencies
+// Geotoolkit dependencies
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
-
-// MDWeb dependencies
 import org.geotoolkit.lucene.IndexingException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.lucene.index.AbstractIndexer.IndexDirectoryFilter;
 import org.geotoolkit.util.FileUtilities;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * The base for The CSW configurer.

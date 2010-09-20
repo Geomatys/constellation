@@ -1,5 +1,5 @@
-INSERT INTO "Storage"."Forms" VALUES (10, 'CSWCat', '000068C3-3B49-C671-89CF-10A39BB1B652', 'admin', 'admin', 'inspire_core_service', '2009-07-01', 0, 1, 'NORMALFORM');
-INSERT INTO "Storage"."Forms" VALUES (11, 'CSWCat', 'urn:uuid:3e195454-42e8-11dd-8329-00e08157d076', 'admin', 'admin', 'inspire_core_service', '2009-07-01', 0, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type")  VALUES (10, 'CSWCat', '3d8eac08-5af4-44ed-bef8-eba86a7d5972', '000068C3-3B49-C671-89CF-10A39BB1B652', 'admin', 'admin', 'inspire_core_service', '2009-07-01', 0, 1, 'NORMALFORM');
+INSERT INTO "Storage"."Records" ("accessionNumber","recordSet", "identifier", "title", "maintainerID", "validatorID", "profile", "updateDate", "isValidated", "isPublished", "type")  VALUES (11, 'CSWCat', 'c76254e2-914a-42f3-8668-fff429fe3aca','urn:uuid:3e195454-42e8-11dd-8329-00e08157d076', 'admin', 'admin', 'inspire_core_service', '2009-07-01', 0, 1, 'NORMALFORM');
 
 INSERT INTO "Storage"."Values" VALUES (10, 'Ebrim v2.5:ExtrinsicObject', 1, 'ExtrinsicObject', 'Ebrim v2.5', 'Ebrim v2.5:ExtrinsicObject.1');
 INSERT INTO "Storage"."Values" VALUES (10, 'Ebrim v2.5:ExtrinsicObject:name', 1, 'InternationalString', 'Ebrim v2.5', 'Ebrim v2.5:ExtrinsicObject.1:name.1');

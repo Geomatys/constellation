@@ -33,8 +33,8 @@ import org.constellation.util.Util;
 import org.geotoolkit.csw.xml.CSWClassesContext;
 import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 import org.junit.*;
 
@@ -63,16 +63,16 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
 
             Connection con = ds.getConnection();
 
-            ScriptRunner sr = new ScriptRunner(con);
-            sr.run(Util.getResourceAsStream("org/constellation/sql/structure-mdweb.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-base-data.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-base-data.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-data.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19119-data.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19108-data.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/DC-schema.sql"));
-            sr.run(Util.getResourceAsStream("org/constellation/sql/ebrim-schema.sql"));
+            DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+            sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/model/mdw_schema_2.1(derby).sql"));
+            sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
+            sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
+            sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
+            sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
+            sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
+            sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
+            sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv2.5.sql"));
+            sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-3.sql"));
             sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-4.sql"));

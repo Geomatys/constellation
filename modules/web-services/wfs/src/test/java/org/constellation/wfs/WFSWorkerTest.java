@@ -89,6 +89,7 @@ import org.geotoolkit.xsd.xml.v2001.Schema;
 import org.geotoolkit.xsd.xml.v2001.XSDMarshallerPool;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -951,7 +952,7 @@ public class WFSWorkerTest {
 
         Connection con = ds.getConnection();
 
-        ScriptRunner sr = new ScriptRunner(con);
+        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
         sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
 
@@ -987,14 +988,14 @@ public class WFSWorkerTest {
 
         con = ds2.getConnection();
 
-        sr = new ScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-mdweb.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-base-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-base-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19108-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-schema.sql"));
+        sr = new DerbySqlScriptRunner(con);
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/model/mdw_schema_2.1(derby).sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data.sql"));
 
         con.close();

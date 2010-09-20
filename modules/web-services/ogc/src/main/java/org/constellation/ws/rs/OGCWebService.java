@@ -18,7 +18,6 @@
 package org.constellation.ws.rs;
 
 // J2SE dependencies
-import org.opengis.util.CodeList;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.io.File;
@@ -33,9 +32,9 @@ import javax.xml.bind.Unmarshaller;
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ws.CstlServiceException;
-
-// Geotools dependencies
 import org.constellation.ws.WebServiceUtilities;
+
+// Geotoolkit dependencies
 import org.geotoolkit.internal.CodeLists;
 import org.geotoolkit.ows.xml.OWSExceptionCode;
 import org.geotoolkit.util.StringUtilities;
@@ -44,7 +43,8 @@ import org.geotoolkit.util.collection.UnmodifiableArrayList;
 
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
-
+// GeoAPI dependencies
+import org.opengis.util.CodeList;
 /**
  * Abstract parent REST facade for all OGC web services in Constellation.
  * <p>

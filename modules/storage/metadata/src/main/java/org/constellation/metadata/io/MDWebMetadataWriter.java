@@ -644,13 +644,13 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                             
                         } catch (NoSuchFieldException ex) {
                             LOGGER.log(Level.WARNING, "no such Field:" + propName + " in class:" + valueClass.getName());
-                            return result;
+                            continue;
                         } catch (SecurityException ex) {
                             LOGGER.log(Level.WARNING, null, ex);
-                            return result;
+                            continue;
                         } catch (IllegalAccessException ex) {
                             LOGGER.log(Level.WARNING, null, ex);
-                            return result;
+                            continue;
                         }
                     }
                 }

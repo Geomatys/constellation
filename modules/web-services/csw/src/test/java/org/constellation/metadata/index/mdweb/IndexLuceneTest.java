@@ -32,28 +32,29 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 // Constellation dependencies
+import org.constellation.generic.database.Automatic;
+import org.constellation.generic.database.BDD;
+import org.constellation.util.Util;
 
 // lucene dependencies
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
-// geotools dependencies
-import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
-import org.constellation.util.Util;
+// geotoolkit dependencies
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 
 // MDWeb dependencies
 import org.mdweb.io.MD_IOException;
-import org.mdweb.io.sql.v20.Writer20;
+import org.mdweb.io.Writer;
+import org.mdweb.io.sql.v21.Writer21;
 import org.mdweb.model.schemas.Classe;
 import org.mdweb.model.schemas.Obligation;
 import org.mdweb.model.schemas.Path;
@@ -103,11 +104,11 @@ public class IndexLuceneTest {
 
         Connection con = ds.getConnection();
 
-        ScriptRunner sr = new ScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-mdweb.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-base-data.sql"));
+        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/model/mdw_schema_2.1(derby).sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
 
-        Writer20 writer = new Writer20(ds, false);
+        Writer21 writer = new Writer21(ds, false);
         fillTestData(writer);
 
         BDD bdd = new BDD("org.apache.derby.jdbc.EmbeddedDriver", url, "", "");
@@ -155,7 +156,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        LOGGER.log(LOG_LEVEL,"SimpleSearch 1:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 1:\n{0}", resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("1:CATEST");
@@ -172,7 +173,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        LOGGER.log(LOG_LEVEL,"SimpleSearch 2:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 2:\n{0}", resultReport);
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("1:CATEST");
@@ -213,7 +214,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        LOGGER.log(LOG_LEVEL,"SimpleSearch 4:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 4:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("1:CATEST");
@@ -235,7 +236,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        LOGGER.log(LOG_LEVEL,"SimpleSearch 5:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 5:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("1:CATEST");
@@ -253,7 +254,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        LOGGER.log(LOG_LEVEL,"SimpleSearch 5:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 5:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("2:CATEST");
@@ -276,7 +277,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        LOGGER.log(LOG_LEVEL,"SimpleSearch 6:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 6:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("3:CATEST");
@@ -300,7 +301,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        LOGGER.log(LOG_LEVEL,"SimpleSearch 7:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 7:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("2:CATEST");
@@ -327,7 +328,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
 
-        LOGGER.log(LOG_LEVEL,"SimpleSearch 8:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SimpleSearch 8:\n{0}", resultReport);
 
         expectedResult = new ArrayList<String>();
         expectedResult.add("2:CATEST");
@@ -363,7 +364,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        LOGGER.log(LOG_LEVEL,"SortedSearch 1:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SortedSearch 1:\n{0}", resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("3:CATEST");
@@ -386,7 +387,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        LOGGER.log(LOG_LEVEL,"SortedSearch 2:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SortedSearch 2:\n{0}", resultReport);
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("4:CATEST");
@@ -409,7 +410,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        LOGGER.log(LOG_LEVEL,"SortedSearch 3:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SortedSearch 3:\n{0}", resultReport);
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("2:CATEST");
@@ -432,7 +433,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        LOGGER.log(LOG_LEVEL,"SortedSearch 4:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "SortedSearch 4:\n{0}", resultReport);
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("4:CATEST");
@@ -464,7 +465,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        LOGGER.log(LOG_LEVEL,"spatialSearch 1:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "spatialSearch 1:\n{0}", resultReport);
         
         List<String> expectedResult = new ArrayList<String>();
         expectedResult.add("2:CATEST");
@@ -489,7 +490,7 @@ public class IndexLuceneTest {
         for (String s: result)
             resultReport = resultReport + s + '\n';
         
-        LOGGER.log(LOG_LEVEL,"spatialSearch 2:\n" + resultReport);
+        LOGGER.log(LOG_LEVEL, "spatialSearch 2:\n{0}", resultReport);
         
         expectedResult = new ArrayList<String>();
         expectedResult.add("1:CATEST");
@@ -498,7 +499,7 @@ public class IndexLuceneTest {
     }
 
     
-    public static void fillTestData(Writer20 writer) throws MD_IOException {
+    public static void fillTestData(Writer writer) throws MD_IOException {
         
         //we create a new Catalog
         RecordSet cat             = new RecordSet("CATEST", "CATEST");

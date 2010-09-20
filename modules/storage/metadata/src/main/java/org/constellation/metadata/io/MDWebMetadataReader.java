@@ -450,19 +450,22 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 final org.mdweb.model.schemas.CodeList codelist = (org.mdweb.model.schemas.CodeList) value.getType();
                 try {
                     final CodeListElement element = codelist.getElementByCode(Integer.parseInt(textValue));
-
-                    Method method;
-                    if (classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) {
-                        result = CodeLists.valueOf(classe, element.getName());
-
-                    } else if (classe.isEnum()) {
-                        method = ReflectionUtilities.getMethod("fromValue", classe, String.class);
-                        result = ReflectionUtilities.invokeMethod(method, classe, element.getName());
-                    } else {
-                        LOGGER.severe("unknow codelist type");
+                    if (element == null) {
+                        LOGGER.warning("unable to find a codelist element for code:" + textValue + " in the codelist:" + codelist.getName());
                         return null;
-                    }
+                    } else {
+                        Method method;
+                        if (classe.getSuperclass() != null && classe.getSuperclass().equals(CodeList.class)) {
+                            result = CodeLists.valueOf(classe, element.getName());
 
+                        } else if (classe.isEnum()) {
+                            method = ReflectionUtilities.getMethod("fromValue", classe, String.class);
+                            result = ReflectionUtilities.invokeMethod(method, classe, element.getName());
+                        } else {
+                            LOGGER.warning("unknow codelist type:" + value.getType());
+                            return null;
+                        }
+                    }
                     return result;
                 } catch (NumberFormatException e) {
                     if (textValue != null && !textValue.isEmpty()) {
@@ -692,7 +695,8 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         if (field != null) {
                             setFieldToValue(field, attribName, result, param);
                         } else {
-                            LOGGER.warning("no field " + attribName + " in class:" + classe.getName());
+                            LOGGER.warning("no field " + attribName + " in class:" + classe.getName() + '\n'
+                                         + "currentPath:" + path.getId());
                         }
                     }
                 }

@@ -32,8 +32,8 @@ import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.util.Util;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.util.FileUtilities;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.xml.MarshallerPool;
 
 import org.junit.*;
@@ -56,14 +56,14 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
         Connection con2 = ds2.getConnection();
 
-        ScriptRunner sr = new ScriptRunner(con2);
-        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-mdweb.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-base-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-base-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19108-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-schema_v2.sql"));
+        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con2);
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/model/mdw_schema_2.1(derby).sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML_v2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
 
         final String url = "jdbc:derby:memory:Test1;create=true";
@@ -71,7 +71,7 @@ public class PostgridSOSWorkerTest extends SOSWorkerTest {
 
         Connection con = ds.getConnection();
 
-        sr = new ScriptRunner(con);
+        sr = new DerbySqlScriptRunner(con);
         sr.run(Util.getResourceAsStream("org/constellation/sql/structure-observations.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sos-data.sql"));
        

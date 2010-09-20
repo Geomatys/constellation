@@ -17,27 +17,32 @@
  */
 package org.constellation.observation;
 
+// J2SE dependencies
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-
-// Constellation dependencies
 import java.sql.Timestamp;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import org.geotoolkit.internal.sql.table.CatalogException;
-import org.geotoolkit.internal.sql.table.Database;
-import org.geotoolkit.internal.sql.table.QueryType;
-import org.geotoolkit.internal.sql.table.SingletonTable;
+
+// Constellation dependencies
 import org.constellation.sampling.SamplingCurveTable;
 import org.constellation.sampling.SamplingFeatureTable;
 import org.constellation.sampling.SamplingPointTable;
 import org.constellation.swe.v101.AnyResultTable;
 import org.constellation.swe.v101.CompositePhenomenonTable;
+import org.constellation.swe.v101.PhenomenonTable;
 
 // OpenGis dependencies
-import org.constellation.swe.v101.PhenomenonTable;
+import org.opengis.observation.sampling.SamplingFeature;
+import org.opengis.observation.Observation;
+
+// geotoolkit dependencies
+import org.geotoolkit.internal.sql.table.CatalogException;
+import org.geotoolkit.internal.sql.table.Database;
+import org.geotoolkit.internal.sql.table.QueryType;
+import org.geotoolkit.internal.sql.table.SingletonTable;
+import org.geotoolkit.util.Utilities;
 import org.geotoolkit.gml.xml.v311.AbstractTimeGeometricPrimitiveType;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.gml.xml.v311.TimeInstantType;
@@ -54,11 +59,6 @@ import org.geotoolkit.swe.xml.v101.AnyResultEntry;
 import org.geotoolkit.swe.xml.v101.CompositePhenomenonEntry;
 import org.geotoolkit.swe.xml.v101.DataArrayPropertyType;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
-import org.opengis.observation.sampling.SamplingFeature;
-import org.opengis.observation.Observation;
-
-// geotools dependencies
-import org.geotoolkit.util.Utilities;
 
 
 /**

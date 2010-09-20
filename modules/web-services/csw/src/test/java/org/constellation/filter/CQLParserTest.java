@@ -20,15 +20,14 @@ package org.constellation.filter;
 // J2SE dependencies
 import java.util.logging.Logger;
 
-// Geotools dependencies
-
-// JUnit dependencies
+// Geotoolkit dependencies
 import org.geotoolkit.csw.xml.v202.QueryConstraintType;
 import org.geotoolkit.lucene.filter.LuceneOGCFilter;
 import org.geotoolkit.lucene.filter.SerialChainFilter;
 import org.geotoolkit.lucene.filter.SpatialQuery;
 import org.geotoolkit.ogc.xml.v110.FilterType;
-import org.junit.*;
+
+// GeoAPI dependencies
 import org.opengis.filter.Filter;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Beyond;
@@ -41,6 +40,9 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
+
+// JUnit dependencies
+import org.junit.*;
 import static org.junit.Assert.*;
 
 /**

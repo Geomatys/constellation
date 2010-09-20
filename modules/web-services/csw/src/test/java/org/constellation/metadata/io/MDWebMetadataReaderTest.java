@@ -28,9 +28,11 @@ import org.constellation.generic.database.BDD;
 import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.metadata.CSWworkerTest;
 import org.constellation.util.Util;
+
+// Geotoolkit dependencies
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
 import org.geotoolkit.internal.sql.DefaultDataSource;
-import org.geotoolkit.internal.sql.ScriptRunner;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.v100.ComponentType;
@@ -39,6 +41,8 @@ import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.sml.xml.v100.SystemType;
 import org.geotoolkit.swe.xml.v100.DataRecordType;
 import org.geotoolkit.xml.MarshallerPool;
+
+// Junit dependencies
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -70,20 +74,20 @@ public class MDWebMetadataReaderTest {
 
         Connection con = ds.getConnection();
 
-        ScriptRunner sr = new ScriptRunner(con);
-        sr.run(Util.getResourceAsStream("org/constellation/sql/structure-mdweb.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-base-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-base-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19115-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19119-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/ISO19108-data.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/DC-schema.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/ebrim-schema.sql"));
-        sr.run(Util.getResourceAsStream("org/constellation/sql/mdweb-user-data.sql"));
+        DerbySqlScriptRunner sr = new DerbySqlScriptRunner(con);
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/model/mdw_schema_2.1(derby).sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv2.5.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-5.sql"));
         
-        sr.run(Util.getResourceAsStream("org/constellation/sql/sml-schema_v2.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML_v2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data-2_v2.sql"));
 

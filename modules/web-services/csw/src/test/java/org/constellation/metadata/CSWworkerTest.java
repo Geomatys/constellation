@@ -2256,7 +2256,7 @@ public class CSWworkerTest {
             assertEquals(expectedCitation.getPresentationForms(), resultCitation.getPresentationForms());
             assertEquals(expectedCitation.getSeries(), resultCitation.getSeries());
             if (expectedCitation.getTitle() instanceof DefaultInternationalString) {
-                assertTrue("result citation title:" + resultCitation.getTitle() , resultCitation.getTitle() instanceof DefaultInternationalString);
+                assertTrue("result citation title:" + resultCitation.getTitle() +"\n expected:" + expectedCitation.getTitle(), resultCitation.getTitle() instanceof DefaultInternationalString);
                 DefaultInternationalString expTitle = (DefaultInternationalString) expectedCitation.getTitle();
                 DefaultInternationalString resTitle = (DefaultInternationalString) resultCitation.getTitle();
                 assertEquals(expTitle.getLocales(), resTitle.getLocales());

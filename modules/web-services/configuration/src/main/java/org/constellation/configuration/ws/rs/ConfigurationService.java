@@ -27,6 +27,9 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Arrays;
+import java.util.Map.Entry;
+import java.util.logging.Level;
 
 // Jersey dependencies
 import javax.annotation.PreDestroy;
@@ -38,9 +41,6 @@ import javax.ws.rs.core.Response;
 import com.sun.jersey.spi.resource.Singleton;
 
 // JAXB dependencies
-import java.util.Arrays;
-import java.util.Map.Entry;
-import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
@@ -55,21 +55,23 @@ import org.constellation.configuration.factory.AbstractConfigurerFactory;
 import org.constellation.provider.LayerProviderProxy;
 import org.constellation.provider.StyleProviderProxy;
 import org.constellation.provider.configuration.ConfigDirectory;
-import org.geotoolkit.ows.xml.OWSExceptionCode;
-import org.geotoolkit.ows.xml.v110.ExceptionReport;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.AbstractWebService;
 import org.constellation.ws.rs.ContainerNotifierImpl;
-import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
-// Geotools dependencies
+
+// Geotoolkit dependencies
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.ows.xml.OWSExceptionCode;
+import org.geotoolkit.ows.xml.v110.ExceptionReport;
+
+import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
  * Web service for administration and configuration operations.
