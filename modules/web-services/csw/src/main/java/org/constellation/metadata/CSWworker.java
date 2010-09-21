@@ -661,7 +661,11 @@ public class CSWworker {
                     if (additionalQueryable != null) {
                         final List<String> values = new ArrayList<String>();
                         for (QName name : mdReader.getAdditionalQueryableQName()) {
-                            values.add(name.getPrefix() + ':' + name.getLocalPart());
+                            // allow to redefine the mapping in reader implementation
+                            if (!ISO_QUERYABLE.containsKey(name.getLocalPart()) &&
+                                !DUBLIN_CORE_QUERYABLE.containsKey(name.getLocalPart())) {
+                                values.add(name.getPrefix() + ':' + name.getLocalPart());
+                            }
                         }
                         if (values.size() > 0) {
                             additionalQueryable.setValue(values);
