@@ -38,10 +38,10 @@ import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.geometry.GeneralDirectPosition;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
-import org.geotoolkit.metadata.iso.citation.Citations;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.util.logging.Logging;
 import org.opengis.feature.type.Name;
 
 import org.opengis.geometry.Envelope;
@@ -56,6 +56,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * @author Cédric Briançon (Geomatys)
  */
 public final class GMLGraphicVisitor extends TextGraphicVisitor {
+    private static final Logger LOGGER = Logging.getLogger(GMLGraphicVisitor.class);
 
     private final LayerProviderProxy dp = LayerProviderProxy.getInstance();
 
@@ -134,11 +135,9 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         builder.append("\t\t\t<gml:boundedBy>").append("\n");
         String crsName;
         try {
-            crsName = CRS.lookupIdentifier(Citations.EPSG, crs, true);
-            if (!crsName.startsWith("EPSG:")) {
-                crsName = "ESPG:" + crsName;
-            }
+            crsName = CRS.lookupIdentifier(crs, true);
         } catch (FactoryException ex) {
+            LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
             crsName = crs.getName().getCode();
         }
         builder.append("\t\t\t\t<gml:Box srsName=\"").append(crsName).append("\">\n");
@@ -159,6 +158,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
             try {
                 dates = layerPostgrid.getAvailableTimes();
             } catch (DataStoreException ex) {
+                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
                 dates = null;
             }
             if (dates != null && !(dates.isEmpty())) {
@@ -176,6 +176,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
             try {
                 elevs = layerPostgrid.getAvailableElevations();
             } catch (DataStoreException ex) {
+                LOGGER.log(Level.INFO, ex.getLocalizedMessage(), ex);
                 elevs = null;
             }
             if (elevs != null && !(elevs.isEmpty())) {
@@ -187,21 +188,24 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         try {
             grid = layerPostgrid.getCoverage(objEnv, new Dimension(gfi.getSize()), elevation, time);
         } catch (DataStoreException cat) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, cat.getMessage(), cat);
+            LOGGER.log(Level.WARNING, cat.getLocalizedMessage(), cat);
             return;
         } catch (IOException io) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, io.getMessage(), io);
+            LOGGER.log(Level.WARNING, io.getLocalizedMessage(), io);
             return;
         }
-        if (grid != null) {
+        if (grid != null ) {
             builder.append("\t\t\t<variable>")
                    .append(grid.getSampleDimension(0).getDescription())
                    .append("</variable>").append("\n");
         }
         final MeasurementRange[] ranges = layerPostgrid.getSampleValueRanges();
-        if (ranges != null && ranges.length > 0 && !ranges[0].toString().equals("")) {
-            builder.append("\t\t\t<unit>").append(ranges[0].getUnits().toString())
-                   .append("</unit>").append("\n");
+        if (ranges != null && ranges.length > 0) {
+            final MeasurementRange range = ranges[0];
+            if (!range.isEmpty() && range.getUnits() != null) {
+                builder.append("\t\t\t<unit>").append(range.getUnits().toString())
+                       .append("</unit>").append("\n");
+            }
         }
         builder.append("\t\t\t<value>").append(result)
                .append("</value>").append("\n")
