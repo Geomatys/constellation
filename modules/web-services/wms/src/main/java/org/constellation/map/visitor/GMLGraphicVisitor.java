@@ -28,6 +28,7 @@ import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.measure.unit.Unit;
 
 import org.constellation.provider.LayerDetails;
 import org.constellation.provider.LayerProviderProxy;
@@ -202,9 +203,12 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
         final MeasurementRange[] ranges = layerPostgrid.getSampleValueRanges();
         if (ranges != null && ranges.length > 0) {
             final MeasurementRange range = ranges[0];
-            if (!range.isEmpty() && range.getUnits() != null) {
-                builder.append("\t\t\t<unit>").append(range.getUnits().toString())
-                       .append("</unit>").append("\n");
+            if (range != null) {
+                final Unit unit = range.getUnits();
+                if (unit != null && !unit.toString().isEmpty()) {
+                    builder.append("\t\t\t<unit>").append(unit.toString())
+                           .append("</unit>").append("\n");
+                }
             }
         }
         builder.append("\t\t\t<value>").append(result)
