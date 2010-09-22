@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -170,22 +169,6 @@ public final class WMSMapDecoration {
     private static PortrayalExtension extension = null;
     private static final Hints hints = new Hints();
     private static final Map<String,Float> compressions = new HashMap<String, Float>();
-
-    /**
-     * The default legend template.
-     */
-    private static final LegendTemplate LEGEND_TEMPLATE = new DefaultLegendTemplate(
-                    new DefaultBackgroundTemplate(
-                        new BasicStroke(1),
-                        Color.LIGHT_GRAY,
-                        Color.WHITE,
-                        new Insets(4, 4, 4, 4),
-                        10),
-                    5,
-                    new Dimension(30, 24),
-                    new Font("Arial", Font.PLAIN, 10),
-                    false,
-                    new Font("Arial", Font.BOLD, 12));
 
     private WMSMapDecoration(){}
 
@@ -357,8 +340,16 @@ public final class WMSMapDecoration {
      * Returns the default legend template.
      */
     public static LegendTemplate getDefaultLegendTemplate(){
-        //TODO: must link with wms portrayal template
-        return LEGEND_TEMPLATE;
+        final DecorationExtension ext = (DecorationExtension) getExtension();
+        for(Map<String,Object> map : ext.decorations){
+            final Object template = map.get(TYPE_LEGEND);
+            if(template instanceof LegendTemplate){
+                return (LegendTemplate) template;
+            }
+        }
+
+        //return a default template
+        return null;
     }
 
     private static void parseDecoration(final DecorationExtension deco, final Element decoNode){
