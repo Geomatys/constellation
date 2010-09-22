@@ -20,32 +20,24 @@ package org.constellation.provider;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.constellation.ServiceDef;
 
+import org.constellation.ServiceDef;
 
 import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.data.DataStore;
 import org.geotoolkit.data.query.Query;
 import org.geotoolkit.display.exception.PortrayalException;
-import org.geotoolkit.display2d.service.DefaultGlyphService;
 import org.geotoolkit.data.FeatureCollection;
 import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.display2d.ext.legend.DefaultLegendService;
-import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.factory.FactoryFinder;
-import org.geotoolkit.map.MapBuilder;
-import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapLayer;
 import org.geotoolkit.metadata.iso.extent.DefaultGeographicBoundingBox;
 import org.geotoolkit.referencing.CRS;
@@ -71,9 +63,8 @@ import org.opengis.metadata.extent.GeographicBoundingBox;
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
  */
-public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails {
+public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails implements FeatureLayerDetails {
     
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.provider");
     protected static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     protected static final GeographicBoundingBox DUMMY_BBOX =
             new DefaultGeographicBoundingBox(-180, 180, -77, +77);
@@ -84,8 +75,6 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     protected static final int MARGIN = 4;
 
     protected final DataStore store;
-    protected final List<String> favorites;
-    protected final Name name;
     protected final PropertyName dateStartField;
     protected final PropertyName dateEndField;
     protected final PropertyName elevationStartField;
@@ -98,6 +87,7 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
     
     protected AbstractFeatureLayerDetails(Name name, DataStore store, List<String> favorites,
             String dateStart, String dateEnd, String elevationStart, String elevationEnd){
+        super(name,favorites);
         
         if(store == null){
             throw new NullPointerException("FeatureSource can not be null.");
@@ -110,16 +100,8 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
             LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         }
 
-
-        this.name = name;
         this.store = store;
-
-        if(favorites == null){
-            this.favorites = Collections.emptyList();
-        }else{
-            this.favorites = Collections.unmodifiableList(favorites);
-        }
-
+       
         final FilterFactory ff = FactoryFinder.getFilterFactory(null);
 
         if(dateStart != null)       this.dateStartField = ff.property(dateStart);
@@ -154,22 +136,6 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
         } catch (DataStoreException ex) {
             throw new PortrayalException(ex);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Name getName() {
-        return name;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<String> getFavoriteStyles() {
-        return favorites;
     }
 
     /**
@@ -311,51 +277,13 @@ public abstract class AbstractFeatureLayerDetails implements FeatureLayerDetails
         return new MeasurementRange<?>[0];
     }
 
-    private MutableStyle createDefaultStyle(){
+    @Override
+    protected MutableStyle getDefaultStyle(){
         try {
             return StyleProviderProxy.STYLE_RANDOM_FACTORY.createDefaultVectorStyle(store.getFeatureType(name));
         } catch (DataStoreException ex) {
             return StyleProviderProxy.STYLE_RANDOM_FACTORY.createPolygonStyle();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template)
-                                                                          throws PortrayalException
-    {
-        MutableStyle style = null;
-        if(!getFavoriteStyles().isEmpty()){
-            style = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
-        }
-        if(style == null){
-            style = createDefaultStyle();
-        }
-
-        try {
-            final MapLayer layer = getMapLayer(style, null);
-            final MapContext context = MapBuilder.createContext(DefaultGeographicCRS.WGS84);
-            context.layers().add(layer);
-            return DefaultLegendService.portray(template, context, dimension);
-
-        } catch (PortrayalException ex) {
-            Logger.getLogger(AbstractFeatureLayerDetails.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return DefaultGlyphService.create(style, dimension,null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Dimension getPreferredLegendSize(final LegendTemplate template, final MutableStyle ms) throws PortrayalException {
-        final MapLayer ml = getMapLayer(ms, null);
-        final MapContext mc = MapBuilder.createContext(DefaultGeographicCRS.WGS84);
-        mc.layers().add(ml);
-        return DefaultLegendService.legendPreferredSize(template, mc);
     }
 
     /**
