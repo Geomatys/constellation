@@ -701,7 +701,6 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         final Integer width  = getLegend.getWidth();
         final Integer height = getLegend.getHeight();
 
-
         final Dimension dims;
         if(width != null && height != null){
             dims = new Dimension(width, height);
@@ -709,10 +708,11 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             //layers will calculate the best size
             dims = null;
         }
-        
+        final String style = getLegend.getStyle();
+
         final BufferedImage image;
         try {
-            image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate());
+            image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), style);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }

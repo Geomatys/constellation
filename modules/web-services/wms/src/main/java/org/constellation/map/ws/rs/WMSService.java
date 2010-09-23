@@ -410,25 +410,28 @@ public class WMSService extends GridWebService {
         final String strFormat = getParameter(KEY_FORMAT, true );
         final String strWidth  = getParameter(KEY_WIDTH,  false);
         final String strHeight = getParameter(KEY_HEIGHT, false);
+        final String strStyle  = getParameter(KEY_STYLE,  false);
+        // Verify that the format is known, otherwise returns an exception.
         final String format;
         try {
             format = RequestsUtilities.toFormat(strFormat);
         } catch (IllegalArgumentException i) {
             throw new CstlServiceException(i, INVALID_FORMAT);
         }
+        final Integer width;
+        final Integer height;
         if (strWidth == null || strHeight == null) {
-            return new GetLegendGraphic(strLayer, strFormat, null, null);
+            width  = null;
+            height = null;
         } else {
-            final int width;
-            final int height;
             try {
                 width  = RequestsUtilities.toInt(strWidth);
                 height = RequestsUtilities.toInt(strHeight);
             } catch (NumberFormatException n) {
                 throw new CstlServiceException(n, INVALID_PARAMETER_VALUE);
             }
-            return new GetLegendGraphic(strLayer, format, width, height);
         }
+        return new GetLegendGraphic(strLayer, format, width, height, strStyle);
     }
 
     private boolean isV111orUnder(String version) {

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@ import org.opengis.feature.type.Name;
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
- @Immutable
+@Immutable
 public final class GetLegendGraphic extends WMSQuery {
     /**
      * Layer to consider.
@@ -54,17 +54,23 @@ public final class GetLegendGraphic extends WMSQuery {
     private final Integer height;
 
     /**
+     * Style to apply for the legend output. Optional.
+     */
+    private final String style;
+
+    /**
      * Builds a {@code GetLegendGraphic} request, using the layer and mime-type specified
      * and width and height for the image.
      */
-    public GetLegendGraphic(final Name layer, final String format,
-                            final Integer width, final Integer height)
+    public GetLegendGraphic(final Name layer, final String format, final Integer width,
+                            final Integer height, final String style)
     {
-        super(ServiceDef.WMS_1_1_1_SLD.version,null);
+        super(ServiceDef.WMS_1_1_1_SLD.version, null);
         this.layer  = layer;
         this.format = format;
         this.width  = width;
         this.height = height;
+        this.style  = style;
     }
 
     /**
@@ -112,6 +118,13 @@ public final class GetLegendGraphic extends WMSQuery {
     }
 
     /**
+     * Returns the style for this legend.
+     */
+    public String getStyle() {
+        return style;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -124,10 +137,13 @@ public final class GetLegendGraphic extends WMSQuery {
 
         //Optional Parameters
         if (width != null) {
-            kvp.append('&').append(KEY_WIDTH ).append('=').append(width);
+            kvp.append('&').append(KEY_WIDTH).append('=').append(width);
         }
         if (height != null) {
             kvp.append('&').append(KEY_HEIGHT).append('=').append(height);
+        }
+        if (style != null) {
+            kvp.append('&').append(KEY_STYLE).append('=').append(style);
         }
         return kvp.toString();
     }
