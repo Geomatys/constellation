@@ -655,7 +655,10 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                    infoFormat.equalsIgnoreCase(GML))
         {
             // GML
-            visitor = new GMLGraphicVisitor(getFI);
+            visitor = new GMLGraphicVisitor(getFI, 0);
+        } else if (infoFormat.equalsIgnoreCase(GML3)) {
+            // GML 3
+            visitor = new GMLGraphicVisitor(getFI, 1);
         } else {
             throw new CstlServiceException("MIME type " + infoFormat + " is not accepted by the service.\n" +
                     "You have to choose between: "+ MimeType.TEXT_PLAIN +", "+ MimeType.TEXT_HTML +", "+ MimeType.APP_GML +", "+ GML +

@@ -16,18 +16,25 @@
  */
 package org.constellation.map.visitor;
 
+import com.vividsolutions.jts.geom.Geometry;
 import java.awt.Dimension;
 import java.awt.Shape;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import javax.measure.unit.Unit;
 
 import org.constellation.provider.LayerDetails;
@@ -38,11 +45,19 @@ import org.geotoolkit.coverage.grid.GridCoverage2D;
 import org.geotoolkit.display2d.primitive.ProjectedCoverage;
 import org.geotoolkit.display2d.primitive.ProjectedFeature;
 import org.geotoolkit.geometry.GeneralDirectPosition;
+import org.geotoolkit.geometry.isoonjts.JTSUtils;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
+import org.geotoolkit.internal.jaxb.ObjectFactory;
+import org.geotoolkit.map.FeatureMapLayer;
 import org.geotoolkit.referencing.CRS;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.util.MeasurementRange;
 import org.geotoolkit.util.logging.Logging;
+import org.geotoolkit.xml.MarshallerPool;
+import org.opengis.feature.Feature;
+import org.opengis.feature.GeometryAttribute;
+import org.opengis.feature.Property;
+import org.opengis.feature.type.FeatureType;
 import org.opengis.feature.type.Name;
 
 import org.opengis.geometry.Envelope;
@@ -55,6 +70,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  *
  * @author Johann Sorel (Geomatys)
  * @author Cédric Briançon (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  */
 public final class GMLGraphicVisitor extends TextGraphicVisitor {
     private static final Logger LOGGER = Logging.getLogger(GMLGraphicVisitor.class);
@@ -63,8 +79,34 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
 
     private int index = 0;
 
-    public GMLGraphicVisitor(GetFeatureInfo gfi) {
+    /**
+     * a flag indicating the version of GML: 0 for mapserver output
+     *                                       1 for GML 3 output
+     */
+    private int mode;
+
+    /**
+     * A Map of namespace / prefix
+     */
+    private Map<String, String> prefixMap = new HashMap<String, String>();
+
+    private static MarshallerPool pool;
+    static {
+        try {
+            final Map<String, String> properties = new HashMap<String, String>();
+            properties.put(Marshaller.JAXB_FRAGMENT, "true");
+            properties.put(Marshaller.JAXB_FORMATTED_OUTPUT, "false");
+            pool = new MarshallerPool(properties, ObjectFactory.class);
+        } catch (JAXBException ex) {
+            LOGGER.log(Level.SEVERE, "JAXB Exception while initalizing the marshaller pool", ex);
+        }
+    }
+
+
+    public GMLGraphicVisitor(GetFeatureInfo gfi, int mode) {
         super(gfi);
+        this.mode = mode;
+        prefixMap.put("http://www.opengis.net/gml", "gml");
     }
 
     /**
@@ -85,11 +127,113 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
      */
     @Override
     public void visit(ProjectedFeature graphic, Shape queryArea) {
-        super.visit(graphic, queryArea);
+        if (mode == 0) {
+            super.visit(graphic, queryArea);
+        } else {
+
+            //TODO handle features as real GML features here
+            final StringBuilder builder   = new StringBuilder();
+            final FeatureMapLayer layer   = graphic.getFeatureLayer();
+            final Feature feature         = graphic.getFeature();
+            final FeatureType featureType = feature.getType();
+            String margin                 = "\t";
+
+            // feature member  mark
+            builder.append(margin).append("<gml:featureMember>\n");
+            margin += "\t";
+
+            // featureType mark
+            if (featureType != null) {
+                String ftLocal = featureType.getName().getLocalPart();
+                String ftPrefix  = acquirePrefix(featureType.getName().getNamespaceURI());
+
+                builder.append(margin).append('<').append(ftPrefix).append(ftLocal).append(">\n");
+                margin += "\t";
+
+                for (final Property prop : feature.getProperties()) {
+                    if (prop == null) {
+                        continue;
+                    }
+                    final Name propName = prop.getName();
+                    if (propName == null) {
+                        continue;
+                    }
+                    String pLocal = propName.getLocalPart();
+                    String pPrefix  = acquirePrefix(propName.getNamespaceURI());
+
+                    if (Geometry.class.isAssignableFrom(prop.getType().getBinding())) {
+                        GeometryAttribute geomProp = (GeometryAttribute) prop;
+                        builder.append(margin).append('<').append(pPrefix).append(pLocal).append(">\n");
+                        Marshaller m = null;
+                        try {
+                             m = pool.acquireMarshaller();
+                             StringWriter sw = new StringWriter();
+                             org.opengis.geometry.Geometry gmlGeometry =  JTSUtils.toISO((Geometry) prop.getValue(),geomProp.getType().getCoordinateReferenceSystem());
+                             ObjectFactory factory =  new ObjectFactory();
+                             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
+                             m.marshal(factory.buildAnyGeometry(gmlGeometry), sw);
+                             builder.append(sw.toString());
+                        } catch (JAXBException ex) {
+                            LOGGER.log(Level.WARNING, "JAXB exception while marshalling the geometry", ex);
+                        } finally {
+                            if (m != null) {
+                                pool.release(m);
+                            }
+                        }
+                        builder.append(margin).append("</").append(pPrefix).append(pLocal).append(">\n");
+                    } else {
+                        final Object value = prop.getValue();
+                        builder.append(margin).append('<').append(pPrefix).append(pLocal).append('>').append(value).append("</").append(pPrefix).append(pLocal).append(">\n");
+                    }
+                }
+
+                // end featureType mark
+                margin = margin.substring(1);
+                builder.append(margin).append("</").append(ftPrefix).append(ftLocal).append(">\n");
+            } else {
+                LOGGER.warning("The feature type is null");
+            }
+
+            // end feature member mark
+            margin = margin.substring(1);
+            builder.append(margin).append("</gml:featureMember>");
+
+            final String result = builder.toString();
+            if (builder.length() > 0) {
+                final String layerName = layer.getName();
+                List<String> strs = values.get(layerName);
+                if (strs == null) {
+                    strs = new ArrayList<String>();
+                    values.put(layerName, strs);
+                }
+                strs.add(result.substring(0, result.length()));
+            }
+        }
         index++;
-        //TODO handle features as real GML features here
     }
 
+    /**
+     * Return the defined prefix for the specified namespace.
+     * if it does not already exist a prefix for this namespace,
+     * a new one will be created on the form: "ns" + prefixMap.size()
+     *
+     * @param namespace a attribute or featureType namespace.
+     *
+     * @return a prefix used in XML.
+     */
+    private String acquirePrefix(String namespace) {
+        if (namespace != null && !namespace.isEmpty()) {
+            String result = prefixMap.get(namespace);
+            if (result == null) {
+                result = "ns" + prefixMap.size();
+                prefixMap.put(namespace,result);
+            }
+            System.out.println("mapping=> prefix:" + result + "="+ namespace);
+            return result + ":";
+        }
+        return "";
+    }
+    
     /**
      * {@inheritDoc }
      */
@@ -207,7 +351,7 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
                 final Unit unit = range.getUnits();
                 if (unit != null && !unit.toString().isEmpty()) {
                     builder.append("\t\t\t<unit>").append(unit.toString())
-                           .append("</unit>").append("\n");
+                            .append("</unit>").append("\n");
                 }
             }
         }
@@ -226,18 +370,33 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
     public String getResult(){
         final StringBuilder builder = new StringBuilder();
 
-        builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n")
-               .append("<msGMLOutput xmlns:gml=\"http://www.opengis.net/gml\" ")
-               .append("xmlns:xlink=\"http://www.w3.org/1999/xlink\" ")
-               .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
-               .append("\n");
+        if (mode == 0) {
+            builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n")
+                   .append("<msGMLOutput xmlns:gml=\"http://www.opengis.net/gml\" ")
+                   .append("xmlns:xlink=\"http://www.w3.org/1999/xlink\" ")
+                   .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
+                   .append("\n");
+        } else {
+            builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").append("\n")
+                   .append("<gml:featureCollection ")
+                   .append("xmlns:xlink=\"http://www.w3.org/1999/xlink\" ")
+                   .append("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ");
+            for (Entry<String, String> entry: prefixMap.entrySet()) {
+                builder.append("xmlns:").append(entry.getValue()).append("=\"").append(entry.getKey()).append("\" ");
+            }
+            builder.append(">\n");
+        }
 
         for (String layerName : values.keySet()) {
             for (final String record : values.get(layerName)) {
                 builder.append(record).append("\n");
             }
         }
-        builder.append("</msGMLOutput>");
+        if (mode == 0) {
+            builder.append("</msGMLOutput>");
+        } else {
+            builder.append("</gml:featureCollection>");
+        }
 
 
         values.clear();
