@@ -102,22 +102,22 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
     /**
      * A getCapabilities request used request another csw(2.0.2)
      */
-    private static final GetCapabilitiesType getCapabilitiesRequestv202;
+    private static final GetCapabilitiesType GETCAPABILITIES_V202;
     
     /**
      * A getCapabilities request used request another csw(2.0.0)
      */
-    private static final org.geotoolkit.csw.xml.v200.GetCapabilitiesType getCapabilitiesRequestv200;
+    private static final org.geotoolkit.csw.xml.v200.GetCapabilitiesType GETCAPABILITIES_V200;
 
     static {
         //we build the base request to get the capabilities of anoter CSW service (2.0.2)
         final AcceptVersionsType versions = new AcceptVersionsType(CSW_202_VERSION, "2.0.0");
         final SectionsType sections       = new SectionsType("All");
         final AcceptFormatsType formats   = new AcceptFormatsType(MimeType.TEXT_XML, MimeType.APPLICATION_XML);
-        getCapabilitiesRequestv202            = new GetCapabilitiesType(versions, sections, formats, null, CSW);
+        GETCAPABILITIES_V202            = new GetCapabilitiesType(versions, sections, formats, null, CSW);
 
         //we build the base request to get the capabilities of anoter CSW service (2.0.0)
-        getCapabilitiesRequestv200            = new org.geotoolkit.csw.xml.v200.GetCapabilitiesType(versions, sections, formats, null, CSW);
+        GETCAPABILITIES_V200            = new org.geotoolkit.csw.xml.v200.GetCapabilitiesType(versions, sections, formats, null, CSW);
     }
     
     /**
@@ -220,9 +220,9 @@ public class DefaultCatalogueHarvester extends CatalogueHarvester {
         
         //if the GET request does not work we try the POST request
         if (distantCapabilities == null) {
-            distantCapabilities = sendRequest(sourceURL, getCapabilitiesRequestv202);
+            distantCapabilities = sendRequest(sourceURL, GETCAPABILITIES_V202);
             if (distantCapabilities == null) {
-                distantCapabilities = sendRequest(sourceURL, getCapabilitiesRequestv200);
+                distantCapabilities = sendRequest(sourceURL, GETCAPABILITIES_V200);
             }
         }
         

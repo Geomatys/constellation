@@ -50,8 +50,9 @@ public interface Query {
     /**
      * Formats values.
      */
-     String GML = "gml";
-     String XML = "xml";
+     String GML  = "gml";
+     String GML3 = "gml3";
+     String XML  = "xml";
 
     /**
      * Returns the request type specified for this query.

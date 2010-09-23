@@ -228,7 +228,6 @@ public final class GMLGraphicVisitor extends TextGraphicVisitor {
                 result = "ns" + prefixMap.size();
                 prefixMap.put(namespace,result);
             }
-            System.out.println("mapping=> prefix:" + result + "="+ namespace);
             return result + ":";
         }
         return "";

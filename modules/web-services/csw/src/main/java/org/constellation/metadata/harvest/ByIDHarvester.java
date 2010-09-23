@@ -148,9 +148,9 @@ public class ByIDHarvester extends CatalogueHarvester {
         }
 
         //we initialize the getRecords request
-        int nbRecordInserted = 0;
-        int nbRecordUpdated  = 0;
-        boolean succeed      = false;
+        int nbRecordInserted       = 0;
+        final int nbRecordUpdated  = 0;
+        boolean succeed            = false;
 
         //we prepare to store the distant serviceException and send it later if this is necessary
         final List<CstlServiceException> distantException = new ArrayList<CstlServiceException>();

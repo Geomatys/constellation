@@ -17,7 +17,6 @@
 
 package org.constellation.sos.io.postgrid;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -53,7 +52,6 @@ public final class DatabasePool {
      *
      * @param bdd Some database informations.
      * @return A postgrid {@link Database}.
-     * @throws IOException
      */
     public static Database getDatabase(BDD bdd) {
         Database db = DATABASE_MAP.get(bdd);
@@ -95,7 +93,7 @@ public final class DatabasePool {
     final DataSource dataSource;
     DataSource ds =null;
         try {
-            InitialContext cxt = new InitialContext();
+            final InitialContext cxt = new InitialContext();
             if (cxt == null) {
                 LOGGER.warning("no initialContext found!");
             } else {

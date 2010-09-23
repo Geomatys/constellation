@@ -70,7 +70,7 @@ public class FileSystemHarvester extends CatalogueHarvester {
         //we initialize the getRecords request
         final int nbRecordInserted = harvestDirectory(dataDirectory);
         // TODO
-        int nbRecordUpdated  = 0;
+        final int nbRecordUpdated  = 0;
 
         final int[] result = new int [3];
         result[0]    = nbRecordInserted;

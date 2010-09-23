@@ -45,7 +45,7 @@ public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWrit
 
     private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.ws.rs");
 
-    private static final String schemaLocation =  "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd";
+    private static final String SCHEMA_LOCATION =  "http://www.opengis.net/sos/1.0 http://schemas.opengis.net/sos/1.0.0/sosAll.xsd http://www.opengis.net/sampling/1.0 http://schemas.opengis.net/sampling/1.0.0/sampling.xsd";
    
 
     @Override
@@ -63,7 +63,7 @@ public class SOSResponseWriter<T extends SOSResponse> implements MessageBodyWrit
         Marshaller m = null;
         try {
             m = SOSMarshallerPool.getInstance().acquireMarshaller();
-            m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
+            m.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, SCHEMA_LOCATION);
             if (t instanceof SOSResponseWrapper) {
                 m.marshal(((SOSResponseWrapper)t).getCollection(),  out);
             } else {
