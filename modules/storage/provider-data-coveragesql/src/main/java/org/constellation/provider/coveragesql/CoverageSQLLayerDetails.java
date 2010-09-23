@@ -220,6 +220,9 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
 
     @Override
     protected MutableStyle getDefaultStyle() {
+        if (getSampleValueRanges().length > 0) {
+            return StyleProviderProxy.getInstance().get("GO2:DimRange");
+        }
         return StyleProviderProxy.STYLE_FACTORY.style(StyleProviderProxy.STYLE_FACTORY.rasterSymbolizer());
     }
 
