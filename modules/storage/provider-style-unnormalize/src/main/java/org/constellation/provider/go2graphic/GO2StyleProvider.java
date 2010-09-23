@@ -19,13 +19,17 @@ package org.constellation.provider.go2graphic;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import javax.measure.unit.Unit;
 
 import org.constellation.provider.AbstractStyleProvider;
+import org.geotoolkit.display2d.ext.dimrange.DimRangeSymbolizer;
 import org.geotoolkit.factory.FactoryFinder;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.display2d.ext.vectorfield.VectorFieldSymbolizer;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.style.MutableStyleFactory;
+import org.geotoolkit.util.MeasurementRange;
+import org.geotoolkit.util.NumberRange;
 import org.opengis.style.Symbolizer;
 
 /**
@@ -113,8 +117,11 @@ public class GO2StyleProvider extends AbstractStyleProvider{
         final MutableStyleFactory sf = (MutableStyleFactory)FactoryFinder.getStyleFactory(
                             new Hints(Hints.STYLE_FACTORY, MutableStyleFactory.class));
         //TODO : find another way to load special styles.
-        final Symbolizer symbol = new VectorFieldSymbolizer();
-        index.put("GO2:VectorField", sf.style(symbol));
+        final Symbolizer symbol1 = new VectorFieldSymbolizer();
+        index.put("GO2:VectorField", sf.style(symbol1));
+        
+        final Symbolizer symbol2 = new DimRangeSymbolizer(new MeasurementRange(NumberRange.create(10, 20), Unit.ONE));
+        index.put("GO2:DimRange", sf.style(symbol2));
     }
 
 }
