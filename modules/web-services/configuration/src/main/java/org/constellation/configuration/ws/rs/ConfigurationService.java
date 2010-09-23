@@ -125,10 +125,10 @@ public final class ConfigurationService extends AbstractWebService  {
             cswConfigurer      = configurerfactory.getCSWConfigurer(cn);
             cswFunctionEnabled = true;
         } catch (JAXBException ex) {
-            LOGGER.log(Level.SEVERE, "JAXBException while setting the JAXB context for configuration service:" + ex.getMessage(), ex);
+            LOGGER.log(Level.WARNING, "JAXBException while setting the JAXB context for configuration service: " + ex.getMessage(), ex);
             cswFunctionEnabled = false;
         } catch (ConfigurationException ex) {
-            LOGGER.log(Level.WARNING, "Specific CSW operation will not be available.\n", ex);
+            LOGGER.log(Level.WARNING, "Specific CSW operation will not be available.\nCause:" + ex.getMessage());
             cswFunctionEnabled = false;
         } catch (FactoryNotFoundException ex) {
             LOGGER.warning("Factory not found for CSWConfigurer, specific CSW operation will not be available.");
