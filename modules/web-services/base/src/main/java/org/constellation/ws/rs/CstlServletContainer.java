@@ -37,24 +37,23 @@ public class CstlServletContainer extends ServletContainer {
     @Override
     protected void configure(final ServletConfig sc, ResourceConfig rc, WebApplication wa) {
         super.configure(sc, rc, wa);
-        if (!configured) {
+        /*if (!configured) {
             final ContainerNotifierImpl cnImpl = new ContainerNotifierImpl();
             rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_NOTIFIER, cnImpl);
             rc.getSingletons().add(new ContextInjectableProvider<ContainerNotifierImpl>(ContainerNotifierImpl.class, cnImpl));
             configured = true;
-        }
-
-
-
+        }*/
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
-        //TODO
-        
-    }
-    
+        protected void initiate(ResourceConfig rc, WebApplication wa) {
+            final ContainerNotifierImpl cnImpl = new ContainerNotifierImpl();
+            rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_NOTIFIER, cnImpl);
+            rc.getSingletons().add(new ContextInjectableProvider<ContainerNotifierImpl>(ContainerNotifierImpl.class, cnImpl));
+            wa.initiate(rc);
+
+        }
+
     private static class ContextInjectableProvider<T> extends SingletonTypeInjectableProvider<Context, T> {
         ContextInjectableProvider(Type type, T instance) {
             super(type, instance);
