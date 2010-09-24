@@ -94,6 +94,7 @@ public final class WMSMapDecoration {
 
     private static final Logger LOGGER = Logging.getLogger(WMSMapDecoration.class);
 
+    private static final String TAG_GETLEGEND   = "GetLegendTemplate";
     private static final String TAG_DECORATION  = "Decoration";
     private static final String TAG_BACKGROUND  = "Background";
     private static final String TAG_PARAMETER   = "Parameter";
@@ -170,6 +171,8 @@ public final class WMSMapDecoration {
     private static final Hints hints = new Hints();
     private static final Map<String,Float> compressions = new HashMap<String, Float>();
 
+    private static LegendTemplate legendTemplate = null;
+
     private WMSMapDecoration(){}
 
     /**
@@ -236,7 +239,7 @@ public final class WMSMapDecoration {
 
         hints.clear();
         compressions.clear();
-
+        legendTemplate = null;
 
         final DocumentBuilderFactory fabrique = DocumentBuilderFactory.newInstance();
         final DocumentBuilder constructeur = fabrique.newDocumentBuilder();
@@ -324,6 +327,12 @@ public final class WMSMapDecoration {
             }
         }
 
+        final NodeList lnodes = document.getElementsByTagName(TAG_GETLEGEND);
+        for(int i=0,n=lnodes.getLength(); i<n; i++){
+            final Element lnode = (Element)lnodes.item(i);
+            legendTemplate = parseLegendTemplate(lnode);
+        }
+
         final NodeList nodes = document.getElementsByTagName(TAG_DECORATION);
         final DecorationExtension ext = new DecorationExtension();
 
@@ -340,16 +349,8 @@ public final class WMSMapDecoration {
      * Returns the default legend template.
      */
     public static LegendTemplate getDefaultLegendTemplate(){
-        final DecorationExtension ext = (DecorationExtension) getExtension();
-        for(Map<String,Object> map : ext.decorations){
-            final Object template = map.get(TYPE_LEGEND);
-            if(template instanceof LegendTemplate){
-                return (LegendTemplate) template;
-            }
-        }
-
-        //return a default template
-        return null;
+        getExtension(); //will force parsing the file
+        return legendTemplate;
     }
 
     private static void parseDecoration(final DecorationExtension deco, final Element decoNode){
@@ -506,6 +507,31 @@ public final class WMSMapDecoration {
         }
 
         deco.decorations.add(parsed);
+    }
+
+    private static LegendTemplate parseLegendTemplate(final Element decoNode){
+
+        final Map<String,String> params = parseParameters(decoNode);
+        final BackgroundTemplate background = parseBackground(decoNode);
+
+        final String width = params.get(PARAM_GLYPH_WIDTH);
+        final Dimension glyphSize;
+        if(width != null){
+            glyphSize = new Dimension(
+                    parseInteger(params.get(PARAM_GLYPH_WIDTH),30),
+                    parseInteger(params.get(PARAM_GLYPH_HEIGHT),20));
+        }else{
+            glyphSize = null;
+        }
+
+        final LegendTemplate template = new DefaultLegendTemplate(
+                background,
+                parseInteger(params.get(PARAM_GAP),2),
+                glyphSize,
+                parseFont(params.get(PARAM_SECOND_FONT)),
+                parseBoolean(params.get(PARAM_LAYER_NAME),true),
+                parseFont(params.get(PARAM_MAIN_FONT)));
+        return template;
     }
 
     private static Map<String, String> parseParameters(final Element decoNode) {
