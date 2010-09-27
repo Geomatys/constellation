@@ -727,9 +727,9 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                 try {
                     mutableSLD = utils.readSLD(new URL(sld), getLegend.getSldVersion());
                 } catch (JAXBException ex) {
-                    throw new PortrayalException("The given SLD is not valid", ex);
+                    throw new PortrayalException(ex);
                 } catch (FactoryException ex) {
-                    throw new PortrayalException("The given SLD is not valid", ex);
+                    throw new PortrayalException(ex);
                 } catch (MalformedURLException ex) {
                     throw new PortrayalException("The given SLD url is not valid", ex);
                 }
