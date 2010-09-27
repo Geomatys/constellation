@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,6 @@ import org.geotoolkit.factory.Hints;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.map.MapLayer;
-import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
@@ -41,6 +40,7 @@ import org.opengis.feature.type.Name;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.geometry.Envelope;
 import org.opengis.metadata.extent.GeographicBoundingBox;
+import org.opengis.style.Style;
 
 
 /**
@@ -115,22 +115,7 @@ public interface LayerDetails {
      * @throws PortrayalException if an error occurs while trying to generate the legend graphic.
      */
     BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template,
-                                   final String style) throws PortrayalException;
-
-    /**
-     * Returns the legend graphic representation for the layer.
-     *
-     * @param dimension The dimension of the output legend graphic.
-     * @param template The legend template to apply for the legend response.
-     * @param sld The sld to apply for the legend output.
-     * @param version The version of the SLD standard.
-     * @param layerName The layer name on which the SLD should be applied.
-     * @return A legend graphic for this data.
-     * @throws PortrayalException if an error occurs while trying to generate the legend graphic.
-     */
-    BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template,
-                                   final String sld, final StyledLayerDescriptor version,
-                                   final String layerName) throws PortrayalException;
+                                   final Style style) throws PortrayalException;
 
     /**
      * Returns the preferred size for the legend.

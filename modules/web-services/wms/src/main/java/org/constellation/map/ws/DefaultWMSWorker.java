@@ -17,11 +17,17 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
+import java.net.URL;
+import org.geotoolkit.sld.MutableLayer;
+import org.opengis.util.FactoryException;
+import org.geotoolkit.sld.MutableStyledLayerDescriptor;
+import org.geotoolkit.sld.xml.XMLUtilities;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -712,12 +718,49 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         final BufferedImage image;
         final String sld = getLegend.getSld();
         try {
+            // If a sld file is given, extracts the style from it.
             if (sld != null && !sld.isEmpty()) {
-                image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), sld,
-                        getLegend.getSldVersion(), layerName);
+                final XMLUtilities utils = new XMLUtilities();
+                MutableStyle ms = null;
+                final MutableStyledLayerDescriptor mutableSLD;
+
+                try {
+                    mutableSLD = utils.readSLD(new URL(sld), getLegend.getSldVersion());
+                } catch (JAXBException ex) {
+                    throw new PortrayalException("The given SLD is not valid", ex);
+                } catch (FactoryException ex) {
+                    throw new PortrayalException("The given SLD is not valid", ex);
+                } catch (MalformedURLException ex) {
+                    throw new PortrayalException("The given SLD url is not valid", ex);
+                }
+
+                final List<MutableLayer> emptyNameMutableLayers = new ArrayList<MutableLayer>();
+                for (final MutableLayer mutableLayer : mutableSLD.layers()) {
+                    final String mutableLayerName = mutableLayer.getName();
+                    if (mutableLayerName == null || mutableLayerName.isEmpty()) {
+                        emptyNameMutableLayers.add(mutableLayer);
+                        continue;
+                    }
+                    if (layerName.equals(mutableLayerName)) {
+                        ms = (MutableStyle) mutableLayer.styles().get(0);
+                        break;
+                    }
+                }
+                if (ms == null) {
+                    LOGGER.info("No layer " + layerName + " found for the given SLD. Continue with the first style found.");
+                    ms = (MutableStyle) emptyNameMutableLayers.get(0).styles().get(0);
+                }
+                image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), ms);
             } else {
+                // No sld given, we use the style.
                 final String style = getLegend.getStyle();
-                image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), style);
+                final MutableStyle ms;
+                if (style == null) {
+                    ms = null;
+                } else {
+                    ms = StyleProviderProxy.getInstance().get(style);
+                }
+                image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), ms);
             }
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
