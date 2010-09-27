@@ -235,7 +235,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         Method nameGetter = null;
         String methodName = "";
         int i = 0;
-        while (i < 3) {
+        while (i < 5) {
             try {
                 switch (i) {
                     case 0: methodName = "getTitle";
@@ -249,6 +249,12 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                     case 2: methodName = "getId";
                             nameGetter = obj.getClass().getMethod(methodName);
                             break;
+                    case 3: methodName = "getIdentifier";
+                            nameGetter = obj.getClass().getMethod(methodName);
+                            break;
+                    case 4: methodName = "getFileIdentifier";
+                            nameGetter = obj.getClass().getMethod(methodName);
+                            break;
                     default: break;
                 }
 
@@ -256,10 +262,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             } catch (NoSuchMethodException ex) {
                 LOGGER.finer("There is no " + methodName + " method in " + obj.getClass().getSimpleName());
             } catch (SecurityException ex) {
-                LOGGER.severe(" security exception while getting the title of the object.");
+                LOGGER.warning(" security exception while getting the title of the object.");
             }
             if (nameGetter != null) {
-                i = 3;
+                i = 5;
             } else {
                 i++;
             }
@@ -269,7 +275,7 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             try {
                 final Object objT = nameGetter.invoke(obj);
                 if (objT instanceof String) {
-                    title = (String) obj;
+                    title = (String) objT;
                 } else if (objT != null) {
                     title = objT.toString();
                 } else {
@@ -284,12 +290,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                 LOGGER.warning("invocation target exception for " + methodName + " in " + obj.getClass().getSimpleName() +"\ncause: " + ex.getMessage());
             }
         }
-        if (title == null)
+        if (title == null) {
             title = UNKNOW_TITLE;
-
-        if (title.equals(UNKNOW_TITLE))
             LOGGER.warning("unknow type: " + obj.getClass().getName() + " unable to find a title, using default then.");
-        
+        }
         return title;
     }
 
@@ -584,7 +588,9 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                          propName = "usageDate";
                     } else if (prop.getName().equalsIgnoreCase("dateTime") && object.getClass().getSimpleName().equals("DefaultProcessStep")) {
                         propName = "date";
-                    } else {
+                    } else if (prop.getName().equalsIgnoreCase("aName") && object.getClass().getSimpleName().equals("DefaultTypeName")) {
+                        propName = "name";
+                    }else {
                         propName = prop.getName();
                     }
 
@@ -622,35 +628,16 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
                         }
                     // we get directly the field
                     } else if (!propName.equals("unitOfMeasure") && !propName.equals("verticalDatum")) {
-                        final Class valueClass = object.getClass();
-                        try {
-                            final Field field = valueClass.getDeclaredField(propName);
-                            field.setAccessible(true);
-                            final Object propertyValue;
-                            if (field != null) {
-                                propertyValue = field.get(object);
-                            } else {
-                                propertyValue = null;
-                            }
-                            if (propertyValue != null) {
-                                final Path childPath = new Path(path, prop);
+                        final Class valueClass     = object.getClass();
+                        final Object propertyValue = getValueFromField(valueClass, propName, object);
+                        if (propertyValue != null) {
+                            final Path childPath = new Path(path, prop);
 
-                                //if the path is not already in the database we write it
-                                if (mdWriter.getPath(childPath.getId()) == null) {
-                                    mdWriter.writePath(childPath);
-                                }
-                                result.addAll(addValueFromObject(form, propertyValue, childPath, value));
+                            //if the path is not already in the database we write it
+                            if (mdWriter.getPath(childPath.getId()) == null) {
+                                mdWriter.writePath(childPath);
                             }
-                            
-                        } catch (NoSuchFieldException ex) {
-                            LOGGER.log(Level.WARNING, "no such Field:" + propName + " in class:" + valueClass.getName());
-                            continue;
-                        } catch (SecurityException ex) {
-                            LOGGER.log(Level.WARNING, null, ex);
-                            continue;
-                        } catch (IllegalAccessException ex) {
-                            LOGGER.log(Level.WARNING, null, ex);
-                            continue;
+                            result.addAll(addValueFromObject(form, propertyValue, childPath, value));
                         }
                     }
                 }
@@ -662,7 +649,34 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         }
         return result;
     }
-    
+
+    private Object getValueFromField(Class valueClass, String propName, Object object) {
+        final Class origClass = valueClass;
+        do {
+            try {
+                final Field field = valueClass.getDeclaredField(propName);
+                field.setAccessible(true);
+                final Object propertyValue;
+                if (field != null) {
+                    propertyValue = field.get(object);
+                } else {
+                    propertyValue = null;
+                }
+                return propertyValue;
+
+            } catch (NoSuchFieldException ex) {
+                LOGGER.log(Level.FINER, "no such Field:" + propName + " in class:" + valueClass.getName());
+            } catch (SecurityException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            } catch (IllegalAccessException ex) {
+                LOGGER.log(Level.WARNING, null, ex);
+            }
+            valueClass = valueClass.getSuperclass();
+        } while (valueClass != null);
+        LOGGER.log(Level.WARNING, "no such Field:" + propName + " in class:" + origClass.getName());
+        return null;
+    }
+
     /**
      * Return an MDWeb classe object for the specified java object.
      * 

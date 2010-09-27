@@ -267,8 +267,9 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
     private void initPackage() {
 
         this.geotoolkitPackage  = FileUtilities.searchSubPackage("org.geotoolkit.metadata.iso", "org.geotoolkit.referencing",
-                                                               "org.geotoolkit.service", "org.geotoolkit.naming", "org.geotoolkit.feature.catalog",
-                                                               "org.geotoolkit.metadata.fra", "org.geotoolkit.temporal.object");
+                                                                 "org.geotoolkit.service", "org.geotoolkit.naming", "org.geotoolkit.feature.catalog",
+                                                                 "org.geotoolkit.metadata.fra", "org.geotoolkit.temporal.object",
+                                                                 "org.geotoolkit.util");
         this.sensorMLPackage    = FileUtilities.searchSubPackage("org.geotoolkit.sml.xml.v100");
         this.swePackage         = FileUtilities.searchSubPackage("org.geotoolkit.swe.xml.v100");
         this.gmlPackage         = FileUtilities.searchSubPackage("org.geotoolkit.gml.xml.v311");
@@ -304,7 +305,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                     final Class c = Class.forName(prop.getProperty((String)className));
                     result.put((String)className, c);
                 } catch (ClassNotFoundException ex) {
-                    LOGGER.warning("error in class binding initialization for class:" + className);
+                    LOGGER.log(Level.WARNING, "error in class binding initialization for class:{0}", className);
                 }
             }
 
@@ -377,7 +378,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
      * 
      * @param form the MDWeb formular.
      * @param type An elementSet : BRIEF, SUMMARY, FULL. (default is FULL);
-     * @param elementName 
+     * @param mode
      * 
      * @return a geotoolkit/constellation object representing the metadata.
      */
@@ -523,14 +524,14 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
         } else {
 
             /**
-             * Again another special case LocalName does not have a empty constructor (immutable)
+             * Again another special case TypeName does not have a empty constructor (immutable)
              * and no setters so we must call the normal constructor.
              */
             final String className = classe.getSimpleName();
-            if (className.equals("LocalName")) {
+            if (className.equals("DefaultTypeName")) {
                 TextValue child = null;
 
-                //We search the child of the localName
+                //We search the child of the TypeName
                 for (Value childValue : value.getChildren()) {
                     if (childValue instanceof TextValue) {
                         child = (TextValue) childValue;
@@ -539,9 +540,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 }
                 if (child != null) {
                     final CharSequence cs = child.getValue();
-                    return ReflectionUtilities.newInstance(classe, cs);
+                    final DefaultNameFactory facto = new DefaultNameFactory();
+                    return facto.createTypeName(null, cs);
                 } else {
-                    LOGGER.severe("The localName is mal-formed");
+                    LOGGER.severe("The typeName is mal-formed");
                     return null;
                 }
 
@@ -972,7 +974,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                         }
                          // we put Entry behind the className
                         case 4: {
-                            name = name.substring(0, name.indexOf("Type"));
+                            name = name.substring(0, name.lastIndexOf("Type"));
                             name += "Entry";
                             nameType = 5;
                             break;
@@ -1013,7 +1015,7 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
             }
         }
         if (!classeNotFound.contains(classNameSave)) {
-            LOGGER.severe("class not found: " + classNameSave);
+            LOGGER.log(Level.WARNING, "class not found: {0}", classNameSave);
             classeNotFound.add(classNameSave);
         }
         return null;
@@ -1104,10 +1106,10 @@ public class MDWebMetadataReader extends AbstractMetadataReader {
                 mdReader.removeFormFromCache(recordSet, id);
 
             } catch (MD_IOException ex) {
-                LOGGER.severe("SQLException while removing " + identifier + " from the cache");
+                LOGGER.log(Level.SEVERE, "SQLException while removing {0} from the cache", identifier);
                 return;
             } catch (NumberFormatException e) {
-                LOGGER.severe("NumberFormat while removing " + identifier + " from the cache");
+                LOGGER.log(Level.SEVERE, "NumberFormat while removing {0} from the cache", identifier);
                 return;
             }
             super.removeFromCache(identifier);

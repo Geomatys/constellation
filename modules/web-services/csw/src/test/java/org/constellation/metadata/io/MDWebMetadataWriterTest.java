@@ -18,18 +18,21 @@
 
 package org.constellation.metadata.io;
 
-import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+
+import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import java.io.StringReader;
-import org.geotoolkit.metadata.iso.DefaultMetadata;
 import java.sql.Connection;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.Unmarshaller;
+
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.metadata.CSWworkerTest;
 import org.constellation.util.Util;
+import static org.constellation.metadata.CSWTestUtils.*;
+
 import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.sml.xml.AbstractSensorML;
@@ -39,6 +42,10 @@ import org.geotoolkit.sml.xml.v100.SensorML;
 import org.geotoolkit.sml.xml.v100.SystemType;
 import org.geotoolkit.swe.xml.v100.DataRecordType;
 import org.geotoolkit.xml.MarshallerPool;
+import org.geotoolkit.util.sql.DerbySqlScriptRunner;
+import org.geotoolkit.metadata.iso.DefaultMetadata;
+
+import org.opengis.feature.catalog.FeatureCatalogue;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -78,6 +85,7 @@ public class MDWebMetadataWriterTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19110.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
@@ -562,7 +570,7 @@ public class MDWebMetadataWriterTest {
         DefaultMetadata result = (DefaultMetadata) absResult;
         DefaultMetadata expResult =  (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta10.xml"));
 
-        CSWworkerTest.metadataEquals(expResult,result);
+        metadataEquals(expResult,result);
         
         
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_11));
@@ -573,7 +581,7 @@ public class MDWebMetadataWriterTest {
         result = (DefaultMetadata) absResult;
         expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_11));
 
-        CSWworkerTest.metadataEquals(expResult,result);
+        metadataEquals(expResult,result);
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_12));
         writer.storeMetadata(absExpResult);
@@ -583,7 +591,7 @@ public class MDWebMetadataWriterTest {
         result = (DefaultMetadata) absResult;
         expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_12));
 
-        CSWworkerTest.metadataEquals(expResult,result);
+        metadataEquals(expResult,result);
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_13));
         writer.storeMetadata(absExpResult);
@@ -593,7 +601,7 @@ public class MDWebMetadataWriterTest {
         result = (DefaultMetadata) absResult;
         expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_13));
 
-        CSWworkerTest.metadataEquals(expResult,result);
+        metadataEquals(expResult,result);
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_14));
         writer.storeMetadata(absExpResult);
@@ -603,7 +611,7 @@ public class MDWebMetadataWriterTest {
         result = (DefaultMetadata) absResult;
         expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_14));
 
-        CSWworkerTest.metadataEquals(expResult,result);
+        metadataEquals(expResult,result);
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_15));
         writer.storeMetadata(absExpResult);
@@ -613,7 +621,7 @@ public class MDWebMetadataWriterTest {
         result = (DefaultMetadata) absResult;
         expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_15));
 
-        CSWworkerTest.metadataEquals(expResult,result);
+        metadataEquals(expResult,result);
 
         absExpResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_16));
         writer.storeMetadata(absExpResult);
@@ -623,9 +631,30 @@ public class MDWebMetadataWriterTest {
         result = (DefaultMetadata) absResult;
         expResult =  (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_16));
 
-        CSWworkerTest.metadataEquals(expResult,result);
+        metadataEquals(expResult,result);
 
 
         pool.release(unmarshaller);
+    }
+
+    /**
+     * Tests the storeMetadata method for SML data
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void writeMetadata19110Test() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        FeatureCatalogue absExpResult = (FeatureCatalogue) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/featcatalog1.xml"));
+        writer.storeMetadata(absExpResult);
+
+        Object absResult = reader.getMetadata("12:CSWCat", AbstractMetadataReader.ISO_19115,  null);
+        assertTrue(absResult != null);
+        assertTrue(absResult instanceof FeatureCatalogueImpl);
+        FeatureCatalogueImpl result = (FeatureCatalogueImpl) absResult;
+        FeatureCatalogueImpl expResult =  (FeatureCatalogueImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/featcatalog1.xml"));
+
+        catalogueEquals(expResult,result);
     }
 }

@@ -23,15 +23,19 @@ import java.sql.Connection;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.Unmarshaller;
+
+// cstl dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.jaxb.AnchoredMarshallerPool;
 import org.constellation.metadata.CSWworkerTest;
 import org.constellation.util.Util;
+import static org.constellation.metadata.CSWTestUtils.*;
 
 // Geotoolkit dependencies
 import org.geotoolkit.util.sql.DerbySqlScriptRunner;
 import org.geotoolkit.ebrim.xml.EBRIMClassesContext;
+import org.geotoolkit.feature.catalog.FeatureCatalogueImpl;
 import org.geotoolkit.internal.sql.DefaultDataSource;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.sml.xml.AbstractSensorML;
@@ -79,6 +83,7 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19115.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19119.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19108.sql"));
+        sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ISO19110.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/data/defaultRecordSets.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/users/creation_user.sql"));
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/catalog_web_service.sql"));
@@ -86,6 +91,7 @@ public class MDWebMetadataReaderTest {
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/ebrimv3.0.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-5.sql"));
+        sr.run(Util.getResourceAsStream("org/constellation/metadata/sql/csw-data-6.sql"));
         
         sr.run(Util.getResourceAsStream("org/mdweb/sql/v21/metadata/schemas/SensorML_v2.sql"));
         sr.run(Util.getResourceAsStream("org/constellation/sql/sml-data_v2.sql"));
@@ -131,14 +137,14 @@ public class MDWebMetadataReaderTest {
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta1.xml"));
 
         assertTrue(result instanceof DefaultMetadata);
-        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+        metadataEquals(expResult, (DefaultMetadata)result);
 
         result = reader.getMetadata("15:CSWCat", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta9.xml"));
 
         assertTrue(result instanceof DefaultMetadata);
-        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+        metadataEquals(expResult, (DefaultMetadata)result);
 
         pool.release(unmarshaller);
     }
@@ -157,7 +163,7 @@ public class MDWebMetadataReaderTest {
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta-fra1.xml"));
 
         assertTrue(result instanceof DefaultMetadata);
-        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+        metadataEquals(expResult, (DefaultMetadata)result);
 
 
         pool.release(unmarshaller);
@@ -177,14 +183,14 @@ public class MDWebMetadataReaderTest {
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/meta10.xml"));
 
         assertTrue(result instanceof DefaultMetadata);
-        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+        metadataEquals(expResult, (DefaultMetadata)result);
 
         result = reader.getMetadata("18:CSWCat", AbstractMetadataReader.ISO_19115, null);
 
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_11));
 
         assertTrue(result instanceof DefaultMetadata);
-        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+        metadataEquals(expResult, (DefaultMetadata)result);
 
 
         result = reader.getMetadata("19:CSWCat", AbstractMetadataReader.ISO_19115, null);
@@ -192,7 +198,7 @@ public class MDWebMetadataReaderTest {
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_12));
 
         assertTrue(result instanceof DefaultMetadata);
-        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+        metadataEquals(expResult, (DefaultMetadata)result);
 
         
 
@@ -201,7 +207,7 @@ public class MDWebMetadataReaderTest {
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_13));
 
         assertTrue(result instanceof DefaultMetadata);
-        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+        metadataEquals(expResult, (DefaultMetadata)result);
 
 
         result = reader.getMetadata("21:CSWCat", AbstractMetadataReader.ISO_19115, null);
@@ -209,7 +215,7 @@ public class MDWebMetadataReaderTest {
         expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_14));
 
         assertTrue(result instanceof DefaultMetadata);
-        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+        metadataEquals(expResult, (DefaultMetadata)result);
 
         pool.release(unmarshaller);
     }
@@ -228,7 +234,26 @@ public class MDWebMetadataReaderTest {
         DefaultMetadata expResult = (DefaultMetadata) unmarshaller.unmarshal(new StringReader(StaticMetadata.META_17));
 
         assertTrue(result instanceof DefaultMetadata);
-        CSWworkerTest.metadataEquals(expResult, (DefaultMetadata)result);
+        metadataEquals(expResult, (DefaultMetadata)result);
+
+        pool.release(unmarshaller);
+    }
+
+     /**
+     * Tests the getMetadata method for ISO 19119 data
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void getMetadataISO19110Test() throws Exception {
+
+        Unmarshaller unmarshaller = pool.acquireUnmarshaller();
+        Object result = reader.getMetadata("23:CSWCat", AbstractMetadataReader.ISO_19115, null);
+
+        FeatureCatalogueImpl expResult = (FeatureCatalogueImpl) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/metadata/featcatalog1.xml"));
+
+        assertTrue(result instanceof FeatureCatalogueImpl);
+        catalogueEquals(expResult, (FeatureCatalogueImpl)result);
 
         pool.release(unmarshaller);
     }
