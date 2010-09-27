@@ -408,9 +408,6 @@ public class WMSService extends GridWebService {
     private GetLegendGraphic adaptGetLegendGraphic() throws CstlServiceException {
         final Name strLayer  = Util.parseLayerName(getParameter(KEY_LAYER,  true));
         final String strFormat = getParameter(KEY_FORMAT, true );
-        final String strWidth  = getParameter(KEY_WIDTH,  false);
-        final String strHeight = getParameter(KEY_HEIGHT, false);
-        final String strStyle  = getParameter(KEY_STYLE,  false);
         // Verify that the format is known, otherwise returns an exception.
         final String format;
         try {
@@ -418,6 +415,9 @@ public class WMSService extends GridWebService {
         } catch (IllegalArgumentException i) {
             throw new CstlServiceException(i, INVALID_FORMAT);
         }
+
+        final String strWidth  = getParameter(KEY_WIDTH,  false);
+        final String strHeight = getParameter(KEY_HEIGHT, false);
         final Integer width;
         final Integer height;
         if (strWidth == null || strHeight == null) {
@@ -426,12 +426,31 @@ public class WMSService extends GridWebService {
         } else {
             try {
                 width  = RequestsUtilities.toInt(strWidth);
+            } catch (NumberFormatException n) {
+                throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, KEY_WIDTH.toLowerCase());
+            }
+            try {
                 height = RequestsUtilities.toInt(strHeight);
             } catch (NumberFormatException n) {
-                throw new CstlServiceException(n, INVALID_PARAMETER_VALUE);
+                throw new CstlServiceException(n, INVALID_PARAMETER_VALUE, KEY_HEIGHT.toLowerCase());
             }
         }
-        return new GetLegendGraphic(strLayer, format, width, height, strStyle);
+
+        final String strStyle   = getParameter(KEY_STYLE,       false);
+        final String strSld     = getParameter(KEY_SLD,         false);
+        final String strSldVers = getParameter(KEY_SLD_VERSION, (strSld != null) ? true : false);
+        final StyledLayerDescriptor sldVersion;
+        if (strSldVers == null) {
+            sldVersion = null;
+        } else if (strSldVers.equalsIgnoreCase("1.0.0")) {
+            sldVersion = StyledLayerDescriptor.V_1_0_0;
+        } else if (strSldVers.equalsIgnoreCase("1.1.0")) {
+            sldVersion = StyledLayerDescriptor.V_1_1_0;
+        } else {
+            throw new CstlServiceException("The given sld version number "+ strSldVers +" is not known.",
+                    INVALID_PARAMETER_VALUE, KEY_SLD_VERSION.toLowerCase());
+        }
+        return new GetLegendGraphic(strLayer, format, width, height, strStyle, strSld, sldVersion);
     }
 
     private boolean isV111orUnder(String version) {
@@ -483,6 +502,7 @@ public class WMSService extends GridWebService {
         //final String strRemoteOwsType = getParameter(KEY_REMOTE_OWS_TYPE, false);
         final String strRemoteOwsUrl = getParameter(KEY_REMOTE_OWS_URL, false);
         final String urlSLD          = getParameter(KEY_SLD,            false);
+        final String strSldVersion   = getParameter(KEY_SLD_VERSION, (urlSLD != null) ? true : false);
         final String strAzimuth      = getParameter(KEY_AZIMUTH,        false);
         final String strStyles       = getParameter(KEY_STYLES, ((urlSLD != null)
                 && (version.equals(ServiceDef.WMS_1_1_1_SLD.version.toString()))) ? false : fromGetMap);
@@ -578,7 +598,18 @@ public class WMSService extends GridWebService {
             }
         } else {
             try {
-                sld = QueryAdapter.toSLD(urlSLD);
+                final StyledLayerDescriptor sldVersion;
+                if (strSldVersion == null) {
+                    sldVersion = null;
+                } else if (strSldVersion.equalsIgnoreCase("1.1.0")) {
+                    sldVersion = StyledLayerDescriptor.V_1_1_0;
+                } else if (strSldVersion.equalsIgnoreCase("1.0.0")) {
+                    sldVersion = StyledLayerDescriptor.V_1_0_0;
+                } else {
+                    throw new CstlServiceException("The given sld version "+ strSldVersion +" is not known.",
+                            INVALID_PARAMETER_VALUE, KEY_SLD_VERSION.toLowerCase());
+                }
+                sld = QueryAdapter.toSLD(urlSLD, sldVersion);
             } catch (MalformedURLException ex) {
                 throw new CstlServiceException(ex, STYLE_NOT_DEFINED);
             }

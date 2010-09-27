@@ -31,6 +31,7 @@ import org.geotoolkit.factory.Hints;
 import org.geotoolkit.display.exception.PortrayalException;
 import org.geotoolkit.display2d.ext.legend.LegendTemplate;
 import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.geotoolkit.storage.DataStoreException;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.MeasurementRange;
@@ -115,6 +116,21 @@ public interface LayerDetails {
      */
     BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template,
                                    final String style) throws PortrayalException;
+
+    /**
+     * Returns the legend graphic representation for the layer.
+     *
+     * @param dimension The dimension of the output legend graphic.
+     * @param template The legend template to apply for the legend response.
+     * @param sld The sld to apply for the legend output.
+     * @param version The version of the SLD standard.
+     * @param layerName The layer name on which the SLD should be applied.
+     * @return A legend graphic for this data.
+     * @throws PortrayalException if an error occurs while trying to generate the legend graphic.
+     */
+    BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template,
+                                   final String sld, final StyledLayerDescriptor version,
+                                   final String layerName) throws PortrayalException;
 
     /**
      * Returns the preferred size for the legend.

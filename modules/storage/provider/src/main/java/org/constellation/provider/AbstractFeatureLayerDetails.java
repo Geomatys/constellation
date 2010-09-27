@@ -277,6 +277,9 @@ public abstract class AbstractFeatureLayerDetails extends AbstractLayerDetails i
         return new MeasurementRange<?>[0];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected MutableStyle getDefaultStyle(){
         try {

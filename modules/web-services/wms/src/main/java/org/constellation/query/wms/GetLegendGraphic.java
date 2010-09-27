@@ -21,6 +21,7 @@ import org.constellation.query.QueryRequest;
 import org.constellation.ws.MimeType;
 
 import org.geotoolkit.lang.Immutable;
+import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
 import org.opengis.feature.type.Name;
 
 
@@ -59,18 +60,31 @@ public final class GetLegendGraphic extends WMSQuery {
     private final String style;
 
     /**
+     * SLD to apply on the legend output. Optional.
+     */
+    private final String sld;
+
+    /**
+     * Version of the SLD.
+     */
+    private final StyledLayerDescriptor sldVersion;
+
+    /**
      * Builds a {@code GetLegendGraphic} request, using the layer and mime-type specified
      * and width and height for the image.
      */
     public GetLegendGraphic(final Name layer, final String format, final Integer width,
-                            final Integer height, final String style)
+                            final Integer height, final String style, final String sld,
+                            final StyledLayerDescriptor sldVersion)
     {
         super(ServiceDef.WMS_1_1_1_SLD.version, null);
-        this.layer  = layer;
-        this.format = format;
-        this.width  = width;
-        this.height = height;
-        this.style  = style;
+        this.layer      = layer;
+        this.format     = format;
+        this.width      = width;
+        this.height     = height;
+        this.style      = style;
+        this.sld        = sld;
+        this.sldVersion = sldVersion;
     }
 
     /**
@@ -118,10 +132,21 @@ public final class GetLegendGraphic extends WMSQuery {
     }
 
     /**
+     * Returns the sld value.
+     */
+    public String getSld() {
+        return sld;
+    }
+
+    /**
      * Returns the style for this legend.
      */
     public String getStyle() {
         return style;
+    }
+
+    public StyledLayerDescriptor getSldVersion() {
+        return sldVersion;
     }
 
     /**
@@ -144,6 +169,9 @@ public final class GetLegendGraphic extends WMSQuery {
         }
         if (style != null) {
             kvp.append('&').append(KEY_STYLE).append('=').append(style);
+        }
+        if (sld != null) {
+            kvp.append('&').append(KEY_SLD).append('=').append(sld);
         }
         return kvp.toString();
     }

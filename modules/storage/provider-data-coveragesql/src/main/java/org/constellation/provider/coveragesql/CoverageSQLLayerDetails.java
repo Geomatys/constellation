@@ -218,6 +218,9 @@ class CoverageSQLLayerDetails extends AbstractLayerDetails implements CoverageLa
         return reader.getInput().getAvailableElevations();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected MutableStyle getDefaultStyle() {
         if (getSampleValueRanges().length > 0) {

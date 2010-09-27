@@ -119,6 +119,8 @@ public abstract class WMSQuery implements Query {
     public static final String KEY_STYLE = "STYLE";
     /** Parameter used in getMap,getLegendGraphic */
     public static final String KEY_SLD = "SLD";
+    /** Parameter used in getMap, getLegendGraphic */
+    public static final String KEY_SLD_VERSION = "SLD_VERSION";
     /** Parameter used in getLegendGraphic */
     public static final String KEY_FEATURETYPE = "FEATURETYPE";
     /** Parameter used in getLegendGraphic */

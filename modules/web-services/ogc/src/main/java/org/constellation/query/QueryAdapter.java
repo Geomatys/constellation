@@ -78,9 +78,11 @@ public final class QueryAdapter {
         return queryLayers;
     }
 
-    public static MutableStyledLayerDescriptor toSLD(final String sldURL) throws MalformedURLException {
+    public static MutableStyledLayerDescriptor toSLD(final String sldURL, final StyledLayerDescriptor version)
+                                                                                  throws MalformedURLException
+    {
 
-        if(sldURL == null || sldURL.trim().length() == 0){
+        if (sldURL == null || sldURL.trim().isEmpty()) {
             return null;
         }
 
@@ -91,24 +93,12 @@ public final class QueryAdapter {
 
         final XMLUtilities sldUtilities = new XMLUtilities();
 
-        //try sld v1.1
         try {
-            sld = sldUtilities.readSLD(url, StyledLayerDescriptor.V_1_1_0);
+            sld = sldUtilities.readSLD(url, version);
         } catch (JAXBException ex) {
-            Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         } catch (FactoryException ex) {
-            Logger.getLogger(QueryAdapter.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        if(sld == null){
-            //try sld v1.0
-            try {
-                sld = sldUtilities.readSLD(url, StyledLayerDescriptor.V_1_0_0);
-            } catch (JAXBException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            } catch (FactoryException ex) {
-                LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
-            }
+            LOGGER.log(Level.WARNING, ex.getLocalizedMessage(), ex);
         }
 
         return sld;

@@ -694,32 +694,37 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
     @Override
     public BufferedImage getLegendGraphic(final GetLegendGraphic getLegend) throws CstlServiceException {
         final LayerDetails layer = getLayerReference(getLegend.getLayer(), getLegend.getVersion().toString());
+        final String layerName = layer.getName().toString();
         if (!layer.isQueryable(ServiceDef.Query.WMS_ALL)) {
             throw new CstlServiceException("You are not allowed to request the layer \""+
-                    layer.getName() +"\".", LAYER_NOT_QUERYABLE, KEY_LAYER.toLowerCase());
+                    layerName +"\".", LAYER_NOT_QUERYABLE, KEY_LAYER.toLowerCase());
         }
         final Integer width  = getLegend.getWidth();
         final Integer height = getLegend.getHeight();
 
         final Dimension dims;
-        if(width != null && height != null){
+        if (width != null && height != null) {
             dims = new Dimension(width, height);
-        }else{
+        } else {
             //layers will calculate the best size
             dims = null;
         }
-        final String style = getLegend.getStyle();
-
         final BufferedImage image;
+        final String sld = getLegend.getSld();
         try {
-            image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), style);
+            if (sld != null && !sld.isEmpty()) {
+                image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), sld,
+                        getLegend.getSldVersion(), layerName);
+            } else {
+                final String style = getLegend.getStyle();
+                image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), style);
+            }
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
         if (image == null) {
-            throw new CstlServiceException("The requested layer \""+ layer.getName() +
-                    "\" does not support GetLegendGraphic request",
-                    NO_APPLICABLE_CODE, KEY_LAYER);
+            throw new CstlServiceException("The requested layer \""+ layerName +"\" does not support "
+                    + "GetLegendGraphic request", NO_APPLICABLE_CODE, KEY_LAYER.toLowerCase());
         }
         return image;
     }
@@ -902,26 +907,41 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             throw new NullPointerException("SLD should not be null");
         }
 
-        for(final Layer layer : sld.layers()){
-
-            if(layer instanceof MutableNamedLayer && layerName.getLocalPart().equals(layer.getName()) ){
-                //we can only extract style from a NamedLayer that has the same name
-                final MutableNamedLayer mnl = (MutableNamedLayer) layer;
-
-                for(final MutableLayerStyle mls : mnl.styles()){
-                    if(mls instanceof MutableNamedStyle){
+        final List<MutableNamedLayer> emptyNameSLDLayers = new ArrayList<MutableNamedLayer>();
+        for(final Layer sldLayer : sld.layers()){
+            // We can't do anything if it is not a MutableNamedLayer.
+            if (!(sldLayer instanceof MutableNamedLayer)) {
+                continue;
+            }
+            final MutableNamedLayer mnl = (MutableNamedLayer) sldLayer;
+            final String sldLayerName = mnl.getName();
+            // We store this sld layer, for the case all styles defined in the sld would
+            // be associated to no layer.
+            if (sldLayerName == null || sldLayerName.isEmpty()) {
+                emptyNameSLDLayers.add(mnl);
+                continue;
+            }
+            // If it matches, then we return it.
+            if (layerName.getLocalPart().equals(sldLayerName)) {
+                for (final MutableLayerStyle mls : mnl.styles()) {
+                    if (mls instanceof MutableNamedStyle) {
                         final MutableNamedStyle mns = (MutableNamedStyle) mls;
                         final String namedStyle = mns.getName();
                         return StyleProviderProxy.getInstance().get(namedStyle);
-                    }else if(mls instanceof MutableStyle){
-                        return (MutableStyle)mls;
+                    } else if (mls instanceof MutableStyle) {
+                        return (MutableStyle) mls;
                     }
 
                 }
             }
         }
 
-        //no valid style found
+        //no valid style found, returns the first one that do not specify a layer on which to apply.
+        LOGGER.info("No layer "+ layerName +" found for the styles defined in the given SLD file.");
+        if (!emptyNameSLDLayers.isEmpty()) {
+            LOGGER.info("Continue with the first style read in the SLD, that do not specify any layer on which to apply.");
+            return (MutableStyle) ((MutableNamedLayer)sld.layers().get(0)).styles().get(0);
+        }
         return null;
     }
 
