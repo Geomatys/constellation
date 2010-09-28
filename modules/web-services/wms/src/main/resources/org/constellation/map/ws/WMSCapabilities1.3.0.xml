@@ -35,8 +35,8 @@
     <ContactElectronicMailAddress>vincent.heurteaux@geomatys.fr</ContactElectronicMailAddress>
   </ContactInformation>
   <!-- Fees or access constraints imposed. -->
-  <Fees>none</Fees>
-  <AccessConstraints>none</AccessConstraints>
+  <Fees>no conditions apply</Fees>
+  <AccessConstraints>None</AccessConstraints>
   <LayerLimit>16</LayerLimit>
   <MaxWidth>2048</MaxWidth>
   <MaxHeight>2048</MaxHeight>

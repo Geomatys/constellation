@@ -33,8 +33,8 @@
     <ContactElectronicMailAddress>vincent.heurteaux@geomatys.fr</ContactElectronicMailAddress>
   </ContactInformation>
   <!-- Fees or access constraints imposed. -->
-  <Fees>none</Fees>
-  <AccessConstraints>none</AccessConstraints>
+  <Fees>no conditions apply</Fees>
+  <AccessConstraints>None</AccessConstraints>
 </Service>
 <Capability>
   <Request>

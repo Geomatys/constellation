@@ -650,6 +650,15 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
         return result;
     }
 
+    /**
+     * Try to extract the value of a field named propName in the specified class (or any of its super class)
+     *
+     * @param valueClass A class.
+     * @param propName The name of the searched field.
+     * @param object the object on which we want to extract the field value.
+     *
+     * @return The value of the specified field or {@code null}
+     */
     private Object getValueFromField(Class valueClass, String propName, Object object) {
         final Class origClass = valueClass;
         do {
@@ -829,10 +838,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             final String codeSuffix = "Code";
             while (nameType < 12) {
                 
-                LOGGER.finer("searching: " + standard.getName() + ":" + name);
+                LOGGER.finer("searching: " + standard.getName() + ':' + name);
                 result = mdWriter.getClasse(name, standard);
                 if (result != null) {
-                    LOGGER.finer("class found:" + standard.getName() + ":" + name);
+                    LOGGER.finer("class found:" + standard.getName() + ':' + name);
                     classBinding.put(object.getClass().getName(), result);
                     return result;
                 } 
@@ -1026,7 +1035,10 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
             
             final long time = System.currentTimeMillis() - start;
 
-            LOGGER.log(logLevel, "inserted new Form: " + form.getTitle() + "( ID:" + form.getId() + " in " + time + " ms (transformation: " + transTime + " DB write: " + writeTime + ")");
+            final StringBuilder report = new StringBuilder("inserted new Form: ");
+            report.append(report).append(form.getTitle()).append("( ID:").append(form.getId());
+            report.append(" in ").append(time).append(" ms (transformation: ").append(transTime).append(" DB write: ").append(writeTime).append(")");
+            LOGGER.log(logLevel, report.toString());
             if (!noIndexation) {
                 indexDocument(form);
             }
@@ -1038,11 +1050,6 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
 
     protected void indexDocument(Form f) {
         //need to be override by child
-    }
-
-    private void logMapSize() {
-        LOGGER.info("\nclasses      :" + classBinding.size() +
-                    "\nvalues       :" + alreadyWrite.size());
     }
 
     /**
