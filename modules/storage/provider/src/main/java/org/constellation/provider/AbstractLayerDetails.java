@@ -114,7 +114,7 @@ public abstract class AbstractLayerDetails implements LayerDetails{
             if (dimension == null) {
                 dimension = DefaultGlyphService.glyphPreferredSize(mutableStyle, dimension, null);
             }
-            return DefaultGlyphService.create(mutableStyle, dimension, null);
+            return DefaultGlyphService.create(mutableStyle, dimension, getMapLayer(mutableStyle, null));
         }
         try {
             final MapLayer layer = getMapLayer(mutableStyle, null);

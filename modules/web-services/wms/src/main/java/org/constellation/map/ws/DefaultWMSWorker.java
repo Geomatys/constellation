@@ -691,7 +691,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
     /**
      * Return the legend graphic for the current layer.
      * <p>If no width or height have been specified, a default output
-     * size is adopted (140x15 pixels).</p>
+     * size is adopted, the size will depend on the symbolizer used.</p>
      *
      * @param getLegend The {@linkplain GetLegendGraphic get legend graphic} request.
      * @return a file containing the legend graphic image.
