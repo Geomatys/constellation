@@ -95,20 +95,27 @@ public abstract class AbstractLayerDetails implements LayerDetails{
      * {@inheritDoc}
      */
     @Override
-    public BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template,
+    public BufferedImage getLegendGraphic(Dimension dimension, final LegendTemplate template,
                                           final Style style) throws PortrayalException
     {
-        if (style != null) {
-            return DefaultGlyphService.create(style, dimension, null);
-        }
         MutableStyle mutableStyle = null;
-        if(!getFavoriteStyles().isEmpty()){
-            mutableStyle = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
-        }
-        if (mutableStyle == null) {
-            mutableStyle = getDefaultStyle();
+        if (style != null) {
+            mutableStyle = (MutableStyle) style;
+        } else {
+            if (!getFavoriteStyles().isEmpty()) {
+                mutableStyle = StyleProviderProxy.getInstance().get(getFavoriteStyles().get(0));
+            }
+            if (mutableStyle == null) {
+                mutableStyle = getDefaultStyle();
+            }
         }
 
+        if (template == null) {
+            if (dimension == null) {
+                dimension = DefaultGlyphService.glyphPreferredSize(mutableStyle, dimension, null);
+            }
+            return DefaultGlyphService.create(mutableStyle, dimension, null);
+        }
         try {
             final MapLayer layer = getMapLayer(mutableStyle, null);
             final MapContext context = MapBuilder.createContext();
@@ -118,6 +125,9 @@ public abstract class AbstractLayerDetails implements LayerDetails{
             LOGGER.log(Level.INFO, ex.getMessage(), ex);
         }
 
+        if (dimension == null) {
+            dimension = DefaultGlyphService.glyphPreferredSize(mutableStyle, dimension, null);
+        }
         return DefaultGlyphService.create(mutableStyle, dimension, null);
     }
 

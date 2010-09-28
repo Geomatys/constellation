@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.FileNotFoundException;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.text.DateFormat;
@@ -727,11 +728,17 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                 try {
                     mutableSLD = utils.readSLD(new URL(sld), getLegend.getSldVersion());
                 } catch (JAXBException ex) {
-                    throw new PortrayalException(ex);
+                    final String message;
+                    if (ex.getLinkedException() instanceof FileNotFoundException) {
+                        message = "The given url \""+ sld +"\" points to an non-existing file.";
+                    } else {
+                        message = ex.getLocalizedMessage();
+                    }
+                    throw new PortrayalException(message, ex);
                 } catch (FactoryException ex) {
                     throw new PortrayalException(ex);
                 } catch (MalformedURLException ex) {
-                    throw new PortrayalException("The given SLD url is not valid", ex);
+                    throw new PortrayalException("The given SLD url \""+ sld +"\" is not a valid url", ex);
                 }
 
                 final List<MutableLayer> emptyNameMutableLayers = new ArrayList<MutableLayer>();
@@ -763,7 +770,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                 image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), ms);
             }
         } catch (PortrayalException ex) {
-            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+            throw new CstlServiceException(ex);
         }
         if (image == null) {
             throw new CstlServiceException("The requested layer \""+ layerName +"\" does not support "
