@@ -17,6 +17,7 @@
 package org.constellation.map.ws;
 
 //J2SE dependencies
+import org.geotoolkit.wms.xml.v130.Capability;
 import java.net.URL;
 import org.geotoolkit.sld.MutableLayer;
 import org.opengis.util.FactoryException;
@@ -78,6 +79,9 @@ import org.geotoolkit.display2d.service.ViewDef;
 import org.geotoolkit.display2d.service.VisitDef;
 import org.geotoolkit.factory.Hints;
 import org.geotoolkit.geometry.jts.JTSEnvelope2D;
+import org.geotoolkit.inspire.xml.vs.ExtendedCapabilitiesType;
+import org.geotoolkit.inspire.xml.vs.LanguageType;
+import org.geotoolkit.inspire.xml.vs.LanguagesType;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.se.xml.v110.OnlineResourceType;
 import org.geotoolkit.sld.MutableLayerStyle;
@@ -513,6 +517,40 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                     new EXGeographicBoundingBox(-180.0, -90.0, 180.0, 90.0), layers);
 
         inCapabilities.getCapability().setLayer(mainLayer);
+
+
+        /*
+         * INSPIRE PART
+         */
+        if (queryVersion.equals(ServiceDef.WMS_1_3_0.version.toString()) || queryVersion.equals(ServiceDef.WMS_1_3_0_SLD.version.toString()) ) {
+           
+            System.out.println("passez par la");
+            Capability capa = (Capability) inCapabilities.getCapability();
+            ExtendedCapabilitiesType inspireExtension =  capa.getInspireExtendedCapabilities();
+
+            // TODO resourceLocator
+            //inspireExtension.setResourcelocator(null);
+
+            // TODO metadataURL an url to the service metadata (getRecordById)
+            //inspireExtension.setMetadataUrl(null);
+
+            // TODO  temporal extent
+            //inspireExtension.setTemporalRefererence(null);
+
+            //TODO conformity
+            //inspireExtension.setConformity(null)
+
+            inspireExtension.setMetadataDate(new Date(System.currentTimeMillis()));
+
+            //TODO keywords
+            //inspireExtension.setInpireKeywords(null);
+
+            // TODO multiple language
+            LanguagesType languages = new LanguagesType(new LanguageType("EN", true));
+            inspireExtension.setLanguages(languages);
+            inspireExtension.setCurrentLanguage("EN");
+
+        } 
         CAPS_RESPONSE.put(queryVersion, inCapabilities);
         return inCapabilities;
     }

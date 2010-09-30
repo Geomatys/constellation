@@ -1,128 +1,258 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<WMS_Capabilities version="1.3.0" xmlns="http://www.opengis.net/wms" xmlns:sld="http://www.opengis.net/sld" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wms http://schemas.opengis.net/wms/1.3.0/capabilities_1_3_0.xsd">
+<WMS_Capabilities version="1.3.0" xmlns="http://www.opengis.net/wms" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:sld="http://www.opengis.net/sld" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inspire_vs="http://inspira.europa.eu/networkservice/view/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wms http://schemas.opengis.net/wms/1.3.0/capabilities_1_3_0.xsd">
 <!-- Service Metadata -->
-<Service>
+    <Service>
   <!-- The WMT-defined name for this type of service -->
-  <Name>OGC:WMS</Name>
+        <Name>OGC:WMS</Name>
   <!-- Human-readable title for pick lists -->
-  <Title>Constellation Map Server</Title>
+        <Title>Constellation Map Server</Title>
   <!-- Narrative description providing additional information -->
-  <Abstract>Map Server.  Contact: someone@geomatys.fr.  High-quality maps.</Abstract>
-  <KeywordList>
-    <Keyword>WMS</Keyword>
-    <Keyword>???</Keyword>
-    <Keyword>????</Keyword>
-  </KeywordList>
+        <Abstract>Map Server.  Contact: someone@geomatys.fr.  High-quality maps.</Abstract>
+        <KeywordList>
+            <Keyword>WMS</Keyword>
+            <Keyword>???</Keyword>
+            <Keyword>????</Keyword>
+        </KeywordList>
   <!-- Top-level web address of service or service provider.  See also OnlineResource
   elements under <DCPType>. -->
-  <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://www.geomatys.fr/"/>
+        <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="http://www.geomatys.fr/"/>
   <!-- Contact information -->
-  <ContactInformation>
-    <ContactPersonPrimary>
-      <ContactPerson>Vincent Heurteaux</ContactPerson>
-      <ContactOrganization>Geomatys</ContactOrganization>
-    </ContactPersonPrimary>
-    <ContactPosition>PDG</ContactPosition>
-    <ContactAddress>
-      <AddressType>postal</AddressType>
-      <Address>24 rue Pierre Renaudel</Address>
-      <City>ARLES</City>
-      <StateOrProvince>bouches du rhone</StateOrProvince>
-      <PostCode>13200 </PostCode>
-      <Country>FRANCE</Country>
-    </ContactAddress>
-    <ContactVoiceTelephone>04 67 54 87 30</ContactVoiceTelephone>
-    <ContactElectronicMailAddress>vincent.heurteaux@geomatys.fr</ContactElectronicMailAddress>
-  </ContactInformation>
+        <ContactInformation>
+            <ContactPersonPrimary>
+                <ContactPerson>Vincent Heurteaux</ContactPerson>
+                <ContactOrganization>Geomatys</ContactOrganization>
+            </ContactPersonPrimary>
+            <ContactPosition>PDG</ContactPosition>
+            <ContactAddress>
+                <AddressType>postal</AddressType>
+                <Address>24 rue Pierre Renaudel</Address>
+                <City>ARLES</City>
+                <StateOrProvince>bouches du rhone</StateOrProvince>
+                <PostCode>13200 </PostCode>
+                <Country>FRANCE</Country>
+            </ContactAddress>
+            <ContactVoiceTelephone>04 67 54 87 30</ContactVoiceTelephone>
+            <ContactElectronicMailAddress>vincent.heurteaux@geomatys.fr</ContactElectronicMailAddress>
+        </ContactInformation>
   <!-- Fees or access constraints imposed. -->
-  <Fees>no conditions apply</Fees>
-  <AccessConstraints>None</AccessConstraints>
-  <LayerLimit>16</LayerLimit>
-  <MaxWidth>2048</MaxWidth>
-  <MaxHeight>2048</MaxHeight>
-</Service>
-<Capability>
-  <Request>
-    <GetCapabilities>
-      <Format>text/xml</Format>
-      <Format>application/vnd.ogc.wms_xml</Format>
-      <DCPType>
-        <HTTP>
-          <Get>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
-          </Get>
-          <Post>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
-          </Post>
-        </HTTP>
-      </DCPType>
-    </GetCapabilities>
-    <GetMap>
-      <Format>image/gif</Format>
-      <Format>image/png</Format>
-      <Format>image/jpeg</Format>
-      <Format>image/bmp</Format>
-      <Format>image/tiff</Format>
-      <Format>image/x-portable-pixmap</Format>
-      <DCPType>
-        <HTTP>
-          <Get>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
-          </Get>
-          <Post>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
-          </Post>
-        </HTTP>
-      </DCPType>
-    </GetMap>
-    <GetFeatureInfo>
-      <Format>text/xml</Format>
-      <Format>text/plain</Format>
-      <Format>text/html</Format>
-      <DCPType>
-        <HTTP>
-          <Get>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
-          </Get>
-          <Post>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
-          </Post>
-        </HTTP>
-      </DCPType>
-    </GetFeatureInfo>
-    <sld:DescribeLayer>
-      <Format>text/xml</Format>
-      <DCPType>
-        <HTTP>
-          <Get>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
-          </Get>
-          <Post>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
-          </Post>
-        </HTTP>
-      </DCPType>
-    </sld:DescribeLayer>
-    <sld:GetLegendGraphic>
-      <Format>image/png</Format>
-      <Format>image/jpeg</Format>
-      <Format>image/gif</Format>
-      <Format>image/tiff</Format>
-      <DCPType>
-        <HTTP>
-          <Get>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
-          </Get>
-          <Post>
-            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
-          </Post>
-        </HTTP>
-      </DCPType>
-    </sld:GetLegendGraphic>
-  </Request>
-  <Exception>
-    <Format>XML</Format>
-  </Exception>
-<sld:UserDefinedSymbolization SupportSLD="1" UserLayer="1" UserStyle="1" RemoteWCS="1" InlineFeature="1"/>
-</Capability>
+        <Fees>no conditions apply</Fees>
+        <AccessConstraints>None</AccessConstraints>
+        <LayerLimit>16</LayerLimit>
+        <MaxWidth>2048</MaxWidth>
+        <MaxHeight>2048</MaxHeight>
+    </Service>
+    <Capability>
+        <Request>
+            <GetCapabilities>
+                <Format>text/xml</Format>
+                <Format>application/vnd.ogc.wms_xml</Format>
+                <DCPType>
+                    <HTTP>
+                        <Get>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
+                        </Get>
+                        <Post>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
+                        </Post>
+                    </HTTP>
+                </DCPType>
+            </GetCapabilities>
+            <GetMap>
+                <Format>image/gif</Format>
+                <Format>image/png</Format>
+                <Format>image/jpeg</Format>
+                <Format>image/bmp</Format>
+                <Format>image/tiff</Format>
+                <Format>image/x-portable-pixmap</Format>
+                <DCPType>
+                    <HTTP>
+                        <Get>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
+                        </Get>
+                        <Post>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
+                        </Post>
+                    </HTTP>
+                </DCPType>
+            </GetMap>
+            <GetFeatureInfo>
+                <Format>text/xml</Format>
+                <Format>text/plain</Format>
+                <Format>text/html</Format>
+                <DCPType>
+                    <HTTP>
+                        <Get>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
+                        </Get>
+                        <Post>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
+                        </Post>
+                    </HTTP>
+                </DCPType>
+            </GetFeatureInfo>
+            <sld:DescribeLayer>
+                <Format>text/xml</Format>
+                <DCPType>
+                    <HTTP>
+                        <Get>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
+                        </Get>
+                        <Post>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
+                        </Post>
+                    </HTTP>
+                </DCPType>
+            </sld:DescribeLayer>
+            <sld:GetLegendGraphic>
+                <Format>image/png</Format>
+                <Format>image/jpeg</Format>
+                <Format>image/gif</Format>
+                <Format>image/tiff</Format>
+                <DCPType>
+                    <HTTP>
+                        <Get>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
+                        </Get>
+                        <Post>
+                            <OnlineResource xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href=""/>
+                        </Post>
+                    </HTTP>
+                </DCPType>
+            </sld:GetLegendGraphic>
+        </Request>
+        <Exception>
+            <Format>XML</Format>
+        </Exception>
+        <sld:UserDefinedSymbolization SupportSLD="1" UserLayer="1" UserStyle="1" RemoteWCS="1" InlineFeature="1"/>
+        <inspire_vs:ExtendedCapabilities>
+            <!--inspire_vs:Resourcelocator>
+                <gmd:linkage>
+                    <gmd:URL>http://</gmd:URL>
+                </gmd:linkage>
+            </inspire_vs:Resourcelocator>
+            <inspire_vs:MetadataUrl>
+                <gmd:linkage>
+                    <gmd:URL>http://</gmd:URL>
+                </gmd:linkage>
+            </inspire_vs:MetadataUrl-->
+            <inspire_vs:ResourceType>
+                <gmd:MD_ScopeCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#service" codeListValue="service"/>
+            </inspire_vs:ResourceType>
+            <!--inspire_vs:TemporalRefererence>
+                <gmd:EX_Extent>
+                    <gmd:temporalElement>
+                        <gmd:EX_TemporalExtent>
+                            <gmd:extent>
+                                <gml:TimePeriod gml:id="extent">
+                                    <gml:beginPosition>1970-01-02T10:20:00.000+01:00</gml:beginPosition>
+                                    <gml:endPosition>1970-01-02T10:20:00.001+01:00</gml:endPosition>
+                                </gml:TimePeriod>
+                            </gmd:extent>
+                        </gmd:EX_TemporalExtent>
+                    </gmd:temporalElement>
+                </gmd:EX_Extent>
+            </inspire_vs:TemporalRefererence-->
+            <!--inspire_vs:Conformity>
+                <gmd:DQ_ConformanceResult>
+                    <gmd:specification>
+                        <gmd:CI_Citation>
+                            <gmd:title>
+                                <gco:CharacterString>European Petroleum Survey Group</gco:CharacterString>
+                            </gmd:title>
+                            <gmd:alternateTitle>
+                                <gco:CharacterString>EPSG</gco:CharacterString>
+                            </gmd:alternateTitle>
+                            <gmd:identifier>
+                                <gmd:MD_Identifier>
+                                    <gmd:code>
+                                        <gco:CharacterString>EPSG</gco:CharacterString>
+                                    </gmd:code>
+                                </gmd:MD_Identifier>
+                            </gmd:identifier>
+                            <gmd:citedResponsibleParty>
+                                <gmd:CI_ResponsibleParty>
+                                    <gmd:organisationName>
+                                        <gco:CharacterString>European Petroleum Survey Group</gco:CharacterString>
+                                    </gmd:organisationName>
+                                    <gmd:contactInfo>
+                                        <gmd:CI_Contact>
+                                            <gmd:onlineResource>
+                                                <gmd:CI_OnlineResource>
+                                                    <gmd:linkage>
+                                                        <gmd:URL>http://www.epsg.org</gmd:URL>
+                                                    </gmd:linkage>
+                                                    <gmd:function>
+                                                        <gmd:CI_OnLineFunctionCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#information" codeListValue="information"/>
+                                                    </gmd:function>
+                                                </gmd:CI_OnlineResource>
+                                            </gmd:onlineResource>
+                                        </gmd:CI_Contact>
+                                    </gmd:contactInfo>
+                                    <gmd:role>
+                                        <gmd:CI_RoleCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#principalInvestigator" codeListValue="principalInvestigator"/>
+                                    </gmd:role>
+                                </gmd:CI_ResponsibleParty>
+                            </gmd:citedResponsibleParty>
+                            <gmd:presentationForm>
+                                <gmd:CI_PresentationFormCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#tableDigital" codeListValue="tableDigital"/>
+                            </gmd:presentationForm>
+                        </gmd:CI_Citation>
+                    </gmd:specification>
+                    <gmd:explanation xsi:type="gmd:PT_FreeText_PropertyType">
+                        <gco:CharacterString>see the referenced specification</gco:CharacterString>
+                        <gmd:PT_FreeText>
+                            <gmd:textGroup>
+                                <gmd:LocalisedCharacterString>see the referenced specification</gmd:LocalisedCharacterString>
+                            </gmd:textGroup>
+                        </gmd:PT_FreeText>
+                    </gmd:explanation>
+                    <gmd:pass>
+                        <gco:Boolean>true</gco:Boolean>
+                    </gmd:pass>
+                </gmd:DQ_ConformanceResult>
+            </inspire_vs:Conformity-->
+            <inspire_vs:MetadataPointOfContact>
+                <gmd:CI_ResponsibleParty>
+                    <gmd:organisationName>
+                        <gco:CharacterString>Geomatys</gco:CharacterString>
+                    </gmd:organisationName>
+                    <gmd:contactInfo>
+                        <gmd:CI_Contact>
+                            <gmd:onlineResource>
+                                <gmd:CI_OnlineResource>
+                                    <gmd:linkage>
+                                        <gmd:URL>http://www.geomatys.fr/</gmd:URL>
+                                    </gmd:linkage>
+                                    <gmd:function>
+                                        <gmd:CI_OnLineFunctionCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#information" codeListValue="information"/>
+                                    </gmd:function>
+                                </gmd:CI_OnlineResource>
+                            </gmd:onlineResource>
+                        </gmd:CI_Contact>
+                    </gmd:contactInfo>
+                    <gmd:role>
+                        <gmd:CI_RoleCode codeList="http://www.tc211.org/ISO19139/resources/codeList.xml#principalInvestigator" codeListValue="principalInvestigator"/>
+                    </gmd:role>
+                </gmd:CI_ResponsibleParty>
+            </inspire_vs:MetadataPointOfContact>
+            <!--inspire_vs:MetadataDate>
+                <gco:Date>1970-01-02T11:35:41.215+01:00</gco:Date>
+            </inspire_vs:MetadataDate-->
+            <inspire_vs:SpatialDataService>
+                <srv:serviceType>
+                    <gco:LocalName>view</gco:LocalName>
+                </srv:serviceType>
+            </inspire_vs:SpatialDataService>
+            <!--inspire_vs:InpireKeywords>
+                <gmd:keyword>
+                    <gco:CharacterString>something</gco:CharacterString>
+                </gmd:keyword>
+            </inspire_vs:InpireKeywords-->
+            <inspire_vs:Languages>
+                <inspire_vs:Language>FR</inspire_vs:Language>
+                <inspire_vs:Language default="true">EN</inspire_vs:Language>
+            </inspire_vs:Languages>
+            <inspire_vs:currentLanguage>EN</inspire_vs:currentLanguage>
+        </inspire_vs:ExtendedCapabilities>
+    </Capability>
 </WMS_Capabilities>
