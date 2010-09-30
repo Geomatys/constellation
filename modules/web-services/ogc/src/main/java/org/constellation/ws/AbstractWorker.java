@@ -135,6 +135,9 @@ public abstract class AbstractWorker implements Worker {
         this.logLevel = logLevel;
     }
 
+    protected Object getStaticCapabilitiesObject(final String version, final String service) throws JAXBException {
+        return getStaticCapabilitiesObject(version, service, null);
+    }
     /**
      * Returns the file where to read the capabilities document for each service.
      * If no such file is found, then this method returns {@code null}.
@@ -146,8 +149,13 @@ public abstract class AbstractWorker implements Worker {
      * @throws JAXBException
      * @throws IOException
      */
-    protected Object getStaticCapabilitiesObject(final String version, final String service) throws JAXBException {
-        final String fileName = service + "Capabilities" + version + ".xml";
+    protected Object getStaticCapabilitiesObject(final String version, final String service, final String language) throws JAXBException {
+        final String fileName;
+        if (language == null) {
+            fileName = service + "Capabilities" + version + ".xml";
+        } else {
+            fileName = service + "Capabilities" + version + '-' + language + ".xml";
+        }
         final String home;
         if (getServletContext() != null) {
             home     = getServletContext().getRealPath("WEB-INF");

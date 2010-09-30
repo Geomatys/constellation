@@ -155,6 +155,8 @@ public abstract class WMSQuery implements Query {
     public static final String KEY_WMTVER = "WMTVER";
     /** Parameter used to store additional parameters from the query, the value object is a MultiValueMap */
     public static final String KEY_EXTRA_PARAMETERS = "EXTRA";
+    /** Parameter INSPIRE used to choose the language of the capabilities document */
+    public static final String KEY_LANGUAGE = "LANGUAGE";
 
     private final Version version;
     /**

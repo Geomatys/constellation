@@ -312,6 +312,7 @@ public class WMSService extends GridWebService {
             throw new CstlServiceException("Invalid service specified. Should be WMS.",
                     INVALID_PARAMETER_VALUE, KEY_SERVICE.toLowerCase());
         }
+        final String language = getParameter(KEY_LANGUAGE, false);
         if (version == null) {
             final ServiceDef capsService = getBestVersion(null);
             String format = getParameter(KEY_FORMAT, false);
@@ -324,7 +325,7 @@ public class WMSService extends GridWebService {
                 format = (ServiceDef.WMS_1_1_1_SLD.version.equals(capsService.version)) ?
                     MimeType.APP_WMS_XML : MimeType.TEXT_XML;
             }
-            return new GetCapabilities(capsService.version, format);
+            return new GetCapabilities(capsService.version, format, language);
         }
         final ServiceDef bestVersion = getBestVersion(version);
         String format = getParameter(KEY_FORMAT, false);
@@ -337,7 +338,7 @@ public class WMSService extends GridWebService {
             format = (ServiceDef.WMS_1_1_1_SLD.version.equals(bestVersion.version)) ?
                      MimeType.APP_WMS_XML : MimeType.TEXT_XML;
         }
-        return new GetCapabilities(bestVersion.version, format);
+        return new GetCapabilities(bestVersion.version, format, language);
     }
 
     /**

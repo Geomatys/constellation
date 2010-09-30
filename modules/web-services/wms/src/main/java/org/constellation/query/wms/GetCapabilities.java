@@ -37,13 +37,16 @@ public final class GetCapabilities extends WMSQuery {
      */
     private final String format;
 
+    private final String language;
+
     public GetCapabilities(final Version version) {
-        this(version, null);
+        this(version, null, null);
     }
 
-    public GetCapabilities(final Version version, final String format) {
+    public GetCapabilities(final Version version, final String format, final String language) {
         super(version, null);
         this.format = format;
+        this.language = language;
     }
 
     /**
@@ -67,6 +70,13 @@ public final class GetCapabilities extends WMSQuery {
     }
 
     /**
+     * @return the language
+     */
+    public String getLanguage() {
+        return language;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -83,6 +93,9 @@ public final class GetCapabilities extends WMSQuery {
         }
         if (format != null) {
             kvp.append('&').append(KEY_FORMAT).append('=').append(format);
+        }
+        if (language != null) {
+            kvp.append('&').append(KEY_LANGUAGE).append('=').append(language);
         }
         return kvp.toString();
     }

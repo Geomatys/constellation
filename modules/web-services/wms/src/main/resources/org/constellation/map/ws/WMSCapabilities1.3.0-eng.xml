@@ -247,12 +247,12 @@
                 <gmd:keyword>
                     <gco:CharacterString>something</gco:CharacterString>
                 </gmd:keyword>
-            </inspire_vs:InpireKeywords-->
+            </inspire_vs:InpireKeywords>
             <inspire_vs:Languages>
                 <inspire_vs:Language>FR</inspire_vs:Language>
                 <inspire_vs:Language default="true">EN</inspire_vs:Language>
             </inspire_vs:Languages>
-            <inspire_vs:currentLanguage>EN</inspire_vs:currentLanguage>
+            <inspire_vs:currentLanguage>EN</inspire_vs:currentLanguage-->
         </inspire_vs:ExtendedCapabilities>
     </Capability>
 </WMS_Capabilities>

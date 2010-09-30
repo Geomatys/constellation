@@ -28,7 +28,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -145,6 +144,14 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
     private static final Map<String,AbstractWMSCapabilities> CAPS_RESPONSE =
             new HashMap<String,AbstractWMSCapabilities>();
 
+    private static final Map<String, LanguageType> SUPPORTED_LANGUAGES = new HashMap<String, LanguageType>();
+    static {
+        LanguageType language = new LanguageType("eng", true);
+        SUPPORTED_LANGUAGES.put("eng", language);
+        language = new LanguageType("fre");
+        SUPPORTED_LANGUAGES.put("fre", language);
+    }
+
     @Override
     protected MarshallerPool getMarshallerPool() {
         return WMSMarshallerPool.getInstance();
@@ -185,9 +192,22 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
      */
     @Override
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab) throws CstlServiceException {
+         // we get the request language, if its not set we get the default "eng"
+        final String currentLanguage;
+        if (getCapab.getLanguage() != null) {
+            if (SUPPORTED_LANGUAGES.containsKey(getCapab.getLanguage())) {
+                currentLanguage = getCapab.getLanguage();
+            } else {
+                currentLanguage = "eng";
+            }
+        } else {
+            currentLanguage = "eng";
+        }
+
         final String queryVersion = getCapab.getVersion().toString();
-        if (CAPS_RESPONSE.containsKey(queryVersion)) {
-            return CAPS_RESPONSE.get(queryVersion);
+        final String key_cache    = queryVersion + '-' + currentLanguage;
+        if (CAPS_RESPONSE.containsKey(key_cache)) {
+            return CAPS_RESPONSE.get(key_cache);
         }
 
         //Add accepted CRS codes
@@ -204,7 +224,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         //Generate the correct URL in the static part. ?TODO: clarify this.
         final AbstractWMSCapabilities inCapabilities;
         try {
-            inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(queryVersion, "WMS");
+            inCapabilities = (AbstractWMSCapabilities) getStaticCapabilitiesObject(queryVersion, "WMS", currentLanguage);
         } catch (JAXBException ex) {
             throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
@@ -414,12 +434,12 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                         }
                         final org.geotoolkit.wms.xml.v111.LegendURL legendURL1 =
                                 new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_PNG, or,
-                                BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height));
+                                dimLegend.width, dimLegend.height);
 
                         or = new org.geotoolkit.wms.xml.v111.OnlineResource(legendUrlGif);
                         final org.geotoolkit.wms.xml.v111.LegendURL legendURL2 =
                                 new org.geotoolkit.wms.xml.v111.LegendURL(MimeType.IMAGE_GIF, or,
-                                BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height));
+                                dimLegend.width, dimLegend.height);
 
                         final org.geotoolkit.wms.xml.v111.Style style = new org.geotoolkit.wms.xml.v111.Style(
                                 styleName, styleName, null, null, null, legendURL1, legendURL2);
@@ -427,11 +447,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                     }
                 }
 
-                final LatLonBoundingBox bbox = new LatLonBoundingBox(
-                        inputGeoBox.getWestBoundLongitude(),
-                        inputGeoBox.getSouthBoundLatitude(),
-                        inputGeoBox.getEastBoundLongitude(),
-                        inputGeoBox.getNorthBoundLatitude());
+                final LatLonBoundingBox bbox = new LatLonBoundingBox(inputGeoBox);
                 if (layer instanceof CoverageLayerDetails) {
                     final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
                     outputLayer = new org.geotoolkit.wms.xml.v111.Layer(layerName,
@@ -475,23 +491,19 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                         }
                         final org.geotoolkit.wms.xml.v130.LegendURL legendURL1 =
                                 new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_PNG, or,
-                                BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height));
+                                dimLegend.width, dimLegend.height);
 
                         or = new org.geotoolkit.wms.xml.v130.OnlineResource(legendUrlGif);
                         final org.geotoolkit.wms.xml.v130.LegendURL legendURL2 =
                                 new org.geotoolkit.wms.xml.v130.LegendURL(MimeType.IMAGE_GIF, or,
-                                BigInteger.valueOf(dimLegend.width), BigInteger.valueOf(dimLegend.height));
+                                dimLegend.width, dimLegend.height);
                         final org.geotoolkit.wms.xml.v130.Style style = new org.geotoolkit.wms.xml.v130.Style(
                         styleName, styleName, null, null, null, legendURL1, legendURL2);
                         styles.add(style);
                     }
                 }
 
-                final EXGeographicBoundingBox bbox = new EXGeographicBoundingBox(
-                        inputGeoBox.getWestBoundLongitude(),
-                        inputGeoBox.getSouthBoundLatitude(),
-                        inputGeoBox.getEastBoundLongitude(),
-                        inputGeoBox.getNorthBoundLatitude());
+                final EXGeographicBoundingBox bbox = new EXGeographicBoundingBox(inputGeoBox);
                 if (layer instanceof CoverageLayerDetails) {
                     final CoverageLayerDetails coverageLayer = (CoverageLayerDetails)layer;
                     outputLayer = new org.geotoolkit.wms.xml.v130.Layer(layerName,
@@ -524,7 +536,6 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
          */
         if (queryVersion.equals(ServiceDef.WMS_1_3_0.version.toString()) || queryVersion.equals(ServiceDef.WMS_1_3_0_SLD.version.toString()) ) {
            
-            System.out.println("passez par la");
             Capability capa = (Capability) inCapabilities.getCapability();
             ExtendedCapabilitiesType inspireExtension =  capa.getInspireExtendedCapabilities();
 
@@ -545,13 +556,16 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             //TODO keywords
             //inspireExtension.setInpireKeywords(null);
 
-            // TODO multiple language
-            LanguagesType languages = new LanguagesType(new LanguageType("EN", true));
+            List<LanguageType> languageList = new ArrayList<LanguageType>();
+            for (LanguageType language : SUPPORTED_LANGUAGES.values()) {
+                languageList.add(language);
+            }
+            LanguagesType languages = new LanguagesType(languageList);
             inspireExtension.setLanguages(languages);
-            inspireExtension.setCurrentLanguage("EN");
+            inspireExtension.setCurrentLanguage(currentLanguage);
 
         } 
-        CAPS_RESPONSE.put(queryVersion, inCapabilities);
+        CAPS_RESPONSE.put(key_cache, inCapabilities);
         return inCapabilities;
     }
 
