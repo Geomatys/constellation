@@ -192,7 +192,10 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
      */
     @Override
     public AbstractWMSCapabilities getCapabilities(final GetCapabilities getCapab) throws CstlServiceException {
-         // we get the request language, if its not set we get the default "eng"
+
+        final String queryVersion = getCapab.getVersion().toString();
+
+        // we get the request language, if its not set we get the default "eng"
         final String currentLanguage;
         if (getCapab.getLanguage() != null) {
             if (SUPPORTED_LANGUAGES.containsKey(getCapab.getLanguage())) {
@@ -200,11 +203,13 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             } else {
                 currentLanguage = "eng";
             }
+        } else if ("1.1.1".equals(queryVersion)){
+            currentLanguage = null;
         } else {
             currentLanguage = "eng";
         }
 
-        final String queryVersion = getCapab.getVersion().toString();
+
         final String key_cache    = queryVersion + '-' + currentLanguage;
         if (CAPS_RESPONSE.containsKey(key_cache)) {
             return CAPS_RESPONSE.get(key_cache);
