@@ -775,6 +775,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         }
         final BufferedImage image;
         final String rule = getLegend.getRule();
+        final Double scale = getLegend.getScale();
         final String sld = getLegend.getSld();
         try {
             MutableStyle ms = null;
@@ -824,7 +825,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                     ms = StyleProviderProxy.getInstance().get(style);
                 }
             }
-            image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), ms, rule);
+            image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), ms, rule, scale);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex);
         }

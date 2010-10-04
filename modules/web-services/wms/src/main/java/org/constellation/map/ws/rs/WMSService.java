@@ -452,7 +452,9 @@ public class WMSService extends GridWebService {
             throw new CstlServiceException("The given sld version number "+ strSldVers +" is not known.",
                     INVALID_PARAMETER_VALUE, KEY_SLD_VERSION.toLowerCase());
         }
-        return new GetLegendGraphic(strLayer, format, width, height, strStyle, strSld, sldVersion, strRule);
+        final String strScale   = getParameter(KEY_SCALE,       false);
+        final Double scale = RequestsUtilities.toDouble(strScale);
+        return new GetLegendGraphic(strLayer, format, width, height, strStyle, strSld, sldVersion, strRule, scale);
     }
 
     private boolean isV111orUnder(String version) {

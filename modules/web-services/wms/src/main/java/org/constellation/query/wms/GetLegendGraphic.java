@@ -75,12 +75,18 @@ public final class GetLegendGraphic extends WMSQuery {
     private final String rule;
 
     /**
+     * Scale for the style.
+     */
+    private final Double scale;
+
+    /**
      * Builds a {@code GetLegendGraphic} request, using the layer and mime-type specified
      * and width and height for the image.
      */
     public GetLegendGraphic(final Name layer, final String format, final Integer width,
                             final Integer height, final String style, final String sld,
-                            final StyledLayerDescriptor sldVersion, final String rule)
+                            final StyledLayerDescriptor sldVersion, final String rule,
+                            final Double scale)
     {
         super(ServiceDef.WMS_1_1_1_SLD.version, null);
         this.layer      = layer;
@@ -91,6 +97,7 @@ public final class GetLegendGraphic extends WMSQuery {
         this.sld        = sld;
         this.sldVersion = sldVersion;
         this.rule       = rule;
+        this.scale      = scale;
     }
 
     /**
@@ -135,6 +142,13 @@ public final class GetLegendGraphic extends WMSQuery {
     @Override
     public QueryRequest getRequest() {
         return GET_LEGEND_GRAPHIC;
+    }
+
+    /**
+     * Returns the scale for the rule that can be applied.
+     */
+    public Double getScale() {
+        return scale;
     }
 
     /**
@@ -195,6 +209,9 @@ public final class GetLegendGraphic extends WMSQuery {
         }
         if (rule != null) {
             kvp.append('&').append(KEY_RULE).append('=').append(rule);
+        }
+        if (scale != null) {
+            kvp.append('&').append(KEY_SCALE).append('=').append(scale);
         }
         return kvp.toString();
     }

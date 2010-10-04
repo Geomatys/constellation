@@ -14,7 +14,6 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-
 package org.constellation.provider;
 
 import java.awt.Dimension;
@@ -98,7 +97,8 @@ public abstract class AbstractLayerDetails implements LayerDetails{
      */
     @Override
     public BufferedImage getLegendGraphic(Dimension dimension, final LegendTemplate template,
-                                          final Style style, final String rule) throws PortrayalException
+                                          final Style style, final String rule, final Double scale)
+                                          throws PortrayalException
     {
         MutableStyle mutableStyle = null;
         if (style != null) {
@@ -119,7 +119,14 @@ public abstract class AbstractLayerDetails implements LayerDetails{
             // If a rule is given, we try to find the matching one in the style.
             // If none matches, then we can just apply all the style.
             if (rule != null) {
-                final MutableRule mr = findRuleInStyle(rule, mutableStyle);
+                final MutableRule mr = findRuleByNameInStyle(rule, mutableStyle);
+                if (mr != null) {
+                    return DefaultGlyphService.create(mr, dimension, getMapLayer(mutableStyle, null));
+                }
+            }
+            // Otherwise, if there is a scale, we can filter rules.
+            if (scale != null) {
+                final MutableRule mr = findRuleByScaleInStyle(scale, mutableStyle);
                 if (mr != null) {
                     return DefaultGlyphService.create(mr, dimension, getMapLayer(mutableStyle, null));
                 }
@@ -141,7 +148,14 @@ public abstract class AbstractLayerDetails implements LayerDetails{
         // If a rule is given, we try to find the matching one in the style.
         // If none matches, then we can just apply all the style.
         if (rule != null) {
-            final MutableRule mr = findRuleInStyle(rule, mutableStyle);
+            final MutableRule mr = findRuleByNameInStyle(rule, mutableStyle);
+            if (mr != null) {
+                return DefaultGlyphService.create(mr, dimension, getMapLayer(mutableStyle, null));
+            }
+        }
+        // Otherwise, if there is a scale, we can filter rules.
+        if (scale != null) {
+            final MutableRule mr = findRuleByScaleInStyle(scale, mutableStyle);
             if (mr != null) {
                 return DefaultGlyphService.create(mr, dimension, getMapLayer(mutableStyle, null));
             }
@@ -164,14 +178,42 @@ public abstract class AbstractLayerDetails implements LayerDetails{
      * Returns the {@linkplain MutableRule rule} which matches with the given name, or {@code null}
      * if none.
      *
-     * @param rule The rule name to try finding in the given style.
+     * @param ruleName The rule name to try finding in the given style.
      * @param ms The style for which we want to extract the rule.
      * @return The rule with the given name, or {@code null} if no one matches.
      */
-    private MutableRule findRuleInStyle(final String rule, final MutableStyle ms) {
+    private MutableRule findRuleByNameInStyle(final String ruleName, final MutableStyle ms) {
+        if (ruleName == null) {
+            return null;
+        }
         for (final MutableFeatureTypeStyle mfts : ms.featureTypeStyles()) {
             for (final MutableRule mutableRule : mfts.rules()) {
-                if (rule.equals(mutableRule.getName())) {
+                if (ruleName.equals(mutableRule.getName())) {
+                    return mutableRule;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the {@linkplain MutableRule rule} which can be applied for the given scale, or
+     * {@code null} if no rules can be used at this scale.
+     *
+     * @param scale The scale.
+     * @param ms The style for which we want to extract a rule for the given scale.
+     * @return The first rule for the given scale that can be applied, or {@code null} if no
+     *         one matches.
+     */
+    private MutableRule findRuleByScaleInStyle(final Double scale, final MutableStyle ms) {
+        if (scale == null) {
+            return null;
+        }
+        for (final MutableFeatureTypeStyle mfts : ms.featureTypeStyles()) {
+            for (final MutableRule mutableRule : mfts.rules()) {
+                if (scale < mutableRule.getMaxScaleDenominator() &&
+                    scale > mutableRule.getMinScaleDenominator())
+                {
                     return mutableRule;
                 }
             }
