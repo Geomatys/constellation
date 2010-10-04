@@ -774,12 +774,13 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             dims = null;
         }
         final BufferedImage image;
+        final String rule = getLegend.getRule();
         final String sld = getLegend.getSld();
         try {
+            MutableStyle ms = null;
             // If a sld file is given, extracts the style from it.
             if (sld != null && !sld.isEmpty()) {
                 final XMLUtilities utils = new XMLUtilities();
-                MutableStyle ms = null;
                 final MutableStyledLayerDescriptor mutableSLD;
 
                 try {
@@ -814,18 +815,16 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
                     LOGGER.info("No layer " + layerName + " found for the given SLD. Continue with the first style found.");
                     ms = (MutableStyle) emptyNameMutableLayers.get(0).styles().get(0);
                 }
-                image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), ms);
             } else {
                 // No sld given, we use the style.
                 final String style = getLegend.getStyle();
-                final MutableStyle ms;
                 if (style == null) {
                     ms = null;
                 } else {
                     ms = StyleProviderProxy.getInstance().get(style);
                 }
-                image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), ms);
             }
+            image = layer.getLegendGraphic(dims, WMSMapDecoration.getDefaultLegendTemplate(), ms, rule);
         } catch (PortrayalException ex) {
             throw new CstlServiceException(ex);
         }

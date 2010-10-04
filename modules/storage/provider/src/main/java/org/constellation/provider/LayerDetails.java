@@ -111,11 +111,12 @@ public interface LayerDetails {
      * @param dimension The dimension of the output legend graphic.
      * @param template The legend template to apply for the legend response.
      * @param style The style to apply on the output.
+     * @apram rule The rule to apply from the style.
      * @return A legend graphic for this data.
      * @throws PortrayalException if an error occurs while trying to generate the legend graphic.
      */
     BufferedImage getLegendGraphic(final Dimension dimension, final LegendTemplate template,
-                                   final Style style) throws PortrayalException;
+                                   final Style style, final String rule) throws PortrayalException;
 
     /**
      * Returns the preferred size for the legend.

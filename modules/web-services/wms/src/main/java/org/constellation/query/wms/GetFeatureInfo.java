@@ -24,12 +24,13 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.constellation.query.QueryRequest;
 
+import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.sld.MutableStyledLayerDescriptor;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
-import org.opengis.feature.type.Name;
 
+import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 
 
@@ -37,12 +38,12 @@ import org.opengis.geometry.Envelope;
  * Representation of a {@code WMS GetFeatureInfo} request, with its parameters. It
  * is an extension of the {@link GetMap} request.
  *
- * @version $Id$
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  *
  * @see GetMap
  */
+@Immutable
 public final class GetFeatureInfo extends GetMap {
     /**
      * X coordinate to request.
@@ -149,7 +150,7 @@ public final class GetFeatureInfo extends GetMap {
         final String getMapKvp = super.toKvp();
         final StringBuilder kvp = new StringBuilder(getMapKvp);
         final Version version = getVersion();
-        //Obligatory Parameters
+        // Mandatory parameters
         kvp.append('&').append(KEY_QUERY_LAYERS).append('=').append(StringUtilities.toCommaSeparatedValues(queryLayers))
            .append('&').append(KEY_INFO_FORMAT ).append('=').append(infoFormat)
            .append('&').append((version.toString().equals("1.1.1")) ?
@@ -159,7 +160,7 @@ public final class GetFeatureInfo extends GetMap {
                                KEY_J_V111 :
                                KEY_J_V130 )     .append('=').append(y);
 
-        //Optional parameters
+        // Optional parameters
         if (featureCount != null) {
             kvp.append('&').append(KEY_FEATURE_COUNT).append('=').append(featureCount);
         }

@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,6 @@ import org.geotoolkit.util.Version;
 /**
  * Representation of a {@code WMS GetCapabilities} request, with its parameters.
  *
- * @version $Id$
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
@@ -82,11 +81,11 @@ public final class GetCapabilities extends WMSQuery {
     @Override
     public String toKvp() {
         final StringBuilder kvp = new StringBuilder();
-        //Obligatory Parameters
+        // Mandatory parameters
         kvp.append(KEY_REQUEST).append('=').append(GETCAPABILITIES).append('&')
            .append(KEY_SERVICE).append('=').append(getService());
 
-        //Optional Parameters
+        // Optional parameters
         final Version version = getVersion();
         if (version != null) {
             kvp.append('&').append(KEY_VERSION).append('=').append(version);

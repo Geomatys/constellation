@@ -22,13 +22,13 @@ import org.constellation.ws.MimeType;
 
 import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.sld.xml.Specification.StyledLayerDescriptor;
+
 import org.opengis.feature.type.Name;
 
 
 /**
  * Representation of a {@code WMS GetLegendGraphic} request, with its parameters.
  *
- * @version $Id$
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
@@ -70,12 +70,17 @@ public final class GetLegendGraphic extends WMSQuery {
     private final StyledLayerDescriptor sldVersion;
 
     /**
+     * Rule from SLD to apply for styling the legend output.
+     */
+    private final String rule;
+
+    /**
      * Builds a {@code GetLegendGraphic} request, using the layer and mime-type specified
      * and width and height for the image.
      */
     public GetLegendGraphic(final Name layer, final String format, final Integer width,
                             final Integer height, final String style, final String sld,
-                            final StyledLayerDescriptor sldVersion)
+                            final StyledLayerDescriptor sldVersion, final String rule)
     {
         super(ServiceDef.WMS_1_1_1_SLD.version, null);
         this.layer      = layer;
@@ -85,6 +90,7 @@ public final class GetLegendGraphic extends WMSQuery {
         this.style      = style;
         this.sld        = sld;
         this.sldVersion = sldVersion;
+        this.rule       = rule;
     }
 
     /**
@@ -145,8 +151,19 @@ public final class GetLegendGraphic extends WMSQuery {
         return style;
     }
 
+    /**
+     * Returns the SLD version for the given SLD file. Note that this parameter is
+     * mandatory when {@link #sld} is specified.
+     */
     public StyledLayerDescriptor getSldVersion() {
         return sldVersion;
+    }
+
+    /**
+     * Returns the rule to apply from the SLD file.
+     */
+    public String getRule() {
+        return rule;
     }
 
     /**
@@ -155,12 +172,12 @@ public final class GetLegendGraphic extends WMSQuery {
     @Override
     public String toKvp() {
         final StringBuilder kvp = new StringBuilder();
-        //Obligatory Parameters
+        // Mandatory parameters
         kvp            .append(KEY_REQUEST).append('=').append(GETLEGENDGRAPHIC)
            .append('&').append(KEY_FORMAT ).append('=').append(format)
            .append('&').append(KEY_LAYER  ).append('=').append(layer);
 
-        //Optional Parameters
+        // Optional parameters
         if (width != null) {
             kvp.append('&').append(KEY_WIDTH).append('=').append(width);
         }
@@ -172,6 +189,12 @@ public final class GetLegendGraphic extends WMSQuery {
         }
         if (sld != null) {
             kvp.append('&').append(KEY_SLD).append('=').append(sld);
+        }
+        if (sldVersion != null) {
+            kvp.append('&').append(KEY_SLD_VERSION).append('=').append(sldVersion);
+        }
+        if (rule != null) {
+            kvp.append('&').append(KEY_RULE).append('=').append(rule);
         }
         return kvp.toString();
     }

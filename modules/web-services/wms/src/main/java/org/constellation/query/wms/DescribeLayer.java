@@ -2,7 +2,7 @@
  *    Constellation - An open source and standard compliant SDI
  *    http://www.constellation-sdi.org
  *
- *    (C) 2007 - 2009, Geomatys
+ *    (C) 2007 - 2010, Geomatys
  *
  *    This library is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,6 @@ import org.geotoolkit.util.collection.UnmodifiableArrayList;
 /**
  * Representation of a {@code WMS DescribeLayer} request, with its parameters.
  *
- * @version $Id$
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
@@ -78,11 +77,11 @@ public final class DescribeLayer extends WMSQuery {
     @Override
     public String toKvp() {
         final StringBuilder kvp = new StringBuilder();
-        //Obligatory Parameters
+        // Mandatory parameters
         kvp.append(KEY_REQUEST).append('=').append(DESCRIBELAYER).append('&')
            .append(KEY_LAYERS ).append('=').append(StringUtilities.toCommaSeparatedValues(layers));
 
-        //Optional Parameters
+        // Optional parameters
         final Version version = getVersion();
         if (version != null) {
             kvp.append('&').append(KEY_VERSION).append('=').append(version);

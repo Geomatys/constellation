@@ -53,9 +53,9 @@ import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import org.constellation.ws.rs.GridWebService;
+import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
 
 //GeotoolKit dependencies
-import org.constellation.ws.rs.provider.SchemaLocatedExceptionResponse;
 import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.display2d.service.DefaultPortrayalService;
 import org.geotoolkit.referencing.CRS;
@@ -440,6 +440,7 @@ public class WMSService extends GridWebService {
         final String strStyle   = getParameter(KEY_STYLE,       false);
         final String strSld     = getParameter(KEY_SLD,         false);
         final String strSldVers = getParameter(KEY_SLD_VERSION, (strSld != null) ? true : false);
+        final String strRule    = getParameter(KEY_RULE,        false);
         final StyledLayerDescriptor sldVersion;
         if (strSldVers == null) {
             sldVersion = null;
@@ -451,7 +452,7 @@ public class WMSService extends GridWebService {
             throw new CstlServiceException("The given sld version number "+ strSldVers +" is not known.",
                     INVALID_PARAMETER_VALUE, KEY_SLD_VERSION.toLowerCase());
         }
-        return new GetLegendGraphic(strLayer, format, width, height, strStyle, strSld, sldVersion);
+        return new GetLegendGraphic(strLayer, format, width, height, strStyle, strSld, sldVersion, strRule);
     }
 
     private boolean isV111orUnder(String version) {

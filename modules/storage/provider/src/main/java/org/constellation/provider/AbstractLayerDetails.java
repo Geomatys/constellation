@@ -31,6 +31,8 @@ import org.geotoolkit.display2d.service.DefaultGlyphService;
 import org.geotoolkit.map.MapBuilder;
 import org.geotoolkit.map.MapContext;
 import org.geotoolkit.map.MapLayer;
+import org.geotoolkit.style.MutableFeatureTypeStyle;
+import org.geotoolkit.style.MutableRule;
 import org.geotoolkit.style.MutableStyle;
 import org.geotoolkit.util.logging.Logging;
 
@@ -96,7 +98,7 @@ public abstract class AbstractLayerDetails implements LayerDetails{
      */
     @Override
     public BufferedImage getLegendGraphic(Dimension dimension, final LegendTemplate template,
-                                          final Style style) throws PortrayalException
+                                          final Style style, final String rule) throws PortrayalException
     {
         MutableStyle mutableStyle = null;
         if (style != null) {
@@ -114,6 +116,14 @@ public abstract class AbstractLayerDetails implements LayerDetails{
             if (dimension == null) {
                 dimension = DefaultGlyphService.glyphPreferredSize(mutableStyle, dimension, null);
             }
+            // If a rule is given, we try to find the matching one in the style.
+            // If none matches, then we can just apply all the style.
+            if (rule != null) {
+                final MutableRule mr = findRuleInStyle(rule, mutableStyle);
+                if (mr != null) {
+                    return DefaultGlyphService.create(mr, dimension, getMapLayer(mutableStyle, null));
+                }
+            }
             return DefaultGlyphService.create(mutableStyle, dimension, getMapLayer(mutableStyle, null));
         }
         try {
@@ -128,7 +138,15 @@ public abstract class AbstractLayerDetails implements LayerDetails{
         if (dimension == null) {
             dimension = DefaultGlyphService.glyphPreferredSize(mutableStyle, dimension, null);
         }
-        return DefaultGlyphService.create(mutableStyle, dimension, null);
+        // If a rule is given, we try to find the matching one in the style.
+        // If none matches, then we can just apply all the style.
+        if (rule != null) {
+            final MutableRule mr = findRuleInStyle(rule, mutableStyle);
+            if (mr != null) {
+                return DefaultGlyphService.create(mr, dimension, getMapLayer(mutableStyle, null));
+            }
+        }
+        return DefaultGlyphService.create(mutableStyle, dimension, getMapLayer(mutableStyle, null));
     }
 
     /**
@@ -142,4 +160,22 @@ public abstract class AbstractLayerDetails implements LayerDetails{
         return DefaultLegendService.legendPreferredSize(template, mc);
     }
 
+    /**
+     * Returns the {@linkplain MutableRule rule} which matches with the given name, or {@code null}
+     * if none.
+     *
+     * @param rule The rule name to try finding in the given style.
+     * @param ms The style for which we want to extract the rule.
+     * @return The rule with the given name, or {@code null} if no one matches.
+     */
+    private MutableRule findRuleInStyle(final String rule, final MutableStyle ms) {
+        for (final MutableFeatureTypeStyle mfts : ms.featureTypeStyles()) {
+            for (final MutableRule mutableRule : mfts.rules()) {
+                if (rule.equals(mutableRule.getName())) {
+                    return mutableRule;
+                }
+            }
+        }
+        return null;
+    }
 }

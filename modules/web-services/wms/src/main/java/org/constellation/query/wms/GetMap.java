@@ -29,11 +29,12 @@ import org.constellation.ws.MimeType;
 
 import org.geotoolkit.client.util.RequestsUtilities;
 import org.geotoolkit.geometry.ImmutableEnvelope;
+import org.geotoolkit.lang.Immutable;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.Version;
 import org.geotoolkit.util.collection.UnmodifiableArrayList;
-import org.opengis.feature.type.Name;
 
+import org.opengis.feature.type.Name;
 import org.opengis.geometry.Envelope;
 import org.opengis.sld.StyledLayerDescriptor;
 
@@ -46,6 +47,7 @@ import org.opengis.sld.StyledLayerDescriptor;
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
  */
+@Immutable
 public class GetMap extends WMSQuery {
     /**
      * Envelope which contains the bounds and the crs for the request.
@@ -356,7 +358,7 @@ public class GetMap extends WMSQuery {
     public String toKvp() {
         final StringBuilder kvp = new StringBuilder();
         final Version version = getVersion();
-        //Obligatory Parameters
+        // Mandatory parameters
         kvp            .append(KEY_REQUEST ).append('=').append(GETMAP)
            .append('&').append(KEY_BBOX    ).append('=').append(RequestsUtilities.toBboxValue(envelope))
            .append('&').append((version.toString().equals("1.1.1")) ?
@@ -369,7 +371,7 @@ public class GetMap extends WMSQuery {
            .append('&').append(KEY_HEIGHT  ).append('=').append(size.height)
            .append('&').append(KEY_STYLES  ).append('=').append(StringUtilities.toCommaSeparatedValues(styles));
 
-        //Optional Parameters
+        // Optional parameters
         if (sld != null) {
             kvp.append('&').append(KEY_SLD).append('=').append(sld);
         }
