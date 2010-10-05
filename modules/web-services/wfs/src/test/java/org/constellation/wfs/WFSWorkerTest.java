@@ -602,7 +602,7 @@ public class WFSWorkerTest {
         featureWriter.write((FeatureCollection)result,writer);
 
         DomCompare.compare(
-                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1.xml"),
+                FileUtilities.getFileFromResource("org.constellation.wfs.xml.namedPlacesCollection-1_reproj.xml"),
                 writer.toString());
 
         /**
