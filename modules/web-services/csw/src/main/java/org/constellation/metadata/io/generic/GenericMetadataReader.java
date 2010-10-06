@@ -18,8 +18,12 @@
 package org.constellation.metadata.io.generic;
 
 // J2SE dependencies
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import javax.xml.namespace.QName;
 
@@ -40,10 +44,11 @@ import org.geotoolkit.csw.xml.v202.AbstractRecordType;
 /**
  * A database Reader using a generic configuration to request an unknown database.
  * 
- *
  * @author Guilhem Legal (Geomatys)
  */
 public abstract class GenericMetadataReader extends GenericReader implements CSWMetadataReader {
+
+    protected Level logLevel = Level.INFO;
     
     /**
      * Build a new Generic metadata reader and initialize the statement.
@@ -113,8 +118,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
     }
 
     /**
-     *
-     * return a metadata in dublin core representation.
+     * Return a metadata in dublin core representation.
      *
      * @param identifier An unique identifier for the metadata.
      * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
@@ -136,8 +140,11 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
     protected abstract DefaultMetadata getISO(String identifier, Values values);
     
     /**
-     * Return a list of variables name used for the dublicore representation.
-     * @return
+     * Return a list of variables names used for the dublicore representation.
+     * 
+     * @param type An elementSet: FULL, SUMMARY and BRIEF. (implies elementName == null)
+     * @param elementName A list of QName describing the requested fields. (implies type == null)
+     * @return a list of variables names.
      */
     protected abstract List<String> getVariablesForDublinCore(ElementSetType type, List<QName> elementName);
 
@@ -189,5 +196,73 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
     public List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isCacheEnabled() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isThreadEnabled() {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<QName> getAdditionalQueryableQName() {
+        return new ArrayList<QName>();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, List<String>> getAdditionalQueryablePathMap() {
+        return new HashMap<String, List<String>>();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, URI> getConceptMap() {
+        return new HashMap<String, URI>();
+    }
+
+    @Override
+    public List<Integer> getSupportedDataTypes() {
+        return Arrays.asList(ISO_19115, DUBLINCORE);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeFromCache(String string) {
+        throw new UnsupportedOperationException("Cache is not enabled on this implementation");
+    }
+
+    /**
+     * @return the logLevel
+     */
+    public Level getLogLevel() {
+        return logLevel;
+    }
+
+    /**
+     * @param logLevel the logLevel to set
+     */
+    @Override
+    public void setLogLevel(Level logLevel) {
+        this.logLevel = logLevel;
+    }
+
 }

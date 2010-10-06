@@ -157,7 +157,7 @@ public class DefaultObservationFilter implements ObservationFilter {
     @Override
     public void setProcedure(List<String> procedures, ObservationOfferingEntry off) {
         sqlRequest.append(" ( ");
-        if (procedures.size() != 0) {
+        if (!procedures.isEmpty()) {
 
             for (String s : procedures) {
                 if (s != null) {
@@ -324,7 +324,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public List<ObservationResult> filterResult() throws CstlServiceException {
-        LOGGER.finer("request:" + sqlRequest.toString());
+        LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
             final List<ObservationResult> results = new ArrayList<ObservationResult>();
             final Statement currentStatement      = connection.createStatement();
@@ -339,7 +339,7 @@ public class DefaultObservationFilter implements ObservationFilter {
             return results;
 
         } catch (SQLException ex) {
-            LOGGER.severe("SQLException while executing the query: " + sqlRequest.toString());
+            LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
@@ -351,7 +351,7 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     @Override
     public List<String> filterObservation() throws CstlServiceException {
-        LOGGER.finer("request:" + sqlRequest.toString());
+        LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {
             final List<String> results       = new ArrayList<String>();
             final Statement currentStatement = connection.createStatement();
@@ -363,7 +363,7 @@ public class DefaultObservationFilter implements ObservationFilter {
             currentStatement.close();
             return results;
         } catch (SQLException ex) {
-            LOGGER.severe("SQLException while executing the query: " + sqlRequest.toString());
+            LOGGER.log(Level.SEVERE, "SQLException while executing the query: {0}", sqlRequest.toString());
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
