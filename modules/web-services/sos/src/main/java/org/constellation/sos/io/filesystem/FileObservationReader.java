@@ -17,6 +17,7 @@
 
 package org.constellation.sos.io.filesystem;
 
+import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import java.io.File;
 import java.util.ArrayList;
@@ -367,8 +368,16 @@ public class FileObservationReader implements ObservationReader {
      * {@inheritDoc}
      */
     @Override
+    public AbstractTimePrimitiveType getFeatureOfInterestTime(String samplingFeatureName) throws CstlServiceException {
+        throw new CstlServiceException("The Filesystem implementation of SOS does not support GetFeatureofInterestTime");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void destroy() {
-        
+        // nothing to destroy
     }
 
     /**

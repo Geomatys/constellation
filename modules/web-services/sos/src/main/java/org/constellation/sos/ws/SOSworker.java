@@ -102,6 +102,8 @@ import org.geotoolkit.sos.xml.v100.Contents.ObservationOfferingList;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
 import org.geotoolkit.sos.xml.v100.EventTime;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
 import org.geotoolkit.sos.xml.v100.GetObservation;
 import org.geotoolkit.sos.xml.v100.GetResult;
 import org.geotoolkit.sos.xml.v100.GetResultResponse;
@@ -120,6 +122,7 @@ import org.geotoolkit.sos.xml.v100.ResponseModeType;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.gml.xml.v311.AbstractFeatureEntry;
+import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.gml.xml.v311.EnvelopeEntry;
 import org.geotoolkit.gml.xml.v311.FeatureCollectionType;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
@@ -141,7 +144,6 @@ import org.geotoolkit.sampling.xml.v100.SamplingSurfaceType;
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sml.xml.SmlFactory;
 import org.geotoolkit.sml.xml.v100.SensorML;
-import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.swe.xml.AbstractEncoding;
 import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.DataArray;
@@ -467,7 +469,7 @@ public class SOSworker {
             LOGGER.warning(notWorkingMsg + "\ncause: Unable to find a SOS Factory");
             isStarted = false;
         } catch (MetadataIoException ex) {
-            LOGGER.warning(notWorkingMsg + "\ncause: MetadataIOException wile initializing the sensor reader/writer:\n" + ex.getMessage());
+            LOGGER.warning(notWorkingMsg + "\ncause: MetadataIOException while initializing the sensor reader/writer:\n" + ex.getMessage());
             isStarted = false;
         } catch (CstlServiceException ex) {
             LOGGER.warning(notWorkingMsg + "\ncause:" + ex.getMessage());
@@ -687,7 +689,8 @@ public class SOSworker {
                go.updateParameter("observedProperty", omReader.getPhenomenonNames());
 
                //the feature of interest list
-               go.updateParameter("featureOfInterest", omReader.getFeatureOfInterestNames());
+               Collection<String> foiNames = omReader.getFeatureOfInterestNames();
+               go.updateParameter("featureOfInterest", foiNames);
 
                // the different responseMode available
                final List<String> arm = new ArrayList<String>();
@@ -707,6 +710,18 @@ public class SOSworker {
                    ds.updateParameter(PROCEDURE, smlReader.getSensorNames());
                } else {
                    ds.updateParameter(PROCEDURE, procNames);
+               }
+
+               final Operation gfoi = om.getOperation("GetFeatureOfInterest");
+               if (gfoi != null) {
+                   //the feature of interest list
+                   gfoi.updateParameter("featureOfInterestId", foiNames);
+               }
+
+               final Operation gfoit = om.getOperation("GetFeatureOfInterestTime");
+               if (gfoit != null) {
+                   //the feature of interest list
+                   gfoit.updateParameter("featureOfInterestId", foiNames);
                }
             }
         }
@@ -992,7 +1007,7 @@ public class SOSworker {
                 if (foiRequest.getBBOX() != null) {
                     final EnvelopeEntry e = foiRequest.getBBOX().getEnvelope();
 
-                    if (isWellFormedEnvelope(e)) {
+                    if (e != null && e.isCompleteEnvelope2D()) {
                         boolean add = false;
                         final List<String> matchingFeatureOfInterest = new ArrayList<String>();
                         if (localOmFilter.isBoundedObservation()) {
@@ -1539,6 +1554,28 @@ public class SOSworker {
         return null;
     }
 
+    public AbstractTimePrimitiveType getFeatureOfInterestTime(GetFeatureOfInterestTime request) throws CstlServiceException {
+        LOGGER.log(logLevel, "GetFeatureOfInterestTime request processing\n");
+        final long start = System.currentTimeMillis();
+        verifyBaseRequest(request);
+        
+        final AbstractTimePrimitiveType result;
+        final String fid = request.getFeatureOfInterestId();
+
+        // if there is no filter we throw an exception
+        if (fid == null || fid.isEmpty()) {
+            throw new CstlServiceException("You must specify a samplingFeatureId", MISSING_PARAMETER_VALUE);
+        }
+
+        if (omReader.getFeatureOfInterestNames().contains(fid)) {
+            result = omReader.getFeatureOfInterestTime(fid);
+        } else {
+            throw new CstlServiceException("there is not such samplingFeature on the server", INVALID_PARAMETER_VALUE);
+        }
+        LOGGER.log(logLevel, "GetFeatureOfInterestTime processed in " + (System.currentTimeMillis() - start) + "ms");
+        return result;
+    }
+
     /**
      * Build the correct featurePropertyType from a sampling feature
      * 
@@ -1563,7 +1600,7 @@ public class SOSworker {
 
     private List<SamplingFeature> spatialFiltering(BBOXType bbox) throws CstlServiceException {
         final EnvelopeEntry e = bbox.getEnvelope();
-        if (isWellFormedEnvelope(e)) {
+        if (e != null && e.isCompleteEnvelope2D()) {
 
             final List<SamplingFeature> matchingFeatureOfInterest = new ArrayList<SamplingFeature>();
             final List<ObservationOfferingEntry> offerings        = omReader.getObservationOfferings();
@@ -1590,17 +1627,6 @@ public class SOSworker {
         } else {
             throw new CstlServiceException("the envelope is not build correctly", INVALID_PARAMETER_VALUE);
         }
-    }
-
-    /**
-     * Return True if the envellope got the sufficient 
-     * 
-     * @param env
-     * @return
-     */
-    private boolean isWellFormedEnvelope(EnvelopeEntry env) {
-        return env != null && env.getLowerCorner() != null && env.getUpperCorner() != null &&
-               env.getLowerCorner().getValue().size() == 2 && env.getUpperCorner().getValue().size() == 2;
     }
 
     /**
@@ -2082,7 +2108,7 @@ public class SOSworker {
      */
     public String getOutputFormat() {
         if (outputFormat == null) {
-            return MimeType.APP_XML;
+            return MimeType.APPLICATION_XML;
         }
         return outputFormat;
     }

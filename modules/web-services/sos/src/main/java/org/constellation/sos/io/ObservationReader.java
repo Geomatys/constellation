@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 import org.constellation.ws.CstlServiceException;
 
 // GeoAPI
+import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
@@ -87,10 +88,21 @@ public interface ObservationReader {
     /**
      * Return a list of sampling feature identifiers.
      *
-     * @return
+     * @return A list of sampling feature identifiers.
      * @throws org.constellation.ws.CstlServiceException
      */
     Collection<String> getFeatureOfInterestNames() throws CstlServiceException;
+
+    /**
+     * Return a sampling feature for the specified sampling feature.
+     *
+     * @param samplingFeatureName The identifier of the feature of interest.
+     *
+     * @return the correspounding feature Of interest.
+     * @throws org.constellation.ws.CstlServiceException
+     */
+    SamplingFeature getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException;
+
 
     /**
      * Return a sampling feature for the specified sampling feature.
@@ -99,7 +111,7 @@ public interface ObservationReader {
      * @return
      * @throws org.constellation.ws.CstlServiceException
      */
-    SamplingFeature getFeatureOfInterest(String samplingFeatureName) throws CstlServiceException;
+    AbstractTimePrimitiveType getFeatureOfInterestTime(String samplingFeatureName) throws CstlServiceException;
 
     /**
      * Return an observation for the specified identifier.

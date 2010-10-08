@@ -33,6 +33,7 @@ import org.constellation.sos.io.ObservationReader;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import static org.constellation.sos.ws.SOSConstants.*;
+import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
@@ -449,6 +450,14 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
         } catch (MetadataIoException ex) {
             throw new CstlServiceException(ex);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AbstractTimePrimitiveType getFeatureOfInterestTime(String samplingFeatureName) throws CstlServiceException {
+        throw new CstlServiceException("The Default generic implementation of SOS does not support GetFeatureofInterestTime");
     }
 
     /**

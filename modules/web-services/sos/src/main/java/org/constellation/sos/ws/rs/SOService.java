@@ -52,6 +52,7 @@ import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.SOSResponseWrapper;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
@@ -136,6 +137,12 @@ public class SOService extends OGCWebService {
              if (request instanceof RegisterSensor) {
                 final RegisterSensor rs = (RegisterSensor)request;
                 return Response.ok(worker.registerSensor(rs), MimeType.TEXT_XML).build();
+             }
+
+             if (request instanceof GetFeatureOfInterestTime) {
+                final GetFeatureOfInterestTime gft = (GetFeatureOfInterestTime)request;
+                final SOSResponseWrapper response = new SOSResponseWrapper(worker.getFeatureOfInterestTime(gft));
+                return Response.ok(response, MimeType.TEXT_XML).build();
              }
 
              if (request instanceof GetCapabilities) {

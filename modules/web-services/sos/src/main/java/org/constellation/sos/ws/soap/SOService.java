@@ -52,8 +52,12 @@ import org.geotoolkit.sos.xml.v100.InsertObservationResponse;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
 import org.constellation.sos.ws.SOSworker;
+import org.geotoolkit.gml.xml.v311.AbstractFeatureEntry;
+import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
+import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
 import org.geotoolkit.util.FileUtilities;
 
 
@@ -133,7 +137,7 @@ public class SOService {
     
     
     /**
-     * Web service operation whitch respond a collection of observation satisfying 
+     * Web service operation which respond a collection of observation satisfying 
      * the restriction specified in the query.
      * 
      * @param requestObservation a document specifying the parameter of the request.
@@ -144,6 +148,42 @@ public class SOService {
         try {
             LOGGER.info("received SOAP getObservation request");
             return (ObservationCollectionEntry) worker.getObservation(requestObservation);
+        } catch (CstlServiceException ex) {
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                         ServiceDef.SOS_1_0_0.exceptionVersion.toString());
+        }
+    }
+
+    /**
+     * Web service operation which respond a collection of featureOfInterest
+     * the restriction specified in the query.
+     *
+     * @param requestfeatureOfInterest a document specifying the parameter of the request.
+     * @throws SOServiceException
+     */
+    @WebMethod(action="getFeatureOfInterest")
+    public AbstractFeatureEntry getFeatureOfInterest(@WebParam(name = "GetFeatureOfInterest") GetFeatureOfInterest requestfeatureOfInterest) throws SOServiceException {
+        try {
+            LOGGER.info("received SOAP getfeatureOfInterest request");
+            return worker.getFeatureOfInterest(requestfeatureOfInterest);
+        } catch (CstlServiceException ex) {
+            throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
+                                         ServiceDef.SOS_1_0_0.exceptionVersion.toString());
+        }
+    }
+
+    /**
+     * Web service operation which respond a primitive time object
+     * the restriction specified in the query.
+     *
+     * @param requestfeatureOfInterestTime a document specifying the parameter of the request.
+     * @throws SOServiceException
+     */
+    @WebMethod(action="getFeatureOfInterestTime")
+    public AbstractTimePrimitiveType getFeatureOfInterestTime(@WebParam(name = "GetFeatureOfInterestTime") GetFeatureOfInterestTime requestfeatureOfInterestTime) throws SOServiceException {
+        try {
+            LOGGER.info("received SOAP getfeatureOfInterest request");
+            return worker.getFeatureOfInterestTime(requestfeatureOfInterestTime);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                          ServiceDef.SOS_1_0_0.exceptionVersion.toString());

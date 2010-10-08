@@ -22,6 +22,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.LocalCache;
 import org.geotoolkit.internal.sql.table.Table;
@@ -100,6 +103,25 @@ public class SpecialOperationsTable extends Table{
             r.close();
             stmt.close();
             return result;
+        }
+    }
+
+    public List<Date> getTimeForStation(final String samplingfeatureId) throws SQLException {
+        final LocalCache lc = getLocalCache();
+        synchronized (lc) {
+            final Statement stmt = lc.connection().createStatement();
+            final ResultSet r    = stmt.executeQuery("SELECT min(sampling_time_begin), max(sampling_time_end) "
+                                                   + "FROM \"observation\".\"observations\" "
+                                                   + "WHERE \"feature_of_interest\" ='" + samplingfeatureId + "' "
+                                                   + "OR \"feature_of_interest_point\" ='" + samplingfeatureId + "' "
+                                                   + "OR \"feature_of_interest_curve\" ='" + samplingfeatureId + "' ");
+
+            r.next();
+            final Date begin = r.getDate(1);
+            final Date end   = r.getDate(2);
+            r.close();
+            stmt.close();
+            return Arrays.asList(begin, end);
         }
     }
 

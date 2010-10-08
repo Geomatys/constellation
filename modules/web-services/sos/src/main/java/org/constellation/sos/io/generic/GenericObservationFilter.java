@@ -17,7 +17,6 @@
 
 package org.constellation.sos.io.generic;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,20 +27,14 @@ import java.util.Properties;
 
 // JAXB dependencies
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
-import org.constellation.generic.database.BDD;
 import org.constellation.generic.database.From;
 import org.constellation.generic.database.FilterQuery;
 import org.constellation.generic.database.FilterSelect;
-import org.constellation.generic.database.GenericDatabaseMarshallerPool;
 import org.constellation.generic.database.Where;
-import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
 import org.geotoolkit.sos.xml.v100.ObservationOfferingEntry;
 import org.geotoolkit.sos.xml.v100.ResponseModeType;
@@ -61,78 +54,35 @@ import static org.constellation.sos.ws.SOSConstants.*;
  *
  * @author Guilhem Legal
  */
-public class GenericObservationFilter implements ObservationFilter {
-
-    private final FilterQuery configurationQuery;
-
-    private FilterQuery currentQuery;
+public class GenericObservationFilter extends AbstractGenericObservationFilter {
 
     /**
      * The properties file allowing to store the id mapping between physical and database ID.
      */
     protected Properties map;
 
-    /**
-     * use for debugging purpose
-     */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
 
     /**
-     * The base for observation id.
+     * Clone a  Generic Observation Filter for CSTL O&M datasource.
+     * @param omFilter
      */
-    protected String observationIdBase;
-
-    /**
-     * The base for observation id.
-     */
-    protected String observationTemplateIdBase;
-
-    /**
-     *
-     */
-    private final Connection connection;
-
     public GenericObservationFilter(GenericObservationFilter omFilter) {
-        this.observationIdBase         = omFilter.observationIdBase;
-        this.observationTemplateIdBase = omFilter.observationTemplateIdBase;
+        super(omFilter);
         this.map                       = omFilter.map;
-        this.configurationQuery        = omFilter.configurationQuery;
-        this.connection                = omFilter.connection;
     }
 
+    /**
+     * Build a new Generic Observation Filter for CSTL O&M datasource.
+     *
+     * @param observationIdBase
+     * @param observationTemplateIdBase
+     * @param map
+     * @param configuration
+     * @throws CstlServiceException
+     */
     public GenericObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
-        this.observationIdBase         = observationIdBase;
-        this.observationTemplateIdBase = observationTemplateIdBase;
+        super(observationIdBase, observationTemplateIdBase, configuration);
         this.map                       = map;
-        
-        if (configuration == null) {
-            throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
-        }
-        // we get the database informations
-        final BDD db = configuration.getBdd();
-        if (db == null) {
-            throw new CstlServiceException("The configuration file does not contains a BDD object", NO_APPLICABLE_CODE);
-        }
-        try {
-            final Unmarshaller unmarshaller = GenericDatabaseMarshallerPool.getInstance().acquireUnmarshaller();
-            final File affinage = new File(configuration.getConfigurationDirectory(), "affinage.xml");
-            if (affinage.exists()) {
-                final Object object = unmarshaller.unmarshal(affinage);
-                if (object instanceof FilterQuery)
-                    this.configurationQuery = (FilterQuery) object;
-                else
-                    throw new CstlServiceException("Invalid content in affinage.xml", NO_APPLICABLE_CODE);
-            } else {
-                throw new CstlServiceException("Unable to find affinage.xml", NO_APPLICABLE_CODE);
-            }
-            GenericDatabaseMarshallerPool.getInstance().release(unmarshaller);
-            this.connection = db.getConnection();
-        } catch (JAXBException ex) {
-            throw new CstlServiceException("JAXBException in genericObservationFilter constructor", NO_APPLICABLE_CODE);
-        } catch (SQLException ex) {
-            throw new CstlServiceException("SQLException while initializing the observation filter:" +'\n'+
-                                           "cause:" + ex.getMessage(), NO_APPLICABLE_CODE);
-        }
     }
     
     /**
@@ -325,9 +275,10 @@ public class GenericObservationFilter implements ObservationFilter {
     @Override
     public List<ObservationResult> filterResult() throws CstlServiceException {
         final String request = currentQuery.buildSQLQuery();
-        LOGGER.info("request:" + request);
+        LOGGER.log(Level.INFO, "request:{0}", request);
         try {
             final List<ObservationResult> results = new ArrayList<ObservationResult>();
+            final Connection connection           = dataSource.getConnection();
             final Statement currentStatement      = connection.createStatement();
             final ResultSet result                = currentStatement.executeQuery(request);
             while (result.next()) {
@@ -340,7 +291,7 @@ public class GenericObservationFilter implements ObservationFilter {
             return results;
 
         } catch (SQLException ex) {
-            LOGGER.severe("SQLException while executing the query: " + request);
+            LOGGER.log(Level.WARNING, "SQLException while executing the query: {0}", request);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage() + '\n' + "while executing the request:" + request,
                                           NO_APPLICABLE_CODE);
         }
@@ -353,9 +304,10 @@ public class GenericObservationFilter implements ObservationFilter {
     @Override
     public List<String> filterObservation() throws CstlServiceException {
         final String request = currentQuery.buildSQLQuery();
-        LOGGER.info("request:" + request);
+        LOGGER.log(Level.INFO, "request:{0}", request);
         try {
             final List<String> results       = new ArrayList<String>();
+            final Connection connection      = dataSource.getConnection();
             final Statement currentStatement = connection.createStatement();
             final ResultSet result           = currentStatement.executeQuery(request);
             while (result.next()) {
@@ -365,7 +317,7 @@ public class GenericObservationFilter implements ObservationFilter {
             currentStatement.close();
             return results;
         } catch (SQLException ex) {
-            LOGGER.severe("SQLException while executing the query: " + request);
+            LOGGER.log(Level.WARNING, "SQLException while executing the query: {0}", request);
             throw new CstlServiceException("the service has throw a SQL Exception:" + ex.getMessage(),
                                           NO_APPLICABLE_CODE);
         }
@@ -395,19 +347,4 @@ public class GenericObservationFilter implements ObservationFilter {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void refresh() {
-        // do nothing
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setLoglevel(Level logLevel) {
-         //do nothing
-    }
 }

@@ -183,6 +183,50 @@
 				</ows:AllowedValues>
 			</ows:Parameter>
 		</ows:Operation>
+                <ows:Operation name="GetFeatureOfInterest">
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Post xlink:href=""/>
+				</ows:HTTP>
+			</ows:DCP>
+                        <ows:Parameter name="featureOfInterestId">
+				<ows:AllowedValues>
+					<ows:Value>toUpdate</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="version">
+				<ows:AllowedValues>
+					<ows:Value>1.0.0</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="service">
+				<ows:AllowedValues>
+					<ows:Value>SOS</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+		</ows:Operation>
+                <ows:Operation name="GetFeatureOfInterestTime">
+			<ows:DCP>
+				<ows:HTTP>
+					<ows:Post xlink:href=""/>
+				</ows:HTTP>
+			</ows:DCP>
+                        <ows:Parameter name="featureOfInterestId">
+				<ows:AllowedValues>
+					<ows:Value>toUpdate</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="version">
+				<ows:AllowedValues>
+					<ows:Value>1.0.0</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+			<ows:Parameter name="service">
+				<ows:AllowedValues>
+					<ows:Value>SOS</ows:Value>
+				</ows:AllowedValues>
+			</ows:Parameter>
+		</ows:Operation>
 		<ows:Operation name="DescribeSensor">
 			<ows:DCP>
 				<ows:HTTP>

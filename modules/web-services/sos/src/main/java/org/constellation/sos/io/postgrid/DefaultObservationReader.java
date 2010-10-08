@@ -18,6 +18,7 @@
 package org.constellation.sos.io.postgrid;
 
 // J2SE dependencies
+import java.util.Date;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -31,6 +32,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 // Constellation dependencies
+import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.internal.sql.table.CatalogException;
 import org.geotoolkit.internal.sql.table.Database;
 import org.geotoolkit.internal.sql.table.NoSuchRecordException;
@@ -54,6 +56,8 @@ import org.constellation.ws.CstlServiceException;
 import static org.constellation.sos.ws.SOSConstants.*;
 
 import org.geotoolkit.gml.xml.v311.ReferenceEntry;
+import org.geotoolkit.gml.xml.v311.TimePeriodType;
+import org.geotoolkit.gml.xml.v311.TimePositionType;
 import org.geotoolkit.observation.xml.v100.MeasurementEntry;
 import org.geotoolkit.observation.xml.v100.ObservationEntry;
 import org.geotoolkit.sampling.xml.v100.SamplingFeatureEntry;
@@ -462,6 +466,21 @@ public class DefaultObservationReader implements ObservationReader {
             } while (again);
             return observationIdBase + id;
         } catch( SQLException e) {
+            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+            throw new CstlServiceException("The service has throw a SQLException:" + e.getMessage(),
+                                          NO_APPLICABLE_CODE);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AbstractTimePrimitiveType getFeatureOfInterestTime(String samplingFeatureName) throws CstlServiceException {
+        try {
+            List<Date> bounds = specialTable.getTimeForStation(samplingFeatureName);
+            return new TimePeriodType(new TimePositionType(bounds.get(0)), new TimePositionType(bounds.get(1)));
+        } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, e.getMessage(), e);
             throw new CstlServiceException("The service has throw a SQLException:" + e.getMessage(),
                                           NO_APPLICABLE_CODE);
