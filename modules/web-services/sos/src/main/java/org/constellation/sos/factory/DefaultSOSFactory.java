@@ -94,7 +94,7 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase) throws CstlServiceException {
+    public ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase, String sensorIdBase) throws CstlServiceException {
         if (type == null) {
             return null;
         }
@@ -134,7 +134,7 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
      * {@inheritDoc}
      */
     @Override
-    public SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws MetadataIoException {
+    public SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, String phenomenonIdBase, Properties map) throws MetadataIoException {
         if (type == null) {
             return null;
         }

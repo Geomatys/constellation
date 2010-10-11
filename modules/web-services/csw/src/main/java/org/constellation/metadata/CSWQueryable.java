@@ -34,11 +34,11 @@ public final class CSWQueryable {
      public static final QName DEGREE_QNAME                               = new QName(INSPIRE, "Degree",                          INSPIRE_PREFIX);
      public static final QName ACCESS_CONSTRAINTS_QNAME                   = new QName(INSPIRE, "AccessConstraints",               INSPIRE_PREFIX);
      public static final QName OTHER_CONSTRAINTS_QNAME                    = new QName(INSPIRE, "OtherConstraints",                INSPIRE_PREFIX);
-     public static final QName INS_CLASSIFICATION_QNAME                     = new QName(INSPIRE, "Classification",                  INSPIRE_PREFIX);
+     public static final QName INS_CLASSIFICATION_QNAME                   = new QName(INSPIRE, "Classification",                  INSPIRE_PREFIX);
      public static final QName CONDITION_APPLYING_TO_ACCESS_AND_USE_QNAME = new QName(INSPIRE, "ConditionApplyingToAccessAndUse", INSPIRE_PREFIX);
-     public static final QName METADATA_POINT_OF_CONTACT_QNAME           = new QName(INSPIRE, "MetadataPointOfContact",          INSPIRE_PREFIX);
-     public static final QName LINEAGE_QNAME                               = new QName(INSPIRE, "Lineage",                         INSPIRE_PREFIX);
-     public static final QName SPECIFICATION_TITLE_QNAME                    = new QName(INSPIRE, "SpecificationTitle",              INSPIRE_PREFIX);
+     public static final QName METADATA_POINT_OF_CONTACT_QNAME            = new QName(INSPIRE, "MetadataPointOfContact",          INSPIRE_PREFIX);
+     public static final QName LINEAGE_QNAME                              = new QName(INSPIRE, "Lineage",                         INSPIRE_PREFIX);
+     public static final QName SPECIFICATION_TITLE_QNAME                  = new QName(INSPIRE, "SpecificationTitle",              INSPIRE_PREFIX);
      public static final QName SPECIFICATION_DATE_QNAME                   = new QName(INSPIRE, "SpecificationDate",               INSPIRE_PREFIX);
      public static final QName SPECIFICATION_DATETYPE_QNAME               = new QName(INSPIRE, "SpecificationDateType",           INSPIRE_PREFIX);
 

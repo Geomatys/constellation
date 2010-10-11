@@ -59,7 +59,7 @@ public class SOSFactoryTest {
         ObservationFilter of = sosFactory.getObservationFilter(null, null, null, null, null);
         assertTrue(of == null);
 
-        ObservationReader or = sosFactory.getObservationReader(null, null, null);
+        ObservationReader or = sosFactory.getObservationReader(null, null, null,null);
         assertTrue(or == null);
 
         ObservationWriter ow = sosFactory.getObservationWriter(null, null,null);
@@ -68,7 +68,7 @@ public class SOSFactoryTest {
         SensorWriter sw = sosFactory.getSensorWriter(null, null, null, null);
         assertTrue(sw == null);
 
-        SensorReader sr = sosFactory.getSensorReader(null, null, null, null);
+        SensorReader sr = sosFactory.getSensorReader(null, null, null, null,null);
         assertTrue(sr == null);
     }
 
@@ -102,7 +102,7 @@ public class SOSFactoryTest {
 
         exLaunched = false;
         try  {
-            ObservationReader or = sosFactory.getObservationReader(ObservationReaderType.DEFAULT, config, "idbase");
+            ObservationReader or = sosFactory.getObservationReader(ObservationReaderType.DEFAULT, config, "idbase", "sensorBase");
         } catch (CstlServiceException ex) {
             exLaunched = true;
             
@@ -111,7 +111,7 @@ public class SOSFactoryTest {
 
         exLaunched = false;
         try  {
-            ObservationReader or = sosFactory.getObservationReader(ObservationReaderType.GENERIC, config, "idbase");
+            ObservationReader or = sosFactory.getObservationReader(ObservationReaderType.GENERIC, config, "idbase", "sensorBase");
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertTrue(ex.getMessage().contains("No suitable driver found for SomeUrl"));

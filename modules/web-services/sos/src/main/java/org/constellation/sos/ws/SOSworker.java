@@ -438,9 +438,9 @@ public class SOSworker {
             templateValidTime = (h * 3600000) + (m * 60000);
 
             // we initialize the reader/writer/filter
-            smlReader = sosFactory.getSensorReader(smlType, smlConfiguration, sensorIdBase, map);
+            smlReader = sosFactory.getSensorReader(smlType, smlConfiguration, sensorIdBase, phenomenonIdBase, map);
             smlWriter = sosFactory.getSensorWriter(smlType, smlConfiguration, sensorIdBase, map);
-            omReader  = sosFactory.getObservationReader(omReaderType, omConfiguration, observationIdBase);
+            omReader  = sosFactory.getObservationReader(omReaderType, omConfiguration, observationIdBase, sensorIdBase);
             omWriter  = sosFactory.getObservationWriter(omWriterType, observationTemplateIdBase, omConfiguration);
             omFilter  = sosFactory.getObservationFilter(omFilterType, observationIdBase, observationTemplateIdBase, map, omConfiguration);
 

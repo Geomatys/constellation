@@ -69,11 +69,12 @@ public abstract class AbstractSOSFactory extends Factory {
      * @param type  The type of the reader requested.
      * @param configuration A configuration object containing all the information to use the datasource.
      * @param observationIdBase The prefix used for the observations identifier.
+     * @param sensorIdBase  The prefix used for the sensor identifier.
      *
      * @return An Observation reader for the specified datasource.
      * @throws CstlServiceException
      */
-    public abstract ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase) throws CstlServiceException;
+    public abstract ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase, String sensorIdBase) throws CstlServiceException;
 
     /**
      * Return an Observation writer for the specified datasource.
@@ -98,7 +99,7 @@ public abstract class AbstractSOSFactory extends Factory {
      * @return a Sensor metadata reader for the specified datasource.
      * @throws MetadataIoException
      */
-    public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws MetadataIoException;
+    public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, String phenomenonIdBase, Properties map) throws MetadataIoException;
 
     /**
      * Return a Sensor metadata writer for the specified datasource.
