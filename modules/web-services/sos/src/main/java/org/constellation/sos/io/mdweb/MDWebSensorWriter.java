@@ -26,6 +26,7 @@ import java.sql.Savepoint;
 
 // JAXB dependencies
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 
@@ -34,6 +35,7 @@ import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.MDWebMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.SensorWriter;
 import org.constellation.ws.CstlServiceException;
 
@@ -74,13 +76,13 @@ public class MDWebSensorWriter extends MDWebMetadataWriter implements SensorWrit
      */
     private final Properties map;
     
-    public MDWebSensorWriter(final Automatic configuration, final String sensorIdBase, final Properties map) throws MetadataIoException {
+    public MDWebSensorWriter(final Automatic configuration, final Map<String, Object> properties) throws MetadataIoException {
         super(configuration);
-
+        final String sensorIdBase = (String) properties.get(AbstractSOSFactory.SENSOR_ID_BASE);
         final BDD db = configuration.getBdd();
         try {
             smlConnection   = db.getConnection();
-            this.map        = map;
+            this.map        = (Properties) properties.get(AbstractSOSFactory.IDENTIFIER_MAPPING);
              //we build the prepared Statement
             final String version = ((AbstractReader)mdWriter).getVersion();
             if (version.equals("2.0")) {

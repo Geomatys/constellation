@@ -17,6 +17,7 @@
 
 package org.constellation.sos.io.mdweb;
 
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -30,6 +31,7 @@ import org.constellation.generic.database.BDD;
 import org.constellation.metadata.io.AbstractMetadataReader;
 import org.constellation.metadata.io.MDWebMetadataReader;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.ws.CstlServiceException;
 import org.mdweb.io.MD_IOException;
@@ -57,7 +59,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
      * @param map
      * @throws org.constellation.ws.CstlServiceException
      */
-    public MDWebSensorReader(Automatic configuration, Properties map) throws MetadataIoException  {
+    public MDWebSensorReader(Automatic configuration, Map<String, Object> properties) throws MetadataIoException  {
         super(configuration);
         if (configuration == null) {
             throw new MetadataIoException("The configuration object is null", NO_APPLICABLE_CODE);
@@ -75,7 +77,7 @@ public class MDWebSensorReader extends MDWebMetadataReader implements SensorRead
             throw new MetadataIoException("the service has throw a MD_IO Exception:" + ex.getMessage(),
                                          NO_APPLICABLE_CODE);
         }
-        this.map        = map;
+        this.map = (Properties) properties.get(AbstractSOSFactory.IDENTIFIER_MAPPING);
     }
 
     /**

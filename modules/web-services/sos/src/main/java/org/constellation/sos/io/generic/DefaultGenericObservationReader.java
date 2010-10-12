@@ -17,6 +17,8 @@
 
 package org.constellation.sos.io.generic;
 
+import org.constellation.sos.factory.AbstractSOSFactory;
+import java.util.Map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -76,9 +78,9 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
 
     private static final String VAR01 = "var01";
     
-    public DefaultGenericObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException, MetadataIoException {
+    public DefaultGenericObservationReader(Automatic configuration, Map<String, Object> properties) throws CstlServiceException, MetadataIoException {
         super(configuration);
-        this.observationIdBase = observationIdBase;
+        this.observationIdBase = (String) properties.get(AbstractSOSFactory.OBSERVATION_ID_BASE);
     }
 
     /**

@@ -17,6 +17,8 @@
 
 package org.constellation.sos.io.generic;
 
+import org.constellation.sos.factory.AbstractSOSFactory;
+import java.util.Map;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -80,9 +82,9 @@ public class GenericObservationFilter extends AbstractGenericObservationFilter {
      * @param configuration
      * @throws CstlServiceException
      */
-    public GenericObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
-        super(observationIdBase, observationTemplateIdBase, configuration);
-        this.map                       = map;
+    public GenericObservationFilter(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+        super(configuration, properties);
+        this.map = (Properties) properties.get(AbstractSOSFactory.IDENTIFIER_MAPPING);
     }
     
     /**

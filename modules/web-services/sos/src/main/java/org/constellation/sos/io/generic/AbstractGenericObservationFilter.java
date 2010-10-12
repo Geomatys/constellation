@@ -17,6 +17,8 @@
 
 package org.constellation.sos.io.generic;
 
+import java.util.Map;
+import org.constellation.sos.factory.AbstractSOSFactory;
 import java.util.logging.Level;
 import java.io.File;
 import javax.xml.bind.JAXBException;
@@ -73,9 +75,9 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
      */
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos.io.generic");
 
-    public AbstractGenericObservationFilter(String observationIdBase, String observationTemplateIdBase, Automatic configuration) throws CstlServiceException {
-        this.observationIdBase         = observationIdBase;
-        this.observationTemplateIdBase = observationTemplateIdBase;
+    public AbstractGenericObservationFilter(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+        this.observationIdBase         = (String) properties.get(AbstractSOSFactory.OBSERVATION_ID_BASE);
+        this.observationTemplateIdBase = (String) properties.get(AbstractSOSFactory.OBSERVATION_TEMPLATE_ID_BASE);
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }

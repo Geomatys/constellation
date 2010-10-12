@@ -17,7 +17,7 @@
 
 package org.constellation.sos.factory;
 
-import java.util.Properties;
+import java.util.Map;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
@@ -55,16 +55,16 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
+    public ObservationFilter getObservationFilter(ObservationFilterType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
         if (type == null) {
             return null;
         }
         switch (type) {
-            case DEFAULT: return new DefaultObservationFilter(observationIdBase, observationTemplateIdBase, map, configuration);
+            case DEFAULT: return new DefaultObservationFilter(configuration, properties);
 
-            case GENERIC: return new GenericObservationFilter(observationIdBase, observationTemplateIdBase, map, configuration);
+            case GENERIC: return new GenericObservationFilter(configuration, properties);
 
-            case LUCENE : return new LuceneObservationFilter(observationIdBase, observationTemplateIdBase, map, configuration);
+            case LUCENE : return new LuceneObservationFilter(configuration, properties);
 
             default: throw new IllegalArgumentException("Unknow observationFilter type: " + type);
         }
@@ -94,20 +94,20 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase, String sensorIdBase) throws CstlServiceException {
+    public ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
         if (type == null) {
             return null;
         }
         switch (type) {
-            case DEFAULT   : return new DefaultObservationReader(configuration, observationIdBase);
+            case DEFAULT   : return new DefaultObservationReader(configuration, properties);
 
             case GENERIC   : try {
-                                return new DefaultGenericObservationReader(observationIdBase, configuration);
+                                return new DefaultGenericObservationReader(configuration, properties);
                              } catch (MetadataIoException ex) {
                                 throw new CstlServiceException(ex);
                              }
 
-            case FILESYSTEM: return new FileObservationReader(observationIdBase, configuration);
+            case FILESYSTEM: return new FileObservationReader(configuration, properties);
 
             default : throw new IllegalArgumentException("Unknow O&M dataSource type: " + type);
         }
@@ -117,14 +117,14 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
      * {@inheritDoc}
      */
     @Override
-    public ObservationWriter getObservationWriter(ObservationWriterType type, String observationTemplateIdBase, Automatic configuration) throws CstlServiceException {
+    public ObservationWriter getObservationWriter(ObservationWriterType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
         if (type == null) {
             return null;
         }
         switch (type) {
             case DEFAULT   : return new DefaultObservationWriter(configuration);
             
-            case FILESYSTEM: return new FileObservationWriter(configuration, observationTemplateIdBase);
+            case FILESYSTEM: return new FileObservationWriter(configuration, properties);
             
             default : throw new IllegalArgumentException("Unknow O&M dataSource type: " + type);
         }
@@ -134,14 +134,14 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
      * {@inheritDoc}
      */
     @Override
-    public SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, String phenomenonIdBase, Properties map) throws MetadataIoException {
+    public SensorReader getSensorReader(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws MetadataIoException {
         if (type == null) {
             return null;
         }
         switch (type) {
             case FILE_SYSTEM: return new FileSensorReader(configuration);
 
-            case MDWEB: return new MDWebSensorReader(configuration, map);
+            case MDWEB: return new MDWebSensorReader(configuration, properties);
 
             case NONE: return null;
                 
@@ -153,14 +153,14 @@ public class DefaultSOSFactory extends AbstractSOSFactory {
      * {@inheritDoc}
      */
     @Override
-    public SensorWriter getSensorWriter(DataSourceType type,  Automatic configuration, String sensorIdBase, Properties map) throws MetadataIoException {
+    public SensorWriter getSensorWriter(DataSourceType type,  Automatic configuration, Map<String, Object> properties) throws MetadataIoException {
         if (type == null) {
             return null;
         }
         switch (type) {
-            case FILE_SYSTEM: return new FileSensorWriter(configuration, sensorIdBase);
+            case FILE_SYSTEM: return new FileSensorWriter(configuration, properties);
 
-            case MDWEB: return new MDWebSensorWriter(configuration, sensorIdBase, map);
+            case MDWEB: return new MDWebSensorWriter(configuration, properties);
 
             case NONE: return null;
 

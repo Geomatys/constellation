@@ -18,6 +18,7 @@
 
 package org.constellation.sos.io.postgrid;
 
+import java.util.Map;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,6 +33,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
+import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
 import org.constellation.ws.CstlServiceException;
@@ -82,6 +84,11 @@ public class DefaultObservationFilter implements ObservationFilter {
      */
     protected String observationTemplateIdBase;
 
+    /**
+     * Clone a new Observation Filter.
+     * 
+     * @param omFilter
+     */
     public DefaultObservationFilter(DefaultObservationFilter omFilter) {
         this.connection                = omFilter.connection;
         this.map                       = omFilter.map;
@@ -89,13 +96,11 @@ public class DefaultObservationFilter implements ObservationFilter {
         this.observationTemplateIdBase = omFilter.observationTemplateIdBase;
     }
 
-    /**
-     *
-     */
-    public DefaultObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
-        this.observationIdBase         = observationIdBase;
-        this.observationTemplateIdBase = observationTemplateIdBase;
-        this.map                       = map;
+    
+    public DefaultObservationFilter(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+        this.observationIdBase         = (String)     properties.get(AbstractSOSFactory.OBSERVATION_ID_BASE);
+        this.observationTemplateIdBase = (String)     properties.get(AbstractSOSFactory.OBSERVATION_TEMPLATE_ID_BASE);
+        this.map                       = (Properties) properties.get(AbstractSOSFactory.IDENTIFIER_MAPPING);
         
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);

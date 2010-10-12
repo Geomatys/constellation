@@ -17,6 +17,8 @@
 
 package org.constellation.sos.io.filesystem;
 
+import java.util.Map;
+import org.constellation.sos.factory.AbstractSOSFactory;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import java.io.File;
@@ -76,8 +78,8 @@ public class FileObservationReader implements ObservationReader {
 
     private static final String FILE_EXTENSION = ".xml";
 
-    public FileObservationReader(String observationIdBase, Automatic configuration) throws CstlServiceException {
-        this.observationIdBase = observationIdBase;
+    public FileObservationReader(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+        this.observationIdBase = (String) properties.get(AbstractSOSFactory.OBSERVATION_ID_BASE);
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory != null && dataDirectory.exists()) {
             offeringDirectory            = new File(dataDirectory, "offerings");

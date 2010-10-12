@@ -421,6 +421,14 @@ public class SOSworker {
             observationTemplateIdBase = configuration.getObservationTemplateIdBase() != null ?
             configuration.getObservationTemplateIdBase() : "urn:ogc:object:observationTemplate:unknow:";
 
+            // we fill a map of properties to sent to the reader/writer/filter
+            final Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put(AbstractSOSFactory.OBSERVATION_ID_BASE, observationIdBase);
+            properties.put(AbstractSOSFactory.OBSERVATION_TEMPLATE_ID_BASE, observationTemplateIdBase);
+            properties.put(AbstractSOSFactory.SENSOR_ID_BASE, sensorIdBase);
+            properties.put(AbstractSOSFactory.PHENOMENON_ID_BASE, phenomenonIdBase);
+            properties.put(AbstractSOSFactory.IDENTIFIER_MAPPING, map);
+
             int h, m;
             try {
                 String validTime = configuration.getTemplateValidTime();
@@ -438,11 +446,11 @@ public class SOSworker {
             templateValidTime = (h * 3600000) + (m * 60000);
 
             // we initialize the reader/writer/filter
-            smlReader = sosFactory.getSensorReader(smlType, smlConfiguration, sensorIdBase, phenomenonIdBase, map);
-            smlWriter = sosFactory.getSensorWriter(smlType, smlConfiguration, sensorIdBase, map);
-            omReader  = sosFactory.getObservationReader(omReaderType, omConfiguration, observationIdBase, sensorIdBase);
-            omWriter  = sosFactory.getObservationWriter(omWriterType, observationTemplateIdBase, omConfiguration);
-            omFilter  = sosFactory.getObservationFilter(omFilterType, observationIdBase, observationTemplateIdBase, map, omConfiguration);
+            smlReader = sosFactory.getSensorReader(smlType, smlConfiguration, properties);
+            smlWriter = sosFactory.getSensorWriter(smlType, smlConfiguration, properties);
+            omReader  = sosFactory.getObservationReader(omReaderType, omConfiguration, properties);
+            omWriter  = sosFactory.getObservationWriter(omWriterType, omConfiguration, properties);
+            omFilter  = sosFactory.getObservationFilter(omFilterType, omConfiguration, properties);
 
             //we initialize the variables depending on the Reader capabilities
             this.acceptedResponseMode   = omReader.getResponseModes();

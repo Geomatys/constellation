@@ -18,6 +18,7 @@
 package org.constellation.sos.io.lucene;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +28,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
 import org.constellation.generic.database.Automatic;
+import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.ObservationFilter;
 import org.constellation.sos.io.ObservationResult;
 import org.constellation.ws.CstlServiceException;
@@ -66,8 +68,8 @@ public class LuceneObservationFilter implements ObservationFilter {
         this.searcher = omFilter.searcher;
     }
 
-    public LuceneObservationFilter(String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException {
-        this.map                       = map;
+    public LuceneObservationFilter(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+        this.map  =  (Properties) properties.get(AbstractSOSFactory.IDENTIFIER_MAPPING);;
         try {
             this.searcher = new LuceneObservationSearcher(configuration.getConfigurationDirectory(), "");
         } catch (IndexingException ex) {

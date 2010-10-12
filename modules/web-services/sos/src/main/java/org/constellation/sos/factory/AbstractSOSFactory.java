@@ -17,7 +17,7 @@
 
 package org.constellation.sos.factory;
 
-import java.util.Properties;
+import java.util.Map;
 import org.constellation.configuration.DataSourceType;
 import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
@@ -39,19 +39,27 @@ import org.geotoolkit.factory.Factory;
  */
 public abstract class AbstractSOSFactory extends Factory {
 
+    public static final String OBSERVATION_ID_BASE = "observationIdBase";
+
+    public static final String OBSERVATION_TEMPLATE_ID_BASE = "observationTemplateIdBase";
+
+    public static final String SENSOR_ID_BASE = "sensorIdBase";
+
+    public static final String PHENOMENON_ID_BASE = "phenomenonIdBase";
+
+    public static final String IDENTIFIER_MAPPING = "identifierMapping";
+
     /**
      * Return an observation filter for  the specified datasource.
      *
      * @param type The type of the filter requested.
-     * @param observationIdBase The prefix used for the observations identifier.
-     * @param observationTemplateIdBase The prefix used for the observation templates identifier.
-     * @param map A mapping between real database ID and physysical identifiers.
      * @param configuration A configuration object containing all the information to use the datasource.
+     * @param properties The associated parameters (observation base identifier, template base identifiers,....)
      *
      * @return An observation filter for  the specified datasource.
      * @throws CstlServiceException
      */
-    public abstract ObservationFilter getObservationFilter(ObservationFilterType type, String observationIdBase, String observationTemplateIdBase, Properties map, Automatic configuration) throws CstlServiceException;
+    public abstract ObservationFilter getObservationFilter(ObservationFilterType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
 
     /**
      * Clone an observation filter.
@@ -68,50 +76,47 @@ public abstract class AbstractSOSFactory extends Factory {
      * 
      * @param type  The type of the reader requested.
      * @param configuration A configuration object containing all the information to use the datasource.
-     * @param observationIdBase The prefix used for the observations identifier.
-     * @param sensorIdBase  The prefix used for the sensor identifier.
+     * @param properties The associated parameters (observation base identifier, template base identifiers,....)
      *
      * @return An Observation reader for the specified datasource.
      * @throws CstlServiceException
      */
-    public abstract ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, String observationIdBase, String sensorIdBase) throws CstlServiceException;
+    public abstract ObservationReader getObservationReader(ObservationReaderType type, Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
 
     /**
      * Return an Observation writer for the specified datasource.
      *
      * @param type The type of the writer requested.
-     * @param observationTemplateIdBase The prefix used for the observation templates identifier.
      * @param configuration A configuration object containing all the information to use the datasource.
+     * @param properties The associated parameters (observation base identifier, template base identifiers,....)
      * 
      * @return an Observation writer for the specified datasource.
      * @throws CstlServiceException
      */
-    public abstract ObservationWriter getObservationWriter(ObservationWriterType type, String observationTemplateIdBase, Automatic configuration) throws CstlServiceException;
+    public abstract ObservationWriter getObservationWriter(ObservationWriterType type,  Automatic configuration, Map<String, Object> properties) throws CstlServiceException;
 
     /**
      *  Return a Sensor metadata reader for the specified datasource.
      *
      * @param type The type of the reader requested.
      * @param configuration A configuration object containing all the information to use the datasource.
-     * @param sensorIdBase  The prefix used for the sensor metadatas identifier.
-     * @param map A mapping between real database ID and physysical identifiers.
-     * 
+     * @param properties The associated parameters (observation base identifier, template base identifiers,....)
+     *
      * @return a Sensor metadata reader for the specified datasource.
      * @throws MetadataIoException
      */
-    public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, String sensorIdBase, String phenomenonIdBase, Properties map) throws MetadataIoException;
+    public abstract SensorReader getSensorReader(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws MetadataIoException;
 
     /**
      * Return a Sensor metadata writer for the specified datasource.
      *
      * @param type  The type of the writer requested.
      * @param configuration A configuration object containing all the information to use the datasource.
-     * @param sensorIdBase The prefix used for the sensor metadatas identifier.
-     * @param map  A mapping between real database ID and physysical identifiers.
+     * @param properties The associated parameters (observation base identifier, template base identifiers,....)
      *
      * @return a Sensor metadata writer for the specified datasource.
      * @throws MetadataIoException
      */
-    public abstract SensorWriter getSensorWriter(DataSourceType type, Automatic configuration, String sensorIdBase, Properties map) throws MetadataIoException;
+    public abstract SensorWriter getSensorWriter(DataSourceType type, Automatic configuration, Map<String, Object> properties) throws MetadataIoException;
 
 }

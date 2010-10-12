@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 
 // JAXB dependencies
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
@@ -28,6 +29,7 @@ import javax.xml.bind.Marshaller;
 
 // constellation dependencies
 import org.constellation.generic.database.Automatic;
+import org.constellation.sos.factory.AbstractSOSFactory;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.lucene.LuceneObservationIndexer;
 import org.constellation.ws.CstlServiceException;
@@ -79,9 +81,9 @@ public class FileObservationWriter implements ObservationWriter {
 
     private static final Logger LOGGER = Logger.getLogger("org.constellation.sos.io.filesystem");
 
-    public FileObservationWriter(Automatic configuration, String observationTemplateIdBase) throws CstlServiceException {
+    public FileObservationWriter(Automatic configuration,  Map<String, Object> properties) throws CstlServiceException {
         super();
-        this.observationTemplateIdBase = observationTemplateIdBase;
+        this.observationTemplateIdBase = (String) properties.get(AbstractSOSFactory.OBSERVATION_TEMPLATE_ID_BASE);
         final File dataDirectory = configuration.getDataDirectory();
         if (dataDirectory.exists()) {
             offeringDirectory    = new File(dataDirectory, "offerings");

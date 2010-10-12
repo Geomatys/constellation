@@ -17,6 +17,8 @@
 
 package org.constellation.sos.io.filesystem;
 
+import java.util.Map;
+import org.constellation.sos.factory.AbstractSOSFactory;
 import org.geotoolkit.sml.xml.SensorMLMarshallerPool;
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +38,7 @@ import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 /**
+ * A sensorML Writer working on a fileSystem.
  *
  * @author Guilhem Legal (Geomatys)
  */
@@ -57,11 +60,11 @@ public class FileSensorWriter implements SensorWriter {
 
     private String sensorIdBase;
 
-    public FileSensorWriter(Automatic configuration, String sensorIdBase) throws MetadataIoException {
+    public FileSensorWriter(Automatic configuration,  Map<String, Object> properties) throws MetadataIoException {
         if (configuration == null) {
             throw new MetadataIoException("The sensor configuration object is null", NO_APPLICABLE_CODE);
         }
-        this.sensorIdBase = sensorIdBase;
+        this.sensorIdBase = (String) properties.get(AbstractSOSFactory.SENSOR_ID_BASE);
         uncommittedFiles = new ArrayList<File>();
         if (configuration.getDataDirectory() == null) {
             throw new MetadataIoException("The sensor data directory is null", NO_APPLICABLE_CODE);

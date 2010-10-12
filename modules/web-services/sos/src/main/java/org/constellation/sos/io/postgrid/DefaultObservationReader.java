@@ -18,6 +18,8 @@
 package org.constellation.sos.io.postgrid;
 
 // J2SE dependencies
+import org.constellation.sos.factory.AbstractSOSFactory;
+import java.util.Map;
 import java.util.Date;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -126,8 +128,8 @@ public class DefaultObservationReader implements ObservationReader {
      * @param dataSourceOM
      * @param observationIdBase
      */
-    public DefaultObservationReader(Automatic configuration, String observationIdBase) throws CstlServiceException {
-        this.observationIdBase = observationIdBase;
+    public DefaultObservationReader(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
+        this.observationIdBase = (String) properties.get(AbstractSOSFactory.OBSERVATION_ID_BASE);
         if (configuration == null) {
             throw new CstlServiceException("The configuration object is null", NO_APPLICABLE_CODE);
         }

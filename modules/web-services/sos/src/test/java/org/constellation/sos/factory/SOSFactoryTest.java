@@ -5,6 +5,8 @@
 
 package org.constellation.sos.factory;
 
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Properties;
 import org.constellation.configuration.ObservationFilterType;
 import org.constellation.configuration.ObservationReaderType;
@@ -56,19 +58,19 @@ public class SOSFactoryTest {
     @Test
     public void nullTypeTest() throws Exception {
     
-        ObservationFilter of = sosFactory.getObservationFilter(null, null, null, null, null);
+        ObservationFilter of = sosFactory.getObservationFilter(null, null, null);
         assertTrue(of == null);
 
-        ObservationReader or = sosFactory.getObservationReader(null, null, null,null);
+        ObservationReader or = sosFactory.getObservationReader(null, null, null);
         assertTrue(or == null);
 
         ObservationWriter ow = sosFactory.getObservationWriter(null, null,null);
         assertTrue(ow == null);
 
-        SensorWriter sw = sosFactory.getSensorWriter(null, null, null, null);
+        SensorWriter sw = sosFactory.getSensorWriter(null, null, null);
         assertTrue(sw == null);
 
-        SensorReader sr = sosFactory.getSensorReader(null, null, null, null,null);
+        SensorReader sr = sosFactory.getSensorReader(null, null, null);
         assertTrue(sr == null);
     }
 
@@ -80,11 +82,17 @@ public class SOSFactoryTest {
     @Test
     public void defaultTypeTest() throws Exception {
 
-        BDD bdd            = new BDD("org.postgresql.driver", "SomeUrl", "boby", "gary");
-        Automatic config   = new Automatic("postgrid", bdd);
+        final BDD bdd            = new BDD("org.postgresql.driver", "SomeUrl", "boby", "gary");
+        final Automatic config   = new Automatic("postgrid", bdd);
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put(AbstractSOSFactory.OBSERVATION_ID_BASE, "idbase");
+        parameters.put(AbstractSOSFactory.OBSERVATION_TEMPLATE_ID_BASE, "templateIdBase");
+        parameters.put(AbstractSOSFactory.SENSOR_ID_BASE, "sensorBase");
+        parameters.put(AbstractSOSFactory.IDENTIFIER_MAPPING, new Properties());
+
         boolean exLaunched = false;
         try  {
-            ObservationFilter of = sosFactory.getObservationFilter(ObservationFilterType.DEFAULT, "idbase", "templateIdBase", new Properties(), config);
+            ObservationFilter of = sosFactory.getObservationFilter(ObservationFilterType.DEFAULT, config, parameters);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertTrue(ex.getMessage().contains("No suitable driver found for SomeUrl"));
@@ -93,7 +101,7 @@ public class SOSFactoryTest {
 
         exLaunched = false;
         try  {
-            ObservationFilter of = sosFactory.getObservationFilter(ObservationFilterType.GENERIC, "idbase", "templateIdBase", new Properties(), config);
+            ObservationFilter of = sosFactory.getObservationFilter(ObservationFilterType.GENERIC, config, parameters);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertEquals(ex.getMessage(), "Unable to find affinage.xml");
@@ -102,7 +110,7 @@ public class SOSFactoryTest {
 
         exLaunched = false;
         try  {
-            ObservationReader or = sosFactory.getObservationReader(ObservationReaderType.DEFAULT, config, "idbase", "sensorBase");
+            ObservationReader or = sosFactory.getObservationReader(ObservationReaderType.DEFAULT, config, parameters);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             
@@ -111,7 +119,7 @@ public class SOSFactoryTest {
 
         exLaunched = false;
         try  {
-            ObservationReader or = sosFactory.getObservationReader(ObservationReaderType.GENERIC, config, "idbase", "sensorBase");
+            ObservationReader or = sosFactory.getObservationReader(ObservationReaderType.GENERIC, config, parameters);
         } catch (CstlServiceException ex) {
             exLaunched = true;
             assertTrue(ex.getMessage().contains("No suitable driver found for SomeUrl"));
