@@ -530,6 +530,12 @@ public class SOSworker {
         LOGGER.info(infos.toString());
     }
 
+    /**
+     * Load the Capabilites document from a configuration file if its present.
+     * 
+     * @param configurationDirectory
+     * @throws JAXBException
+     */
     private void cacheCapabilities(File configurationDirectory) throws JAXBException {
         //we fill the cachedCapabilities if we have to
         LOGGER.info("adding capabilities document in cache");
@@ -549,15 +555,14 @@ public class SOSworker {
     }
     
     /**
-     *
-     * @param configDir
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     * Load the Mapping between database identifier/real Identifier
+     * 
+     * @param configDirectory
      */
-    private void loadMapping(File configDir) {
+    private void loadMapping(File configDirectory) {
         // the file who record the map between phisycal ID and DB ID.
         try {
-            final File f = new File(configDir, "mapping.properties");
+            final File f = new File(configDirectory, "mapping.properties");
             if (f.exists()) {
                 final FileInputStream in = new FileInputStream(f);
                 map.load(in);
@@ -576,6 +581,7 @@ public class SOSworker {
             LOGGER.log(Level.WARNING, "IO Exception while loading the mapping file:{0}", e.getMessage());
         }
     }
+    
     /**
      * Web service operation describing the service and its capabilities.
      * 

@@ -639,7 +639,11 @@ public abstract class FilterParser {
      */
     protected boolean isDateField(final PropertyName pName) {
         if (pName != null && pName.getPropertyName() != null) {
-            final String propertyName = pName.getPropertyName();
+            String propertyName = pName.getPropertyName();
+            final int semicolonPos = propertyName.lastIndexOf(':');
+            if (semicolonPos != -1) {
+                propertyName = propertyName.substring(semicolonPos + 1);
+            }
             return propertyName.contains("Date") || propertyName.contains("Modified")  || propertyName.contains("date")
                 || propertyName.equalsIgnoreCase("TempExtent_begin") || propertyName.equalsIgnoreCase("TempExtent_end");
         }

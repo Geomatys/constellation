@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.geotoolkit.gml.xml.v311.FeaturePropertyType;
 import org.geotoolkit.observation.xml.v100.MeasureEntry;
@@ -42,7 +43,9 @@ import org.geotoolkit.swe.xml.v101.PhenomenonPropertyType;
 import org.opengis.observation.Observation;
 
 /**
- *
+ * Static methods use to create valid XML file, by setting object into referenceMode.
+ * The goal is to avois to declare the same block many times in a XML file.
+ * 
  * @author Guilhem Legal (Geomatys)
  */
 public final class Normalizer {
@@ -138,7 +141,7 @@ public final class Normalizer {
      */
     public static ObservationCollectionEntry normalizeDocument(ObservationCollectionEntry collection) {
         //first if the collection is empty
-        if (collection.getMember().size() == 0) {
+        if (collection.getMember().isEmpty()) {
             return new ObservationCollectionEntry("urn:ogc:def:nil:OGC:inapplicable");
         }
 
@@ -195,7 +198,7 @@ public final class Normalizer {
                 // do nothing
             } else {
                 if (observation.getResult() != null)
-                    LOGGER.warning("NormalizeDocument: Class not recognized for result:" + observation.getResult().getClass().getSimpleName());
+                    LOGGER.log(Level.WARNING, "NormalizeDocument: Class not recognized for result:{0}", observation.getResult().getClass().getSimpleName());
                 else
                     LOGGER.warning("NormalizeDocument: The result is null");
             }
