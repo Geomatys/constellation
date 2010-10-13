@@ -128,7 +128,6 @@
       <id>csw</id>
       <modules>
         <module>csw</module>
-        <module>configuration</module>
       </modules>
     </profile>
   </profiles>
@@ -140,6 +139,7 @@
   <modules>
     <module>base</module>
     <module>ogc</module>
+    <module>configuration</module>
   </modules>
 
 </project>
