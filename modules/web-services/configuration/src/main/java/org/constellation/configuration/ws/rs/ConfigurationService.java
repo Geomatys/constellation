@@ -128,7 +128,7 @@ public final class ConfigurationService extends AbstractWebService  {
             LOGGER.log(Level.WARNING, "JAXBException while setting the JAXB context for configuration service: " + ex.getMessage(), ex);
             cswFunctionEnabled = false;
         } catch (ConfigurationException ex) {
-            LOGGER.log(Level.WARNING, "Specific CSW operation will not be available.\nCause:" + ex.getMessage());
+            LOGGER.log(Level.WARNING, "Specific CSW operation will not be available.\nCause:{0}", ex.getMessage());
             cswFunctionEnabled = false;
         } catch (FactoryNotFoundException ex) {
             LOGGER.warning("Factory not found for CSWConfigurer, specific CSW operation will not be available.");
@@ -532,6 +532,7 @@ public final class ConfigurationService extends AbstractWebService  {
         if (cswConfigurer != null) {
             cswConfigurer.destroy();
         }
+        /**
         try {
             final StyleProviderProxy spp = StyleProviderProxy.getInstance(false);
             if (spp != null) {
@@ -546,6 +547,6 @@ public final class ConfigurationService extends AbstractWebService  {
             // shutdown is a bit late for looking for this factory.
             // @TODO avoid this above block if StyleProviderProxy has never been initialized.
             LOGGER.fine(ex.toString());
-        }
+        }**/
     }
 }
