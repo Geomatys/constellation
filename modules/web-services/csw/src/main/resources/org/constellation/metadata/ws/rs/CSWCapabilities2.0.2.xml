@@ -202,7 +202,8 @@
 				<ows:Value>csw:Record</ows:Value>
 			</ows:Parameter>
 			<ows:Parameter name="SchemaLanguage">
-				<ows:Value>http://www.w3.org/TR/xmlschema-1/</ows:Value>
+				<ows:Value>http://www.w3.org/XML/Schema</ows:Value>
+                                <ows:Value>XMLSCHEMA</ows:Value>
 			</ows:Parameter>
 			<ows:Parameter name="outputFormat">
 				<ows:Value>text/xml</ows:Value>

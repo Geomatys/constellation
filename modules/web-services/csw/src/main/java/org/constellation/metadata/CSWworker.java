@@ -211,6 +211,11 @@ public class CSWworker {
      * A list of the supported Type name 
      */
     private List<QName> supportedTypeNames;
+
+    /**
+     * A list of the supported SchemaLanguage for describeRecord Operation
+     */
+    private List<String> supportedSchemaLanguage;
     
     /**
      * A map of QName - xsd svhema object
@@ -294,6 +299,7 @@ public class CSWworker {
                 final Automatic configuration = (Automatic) configUnmarshaller.unmarshal(configFile);
                 init(configuration, serviceID, configDir);
                 initializeSupportedTypeNames();
+                initializeSupportedSchemaLanguage();
                 initializeAcceptedResourceType();
                 initializeRecordSchema();
                 initializeAnchorsMap();
@@ -340,6 +346,7 @@ public class CSWworker {
             // we initialize the filterParsers
             init(configuration, serviceID, configDir);
             initializeSupportedTypeNames();
+            initializeSupportedSchemaLanguage();
             initializeAcceptedResourceType();
             initializeRecordSchema();
             initializeAnchorsMap();
@@ -443,6 +450,15 @@ public class CSWworker {
             acceptedResourceType.add(EBRIM_30);
             acceptedResourceType.add(EBRIM_25);
         }
+    }
+
+    /**
+     * Initialize the supported outputSchema in function of the reader capacity.
+     */
+    private void initializeSupportedSchemaLanguage() {
+        supportedSchemaLanguage = new ArrayList<String>();
+        supportedSchemaLanguage.add("http://www.w3.org/XML/Schema");
+        supportedSchemaLanguage.add("XMLSCHEMA");
     }
 
     /**
@@ -690,6 +706,10 @@ public class CSWworker {
                             values.add(Namespaces.getPreferredPrefix(qn.getNamespaceURI(), "") + ':' + qn.getLocalPart());
                         }
                         tn.setValue(values);
+                    }
+                    final DomainType sl = dr.getParameter("SchemaLanguage");
+                    if (sl != null) {
+                        sl.setValue(supportedSchemaLanguage);
                     }
                 }
 
