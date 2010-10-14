@@ -459,6 +459,7 @@ public class CSWworker {
         supportedSchemaLanguage = new ArrayList<String>();
         supportedSchemaLanguage.add("http://www.w3.org/XML/Schema");
         supportedSchemaLanguage.add("XMLSCHEMA");
+        supportedSchemaLanguage.add("http://www.w3.org/TR/xmlschema-1/");
     }
 
     /**
@@ -1205,10 +1206,14 @@ public class CSWworker {
         if (schemaLanguage == null) {
             schemaLanguage = "http://www.w3.org/XML/Schema";
 
-        } else if (!schemaLanguage.equals("http://www.w3.org/XML/Schema") && !schemaLanguage.equalsIgnoreCase("XMLSCHEMA")){
+        } else if (!supportedSchemaLanguage.contains(schemaLanguage)){
 
-            throw new CstlServiceException("The server does not support this schema language: " + schemaLanguage + '\n' +
-                                          " supported ones are: XMLSCHEMA or http://www.w3.org/XML/Schema",
+            String supportedList = "";
+            for (String s : supportedSchemaLanguage) {
+                supportedList = s + '\n';
+            }
+            throw new CstlServiceException("The server does not support this schema language: " + schemaLanguage +
+                                           "\nsupported ones are:\n" + supportedList,
                                           INVALID_PARAMETER_VALUE, "schemaLanguage");
         }
         final List<SchemaComponentType> components   = new ArrayList<SchemaComponentType>();
