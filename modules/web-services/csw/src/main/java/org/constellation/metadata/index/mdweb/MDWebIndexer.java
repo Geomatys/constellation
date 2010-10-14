@@ -113,8 +113,9 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             }
             ((AbstractReader) mdWebReader).setReadProfile(false);
             initEbrimClasses();
-            if (create)
+            if (create) {
                 createIndex();
+            }
         } catch (SQLException ex) {
             throw new IndexingException("SQL Exception while creating mdweb indexer: " + ex.getMessage());
         } catch (MD_IOException ex) {
@@ -158,7 +159,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             }
             nbRecordSets = cats.size();
             final Set<Entry<Integer, RecordSet>> results = mdWebReader.getAllIdentifiers(catToIndex);
-            LOGGER.log(logLevel, results.size() + " forms to read.");
+            LOGGER.log(logLevel, "{0} forms to read.", results.size());
             for (Entry<Integer, RecordSet> entry : results) {
                 final Form form = mdWebReader.getForm(entry.getValue(), entry.getKey());
                 indexDocument(writer, form);
@@ -171,7 +172,7 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             LOGGER.severe(IO_SINGLE_MSG + ex.getMessage());
             throw new IndexingException("IOException while indexing documents:" + ex.getMessage(), ex);
         } catch (MD_IOException ex) {
-            LOGGER.severe("SQLException while indexing document: " + ex.getMessage());
+            LOGGER.log(Level.SEVERE, "SQLException while indexing document: {0}", ex.getMessage());
             throw new IndexingException("SQLException while indexing documents.", ex);
         }
         LOGGER.log(logLevel, "Index creation process in " + (System.currentTimeMillis() - time) + " ms\nRecordSets: " +
@@ -364,8 +365,8 @@ public class MDWebIndexer extends AbstractCSWIndexer<Form> {
             conditionalPathID = pathID.substring(0, pathID.lastIndexOf(':') + 1) + fullPathID.substring(separator + 1, fullPathID.indexOf('='));
             conditionalValue  = fullPathID.substring(fullPathID.indexOf('=') + 1);
             LOGGER.finer("pathID           : " + pathID + '\n'
-                    + "conditionalPathID: " + conditionalPathID + '\n'
-                    + "conditionalValue : " + conditionalValue);
+                       + "conditionalPathID: " + conditionalPathID + '\n'
+                       + "conditionalValue : " + conditionalValue);
         } else {
             if (fullPathID.indexOf('[') != -1) {
                 final String stringOrdinal = fullPathID.substring(fullPathID.indexOf('[') + 1, fullPathID.indexOf(']'));

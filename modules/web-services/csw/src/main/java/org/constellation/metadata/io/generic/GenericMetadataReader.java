@@ -186,7 +186,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      */
     @Override
     public List<DomainValues> getFieldDomainofValues(String propertyNames) throws MetadataIoException {
-         throw new UnsupportedOperationException("Not supported yet.");
+         throw new MetadataIoException("Not supported int this implementation.");
     }
 
     /**
@@ -194,7 +194,7 @@ public abstract class GenericMetadataReader extends GenericReader implements CSW
      */
     @Override
     public List<String> executeEbrimSQLQuery(String sqlQuery) throws MetadataIoException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new MetadataIoException("Not supported int this implementation.");
     }
 
     /**

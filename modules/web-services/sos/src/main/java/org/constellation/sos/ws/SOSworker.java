@@ -716,6 +716,9 @@ public class SOSworker {
                // the different responseFormat available
                go.updateParameter("responseFormat", acceptedResponseFormat);
 
+               // the result filtrable part
+               go.updateParameter("result", omFilter.supportedQueryableResultProperties());
+
                /**
                 * Because sometimes there is some sensor that are queryable in DescribeSensor but not in GetObservation
                 */
@@ -1122,7 +1125,7 @@ public class SOSworker {
                      throw new CstlServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
                                                    INVALID_PARAMETER_VALUE, "propertyIsEqualTo"); // cite test
                 }
-
+                localOmFilter.setResultEquals(propertyName, literal.getStringValue());
 
             } else if (result.getPropertyIsLike() != null) {
                 throw new CstlServiceException(NOT_SUPPORTED, OPERATION_NOT_SUPPORTED, "propertyIsLike");

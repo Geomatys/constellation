@@ -328,6 +328,22 @@ public class DefaultObservationFilter implements ObservationFilter {
      * {@inheritDoc}
      */
     @Override
+    public void setResultEquals(String propertyName, String value) throws CstlServiceException{
+        throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> supportedQueryableResultProperties() {
+        return new ArrayList<String>();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public List<ObservationResult> filterResult() throws CstlServiceException {
         LOGGER.log(Level.FINER, "request:{0}", sqlRequest.toString());
         try {

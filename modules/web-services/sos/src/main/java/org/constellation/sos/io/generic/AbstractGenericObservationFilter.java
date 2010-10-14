@@ -17,6 +17,8 @@
 
 package org.constellation.sos.io.generic;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.constellation.sos.factory.AbstractSOSFactory;
 import java.util.logging.Level;
@@ -130,5 +132,21 @@ public abstract class AbstractGenericObservationFilter implements ObservationFil
     @Override
     public void refresh() {
         // do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> supportedQueryableResultProperties() {
+        return new ArrayList<String>();
+    }
+
+     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setResultEquals(String propertyName, String value) throws CstlServiceException{
+        throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
     }
 }

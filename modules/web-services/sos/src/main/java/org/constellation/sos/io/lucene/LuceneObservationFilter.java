@@ -17,6 +17,7 @@
 
 package org.constellation.sos.io.lucene;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -55,6 +56,8 @@ import org.opengis.observation.Observation;
  */
 public class LuceneObservationFilter implements ObservationFilter {
 
+    private static final Logger LOGGER =Logger.getLogger("org.constellation.sos.io.lucene");
+    
     private Properties map;
 
     private StringBuilder luceneRequest;
@@ -69,11 +72,11 @@ public class LuceneObservationFilter implements ObservationFilter {
     }
 
     public LuceneObservationFilter(Automatic configuration, Map<String, Object> properties) throws CstlServiceException {
-        this.map  =  (Properties) properties.get(AbstractSOSFactory.IDENTIFIER_MAPPING);;
+        this.map  =  (Properties) properties.get(AbstractSOSFactory.IDENTIFIER_MAPPING);
         try {
             this.searcher = new LuceneObservationSearcher(configuration.getConfigurationDirectory(), "");
         } catch (IndexingException ex) {
-            Logger.getAnonymousLogger().log(Level.SEVERE, "IndexingException in LuceneObservationFilter constructor", ex);
+            LOGGER.log(Level.SEVERE, "IndexingException in LuceneObservationFilter constructor", ex);
             throw new CstlServiceException("IndexingException in LuceneObservationFilter constructor", ex, NO_APPLICABLE_CODE);
         }
     }
@@ -115,7 +118,7 @@ public class LuceneObservationFilter implements ObservationFilter {
     @Override
     public void setProcedure(List<String> procedures, ObservationOfferingEntry off) {
         luceneRequest.append(" ( ");
-        if (procedures.size() != 0) {
+        if (!procedures.isEmpty()) {
 
             for (String s : procedures) {
                 if (s != null) {
@@ -328,6 +331,19 @@ public class LuceneObservationFilter implements ObservationFilter {
         throw new CstlServiceException("SetBoundingBox is not supported by this ObservationFilter implementation.");
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setResultEquals(String propertyName, String value) throws CstlServiceException{
+        throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
+    }
+
+    @Override
+    public List<String> supportedQueryableResultProperties() {
+        return new ArrayList<String>();
+    }
+    
     /**
      * {@inheritDoc}
      */

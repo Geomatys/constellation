@@ -110,6 +110,21 @@ public interface ObservationFilter {
     void setBoundingBox(EnvelopeEntry e) throws CstlServiceException;
 
     /**
+     * Add a filter on the result for the specified property.
+     *
+     * @param propertyName a property of the result.
+     * @param value a literal value.
+     */
+    void setResultEquals(String propertyName, String value) throws CstlServiceException;
+
+    /**
+     * Return the list of properties that can be applied on the result.
+     * 
+     * @return  the list of properties that can be applied on the result.
+     */
+    List<String> supportedQueryableResultProperties();
+
+    /**
      * Execute the current query and return a list of observation result.
      * 
      * @return
