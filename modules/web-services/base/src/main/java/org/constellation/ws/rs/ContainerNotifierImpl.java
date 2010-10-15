@@ -28,18 +28,19 @@ import java.util.List;
  */
 public class ContainerNotifierImpl implements ContainerNotifier {
     
-    private List<ContainerListener> cls;
+    private List<ContainerListener> containerListeners;
 
     public ContainerNotifierImpl() {
-        cls = new ArrayList<ContainerListener>();
+        containerListeners = new ArrayList<ContainerListener>();
     }
     
+    @Override
     public void addListener(ContainerListener arg0) {
-        cls.add(arg0);
+        containerListeners.add(arg0);
     }
     
     public void reload() {
-        for ( ContainerListener cl : cls) {
+        for ( ContainerListener cl : containerListeners) {
             cl.onReload();
         }
     }
