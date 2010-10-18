@@ -717,7 +717,10 @@ public class SOSworker {
                go.updateParameter("responseFormat", acceptedResponseFormat);
 
                // the result filtrable part
-               go.updateParameter("result", omFilter.supportedQueryableResultProperties());
+               final List<String> queryableResultProperties = omFilter.supportedQueryableResultProperties();
+               if (queryableResultProperties != null && !queryableResultProperties.isEmpty()) {
+                go.updateParameter("result", queryableResultProperties);
+               }
 
                /**
                 * Because sometimes there is some sensor that are queryable in DescribeSensor but not in GetObservation
