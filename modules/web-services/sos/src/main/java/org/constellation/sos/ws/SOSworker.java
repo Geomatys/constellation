@@ -834,14 +834,15 @@ public class SOSworker {
         final ObservationFilter localOmFilter = sosFactory.cloneObservationFilter(omFilter);
 
 
-        //we verify that the output format is good.     
-        if (requestObservation.getResponseFormat() != null) {
-            if (!acceptedResponseFormat.contains(requestObservation.getResponseFormat())) {
+        //we verify that the output format is good.
+        final String responseFormat = requestObservation.getResponseFormat();
+        if (responseFormat != null) {
+            if (!acceptedResponseFormat.contains(responseFormat)) {
                 final StringBuilder arf = new StringBuilder();
                 for (String s : acceptedResponseFormat) {
                     arf.append(s).append('\n');
                 }
-                throw new CstlServiceException(requestObservation.getResponseFormat() + " is not accepted for responseFormat.\n" +
+                throw new CstlServiceException(responseFormat + " is not accepted for responseFormat.\n" +
                                                "Accepted values are:\n" + arf.toString(),
                                                INVALID_PARAMETER_VALUE, "responseFormat");
             }
@@ -855,6 +856,11 @@ public class SOSworker {
                     MISSING_PARAMETER_VALUE, "responseFormat");
         }
 
+        // we set the response format on the filter reader
+        if (localOmFilter instanceof ObservationFilterReader) {
+            ((ObservationFilterReader)localOmFilter).setResponseFormat(responseFormat);
+        }
+        
         QName resultModel = requestObservation.getResultModel();
         if (resultModel == null) {
             resultModel = OBSERVATION_QNAME;
@@ -1128,7 +1134,9 @@ public class SOSworker {
                      throw new CstlServiceException(" to use the operation Equal you must specify the propertyName and the litteral",
                                                    INVALID_PARAMETER_VALUE, "propertyIsEqualTo"); // cite test
                 }
-                localOmFilter.setResultEquals(propertyName, literal.getStringValue());
+                if (!localOmFilter.supportedQueryableResultProperties().isEmpty()) {
+                    localOmFilter.setResultEquals(propertyName, literal.getStringValue());
+                }
 
             } else if (result.getPropertyIsLike() != null) {
                 throw new CstlServiceException(NOT_SUPPORTED, OPERATION_NOT_SUPPORTED, "propertyIsLike");

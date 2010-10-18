@@ -339,11 +339,14 @@ public class LuceneObservationFilter implements ObservationFilter {
         throw new CstlServiceException("setResultEquals is not supported by this ObservationFilter implementation.");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<String> supportedQueryableResultProperties() {
         return new ArrayList<String>();
     }
-    
+
     /**
      * {@inheritDoc}
      */

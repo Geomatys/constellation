@@ -98,8 +98,12 @@ public class SOService extends OGCWebService {
                 final Object response   = worker.getObservation(go);
 
                 String outputFormat = go.getResponseFormat();
-                if (outputFormat != null  && outputFormat.startsWith(MimeType.TEXT_XML)) {
-                    outputFormat = MimeType.TEXT_XML;
+                if (outputFormat != null) {
+                    if (outputFormat.startsWith(MimeType.TEXT_XML)) {
+                        outputFormat = MimeType.TEXT_XML;
+                    } else if (outputFormat.startsWith("text/")) {
+                        outputFormat = MimeType.TEXT_PLAIN;
+                    }
                 }
                 Object marshalled;
                 if (response instanceof ObservationCollectionEntry) {
