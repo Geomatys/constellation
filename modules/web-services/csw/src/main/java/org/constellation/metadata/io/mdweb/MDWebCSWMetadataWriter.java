@@ -209,9 +209,12 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
      *
      * @param obj the object for which we want a title.
      *
-     * @return the founded title or UNKNOW_TITLE
+     * @return the found title or UNKNOW_TITLE
+     *
+     * @deprecated will be replaced by Utils.getTitle
      */
     @Override
+    @Deprecated
     public String findTitle(Object obj) {
 
         //here we try to get the title
@@ -283,7 +286,7 @@ public class MDWebCSWMetadataWriter extends MDWebMetadataWriter implements CSWMe
             if (nameGetter != null) {
                 final Object objT = ReflectionUtilities.invokeMethod(obj, nameGetter);
                 if (objT instanceof String) {
-                    title = (String) obj;
+                    title = (String) objT;
 
                 } else if (objT instanceof AbstractSimpleLiteral) {
                     titleSL = (AbstractSimpleLiteral) objT;

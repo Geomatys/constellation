@@ -219,14 +219,17 @@ public class MDWebMetadataWriter extends AbstractMetadataWriter {
     }
 
      /**
-     * This method try to find a title for this object.
-     * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
-     * else we try to find a getName(), getTitle(), or getId() method.
-     *
-     * @param obj the object for which we want a title.
-     *
-     * @return the founded title or UNKNOW_TITLE
-     */
+      * This method try to find a title for this object.
+      * if the object is a ISO19115:Metadata or CSW:Record we know were to search the title,
+      * else we try to find a getName(), getTitle(), or getId() method.
+      *
+      * @param obj the object for which we want a title.
+      *
+      * @return the founded title or UNKNOW_TITLE
+      *
+      * @deprecated will be replaced by utils.getTitle
+      */
+    @Deprecated
     protected String findTitle(Object obj) {
 
         //here we try to get the title

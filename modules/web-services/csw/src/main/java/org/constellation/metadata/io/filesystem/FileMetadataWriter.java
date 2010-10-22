@@ -27,9 +27,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
 
 // JAXB dependencies
-import java.util.logging.Level;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -38,23 +38,21 @@ import javax.xml.bind.Unmarshaller;
 //geotoolkit dependencies
 import org.geotoolkit.csw.xml.v202.RecordPropertyType;
 import org.geotoolkit.csw.xml.v202.RecordType;
+import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
+import org.geotoolkit.lucene.index.AbstractIndexer;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.util.SimpleInternationalString;
 import org.geotoolkit.xml.MarshallerPool;
-import org.geotoolkit.csw.xml.Record;
-import org.geotoolkit.dublincore.xml.AbstractSimpleLiteral;
-import org.geotoolkit.ebrim.xml.RegistryObject;
-import org.geotoolkit.lucene.index.AbstractIndexer;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // Constellation dependencies
 import org.constellation.generic.database.Automatic;
 import org.constellation.metadata.io.AbstractCSWMetadataWriter;
 import org.constellation.metadata.io.MetadataIoException;
+import org.constellation.metadata.utils.Utils;
 import org.constellation.util.ReflectionUtilities;
 
 // GeoApi dependencies
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
 import org.opengis.util.InternationalString;
 
 
@@ -76,8 +74,9 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      */
     private final File dataDirectory;
 
-    private static final String UNKNOW_IDENTIFIER = "unknow_identifier";
-
+    /**
+     * A string constant frequantly used in error message.
+     */
     private static final String IN_CLASS_MSG = " in the class:";
      
     /**
@@ -86,7 +85,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
      * @param index A lucene indexer.
      * @param configuration An object containing all the datasource informations (in this case the data directory).
      *
-     * @throws java.sql.SQLException
+     * @throws org.constellation.metadata.io.MetadataIoException
      */
     public FileMetadataWriter(Automatic configuration, AbstractIndexer index) throws MetadataIoException {
         super(index);
@@ -103,96 +102,6 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
     }
 
     /**
-     * This method try to find an Identifier for this object.
-     * if the object is a ISO19115:Metadata or CSW:Record we know were to search the identifier,
-     * else we try to find a getId(), getIdentifier() or getFileIdentifier() method.
-     *
-     * @param obj the object for wich we want a identifier.
-     *
-     * @return the founded identifier or UNKNOW_IDENTIFIER
-     */
-    protected static String findIdentifier(Object obj) {
-
-        //here we try to get the identifier
-        AbstractSimpleLiteral identifierSL = null;
-        String identifier = UNKNOW_IDENTIFIER;
-        if (obj instanceof Record) {
-            identifierSL = ((Record) obj).getIdentifier();
-
-            if (identifierSL == null) {
-                identifier = UNKNOW_IDENTIFIER;
-            } else {
-                if (identifierSL.getContent().size() > 0)
-                    identifier = identifierSL.getContent().get(0);
-            }
-
-        } else if (obj instanceof DefaultMetadata) {
-            identifier = ((DefaultMetadata) obj).getFileIdentifier();
-
-        } else if (obj instanceof RegistryObject) {
-            identifier = ((RegistryObject) obj).getId();
-
-        } else {
-            Method nameGetter = null;
-            String methodName = "";
-            int i = 0;
-            while (i < 3) {
-                try {
-                    switch (i) {
-                        case 0: methodName = "getId";
-                                nameGetter = obj.getClass().getMethod(methodName);
-                                break;
-
-                        case 1: methodName = "getIdentifier";
-                                nameGetter = obj.getClass().getMethod(methodName);
-                                break;
-
-                        case 2: methodName = "getFileIdentifier";
-                                nameGetter = obj.getClass().getMethod(methodName);
-                                break;
-                        default: break;
-                    }
-
-
-                } catch (NoSuchMethodException ex) {
-                    LOGGER.finer("there is no " + methodName + " method in " + obj.getClass().getSimpleName());
-                } catch (SecurityException ex) {
-                    LOGGER.warning(" security exception while getting the identifier of the object.");
-                }
-                if (nameGetter != null) {
-                    i = 3;
-                } else {
-                    i++;
-                }
-            }
-
-            if (nameGetter != null) {
-               
-                final Object objT = ReflectionUtilities.invokeMethod(obj, nameGetter);
-                if (objT instanceof String) {
-                    identifier = (String) obj;
-                } else if (objT instanceof AbstractSimpleLiteral) {
-                    identifierSL = (AbstractSimpleLiteral) objT;
-                    if (identifierSL.getContent().size() > 0) {
-                        identifier = identifierSL.getContent().get(0);
-                    } else {
-                        identifier = UNKNOW_IDENTIFIER;
-                    }
-                } else {
-                    identifier = UNKNOW_IDENTIFIER;
-                }
-
-                if (identifier == null) {
-                    identifier = UNKNOW_IDENTIFIER;
-                }
-            }
-            if (identifier.equals(UNKNOW_IDENTIFIER))
-                LOGGER.warning("unknow type: " + obj.getClass().getName() + " unable to find an identifier, using default then.");
-        }
-        return identifier;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -201,7 +110,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
         Marshaller marshaller = null;
         try {
             marshaller = marshallerPool.acquireMarshaller();
-            final String identifier = findIdentifier(obj);
+            final String identifier = Utils.findIdentifier(obj);
             f = new File(dataDirectory, identifier + ".xml");
             f.createNewFile();
             marshaller.marshal(obj, f);
@@ -217,14 +126,6 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
             }
         }
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void destroy() {
-        super.destroy();
     }
 
     /**
@@ -306,7 +207,7 @@ public class FileMetadataWriter extends AbstractCSWMetadataWriter {
                 
                 // we verify that the metadata to update has the same type that the Xpath type
                 if (!metadata.getClass().equals(type)) {
-                    throw new MetadataIoException("The metadata :" + findIdentifier(metadata) + "is not of the same type that the one describe in Xpath expression", INVALID_PARAMETER_VALUE);
+                    throw new MetadataIoException("The metadata :" + Utils.findIdentifier(metadata) + "is not of the same type that the one describe in Xpath expression", INVALID_PARAMETER_VALUE);
                 }
 
                 //we remove the type name from the xpath
