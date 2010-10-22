@@ -17,16 +17,15 @@
 package org.constellation.provider.configuration;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
-import org.constellation.util.Util;
+import org.geotoolkit.util.FileUtilities;
 
 /**
  * Temporary copy of static methods from the WebService class (in module web-base),
@@ -38,13 +37,14 @@ import org.constellation.util.Util;
  * @version $Id$
  *
  * @author Cédric Briançon (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  */
 public final class ConfigDirectory {
 
     private ConfigDirectory() {}
     
     /**
-     * The default debugging logger for all web services.
+     * The default debugging logger.
      */
     private static final Logger LOGGER = Logger.getLogger("org.constellation.provider.configuration");
 
@@ -66,41 +66,53 @@ public final class ConfigDirectory {
     public static final String WINDOWS_DIRECTORY = "Application Data\\Constellation";
 
     /**
-     * Returns the configuration directory for Constellation. It is either the one
-     * defined in the JNDI variable, or the default in the home directory.
+     * The user directory where configuration files are stored.
+     * this variable is fill by the user in the jsf interface.
      */
-    public static File getConfigDirectory() {
-        try {
-            final String path = getPropertyValue("Constellation", "config_dir");
-            if (path != null) {
-                final File folder = new File(path);
-                if (folder.exists() && folder.canRead() && folder.canWrite()) {
-                    return folder;
-                } else {
-                    try {
-                        folder.createNewFile();
-                        return folder;
-                    } catch (IOException ex) {
-                        LOGGER.log(Level.INFO, "Unable to create the file "+ folder, ex);
-                    }
-                }
-            } else {
-                throw new NamingException("config_dir is not defined in the Constellation JNDI resource.");
+    public static String USER_DIRECTORY = null;
+    //we try to load this variable at the start by reading a properties file
+    static {
+        File propertiesFile = FileUtilities.getFileFromResource("constellation.properties");
+        if (propertiesFile != null && propertiesFile.exists()) {
+            try {
+                Properties prop = FileUtilities.getPropertiesFromFile(propertiesFile);
+                USER_DIRECTORY = prop.getProperty("configuration_directory");
+            } catch (IOException ex) {
+                LOGGER.warning("IOException while reading the constellation properties file");
             }
-
-        } catch (NamingException ex) {
-            LOGGER.log(Level.FINE, "Does not succeed in retrieving Constellation's JNDI configuration. " +
-                    "Using the default configuration directory instead.", ex);
-        }
-
-        return getConstellationDirectory();
+        } 
     }
+    
 
     /**
-     * Return the ".constellation" directory.
+     * Return the configuration directory.
+     * 
+     * priority is :
+     *  1) packaged war file
+     *  2) user defined directory
+     *  3) .constellation in home directory
      */
-    private static File getConstellationDirectory() {
+    public static File getConfigDirectory() {
         File constellationDirectory;
+
+        // 1) WAR packaged config
+        constellationDirectory = FileUtilities.getDirectoryFromResource("configuration");
+        if (constellationDirectory != null && constellationDirectory.isDirectory()) {
+            return constellationDirectory;
+        }
+
+        // 2) user defined config
+        if (USER_DIRECTORY != null) {
+            constellationDirectory = new File(USER_DIRECTORY);
+            if (!constellationDirectory.exists()) {
+                LOGGER.log(Level.INFO, "The configuration directory {0} does not exist", USER_DIRECTORY);
+            } else if (!constellationDirectory.isDirectory()){
+                LOGGER.log(Level.INFO, "The configuration path {0} is not a directory", USER_DIRECTORY);
+            }
+            return constellationDirectory;
+        }
+
+        // 3) .constellation in home directory
         final String home = System.getProperty("user.home");
 
         if (System.getProperty("os.name", "").startsWith("Windows")) {
@@ -109,6 +121,14 @@ public final class ConfigDirectory {
              constellationDirectory = new File(home, UNIX_DIRECTORY);
         }
         return constellationDirectory;
+    }
+
+    /**
+     * Return a file at the root in the configuration directory.
+     */
+    public static File getConfigFile(String fileName) {
+        File constellationDirectory = getConfigDirectory();
+        return new File(constellationDirectory, fileName);
     }
 
     /**
@@ -164,34 +184,4 @@ public final class ConfigDirectory {
         return value;
     }
 
-    /**
-     * Returns the file named "config.xml" under the folder "WEB-INF/classes" of the
-     * Constellation' web archive, or {@code null} if no config file was found.
-     */
-    public static File getWarPackagedConfig(String fileName) {
-        LOGGER.warning("Try to find the file config.xml into the web archive of Constellation !");
-
-        final InputStream is = Util.getResourceAsStream("/" + fileName);
-        if (is != null) {
-            int i;
-            try {
-
-                final File configFile = File.createTempFile("temp", ".xml");
-
-                final FileOutputStream fos = new FileOutputStream(configFile);
-                while ((i = is.read()) != -1) {
-                    fos.write(i);
-                }
-                fos.close();
-                return configFile;
-
-            } catch (IOException ex) {
-                Logger.getLogger(ConfigDirectory.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        } else {
-            LOGGER.info("No " + fileName + " resource found in the archive.");
-        }
-        return null;
-    }
 }

@@ -17,16 +17,17 @@
 
 package org.constellation.configuration.ws.rs;
 
-import org.geotoolkit.util.FileUtilities;
 import java.io.File;
 
 // Constellation dependencies
 import org.constellation.configuration.AcknowlegementType;
 import org.constellation.configuration.exception.ConfigurationException;
+import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.rs.ContainerNotifierImpl;
+
+// geotoolkit pending
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
-import static org.constellation.configuration.ws.rs.ConfigurationService.*;
 
 /**
  *
@@ -56,17 +57,14 @@ public class DefaultCSWConfigurer extends AbstractCSWConfigurer {
     
     @Override
     protected File getConfigurationDirectory() {
-        File configDir = FileUtilities.getDirectoryFromResource("configuration");
+        final File configDir = ConfigDirectory.getConfigDirectory();
 
-        /*
-         * if the configuration files are put under the WEB-INF/classes/csw_configuration directory of the WAR file.
-         */
-        if (configDir == null || !configDir.exists()) {
-            configDir = FileUtilities.getDirectoryFromResource("csw_configuration");
-            if (configDir == null || !configDir.exists()) {
-                return SERVCE_DIRECTORY.get("CSW");
+        if (configDir != null && configDir.exists()) {
+            final File cswDir = new File(configDir, "csw_configuration");
+            if (cswDir != null && configDir.exists()) {
+                return cswDir;
             }
         }
-        return configDir;
+        return null;
     }
 }

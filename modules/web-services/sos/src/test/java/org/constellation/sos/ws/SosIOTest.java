@@ -140,7 +140,7 @@ public class SosIOTest {
             
             Marshaller marshaller = marshallerPool.acquireMarshaller();
 
-            GetCapabilities request = new GetCapabilities("1.0.0", MimeType.APP_XML);
+            GetCapabilities request = new GetCapabilities("1.0.0", MimeType.APPLICATION_XML);
             Capabilities expResult  = defaultWorker.getCapabilities(request);
             Capabilities result     = genericWorker.getCapabilities(request);
 

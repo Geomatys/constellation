@@ -25,9 +25,7 @@ import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.constellation.provider.configuration.ConfigDirectory;
-import org.constellation.provider.configuration.ProviderSource;
 import org.geotoolkit.map.ElevationModel;
-import org.geotoolkit.util.FileUtilities;
 import org.opengis.feature.type.Name;
 
 /**
@@ -46,8 +44,6 @@ public class LayerProviderProxy extends AbstractLayerProvider{
     private static final Logger LOGGER = Logger.getLogger(LayerProviderProxy.class.getName());*/
 
     private static final Collection<LayerProviderService> SERVICES = new ArrayList<LayerProviderService>();
-
-    private static String configPath = null;
 
     private static LayerProviderProxy instance = null;
 
@@ -176,19 +172,8 @@ public class LayerProviderProxy extends AbstractLayerProvider{
 
     }
 
-    private static synchronized void init(final String confPath){
-        if (confPath == null) {
-            throw new NullPointerException("Configuration path can not be null.");
-        }
-
-        if (configPath != null) {
-            throw new IllegalStateException("The layer provider proxy has already been initialize");
-        }
-
-        configPath = confPath;
-
+    private static synchronized void init(){
         loadServices();
-
     }
 
     public static void loadServices() {
@@ -200,24 +185,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
             /*
              * First check that there are config files in the WEB-INF/classes directory
              */
-            File configFile = FileUtilities.getFileFromResource(fileName);
-            /*
-             * No config file in the resources, then we try with the default config directory.
-             */
-            if (configFile == null || !configFile.exists()) {
-                final String path = configPath + fileName;
-                configFile = new File(path);
-            }
-            /*
-             * HACK for ifremer.
-             */
-            if (!configFile.exists() && name.equals("postgrid")) {
-                final File warFile = ConfigDirectory.getWarPackagedConfig("config.xml");
-                if(warFile != null){
-                    configFile = warFile;
-                }
-            }
-
+            File configFile = ConfigDirectory.getConfigFile(fileName);
 
             service.setConfiguration(configFile);
 
@@ -244,7 +212,7 @@ public class LayerProviderProxy extends AbstractLayerProvider{
      */
     public static synchronized LayerProviderProxy getInstance(final boolean createIfNotExists){
         if(instance == null && createIfNotExists){
-            init(ConfigDirectory.getConfigDirectory().getPath() + File.separator);
+            init();
             instance = new LayerProviderProxy();
         }
         

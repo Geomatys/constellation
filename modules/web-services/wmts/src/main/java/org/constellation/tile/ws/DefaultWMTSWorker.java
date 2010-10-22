@@ -154,7 +154,7 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
      * Instanciates the working class for a SOAP client, that do request on a SOAP PEP service.
      */
     public DefaultWMTSWorker() {
-        LOGGER.info("WMTS Service started");
+        LOGGER.info("WMTS Service running");
     }
 
     @Override

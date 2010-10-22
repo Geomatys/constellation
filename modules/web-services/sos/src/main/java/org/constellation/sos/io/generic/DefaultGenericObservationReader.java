@@ -237,7 +237,7 @@ public class DefaultGenericObservationReader extends GenericReader implements Ob
             }
 
             //static part
-            final List<String> responseFormat = Arrays.asList(MimeType.APP_XML);
+            final List<String> responseFormat = Arrays.asList(MimeType.APPLICATION_XML);
             final List<QName> resultModel     = Arrays.asList(OBSERVATION_QNAME);
             final List<ResponseModeType> responseMode = Arrays.asList(ResponseModeType.INLINE, ResponseModeType.RESULT_TEMPLATE);
             return new ObservationOfferingEntry(offeringName,

@@ -210,9 +210,9 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
         }
 
 
-        final String key_cache    = queryVersion + '-' + currentLanguage;
-        if (CAPS_RESPONSE.containsKey(key_cache)) {
-            return CAPS_RESPONSE.get(key_cache);
+        final String keyCache    = queryVersion + '-' + currentLanguage;
+        if (CAPS_RESPONSE.containsKey(keyCache)) {
+            return CAPS_RESPONSE.get(keyCache);
         }
 
         //Add accepted CRS codes
@@ -570,7 +570,7 @@ public class DefaultWMSWorker extends AbstractWorker implements WMSWorker {
             inspireExtension.setCurrentLanguage(currentLanguage);
 
         } 
-        CAPS_RESPONSE.put(key_cache, inCapabilities);
+        CAPS_RESPONSE.put(keyCache, inCapabilities);
         return inCapabilities;
     }
 

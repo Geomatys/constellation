@@ -190,6 +190,7 @@ public abstract class OGCWebService extends AbstractWebService {
      *
      * @return The capabilities Object, or {@code null} if none.
      */
+    @Deprecated
     protected Object getStaticCapabilitiesObject(final ServiceDef def) throws JAXBException {
         final String fileName = def.specification.toString() + "Capabilities" + def.version.toString() + ".xml";
        

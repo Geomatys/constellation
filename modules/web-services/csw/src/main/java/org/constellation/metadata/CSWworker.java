@@ -1730,37 +1730,22 @@ public class CSWworker {
         }
     }
 
-     /**
-     * In some implementations there is no sicade directory.
-     * So if we don't find The .constellation/csw_configuration directory
-     * IFREMER hack
-     * we search the deployed war directory /WEB-INF/classes/csw_configuration
+    /**
+     * Look for the CSW configuration directory.
      */
     public static File getConfigDirectory() {
 
-        /* Ifremer's server does not contain any .constellation directory, so the
-         * configuration files are put under the WEB-INF/classes/configuration/ directory of the WAR file.
-         */
-        File configDir = FileUtilities.getDirectoryFromResource("configuration");
-
-        final String configUrl = "csw_configuration";
-
-        /*
-         * if the configuration files are put under the WEB-INF/classes/csw_configuration directory of the WAR file.
-         */
-        if (configDir == null || !configDir.exists()) {
-            configDir = FileUtilities.getDirectoryFromResource(configUrl);
+        final File configDir = ConfigDirectory.getConfigDirectory();
+        if (configDir != null && configDir.exists()) {
+            final File sosDir = new File(configDir, "csw_configuration");
+            if (sosDir != null && sosDir.exists()) {
+                LOGGER.log(Level.INFO, "taking configuration from constellation directory: {0}", configDir.getPath());
+            } else {
+                LOGGER.warning("Unable to find a CSW configuration directory");
+            }
+            return sosDir;
         }
-
-       // else we search the .constellation directory
-        if (configDir == null || !configDir.exists()) {
-            configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
-        }
-
-        if (configDir != null) {
-            LOGGER.log(Level.INFO, "taking configuration from constellation directory: {0}", configDir.getPath());
-        }
-        return configDir;
+        return null;
     }
 
     /**

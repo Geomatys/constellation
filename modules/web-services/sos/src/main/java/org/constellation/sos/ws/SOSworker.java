@@ -231,7 +231,7 @@ public class SOSworker {
     private static final List<String> ACCEPTED_OUTPUT_FORMATS;
     static {
         ACCEPTED_OUTPUT_FORMATS = Arrays.asList(MimeType.TEXT_XML,
-                                                MimeType.APP_XML,
+                                                MimeType.APPLICATION_XML,
                                                 MimeType.TEXT_PLAIN);
     }
 
@@ -625,7 +625,7 @@ public class SOSworker {
             }
             
         } else {
-            this.outputFormat = MimeType.APP_XML;
+            this.outputFormat = MimeType.APPLICATION_XML;
         }
         
         //we prepare the different parts response document
@@ -731,6 +731,7 @@ public class SOSworker {
                } else {
                    ds.updateParameter(PROCEDURE, procNames);
                }
+               ds.updateParameter("outputFormat", ACCEPTED_SENSORML_FORMATS);
 
                final Operation gfoi = om.getOperation("GetFeatureOfInterest");
                if (gfoi != null) {
@@ -2195,35 +2196,20 @@ public class SOSworker {
     }
 
     /**
-     * In some implementations there is no .constellation directory.
-     *
-     * we search first in the classes resource into /WEB-INF/classes/configuration
-     * else if we don't find it we look for .constellation/sos_configuration directory
-     *
+     * Look for the SOS configuration directory.
      */
     private File getConfigDirectory() {
-
-        /* Ifremer's server does not contain any .constellation directory, so the
-         * configuration files are put under the WEB-INF/classes/configuration/ directory of the WAR file.
-         */
-        File configDir = FileUtilities.getDirectoryFromResource("configuration");
-
-         final String configUrl = "sos_configuration";
-
-        // if not find we search also in WEB-INF/classes/sos_configuration
-        if (configDir == null || !configDir.exists()) {
-            configDir = FileUtilities.getDirectoryFromResource(configUrl);
+        final File configDir = ConfigDirectory.getConfigDirectory();
+        if (configDir != null && configDir.exists()) {
+            final File sosDir = new File(configDir, "sos_configuration");
+            if (sosDir != null && sosDir.exists()) {
+                LOGGER.log(Level.INFO, "taking configuration from constellation directory: {0}", configDir.getPath());
+            } else {
+                LOGGER.warning("Unable to find a SOS configuration directory");
+            }
+            return sosDir;
         }
-
-        // else we search the .constellation directory
-        if (configDir == null || !configDir.exists()) {
-            configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
-        }
-
-        if (configDir != null) {
-            LOGGER.log(Level.INFO, "taking configuration from constellation directory: {0}", configDir.getPath());
-        }
-        return configDir;
+        return null;
     }
 
     /**
