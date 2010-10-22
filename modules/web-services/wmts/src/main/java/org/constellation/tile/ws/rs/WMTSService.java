@@ -39,7 +39,6 @@ import static org.constellation.query.Query.KEY_SERVICE;
 import static org.constellation.query.Query.KEY_VERSION;
 import org.geotoolkit.ows.xml.RequestBase;
 
-import org.geotoolkit.wmts.xml.v100.Capabilities;
 import org.geotoolkit.ows.xml.v110.AcceptFormatsType;
 import org.geotoolkit.ows.xml.v110.AcceptVersionsType;
 import org.geotoolkit.ows.xml.v110.ExceptionReport;
@@ -114,8 +113,6 @@ public class WMTSService extends GridWebService {
 
             if (request instanceof GetCapabilities) {
                 final GetCapabilities gc = (GetCapabilities) request;
-                worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.WMTS_1_0_0));
-                
                 return Response.ok(worker.getCapabilities(gc), MimeType.TEXT_XML).build();
             }
             if (request instanceof GetTile) {

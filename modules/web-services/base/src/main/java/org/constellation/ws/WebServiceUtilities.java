@@ -81,6 +81,7 @@ public class WebServiceUtilities {
      * @param fileName The name of the file requested.
      * @return The specified file.
      */
+    @Deprecated
     public static File getFile(final String fileName, final String home) {
          File path;
          if (home == null || !(path = new File(home)).isDirectory()) {

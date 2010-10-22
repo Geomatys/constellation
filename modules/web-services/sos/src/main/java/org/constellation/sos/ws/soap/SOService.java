@@ -18,11 +18,10 @@
 package org.constellation.sos.ws.soap;
 
 // JDK dependencies
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
 // JAX-WS dependencies
 import javax.jws.WebMethod;
@@ -31,15 +30,12 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 
-// JAXB dependencies
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
 // Constellation dependencies
-import javax.xml.bind.annotation.XmlSeeAlso;
 import org.constellation.ServiceDef;
-import org.constellation.provider.configuration.ConfigDirectory;
 import org.constellation.ws.CstlServiceException;
+import org.constellation.sos.ws.SOSworker;
+
+// Geotoolkit dependencies
 import org.geotoolkit.sml.xml.AbstractSensorML;
 import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.sos.xml.v100.DescribeSensor;
@@ -51,14 +47,11 @@ import org.geotoolkit.sos.xml.v100.InsertObservation;
 import org.geotoolkit.sos.xml.v100.InsertObservationResponse;
 import org.geotoolkit.sos.xml.v100.RegisterSensor;
 import org.geotoolkit.sos.xml.v100.RegisterSensorResponse;
-import org.constellation.sos.ws.SOSworker;
 import org.geotoolkit.gml.xml.v311.AbstractFeatureEntry;
 import org.geotoolkit.gml.xml.v311.AbstractTimePrimitiveType;
 import org.geotoolkit.observation.xml.v100.ObservationCollectionEntry;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterest;
 import org.geotoolkit.sos.xml.v100.GetFeatureOfInterestTime;
-import org.geotoolkit.util.FileUtilities;
 
 
 /**
@@ -109,8 +102,6 @@ public class SOService {
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilities requestCapabilities) throws SOServiceException  {
         try {
             LOGGER.info("received SOAP getCapabilities request");
-            worker.setSkeletonCapabilities((Capabilities)getCapabilitiesObject());
-             
             return worker.getCapabilities(requestCapabilities);
         } catch (CstlServiceException ex) {
             throw new SOServiceException(ex.getMessage(), ex.getExceptionCode().name(),
@@ -243,38 +234,5 @@ public class SOService {
         }
     }
     
-    /**
-     * Returns the file where to read the capabilities document for each service.
-     * If no such file is found, then this method returns {@code null}.
-     *
-     * @param  version the version of the service.
-     * @return The capabilities Object, or {@code null} if none.
-     * @throws JAXBException
-     */
-    public Object getCapabilitiesObject() {
-        final String fileName     = "SOSCapabilities1.0.0.xml";
-        Object response           = capabilities.get(fileName);
-        if (response == null) {
-            final String configUrl    = "sos_configuration";
-            final File configDir      = new File(ConfigDirectory.getConfigDirectory(), configUrl);
-            if (configDir.exists()) {
-                LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
-            } else {
-                return FileUtilities.getDirectoryFromResource(configUrl);
-            }
-            try {
-                final Unmarshaller unmarshaller = SOSMarshallerPool.getInstance().acquireUnmarshaller();
-                final File f                    = new File(configDir, fileName);
-                LOGGER.info(f.toString());
-                response                        = unmarshaller.unmarshal(f);
-                SOSMarshallerPool.getInstance().release(unmarshaller);
-            } catch(JAXBException ex) {
-                LOGGER.log(Level.SEVERE, "unable to unmarshall the capabilities file", ex);
-            }
-            capabilities.put(fileName, response);
-            
-        }
-        return response;
-    }
 }
 

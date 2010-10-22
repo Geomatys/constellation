@@ -114,8 +114,6 @@ public class CSWworkerTest {
 
     protected static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
 
-    protected static Capabilities skeletonCapabilities;
-
     public static void fillPoolAnchor(AnchoredMarshallerPool pool) {
         try {
             pool.addAnchor("Common Data Index record", new URI("SDN:L231:3:CDI"));

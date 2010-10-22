@@ -30,11 +30,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.constellation.util.Util;
 import org.constellation.ws.CstlServiceException;
 
 import org.geotoolkit.csw.xml.CSWMarshallerPool;
-import org.geotoolkit.csw.xml.v202.Capabilities;
 import org.geotoolkit.csw.xml.v202.GetCapabilitiesType;
 import org.geotoolkit.xml.MarshallerPool;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -54,7 +52,7 @@ public class CSWorkerInitialisationTest {
 
     private static File configurationDirectory = new File("CSWorkerInitialisationTest");
 
-    private static Capabilities skeletonCapabilities;
+    
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -65,7 +63,6 @@ public class CSWorkerInitialisationTest {
         pool = CSWMarshallerPool.getInstance();
         Unmarshaller u = pool.acquireUnmarshaller();
 
-        skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
         pool.release(u);
     }
 
@@ -125,7 +122,6 @@ public class CSWorkerInitialisationTest {
          * Test 1: No configuration file.
          */
         CSWworker worker = new CSWworker("", configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
         boolean exceptionLaunched = false;
@@ -149,7 +145,6 @@ public class CSWorkerInitialisationTest {
         configFile.createNewFile();
         
         worker = new CSWworker("",  configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -181,7 +176,6 @@ public class CSWorkerInitialisationTest {
 
 
         worker = new CSWworker("",  configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -208,7 +202,6 @@ public class CSWorkerInitialisationTest {
         tempMarshaller.marshal(new UnknowObject(), configFile);
 
         worker = new CSWworker("",  configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -235,7 +228,6 @@ public class CSWorkerInitialisationTest {
         tempMarshaller.marshal(configuration, configFile);
 
         worker = new CSWworker("",  configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -262,7 +254,6 @@ public class CSWorkerInitialisationTest {
         tempMarshaller.marshal(configuration, configFile);
 
         worker = new CSWworker("",  configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -289,7 +280,6 @@ public class CSWorkerInitialisationTest {
         tempMarshaller.marshal(configuration, configFile);
 
         worker = new CSWworker("",  configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -315,7 +305,6 @@ public class CSWorkerInitialisationTest {
         tempMarshaller.marshal(configuration, configFile);
 
         worker = new CSWworker("",  configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -341,7 +330,6 @@ public class CSWorkerInitialisationTest {
         tempMarshaller.marshal(configuration, configFile);
 
         worker = new CSWworker("",  configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -367,7 +355,6 @@ public class CSWorkerInitialisationTest {
         tempMarshaller.marshal(configuration, configFile);
 
         worker = new CSWworker("",  configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;
@@ -393,7 +380,6 @@ public class CSWorkerInitialisationTest {
         tempMarshaller.marshal(configuration, configFile);
 
         worker = new CSWworker("",  configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
 
         exceptionLaunched = false;

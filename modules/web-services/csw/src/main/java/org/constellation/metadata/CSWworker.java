@@ -73,12 +73,14 @@ import static org.constellation.metadata.CSWConstants.*;
 
 //geotoolkit dependencies
 import org.constellation.metadata.harvest.CatalogueHarvester;
+import org.constellation.ws.AbstractWorker;
 import org.geotoolkit.factory.FactoryNotFoundException;
 import org.geotoolkit.factory.FactoryRegistry;
 import org.geotoolkit.inspire.xml.InspireCapabilitiesType;
 import org.geotoolkit.inspire.xml.MultiLingualCapabilities;
 import org.geotoolkit.metadata.iso.DefaultMetadata;
 import org.geotoolkit.csw.xml.AbstractCswRequest;
+import org.geotoolkit.csw.xml.CSWMarshallerPool;
 import org.geotoolkit.csw.xml.CswXmlFactory;
 import org.geotoolkit.csw.xml.ElementSetType;
 import org.geotoolkit.csw.xml.ElementSetName;
@@ -126,9 +128,9 @@ import org.geotoolkit.ows.xml.v100.OperationsMetadata;
 import org.geotoolkit.ows.xml.v100.SectionsType;
 import org.geotoolkit.ows.xml.v100.ServiceIdentification;
 import org.geotoolkit.ows.xml.v100.ServiceProvider;
-import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
+import org.geotoolkit.xml.MarshallerPool;
 import org.geotoolkit.xml.Namespaces;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 import static org.geotoolkit.csw.xml.TypeNames.*;
@@ -145,18 +147,8 @@ import org.opengis.util.CodeList;
  * 
  * @author Guilhem Legal (Geomatys)
  */
-public class CSWworker {
+public class CSWworker extends AbstractWorker {
 
-    /**
-     * use for debugging purpose
-     */
-    private static final Logger LOGGER = Logger.getLogger("org.constellation.metadata");
-    
-    /**
-     * A capabilities object containing the static part of the document.
-     */
-    private Capabilities skeletonCapabilities;
-    
     /**
      * The service url.
      */
@@ -575,9 +567,13 @@ public class CSWworker {
         }
         */
 
-        // if the static capabilities are null we send an exception
-        if (skeletonCapabilities == null)
-            throw new CstlServiceException("The service was unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
+        // we load the skeleton capabilities
+        Capabilities skeletonCapabilities;
+        try {
+            skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
+        } catch (JAXBException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+        }
 
         //we prepare the response document
         Capabilities c = null; 
@@ -1280,8 +1276,13 @@ public class CSWworker {
                 final int pointLocation = token.indexOf('.');
                 if (pointLocation != -1) {
 
-                    if (skeletonCapabilities == null)
-                        throw new CstlServiceException("The service was unable to find the capabilities skeleton", NO_APPLICABLE_CODE);
+                    // we load the skeleton capabilities
+                    Capabilities skeletonCapabilities;
+                    try {
+                        skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("2.0.2", "CSW");
+                    } catch (JAXBException ex) {
+                        throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
+                    }
 
                     final String operationName = token.substring(0, pointLocation);
                     final String parameter     = token.substring(pointLocation + 1);
@@ -1618,15 +1619,6 @@ public class CSWworker {
     }
     
     /**
-     * Set the capabilities document.
-     * 
-     * @param skeletonCapabilities An OWS 1.0.0 capabilities object.
-     */
-    public void setSkeletonCapabilities(final Capabilities skeletonCapabilities) {
-        this.skeletonCapabilities = skeletonCapabilities;
-    }
-    
-    /**
      * Set the current service URL
      */
     public void setServiceURL(final String serviceURL){
@@ -1760,8 +1752,9 @@ public class CSWworker {
     }
     
     /**
-     * Destroy all the resource and close the connection when the web application is undeployed.
+     * {@inheritDoc }
      */
+    @Override
     public void destroy() {
         if (mdReader != null) {
             mdReader.destroy();
@@ -1780,6 +1773,10 @@ public class CSWworker {
         }
     }
 
+    /**
+     * {@inheritDoc }
+     */
+    @Override
     public void setLogLevel(Level logLevel) {
         this.logLevel = logLevel;
         if (indexSearcher != null) {
@@ -1792,6 +1789,14 @@ public class CSWworker {
         if (mdReader != null) {
             mdReader.setLogLevel(logLevel);
         }
+    }
+
+    /**
+     * {@inheritDoc }
+     */
+    @Override
+    protected MarshallerPool getMarshallerPool() {
+        return CSWMarshallerPool.getInstance();
     }
 
 }

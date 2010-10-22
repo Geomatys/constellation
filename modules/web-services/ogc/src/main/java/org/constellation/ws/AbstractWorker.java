@@ -42,6 +42,7 @@ import org.geotoolkit.xml.MarshallerPool;
  * 
  * @author Cédric Briançon (Geomatys)
  * @author Johann Sorel (Geomatys)
+ * @author Guilhem Legal (Geomatys)
  */
 public abstract class AbstractWorker implements Worker {
 

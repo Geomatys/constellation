@@ -20,19 +20,13 @@ package org.constellation.ws.rs;
 // J2SE dependencies
 import java.util.StringTokenizer;
 import java.util.logging.Level;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 // Constellation dependencies
 import org.constellation.ServiceDef;
 import org.constellation.ws.CstlServiceException;
-import org.constellation.ws.WebServiceUtilities;
 
 // Geotoolkit dependencies
 import org.geotoolkit.internal.CodeLists;
@@ -76,18 +70,6 @@ public abstract class OGCWebService extends AbstractWebService {
      * avoid modification after instanciation.
      */
     private final UnmodifiableArrayList<ServiceDef> supportedVersions;
-    
-    /**
-     * A map containing the Capabilities Object already load from file.
-     */
-    private final Map<String,Object> capabilities = new HashMap<String,Object>();
-    /**
-     * The time of the last update of the cached capabilities map, represented
-     * as the number of milliseconds since the Unix Epoch (i.e. useful as a
-     * parameter to the Date constructor).
-     */
-    private long lastUpdateTime = 0;
-    
     
     /**
      * Initialize the basic attributes of a web serviceType.
@@ -181,64 +163,6 @@ public abstract class OGCWebService extends AbstractWebService {
     }
 
     /**
-     * Returns the file where to read the capabilities document for each serviceType.
-     * If no such file is found, then this method returns {@code null}.
-     *
-     * TODO the data providers should send events when data changes, which should result
-     * in a capability update. the capabilities should not be updated only with the presence
-     * of a "change.properties" file.
-     *
-     * @return The capabilities Object, or {@code null} if none.
-     */
-    @Deprecated
-    protected Object getStaticCapabilitiesObject(final ServiceDef def) throws JAXBException {
-        final String fileName = def.specification.toString() + "Capabilities" + def.version.toString() + ".xml";
-       
-        final String home    = getServletContext().getRealPath("WEB-INF");
-        final boolean update = WebServiceUtilities.getUpdateCapabilitiesFlag(home);
-
-        //we look if we have already put it in cache
-        Object response = capabilities.get(fileName);
-
-        if (response == null || update) {
-            if (update) {
-                LOGGER.info("updating metadata");
-            }
-
-            final File f = WebServiceUtilities.getFile(fileName, home);
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = getMarshallerPool().acquireUnmarshaller();
-                if (f == null || !f.exists()) {
-                    final InputStream in = getClass().getResourceAsStream(fileName);
-                    if (in != null) {
-                        response = unmarshaller.unmarshal(in);
-                        in.close();
-                    } else {
-                        LOGGER.warning("Unable to find the skeleton capabilities file in the resource.");
-                    }
-                } else {
-                    response = unmarshaller.unmarshal(f);
-                }
-            } catch (IOException ex) {
-                LOGGER.warning("Unable to close the skeleton capabilities input stream.");
-            } finally {
-                if (unmarshaller != null) {
-                    getMarshallerPool().release(unmarshaller);
-                }
-            }
-            if (response != null) {
-                capabilities.put(fileName, response);
-                lastUpdateTime = System.currentTimeMillis();
-            }
-
-            WebServiceUtilities.storeUpdateCapabilitiesFlag(home);
-       }
-       return response;
-        
-    }
-
-    /**
      * Return a Version Object from the version number.
      * if the version number is not correct return the default version.
      *
@@ -298,13 +222,6 @@ public abstract class OGCWebService extends AbstractWebService {
             }
         }
         return firstSpecifiedVersion;
-    }
-
-    /**
-     * return the last time that the capabilities have been updated (not yet really used)
-     */
-    public long getLastUpdateTime() {
-        return lastUpdateTime;
     }
 
     /**

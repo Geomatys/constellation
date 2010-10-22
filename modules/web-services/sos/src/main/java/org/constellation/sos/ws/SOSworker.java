@@ -68,13 +68,16 @@ import org.constellation.sos.io.ObservationResult;
 import org.constellation.sos.io.ObservationWriter;
 import org.constellation.sos.io.SensorReader;
 import org.constellation.sos.io.SensorWriter;
+import org.constellation.ws.AbstractWorker;
 import org.constellation.ws.CstlServiceException;
 import org.constellation.ws.MimeType;
 import static org.constellation.sos.ws.SOSConstants.*;
 import static org.constellation.sos.ws.Utils.*;
 import static org.constellation.sos.ws.Normalizer.*;
 
+
 // GeoAPI dependencies
+import org.geotoolkit.xml.MarshallerPool;
 import org.opengis.observation.Observation;
 import org.opengis.observation.CompositePhenomenon;
 import org.opengis.observation.Phenomenon;
@@ -96,6 +99,7 @@ import org.geotoolkit.ows.xml.v110.RangeType;
 import org.geotoolkit.ows.xml.v110.SectionsType;
 import org.geotoolkit.ows.xml.v110.ServiceIdentification;
 import org.geotoolkit.ows.xml.v110.ServiceProvider;
+import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.sos.xml.v100.Contents;
 import org.geotoolkit.sos.xml.v100.Contents.ObservationOfferingList;
@@ -149,7 +153,6 @@ import org.geotoolkit.swe.xml.AnyResult;
 import org.geotoolkit.swe.xml.DataArray;
 import org.geotoolkit.swe.xml.TextBlock;
 import org.geotoolkit.swe.xml.v101.PhenomenonEntry;
-import org.geotoolkit.util.FileUtilities;
 import org.geotoolkit.util.StringUtilities;
 import org.geotoolkit.util.logging.MonolineFormatter;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
@@ -160,15 +163,10 @@ import static org.geotoolkit.sos.xml.v100.ResponseModeType.*;
  *
  * @author Guilhem Legal (Geomatys).
  */
-public class SOSworker {
+public class SOSworker extends AbstractWorker {
 
     public static final int DISCOVERY     = 0;
     public static final int TRANSACTIONAL = 1;
-    
-    /**
-     * use for debugging purpose
-     */
-    protected static final Logger LOGGER = Logger.getLogger("org.constellation.sos");
     
     /**
      * A list of temporary ObservationTemplate
@@ -204,11 +202,6 @@ public class SOSworker {
      * The valid time for a getObservation template (in ms).
      */
     private long templateValidTime;
-    
-    /**
-     * A capabilities object containing the static part of the document.
-     */
-    private Capabilities skeletonCapabilities;
     
     /**
      * The service url.
@@ -324,11 +317,6 @@ public class SOSworker {
      */
     private static Capabilities cachedCapabilities;
 
-    /**
-     * The log level off al the informations log.
-     */
-    private Level logLevel = Level.INFO;
-    
     /**
      * Initialize the database connection.
      */
@@ -641,9 +629,14 @@ public class SOSworker {
             sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
         }
 
-        if (skeletonCapabilities == null) {
-            throw new CstlServiceException("the service was unable to find the metadata for capabilities operation", NO_APPLICABLE_CODE);
+        // we load the skeleton capabilities
+        Capabilities skeletonCapabilities;
+        try {
+            skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "SOS");
+        } catch (JAXBException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
+        
         final Capabilities localCapabilities;
         if (keepCapabilities) {
             localCapabilities = cachedCapabilities;
@@ -2143,13 +2136,6 @@ public class SOSworker {
     }
     
     /**
-     * Set the capabilities document.
-     */
-    public void setSkeletonCapabilities(Capabilities skeletonCapabilities) {
-        this.skeletonCapabilities = skeletonCapabilities;
-    }
-    
-    /**
      * Set the current service URL
      */
     public void setServiceURL(String serviceURL){
@@ -2264,6 +2250,14 @@ public class SOSworker {
         if (smlWriter instanceof AbstractMetadataWriter) {
             ((AbstractMetadataWriter)smlWriter).setLogLevel(logLevel);
         }
+    }
+
+   /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected MarshallerPool getMarshallerPool() {
+        return SOSMarshallerPool.getInstance();
     }
     
     /**

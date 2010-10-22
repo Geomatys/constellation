@@ -68,5 +68,4 @@ public interface WMTSWorker extends Worker {
 
     void setServiceURL(String serviceURL);
 
-    void setSkeletonCapabilities(final Capabilities skeletonCapabilities);
 }

@@ -20,18 +20,14 @@ package org.constellation.sos.ws;
 import java.io.File;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import org.constellation.configuration.SOSConfiguration;
 import org.constellation.generic.database.Automatic;
 import org.constellation.generic.database.BDD;
-import org.geotoolkit.sos.xml.v100.Capabilities;
 import org.geotoolkit.sos.xml.v100.GetCapabilities;
-import org.constellation.util.Util;
 import static org.geotoolkit.ows.xml.OWSExceptionCode.*;
 
 // JUnit dependencies
 import org.constellation.ws.CstlServiceException;
-import org.geotoolkit.sos.xml.SOSMarshallerPool;
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -44,8 +40,6 @@ public class SOSWorkerInitialisationTest {
 
     private static File configurationDirectory = new File("SOSWorkerInitialisationTest");
 
-    private static Capabilities skeletonCapabilities;
-
     @BeforeClass
     public static void setUpClass() throws Exception {
         deleteTemporaryFile();
@@ -53,9 +47,6 @@ public class SOSWorkerInitialisationTest {
             configurationDirectory.mkdir();
         }
 
-        Unmarshaller unmarshaller = SOSMarshallerPool.getInstance().acquireUnmarshaller();
-        skeletonCapabilities      = (Capabilities) unmarshaller.unmarshal(Util.getResourceAsStream("org/constellation/sos/SOSCapabilities1.0.0.xml"));
-        SOSMarshallerPool.getInstance().release(unmarshaller);
     }
 
     @AfterClass
@@ -118,7 +109,6 @@ public class SOSWorkerInitialisationTest {
          * Test 1: No configuration file.
          */
         SOSworker worker = new SOSworker(configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         boolean exceptionLaunched = false;
         GetCapabilities request = new GetCapabilities();
@@ -141,7 +131,6 @@ public class SOSWorkerInitialisationTest {
         configFile.createNewFile();
 
         worker = new SOSworker(configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {
@@ -166,7 +155,6 @@ public class SOSWorkerInitialisationTest {
         marshaller.marshal(request, configFile);
 
         worker = new SOSworker(configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {
@@ -191,7 +179,6 @@ public class SOSWorkerInitialisationTest {
         marshaller.marshal(new BDD(), configFile);
 
         worker = new SOSworker(configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {
@@ -214,7 +201,6 @@ public class SOSWorkerInitialisationTest {
         marshaller.marshal(configuration, configFile);
 
         worker = new SOSworker(configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {
@@ -239,7 +225,6 @@ public class SOSWorkerInitialisationTest {
         marshaller.marshal(configuration, configFile);
 
         worker = new SOSworker(configurationDirectory);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {
@@ -264,8 +249,6 @@ public class SOSWorkerInitialisationTest {
         marshaller.marshal(configuration, configFile);
 
         worker = new SOSworker(configurationDirectory);
-
-        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {
@@ -293,7 +276,6 @@ public class SOSWorkerInitialisationTest {
 
         worker = new SOSworker(configurationDirectory);
 
-        worker.setSkeletonCapabilities(skeletonCapabilities);
 
         exceptionLaunched = false;
         try {

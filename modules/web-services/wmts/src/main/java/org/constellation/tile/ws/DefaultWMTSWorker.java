@@ -37,6 +37,7 @@ import java.util.SortedSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.xml.bind.JAXBException;
 
 import org.constellation.tile.visitor.GMLGraphicVisitor;
 import org.constellation.tile.visitor.HTMLGraphicVisitor;
@@ -121,11 +122,6 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
      * The service url.
      */
     private String serviceURL;
-    
-    /**
-     * A capabilities object containing the static part of the document.
-     */
-    private Capabilities skeletonCapabilities;
     
     /**
      * A list of supported MIME type
@@ -215,6 +211,14 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
         SectionsType sections = requestCapabilities.getSections();
         if (sections == null) {
             sections = new SectionsType(SectionsType.getExistingSections("1.1.1"));
+        }
+
+        // we load the skeleton capabilities
+        Capabilities skeletonCapabilities;
+        try {
+            skeletonCapabilities = (Capabilities) getStaticCapabilitiesObject("1.0.0", "WMTS");
+        } catch (JAXBException ex) {
+            throw new CstlServiceException(ex, NO_APPLICABLE_CODE);
         }
 
         if (skeletonCapabilities == null) {
@@ -728,16 +732,6 @@ public class DefaultWMTSWorker extends AbstractWorker implements WMTSWorker {
             return buffer.toString();
         }
         return null;
-    }
-
-    /**
-     * Set the capabilities document.
-     *
-     * @param skeletonCapabilities An OWS 1.0.0 capabilities object.
-     */
-    @Override
-    public void setSkeletonCapabilities(final Capabilities skeletonCapabilities) {
-        this.skeletonCapabilities = skeletonCapabilities;
     }
 
     /**

@@ -144,23 +144,6 @@ public class SOSWorkerTest {
             assertEquals(ex.getLocator(), "acceptFormats");
         }
 
-        /*
-         *  TEST 3 : get capabilities no skeleton capabilities
-         */
-
-        worker.setSkeletonCapabilities(null);
-        request = new GetCapabilities();
-
-        exLaunched = false;
-        try {
-            worker.getCapabilities(request);
-        } catch (CstlServiceException ex) {
-            exLaunched = true;
-            assertEquals(ex.getExceptionCode(), NO_APPLICABLE_CODE);
-        }
-
-        worker.setSkeletonCapabilities(capabilities);
-        assertTrue(exLaunched);
     }
     
     /**

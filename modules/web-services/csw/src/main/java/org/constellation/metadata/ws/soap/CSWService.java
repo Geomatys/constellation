@@ -18,7 +18,6 @@
 package org.constellation.metadata.ws.soap;
 
 // J2SE dependencies 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -30,15 +29,9 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 
-// JAXB dependencies
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-
-
 // constellation dependencies
 import org.constellation.ws.CstlServiceException;
 import org.constellation.metadata.CSWworker;
-import org.constellation.provider.configuration.ConfigDirectory;
 
 //geotoolkit dependencies
 import org.geotoolkit.csw.xml.v202.Capabilities;
@@ -54,8 +47,6 @@ import org.geotoolkit.csw.xml.v202.HarvestResponseType;
 import org.geotoolkit.csw.xml.v202.HarvestType;
 import org.geotoolkit.csw.xml.v202.TransactionResponseType;
 import org.geotoolkit.csw.xml.v202.TransactionType;
-import org.geotoolkit.ebrim.xml.EBRIMMarshallerPool;
-import org.geotoolkit.util.FileUtilities;
 
 /**
  *
@@ -100,14 +91,10 @@ public class CSWService {
     public Capabilities getCapabilities(@WebParam(name = "GetCapabilities") GetCapabilitiesType requestCapabilities) throws SOAPServiceException  {
         try {
             LOGGER.info("received SOAP getCapabilities request");
-            worker.setSkeletonCapabilities((Capabilities)getCapabilitiesObject());
-             
             return worker.getCapabilities(requestCapabilities);
             
         } catch (CstlServiceException ex) {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(), requestCapabilities.getVersion().toString());
-        } catch (JAXBException ex) {
-            throw new SOAPServiceException(ex.getMessage(), ex.getErrorCode(), requestCapabilities.getVersion().toString());
         }
     }
     
@@ -194,41 +181,6 @@ public class CSWService {
             throw new SOAPServiceException(ex.getMessage(), ex.getExceptionCode().name(),
                                            requestTransaction.getVersion());
         }
-    }
-    
-    /**
-     * Returns the file where to read the capabilities document for each service.
-     * If no such file is found, then this method returns {@code null}.
-     *
-     * @param  version the version of the service.
-     * @return The capabilities Object, or {@code null} if none.
-     */
-    public Object getCapabilitiesObject() throws JAXBException {
-        final String fileName = "CSWCapabilities2.0.2.xml";
-
-        Object response = capabilities.get(fileName);
-        if (response == null) {
-            final String configUrl = "csw_configuration";
-            final File configDir = new File(ConfigDirectory.getConfigDirectory(), configUrl);
-            if (configDir.exists()) {
-                LOGGER.info("taking configuration from constellation directory: " + configDir.getPath());
-            } else {
-                return FileUtilities.getDirectoryFromResource(configUrl);
-            }
-            final File f = new File(configDir, fileName);
-            LOGGER.info(f.toString());
-            Unmarshaller unmarshaller = null;
-            try {
-                unmarshaller = EBRIMMarshallerPool.getInstance().acquireUnmarshaller();
-                response = unmarshaller.unmarshal(f);
-                capabilities.put(fileName, response);
-            } finally {
-                if (unmarshaller != null) {
-                    EBRIMMarshallerPool.getInstance().release(unmarshaller);
-                }
-            }
-        }
-        return response;
     }
 }
 

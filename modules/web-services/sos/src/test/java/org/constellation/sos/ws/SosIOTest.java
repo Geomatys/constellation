@@ -114,7 +114,6 @@ public class SosIOTest {
         File configDirectory1 = new File("sosDefaultConfig");
         if (configDirectory1.exists()) {
             defaultWorker = new SOSworker(configDirectory1);
-            defaultWorker.setSkeletonCapabilities(staticCapabilities);
         } else {
             configFilesExist = false;
             return;
@@ -123,7 +122,6 @@ public class SosIOTest {
         File configDirectory2 = new File("sosGenericConfig");
         if (configDirectory2.exists()) {
             genericWorker = new SOSworker(configDirectory2);
-            genericWorker.setSkeletonCapabilities(staticCapabilities);
             configFilesExist = true;
         } else {
             configFilesExist = false;

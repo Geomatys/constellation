@@ -18,7 +18,6 @@
 package org.constellation.metadata.ws.rs;
 
 // java se dependencies
-import org.apache.xml.serialize.XMLSerializer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +31,7 @@ import com.sun.jersey.spi.resource.Singleton;
 import javax.annotation.PreDestroy;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
+import org.apache.xml.serialize.XMLSerializer;
 
 //JAXB dependencies
 import javax.xml.bind.JAXBException;
@@ -201,7 +201,6 @@ public class CSWService extends OGCWebService {
                 if (request instanceof GetCapabilities) {
 
                     final GetCapabilities gc = (GetCapabilities)request;
-                    worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.CSW_2_0_2));
                     return Response.ok(worker.getCapabilities(gc), worker.getOutputFormat()).build();
                 }
 
@@ -234,7 +233,6 @@ public class CSWService extends OGCWebService {
                 if (request instanceof GetDomain) {
 
                     final GetDomain gd = (GetDomain)request;
-                    worker.setSkeletonCapabilities((Capabilities)getStaticCapabilitiesObject(ServiceDef.CSW_2_0_2));
                     return Response.ok(worker.getDomain(gd), worker.getOutputFormat()).build();
                 }
 

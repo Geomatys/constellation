@@ -89,11 +89,9 @@ public class MDwebCSWworkerTest extends CSWworkerTest {
         fillPoolAnchor((AnchoredMarshallerPool) pool);
 
         Unmarshaller u = pool.acquireUnmarshaller();
-        skeletonCapabilities = (Capabilities) u.unmarshal(Util.getResourceAsStream("org/constellation/metadata/CSWCapabilities2.0.2.xml"));
         pool.release(u);
 
         worker = new CSWworker("", configDir);
-        worker.setSkeletonCapabilities(skeletonCapabilities);
         worker.setLogLevel(Level.FINER);
     }
 
