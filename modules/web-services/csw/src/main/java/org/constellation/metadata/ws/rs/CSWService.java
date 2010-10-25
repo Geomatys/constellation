@@ -165,15 +165,7 @@ public class CSWService extends OGCWebService {
     }
 
     /**
-     * Treat the incomming request and call the right function.
-     *
-     * @param objectRequest if the server receive a POST request in XML,
-     *        this object contain the request. Else for a GET or a POST kvp
-     *        request this param is {@code null}
-     * @param The worker to call.
-      * 
-     * @return an xml response.
-     * @throw JAXBException
+     * {@inheritDoc}
      */
     protected Response treatIncomingRequest(final Object objectRequest, CSWworker worker) throws JAXBException {
         ServiceDef serviceDef = null;

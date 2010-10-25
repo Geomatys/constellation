@@ -27,20 +27,22 @@ import org.constellation.provider.configuration.ConfigDirectory;
 import org.geotoolkit.util.logging.Logging;
 
 /**
- *
+ * All this method will probably be deleted.
+ * 
  * @author Guilhem Legal (Geomatys)
  */
+@Deprecated
 public class WebServiceUtilities {
 
     private static final Logger LOGGER = Logging.getLogger(WebServiceUtilities.class);
 
     private WebServiceUtilities(){}
 
-    public static boolean getUpdateCapabilitiesFlag(String home) {
+    public static boolean getUpdateCapabilitiesFlag() {
         final Properties p = new Properties();
 
         // if the flag file is present we load the properties
-        final File changeFile = getFile("change.properties", home);
+        final File changeFile = getChangeFile();
         if (changeFile != null && changeFile.exists()) {
             try {
                 final FileInputStream in = new FileInputStream(changeFile);
@@ -57,9 +59,9 @@ public class WebServiceUtilities {
         return  p.getProperty("update").equals("true");
     }
 
-    public static void storeUpdateCapabilitiesFlag(final String home) {
+    public static void storeUpdateCapabilitiesFlag() {
         final Properties p = new Properties();
-        final File changeFile = getFile("change.properties", home);
+        final File changeFile = getChangeFile();
         p.put("update", "false");
 
         // if the flag file is present we store the properties
@@ -75,21 +77,16 @@ public class WebServiceUtilities {
     }
 
     /**
-     * Return a file located in the home directory. In this implementation, it should be
-     * the WEB-INF directory of the deployed service.
+     * Return a the change file named "change.properties" located in the constellation directory.
      *
-     * @param fileName The name of the file requested.
      * @return The specified file.
      */
-    @Deprecated
-    public static File getFile(final String fileName, final String home) {
-         File path;
-         if (home == null || !(path = new File(home)).isDirectory()) {
-            path = ConfigDirectory.getConfigDirectory();
+    private static File getChangeFile() {
+         File path = ConfigDirectory.getConfigDirectory();
+         if (path != null && path.exists() && path.isDirectory()) {
+            return new File(path, "change.properties");
          }
-         if (fileName != null)
-            return new File(path, fileName);
-         else return path;
+         return null;
     }
 
 }

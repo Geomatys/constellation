@@ -73,6 +73,9 @@ public class SOService extends OGCWebService {
         setXMLContext(SOSMarshallerPool.getInstance());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {
         ServiceDef serviceDef = null;
@@ -163,6 +166,13 @@ public class SOService extends OGCWebService {
         }
     }
 
+    /**
+     * Throw an CstlServiceException when a request is not avalable in GET.
+     * 
+     * @param operationName The name of the request. (exemple getCapabilities)
+     *
+     * @throws CstlServiceException every time.
+     */
     private void throwUnsupportedGetMethod(String operationName) throws CstlServiceException {
         throw new CstlServiceException("The operation " + operationName + " is only requestable in XML",
                                                   OPERATION_NOT_SUPPORTED, operationName);

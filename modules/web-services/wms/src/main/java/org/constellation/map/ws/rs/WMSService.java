@@ -100,7 +100,7 @@ public class WMSService extends GridWebService {
     private final WMSWorker worker;
 
     /**
-     * Build a new instance of the webService and initialize the JAXB marshaller.
+     * Build a new instance of the webService and initialize the JAXB context.
      */
     public WMSService() {
         super(ServiceDef.WMS_1_3_0_SLD, ServiceDef.WMS_1_1_1_SLD);
@@ -114,20 +114,7 @@ public class WMSService extends GridWebService {
     }
 
     /**
-     * Treat the incoming request and call the right function in the worker.
-     * <p>
-     * The parent class will have processed the request sufficiently to ensure
-     * all the relevant information is either in the {@code uriContext} field or
-     * in the {@code Object} passed in as a parameter. Here we proceed a step
-     * further to ensure the request is encapsulated in a Java object which we
-     * then pass to the worker when calling the appropriate method.
-     * </p>
-     *
-     * @param  objectRequest  an object encapsulating the request or {@code null}
-     *                          if the request parameters are all in the
-     *                          {@code uriContext} field.
-     * @return a Response, either an image or an XML document depending on the
-     *           user's request.
+     * {@inheritDoc}
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) {

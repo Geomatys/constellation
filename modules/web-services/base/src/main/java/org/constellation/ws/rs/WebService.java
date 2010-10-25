@@ -194,15 +194,21 @@ public abstract class WebService {
         return httpContext;
     }
 
-    /**
-     * Treat the incoming request and call the right function.
+   /**
+     * Treat the incoming request and call the right function in the worker.
+     * <p>
+     * The parent class will have processed the request sufficiently to ensure
+     * all the relevant information is either in the {@code uriContext} field or
+     * in the {@code Object} passed in as a parameter. Here we proceed a step
+     * further to ensure the request is encapsulated in a Java object which we
+     * then pass to the worker when calling the appropriate method.
+     * </p>
      *
-     * @param objectRequest if the server receive a POST request in XML,
-     *        this object contain the request. Else for a GET or a POST kvp
-     *        request this param is {@code null}
-     *
-     * @return an image or xml response.
-     * @throw JAXBException
+     * @param  objectRequest  an object encapsulating the request or {@code null}
+     *                          if the request parameters are all in the
+     *                          {@code uriContext} field.
+     * @return a Response, either an image or an XML document depending on the
+     *           user's request.
      */
     public abstract Response treatIncomingRequest(Object objectRequest) throws JAXBException;
 
@@ -419,6 +425,10 @@ public abstract class WebService {
         }
     }
 
+    /**
+     * Return a map of parameters put in the query.
+     * @return
+     */
     public MultivaluedMap<String,String> getParameters(){
         return uriContext.getQueryParameters();
     }

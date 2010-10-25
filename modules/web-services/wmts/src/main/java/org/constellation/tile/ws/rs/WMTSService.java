@@ -79,14 +79,7 @@ public class WMTSService extends GridWebService {
     }
 
     /**
-     * Treat the incoming request and call the right function.
-     *
-     * @param objectRequest if the server receive a POST request in XML,
-     *        this object contain the request. Else for a GET or a POST kvp
-     *        request this param is {@code null}
-     *
-     * @return an image or xml response.
-     * @throw JAXBException
+     * {@inheritDoc}
      */
     @Override
     public Response treatIncomingRequest(final Object objectRequest) throws JAXBException {

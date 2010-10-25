@@ -102,7 +102,7 @@ public class WCSService extends GridWebService {
     private final WCSWorker worker;
 
     /**
-     * Build a new instance of the webService and initialize the JAXB marshaller.
+     * Build a new instance of the webService and initialize the JAXB context.
      */
     public WCSService() {
         super(ServiceDef.WCS_1_1_1, ServiceDef.WCS_1_0_0);
@@ -116,14 +116,7 @@ public class WCSService extends GridWebService {
     }
 
     /**
-     * Treat the incoming request, contained either in the {@link UriInfo}
-     * injected context variable or in the parameter, then call the right
-     * function in the worker.
-     *
-     * @param objectRequest An object holding the request received, if this is
-     *                        not in the {@code UriInfo} variable.
-     * @return The response to the request, either an image or an XML response.
-     * @throws JAXBException
+     * {@inheritDoc}
      */
     @Override
     public Response treatIncomingRequest(Object objectRequest) throws JAXBException {

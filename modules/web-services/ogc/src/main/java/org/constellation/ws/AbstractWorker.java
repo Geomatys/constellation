@@ -52,7 +52,7 @@ public abstract class AbstractWorker implements Worker {
     protected static final Logger LOGGER = Logging.getLogger("org.constellation.ws");
 
     /**
-     * Contains the request URI and therefore any  KVP parameters it may contain.
+     * Contains the service url used in capabilities document.
      */
     private String serviceUrl = null;
 
@@ -90,19 +90,34 @@ public abstract class AbstractWorker implements Worker {
         this.logLevel = logLevel;
     }
 
-    protected Object getStaticCapabilitiesObject(final String version, final String service) throws JAXBException {
-        return getStaticCapabilitiesObject(version, service, null);
-    }
     /**
      * Returns the file where to read the capabilities document for each service.
      * If no such file is found, then this method returns {@code null}.
+     * This method has a cache system, the object will be read from the file system only one time.
      *
-     * @param home    The home directory, where to search for configuration files.
+     * @param service The service type identifier. example "WMS"
      * @param version The version of the GetCapabilities.
+     * 
      * @return The capabilities Object, or {@code null} if none.
      *
-     * @throws JAXBException
-     * @throws IOException
+     * @throws JAXBException if an error occurs during the unmarshall of the document.
+     */
+    protected Object getStaticCapabilitiesObject(final String version, final String service) throws JAXBException {
+        return getStaticCapabilitiesObject(version, service, null);
+    }
+
+    /**
+     * Returns the file where to read the capabilities document for each service.
+     * If no such file is found, then this method returns {@code null}.
+     * This method has a cache system, the object will be read from the file system only one time.
+     *
+     * @param service The service type identifier. example "WMS"
+     * @param version The version of the GetCapabilities.
+     * @param language The language of the capabilities skeleton.
+     * 
+     * @return The capabilities Object, or {@code null} if none.
+     *
+     * @throws JAXBException if an error occurs during the unmarshall of the document.
      */
     protected Object getStaticCapabilitiesObject(final String version, final String service, final String language) throws JAXBException {
         final String fileName;
@@ -111,9 +126,7 @@ public abstract class AbstractWorker implements Worker {
         } else {
             fileName = service + "Capabilities" + version + '-' + language + ".xml";
         }
-        final String home = null;
-       
-        final boolean update  = WebServiceUtilities.getUpdateCapabilitiesFlag(home);
+        final boolean update  = WebServiceUtilities.getUpdateCapabilitiesFlag();
 
         //Look if the template capabilities is already in cache.
         Object response = capabilities.get(fileName);
@@ -122,12 +135,18 @@ public abstract class AbstractWorker implements Worker {
                 LOGGER.log(logLevel, "updating metadata");
             }
 
-            final File f = WebServiceUtilities.getFile(fileName, home);
+            final File configDirectory = getConfigurationDirectory(service);
+            final File f;
+            if (configDirectory != null && configDirectory.exists()) {
+                f = new File(configDirectory, fileName);
+            } else {
+                f = null;
+            }
             Unmarshaller unmarshaller = null;
             try {
                 unmarshaller = getMarshallerPool().acquireUnmarshaller();
                 // If the file is not present in the configuration directory, take the one in resource.
-                if (!f.exists()) {
+                if (f == null || !f.exists()) {
                     final InputStream in = getClass().getResourceAsStream(fileName);
                     response = unmarshaller.unmarshal(in);
                     in.close();
@@ -141,24 +160,34 @@ public abstract class AbstractWorker implements Worker {
 
                 capabilities.put(fileName, response);
             } catch (IOException ex) {
-                LOGGER.warning("Unable to close the skeleton capabilities input stream.");
+                LOGGER.log(Level.WARNING, "Unable to close the skeleton capabilities input stream.", ex);
             } finally {
                 if (unmarshaller != null) {
                     getMarshallerPool().release(unmarshaller);
                 }
             }
 
-            WebServiceUtilities.storeUpdateCapabilitiesFlag(home);
+            WebServiceUtilities.storeUpdateCapabilitiesFlag();
         }
         return response;
     }
 
+    /**
+     * Return the marshaller pool used to unmarshaller the capabilities documents of the service.
+     *
+     * @return the marshaller pool used to unmarshaller the capabilities documents of the service.
+     */
     protected abstract MarshallerPool getMarshallerPool();
 
 
-    /**
-     * Look for the service configuration directory.
-     */
+   /**
+    * Look for the service configuration directory.
+    *
+    * @param service The service type identifier. example "WMS"
+    *
+    * @return The configuration directory of the service or {@code null}
+    * if there is no configuration directory for this service.
+    */
     protected File getConfigurationDirectory(String service) {
         final File configDir = ConfigDirectory.getConfigDirectory();
         if (configDir != null && configDir.exists()) {
